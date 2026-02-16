@@ -1,14 +1,21 @@
+using System.Text;
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
+using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.MultiTenancy;
 using GlobCRM.Infrastructure.Persistence;
 using GlobCRM.Infrastructure.Persistence.Interceptors;
+using Microsoft.AspNetCore.Authentication.BearerToken;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
 
 namespace GlobCRM.Infrastructure;
 
@@ -27,15 +34,17 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
-        // Register EF Core interceptors
+        // ---- EF Core interceptors ----
         services.AddScoped<TenantDbConnectionInterceptor>();
         services.AddScoped<AuditableEntityInterceptor>();
 
-        // Register TenantDbContext (tenant catalog -- not tenant-scoped)
+        // ---- Database contexts ----
+
+        // TenantDbContext (tenant catalog -- not tenant-scoped)
         services.AddDbContext<TenantDbContext>(options =>
             options.UseNpgsql(connectionString));
 
-        // Register ApplicationDbContext (tenant-scoped) with interceptors
+        // ApplicationDbContext (tenant-scoped) with interceptors
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(connectionString);
@@ -44,7 +53,7 @@ public static class DependencyInjection
                 serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
         });
 
-        // Register Finbuckle multi-tenancy
+        // ---- Finbuckle multi-tenancy ----
         var multiTenantBuilder = services
             .AddMultiTenant<TenantInfo>()
             .WithHostStrategy("__tenant__.globcrm.com")
@@ -56,8 +65,70 @@ public static class DependencyInjection
             multiTenantBuilder.WithHeaderStrategy("X-Tenant-Id");
         }
 
-        // Register TenantProvider as ITenantProvider (scoped, resolves per-request)
+        // TenantProvider as ITenantProvider (scoped, resolves per-request)
         services.AddScoped<ITenantProvider, TenantProvider>();
+
+        // ---- ASP.NET Core Identity ----
+        services.AddIdentityApiEndpoints<ApplicationUser>()
+            .AddRoles<IdentityRole<Guid>>()
+            .AddClaimsPrincipalFactory<CustomClaimsFactory>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+
+        // Identity options: password policy, lockout, email confirmation
+        services.Configure<IdentityOptions>(options =>
+        {
+            // Require email confirmation before login
+            options.SignIn.RequireConfirmedEmail = true;
+
+            // Password policy per locked decisions
+            options.Password.RequireDigit = true;
+            options.Password.RequireLowercase = true;
+            options.Password.RequireUppercase = true;
+            options.Password.RequireNonAlphanumeric = true;
+            options.Password.RequiredLength = 8;
+
+            // Lockout: 15 minutes after 5 failed attempts
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+        });
+
+        // Email confirmation / password reset token lifespan: 24 hours
+        services.Configure<DataProtectionTokenProviderOptions>(options =>
+        {
+            options.TokenLifespan = TimeSpan.FromHours(24);
+        });
+
+        // Bearer token configuration for built-in Identity API endpoints
+        services.Configure<BearerTokenOptions>(IdentityConstants.BearerScheme, options =>
+        {
+            options.BearerTokenExpiration = TimeSpan.FromMinutes(30);  // Default session
+            options.RefreshTokenExpiration = TimeSpan.FromDays(30);    // Max with "Remember me"
+        });
+
+        // ---- JWT Bearer authentication (for validating custom login tokens) ----
+        services.AddAuthentication(options =>
+        {
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = configuration["Jwt:Issuer"],
+                ValidAudience = configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
+            };
+        });
+
+        // ---- Authorization ----
+        services.AddAuthorization();
 
         return services;
     }
