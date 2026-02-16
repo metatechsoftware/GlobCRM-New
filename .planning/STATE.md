@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 2 of 11 (Core Infrastructure)
-Plan: 3 of 12 in current phase
+Plan: 4 of 12 in current phase
 Status: Executing
-Last activity: 2026-02-16 — Plan 02-03 complete (User Profile & Avatar)
+Last activity: 2026-02-16 — Plan 02-04 complete (RBAC Authorization Engine)
 
-Progress: [██▌░░░░░░░] 3/12 plans (Phase 2)
+Progress: [███░░░░░░░] 4/12 plans (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 11
+- Total plans completed: 12
 - Average duration: 7 min
 - Total execution time: ~1 hour
 
@@ -28,7 +28,7 @@ Progress: [██▌░░░░░░░] 3/12 plans (Phase 2)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
-| 02-core-infrastructure | 3 | ~24min | 8min |
+| 02-core-infrastructure | 4 | ~29min | 7min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -37,6 +37,7 @@ Progress: [██▌░░░░░░░] 3/12 plans (Phase 2)
 *Updated after each plan completion*
 | Phase 02 P01 | 7min | 2 tasks | 18 files |
 | Phase 02 P03 | 12min | 2 tasks | 12 files |
+| Phase 02 P04 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -77,6 +78,9 @@ Recent decisions affecting current work:
 - [02-03] SkiaSharp 3.119.2 for avatar processing (MIT license, free -- not ImageSharp $4999)
 - [02-03] IFileStorageService abstraction with LocalFileStorageService for tenant-partitioned local storage
 - [02-03] JSONB columns use System.Text.Json HasConversion for Dictionary<> property support
+- [02-04] Per-user HashSet cache key tracking for targeted permission cache invalidation
+- [02-04] Field access defaults to Editable when no RoleFieldPermission exists (open by default)
+- [02-04] Startup seeding for existing tenants; new org seeding deferred to CreateOrganization handler
 
 ### Pending Todos
 
@@ -89,5 +93,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-03-PLAN.md (User Profile & Avatar)
-Resume file: .planning/phases/02-core-infrastructure/02-03-SUMMARY.md
+Stopped at: Completed 02-04-PLAN.md (RBAC Authorization Engine)
+Resume file: .planning/phases/02-core-infrastructure/02-04-SUMMARY.md
