@@ -1,4 +1,3 @@
-using Finbuckle.MultiTenant;
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using GlobCRM.Domain.Entities;
@@ -7,6 +6,7 @@ using GlobCRM.Infrastructure.Persistence.Configurations;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using TenantInfo = GlobCRM.Infrastructure.MultiTenancy.TenantInfo;
 
 namespace GlobCRM.Infrastructure.Persistence;
 

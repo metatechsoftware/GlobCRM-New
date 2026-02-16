@@ -1,3 +1,6 @@
+using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using GlobCRM.Api.Middleware;
+using GlobCRM.Infrastructure;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,7 +24,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Identity, Finbuckle, and JWT authentication will be configured in Plan 03
+// Register Infrastructure services (Finbuckle, DbContexts, interceptors, tenant provider)
+builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 
 var app = builder.Build();
 
@@ -32,9 +36,14 @@ app.UseHttpsRedirection();
 
 app.UseCors("AllowAngularDev");
 
-// Authentication and authorization middleware will be added in Plan 03
-// app.UseAuthentication();
-// app.UseAuthorization();
+// Finbuckle tenant resolution -- MUST come before UseAuthentication
+app.UseMultiTenant();
+
+// Custom tenant validation middleware
+app.UseTenantResolution();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

@@ -1,4 +1,6 @@
+using Finbuckle.MultiTenant.EntityFrameworkCore.Stores;
 using GlobCRM.Domain.Entities;
+using GlobCRM.Infrastructure.MultiTenancy;
 using GlobCRM.Infrastructure.Persistence.Configurations;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,11 +8,12 @@ namespace GlobCRM.Infrastructure.Persistence;
 
 /// <summary>
 /// Tenant catalog DbContext. NOT tenant-scoped.
+/// Extends Finbuckle's EFCoreStoreDbContext to serve as the Finbuckle tenant store.
 /// Holds the Organization (tenant) table for lookup and management.
 /// This context is used for operations that span all tenants
 /// (e.g., subdomain resolution, org creation, admin operations).
 /// </summary>
-public class TenantDbContext : DbContext
+public class TenantDbContext : EFCoreStoreDbContext<TenantInfo>
 {
     public TenantDbContext(DbContextOptions<TenantDbContext> options)
         : base(options)
@@ -24,5 +27,14 @@ public class TenantDbContext : DbContext
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
+
+        // Configure the Finbuckle TenantInfo entity
+        modelBuilder.Entity<TenantInfo>(entity =>
+        {
+            entity.ToTable("tenant_info");
+
+            entity.Property(t => t.OrganizationId)
+                .HasColumnName("organization_id");
+        });
     }
 }
