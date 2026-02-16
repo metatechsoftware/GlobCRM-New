@@ -7,6 +7,11 @@
     <span class="org-name">{{ authStore.organizationName() }}</span>
   }
 
+  <!-- Nav Links -->
+  <a mat-button routerLink="/dashboard" routerLinkActive="active-link">Dashboard</a>
+  <a mat-button routerLink="/team-directory" routerLinkActive="active-link">Team</a>
+  <a mat-button routerLink="/settings/roles" routerLinkActive="active-link">Settings</a>
+
   <span class="spacer"></span>
 
   <!-- User Menu -->
@@ -21,6 +26,10 @@
       <span class="user-role">{{ authStore.userRole() }}</span>
     </div>
     <mat-divider></mat-divider>
+    <button mat-menu-item routerLink="/profile">
+      <mat-icon>person</mat-icon>
+      <span>My Profile</span>
+    </button>
     <button mat-menu-item (click)="navigateToSecurity()">
       <mat-icon>security</mat-icon>
       <span>Security Settings</span>
