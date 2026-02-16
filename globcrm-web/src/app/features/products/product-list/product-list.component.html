@@ -1,0 +1,49 @@
+<div class="product-list-page">
+  <!-- View Sidebar -->
+  <app-view-sidebar
+    entityType="Product"
+    (viewSelected)="onViewSelected($event)" />
+
+  <!-- Main Content -->
+  <div class="product-list-content">
+    <!-- Header -->
+    <div class="page-header">
+      <h1>Products</h1>
+      <button mat-raised-button color="primary"
+              *appHasPermission="'Product:Create'"
+              (click)="navigateToNewProduct()">
+        <mat-icon>add</mat-icon>
+        New Product
+      </button>
+    </div>
+
+    <!-- Filter Chips -->
+    <app-filter-chips
+      [filters]="filters()"
+      [columnDefinitions]="columnDefinitions()"
+      (filterRemoved)="onFilterRemoved($event)"
+      (filtersCleared)="onFiltersCleared()" />
+
+    <!-- Filter Panel -->
+    <app-filter-panel
+      [columnDefinitions]="columnDefinitions()"
+      [activeFilters]="filters()"
+      (filtersChanged)="onFiltersChanged($event)" />
+
+    <!-- Dynamic Table -->
+    <app-dynamic-table
+      entityType="Product"
+      [data]="displayData()"
+      [columns]="columns()"
+      [columnDefinitions]="columnDefinitions()"
+      [totalCount]="productStore.totalCount()"
+      [pageSize]="productStore.pageSize()"
+      [loading]="productStore.isLoading()"
+      (columnOrderChanged)="onColumnOrderChanged($event)"
+      (columnResized)="onColumnResized($event)"
+      (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
+      (sortChanged)="onSortChanged($event)"
+      (pageChanged)="onPageChanged($event)"
+      (rowEditClicked)="onRowEditClicked($event)" />
+  </div>
+</div>

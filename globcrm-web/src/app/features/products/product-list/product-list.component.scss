@@ -1,0 +1,27 @@
+.product-list-page {
+  display: flex;
+  height: 100%;
+  overflow: hidden;
+}
+
+.product-list-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px 24px;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+    color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+  }
+}
