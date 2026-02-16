@@ -4,7 +4,9 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.Authorization;
 using GlobCRM.Infrastructure.Identity;
+using GlobCRM.Infrastructure.Images;
 using GlobCRM.Infrastructure.MultiTenancy;
 using GlobCRM.Infrastructure.Persistence;
 using GlobCRM.Infrastructure.Persistence.Interceptors;
@@ -137,6 +139,12 @@ public static class DependencyInjection
 
         // ---- Authorization ----
         services.AddAuthorization();
+
+        // ---- RBAC permission authorization (policy provider, handler, permission service, cache) ----
+        services.AddPermissionAuthorization();
+
+        // ---- Image processing and file storage ----
+        services.AddImageServices();
 
         return services;
     }

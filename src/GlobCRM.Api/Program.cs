@@ -1,8 +1,12 @@
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using FluentValidation;
 using GlobCRM.Api.Auth;
+using GlobCRM.Api.Controllers;
 using GlobCRM.Api.Middleware;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Infrastructure;
+using GlobCRM.Infrastructure.Authorization;
+using GlobCRM.Infrastructure.CustomFields;
 using GlobCRM.Infrastructure.Email;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Invitations;
@@ -38,11 +42,18 @@ builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
 builder.Services.AddEmailServices();
 builder.Services.AddOrganizationServices();
 builder.Services.AddInvitationServices();
+builder.Services.AddCustomFieldServices();
+
+// Register profile validators
+builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
 
 var app = builder.Build();
 
 // Seed default roles on startup
 await SeedRolesAsync(app.Services);
+
+// Seed RBAC role templates for all existing tenants
+await SeedRoleTemplatesAsync(app.Services);
 
 // Configure the HTTP request pipeline.
 app.UseSerilogRequestLogging();
@@ -94,4 +105,17 @@ static async Task SeedRolesAsync(IServiceProvider services)
             await roleManager.CreateAsync(new IdentityRole<Guid> { Name = roleName });
         }
     }
+}
+
+/// <summary>
+/// Seeds RBAC role templates (Admin, Manager, Sales Rep, Viewer) for all existing tenants.
+/// Idempotent -- skips tenants that already have templates.
+/// NOTE: For new organizations, the seeding should also be called from the
+/// CreateOrganization handler (Plan 05 or Plan 07 will add that integration).
+/// </summary>
+static async Task SeedRoleTemplatesAsync(IServiceProvider services)
+{
+    using var scope = services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<GlobCRM.Infrastructure.Persistence.ApplicationDbContext>();
+    await RoleTemplateSeeder.SeedAllTenantsAsync(db);
 }
