@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Observable, tap, catchError, throwError, of, EMPTY } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { AuthStore } from './auth.store';
+import { PermissionStore } from '../permissions/permission.store';
 import {
   LoginRequest,
   LoginResponse,
@@ -26,6 +27,7 @@ const REMEMBER_ME_KEY = 'globcrm_remember_me';
 export class AuthService implements OnDestroy {
   private readonly api = inject(ApiService);
   private readonly authStore = inject(AuthStore);
+  private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
   private refreshTimerId: ReturnType<typeof setTimeout> | null = null;
 
@@ -196,6 +198,7 @@ export class AuthService implements OnDestroy {
   logout(): void {
     this.cancelRefreshTimer();
     this.clearStoredTokens();
+    this.permissionStore.clear();
     this.authStore.clearAuth();
     this.router.navigate(['/auth/login']);
   }
@@ -226,6 +229,10 @@ export class AuthService implements OnDestroy {
     }
 
     this.scheduleTokenRefresh(response.expiresIn, response.refreshToken);
+
+    // Load user permissions after successful authentication.
+    // This ensures the PermissionStore is populated before any guards or directives check access.
+    this.permissionStore.loadPermissions();
   }
 
   /**
