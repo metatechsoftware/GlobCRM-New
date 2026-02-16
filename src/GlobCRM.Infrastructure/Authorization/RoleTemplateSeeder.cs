@@ -73,8 +73,8 @@ public static class RoleTemplateSeeder
         // Use IgnoreQueryFilters to see all tenants regardless of current tenant context
         var tenantIds = await db.Users
             .IgnoreQueryFilters()
-            .Where(u => u.OrganizationId != null)
-            .Select(u => u.OrganizationId!.Value)
+            .Where(u => u.OrganizationId != Guid.Empty)
+            .Select(u => u.OrganizationId)
             .Distinct()
             .ToListAsync();
 
