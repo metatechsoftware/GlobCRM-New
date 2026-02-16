@@ -52,6 +52,7 @@ Progress: [████████████░░] 8/9 plans (Phase 3)
 | Phase 03 P03 | 4min | 2 tasks | 3 files |
 | Phase 03 P04 | 9min | 2 tasks | 13 files |
 | Phase 03 P05 | 4min | 2 tasks | 3 files |
+| Phase 03 P06 | 8min | 2 tasks | 8 files |
 | Phase 03 P08 | 5min | 2 tasks | 8 files |
 
 ## Accumulated Context
@@ -141,6 +142,9 @@ Recent decisions affecting current work:
 - [03-05] Team member IDs resolved via ApplicationDbContext.TeamMembers directly (IPermissionService doesn't expose team queries)
 - [03-05] Products have no ownership scope -- shared tenant resources, any user with Product:View sees all
 - [03-05] CompanyId validated on Contact create/update via GetByIdAsync for referential integrity
+- [03-06] Reused ConfirmDeleteDialogComponent from role-list for company delete (DRY dialog sharing across features)
+- [03-06] Contacts tab lazy-loads on first tab switch for better initial load performance
+- [03-06] FilterPanel bindings use activeFilters/filtersChanged (actual API) not filters/filtersApplied (plan names)
 - [03-08] Product list formats unitPrice via Intl.NumberFormat before passing to DynamicTable (no custom cell renderer)
 - [03-08] Product detail uses simple card layout (no tabs, no timeline) -- simpler entity pattern for flat entities
 - [03-08] Entity-timeline date format uses comma separator instead of escaped 'at' for Angular template compatibility
