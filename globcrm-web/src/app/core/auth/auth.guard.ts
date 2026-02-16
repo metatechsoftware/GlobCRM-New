@@ -1,6 +1,48 @@
-import { CanActivateFn } from '@angular/router';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { map, catchError, of } from 'rxjs';
+import { AuthStore } from './auth.store';
+import { AuthService } from './auth.service';
 
-export const authGuard: CanActivateFn = () => {
-  // Placeholder - full implementation in Task 2
-  return true;
+/**
+ * Functional route guard that protects authenticated routes.
+ * - If already authenticated, allows access.
+ * - If not authenticated but has a stored refresh token, attempts silent refresh.
+ * - If all else fails, redirects to /auth/login with returnUrl.
+ */
+export const authGuard: CanActivateFn = (route, state) => {
+  const authStore = inject(AuthStore);
+  const authService = inject(AuthService);
+  const router = inject(Router);
+
+  // Already authenticated, allow access
+  if (authStore.isAuthenticated()) {
+    return true;
+  }
+
+  // Check for stored refresh token and attempt silent refresh
+  const storedRefreshToken = localStorage.getItem('globcrm_refresh_token');
+  if (storedRefreshToken) {
+    return authService.refreshToken(storedRefreshToken).pipe(
+      map((response) => {
+        authStore.setTokens(response.accessToken, response.refreshToken);
+        localStorage.setItem('globcrm_refresh_token', response.refreshToken);
+        return true;
+      }),
+      catchError(() => {
+        localStorage.removeItem('globcrm_refresh_token');
+        localStorage.removeItem('globcrm_remember_me');
+        return of(
+          router.createUrlTree(['/auth/login'], {
+            queryParams: { returnUrl: state.url },
+          })
+        );
+      })
+    );
+  }
+
+  // No authentication, redirect to login
+  return router.createUrlTree(['/auth/login'], {
+    queryParams: { returnUrl: state.url },
+  });
 };
