@@ -30,101 +30,103 @@ import { ProfileService, ProfileDto } from '../profile.service';
       <div class="loading-state">
         <p>Loading profile...</p>
       </div>
-    } @else if (profile(); as p) {
-      <div class="profile-view">
-        <button mat-icon-button (click)="goBack()" class="back-button">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
+    } @else {
+      @if (profile(); as p) {
+        <div class="profile-view">
+          <button mat-icon-button (click)="goBack()" class="back-button">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
 
-        <mat-card class="profile-card">
-          <div class="profile-header">
-            <app-avatar
-              [avatarUrl]="p.avatarUrl"
-              [firstName]="p.firstName"
-              [lastName]="p.lastName"
-              [avatarColor]="p.avatarColor"
-              size="lg" />
-            <div class="profile-name">
-              <h1>{{ p.firstName }} {{ p.lastName }}</h1>
-              @if (p.jobTitle) {
-                <p class="job-title">{{ p.jobTitle }}</p>
-              }
-              @if (p.department) {
-                <p class="department">{{ p.department }}</p>
-              }
-            </div>
-          </div>
-
-          <mat-divider></mat-divider>
-
-          <mat-card-content>
-            <!-- Contact Info -->
-            <div class="info-section">
-              <h3>Contact</h3>
-              <div class="info-row">
-                <mat-icon>email</mat-icon>
-                <span>{{ p.email }}</span>
+          <mat-card class="profile-card">
+            <div class="profile-header">
+              <app-avatar
+                [avatarUrl]="p.avatarUrl"
+                [firstName]="p.firstName"
+                [lastName]="p.lastName"
+                [avatarColor]="p.avatarColor"
+                size="lg" />
+              <div class="profile-name">
+                <h1>{{ p.firstName }} {{ p.lastName }}</h1>
+                @if (p.jobTitle) {
+                  <p class="job-title">{{ p.jobTitle }}</p>
+                }
+                @if (p.department) {
+                  <p class="department">{{ p.department }}</p>
+                }
               </div>
-              @if (p.phone) {
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <mat-card-content>
+              <!-- Contact Info -->
+              <div class="info-section">
+                <h3>Contact</h3>
                 <div class="info-row">
-                  <mat-icon>phone</mat-icon>
-                  <span>{{ p.phone }}</span>
+                  <mat-icon>email</mat-icon>
+                  <span>{{ p.email }}</span>
+                </div>
+                @if (p.phone) {
+                  <div class="info-row">
+                    <mat-icon>phone</mat-icon>
+                    <span>{{ p.phone }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Bio -->
+              @if (p.bio) {
+                <div class="info-section">
+                  <h3>About</h3>
+                  <p class="bio">{{ p.bio }}</p>
                 </div>
               }
-            </div>
 
-            <!-- Bio -->
-            @if (p.bio) {
-              <div class="info-section">
-                <h3>About</h3>
-                <p class="bio">{{ p.bio }}</p>
-              </div>
-            }
+              <!-- Skills -->
+              @if (p.skills && p.skills.length > 0) {
+                <div class="info-section">
+                  <h3>Skills</h3>
+                  <mat-chip-set>
+                    @for (skill of p.skills; track skill) {
+                      <mat-chip>{{ skill }}</mat-chip>
+                    }
+                  </mat-chip-set>
+                </div>
+              }
 
-            <!-- Skills -->
-            @if (p.skills && p.skills.length > 0) {
-              <div class="info-section">
-                <h3>Skills</h3>
-                <mat-chip-set>
-                  @for (skill of p.skills; track skill) {
-                    <mat-chip>{{ skill }}</mat-chip>
+              <!-- Social Links -->
+              @if (p.socialLinks && hasSocialLinks(p.socialLinks)) {
+                <div class="info-section">
+                  <h3>Social</h3>
+                  @if (p.socialLinks['linkedin']) {
+                    <div class="info-row">
+                      <mat-icon>link</mat-icon>
+                      <a [href]="p.socialLinks['linkedin']" target="_blank">LinkedIn</a>
+                    </div>
                   }
-                </mat-chip-set>
-              </div>
-            }
-
-            <!-- Social Links -->
-            @if (p.socialLinks && hasSocialLinks(p.socialLinks)) {
-              <div class="info-section">
-                <h3>Social</h3>
-                @if (p.socialLinks['linkedin']) {
-                  <div class="info-row">
-                    <mat-icon>link</mat-icon>
-                    <a [href]="p.socialLinks['linkedin']" target="_blank">LinkedIn</a>
-                  </div>
-                }
-                @if (p.socialLinks['twitter']) {
-                  <div class="info-row">
-                    <mat-icon>link</mat-icon>
-                    <a [href]="p.socialLinks['twitter']" target="_blank">Twitter / X</a>
-                  </div>
-                }
-                @if (p.socialLinks['github']) {
-                  <div class="info-row">
-                    <mat-icon>link</mat-icon>
-                    <a [href]="p.socialLinks['github']" target="_blank">GitHub</a>
-                  </div>
-                }
-              </div>
-            }
-          </mat-card-content>
-        </mat-card>
-      </div>
-    } @else {
-      <div class="empty-state">
-        <h3>Profile not found</h3>
-        <button mat-stroked-button (click)="goBack()">Go Back</button>
-      </div>
+                  @if (p.socialLinks['twitter']) {
+                    <div class="info-row">
+                      <mat-icon>link</mat-icon>
+                      <a [href]="p.socialLinks['twitter']" target="_blank">Twitter / X</a>
+                    </div>
+                  }
+                  @if (p.socialLinks['github']) {
+                    <div class="info-row">
+                      <mat-icon>link</mat-icon>
+                      <a [href]="p.socialLinks['github']" target="_blank">GitHub</a>
+                    </div>
+                  }
+                </div>
+              }
+            </mat-card-content>
+          </mat-card>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <h3>Profile not found</h3>
+          <button mat-stroked-button (click)="goBack()">Go Back</button>
+        </div>
+      }
     }
   `,
   styles: [`
