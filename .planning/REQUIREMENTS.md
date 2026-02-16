@@ -254,142 +254,142 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| AUTH-05 | — | Pending |
-| AUTH-06 | — | Pending |
-| AUTH-07 | — | Pending |
-| AUTH-08 | — | Pending |
-| RBAC-01 | — | Pending |
-| RBAC-02 | — | Pending |
-| RBAC-03 | — | Pending |
-| RBAC-04 | — | Pending |
-| RBAC-05 | — | Pending |
-| RBAC-06 | — | Pending |
-| COMP-01 | — | Pending |
-| COMP-02 | — | Pending |
-| COMP-03 | — | Pending |
-| COMP-04 | — | Pending |
-| COMP-05 | — | Pending |
-| CONT-01 | — | Pending |
-| CONT-02 | — | Pending |
-| CONT-03 | — | Pending |
-| CONT-04 | — | Pending |
-| CONT-05 | — | Pending |
-| CONT-06 | — | Pending |
-| PROD-01 | — | Pending |
-| PROD-02 | — | Pending |
-| PROD-03 | — | Pending |
-| PROD-04 | — | Pending |
-| PROD-05 | — | Pending |
-| DEAL-01 | — | Pending |
-| DEAL-02 | — | Pending |
-| DEAL-03 | — | Pending |
-| DEAL-04 | — | Pending |
-| DEAL-05 | — | Pending |
-| DEAL-06 | — | Pending |
-| DEAL-07 | — | Pending |
-| DEAL-08 | — | Pending |
-| DEAL-09 | — | Pending |
-| DEAL-10 | — | Pending |
-| QUOT-01 | — | Pending |
-| QUOT-02 | — | Pending |
-| QUOT-03 | — | Pending |
-| QUOT-04 | — | Pending |
-| QUOT-05 | — | Pending |
-| QUOT-06 | — | Pending |
-| QUOT-07 | — | Pending |
-| QUOT-08 | — | Pending |
-| ACTV-01 | — | Pending |
-| ACTV-02 | — | Pending |
-| ACTV-03 | — | Pending |
-| ACTV-04 | — | Pending |
-| ACTV-05 | — | Pending |
-| ACTV-06 | — | Pending |
-| ACTV-07 | — | Pending |
-| ACTV-08 | — | Pending |
-| ACTV-09 | — | Pending |
-| ACTV-10 | — | Pending |
-| ACTV-11 | — | Pending |
-| ACTV-12 | — | Pending |
-| ACTV-13 | — | Pending |
-| ACTV-14 | — | Pending |
-| REQS-01 | — | Pending |
-| REQS-02 | — | Pending |
-| REQS-03 | — | Pending |
-| REQS-04 | — | Pending |
-| REQS-05 | — | Pending |
-| REQS-06 | — | Pending |
-| CALR-01 | — | Pending |
-| CALR-02 | — | Pending |
-| CALR-03 | — | Pending |
-| CALR-04 | — | Pending |
-| CALR-05 | — | Pending |
-| NOTE-01 | — | Pending |
-| NOTE-02 | — | Pending |
-| NOTE-03 | — | Pending |
-| NOTE-04 | — | Pending |
-| ATCH-01 | — | Pending |
-| ATCH-02 | — | Pending |
-| ATCH-03 | — | Pending |
-| ATCH-04 | — | Pending |
-| MAIL-01 | — | Pending |
-| MAIL-02 | — | Pending |
-| MAIL-03 | — | Pending |
-| MAIL-04 | — | Pending |
-| MAIL-05 | — | Pending |
-| MAIL-06 | — | Pending |
-| MAIL-07 | — | Pending |
-| FEED-01 | — | Pending |
-| FEED-02 | — | Pending |
-| FEED-03 | — | Pending |
-| FEED-04 | — | Pending |
-| FEED-05 | — | Pending |
-| NOTF-01 | — | Pending |
-| NOTF-02 | — | Pending |
-| NOTF-03 | — | Pending |
-| NOTF-04 | — | Pending |
-| NOTF-05 | — | Pending |
-| NOTF-06 | — | Pending |
-| DASH-01 | — | Pending |
-| DASH-02 | — | Pending |
-| DASH-03 | — | Pending |
-| DASH-04 | — | Pending |
-| DASH-05 | — | Pending |
-| DASH-06 | — | Pending |
-| VIEW-01 | — | Pending |
-| VIEW-02 | — | Pending |
-| VIEW-03 | — | Pending |
-| VIEW-04 | — | Pending |
-| VIEW-05 | — | Pending |
-| VIEW-06 | — | Pending |
-| CUST-01 | — | Pending |
-| CUST-02 | — | Pending |
-| CUST-03 | — | Pending |
-| CUST-04 | — | Pending |
-| CUST-05 | — | Pending |
-| CUST-06 | — | Pending |
-| CUST-07 | — | Pending |
-| IMPT-01 | — | Pending |
-| IMPT-02 | — | Pending |
-| IMPT-03 | — | Pending |
-| IMPT-04 | — | Pending |
-| IMPT-05 | — | Pending |
-| SRCH-01 | — | Pending |
-| SRCH-02 | — | Pending |
-| SRCH-03 | — | Pending |
-| SRCH-04 | — | Pending |
-| RESP-01 | — | Pending |
-| RESP-02 | — | Pending |
-| RESP-03 | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| AUTH-05 | Phase 1 | Pending |
+| AUTH-06 | Phase 1 | Pending |
+| AUTH-07 | Phase 1 | Pending |
+| AUTH-08 | Phase 1 | Pending |
+| RBAC-01 | Phase 2 | Pending |
+| RBAC-02 | Phase 2 | Pending |
+| RBAC-03 | Phase 2 | Pending |
+| RBAC-04 | Phase 2 | Pending |
+| RBAC-05 | Phase 2 | Pending |
+| RBAC-06 | Phase 2 | Pending |
+| CUST-01 | Phase 2 | Pending |
+| CUST-02 | Phase 2 | Pending |
+| CUST-03 | Phase 2 | Pending |
+| CUST-04 | Phase 2 | Pending |
+| CUST-05 | Phase 2 | Pending |
+| CUST-06 | Phase 2 | Pending |
+| CUST-07 | Phase 2 | Pending |
+| VIEW-01 | Phase 2 | Pending |
+| VIEW-02 | Phase 2 | Pending |
+| VIEW-03 | Phase 2 | Pending |
+| VIEW-04 | Phase 2 | Pending |
+| VIEW-05 | Phase 2 | Pending |
+| VIEW-06 | Phase 2 | Pending |
+| COMP-01 | Phase 3 | Pending |
+| COMP-02 | Phase 3 | Pending |
+| COMP-03 | Phase 3 | Pending |
+| COMP-04 | Phase 3 | Pending |
+| COMP-05 | Phase 3 | Pending |
+| CONT-01 | Phase 3 | Pending |
+| CONT-02 | Phase 3 | Pending |
+| CONT-03 | Phase 3 | Pending |
+| CONT-04 | Phase 3 | Pending |
+| CONT-05 | Phase 3 | Pending |
+| CONT-06 | Phase 3 | Pending |
+| PROD-01 | Phase 3 | Pending |
+| PROD-02 | Phase 3 | Pending |
+| PROD-03 | Phase 3 | Pending |
+| PROD-04 | Phase 3 | Pending |
+| PROD-05 | Phase 3 | Pending |
+| DEAL-01 | Phase 4 | Pending |
+| DEAL-02 | Phase 4 | Pending |
+| DEAL-03 | Phase 4 | Pending |
+| DEAL-04 | Phase 4 | Pending |
+| DEAL-05 | Phase 4 | Pending |
+| DEAL-06 | Phase 4 | Pending |
+| DEAL-07 | Phase 4 | Pending |
+| DEAL-08 | Phase 4 | Pending |
+| DEAL-09 | Phase 4 | Pending |
+| DEAL-10 | Phase 4 | Pending |
+| ACTV-01 | Phase 5 | Pending |
+| ACTV-02 | Phase 5 | Pending |
+| ACTV-03 | Phase 5 | Pending |
+| ACTV-04 | Phase 5 | Pending |
+| ACTV-05 | Phase 5 | Pending |
+| ACTV-06 | Phase 5 | Pending |
+| ACTV-07 | Phase 5 | Pending |
+| ACTV-08 | Phase 5 | Pending |
+| ACTV-09 | Phase 5 | Pending |
+| ACTV-10 | Phase 5 | Pending |
+| ACTV-11 | Phase 5 | Pending |
+| ACTV-12 | Phase 5 | Pending |
+| ACTV-13 | Phase 5 | Pending |
+| ACTV-14 | Phase 5 | Pending |
+| QUOT-01 | Phase 6 | Pending |
+| QUOT-02 | Phase 6 | Pending |
+| QUOT-03 | Phase 6 | Pending |
+| QUOT-04 | Phase 6 | Pending |
+| QUOT-05 | Phase 6 | Pending |
+| QUOT-06 | Phase 6 | Pending |
+| QUOT-07 | Phase 6 | Pending |
+| QUOT-08 | Phase 6 | Pending |
+| REQS-01 | Phase 6 | Pending |
+| REQS-02 | Phase 6 | Pending |
+| REQS-03 | Phase 6 | Pending |
+| REQS-04 | Phase 6 | Pending |
+| REQS-05 | Phase 6 | Pending |
+| REQS-06 | Phase 6 | Pending |
+| MAIL-01 | Phase 7 | Pending |
+| MAIL-02 | Phase 7 | Pending |
+| MAIL-03 | Phase 7 | Pending |
+| MAIL-04 | Phase 7 | Pending |
+| MAIL-05 | Phase 7 | Pending |
+| MAIL-06 | Phase 7 | Pending |
+| MAIL-07 | Phase 7 | Pending |
+| NOTF-01 | Phase 8 | Pending |
+| NOTF-02 | Phase 8 | Pending |
+| NOTF-03 | Phase 8 | Pending |
+| NOTF-04 | Phase 8 | Pending |
+| NOTF-05 | Phase 8 | Pending |
+| NOTF-06 | Phase 8 | Pending |
+| FEED-01 | Phase 8 | Pending |
+| FEED-02 | Phase 8 | Pending |
+| FEED-03 | Phase 8 | Pending |
+| FEED-04 | Phase 8 | Pending |
+| FEED-05 | Phase 8 | Pending |
+| DASH-01 | Phase 9 | Pending |
+| DASH-02 | Phase 9 | Pending |
+| DASH-03 | Phase 9 | Pending |
+| DASH-04 | Phase 9 | Pending |
+| DASH-05 | Phase 9 | Pending |
+| DASH-06 | Phase 9 | Pending |
+| IMPT-01 | Phase 10 | Pending |
+| IMPT-02 | Phase 10 | Pending |
+| IMPT-03 | Phase 10 | Pending |
+| IMPT-04 | Phase 10 | Pending |
+| IMPT-05 | Phase 10 | Pending |
+| SRCH-01 | Phase 10 | Pending |
+| SRCH-02 | Phase 10 | Pending |
+| SRCH-03 | Phase 10 | Pending |
+| SRCH-04 | Phase 10 | Pending |
+| CALR-01 | Phase 11 | Pending |
+| CALR-02 | Phase 11 | Pending |
+| CALR-03 | Phase 11 | Pending |
+| CALR-04 | Phase 11 | Pending |
+| CALR-05 | Phase 11 | Pending |
+| NOTE-01 | Phase 11 | Pending |
+| NOTE-02 | Phase 11 | Pending |
+| NOTE-03 | Phase 11 | Pending |
+| NOTE-04 | Phase 11 | Pending |
+| ATCH-01 | Phase 11 | Pending |
+| ATCH-02 | Phase 11 | Pending |
+| ATCH-03 | Phase 11 | Pending |
+| ATCH-04 | Phase 11 | Pending |
+| RESP-01 | Phase 11 | Pending |
+| RESP-02 | Phase 11 | Pending |
+| RESP-03 | Phase 11 | Pending |
 
 **Coverage:**
 - v1 requirements: 107 total
-- Mapped to phases: 0
-- Unmapped: 107 (pending roadmap creation)
+- Mapped to phases: 107
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-16*
-*Last updated: 2026-02-16 after initial definition*
+*Last updated: 2026-02-16 after roadmap creation*
