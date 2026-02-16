@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 2 (Core Infrastructure)
+**Current focus:** Phase 3 (Core CRM Entities)
 
 ## Current Position
 
-Phase: 2 of 11 (Core Infrastructure)
-Plan: 14 of 14 in current phase
-Status: Phase Complete
-Last activity: 2026-02-16 — Plan 02-13 complete (Frontend Permission Enforcement)
+Phase: 3 of 11 (Core CRM Entities)
+Plan: 2 of 9 in current phase
+Status: In Progress
+Last activity: 2026-02-16 — Plan 03-02 complete (Frontend Entity Data Layer)
 
-Progress: [██████████████] 14/14 plans (Phase 2)
+Progress: [███░░░░░░░░░░░] 2/9 plans (Phase 3)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19
-- Average duration: 7 min
-- Total execution time: ~1.5 hours
+- Total plans completed: 21
+- Average duration: 6 min
+- Total execution time: ~1.6 hours
 
 **By Phase:**
 
@@ -29,6 +29,7 @@ Progress: [██████████████] 14/14 plans (Phase 2)
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
+| 03-core-crm-entities | 2 | ~4min | 2min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -46,6 +47,7 @@ Progress: [██████████████] 14/14 plans (Phase 2)
 | Phase 02 P11 | 10min | 2 tasks | 17 files |
 | Phase 02 P13 | 2min | 1 task | 8 files |
 | Phase 02 P14 | 2min | 1 task | 2 files |
+| Phase 03 P02 | 2min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -116,6 +118,9 @@ Recent decisions affecting current work:
 - [02-13] adminGuard (role-based) for settings route protection -- backend uses Authorize(Roles = "Admin"), not entity permissions
 - [02-13] Contact entity permissions as proxy for *appHasPermission on settings buttons -- Admin has All scope on all entity CRUD
 - [02-14] Raw SQL migration via migrationBuilder.Sql() for GIN indexes (EF Core has no native GIN index API)
+- [03-02] Shared query models (PagedResult, EntityQueryParams, FilterParam, TimelineEntry) in shared/models/query.models.ts
+- [03-02] Product detail uses ProductDto directly (no separate ProductDetailDto) -- fewer fields than Company/Contact
+- [03-02] Entity signal stores are component-provided (not root), matching ViewStore pattern for per-page isolation
 
 ### Pending Todos
 
@@ -128,5 +133,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-13-PLAN.md (Frontend Permission Enforcement) -- Phase 2 fully complete (14/14)
-Resume file: .planning/phases/02-core-infrastructure/02-13-SUMMARY.md
+Stopped at: Completed 03-02-PLAN.md (Frontend Entity Data Layer) -- Phase 3 in progress (2/9)
+Resume file: .planning/phases/03-core-crm-entities/03-02-SUMMARY.md
