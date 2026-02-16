@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 1 of 11 (Foundation)
-Plan: 5 of 8 in current phase
+Plan: 7 of 8 in current phase
 Status: Executing
-Last activity: 2026-02-16 — Completed 01-04-PLAN.md
+Last activity: 2026-02-16 — Completed 01-06-PLAN.md
 
-Progress: [████░░░░░░] 4/8 plans
+Progress: [███████░░░] 6/8 plans
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4
+- Total plans completed: 6
 - Average duration: 7 min
-- Total execution time: 0.47 hours
+- Total execution time: 0.70 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 4 | 28min | 7min |
+| 01-foundation | 6 | 42min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-01 (8min), 01-02 (6min), 01-03 (~7min), 01-04 (7min)
+- Last 5 plans: 01-02 (6min), 01-03 (~7min), 01-04 (7min), 01-05 (7min), 01-06 (7min)
 - Trend: Consistent ~7min per plan
 
 *Updated after each plan completion*
@@ -60,6 +60,10 @@ Recent decisions affecting current work:
 - [Phase 01-03]: TenantDbContext extends EFCoreStoreDbContext for Finbuckle EF Core store integration
 - [Phase 01-03]: JWT bearer as default auth scheme; custom login endpoint generates JWTs with organizationId claim
 - [Phase 01-03]: Development mode uses WithHeaderStrategy('X-Tenant-Id') fallback for local testing without subdomains
+- [01-05] Cross-tenant invitation token lookup uses IgnoreQueryFilters() since accepting user has no tenant context
+- [01-05] LogoutEndpoint in Api project (not Application) due to HttpContext/IResult dependency
+- [01-05] Application layer avoids EF Core dependency: uses FindByEmailAsync and synchronous IQueryable.Count()
+- [01-05] InvitationServiceExtensions follows per-subsystem DI pattern; all services registered in Program.cs
 
 ### Pending Todos
 
@@ -72,5 +76,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 01-04-PLAN.md
-Resume file: .planning/phases/01-foundation/01-04-SUMMARY.md
+Stopped at: Completed 01-05-PLAN.md
+Resume file: .planning/phases/01-foundation/01-05-SUMMARY.md
