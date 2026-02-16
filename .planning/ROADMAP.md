@@ -90,10 +90,18 @@ Plans:
   4. Contact list page uses dynamic table and contact detail shows entity timeline
   5. User can navigate from company to related contacts, deals, quotes, and activities
   6. User can create products with name, description, unit price, SKU, and category for use in quotes
-**Plans**: TBD
+**Plans**: 9 plans
 
 Plans:
-- TBD
+- [ ] 03-01-PLAN.md -- Backend domain entities (Company, Contact, Product) + EF Core configs + migration + RLS
+- [ ] 03-02-PLAN.md -- Frontend entity models, API services, and NgRx Signal Stores
+- [ ] 03-03-PLAN.md -- Frontend shared components (custom-field-form, entity-timeline, related-entity-tabs)
+- [ ] 03-04-PLAN.md -- Backend repositories with server-side query + TenantSeeder + permission seeder update
+- [ ] 03-05-PLAN.md -- Backend API controllers (Companies, Contacts, Products) + timeline endpoints
+- [ ] 03-06-PLAN.md -- Frontend Company feature (list + detail + form pages)
+- [ ] 03-07-PLAN.md -- Frontend Contact feature (list + detail + form pages with company linking)
+- [ ] 03-08-PLAN.md -- Frontend Product feature (list + detail + form pages)
+- [ ] 03-09-PLAN.md -- Navbar CRM navigation + app routing + E2E verification checkpoint
 
 ### Phase 4: Deals & Pipelines
 **Goal**: Configurable deal pipelines with Kanban board and multiple views
@@ -240,8 +248,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Foundation | 0/8 | Planned | - |
-| 2. Core Infrastructure | 0/TBD | Not started | - |
-| 3. Core CRM Entities | 0/TBD | Not started | - |
+| 2. Core Infrastructure | 0/14 | Not started | - |
+| 3. Core CRM Entities | 0/9 | Not started | - |
 | 4. Deals & Pipelines | 0/TBD | Not started | - |
 | 5. Activities & Workflow | 0/TBD | Not started | - |
 | 6. Quotes & Requests | 0/TBD | Not started | - |
