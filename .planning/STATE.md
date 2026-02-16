@@ -57,6 +57,9 @@ Recent decisions affecting current work:
 - [01-04] Separate DI extension methods per subsystem (EmailServiceExtensions, OrganizationServiceExtensions) for parallel-safe registration
 - [01-04] TenantSeeder uses seed manifest pattern -- data structure now, entity creation in Phase 3
 - [01-04] Reserved subdomain list includes infrastructure (www, api, cdn) and product names (app, dashboard, console)
+- [Phase 01-03]: TenantDbContext extends EFCoreStoreDbContext for Finbuckle EF Core store integration
+- [Phase 01-03]: JWT bearer as default auth scheme; custom login endpoint generates JWTs with organizationId claim
+- [Phase 01-03]: Development mode uses WithHeaderStrategy('X-Tenant-Id') fallback for local testing without subdomains
 
 ### Pending Todos
 
