@@ -1,0 +1,125 @@
+<div class="custom-field-list">
+  <div class="page-header">
+    <h1>Custom Field Definitions</h1>
+    <div class="header-actions">
+      <mat-slide-toggle
+        [checked]="showDeleted()"
+        (change)="toggleShowDeleted()"
+        color="primary">
+        Show Deleted
+      </mat-slide-toggle>
+      <button mat-stroked-button (click)="toggleSectionManager()">
+        <mat-icon>folder_open</mat-icon>
+        Manage Sections
+      </button>
+      <button mat-flat-button color="primary" (click)="openAddDialog()">
+        <mat-icon>add</mat-icon>
+        Add Field
+      </button>
+    </div>
+  </div>
+
+  <mat-tab-group (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
+    @for (entityType of entityTypes; track entityType) {
+      <mat-tab [label]="entityType">
+        <div class="tab-content">
+          @if (showSectionManager()) {
+            <div class="section-manager">
+              <h3>Sections for {{ selectedEntityType() }}</h3>
+              @for (section of sections(); track section.id) {
+                <div class="section-item">
+                  <span class="section-name">{{ section.name }}</span>
+                  <span class="section-order">Order: {{ section.sortOrder }}</span>
+                </div>
+              }
+              @if (sections().length === 0) {
+                <p class="empty-message">No sections defined. Fields will appear under "General".</p>
+              }
+            </div>
+          }
+
+          @if (loading()) {
+            <div class="loading-indicator">
+              <p>Loading fields...</p>
+            </div>
+          } @else if (fieldGroups().length === 0) {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">playlist_add</mat-icon>
+              <h3>No custom fields defined</h3>
+              <p>Add custom fields to extend {{ selectedEntityType() }} records with additional data.</p>
+              <button mat-flat-button color="primary" (click)="openAddDialog()">
+                <mat-icon>add</mat-icon>
+                Add First Field
+              </button>
+            </div>
+          } @else {
+            @for (group of fieldGroups(); track group.sectionId) {
+              <mat-expansion-panel [expanded]="true" class="section-panel">
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    {{ group.sectionName }}
+                    <span class="field-count">({{ group.fields.length }} fields)</span>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <table mat-table [dataSource]="group.fields" class="fields-table">
+                  <ng-container matColumnDef="label">
+                    <th mat-header-cell *matHeaderCellDef>Label</th>
+                    <td mat-cell *matCellDef="let field">{{ field.label }}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <td mat-cell *matCellDef="let field">
+                      <code class="field-name">{{ field.name }}</code>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="fieldType">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let field">
+                      <span class="type-chip" [attr.data-type]="field.fieldType">
+                        {{ field.fieldType }}
+                      </span>
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="required">
+                    <th mat-header-cell *matHeaderCellDef>Required</th>
+                    <td mat-cell *matCellDef="let field">
+                      @if (field.validation?.required) {
+                        <mat-icon class="required-icon">check_circle</mat-icon>
+                      } @else {
+                        <mat-icon class="optional-icon">radio_button_unchecked</mat-icon>
+                      }
+                    </td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="sortOrder">
+                    <th mat-header-cell *matHeaderCellDef>Order</th>
+                    <td mat-cell *matCellDef="let field">{{ field.sortOrder }}</td>
+                  </ng-container>
+
+                  <ng-container matColumnDef="actions">
+                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <td mat-cell *matCellDef="let field">
+                      <button mat-icon-button matTooltip="Edit" (click)="openEditDialog(field)">
+                        <mat-icon>edit</mat-icon>
+                      </button>
+                      <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteField(field)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </td>
+                  </ng-container>
+
+                  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+                </table>
+              </mat-expansion-panel>
+            }
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</div>

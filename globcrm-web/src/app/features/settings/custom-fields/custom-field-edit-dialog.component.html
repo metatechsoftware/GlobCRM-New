@@ -1,0 +1,170 @@
+<h2 mat-dialog-title>{{ isCreateMode() ? 'Create Custom Field' : 'Edit Custom Field' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="field-form">
+    <!-- Basic Info -->
+    <div class="form-section">
+      <h3>Basic Information</h3>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Label</mat-label>
+        <input matInput formControlName="label" placeholder="e.g. Company Size" />
+        @if (form.get('label')?.hasError('required') && form.get('label')?.touched) {
+          <mat-error>Label is required</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Name (API identifier)</mat-label>
+        <input matInput formControlName="name" placeholder="Auto-generated from label" />
+        @if (!isCreateMode()) {
+          <mat-hint>Name cannot be changed after creation</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Field Type</mat-label>
+        <mat-select formControlName="fieldType">
+          @for (type of fieldTypes; track type) {
+            <mat-option [value]="type">{{ type }}</mat-option>
+          }
+        </mat-select>
+        @if (!isCreateMode()) {
+          <mat-hint>Type cannot be changed after creation</mat-hint>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Section</mat-label>
+        <mat-select formControlName="sectionId">
+          <mat-option [value]="null">General (no section)</mat-option>
+          @for (section of data.sections; track section.id) {
+            <mat-option [value]="section.id">{{ section.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="half-width">
+        <mat-label>Sort Order</mat-label>
+        <input matInput formControlName="sortOrder" type="number" />
+      </mat-form-field>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Type-specific fields -->
+    @if (showTextValidation()) {
+      <div class="form-section">
+        <h3>Text Validation</h3>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Min Length</mat-label>
+            <input matInput formControlName="minLength" type="number" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Max Length</mat-label>
+            <input matInput formControlName="maxLength" type="number" />
+          </mat-form-field>
+        </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Regex Pattern</mat-label>
+          <input matInput formControlName="regexPattern" placeholder="e.g. ^[A-Z]+" />
+        </mat-form-field>
+      </div>
+    }
+
+    @if (showNumberValidation()) {
+      <div class="form-section">
+        <h3>Number Validation</h3>
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Min Value</mat-label>
+            <input matInput formControlName="minValue" type="number" />
+          </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>Max Value</mat-label>
+            <input matInput formControlName="maxValue" type="number" />
+          </mat-form-field>
+        </div>
+      </div>
+    }
+
+    @if (showOptions()) {
+      <div class="form-section">
+        <h3>Options</h3>
+        <div formArrayName="options">
+          @for (option of options.controls; track $index; let i = $index) {
+            <div [formGroupName]="i" class="option-row">
+              <mat-form-field appearance="outline">
+                <mat-label>Value</mat-label>
+                <input matInput formControlName="value" />
+              </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>Label</mat-label>
+                <input matInput formControlName="label" />
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="color-field">
+                <mat-label>Color</mat-label>
+                <input matInput formControlName="color" placeholder="#FF0000" />
+              </mat-form-field>
+              <div class="option-actions">
+                <button mat-icon-button matTooltip="Move Up" (click)="moveOption(i, 'up')" [disabled]="i === 0">
+                  <mat-icon>arrow_upward</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Move Down" (click)="moveOption(i, 'down')" [disabled]="i === options.length - 1">
+                  <mat-icon>arrow_downward</mat-icon>
+                </button>
+                <button mat-icon-button matTooltip="Remove" color="warn" (click)="removeOption(i)">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+        <button mat-stroked-button type="button" (click)="addOption()">
+          <mat-icon>add</mat-icon>
+          Add Option
+        </button>
+      </div>
+    }
+
+    @if (showRelation()) {
+      <div class="form-section">
+        <h3>Relation Target</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Related Entity Type</mat-label>
+          <mat-select formControlName="relationEntityType">
+            @for (type of entityTypes; track type) {
+              <mat-option [value]="type">{{ type }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </div>
+    }
+
+    <mat-divider></mat-divider>
+
+    <!-- Validation section -->
+    <mat-expansion-panel class="validation-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>Validation Rules</mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <div class="validation-checks">
+        <mat-checkbox formControlName="required">Required</mat-checkbox>
+        <mat-checkbox formControlName="unique">Unique</mat-checkbox>
+      </div>
+    </mat-expansion-panel>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="cancel()">Cancel</button>
+  <button
+    mat-flat-button
+    color="primary"
+    (click)="save()"
+    [disabled]="saving()">
+    {{ saving() ? 'Saving...' : (isCreateMode() ? 'Create' : 'Save') }}
+  </button>
+</mat-dialog-actions>
