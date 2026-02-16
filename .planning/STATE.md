@@ -10,25 +10,25 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 2 of 11 (Core Infrastructure)
-Plan: 4 of 12 in current phase
+Plan: 5 of 12 in current phase
 Status: Executing
-Last activity: 2026-02-16 — Plan 02-04 complete (RBAC Authorization Engine)
+Last activity: 2026-02-16 — Plan 02-05 complete (Custom Fields & Views API)
 
-Progress: [███░░░░░░░] 4/12 plans (Phase 2)
+Progress: [████░░░░░░] 5/12 plans (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12
+- Total plans completed: 13
 - Average duration: 7 min
-- Total execution time: ~1 hour
+- Total execution time: ~1.1 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
-| 02-core-infrastructure | 4 | ~29min | 7min |
+| 02-core-infrastructure | 5 | ~37min | 7min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -38,6 +38,7 @@ Progress: [███░░░░░░░] 4/12 plans (Phase 2)
 | Phase 02 P01 | 7min | 2 tasks | 18 files |
 | Phase 02 P03 | 12min | 2 tasks | 12 files |
 | Phase 02 P04 | 5min | 2 tasks | 9 files |
+| Phase 02 P05 | 8min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,10 @@ Recent decisions affecting current work:
 - [02-04] Per-user HashSet cache key tracking for targeted permission cache invalidation
 - [02-04] Field access defaults to Editable when no RoleFieldPermission exists (open by default)
 - [02-04] Startup seeding for existing tenants; new org seeding deferred to CreateOrganization handler
+- [02-05] DI registration via separate CustomFieldServiceExtensions (Program.cs subsystem pattern)
+- [02-05] CustomFieldValidator handles JsonElement values from System.Text.Json deserialization
+- [02-05] Unique field validation deferred to Phase 3 when entity instances exist
+- [02-05] Soft-delete restore uses IgnoreQueryFilters to bypass combined tenant+soft-delete filter
 
 ### Pending Todos
 
@@ -93,5 +98,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-04-PLAN.md (RBAC Authorization Engine)
-Resume file: .planning/phases/02-core-infrastructure/02-04-SUMMARY.md
+Stopped at: Completed 02-05-PLAN.md (Custom Fields & Views API)
+Resume file: .planning/phases/02-core-infrastructure/02-05-SUMMARY.md
