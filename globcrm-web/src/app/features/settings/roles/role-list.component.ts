@@ -19,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import { RoleDto } from '../../../core/permissions/permission.models';
+import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 @Component({
   selector: 'app-role-list',
@@ -34,6 +35,7 @@ import { RoleDto } from '../../../core/permissions/permission.models';
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    HasPermissionDirective,
   ],
   templateUrl: './role-list.component.html',
   styleUrl: './role-list.component.scss',

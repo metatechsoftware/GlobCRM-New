@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import { TeamDto } from '../../../core/permissions/permission.models';
 import { ConfirmDeleteDialogComponent } from '../roles/role-list.component';
+import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 @Component({
   selector: 'app-team-list',
@@ -27,6 +28,7 @@ import { ConfirmDeleteDialogComponent } from '../roles/role-list.component';
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    HasPermissionDirective,
   ],
   templateUrl: './team-list.component.html',
   styleUrl: './team-list.component.scss',

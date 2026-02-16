@@ -1,8 +1,10 @@
 import { Routes } from '@angular/router';
+import { adminGuard } from '../../core/permissions/admin.guard';
 
 export const SETTINGS_ROUTES: Routes = [
   {
     path: 'roles',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./roles/role-list.component').then(
         (m) => m.RoleListComponent
@@ -10,6 +12,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'roles/new',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./roles/role-edit.component').then(
         (m) => m.RoleEditComponent
@@ -17,6 +20,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'roles/:id',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./roles/role-edit.component').then(
         (m) => m.RoleEditComponent
@@ -24,6 +28,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'teams',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./teams/team-list.component').then(
         (m) => m.TeamListComponent
@@ -31,6 +36,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'teams/new',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./teams/team-edit.component').then(
         (m) => m.TeamEditComponent
@@ -38,6 +44,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'teams/:id',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./teams/team-edit.component').then(
         (m) => m.TeamEditComponent
@@ -45,6 +52,7 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: 'custom-fields',
+    canActivate: [adminGuard],
     loadComponent: () =>
       import('./custom-fields/custom-field-list.component').then(
         (m) => m.CustomFieldListComponent

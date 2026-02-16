@@ -12,7 +12,7 @@
         <mat-icon>folder_open</mat-icon>
         Manage Sections
       </button>
-      <button mat-flat-button color="primary" (click)="openAddDialog()">
+      <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" (click)="openAddDialog()">
         <mat-icon>add</mat-icon>
         Add Field
       </button>
@@ -47,7 +47,7 @@
               <mat-icon class="empty-icon">playlist_add</mat-icon>
               <h3>No custom fields defined</h3>
               <p>Add custom fields to extend {{ selectedEntityType() }} records with additional data.</p>
-              <button mat-flat-button color="primary" (click)="openAddDialog()">
+              <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" (click)="openAddDialog()">
                 <mat-icon>add</mat-icon>
                 Add First Field
               </button>
@@ -103,10 +103,10 @@
                   <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Actions</th>
                     <td mat-cell *matCellDef="let field">
-                      <button mat-icon-button matTooltip="Edit" (click)="openEditDialog(field)">
+                      <button *appHasPermission="'Contact:Edit'" mat-icon-button matTooltip="Edit" (click)="openEditDialog(field)">
                         <mat-icon>edit</mat-icon>
                       </button>
-                      <button mat-icon-button matTooltip="Delete" color="warn" (click)="deleteField(field)">
+                      <button *appHasPermission="'Contact:Delete'" mat-icon-button matTooltip="Delete" color="warn" (click)="deleteField(field)">
                         <mat-icon>delete</mat-icon>
                       </button>
                     </td>

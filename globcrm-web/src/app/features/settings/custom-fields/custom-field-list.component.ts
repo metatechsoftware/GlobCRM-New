@@ -19,6 +19,7 @@ import {
   CustomFieldSection,
 } from '../../../core/custom-fields/custom-field.models';
 import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component';
+import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 interface FieldGroup {
   sectionId: string | null;
@@ -55,6 +56,7 @@ const ENTITY_TYPES = [
     MatDialogModule,
     MatTooltipModule,
     MatSnackBarModule,
+    HasPermissionDirective,
   ],
   templateUrl: './custom-field-list.component.html',
 })
