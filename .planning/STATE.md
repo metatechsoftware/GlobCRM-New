@@ -35,6 +35,7 @@ Progress: [██░░░░░░░░] 2/12 plans (Phase 2)
 - Trend: Consistent ~7min per plan
 
 *Updated after each plan completion*
+| Phase 02 P01 | 7min | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -70,6 +71,8 @@ Recent decisions affecting current work:
 - [02-02] Soft-delete unique constraint uses HasFilter('NOT is_deleted') for field name reuse
 - [02-02] NpgsqlDataSourceBuilder with EnableDynamicJson() shared across both DbContexts
 - [02-02] CustomFieldDefinition query filter combines tenant isolation AND soft-delete
+- [Phase 02-01]: Child RBAC entities inherit tenant isolation via parent FK -- no TenantId or query filter needed
+- [Phase 02-01]: UserPreferencesData uses explicit JSON value converter (not OwnsOne.ToJson) due to Dictionary property limitation in EF Core
 
 ### Pending Todos
 
@@ -82,5 +85,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-02-PLAN.md (Custom Fields & Saved Views)
-Resume file: .planning/phases/02-core-infrastructure/02-02-SUMMARY.md
+Stopped at: Completed 02-01-PLAN.md (RBAC Domain Entities)
+Resume file: .planning/phases/02-core-infrastructure/02-01-SUMMARY.md
