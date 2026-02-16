@@ -161,6 +161,51 @@ COMMENT ON POLICY tenant_isolation_saved_views ON saved_views IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- companies - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE companies ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE companies FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_companies ON companies
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_companies ON companies IS
+    'Ensures company queries only return companies for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- contacts - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE contacts ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE contacts FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_contacts ON contacts
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_contacts ON contacts IS
+    'Ensures contact queries only return contacts for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- products - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE products ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE products FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_products ON products
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_products ON products IS
+    'Ensures product queries only return products for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

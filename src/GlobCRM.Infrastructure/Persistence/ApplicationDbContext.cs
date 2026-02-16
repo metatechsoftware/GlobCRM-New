@@ -63,6 +63,11 @@ public class ApplicationDbContext
     public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
     public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
 
+    // CRM Entity DbSets
+    public DbSet<Company> Companies => Set<Company>();
+    public DbSet<Contact> Contacts => Set<Contact>();
+    public DbSet<Product> Products => Set<Product>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -85,6 +90,11 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new TeamConfiguration());
         modelBuilder.ApplyConfiguration(new TeamMemberConfiguration());
         modelBuilder.ApplyConfiguration(new UserRoleAssignmentConfiguration());
+
+        // CRM entity configurations
+        modelBuilder.ApplyConfiguration(new CompanyConfiguration());
+        modelBuilder.ApplyConfiguration(new ContactConfiguration());
+        modelBuilder.ApplyConfiguration(new ProductConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -119,5 +129,17 @@ public class ApplicationDbContext
         // Note: RolePermission, RoleFieldPermission, TeamMember, UserRoleAssignment
         // do NOT need their own query filters -- they are filtered through their
         // parent's FK relationship (Role or Team) which is already tenant-filtered.
+
+        // Global query filter: filter Companies by TenantId (tenant-scoped)
+        modelBuilder.Entity<Company>().HasQueryFilter(
+            c => _tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Contacts by TenantId (tenant-scoped)
+        modelBuilder.Entity<Contact>().HasQueryFilter(
+            c => _tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Products by TenantId (tenant-scoped)
+        modelBuilder.Entity<Product>().HasQueryFilter(
+            p => _tenantProvider == null || _tenantProvider.GetTenantId() == null || p.TenantId == _tenantProvider.GetTenantId());
     }
 }
