@@ -1,0 +1,127 @@
+.dynamic-table-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// Toolbar
+.table-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--mat-sys-surface, #fff);
+  border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+
+  .quick-search {
+    flex: 1;
+    max-width: 320px;
+
+    // Reduce form field height in toolbar
+    ::ng-deep .mat-mdc-form-field-infix {
+      min-height: 36px;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+  }
+}
+
+// Table container with horizontal scroll
+.table-container {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+
+  table {
+    width: 100%;
+    table-layout: fixed;
+  }
+}
+
+// Sticky header
+th.mat-mdc-header-cell {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--mat-sys-surface, #fff);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+
+  // CDK Drag styles for header reorder
+  &.cdk-drag-preview {
+    background: var(--mat-sys-surface-container, #f5f5f5);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+
+  &.cdk-drag-placeholder {
+    opacity: 0.3;
+  }
+}
+
+// Column resize handle
+::ng-deep .column-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  z-index: 11;
+
+  &:hover {
+    background: var(--mat-sys-primary, #1976d2);
+    opacity: 0.5;
+  }
+}
+
+.column-resizable {
+  position: relative;
+}
+
+// Row styles
+tr.mat-mdc-row {
+  &:nth-child(even) {
+    background: var(--mat-sys-surface-container-lowest, #fafafa);
+  }
+
+  &:hover {
+    background: var(--mat-sys-surface-container, #f0f0f0);
+  }
+}
+
+// Cell styles
+td.mat-mdc-cell {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 300px;
+}
+
+// Actions column
+.actions-column {
+  width: 64px;
+  min-width: 64px;
+  max-width: 64px;
+  text-align: center;
+}
+
+// No data row
+.no-data-row td {
+  text-align: center;
+  padding: 48px 16px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-size: 14px;
+}
+
+// Paginator
+mat-paginator {
+  border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+}
+
+// Progress bar positioned at top of table
+mat-progress-bar {
+  position: relative;
+  z-index: 12;
+}
