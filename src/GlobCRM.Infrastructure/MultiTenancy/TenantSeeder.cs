@@ -1,25 +1,30 @@
 using System.Text.Json;
 using GlobCRM.Application.Common;
+using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
 
 namespace GlobCRM.Infrastructure.MultiTenancy;
 
 /// <summary>
 /// Seeds initial data for newly created organizations.
-/// Phase 1 creates default pipeline configuration as JSON metadata.
-/// Phase 3 (Core CRM Entities) will execute the full seed with contacts, companies, and deals.
+/// Creates Company, Contact, and Product entities from a seed manifest.
+/// Pipeline and Deal seeding deferred until those entities exist (Phase 4+).
 /// </summary>
 public class TenantSeeder : ITenantSeeder
 {
     private readonly IOrganizationRepository _organizationRepository;
+    private readonly ApplicationDbContext _db;
     private readonly ILogger<TenantSeeder> _logger;
 
     public TenantSeeder(
         IOrganizationRepository organizationRepository,
+        ApplicationDbContext db,
         ILogger<TenantSeeder> logger)
     {
         _organizationRepository = organizationRepository;
+        _db = db;
         _logger = logger;
     }
 
@@ -37,20 +42,88 @@ public class TenantSeeder : ITenantSeeder
             return;
         }
 
-        // Phase 1: Store default pipeline configuration as seed manifest
-        // Phase 3 will create the actual Contact, Company, Deal, and Pipeline entities
-        // and use this manifest to provision them
         var seedManifest = CreateSeedManifest();
 
         _logger.LogInformation(
-            "Seed manifest created for organization {OrgId}: {PipelineStageCount} pipeline stages, {ContactCount} contacts, {CompanyCount} companies, {DealCount} deals",
+            "Seed manifest created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, {DealCount} deals (deferred)",
             organizationId,
-            seedManifest.Pipeline.Stages.Count,
-            seedManifest.Contacts.Count,
             seedManifest.Companies.Count,
+            seedManifest.Contacts.Count,
+            seedManifest.Products.Count,
             seedManifest.Deals.Count);
 
-        // For now, log the manifest. In Phase 3, this will be executed against the CRM entities.
+        // Create Company entities from manifest
+        var companyMap = new Dictionary<string, Company>();
+        foreach (var companySeed in seedManifest.Companies)
+        {
+            var company = new Company
+            {
+                TenantId = organizationId,
+                Name = companySeed.Name,
+                Industry = companySeed.Industry,
+                Website = companySeed.Website,
+                Size = companySeed.Size,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.Companies.Add(company);
+            companyMap[companySeed.Name] = company;
+        }
+
+        // Create Contact entities from manifest, linking to companies
+        foreach (var contactSeed in seedManifest.Contacts)
+        {
+            var contact = new Contact
+            {
+                TenantId = organizationId,
+                FirstName = contactSeed.FirstName,
+                LastName = contactSeed.LastName,
+                Email = contactSeed.Email,
+                JobTitle = contactSeed.Title,
+                CompanyId = companyMap.TryGetValue(contactSeed.CompanyRef, out var company)
+                    ? company.Id
+                    : null,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.Contacts.Add(contact);
+        }
+
+        // Create Product entities from manifest
+        foreach (var productSeed in seedManifest.Products)
+        {
+            var product = new Product
+            {
+                TenantId = organizationId,
+                Name = productSeed.Name,
+                Description = productSeed.Description,
+                UnitPrice = productSeed.UnitPrice,
+                SKU = productSeed.SKU,
+                Category = productSeed.Category,
+                IsActive = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.Products.Add(product);
+        }
+
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products",
+            organizationId,
+            seedManifest.Companies.Count,
+            seedManifest.Contacts.Count,
+            seedManifest.Products.Count);
+
+        // Deal and Pipeline seeding deferred until those entities exist (Phase 4+)
+        _logger.LogDebug(
+            "Deal and pipeline seeding deferred for organization {OrgId} -- entities not yet available",
+            organizationId);
+
         _logger.LogDebug(
             "Seed manifest details for {OrgId}: {Manifest}",
             organizationId,
@@ -128,6 +201,33 @@ public class TenantSeeder : ITenantSeeder
                     Size = "11-50"
                 }
             ],
+            Products =
+            [
+                new ProductSeed
+                {
+                    Name = "CRM Enterprise License",
+                    Description = "Annual enterprise license",
+                    UnitPrice = 499.99m,
+                    SKU = "CRM-ENT-001",
+                    Category = "Software"
+                },
+                new ProductSeed
+                {
+                    Name = "Premium Support",
+                    Description = "24/7 premium support package",
+                    UnitPrice = 99.99m,
+                    SKU = "SUP-PREM-001",
+                    Category = "Support"
+                },
+                new ProductSeed
+                {
+                    Name = "Data Migration Service",
+                    Description = "One-time data migration assistance",
+                    UnitPrice = 1500.00m,
+                    SKU = "SVC-MIG-001",
+                    Category = "Services"
+                }
+            ],
             Deals =
             [
                 new DealSeed
@@ -154,6 +254,7 @@ public class SeedManifest
     public PipelineSeed Pipeline { get; set; } = new();
     public List<ContactSeed> Contacts { get; set; } = [];
     public List<CompanySeed> Companies { get; set; } = [];
+    public List<ProductSeed> Products { get; set; } = [];
     public List<DealSeed> Deals { get; set; } = [];
 }
 
@@ -185,6 +286,15 @@ public class CompanySeed
     public string Industry { get; set; } = string.Empty;
     public string Website { get; set; } = string.Empty;
     public string Size { get; set; } = string.Empty;
+}
+
+public class ProductSeed
+{
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public decimal UnitPrice { get; set; }
+    public string SKU { get; set; } = string.Empty;
+    public string Category { get; set; } = string.Empty;
 }
 
 public class DealSeed

@@ -10,6 +10,7 @@ using GlobCRM.Infrastructure.CustomFields;
 using GlobCRM.Infrastructure.Email;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Invitations;
+using GlobCRM.Infrastructure.CrmEntities;
 using GlobCRM.Infrastructure.Organizations;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -48,6 +49,7 @@ builder.Services.AddEmailServices();
 builder.Services.AddOrganizationServices();
 builder.Services.AddInvitationServices();
 builder.Services.AddCustomFieldServices();
+builder.Services.AddCrmEntityServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();

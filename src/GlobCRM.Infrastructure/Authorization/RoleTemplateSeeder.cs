@@ -66,6 +66,7 @@ public static class RoleTemplateSeeder
     /// <summary>
     /// Seeds template roles for all existing tenants.
     /// Called on application startup to ensure all tenants have role templates.
+    /// Also ensures existing roles have permissions for all entity types (idempotent).
     /// </summary>
     public static async Task SeedAllTenantsAsync(ApplicationDbContext db)
     {
@@ -81,6 +82,67 @@ public static class RoleTemplateSeeder
         foreach (var tenantId in tenantIds)
         {
             await SeedTemplateRolesAsync(db, tenantId);
+            await EnsurePermissionsForAllEntityTypesAsync(db, tenantId);
+        }
+    }
+
+    /// <summary>
+    /// Ensures all template roles for a tenant have permissions for every EntityType.
+    /// Idempotent: only adds missing permissions. This handles the case where roles
+    /// were seeded before new entity types (Company, Contact, Product) were added.
+    /// Scope mapping follows the same pattern as SeedTemplateRolesAsync:
+    ///   Admin = All, Manager = Team, Sales Rep = View(Team)/CED(Own), Viewer = View(All)/CED(None)
+    /// </summary>
+    public static async Task EnsurePermissionsForAllEntityTypesAsync(ApplicationDbContext db, Guid tenantId)
+    {
+        var templateRoles = await db.Roles
+            .IgnoreQueryFilters()
+            .Include(r => r.Permissions)
+            .Where(r => r.TenantId == tenantId && r.IsTemplate)
+            .ToListAsync();
+
+        if (templateRoles.Count == 0) return;
+
+        var entityTypes = Enum.GetNames<EntityType>();
+        var hasChanges = false;
+
+        foreach (var role in templateRoles)
+        {
+            Func<string, PermissionScope> scopeResolver = role.Name switch
+            {
+                "Admin" => _ => PermissionScope.All,
+                "Manager" => _ => PermissionScope.Team,
+                "Sales Rep" => op => op == "View" ? PermissionScope.Team : PermissionScope.Own,
+                "Viewer" => op => op == "View" ? PermissionScope.All : PermissionScope.None,
+                _ => _ => PermissionScope.None // Unknown role gets no access
+            };
+
+            foreach (var entityType in entityTypes)
+            {
+                foreach (var operation in Operations)
+                {
+                    var exists = role.Permissions.Any(p =>
+                        p.EntityType == entityType && p.Operation == operation);
+
+                    if (!exists)
+                    {
+                        role.Permissions.Add(new RolePermission
+                        {
+                            Id = Guid.NewGuid(),
+                            RoleId = role.Id,
+                            EntityType = entityType,
+                            Operation = operation,
+                            Scope = scopeResolver(operation)
+                        });
+                        hasChanges = true;
+                    }
+                }
+            }
+        }
+
+        if (hasChanges)
+        {
+            await db.SaveChangesAsync();
         }
     }
 
