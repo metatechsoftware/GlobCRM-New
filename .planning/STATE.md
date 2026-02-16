@@ -10,25 +10,25 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 2 of 11 (Core Infrastructure)
-Plan: 5 of 12 in current phase
+Plan: 9 of 12 in current phase
 Status: Executing
-Last activity: 2026-02-16 — Plan 02-05 complete (Custom Fields & Views API)
+Last activity: 2026-02-16 — Plan 02-09 complete (Angular Permission Infrastructure)
 
-Progress: [████░░░░░░] 5/12 plans (Phase 2)
+Progress: [███████░░░] 7/12 plans (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 13
+- Total plans completed: 15
 - Average duration: 7 min
-- Total execution time: ~1.1 hours
+- Total execution time: ~1.2 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
-| 02-core-infrastructure | 5 | ~37min | 7min |
+| 02-core-infrastructure | 7 | ~49min | 7min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -39,6 +39,7 @@ Progress: [████░░░░░░] 5/12 plans (Phase 2)
 | Phase 02 P03 | 12min | 2 tasks | 12 files |
 | Phase 02 P04 | 5min | 2 tasks | 9 files |
 | Phase 02 P05 | 8min | 2 tasks | 9 files |
+| Phase 02 P09 | 6min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -86,6 +87,10 @@ Recent decisions affecting current work:
 - [02-05] CustomFieldValidator handles JsonElement values from System.Text.Json deserialization
 - [02-05] Unique field validation deferred to Phase 3 when entity instances exist
 - [02-05] Soft-delete restore uses IgnoreQueryFilters to bypass combined tenant+soft-delete filter
+- [02-09] PermissionStore uses computed Map<string,string> for O(1) permission lookups (not array scanning)
+- [02-09] Directives use effect() for reactive signal-based permission checks, avoiding per-cycle method calls
+- [02-09] permissionGuard uses polling with 5s timeout to wait for PermissionStore before checking access
+- [02-09] Field access defaults to fallback parameter (default: editable) when no permission defined
 
 ### Pending Todos
 
@@ -98,5 +103,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 02-05-PLAN.md (Custom Fields & Views API)
-Resume file: .planning/phases/02-core-infrastructure/02-05-SUMMARY.md
+Stopped at: Completed 02-09-PLAN.md (Angular Permission Infrastructure)
+Resume file: .planning/phases/02-core-infrastructure/02-09-SUMMARY.md
