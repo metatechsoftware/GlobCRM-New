@@ -29,7 +29,17 @@ public class TenantDbContext : EFCoreStoreDbContext<TenantInfo>
         modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
 
         // Exclude entities managed by ApplicationDbContext (discovered via Organization navigations)
-        modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<ApplicationUser>(entity =>
+        {
+            entity.ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
+
+            // Ignore complex properties not needed in TenantDbContext —
+            // prevents EF Core from interpreting Dictionary<string,bool> as navigation
+            entity.Ignore(u => u.Preferences);
+            entity.Ignore(u => u.WorkSchedule);
+            entity.Ignore(u => u.SocialLinks);
+            entity.Ignore(u => u.Skills);
+        });
         modelBuilder.Entity<Invitation>().ToTable("invitations", t => t.ExcludeFromMigrations());
 
         // Configure the Finbuckle TenantInfo entity
