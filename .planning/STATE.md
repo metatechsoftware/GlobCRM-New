@@ -10,27 +10,27 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 1 of 11 (Foundation)
-Plan: 7 of 8 in current phase
+Plan: 8 of 8 in current phase
 Status: Executing
-Last activity: 2026-02-16 — Completed 01-06-PLAN.md
+Last activity: 2026-02-16 — Completed 01-07-PLAN.md
 
-Progress: [███████░░░] 6/8 plans
+Progress: [████████░░] 7/8 plans
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: 7 min
-- Total execution time: 0.70 hours
+- Total execution time: 0.83 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 6 | 42min | 7min |
+| 01-foundation | 7 | 50min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (6min), 01-03 (~7min), 01-04 (7min), 01-05 (7min), 01-06 (7min)
+- Last 5 plans: 01-03 (~7min), 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min)
 - Trend: Consistent ~7min per plan
 
 *Updated after each plan completion*
@@ -68,6 +68,11 @@ Recent decisions affecting current work:
 - [01-06] Password strength: 4-tier scoring (length, uppercase, digits, special chars) with color-coded mat-progress-bar
 - [01-06] Forgot password always shows success to prevent email enumeration
 - [01-06] Verify email handles both pending and confirmation states in single component via query params
+- [01-07] Used qrcode (npm) instead of angularx-qrcode due to Angular 21+ peer dependency requirement
+- [01-07] Navbar visibility via toSignal(router.events) + computed() for reactive route-based show/hide
+- [01-07] Recovery codes generated client-side as placeholder; production API returns actual codes
+- [01-07] Wizard completeSetup navigates to dashboard even on API error for graceful degradation
+- [01-07] 2FA route at /auth/2fa protected with authGuard
 
 ### Pending Todos
 
@@ -80,5 +85,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 01-06-PLAN.md
-Resume file: .planning/phases/01-foundation/01-06-SUMMARY.md
+Stopped at: Completed 01-07-PLAN.md
+Resume file: .planning/phases/01-foundation/01-07-SUMMARY.md
