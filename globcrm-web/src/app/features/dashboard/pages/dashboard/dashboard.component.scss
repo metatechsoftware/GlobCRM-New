@@ -1,0 +1,37 @@
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.welcome-card {
+  max-width: 600px;
+  width: 100%;
+}
+
+.welcome-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #1976d2;
+}
+
+.welcome-text {
+  color: rgba(0, 0, 0, 0.6);
+  margin: 1rem 0;
+}
+
+.org-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.95rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #00897b;
+  }
+}

@@ -12,9 +12,18 @@ export const AUTH_ROUTES: Routes = [
       import('./pages/signup/signup.component').then((m) => m.SignupComponent),
   },
   {
-    path: 'verify',
+    path: 'join/:token',
     loadComponent: () =>
-      import('./pages/verify/verify.component').then((m) => m.VerifyComponent),
+      import('./pages/signup/join-org/join-org.component').then(
+        (m) => m.JoinOrgComponent
+      ),
+  },
+  {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./pages/verify/verify.component').then(
+        (m) => m.VerifyComponent
+      ),
   },
   {
     path: 'forgot-password',

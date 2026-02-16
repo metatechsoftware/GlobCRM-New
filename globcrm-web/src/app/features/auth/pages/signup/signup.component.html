@@ -1,0 +1,29 @@
+<div class="auth-container">
+  <mat-card class="auth-card signup-card">
+    <mat-card-header class="auth-card-header">
+      <div class="brand-header">
+        <h1 class="brand-title">GlobCRM</h1>
+        <p class="brand-subtitle">Create your account</p>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <mat-tab-group animationDuration="200ms" color="primary">
+        <mat-tab label="Create Organization">
+          <div class="tab-content">
+            <app-create-org></app-create-org>
+          </div>
+        </mat-tab>
+        <mat-tab label="Join Organization">
+          <div class="tab-content">
+            <app-join-org></app-join-org>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+
+    <mat-card-actions class="auth-card-footer">
+      <p>Already have an account? <a routerLink="/auth/login" class="auth-link">Sign in</a></p>
+    </mat-card-actions>
+  </mat-card>
+</div>
