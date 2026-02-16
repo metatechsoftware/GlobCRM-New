@@ -19,18 +19,18 @@ Progress: [██░░░░░░░░] 2/8 plans
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 1
-- Average duration: 6 min
-- Total execution time: 0.1 hours
+- Total plans completed: 2
+- Average duration: 7 min
+- Total execution time: 0.23 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 1 | 6min | 6min |
+| 01-foundation | 2 | 14min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-02 (6min)
+- Last 5 plans: 01-01 (8min), 01-02 (6min)
 - Trend: Establishing baseline
 
 *Updated after each plan completion*
@@ -50,6 +50,9 @@ Recent decisions affecting current work:
 - [01-02] @ngrx/signals v19 for Angular 19 compatibility (v21 requires Angular 21)
 - [01-02] Access token in memory (signal), refresh token in localStorage only with rememberMe
 - [01-02] Token refresh at 80% of expiry; uniform GlobCRM branding for Phase 1
+- [Phase 01]: Used .slnx solution format (new .NET 10 default)
+- [Phase 01]: Added Identity.Stores to Domain for IdentityUser base class
+- [Phase 01]: FORCE ROW LEVEL SECURITY on tenant-scoped tables for defense-in-depth
 
 ### Pending Todos
 
