@@ -64,6 +64,10 @@ Recent decisions affecting current work:
 - [01-05] LogoutEndpoint in Api project (not Application) due to HttpContext/IResult dependency
 - [01-05] Application layer avoids EF Core dependency: uses FindByEmailAsync and synchronous IQueryable.Count()
 - [01-05] InvitationServiceExtensions follows per-subsystem DI pattern; all services registered in Program.cs
+- [01-06] Auth pages use pages/ subdirectory structure from Plan 02 scaffolding (not flat structure)
+- [01-06] Password strength: 4-tier scoring (length, uppercase, digits, special chars) with color-coded mat-progress-bar
+- [01-06] Forgot password always shows success to prevent email enumeration
+- [01-06] Verify email handles both pending and confirmation states in single component via query params
 
 ### Pending Todos
 
@@ -76,5 +80,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 01-05-PLAN.md
-Resume file: .planning/phases/01-foundation/01-05-SUMMARY.md
+Stopped at: Completed 01-06-PLAN.md
+Resume file: .planning/phases/01-foundation/01-06-SUMMARY.md
