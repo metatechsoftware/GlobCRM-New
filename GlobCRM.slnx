@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/GlobCRM.Api/GlobCRM.Api.csproj" />
+    <Project Path="src/GlobCRM.Application/GlobCRM.Application.csproj" />
+    <Project Path="src/GlobCRM.Domain/GlobCRM.Domain.csproj" />
+    <Project Path="src/GlobCRM.Infrastructure/GlobCRM.Infrastructure.csproj" />
+  </Folder>
+</Solution>
