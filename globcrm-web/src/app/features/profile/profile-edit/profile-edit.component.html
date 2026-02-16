@@ -1,0 +1,256 @@
+<div class="profile-edit">
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Loading profile...</p>
+    </div>
+  } @else {
+    <div class="page-header">
+      <h1>Edit Profile</h1>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="save()"
+        [disabled]="saving()">
+        <mat-icon>save</mat-icon>
+        {{ saving() ? 'Saving...' : 'Save Changes' }}
+      </button>
+    </div>
+
+    <!-- Section 1: Personal Info -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Personal Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="avatar-section">
+          <app-avatar-upload
+            [currentAvatarUrl]="profile()?.avatarUrl ?? null"
+            [firstName]="profile()?.firstName ?? ''"
+            [lastName]="profile()?.lastName ?? ''"
+            (avatarUploaded)="onAvatarUploaded($event)"
+            (avatarRemoved)="onAvatarRemoved()" />
+        </div>
+
+        <form [formGroup]="profileForm" class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" />
+            @if (profileForm.get('firstName')?.hasError('required') && profileForm.get('firstName')?.touched) {
+              <mat-error>First name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" />
+            @if (profileForm.get('lastName')?.hasError('required') && profileForm.get('lastName')?.touched) {
+              <mat-error>Last name is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" />
+            <mat-hint>Email cannot be changed</mat-hint>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone</mat-label>
+            <input matInput formControlName="phone" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Bio</mat-label>
+            <textarea matInput formControlName="bio" rows="3"></textarea>
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section 2: Work Info -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Work Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="profileForm" class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Job Title</mat-label>
+            <input matInput formControlName="jobTitle" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Department</mat-label>
+            <input matInput formControlName="department" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Reporting Manager</mat-label>
+            <input matInput formControlName="reportingManagerId" placeholder="Manager user ID" />
+          </mat-form-field>
+        </form>
+
+        <!-- Skills -->
+        <div class="skills-section">
+          <h4>Skills</h4>
+          <mat-chip-set>
+            @for (skill of skills(); track skill) {
+              <mat-chip (removed)="removeSkill(skill)">
+                {{ skill }}
+                <button matChipRemove>
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip>
+            }
+          </mat-chip-set>
+          <div class="add-skill">
+            <mat-form-field appearance="outline">
+              <mat-label>Add Skill</mat-label>
+              <input
+                matInput
+                [value]="newSkill()"
+                (input)="newSkill.set($any($event.target).value)"
+                (keyup.enter)="addSkill()" />
+            </mat-form-field>
+            <button mat-icon-button (click)="addSkill()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section 3: Social Links -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Social Links</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="profileForm" class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>LinkedIn</mat-label>
+            <mat-icon matPrefix>link</mat-icon>
+            <input matInput formControlName="linkedIn" placeholder="https://linkedin.com/in/username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Twitter / X</mat-label>
+            <mat-icon matPrefix>link</mat-icon>
+            <input matInput formControlName="twitter" placeholder="https://twitter.com/username" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>GitHub</mat-label>
+            <mat-icon matPrefix>link</mat-icon>
+            <input matInput formControlName="gitHub" placeholder="https://github.com/username" />
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section 4: Work Schedule -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Work Schedule</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="work-days">
+          <h4>Work Days</h4>
+          <div class="day-checkboxes">
+            @for (day of workDays; track day) {
+              <mat-checkbox
+                [checked]="isWorkDaySelected(day)"
+                (change)="toggleWorkDay(day)">
+                {{ day }}
+              </mat-checkbox>
+            }
+          </div>
+        </div>
+
+        <form [formGroup]="profileForm" class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Start Time</mat-label>
+            <input matInput type="time" formControlName="workStartTime" />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>End Time</mat-label>
+            <input matInput type="time" formControlName="workEndTime" />
+          </mat-form-field>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section 5: Preferences -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Preferences</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="preferencesForm">
+          <div class="preferences-grid">
+            <div class="pref-item">
+              <h4>Theme</h4>
+              <mat-radio-group formControlName="theme">
+                <mat-radio-button value="Light">Light</mat-radio-button>
+                <mat-radio-button value="Dark">Dark</mat-radio-button>
+              </mat-radio-group>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Language</mat-label>
+              <mat-select formControlName="language">
+                @for (lang of languages; track lang.value) {
+                  <mat-option [value]="lang.value">{{ lang.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Timezone</mat-label>
+              <mat-select formControlName="timezone">
+                @for (tz of timezones; track tz) {
+                  <mat-option [value]="tz">{{ tz }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Date Format</mat-label>
+              <mat-select formControlName="dateFormat">
+                @for (fmt of dateFormats; track fmt.value) {
+                  <mat-option [value]="fmt.value">{{ fmt.label }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Section 6: Notifications -->
+    <mat-card class="section-card">
+      <mat-card-header>
+        <mat-card-title>Email Notifications</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="preferencesForm">
+          <div class="notification-toggles">
+            <mat-slide-toggle formControlName="taskAssigned" color="primary">
+              Task Assigned
+            </mat-slide-toggle>
+            <mat-slide-toggle formControlName="dealUpdated" color="primary">
+              Deal Updated
+            </mat-slide-toggle>
+            <mat-slide-toggle formControlName="mention" color="primary">
+              Mentions
+            </mat-slide-toggle>
+            <mat-slide-toggle formControlName="weeklyReport" color="primary">
+              Weekly Report
+            </mat-slide-toggle>
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  }
+</div>

@@ -24,6 +24,30 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'settings',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/settings/settings.routes').then(
+        (m) => m.SETTINGS_ROUTES
+      ),
+  },
+  {
+    path: 'profile',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/profile/profile.routes').then(
+        (m) => m.PROFILE_ROUTES
+      ),
+  },
+  {
+    path: 'team-directory',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./features/profile/team-directory/team-directory.component').then(
+        (m) => m.TeamDirectoryComponent
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',

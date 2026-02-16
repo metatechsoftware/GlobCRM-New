@@ -1,0 +1,61 @@
+<div class="permission-matrix">
+  <h3 class="matrix-title">Permission Matrix</h3>
+  <p class="matrix-description">
+    Set access levels for each entity type. Choose scope per operation: None, Own (created by user), Team (same team), or All.
+  </p>
+
+  <div class="matrix-container">
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th class="entity-header">Entity</th>
+          @for (op of operations; track op) {
+            <th class="operation-header">
+              <div class="op-header-content">
+                <span>{{ op }}</span>
+                <mat-form-field appearance="outline" class="quick-set-field">
+                  <mat-label>Set all</mat-label>
+                  <mat-select
+                    [value]="getQuickSetValue(op)"
+                    (selectionChange)="onQuickSet(op, $event.value)"
+                  >
+                    @for (scope of scopes; track scope) {
+                      <mat-option [value]="scope">
+                        {{ scopeLabels[scope] }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </div>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (entity of entityTypes; track entity) {
+          <tr class="entity-row">
+            <td class="entity-name">{{ entity }}</td>
+            @for (op of operations; track op) {
+              <td class="scope-cell">
+                <mat-form-field appearance="outline" class="scope-select-field">
+                  <mat-select
+                    [value]="getScope(entity, op)"
+                    (selectionChange)="onCellChange(entity, op, $event.value)"
+                    [class]="getScopeClass(getScope(entity, op))"
+                    [panelClass]="'scope-panel'"
+                  >
+                    @for (scope of scopes; track scope) {
+                      <mat-option [value]="scope" [class]="getScopeClass(scope)">
+                        {{ scopeLabels[scope] }}
+                      </mat-option>
+                    }
+                  </mat-select>
+                </mat-form-field>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

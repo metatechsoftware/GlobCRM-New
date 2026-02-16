@@ -61,6 +61,7 @@ export interface TeamDto {
 }
 
 export interface TeamDetailDto extends TeamDto {
+  defaultRoleId: string | null;
   members: TeamMemberDto[];
 }
 
@@ -69,14 +70,18 @@ export interface TeamMemberDto {
   email: string;
   firstName: string;
   lastName: string;
+  avatarUrl: string | null;
+  avatarColor: string | null;
 }
 
 export interface CreateTeamRequest {
   name: string;
   description?: string | null;
+  defaultRoleId?: string | null;
 }
 
 export interface UpdateTeamRequest {
   name: string;
   description?: string | null;
+  defaultRoleId?: string | null;
 }

@@ -1,0 +1,88 @@
+<div class="team-directory">
+  <div class="page-header">
+    <h1>Team Directory</h1>
+  </div>
+
+  <div class="filters">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search members</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        [value]="searchQuery()"
+        (input)="onSearchInput($any($event.target).value)"
+        placeholder="Search by name, email, or title..." />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="department-filter">
+      <mat-label>Department</mat-label>
+      <mat-select [value]="selectedDepartment()" (selectionChange)="onDepartmentChange($event.value)">
+        <mat-option value="">All Departments</mat-option>
+        @for (dept of departments(); track dept) {
+          <mat-option [value]="dept">{{ dept }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  @if (loading()) {
+    <div class="loading-state">
+      <p>Loading team members...</p>
+    </div>
+  } @else if (members().length === 0) {
+    <div class="empty-state">
+      <mat-icon class="empty-icon">people</mat-icon>
+      <h3>No team members found</h3>
+      @if (searchQuery() || selectedDepartment()) {
+        <p>Try adjusting your search or filter criteria.</p>
+      }
+    </div>
+  } @else {
+    <div class="members-grid">
+      @for (member of members(); track member.id) {
+        <mat-card class="member-card" (click)="viewProfile(member)">
+          <mat-card-content>
+            <div class="card-top">
+              <app-avatar
+                [avatarUrl]="member.avatarUrl"
+                [firstName]="member.firstName"
+                [lastName]="member.lastName"
+                [avatarColor]="member.avatarColor"
+                size="lg" />
+            </div>
+            <div class="card-info">
+              <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
+              @if (member.jobTitle) {
+                <p class="member-title">{{ member.jobTitle }}</p>
+              }
+              @if (member.department) {
+                <p class="member-dept">{{ member.department }}</p>
+              }
+              <div class="member-contact">
+                <div class="contact-row">
+                  <mat-icon>email</mat-icon>
+                  <span>{{ member.email }}</span>
+                </div>
+                @if (member.phone) {
+                  <div class="contact-row">
+                    <mat-icon>phone</mat-icon>
+                    <span>{{ member.phone }}</span>
+                  </div>
+                }
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+    </div>
+
+    <mat-paginator
+      [length]="totalCount()"
+      [pageSize]="pageSize()"
+      [pageIndex]="page() - 1"
+      [pageSizeOptions]="[12, 24, 48]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  }
+</div>

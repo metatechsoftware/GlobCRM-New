@@ -1,0 +1,110 @@
+<div class="role-list-container">
+  <div class="page-header">
+    <h1>Role Management</h1>
+    <button mat-flat-button color="primary" routerLink="/settings/roles/new">
+      <mat-icon>add</mat-icon>
+      Create Role
+    </button>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading roles...</p>
+    </div>
+  } @else if (errorMessage()) {
+    <div class="error-container">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <p>{{ errorMessage() }}</p>
+      <button mat-flat-button color="primary" (click)="loadRoles()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  } @else {
+    <table mat-table [dataSource]="roles()" class="roles-table">
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef>Name</th>
+        <td mat-cell *matCellDef="let role">{{ role.name }}</td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let role" class="description-cell">
+          {{ role.description || '-' }}
+        </td>
+      </ng-container>
+
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let role">
+          <mat-chip-set>
+            <mat-chip [highlighted]="role.isSystem" [color]="getRoleTypeColor(role)">
+              {{ getRoleTypeLabel(role) }}
+            </mat-chip>
+          </mat-chip-set>
+        </td>
+      </ng-container>
+
+      <!-- Permission Count Column -->
+      <ng-container matColumnDef="permissionCount">
+        <th mat-header-cell *matHeaderCellDef>Permissions</th>
+        <td mat-cell *matCellDef="let role">{{ role.permissionCount }}</td>
+      </ng-container>
+
+      <!-- Assigned Users Column -->
+      <ng-container matColumnDef="assignedUserCount">
+        <th mat-header-cell *matHeaderCellDef>Users</th>
+        <td mat-cell *matCellDef="let role">{{ role.assignedUserCount }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let role">
+          <div class="action-buttons">
+            <button
+              mat-icon-button
+              (click)="onEdit(role)"
+              [disabled]="role.isSystem"
+              matTooltip="Edit role"
+            >
+              <mat-icon>edit</mat-icon>
+            </button>
+            @if (role.isTemplate) {
+              <button
+                mat-icon-button
+                (click)="onClone(role)"
+                matTooltip="Clone role"
+              >
+                <mat-icon>content_copy</mat-icon>
+              </button>
+            }
+            <button
+              mat-icon-button
+              color="warn"
+              (click)="onDelete(role)"
+              [disabled]="role.isSystem"
+              matTooltip="Delete role"
+            >
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+
+      <!-- No data row -->
+      <tr class="mat-mdc-no-data-row" *matNoDataRow>
+        <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
+          No roles found. Create your first role to get started.
+        </td>
+      </tr>
+    </table>
+  }
+</div>
