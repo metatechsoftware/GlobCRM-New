@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 2 of 11 (Core Infrastructure)
-Plan: 0 of TBD in current phase
-Status: Ready for planning
-Last activity: 2026-02-16 — Phase 1 complete (verified E2E)
+Plan: 2 of 12 in current phase
+Status: Executing
+Last activity: 2026-02-16 — Plan 02-02 complete (Custom Fields & Saved Views)
 
-Progress: [██████████] 8/8 plans (Phase 1)
+Progress: [██░░░░░░░░] 2/12 plans (Phase 2)
 
 ## Performance Metrics
 
@@ -28,6 +28,7 @@ Progress: [██████████] 8/8 plans (Phase 1)
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
+| 02-core-infrastructure | 2 | ~12min | 6min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -65,6 +66,10 @@ Recent decisions affecting current work:
 - [01-08-E2E] Angular must import environment.development.ts (not environment.ts); fileReplacements swaps for production
 - [01-08-E2E] Angular login uses /api/auth/login-extended (custom JWT), not /api/auth/login (Identity opaque tokens)
 - [01-08-E2E] Backend runs on port 5233 (launchSettings.json), Angular dev env updated accordingly
+- [02-02] JSONB value types mapped via HasColumnType('jsonb') -- not separate tables
+- [02-02] Soft-delete unique constraint uses HasFilter('NOT is_deleted') for field name reuse
+- [02-02] NpgsqlDataSourceBuilder with EnableDynamicJson() shared across both DbContexts
+- [02-02] CustomFieldDefinition query filter combines tenant isolation AND soft-delete
 
 ### Pending Todos
 
@@ -77,5 +82,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Phase 2 context gathered
-Resume file: .planning/phases/02-core-infrastructure/02-CONTEXT.md
+Stopped at: Completed 02-02-PLAN.md (Custom Fields & Saved Views)
+Resume file: .planning/phases/02-core-infrastructure/02-02-SUMMARY.md
