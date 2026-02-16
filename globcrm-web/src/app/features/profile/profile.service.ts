@@ -4,6 +4,12 @@ import { Observable } from 'rxjs';
 import { ApiService } from '../../core/api/api.service';
 import { environment } from '../../../environments/environment.development';
 
+export interface WorkSchedule {
+  workDays: string[];
+  startTime: string;
+  endTime: string;
+}
+
 export interface ProfileDto {
   id: string;
   email: string;
@@ -13,17 +19,17 @@ export interface ProfileDto {
   bio: string | null;
   jobTitle: string | null;
   department: string | null;
+  timezone: string | null;
+  language: string | null;
   reportingManagerId: string | null;
   reportingManagerName: string | null;
-  skills: string[];
-  linkedIn: string | null;
-  twitter: string | null;
-  gitHub: string | null;
+  skills: string[] | null;
+  socialLinks: Record<string, string> | null;
   avatarUrl: string | null;
   avatarColor: string | null;
-  workDays: string[];
-  workStartTime: string | null;
-  workEndTime: string | null;
+  workSchedule: WorkSchedule | null;
+  preferences: PreferencesDto | null;
+  createdAt: string;
 }
 
 export interface UpdateProfileRequest {
@@ -33,37 +39,28 @@ export interface UpdateProfileRequest {
   bio?: string | null;
   jobTitle?: string | null;
   department?: string | null;
+  timezone?: string | null;
+  language?: string | null;
   reportingManagerId?: string | null;
   skills?: string[];
-  linkedIn?: string | null;
-  twitter?: string | null;
-  gitHub?: string | null;
-  workDays?: string[];
-  workStartTime?: string | null;
-  workEndTime?: string | null;
+  socialLinks?: Record<string, string> | null;
+  workSchedule?: WorkSchedule | null;
 }
 
 export interface PreferencesDto {
-  theme: 'Light' | 'Dark';
+  theme: string;
   language: string;
   timezone: string;
   dateFormat: string;
-  notifications: NotificationPreferences;
-}
-
-export interface NotificationPreferences {
-  taskAssigned: boolean;
-  dealUpdated: boolean;
-  mention: boolean;
-  weeklyReport: boolean;
+  emailNotifications: Record<string, boolean>;
 }
 
 export interface UpdatePreferencesRequest {
-  theme?: 'Light' | 'Dark';
+  theme?: string;
   language?: string;
   timezone?: string;
   dateFormat?: string;
-  notifications?: Partial<NotificationPreferences>;
+  emailNotifications?: Record<string, boolean>;
 }
 
 export interface TeamMemberDto {
@@ -83,7 +80,6 @@ export interface PaginatedResult<T> {
   totalCount: number;
   page: number;
   pageSize: number;
-  totalPages: number;
 }
 
 /**
@@ -113,7 +109,7 @@ export class ProfileService {
   /** Upload avatar image (multipart form data) */
   uploadAvatar(file: Blob): Observable<{ avatarUrl: string }> {
     const formData = new FormData();
-    formData.append('file', file, 'avatar.webp');
+    formData.append('avatar', file, 'avatar.webp');
     return this.http.post<{ avatarUrl: string }>(
       `${this.baseUrl}/api/profile/avatar`,
       formData,

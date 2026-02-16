@@ -94,25 +94,25 @@ import { ProfileService, ProfileDto } from '../profile.service';
             }
 
             <!-- Social Links -->
-            @if (p.linkedIn || p.twitter || p.gitHub) {
+            @if (p.socialLinks && hasSocialLinks(p.socialLinks)) {
               <div class="info-section">
                 <h3>Social</h3>
-                @if (p.linkedIn) {
+                @if (p.socialLinks['linkedin']) {
                   <div class="info-row">
                     <mat-icon>link</mat-icon>
-                    <a [href]="p.linkedIn" target="_blank">LinkedIn</a>
+                    <a [href]="p.socialLinks['linkedin']" target="_blank">LinkedIn</a>
                   </div>
                 }
-                @if (p.twitter) {
+                @if (p.socialLinks['twitter']) {
                   <div class="info-row">
                     <mat-icon>link</mat-icon>
-                    <a [href]="p.twitter" target="_blank">Twitter / X</a>
+                    <a [href]="p.socialLinks['twitter']" target="_blank">Twitter / X</a>
                   </div>
                 }
-                @if (p.gitHub) {
+                @if (p.socialLinks['github']) {
                   <div class="info-row">
                     <mat-icon>link</mat-icon>
-                    <a [href]="p.gitHub" target="_blank">GitHub</a>
+                    <a [href]="p.socialLinks['github']" target="_blank">GitHub</a>
                   </div>
                 }
               </div>
@@ -226,6 +226,10 @@ export class ProfileViewComponent implements OnInit {
     } else {
       this.loading.set(false);
     }
+  }
+
+  hasSocialLinks(links: Record<string, string> | null): boolean {
+    return links !== null && Object.keys(links).length > 0;
   }
 
   goBack(): void {

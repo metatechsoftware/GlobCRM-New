@@ -25,6 +25,7 @@ import {
   PreferencesDto,
   UpdateProfileRequest,
   UpdatePreferencesRequest,
+  WorkSchedule,
 } from '../profile.service';
 
 const WORK_DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
@@ -131,7 +132,7 @@ export class ProfileEditComponent implements OnInit {
     });
 
     this.preferencesForm = this.fb.group({
-      theme: ['Light'],
+      theme: ['light'],
       language: ['en'],
       timezone: ['UTC'],
       dateFormat: ['MM/dd/yyyy'],
@@ -156,11 +157,11 @@ export class ProfileEditComponent implements OnInit {
           jobTitle: profile.jobTitle ?? '',
           department: profile.department ?? '',
           reportingManagerId: profile.reportingManagerId ?? '',
-          linkedIn: profile.linkedIn ?? '',
-          twitter: profile.twitter ?? '',
-          gitHub: profile.gitHub ?? '',
-          workStartTime: profile.workStartTime ?? '',
-          workEndTime: profile.workEndTime ?? '',
+          linkedIn: profile.socialLinks?.['linkedin'] ?? '',
+          twitter: profile.socialLinks?.['twitter'] ?? '',
+          gitHub: profile.socialLinks?.['github'] ?? '',
+          workStartTime: profile.workSchedule?.startTime ?? '',
+          workEndTime: profile.workSchedule?.endTime ?? '',
         });
         this.loading.set(false);
       },
@@ -179,10 +180,10 @@ export class ProfileEditComponent implements OnInit {
           language: prefs.language,
           timezone: prefs.timezone,
           dateFormat: prefs.dateFormat,
-          taskAssigned: prefs.notifications?.taskAssigned ?? true,
-          dealUpdated: prefs.notifications?.dealUpdated ?? true,
-          mention: prefs.notifications?.mention ?? true,
-          weeklyReport: prefs.notifications?.weeklyReport ?? true,
+          taskAssigned: prefs.emailNotifications?.['taskAssigned'] ?? true,
+          dealUpdated: prefs.emailNotifications?.['dealUpdated'] ?? true,
+          mention: prefs.emailNotifications?.['mention'] ?? true,
+          weeklyReport: prefs.emailNotifications?.['weeklyReport'] ?? true,
         });
       },
       error: () => {
@@ -193,20 +194,24 @@ export class ProfileEditComponent implements OnInit {
 
   isWorkDaySelected(day: string): boolean {
     const profile = this.profile();
-    return profile?.workDays?.includes(day) ?? false;
+    return profile?.workSchedule?.workDays?.includes(day) ?? false;
   }
 
   toggleWorkDay(day: string): void {
     const current = this.profile();
     if (!current) return;
-    const days = current.workDays ?? [];
+    const schedule = current.workSchedule ?? { workDays: [], startTime: '09:00', endTime: '17:00' };
+    const days = [...(schedule.workDays ?? [])];
     const index = days.indexOf(day);
     if (index >= 0) {
       days.splice(index, 1);
     } else {
       days.push(day);
     }
-    this.profile.set({ ...current, workDays: [...days] });
+    this.profile.set({
+      ...current,
+      workSchedule: { ...schedule, workDays: days },
+    });
   }
 
   addSkill(): void {
@@ -264,6 +269,22 @@ export class ProfileEditComponent implements OnInit {
     const profileValue = this.profileForm.getRawValue();
     const profile = this.profile();
 
+    // Build socialLinks from individual form fields
+    const socialLinks: Record<string, string> = {};
+    if (profileValue.linkedIn) socialLinks['linkedin'] = profileValue.linkedIn;
+    if (profileValue.twitter) socialLinks['twitter'] = profileValue.twitter;
+    if (profileValue.gitHub) socialLinks['github'] = profileValue.gitHub;
+
+    // Build workSchedule from form fields
+    const workSchedule: WorkSchedule | null =
+      profileValue.workStartTime || profileValue.workEndTime || (profile?.workSchedule?.workDays?.length ?? 0) > 0
+        ? {
+            workDays: profile?.workSchedule?.workDays ?? [],
+            startTime: profileValue.workStartTime || '09:00',
+            endTime: profileValue.workEndTime || '17:00',
+          }
+        : null;
+
     const profileRequest: UpdateProfileRequest = {
       firstName: profileValue.firstName,
       lastName: profileValue.lastName,
@@ -273,12 +294,8 @@ export class ProfileEditComponent implements OnInit {
       department: profileValue.department || null,
       reportingManagerId: profileValue.reportingManagerId || null,
       skills: this.skills(),
-      linkedIn: profileValue.linkedIn || null,
-      twitter: profileValue.twitter || null,
-      gitHub: profileValue.gitHub || null,
-      workDays: profile?.workDays ?? [],
-      workStartTime: profileValue.workStartTime || null,
-      workEndTime: profileValue.workEndTime || null,
+      socialLinks: Object.keys(socialLinks).length > 0 ? socialLinks : null,
+      workSchedule: workSchedule,
     };
 
     const prefsValue = this.preferencesForm.getRawValue();
@@ -287,7 +304,7 @@ export class ProfileEditComponent implements OnInit {
       language: prefsValue.language,
       timezone: prefsValue.timezone,
       dateFormat: prefsValue.dateFormat,
-      notifications: {
+      emailNotifications: {
         taskAssigned: prefsValue.taskAssigned,
         dealUpdated: prefsValue.dealUpdated,
         mention: prefsValue.mention,
