@@ -1,0 +1,142 @@
+<div class="team-edit-container">
+  <div class="page-header">
+    <button mat-icon-button routerLink="/settings/teams">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ pageTitle }}</h1>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-container">
+      <mat-spinner diameter="48"></mat-spinner>
+      <p>Loading team...</p>
+    </div>
+  } @else if (errorMessage() && mode() === 'edit' && !teamForm.dirty) {
+    <div class="error-container">
+      <mat-icon class="error-icon">error_outline</mat-icon>
+      <p>{{ errorMessage() }}</p>
+      <button mat-flat-button color="primary" routerLink="/settings/teams">
+        Back to Teams
+      </button>
+    </div>
+  } @else {
+    <mat-card class="team-form-card">
+      <mat-card-content>
+        <form [formGroup]="teamForm" class="team-form">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Team Name</mat-label>
+            <input
+              matInput
+              formControlName="name"
+              placeholder="Enter team name"
+              maxlength="100"
+            />
+            @if (teamForm.get('name')?.hasError('required') && teamForm.get('name')?.touched) {
+              <mat-error>Team name is required.</mat-error>
+            }
+            @if (teamForm.get('name')?.hasError('maxlength')) {
+              <mat-error>Team name must be 100 characters or less.</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea
+              matInput
+              formControlName="description"
+              placeholder="Optional description"
+              rows="3"
+            ></textarea>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Default Role</mat-label>
+            <mat-select formControlName="defaultRoleId">
+              <mat-option [value]="null">None</mat-option>
+              @for (role of roles(); track role.id) {
+                <mat-option [value]="role.id">{{ role.name }}</mat-option>
+              }
+            </mat-select>
+            <mat-hint>New members will inherit this role's permissions</mat-hint>
+          </mat-form-field>
+        </form>
+
+        @if (errorMessage()) {
+          <div class="form-error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button routerLink="/settings/teams">Cancel</button>
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="onSave()"
+          [disabled]="isSaving() || teamForm.invalid"
+        >
+          @if (isSaving()) {
+            <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
+          } @else {
+            {{ mode() === 'create' ? 'Create Team' : 'Save Changes' }}
+          }
+        </button>
+      </mat-card-actions>
+    </mat-card>
+
+    <!-- Member Management Section (Edit mode only) -->
+    @if (mode() === 'edit') {
+      <mat-card class="members-card">
+        <mat-card-header>
+          <mat-card-title>Team Members</mat-card-title>
+          <div class="members-header-actions">
+            <button mat-flat-button color="primary" (click)="onAddMember()">
+              <mat-icon>person_add</mat-icon>
+              Add Member
+            </button>
+          </div>
+        </mat-card-header>
+
+        <mat-card-content>
+          @if (members().length === 0) {
+            <div class="no-members">
+              <mat-icon>group</mat-icon>
+              <p>No members yet. Add team members to get started.</p>
+            </div>
+          } @else {
+            <mat-list>
+              @for (member of members(); track member.userId) {
+                <mat-list-item class="member-item">
+                  <div class="member-content">
+                    <div
+                      class="member-avatar"
+                      [style.background-color]="member.avatarColor || '#7c4dff'"
+                    >
+                      {{ getInitials(member) }}
+                    </div>
+                    <div class="member-info">
+                      <span class="member-name">
+                        {{ member.firstName }} {{ member.lastName }}
+                      </span>
+                      <span class="member-email">{{ member.email }}</span>
+                    </div>
+                    <button
+                      mat-icon-button
+                      color="warn"
+                      (click)="onRemoveMember(member)"
+                      class="remove-button"
+                    >
+                      <mat-icon>remove_circle_outline</mat-icon>
+                    </button>
+                  </div>
+                </mat-list-item>
+              }
+            </mat-list>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  }
+</div>
