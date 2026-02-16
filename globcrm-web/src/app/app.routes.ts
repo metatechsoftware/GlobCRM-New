@@ -48,6 +48,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'companies',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/companies/companies.routes').then(
+        (m) => m.COMPANY_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
