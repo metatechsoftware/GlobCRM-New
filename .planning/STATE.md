@@ -40,6 +40,7 @@ Progress: [████████░░] 8/12 plans (Phase 2)
 | Phase 02 P04 | 5min | 2 tasks | 9 files |
 | Phase 02 P05 | 8min | 2 tasks | 9 files |
 | Phase 02 P07 | 4min | 2 tasks | 2 files |
+| Phase 02 P08 | 5min | 2 tasks | 14 files |
 | Phase 02 P09 | 6min | 2 tasks | 7 files |
 
 ## Accumulated Context
@@ -92,6 +93,10 @@ Recent decisions affecting current work:
 - [02-07] Role deletion blocked when assigned to users via direct assignment or team default role
 - [02-07] my-permissions endpoint overrides controller Admin auth -- any authenticated user can query own permissions
 - [02-07] TeamMemberInfoDto renamed to avoid namespace collision with TeamDirectoryController's TeamMemberDto
+- [02-08] ViewStore is component-provided (not root) so each entity list page gets its own instance
+- [02-08] FilterOperator union type covers all comparison operators including null checks and between/in
+- [02-08] Column resize uses native DOM events (mousedown/move/up) on thin handle div for performance
+- [02-08] Filter operators adapt dynamically based on field type: text, number, date, select
 - [02-09] PermissionStore uses computed Map<string,string> for O(1) permission lookups (not array scanning)
 - [02-09] Directives use effect() for reactive signal-based permission checks, avoiding per-cycle method calls
 - [02-09] permissionGuard uses polling with 5s timeout to wait for PermissionStore before checking access
