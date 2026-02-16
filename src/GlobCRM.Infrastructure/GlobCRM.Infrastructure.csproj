@@ -10,6 +10,7 @@
     <PackageReference Include="Finbuckle.MultiTenant.EntityFrameworkCore" Version="10.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="10.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="RazorLight" Version="2.3.1" />
     <PackageReference Include="SendGrid" Version="9.29.3" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
   </ItemGroup>
@@ -22,6 +23,14 @@
 
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <!-- Copy Razor email templates to output directory for RazorLight file-based rendering -->
+  <ItemGroup>
+    <Content Include="Email\EmailTemplates\**\*.cshtml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Link>EmailTemplates\%(Filename)%(Extension)</Link>
+    </Content>
   </ItemGroup>
 
 </Project>
