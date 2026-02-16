@@ -47,7 +47,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(u => u.Phone)
             .HasColumnName("phone")
-            .HasMaxLength(50);
+            .HasMaxLength(20);
 
         builder.Property(u => u.JobTitle)
             .HasColumnName("job_title")
@@ -69,7 +69,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(u => u.Bio)
             .HasColumnName("bio")
-            .HasMaxLength(500);
+            .HasMaxLength(1000);
 
         builder.Property(u => u.AvatarUrl)
             .HasColumnName("avatar_url")
@@ -77,7 +77,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(u => u.AvatarColor)
             .HasColumnName("avatar_color")
-            .HasMaxLength(20);
+            .HasMaxLength(7);
 
         builder.Property(u => u.SocialLinks)
             .HasColumnName("social_links")
@@ -108,6 +108,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
         builder.Property(u => u.Preferences)
             .HasColumnName("preferences")
             .HasColumnType("jsonb")
+            .HasDefaultValueSql("'{}'::jsonb")
             .HasConversion(
                 v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
                 v => v == null ? new UserPreferencesData() : JsonSerializer.Deserialize<UserPreferencesData>(v, JsonSerializerOptions.Default)!);
@@ -119,7 +120,7 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
             .OnDelete(DeleteBehavior.SetNull);
 
         builder.HasIndex(u => u.ReportingManagerId)
-            .HasDatabaseName("idx_aspnetusers_reporting_manager_id");
+            .HasDatabaseName("idx_users_reporting_manager");
 
         // Ignore computed property
         builder.Ignore(u => u.FullName);
