@@ -14,21 +14,21 @@ Plan: 9 of 12 in current phase
 Status: Executing
 Last activity: 2026-02-16 — Plan 02-09 complete (Angular Permission Infrastructure)
 
-Progress: [███████░░░] 7/12 plans (Phase 2)
+Progress: [████████░░] 8/12 plans (Phase 2)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 15
+- Total plans completed: 16
 - Average duration: 7 min
-- Total execution time: ~1.2 hours
+- Total execution time: ~1.3 hours
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 01-foundation | 8 | ~56min | 7min |
-| 02-core-infrastructure | 7 | ~49min | 7min |
+| 02-core-infrastructure | 8 | ~53min | 7min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -39,6 +39,7 @@ Progress: [███████░░░] 7/12 plans (Phase 2)
 | Phase 02 P03 | 12min | 2 tasks | 12 files |
 | Phase 02 P04 | 5min | 2 tasks | 9 files |
 | Phase 02 P05 | 8min | 2 tasks | 9 files |
+| Phase 02 P07 | 4min | 2 tasks | 2 files |
 | Phase 02 P09 | 6min | 2 tasks | 7 files |
 
 ## Accumulated Context
@@ -87,6 +88,10 @@ Recent decisions affecting current work:
 - [02-05] CustomFieldValidator handles JsonElement values from System.Text.Json deserialization
 - [02-05] Unique field validation deferred to Phase 3 when entity instances exist
 - [02-05] Soft-delete restore uses IgnoreQueryFilters to bypass combined tenant+soft-delete filter
+- [02-07] Permission/field-permission updates use full-replacement strategy (delete all + insert new) for simplicity
+- [02-07] Role deletion blocked when assigned to users via direct assignment or team default role
+- [02-07] my-permissions endpoint overrides controller Admin auth -- any authenticated user can query own permissions
+- [02-07] TeamMemberInfoDto renamed to avoid namespace collision with TeamDirectoryController's TeamMemberDto
 - [02-09] PermissionStore uses computed Map<string,string> for O(1) permission lookups (not array scanning)
 - [02-09] Directives use effect() for reactive signal-based permission checks, avoiding per-cycle method calls
 - [02-09] permissionGuard uses polling with 5s timeout to wait for PermissionStore before checking access
