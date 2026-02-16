@@ -47,6 +47,7 @@ Progress: [███░░░░░░░░░░░] 2/9 plans (Phase 3)
 | Phase 02 P11 | 10min | 2 tasks | 17 files |
 | Phase 02 P13 | 2min | 1 task | 8 files |
 | Phase 02 P14 | 2min | 1 task | 2 files |
+| Phase 03 P01 | 3min | 2 tasks | 10 files |
 | Phase 03 P02 | 2min | 2 tasks | 10 files |
 
 ## Accumulated Context
@@ -118,6 +119,9 @@ Recent decisions affecting current work:
 - [02-13] adminGuard (role-based) for settings route protection -- backend uses Authorize(Roles = "Admin"), not entity permissions
 - [02-13] Contact entity permissions as proxy for *appHasPermission on settings buttons -- Admin has All scope on all entity CRUD
 - [02-14] Raw SQL migration via migrationBuilder.Sql() for GIN indexes (EF Core has no native GIN index API)
+- [03-01] No Organization navigation on CRM entities -- TenantId is raw Guid with query filter only (avoids ExcludeFromMigrations cross-context issues)
+- [03-01] Contact-Company is nullable FK (not join table) per CONT-03 requirement
+- [03-01] Product has no OwnerId -- products are shared tenant resources
 - [03-02] Shared query models (PagedResult, EntityQueryParams, FilterParam, TimelineEntry) in shared/models/query.models.ts
 - [03-02] Product detail uses ProductDto directly (no separate ProductDetailDto) -- fewer fields than Company/Contact
 - [03-02] Entity signal stores are component-provided (not root), matching ViewStore pattern for per-page isolation
