@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard } from '../../core/auth/auth.guard';
 
 export const AUTH_ROUTES: Routes = [
   {
@@ -41,6 +42,7 @@ export const AUTH_ROUTES: Routes = [
   },
   {
     path: '2fa',
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./pages/two-factor/two-factor.component').then(
         (m) => m.TwoFactorComponent

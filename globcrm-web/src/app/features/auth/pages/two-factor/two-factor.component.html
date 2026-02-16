@@ -1,0 +1,190 @@
+<div class="tfa-container">
+  <mat-card class="tfa-card">
+    <mat-card-header class="tfa-card-header">
+      <div class="header-row">
+        <button mat-icon-button (click)="goBack()" aria-label="Go back">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <div>
+          <h2 class="page-title">Security Settings</h2>
+          <p class="page-subtitle">Two-Factor Authentication</p>
+        </div>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading State -->
+      @if (state() === 'loading') {
+        <div class="loading-state">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading security settings...</p>
+        </div>
+      }
+
+      <!-- Error State -->
+      @if (state() === 'error') {
+        <div class="error-banner">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ errorMessage() }}</span>
+        </div>
+        <button mat-flat-button color="primary" (click)="goBack()">
+          Return to Dashboard
+        </button>
+      }
+
+      <!-- Setup State: 2FA Not Enabled -->
+      @if (state() === 'setup') {
+        <div class="setup-section">
+          <div class="setup-header">
+            <mat-icon class="shield-icon">shield</mat-icon>
+            <h3>Enable Two-Factor Authentication</h3>
+            <p class="setup-description">
+              Add an extra layer of security to your account. You'll need an authenticator app
+              like Google Authenticator, Authy, or Microsoft Authenticator.
+            </p>
+          </div>
+
+          @if (errorMessage()) {
+            <div class="error-banner">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
+
+          <!-- Step 1: QR Code -->
+          <div class="setup-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <h4>Scan this QR code with your authenticator app</h4>
+
+              @if (qrCodeDataUrl()) {
+                <div class="qr-code-container">
+                  <img [src]="qrCodeDataUrl()" alt="2FA QR Code" class="qr-code-image">
+                </div>
+              } @else {
+                <div class="qr-code-container">
+                  <mat-spinner diameter="30"></mat-spinner>
+                </div>
+              }
+
+              @if (sharedKey()) {
+                <div class="manual-entry">
+                  <p class="manual-label">Or enter this key manually:</p>
+                  <code class="shared-key">{{ formatSharedKey(sharedKey()!) }}</code>
+                </div>
+              }
+            </div>
+          </div>
+
+          <mat-divider></mat-divider>
+
+          <!-- Step 2: Verify -->
+          <div class="setup-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <h4>Enter the code from your authenticator app</h4>
+              <form [formGroup]="verifyForm" (ngSubmit)="onEnableSubmit()">
+                <mat-form-field appearance="outline">
+                  <mat-label>Verification Code</mat-label>
+                  <input matInput formControlName="twoFactorCode" type="text"
+                         placeholder="000000" maxlength="6" autocomplete="one-time-code">
+                  <mat-icon matPrefix>pin</mat-icon>
+                  @if (verifyForm.get('twoFactorCode')?.hasError('required') && verifyForm.get('twoFactorCode')?.touched) {
+                    <mat-error>Verification code is required</mat-error>
+                  }
+                  @if (verifyForm.get('twoFactorCode')?.hasError('minlength') && verifyForm.get('twoFactorCode')?.touched) {
+                    <mat-error>Code must be 6 digits</mat-error>
+                  }
+                </mat-form-field>
+
+                <button mat-flat-button color="primary" type="submit"
+                        class="enable-button" [disabled]="isLoading()">
+                  @if (isLoading()) {
+                    <mat-spinner diameter="20" color="accent"></mat-spinner>
+                  } @else {
+                    Enable Two-Factor Authentication
+                  }
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- Recovery Codes State -->
+      @if (state() === 'recovery-codes') {
+        <div class="recovery-section">
+          <div class="recovery-header">
+            <mat-icon class="success-icon">check_circle</mat-icon>
+            <h3>Two-Factor Authentication Enabled</h3>
+            <p class="recovery-description">
+              Save these recovery codes in a safe place. Each code can only be used once
+              to access your account if you lose your authenticator device.
+            </p>
+          </div>
+
+          <div class="recovery-codes-grid">
+            @for (code of recoveryCodes(); track code) {
+              <div class="recovery-code">
+                <code>{{ code }}</code>
+              </div>
+            }
+          </div>
+
+          <div class="recovery-actions">
+            <button mat-stroked-button (click)="downloadRecoveryCodes()">
+              <mat-icon>download</mat-icon>
+              Download Codes
+            </button>
+            <button mat-flat-button color="primary" (click)="dismissRecoveryCodes()">
+              I've Saved My Codes
+            </button>
+          </div>
+        </div>
+      }
+
+      <!-- Enabled State: 2FA Already Active -->
+      @if (state() === 'enabled') {
+        <div class="enabled-section">
+          <div class="enabled-header">
+            <mat-icon class="enabled-icon">verified_user</mat-icon>
+            <h3>Two-Factor Authentication is Enabled</h3>
+            <p class="enabled-description">
+              Your account is protected with an extra layer of security.
+            </p>
+          </div>
+
+          @if (recoveryCodesLeft() > 0) {
+            <div class="recovery-info">
+              <mat-icon>info_outline</mat-icon>
+              <span>You have <strong>{{ recoveryCodesLeft() }}</strong> recovery codes remaining.</span>
+            </div>
+          }
+
+          @if (errorMessage()) {
+            <div class="error-banner">
+              <mat-icon>error_outline</mat-icon>
+              <span>{{ errorMessage() }}</span>
+            </div>
+          }
+
+          <mat-divider></mat-divider>
+
+          <div class="disable-section">
+            <h4>Disable Two-Factor Authentication</h4>
+            <p class="disable-warning">
+              This will remove the extra security on your account.
+            </p>
+            <button mat-stroked-button color="warn" (click)="onDisableSubmit()" [disabled]="isLoading()">
+              @if (isLoading()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              } @else {
+                Disable 2FA
+              }
+            </button>
+          </div>
+        </div>
+      }
+    </mat-card-content>
+  </mat-card>
+</div>
