@@ -5,32 +5,32 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 1 (Foundation)
+**Current focus:** Phase 2 (Core Infrastructure)
 
 ## Current Position
 
-Phase: 1 of 11 (Foundation)
-Plan: 8 of 8 in current phase
-Status: Executing
-Last activity: 2026-02-16 — Completed 01-07-PLAN.md
+Phase: 2 of 11 (Core Infrastructure)
+Plan: 0 of TBD in current phase
+Status: Ready for planning
+Last activity: 2026-02-16 — Phase 1 complete (verified E2E)
 
-Progress: [████████░░] 7/8 plans
+Progress: [██████████] 8/8 plans (Phase 1)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 7
+- Total plans completed: 8
 - Average duration: 7 min
-- Total execution time: 0.83 hours
+- Total execution time: ~1 hour
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 01-foundation | 7 | 50min | 7min |
+| 01-foundation | 8 | ~56min | 7min |
 
 **Recent Trend:**
-- Last 5 plans: 01-03 (~7min), 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min)
+- Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
 - Trend: Consistent ~7min per plan
 
 *Updated after each plan completion*
@@ -54,36 +54,28 @@ Recent decisions affecting current work:
 - [Phase 01]: Added Identity.Stores to Domain for IdentityUser base class
 - [Phase 01]: FORCE ROW LEVEL SECURITY on tenant-scoped tables for defense-in-depth
 - [01-04] Self-contained HTML email templates with inline CSS for email client compatibility (no Razor layout inheritance)
-- [01-04] Separate DI extension methods per subsystem (EmailServiceExtensions, OrganizationServiceExtensions) for parallel-safe registration
+- [01-04] Separate DI extension methods per subsystem for parallel-safe registration
 - [01-04] TenantSeeder uses seed manifest pattern -- data structure now, entity creation in Phase 3
-- [01-04] Reserved subdomain list includes infrastructure (www, api, cdn) and product names (app, dashboard, console)
 - [Phase 01-03]: TenantDbContext extends EFCoreStoreDbContext for Finbuckle EF Core store integration
 - [Phase 01-03]: JWT bearer as default auth scheme; custom login endpoint generates JWTs with organizationId claim
 - [Phase 01-03]: Development mode uses WithHeaderStrategy('X-Tenant-Id') fallback for local testing without subdomains
 - [01-05] Cross-tenant invitation token lookup uses IgnoreQueryFilters() since accepting user has no tenant context
-- [01-05] LogoutEndpoint in Api project (not Application) due to HttpContext/IResult dependency
-- [01-05] Application layer avoids EF Core dependency: uses FindByEmailAsync and synchronous IQueryable.Count()
-- [01-05] InvitationServiceExtensions follows per-subsystem DI pattern; all services registered in Program.cs
-- [01-06] Auth pages use pages/ subdirectory structure from Plan 02 scaffolding (not flat structure)
-- [01-06] Password strength: 4-tier scoring (length, uppercase, digits, special chars) with color-coded mat-progress-bar
-- [01-06] Forgot password always shows success to prevent email enumeration
-- [01-06] Verify email handles both pending and confirmation states in single component via query params
-- [01-07] Used qrcode (npm) instead of angularx-qrcode due to Angular 21+ peer dependency requirement
-- [01-07] Navbar visibility via toSignal(router.events) + computed() for reactive route-based show/hide
-- [01-07] Recovery codes generated client-side as placeholder; production API returns actual codes
-- [01-07] Wizard completeSetup navigates to dashboard even on API error for graceful degradation
-- [01-07] 2FA route at /auth/2fa protected with authGuard
+- [01-08-E2E] Dual DbContext requires ExcludeFromMigrations() for shared entities to prevent duplicate tables
+- [01-08-E2E] Global query filters need null tenant bypass for login/org creation to work without tenant context
+- [01-08-E2E] Angular must import environment.development.ts (not environment.ts); fileReplacements swaps for production
+- [01-08-E2E] Angular login uses /api/auth/login-extended (custom JWT), not /api/auth/login (Identity opaque tokens)
+- [01-08-E2E] Backend runs on port 5233 (launchSettings.json), Angular dev env updated accordingly
 
 ### Pending Todos
 
-None yet.
+None.
 
 ### Blockers/Concerns
 
-None yet.
+None.
 
 ## Session Continuity
 
 Last session: 2026-02-16
-Stopped at: Completed 01-07-PLAN.md
-Resume file: .planning/phases/01-foundation/01-07-SUMMARY.md
+Stopped at: Phase 2 context gathered
+Resume file: .planning/phases/02-core-infrastructure/02-CONTEXT.md
