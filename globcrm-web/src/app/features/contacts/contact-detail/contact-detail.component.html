@@ -1,0 +1,179 @@
+@if (isLoading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (contact()) {
+  <div class="detail-page">
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-left">
+        <a mat-icon-button routerLink="/contacts" aria-label="Back to contacts">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ contact()!.fullName }}</h1>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button
+                *appHasPermission="'Contact:Edit'"
+                routerLink="edit">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-stroked-button color="warn"
+                *appHasPermission="'Contact:Delete'"
+                (click)="onDelete()">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Subheader: Key fields -->
+    <div class="detail-subheader">
+      @if (contact()!.email) {
+        <div class="subheader-item">
+          <mat-icon>email</mat-icon>
+          <span>{{ contact()!.email }}</span>
+        </div>
+      }
+      @if (contact()!.phone) {
+        <div class="subheader-item">
+          <mat-icon>phone</mat-icon>
+          <span>{{ contact()!.phone }}</span>
+        </div>
+      }
+      @if (contact()!.jobTitle) {
+        <div class="subheader-item">
+          <mat-icon>work</mat-icon>
+          <span>{{ contact()!.jobTitle }}</span>
+        </div>
+      }
+      @if (contact()!.companyName) {
+        <div class="subheader-item">
+          <mat-icon>business</mat-icon>
+          <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+        </div>
+      }
+    </div>
+
+    <!-- Main content: Tabs + Timeline sidebar -->
+    <div class="detail-content">
+      <div class="detail-main">
+        <app-related-entity-tabs [tabs]="tabs" (tabChanged)="onTabChanged($event)">
+          <!-- Details tab content (index 0) -->
+          <ng-template>
+            <div class="details-grid">
+              <div class="detail-field">
+                <span class="field-label">First Name</span>
+                <span class="field-value">{{ contact()!.firstName }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Last Name</span>
+                <span class="field-value">{{ contact()!.lastName }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Email</span>
+                <span class="field-value">{{ contact()!.email || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Phone</span>
+                <span class="field-value">{{ contact()!.phone || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Mobile Phone</span>
+                <span class="field-value">{{ contact()!.mobilePhone || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Job Title</span>
+                <span class="field-value">{{ contact()!.jobTitle || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Department</span>
+                <span class="field-value">{{ contact()!.department || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Company</span>
+                <span class="field-value">
+                  @if (contact()!.companyId) {
+                    <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+                  } @else {
+                    -
+                  }
+                </span>
+              </div>
+              <div class="detail-field full-width">
+                <span class="field-label">Address</span>
+                <span class="field-value">{{ contact()!.address || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">City</span>
+                <span class="field-value">{{ contact()!.city || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">State / Region</span>
+                <span class="field-value">{{ contact()!.state || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Country</span>
+                <span class="field-value">{{ contact()!.country || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Postal Code</span>
+                <span class="field-value">{{ contact()!.postalCode || '-' }}</span>
+              </div>
+              <div class="detail-field full-width">
+                <span class="field-label">Description</span>
+                <span class="field-value">{{ contact()!.description || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Custom fields in readonly mode -->
+            <h3 class="section-title">Custom Fields</h3>
+            <app-custom-field-form
+              [entityType]="'Contact'"
+              [customFieldValues]="contact()!.customFields"
+              [readonly]="true" />
+          </ng-template>
+
+          <!-- Company tab content (index 1) -->
+          <ng-template>
+            <div class="company-tab">
+              @if (contact()!.companyId) {
+                <div class="company-info-grid">
+                  <div class="detail-field">
+                    <span class="field-label">Company Name</span>
+                    <span class="field-value">
+                      <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+                    </span>
+                  </div>
+                </div>
+              } @else {
+                <div class="no-company">
+                  <mat-icon>business</mat-icon>
+                  <span>No company linked to this contact.</span>
+                  <button mat-stroked-button
+                          *appHasPermission="'Contact:Edit'"
+                          routerLink="edit">
+                    Link Company
+                  </button>
+                </div>
+              }
+            </div>
+          </ng-template>
+        </app-related-entity-tabs>
+      </div>
+
+      <!-- Timeline sidebar -->
+      <div class="detail-sidebar">
+        <h3 class="sidebar-title">Timeline</h3>
+        <app-entity-timeline
+          [entries]="timelineEntries()"
+          [isLoading]="timelineLoading()" />
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="detail-not-found">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Contact not found</h2>
+    <a mat-stroked-button routerLink="/contacts">Back to Contacts</a>
+  </div>
+}

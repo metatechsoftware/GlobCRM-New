@@ -38,6 +38,7 @@ export const CONTACT_TABS: EntityTab[] = [
   { label: 'Deals', icon: 'handshake', enabled: false },
   { label: 'Quotes', icon: 'request_quote', enabled: false },
   { label: 'Activities', icon: 'task_alt', enabled: false },
+  { label: 'Emails', icon: 'email', enabled: false },
   { label: 'Notes', icon: 'note', enabled: false },
 ];
 
