@@ -94,7 +94,10 @@ namespace GlobCRM.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("ApplicationUser");
+                    b.ToTable("AspNetUsers", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("GlobCRM.Domain.Entities.Invitation", b =>
@@ -136,7 +139,10 @@ namespace GlobCRM.Infrastructure.Persistence.Migrations.Tenant
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("Invitation");
+                    b.ToTable("invitations", null, t =>
+                        {
+                            t.ExcludeFromMigrations();
+                        });
                 });
 
             modelBuilder.Entity("GlobCRM.Domain.Entities.Organization", b =>

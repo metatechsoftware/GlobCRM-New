@@ -47,6 +47,8 @@ public class SendGridEmailSender : IEmailService
         var encodedEmail = WebUtility.UrlEncode(email);
         var verificationUrl = $"https://{subdomain}.{_baseUrl}/auth/verify-email?email={encodedEmail}&code={encodedToken}";
 
+        _logger.LogInformation("=== VERIFICATION EMAIL ===\nTo: {Email}\nURL: {Url}\n=========================", email, verificationUrl);
+
         var model = new VerificationEmailModel
         {
             UserName = ExtractNameFromEmail(email),
@@ -65,6 +67,8 @@ public class SendGridEmailSender : IEmailService
         var encodedEmail = WebUtility.UrlEncode(email);
         var resetUrl = $"https://{subdomain}.{_baseUrl}/auth/reset-password?email={encodedEmail}&code={encodedToken}";
 
+        _logger.LogInformation("=== PASSWORD RESET EMAIL ===\nTo: {Email}\nURL: {Url}\n============================", email, resetUrl);
+
         var model = new PasswordResetEmailModel
         {
             UserName = ExtractNameFromEmail(email),
@@ -79,6 +83,8 @@ public class SendGridEmailSender : IEmailService
     /// <inheritdoc />
     public async Task SendInvitationEmailAsync(string email, string orgName, string inviterName, string role, string joinUrl)
     {
+        _logger.LogInformation("=== INVITATION EMAIL ===\nTo: {Email}\nOrg: {OrgName}\nRole: {Role}\nURL: {Url}\n========================", email, orgName, role, joinUrl);
+
         var model = new InvitationEmailModel
         {
             UserName = ExtractNameFromEmail(email),

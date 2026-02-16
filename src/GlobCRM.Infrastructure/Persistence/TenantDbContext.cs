@@ -28,6 +28,10 @@ public class TenantDbContext : EFCoreStoreDbContext<TenantInfo>
 
         modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
 
+        // Exclude entities managed by ApplicationDbContext (discovered via Organization navigations)
+        modelBuilder.Entity<ApplicationUser>().ToTable("AspNetUsers", t => t.ExcludeFromMigrations());
+        modelBuilder.Entity<Invitation>().ToTable("invitations", t => t.ExcludeFromMigrations());
+
         // Configure the Finbuckle TenantInfo entity
         modelBuilder.Entity<TenantInfo>(entity =>
         {

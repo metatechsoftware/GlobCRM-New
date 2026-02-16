@@ -54,16 +54,21 @@ public class ApplicationDbContext
         base.OnModelCreating(modelBuilder);
 
         // Apply entity type configurations
+        // Organization table is owned by TenantDbContext - apply config for mapping but exclude from migrations
+        modelBuilder.ApplyConfiguration(new OrganizationConfiguration());
+        modelBuilder.Entity<Organization>().ToTable("organizations", t => t.ExcludeFromMigrations());
+
         modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         modelBuilder.ApplyConfiguration(new InvitationConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
-        // This ensures queries never return data from other tenants
+        // When no tenant is resolved (e.g., login, org creation), filter is bypassed
         modelBuilder.Entity<Invitation>().HasQueryFilter(
-            i => _tenantProvider == null || i.TenantId == _tenantProvider.GetTenantId());
+            i => _tenantProvider == null || _tenantProvider.GetTenantId() == null || i.TenantId == _tenantProvider.GetTenantId());
 
         // Global query filter: filter ApplicationUser by OrganizationId
+        // When no tenant is resolved (e.g., login, org creation), filter is bypassed
         modelBuilder.Entity<ApplicationUser>().HasQueryFilter(
-            u => _tenantProvider == null || u.OrganizationId == _tenantProvider.GetTenantId());
+            u => _tenantProvider == null || _tenantProvider.GetTenantId() == null || u.OrganizationId == _tenantProvider.GetTenantId());
     }
 }

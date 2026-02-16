@@ -65,9 +65,10 @@ export class AuthService implements OnDestroy {
   login(request: LoginRequest): Observable<LoginResponse> {
     this.authStore.setLoading(true);
     return this.api
-      .post<LoginResponse>('/api/auth/login?useCookies=false', {
+      .post<LoginResponse>('/api/auth/login-extended', {
         email: request.email,
         password: request.password,
+        rememberMe: request.rememberMe,
       })
       .pipe(
         tap((response) => {
