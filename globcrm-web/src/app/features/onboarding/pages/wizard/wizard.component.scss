@@ -1,0 +1,54 @@
+.wizard-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.wizard-header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.wizard-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin: 0 0 0.5rem 0;
+}
+
+.wizard-subtitle {
+  font-size: 1.1rem;
+  color: rgba(0, 0, 0, 0.6);
+  margin: 0 0 1rem 0;
+}
+
+.skip-all-button {
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    margin-left: 4px;
+  }
+}
+
+.wizard-stepper {
+  background: transparent;
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .wizard-container {
+    padding: 1rem;
+  }
+
+  .wizard-title {
+    font-size: 1.5rem;
+  }
+
+  .wizard-subtitle {
+    font-size: 0.95rem;
+  }
+}

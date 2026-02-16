@@ -14,6 +14,9 @@ import {
   TwoFactorRequest,
   TwoFactorInfo,
   UserInfo,
+  SendInvitationsRequest,
+  SendInvitationsResponse,
+  OrganizationSettings,
 } from './auth.models';
 
 const REFRESH_TOKEN_KEY = 'globcrm_refresh_token';
@@ -175,6 +178,18 @@ export class AuthService implements OnDestroy {
     return this.api.get<{ available: boolean }>(
       `/api/organizations/check-subdomain?name=${encodeURIComponent(subdomain)}`
     );
+  }
+
+  sendInvitations(request: SendInvitationsRequest): Observable<SendInvitationsResponse> {
+    return this.api.post<SendInvitationsResponse>('/api/invitations/send', request);
+  }
+
+  updateOrganizationSettings(settings: OrganizationSettings): Observable<void> {
+    return this.api.put<void>('/api/organizations/settings', settings);
+  }
+
+  completeSetup(): Observable<void> {
+    return this.api.post<void>('/api/organizations/complete-setup', {});
   }
 
   logout(): void {

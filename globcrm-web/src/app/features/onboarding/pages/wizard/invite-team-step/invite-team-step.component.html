@@ -1,0 +1,80 @@
+<div class="step-container">
+  <div class="step-header">
+    <mat-icon class="step-icon">group_add</mat-icon>
+    <h3>Invite Your Team</h3>
+    <p class="step-description">
+      Add team members by typing or pasting email addresses below.
+      You can always invite more people later from Settings.
+    </p>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage() }}</span>
+    </div>
+  }
+
+  @if (resultMessage()) {
+    <div class="success-banner">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ resultMessage() }}</span>
+    </div>
+  }
+
+  <form [formGroup]="inviteForm">
+    <mat-form-field appearance="outline">
+      <mat-label>Email addresses</mat-label>
+      <textarea matInput formControlName="emailInput"
+                placeholder="Enter emails separated by commas or new lines&#10;e.g., alice@company.com, bob@company.com"
+                rows="3"
+                (blur)="parseEmails()"
+                (keydown.enter)="$event.preventDefault(); parseEmails()">
+      </textarea>
+      <mat-hint>Press Enter or click outside to add emails</mat-hint>
+    </mat-form-field>
+
+    @if (emails().length > 0) {
+      <div class="email-chips">
+        <mat-chip-set>
+          @for (email of emails(); track email) {
+            <mat-chip (removed)="removeEmail(email)">
+              {{ email }}
+              <button matChipRemove aria-label="Remove email">
+                <mat-icon>cancel</mat-icon>
+              </button>
+            </mat-chip>
+          }
+        </mat-chip-set>
+      </div>
+    }
+
+    <mat-form-field appearance="outline" class="role-select">
+      <mat-label>Role</mat-label>
+      <mat-select formControlName="role">
+        <mat-option value="Member">Member</mat-option>
+        <mat-option value="Admin">Admin</mat-option>
+      </mat-select>
+      <mat-hint>Role assigned to all invited users</mat-hint>
+    </mat-form-field>
+  </form>
+
+  <div class="step-actions">
+    <button mat-button (click)="onSkip()" class="skip-button">
+      Skip
+    </button>
+    @if (emails().length > 0) {
+      <button mat-flat-button color="primary" (click)="onSendInvitations()"
+              [disabled]="isLoading()">
+        @if (isLoading()) {
+          <mat-spinner diameter="20" color="accent"></mat-spinner>
+        } @else {
+          Send {{ emails().length }} Invitation{{ emails().length > 1 ? 's' : '' }}
+        }
+      </button>
+    }
+    <button mat-stroked-button color="primary" (click)="onContinue()">
+      Continue
+    </button>
+  </div>
+</div>

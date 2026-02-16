@@ -1,0 +1,103 @@
+.step-container {
+  padding: 1.5rem 0;
+}
+
+.step-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+
+  h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0.5rem 0;
+  }
+}
+
+.step-icon {
+  font-size: 40px;
+  width: 40px;
+  height: 40px;
+  color: #1976d2;
+}
+
+.step-description {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 0.9rem;
+  margin: 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #fdecea;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  color: #d32f2f;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: #e8f5e9;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  color: #2e7d32;
+  font-size: 0.875rem;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.role-select {
+  max-width: 200px;
+}
+
+.email-chips {
+  margin-bottom: 1rem;
+}
+
+.step-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.skip-button {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .step-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}

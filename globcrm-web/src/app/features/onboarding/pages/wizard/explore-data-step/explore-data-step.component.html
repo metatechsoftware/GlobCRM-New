@@ -1,0 +1,32 @@
+<div class="step-container">
+  <div class="step-header">
+    <mat-icon class="step-icon">explore</mat-icon>
+    <h3>Explore Your Data</h3>
+    <p class="step-description">
+      We've added some sample data to help you explore GlobCRM.
+      You can delete this sample data anytime from Settings.
+    </p>
+  </div>
+
+  <div class="seed-data-grid">
+    @for (item of seedData; track item.label) {
+      <div class="seed-data-card">
+        <mat-icon [style.color]="item.color" class="seed-icon">{{ item.icon }}</mat-icon>
+        <div class="seed-info">
+          <strong>{{ item.label }}</strong>
+          <p>{{ item.description }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <div class="step-actions">
+    <button mat-button (click)="onSkip()" class="skip-button">
+      Skip
+    </button>
+    <button mat-flat-button color="primary" (click)="onFinish()" class="finish-button">
+      <mat-icon>rocket_launch</mat-icon>
+      Start Using GlobCRM
+    </button>
+  </div>
+</div>

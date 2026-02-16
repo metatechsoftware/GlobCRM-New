@@ -83,3 +83,20 @@ export interface OrganizationInfo {
   name: string;
   subdomain: string;
 }
+
+export interface SendInvitationsRequest {
+  emails: string[];
+  role: string;
+}
+
+export interface SendInvitationsResponse {
+  sent: number;
+  skipped: number;
+  errors?: string[];
+}
+
+export interface OrganizationSettings {
+  timezone: string;
+  currency: string;
+  dateFormat: string;
+}
