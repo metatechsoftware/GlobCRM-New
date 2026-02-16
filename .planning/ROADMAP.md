@@ -61,10 +61,21 @@ Plans:
   5. Admin can define custom fields with all supported types (text, number, date, dropdown, checkbox, multi-select, currency, file, relation)
   6. Custom fields are stored in JSONB with GIN indexing and appear in dynamic tables
   7. User can adjust table columns, save Views with filters and sorting, and switch between personal and team-wide Views
-**Plans**: TBD
+**Plans**: 12 plans
 
 Plans:
-- TBD
+- [ ] 02-01-PLAN.md -- RBAC domain entities, enums, EF Core configs, and migration
+- [ ] 02-02-PLAN.md -- Custom fields + views domain entities, EnableDynamicJson, and migration
+- [ ] 02-03-PLAN.md -- User profile extension, SkiaSharp avatar service, file storage
+- [ ] 02-04-PLAN.md -- RBAC authorization engine (PermissionService, handler, policy provider, role seeder)
+- [ ] 02-05-PLAN.md -- Custom fields + views API controllers and repositories
+- [ ] 02-06-PLAN.md -- User profile + team directory API controllers
+- [ ] 02-07-PLAN.md -- RBAC API controllers (roles CRUD, teams CRUD, user assignment)
+- [ ] 02-08-PLAN.md -- Angular dynamic table component, filter panel, views sidebar
+- [ ] 02-09-PLAN.md -- Angular permission infrastructure (store, directives, guard)
+- [ ] 02-10-PLAN.md -- Angular RBAC settings pages (role management, permission matrix, team management)
+- [ ] 02-11-PLAN.md -- Angular custom fields settings, profile pages, avatar, team directory
+- [ ] 02-12-PLAN.md -- End-to-end verification checkpoint
 
 ### Phase 3: Core CRM Entities
 **Goal**: Companies, contacts, and products with full CRUD and relational navigation
