@@ -1,0 +1,163 @@
+@if (isLoading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (company()) {
+  <div class="detail-page">
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-left">
+        <a mat-icon-button routerLink="/companies" aria-label="Back to companies">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ company()!.name }}</h1>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button
+                *appHasPermission="'Company:Edit'"
+                routerLink="edit">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-stroked-button color="warn"
+                *appHasPermission="'Company:Delete'"
+                (click)="onDelete()">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Subheader: Key fields -->
+    <div class="detail-subheader">
+      @if (company()!.industry) {
+        <div class="subheader-item">
+          <mat-icon>business</mat-icon>
+          <span>{{ company()!.industry }}</span>
+        </div>
+      }
+      @if (company()!.phone) {
+        <div class="subheader-item">
+          <mat-icon>phone</mat-icon>
+          <span>{{ company()!.phone }}</span>
+        </div>
+      }
+      @if (company()!.ownerName) {
+        <div class="subheader-item">
+          <mat-icon>person</mat-icon>
+          <span>{{ company()!.ownerName }}</span>
+        </div>
+      }
+    </div>
+
+    <!-- Main content: Tabs + Timeline sidebar -->
+    <div class="detail-content">
+      <div class="detail-main">
+        <app-related-entity-tabs [tabs]="tabs" (tabChanged)="onTabChanged($event)">
+          <!-- Details tab content -->
+          <ng-template>
+            <div class="details-grid">
+              <div class="detail-field">
+                <span class="field-label">Company Name</span>
+                <span class="field-value">{{ company()!.name }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Industry</span>
+                <span class="field-value">{{ company()!.industry || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Website</span>
+                <span class="field-value">{{ company()!.website || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Phone</span>
+                <span class="field-value">{{ company()!.phone || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Email</span>
+                <span class="field-value">{{ company()!.email || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Address</span>
+                <span class="field-value">{{ company()!.address || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">City</span>
+                <span class="field-value">{{ company()!.city || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">State / Region</span>
+                <span class="field-value">{{ company()!.state || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Country</span>
+                <span class="field-value">{{ company()!.country || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Postal Code</span>
+                <span class="field-value">{{ company()!.postalCode || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Company Size</span>
+                <span class="field-value">{{ company()!.size || '-' }}</span>
+              </div>
+              <div class="detail-field full-width">
+                <span class="field-label">Description</span>
+                <span class="field-value">{{ company()!.description || '-' }}</span>
+              </div>
+            </div>
+
+            <!-- Custom fields in readonly mode -->
+            <h3 class="section-title">Custom Fields</h3>
+            <app-custom-field-form
+              [entityType]="'Company'"
+              [customFieldValues]="company()!.customFields"
+              [readonly]="true" />
+          </ng-template>
+
+          <!-- Contacts tab content -->
+          <ng-template>
+            <div class="contacts-tab">
+              @if (contactsLoading()) {
+                <div class="tab-loading">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else if (contacts().length === 0) {
+                <div class="tab-empty">
+                  <mat-icon>people_outline</mat-icon>
+                  <span>No contacts linked to this company.</span>
+                </div>
+              } @else {
+                <mat-list>
+                  @for (contact of contacts(); track contact.id) {
+                    <mat-list-item>
+                      <mat-icon matListItemIcon>person</mat-icon>
+                      <span matListItemTitle>{{ contact.fullName }}</span>
+                      <span matListItemLine>
+                        @if (contact.jobTitle) { {{ contact.jobTitle }} }
+                        @if (contact.jobTitle && contact.email) { &middot; }
+                        @if (contact.email) { {{ contact.email }} }
+                      </span>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              }
+            </div>
+          </ng-template>
+        </app-related-entity-tabs>
+      </div>
+
+      <!-- Timeline sidebar -->
+      <div class="detail-sidebar">
+        <h3 class="sidebar-title">Timeline</h3>
+        <app-entity-timeline
+          [entries]="timelineEntries()"
+          [isLoading]="timelineLoading()" />
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="detail-not-found">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Company not found</h2>
+    <a mat-stroked-button routerLink="/companies">Back to Companies</a>
+  </div>
+}

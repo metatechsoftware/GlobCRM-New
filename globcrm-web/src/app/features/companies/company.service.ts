@@ -13,6 +13,7 @@ import {
   CreateCompanyRequest,
   UpdateCompanyRequest,
 } from './company.models';
+import { ContactDto } from '../contacts/contact.models';
 
 /**
  * API service for Company entity CRUD operations.
@@ -46,6 +47,10 @@ export class CompanyService {
 
   getTimeline(id: string): Observable<TimelineEntry[]> {
     return this.api.get<TimelineEntry[]>(`${this.basePath}/${id}/timeline`);
+  }
+
+  getCompanyContacts(id: string): Observable<ContactDto[]> {
+    return this.api.get<ContactDto[]>(`${this.basePath}/${id}/contacts`);
   }
 
   private buildQueryParams(params: EntityQueryParams): HttpParams {

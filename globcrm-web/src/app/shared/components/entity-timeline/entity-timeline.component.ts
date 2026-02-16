@@ -219,7 +219,7 @@ const TIMELINE_COLORS: Record<string, string> = {
                 <div class="timeline-description">{{ entry.description }}</div>
               }
               <div class="timeline-meta">
-                <span>{{ entry.timestamp | date:'MMM d, y \'at\' h:mm a' }}</span>
+                <span>{{ entry.timestamp | date:'MMM d, y, h:mm a' }}</span>
                 @if (entry.userName) {
                   <span class="timeline-meta-separator"></span>
                   <span>{{ entry.userName }}</span>
