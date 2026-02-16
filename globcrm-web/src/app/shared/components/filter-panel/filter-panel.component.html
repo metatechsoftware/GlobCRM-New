@@ -1,0 +1,71 @@
+<mat-expansion-panel class="filter-panel" [expanded]="isPanelOpen">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <mat-icon>filter_list</mat-icon>
+      Advanced Filters
+      @if (activeFilters().length > 0) {
+        <span class="filter-count">({{ activeFilters().length }})</span>
+      }
+    </mat-panel-title>
+  </mat-expansion-panel-header>
+
+  <div class="filter-rows">
+    @for (filter of filterRows; track $index) {
+      <div class="filter-row">
+        <!-- Field selector -->
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Field</mat-label>
+          <mat-select
+            [value]="filter.fieldId"
+            (selectionChange)="onFieldChange($index, $event.value)">
+            @for (col of filterableColumns(); track col.fieldId) {
+              <mat-option [value]="col.fieldId">{{ col.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Operator selector -->
+        <mat-form-field appearance="outline" class="filter-operator">
+          <mat-label>Operator</mat-label>
+          <mat-select
+            [value]="filter.operator"
+            (selectionChange)="onOperatorChange($index, $event.value)">
+            @for (op of getOperatorsForField(filter.fieldId); track op.value) {
+              <mat-option [value]="op.value">{{ op.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <!-- Value input -->
+        @if (!isNullOperator(filter.operator)) {
+          <mat-form-field appearance="outline" class="filter-value">
+            <mat-label>Value</mat-label>
+            <input matInput
+                   [value]="filter.value ?? ''"
+                   (input)="onValueChange($index, $any($event.target).value)">
+          </mat-form-field>
+        }
+
+        <!-- Remove button -->
+        <button mat-icon-button
+                color="warn"
+                (click)="removeFilter($index)"
+                aria-label="Remove filter">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+
+  <div class="filter-actions">
+    <button mat-stroked-button (click)="addFilter()">
+      <mat-icon>add</mat-icon>
+      Add Filter
+    </button>
+    <span class="spacer"></span>
+    <button mat-button (click)="clearFilters()">Clear All</button>
+    <button mat-flat-button color="primary" (click)="applyFilters()">
+      Apply Filters
+    </button>
+  </div>
+</mat-expansion-panel>
