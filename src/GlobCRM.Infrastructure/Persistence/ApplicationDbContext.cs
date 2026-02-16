@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant.Abstractions;
 using Finbuckle.MultiTenant.EntityFrameworkCore;
 using GlobCRM.Domain.Entities;
+using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Persistence.Configurations;
 using Microsoft.AspNetCore.Identity;
@@ -48,6 +49,19 @@ public class ApplicationDbContext
     public TenantNotSetMode TenantNotSetMode => TenantNotSetMode.Throw;
 
     public DbSet<Invitation> Invitations => Set<Invitation>();
+    public DbSet<CustomFieldDefinition> CustomFieldDefinitions => Set<CustomFieldDefinition>();
+    public DbSet<CustomFieldSection> CustomFieldSections => Set<CustomFieldSection>();
+    public DbSet<SavedView> SavedViews => Set<SavedView>();
+
+    // RBAC DbSets
+    // 'new' keyword: intentionally hides IdentityDbContext.Roles (DbSet<IdentityRole<Guid>>)
+    // because our custom Role entity is a different type from IdentityRole.
+    public new DbSet<Role> Roles => Set<Role>();
+    public DbSet<RolePermission> RolePermissions => Set<RolePermission>();
+    public DbSet<RoleFieldPermission> RoleFieldPermissions => Set<RoleFieldPermission>();
+    public DbSet<Team> Teams => Set<Team>();
+    public DbSet<TeamMember> TeamMembers => Set<TeamMember>();
+    public DbSet<UserRoleAssignment> UserRoleAssignments => Set<UserRoleAssignment>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,6 +74,17 @@ public class ApplicationDbContext
 
         modelBuilder.ApplyConfiguration(new ApplicationUserConfiguration());
         modelBuilder.ApplyConfiguration(new InvitationConfiguration());
+        modelBuilder.ApplyConfiguration(new CustomFieldDefinitionConfiguration());
+        modelBuilder.ApplyConfiguration(new CustomFieldSectionConfiguration());
+        modelBuilder.ApplyConfiguration(new SavedViewConfiguration());
+
+        // RBAC entity configurations
+        modelBuilder.ApplyConfiguration(new RoleConfiguration());
+        modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
+        modelBuilder.ApplyConfiguration(new RoleFieldPermissionConfiguration());
+        modelBuilder.ApplyConfiguration(new TeamConfiguration());
+        modelBuilder.ApplyConfiguration(new TeamMemberConfiguration());
+        modelBuilder.ApplyConfiguration(new UserRoleAssignmentConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -70,5 +95,29 @@ public class ApplicationDbContext
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
         modelBuilder.Entity<ApplicationUser>().HasQueryFilter(
             u => _tenantProvider == null || _tenantProvider.GetTenantId() == null || u.OrganizationId == _tenantProvider.GetTenantId());
+
+        // Global query filter: CustomFieldDefinition — tenant-scoped AND soft-delete filtered
+        modelBuilder.Entity<CustomFieldDefinition>().HasQueryFilter(
+            f => (_tenantProvider == null || _tenantProvider.GetTenantId() == null || f.TenantId == _tenantProvider.GetTenantId()) && !f.IsDeleted);
+
+        // Global query filter: CustomFieldSection — tenant-scoped
+        modelBuilder.Entity<CustomFieldSection>().HasQueryFilter(
+            s => _tenantProvider == null || _tenantProvider.GetTenantId() == null || s.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: SavedView — tenant-scoped
+        modelBuilder.Entity<SavedView>().HasQueryFilter(
+            v => _tenantProvider == null || _tenantProvider.GetTenantId() == null || v.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Roles by TenantId (tenant-scoped)
+        modelBuilder.Entity<Role>().HasQueryFilter(
+            r => _tenantProvider == null || _tenantProvider.GetTenantId() == null || r.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Teams by TenantId (tenant-scoped)
+        modelBuilder.Entity<Team>().HasQueryFilter(
+            t => _tenantProvider == null || _tenantProvider.GetTenantId() == null || t.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: RolePermission, RoleFieldPermission, TeamMember, UserRoleAssignment
+        // do NOT need their own query filters -- they are filtered through their
+        // parent's FK relationship (Role or Team) which is already tenant-filtered.
     }
 }

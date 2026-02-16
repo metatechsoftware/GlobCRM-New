@@ -16,6 +16,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+using Npgsql;
 
 namespace GlobCRM.Infrastructure;
 
@@ -34,6 +35,13 @@ public static class DependencyInjection
         var connectionString = configuration.GetConnectionString("DefaultConnection")
             ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
+        // ---- Npgsql DataSource with EnableDynamicJson ----
+        // Required for JSONB serialization of Dictionary<string, object?> and List<T> types
+        // used by CustomFieldDefinition (Validation, Options) and SavedView (Columns, Filters, Sorts)
+        var dataSourceBuilder = new NpgsqlDataSourceBuilder(connectionString);
+        dataSourceBuilder.EnableDynamicJson();
+        var dataSource = dataSourceBuilder.Build();
+
         // ---- EF Core interceptors ----
         services.AddScoped<TenantDbConnectionInterceptor>();
         services.AddScoped<AuditableEntityInterceptor>();
@@ -42,12 +50,12 @@ public static class DependencyInjection
 
         // TenantDbContext (tenant catalog -- not tenant-scoped)
         services.AddDbContext<TenantDbContext>(options =>
-            options.UseNpgsql(connectionString));
+            options.UseNpgsql(dataSource));
 
         // ApplicationDbContext (tenant-scoped) with interceptors
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
-            options.UseNpgsql(connectionString);
+            options.UseNpgsql(dataSource);
             options.AddInterceptors(
                 serviceProvider.GetRequiredService<TenantDbConnectionInterceptor>(),
                 serviceProvider.GetRequiredService<AuditableEntityInterceptor>());

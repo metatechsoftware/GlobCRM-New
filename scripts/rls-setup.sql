@@ -82,6 +82,85 @@ COMMENT ON POLICY tenant_isolation_invitations ON invitations IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- Roles - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE roles ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE roles FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_roles ON roles
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_roles ON roles IS
+    'Ensures role queries only return roles for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- Teams - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE teams ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE teams FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_teams ON teams
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_teams ON teams IS
+    'Ensures team queries only return teams for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: Child tables (role_permissions, role_field_permissions, team_members,
+-- user_role_assignments) do NOT need RLS policies. They are accessed through
+-- FK joins from their tenant-filtered parents (roles, teams).
+
+-- =====================================================================
+-- custom_field_definitions - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE custom_field_definitions ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE custom_field_definitions FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_custom_field_definitions ON custom_field_definitions
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_custom_field_definitions ON custom_field_definitions IS
+    'Ensures custom field definitions are isolated per tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- custom_field_sections - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE custom_field_sections ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE custom_field_sections FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_custom_field_sections ON custom_field_sections
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_custom_field_sections ON custom_field_sections IS
+    'Ensures custom field sections are isolated per tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- saved_views - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE saved_views ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE saved_views FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_saved_views ON saved_views
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_saved_views ON saved_views IS
+    'Ensures saved views are isolated per tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

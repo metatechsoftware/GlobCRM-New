@@ -1,3 +1,4 @@
+using System.Text.Json;
 using GlobCRM.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -41,6 +42,84 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 
         builder.Property(u => u.LastLoginAt)
             .HasColumnName("last_login_at");
+
+        // ---- Rich profile fields (Phase 2, Plan 03) ----
+
+        builder.Property(u => u.Phone)
+            .HasColumnName("phone")
+            .HasMaxLength(50);
+
+        builder.Property(u => u.JobTitle)
+            .HasColumnName("job_title")
+            .HasMaxLength(100);
+
+        builder.Property(u => u.Department)
+            .HasColumnName("department")
+            .HasMaxLength(100);
+
+        builder.Property(u => u.Timezone)
+            .HasColumnName("timezone")
+            .HasMaxLength(50)
+            .HasDefaultValue("UTC");
+
+        builder.Property(u => u.Language)
+            .HasColumnName("language")
+            .HasMaxLength(10)
+            .HasDefaultValue("en");
+
+        builder.Property(u => u.Bio)
+            .HasColumnName("bio")
+            .HasMaxLength(500);
+
+        builder.Property(u => u.AvatarUrl)
+            .HasColumnName("avatar_url")
+            .HasMaxLength(500);
+
+        builder.Property(u => u.AvatarColor)
+            .HasColumnName("avatar_color")
+            .HasMaxLength(20);
+
+        builder.Property(u => u.SocialLinks)
+            .HasColumnName("social_links")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => v == null ? null : JsonSerializer.Deserialize<Dictionary<string, string>>(v, JsonSerializerOptions.Default));
+
+        builder.Property(u => u.ReportingManagerId)
+            .HasColumnName("reporting_manager_id");
+
+        builder.Property(u => u.Skills)
+            .HasColumnName("skills")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => v == null ? null : JsonSerializer.Deserialize<List<string>>(v, JsonSerializerOptions.Default));
+
+        // Complex JSONB types -- use explicit JSON serialization value converters
+        // because EF Core's OwnsOne().ToJson() cannot handle Dictionary<> properties
+        builder.Property(u => u.WorkSchedule)
+            .HasColumnName("work_schedule")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => v == null ? null : JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => v == null ? null : JsonSerializer.Deserialize<WorkSchedule>(v, JsonSerializerOptions.Default));
+
+        builder.Property(u => u.Preferences)
+            .HasColumnName("preferences")
+            .HasColumnType("jsonb")
+            .HasConversion(
+                v => JsonSerializer.Serialize(v, JsonSerializerOptions.Default),
+                v => v == null ? new UserPreferencesData() : JsonSerializer.Deserialize<UserPreferencesData>(v, JsonSerializerOptions.Default)!);
+
+        // Self-referential FK: user -> reporting manager
+        builder.HasOne(u => u.ReportingManager)
+            .WithMany()
+            .HasForeignKey(u => u.ReportingManagerId)
+            .OnDelete(DeleteBehavior.SetNull);
+
+        builder.HasIndex(u => u.ReportingManagerId)
+            .HasDatabaseName("idx_aspnetusers_reporting_manager_id");
 
         // Ignore computed property
         builder.Ignore(u => u.FullName);
