@@ -1,8 +1,12 @@
 using Finbuckle.MultiTenant.AspNetCore.Extensions;
+using GlobCRM.Api.Auth;
 using GlobCRM.Api.Middleware;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Infrastructure;
+using GlobCRM.Infrastructure.Email;
 using GlobCRM.Infrastructure.Identity;
+using GlobCRM.Infrastructure.Invitations;
+using GlobCRM.Infrastructure.Organizations;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -29,6 +33,11 @@ builder.Services.AddCors(options =>
 
 // Register Infrastructure services (Finbuckle, DbContexts, Identity, JWT, interceptors)
 builder.Services.AddInfrastructure(builder.Configuration, builder.Environment);
+
+// Register subsystem services (email, organizations, invitations)
+builder.Services.AddEmailServices();
+builder.Services.AddOrganizationServices();
+builder.Services.AddInvitationServices();
 
 var app = builder.Build();
 
@@ -60,8 +69,8 @@ app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
 app.MapPost("/api/auth/login-extended", CustomLoginEndpoint.HandleLogin)
     .AllowAnonymous();
 
-// Logout is client-side (clear tokens) -- this endpoint is for future token blacklisting
-app.MapPost("/api/auth/logout", () => Results.Ok(new { message = "Logged out successfully" }))
+// Logout endpoint with audit logging -- token invalidation is future enhancement
+app.MapPost("/api/auth/logout", LogoutEndpoint.Handle)
     .RequireAuthorization();
 
 // Health check endpoint
