@@ -30,6 +30,8 @@ import { QuoteService } from '../../quotes/quote.service';
 import { QuoteListDto, QUOTE_STATUSES } from '../../quotes/quote.models';
 import { RequestService } from '../../requests/request.service';
 import { RequestListDto, REQUEST_STATUSES, REQUEST_PRIORITIES } from '../../requests/request.models';
+import { EmailService } from '../../emails/email.service';
+import { EmailListDto } from '../../emails/email.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -280,6 +282,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly activityService = inject(ActivityService);
   private readonly quoteService = inject(QuoteService);
   private readonly requestService = inject(RequestService);
+  private readonly emailService = inject(EmailService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
 
@@ -305,6 +308,11 @@ export class CompanyDetailComponent implements OnInit {
   linkedRequests = signal<RequestListDto[]>([]);
   requestsLoading = signal(false);
   requestsLoaded = signal(false);
+
+  /** Emails linked to this company. */
+  companyEmails = signal<EmailListDto[]>([]);
+  emailsLoading = signal(false);
+  emailsLoaded = signal(false);
 
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
@@ -371,7 +379,7 @@ export class CompanyDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change -- lazy load contacts/activities/quotes/requests when tab is selected. */
+  /** Handle tab change -- lazy load contacts/activities/quotes/requests/emails when tab is selected. */
   onTabChanged(index: number): void {
     if (index === 1) {
       this.loadContacts();
@@ -384,6 +392,9 @@ export class CompanyDetailComponent implements OnInit {
     }
     if (index === 5) {
       this.loadLinkedRequests();
+    }
+    if (index === 6) {
+      this.loadCompanyEmails();
     }
   }
 
@@ -478,6 +489,36 @@ export class CompanyDetailComponent implements OnInit {
           this.requestsLoading.set(false);
         },
       });
+  }
+
+  /** Load emails linked to this company (lazy on tab switch). */
+  private loadCompanyEmails(): void {
+    if (this.emailsLoaded() || this.emailsLoading()) return;
+
+    this.emailsLoading.set(true);
+    this.emailService
+      .getByCompany(this.companyId, { pageSize: 20, sortField: 'sentAt', sortDirection: 'desc' })
+      .subscribe({
+        next: (result) => {
+          this.companyEmails.set(result.items);
+          this.emailsLoading.set(false);
+          this.emailsLoaded.set(true);
+        },
+        error: () => {
+          this.emailsLoading.set(false);
+        },
+      });
+  }
+
+  /** Format email date for display. */
+  formatEmailDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(dateStr));
   }
 
   /** Handle delete with confirmation dialog. */

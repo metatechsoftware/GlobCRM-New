@@ -104,6 +104,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'emails',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/emails/emails.routes').then(
+        (m) => m.emailRoutes
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',

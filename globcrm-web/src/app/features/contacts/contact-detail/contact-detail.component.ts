@@ -28,6 +28,8 @@ import { QuoteService } from '../../quotes/quote.service';
 import { QuoteListDto, QUOTE_STATUSES } from '../../quotes/quote.models';
 import { RequestService } from '../../requests/request.service';
 import { RequestListDto, REQUEST_STATUSES, REQUEST_PRIORITIES } from '../../requests/request.models';
+import { EmailService } from '../../emails/email.service';
+import { EmailListDto } from '../../emails/email.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -317,6 +319,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly activityService = inject(ActivityService);
   private readonly quoteService = inject(QuoteService);
   private readonly requestService = inject(RequestService);
+  private readonly emailService = inject(EmailService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
 
@@ -342,6 +345,11 @@ export class ContactDetailComponent implements OnInit {
   linkedRequests = signal<RequestListDto[]>([]);
   requestsLoading = signal(false);
   requestsLoaded = signal(false);
+
+  /** Emails linked to this contact. */
+  contactEmails = signal<EmailListDto[]>([]);
+  emailsLoading = signal(false);
+  emailsLoaded = signal(false);
 
   /** Tab configuration for contact detail. */
   readonly tabs = CONTACT_TABS;
@@ -388,7 +396,7 @@ export class ContactDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change -- lazy load activities/quotes/requests when tab is selected. */
+  /** Handle tab change -- lazy load activities/quotes/requests/emails when tab is selected. */
   onTabChanged(index: number): void {
     // Company tab data comes from the contact detail DTO itself.
     if (index === 3) {
@@ -399,6 +407,9 @@ export class ContactDetailComponent implements OnInit {
     }
     if (index === 5) {
       this.loadLinkedRequests();
+    }
+    if (index === 6) {
+      this.loadContactEmails();
     }
   }
 
@@ -493,6 +504,36 @@ export class ContactDetailComponent implements OnInit {
           this.requestsLoading.set(false);
         },
       });
+  }
+
+  /** Load emails linked to this contact (lazy on tab switch). */
+  private loadContactEmails(): void {
+    if (this.emailsLoaded() || this.emailsLoading()) return;
+
+    this.emailsLoading.set(true);
+    this.emailService
+      .getByContact(this.contactId, { pageSize: 20, sortField: 'sentAt', sortDirection: 'desc' })
+      .subscribe({
+        next: (result) => {
+          this.contactEmails.set(result.items);
+          this.emailsLoading.set(false);
+          this.emailsLoaded.set(true);
+        },
+        error: () => {
+          this.emailsLoading.set(false);
+        },
+      });
+  }
+
+  /** Format email date for display. */
+  formatEmailDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit',
+    }).format(new Date(dateStr));
   }
 
   /** Handle delete with confirmation dialog. */

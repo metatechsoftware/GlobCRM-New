@@ -308,6 +308,51 @@
               </div>
             }
           </ng-template>
+
+          <!-- Emails tab content (index 6) -->
+          <ng-template>
+            @if (emailsLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (companyEmails().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>email</mat-icon>
+                <span>No emails linked to this company.</span>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>Subject</th>
+                    <th>Preview</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (email of companyEmails(); track email.id) {
+                    <tr [style.font-weight]="email.isRead ? 'normal' : '600'">
+                      <td>
+                        <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
+                                  [style.color]="email.isInbound ? '#1976d2' : '#4caf50'">
+                          {{ email.isInbound ? 'arrow_downward' : 'arrow_upward' }}
+                        </mat-icon>
+                      </td>
+                      <td><a [routerLink]="['/emails', email.id]">{{ email.subject }}</a></td>
+                      <td style="color: rgba(0,0,0,0.6); font-size: 13px;">{{ email.bodyPreview }}</td>
+                      <td style="white-space: nowrap;">{{ formatEmailDate(email.sentAt) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <div style="text-align: right; margin-top: 8px;">
+                <a mat-button color="primary" routerLink="/emails">
+                  View All Emails
+                </a>
+              </div>
+            }
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 

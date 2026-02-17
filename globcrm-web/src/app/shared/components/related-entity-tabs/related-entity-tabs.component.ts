@@ -30,6 +30,7 @@ export const COMPANY_TABS: EntityTab[] = [
   { label: 'Activities', icon: 'task_alt', enabled: true },
   { label: 'Quotes', icon: 'request_quote', enabled: true },
   { label: 'Requests', icon: 'support_agent', enabled: true },
+  { label: 'Emails', icon: 'email', enabled: true },
   { label: 'Notes', icon: 'note', enabled: false },
 ];
 
@@ -40,7 +41,7 @@ export const CONTACT_TABS: EntityTab[] = [
   { label: 'Activities', icon: 'task_alt', enabled: true },
   { label: 'Quotes', icon: 'request_quote', enabled: true },
   { label: 'Requests', icon: 'support_agent', enabled: true },
-  { label: 'Emails', icon: 'email', enabled: false },
+  { label: 'Emails', icon: 'email', enabled: true },
   { label: 'Notes', icon: 'note', enabled: false },
 ];
 
