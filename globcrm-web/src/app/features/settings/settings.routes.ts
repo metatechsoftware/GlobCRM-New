@@ -51,6 +51,30 @@ export const SETTINGS_ROUTES: Routes = [
       ),
   },
   {
+    path: 'pipelines',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./pipelines/pipeline-list.component').then(
+        (m) => m.PipelineListComponent
+      ),
+  },
+  {
+    path: 'pipelines/new',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./pipelines/pipeline-edit.component').then(
+        (m) => m.PipelineEditComponent
+      ),
+  },
+  {
+    path: 'pipelines/:id',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./pipelines/pipeline-edit.component').then(
+        (m) => m.PipelineEditComponent
+      ),
+  },
+  {
     path: 'custom-fields',
     canActivate: [adminGuard],
     loadComponent: () =>
