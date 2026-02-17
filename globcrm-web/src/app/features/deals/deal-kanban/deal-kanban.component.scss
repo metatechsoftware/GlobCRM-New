@@ -1,5 +1,6 @@
 // ─── Deal Kanban Board ───────────────────────────────────────────────────────
 // Horizontal scrollable Kanban board with drag-drop deal cards.
+// Uses Angular CDK drag-drop with optimistic stage transitions.
 
 .kanban-layout {
   display: flex;
@@ -147,6 +148,13 @@
   padding: 8px;
   min-height: 80px;
   max-height: calc(100vh - 220px);
+  transition: background-color 0.2s ease;
+  border-radius: 0 0 12px 12px;
+
+  // Drop zone highlight when actively dragging over this column
+  &.cdk-drop-list-dragging {
+    background: var(--mat-sys-primary-container, rgba(103, 80, 164, 0.06));
+  }
 
   &::-webkit-scrollbar {
     width: 4px;
@@ -184,10 +192,17 @@
   cursor: pointer;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.2s ease, transform 0.15s ease;
+  border: 1px solid transparent;
+  user-select: none;
 
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
     transform: translateY(-1px);
+    border-color: var(--mat-sys-outline-variant, #c4c7c5);
+  }
+
+  &:active {
+    cursor: grabbing;
   }
 
   &:last-child {
@@ -269,9 +284,14 @@
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
 
-// Drop zone highlight when dragging over
+// Smooth reorder animation when dragging over cards
 .cdk-drop-list-dragging .deal-card:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Hide original card while dragging
+.cdk-drop-list-dragging .cdk-drag {
+  opacity: 0;
 }
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
@@ -314,6 +334,7 @@
   .header-actions {
     flex-wrap: wrap;
     gap: 8px;
+    width: 100%;
   }
 
   .pipeline-selector {
@@ -327,5 +348,23 @@
   .deal-card {
     min-height: 80px;
     padding: 14px;
+
+    // Touch-friendly tap target sizing
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-column {
+    min-width: 240px;
+    max-width: 280px;
+  }
+
+  .column-header {
+    padding: 10px 12px;
+  }
+
+  .deal-card {
+    padding: 10px;
   }
 }
