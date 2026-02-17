@@ -283,10 +283,16 @@ Plans:
   5. User can upload files to any entity with preview and download capabilities
   6. Attachments are stored in cloud storage with tenant isolation and metadata tracking
   7. Angular web app works on desktop browsers and is responsive on tablet and mobile screen sizes
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- TBD
+- [ ] 11-01-PLAN.md -- Backend domain entities (Note, Attachment) + EF Core configs + migration + AzureBlobStorageService
+- [ ] 11-02-PLAN.md -- Backend repositories + API controllers (NotesController, AttachmentsController, CalendarController)
+- [ ] 11-03-PLAN.md -- Frontend Notes feature (models, service, store, list + form + detail with ngx-quill rich text)
+- [ ] 11-04-PLAN.md -- Frontend reusable EntityAttachmentsComponent + AttachmentService
+- [ ] 11-05-PLAN.md -- Frontend unified calendar (FullCalendar day/week/month with drag-drop and filters)
+- [ ] 11-06-PLAN.md -- Frontend responsive design (hamburger menu navbar, tablet/mobile layouts)
+- [ ] 11-07-PLAN.md -- Integration (navbar links, app routes, entity tab enablement for Notes + Attachments)
 
 ## Progress
 
@@ -305,4 +311,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 8. Real-Time & Notifications | 8/8 | Complete | 2026-02-17 |
 | 9. Dashboards & Reporting | 8/8 | Complete | 2026-02-17 |
 | 10. Data Operations | 6/6 | Complete | 2026-02-17 |
-| 11. Polish & Completeness | 0/TBD | Not started | - |
+| 11. Polish & Completeness | 0/7 | Not started | - |
