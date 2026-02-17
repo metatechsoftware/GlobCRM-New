@@ -48,13 +48,23 @@ public class NotificationDispatcher
 
     /// <summary>
     /// Dispatches a notification: persists to DB, pushes via SignalR, and optionally sends email.
+    /// Uses tenant context from the DbContext.
     /// </summary>
     public async Task DispatchAsync(NotificationRequest request)
+    {
+        await DispatchAsync(request, GetTenantId());
+    }
+
+    /// <summary>
+    /// Dispatches a notification with an explicit tenant ID.
+    /// Used by background services where tenant context is not available via DbContext.
+    /// </summary>
+    public async Task DispatchAsync(NotificationRequest request, Guid tenantId)
     {
         // 1. Create and persist notification entity
         var notification = new Notification
         {
-            TenantId = GetTenantId(),
+            TenantId = tenantId,
             UserId = request.RecipientId,
             Type = request.Type,
             Title = request.Title,

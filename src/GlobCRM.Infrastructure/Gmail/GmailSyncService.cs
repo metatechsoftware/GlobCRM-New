@@ -3,6 +3,7 @@ using System.Text.Json;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
@@ -22,6 +23,8 @@ public class GmailSyncService
     private readonly GmailServiceFactory _serviceFactory;
     private readonly IEmailMessageRepository _messageRepository;
     private readonly IEmailAccountRepository _accountRepository;
+    private readonly NotificationDispatcher _dispatcher;
+    private readonly IFeedRepository _feedRepository;
     private readonly ApplicationDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly ILogger<GmailSyncService> _logger;
@@ -30,6 +33,8 @@ public class GmailSyncService
         GmailServiceFactory serviceFactory,
         IEmailMessageRepository messageRepository,
         IEmailAccountRepository accountRepository,
+        NotificationDispatcher dispatcher,
+        IFeedRepository feedRepository,
         ApplicationDbContext db,
         IConfiguration configuration,
         ILogger<GmailSyncService> logger)
@@ -37,6 +42,8 @@ public class GmailSyncService
         _serviceFactory = serviceFactory;
         _messageRepository = messageRepository;
         _accountRepository = accountRepository;
+        _dispatcher = dispatcher;
+        _feedRepository = feedRepository;
         _db = db;
         _configuration = configuration;
         _logger = logger;
@@ -347,6 +354,40 @@ public class GmailSyncService
 
         // Save message
         await _messageRepository.CreateAsync(emailMessage);
+
+        // Dispatch notification and feed event for new inbound emails only
+        if (isInbound && account != null)
+        {
+            try
+            {
+                await _dispatcher.DispatchAsync(new NotificationRequest
+                {
+                    RecipientId = account.UserId,
+                    Type = NotificationType.EmailReceived,
+                    Title = "New Email Received",
+                    Message = $"New email from {fromName}: {subject}",
+                    EntityType = "Email",
+                    EntityId = emailMessage.Id,
+                    CreatedById = null
+                }, tenantId);
+
+                var feedItem = new FeedItem
+                {
+                    TenantId = tenantId,
+                    Type = FeedItemType.SystemEvent,
+                    Content = $"New email received from {(string.IsNullOrEmpty(fromName) ? fromAddress : fromName)}",
+                    EntityType = "Email",
+                    EntityId = emailMessage.Id,
+                    AuthorId = account.UserId
+                };
+                await _feedRepository.CreateFeedItemAsync(feedItem);
+                await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to dispatch notification for inbound email {EmailId}", emailMessage.Id);
+            }
+        }
     }
 
     // --- Helper methods ---
