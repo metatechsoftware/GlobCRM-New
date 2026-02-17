@@ -8,6 +8,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
 import { NotificationCenterComponent } from '../../../features/notifications/notification-center/notification-center.component';
+import { GlobalSearchComponent } from '../global-search/global-search.component';
 
 @Component({
   selector: 'app-navbar',
@@ -21,6 +22,7 @@ import { NotificationCenterComponent } from '../../../features/notifications/not
     MatMenuModule,
     MatDividerModule,
     NotificationCenterComponent,
+    GlobalSearchComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
