@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 5 (Activities & Workflow)
+**Current focus:** Phase 5 Complete -- Ready for Phase 6
 
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
 Plan: 10 of 10 in current phase
-Status: In Progress
-Last activity: 2026-02-17 — Plan 05-09 complete (Activity Calendar)
+Status: Phase Complete
+Last activity: 2026-02-17 — Plan 05-10 complete (Activities Routing & Entity Tabs)
 
-Progress: [█████████████████████████████░] 9/10 plans (Phase 5)
+Progress: [██████████████████████████████] 10/10 plans (Phase 5)
 
 ## Performance Metrics
 
@@ -76,6 +76,7 @@ Progress: [███████████████████████
 | Phase 05 P08 | 3min | 1 task | 4 files |
 | Phase 05 P09 | 2min | 1 task | 4 files |
 | Phase 05 P07 | 6min | 2 tasks | 4 files |
+| Phase 05 P10 | 7min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -234,6 +235,8 @@ Recent decisions affecting current work:
 - [05-09] Priority-based coloring (Low=green, Medium=blue, High=orange, Urgent=red) instead of stage-based coloring
 - [Phase 05-07]: Activity detail uses mat-tab-group directly (not RelatedEntityTabsComponent) for full control over 6 custom tabs with dynamic badge counts
 - [Phase 05-07]: Timeline rendered inline with activity-specific event type icons (status_changed, comment_added, attachment_uploaded, time_logged, entity_linked) rather than reusing EntityTimelineComponent
+- [05-10] Activities tab reordered before disabled tabs (Quotes, Notes) in COMPANY_TABS/CONTACT_TABS for correct contentChildren template indexing
+- [05-10] Entity-scoped activity loading uses activitiesLoaded signal guard to prevent redundant API calls on tab re-selection
 
 ### Pending Todos
 
@@ -246,5 +249,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-09-PLAN.md (Activity Calendar)
-Resume file: .planning/phases/05-activities-and-workflow/05-09-SUMMARY.md
+Stopped at: Completed 05-10-PLAN.md (Activities Routing & Entity Tabs) -- Phase 5 complete
+Resume file: .planning/phases/05-activities-and-workflow/05-10-SUMMARY.md
