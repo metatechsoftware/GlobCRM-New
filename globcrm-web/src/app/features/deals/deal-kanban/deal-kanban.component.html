@@ -1,0 +1,121 @@
+<div class="kanban-layout">
+  <!-- Header toolbar -->
+  <div class="kanban-header">
+    <h1>Deals</h1>
+
+    <div class="header-actions">
+      <!-- Pipeline selector -->
+      <mat-form-field appearance="outline" class="pipeline-selector">
+        <mat-select
+          [value]="selectedPipelineId()"
+          (selectionChange)="onPipelineChanged($event.value)"
+          placeholder="Select Pipeline">
+          @for (pipeline of pipelines(); track pipeline.id) {
+            <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- Show Closed toggle -->
+      <mat-slide-toggle
+        [checked]="includeTerminal()"
+        (change)="onTerminalToggled($event.checked)"
+        class="terminal-toggle">
+        Show Closed
+      </mat-slide-toggle>
+
+      <!-- View mode switcher -->
+      <mat-button-toggle-group value="kanban" class="view-mode-toggle">
+        <mat-button-toggle value="list" routerLink="/deals">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban">
+          <mat-icon>view_kanban</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="calendar" routerLink="/deals/calendar">
+          <mat-icon>calendar_month</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- New Deal button -->
+      <button mat-raised-button color="primary"
+              *appHasPermission="'Deal:Create'"
+              routerLink="/deals/new">
+        <mat-icon>add</mat-icon> New Deal
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="kanban-loading"></mat-progress-bar>
+  }
+
+  <!-- Kanban board -->
+  @if (kanbanData(); as data) {
+    <div class="kanban-board" cdkDropListGroup>
+      @for (stage of data.stages; track stage.id) {
+        <div class="kanban-column">
+          <div class="column-header" [style.border-top-color]="stage.color">
+            <div class="column-header-left">
+              <span class="column-title">{{ stage.name }}</span>
+              <span class="column-count">{{ stage.deals.length }}</span>
+            </div>
+            <span class="column-total">{{ getColumnTotal(stage) | currency }}</span>
+          </div>
+          <div cdkDropList
+               [cdkDropListData]="stage.deals"
+               [id]="'stage-' + stage.id"
+               (cdkDropListDropped)="onDrop($event, stage.id)"
+               class="column-body">
+            @for (deal of stage.deals; track deal.id) {
+              <div cdkDrag class="deal-card" (click)="openDeal(deal.id)">
+                <div class="deal-title">{{ deal.title }}</div>
+                @if (deal.value) {
+                  <div class="deal-value">{{ deal.value | currency }}</div>
+                }
+                @if (deal.companyName) {
+                  <div class="deal-company">
+                    <mat-icon class="deal-meta-icon">business</mat-icon>
+                    {{ deal.companyName }}
+                  </div>
+                }
+                @if (deal.ownerName) {
+                  <div class="deal-owner">
+                    <mat-icon class="deal-meta-icon">person</mat-icon>
+                    {{ deal.ownerName }}
+                  </div>
+                }
+                @if (deal.expectedCloseDate) {
+                  <div class="deal-date">
+                    <mat-icon class="deal-meta-icon">event</mat-icon>
+                    {{ deal.expectedCloseDate }}
+                  </div>
+                }
+
+                <!-- Drag preview -->
+                <div *cdkDragPreview class="deal-card-preview">
+                  <div class="deal-title">{{ deal.title }}</div>
+                  @if (deal.value) {
+                    <div class="deal-value">{{ deal.value | currency }}</div>
+                  }
+                </div>
+
+                <!-- Drag placeholder -->
+                <div *cdkDragPlaceholder class="deal-card-placeholder"></div>
+              </div>
+            }
+            @if (stage.deals.length === 0) {
+              <div class="column-empty">No deals</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (!isLoading()) {
+    <div class="kanban-empty">
+      <mat-icon class="empty-icon">view_kanban</mat-icon>
+      <p>Select a pipeline to view the Kanban board</p>
+    </div>
+  }
+</div>
