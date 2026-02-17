@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 8 of 11 (Real-Time & Notifications)
-Plan: 4 of 7 in current phase
+Plan: 5 of 7 in current phase
 Status: Executing
-Last activity: 2026-02-17 — Completed 08-04 (CRM Event Notification Integration)
+Last activity: 2026-02-17 — Completed 08-05 (SignalR Client & Notification UI)
 
-Progress: [████████████████░░░░░░░░░░░░░░] 4/7 plans (Phase 8)
+Progress: [█████████████████████░░░░░░░░░] 5/7 plans (Phase 8)
 
 ## Performance Metrics
 
@@ -92,6 +92,7 @@ Progress: [████████████████░░░░░░░
 | Phase 08 P02 | 4min | 2 tasks | 10 files |
 | Phase 08 P03 | 3min | 2 tasks | 8 files |
 | Phase 08 P04 | 4min | 2 tasks | 4 files |
+| Phase 08 P05 | 4min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -301,6 +302,10 @@ Recent decisions affecting current work:
 - [08-04] NotificationDispatcher gets explicit tenantId overload for background services where tenant context unavailable
 - [08-04] Deal stage notifications only sent to owner when owner differs from current user (no self-notifications)
 - [08-04] Activity assignment notifications only sent when assignee differs from current user and assignment changed
+- [08-05] SignalRService uses promise-based start/stop for simpler lifecycle management from AppComponent effect()
+- [08-05] NotificationStore subscribes to SignalR notification$ in withMethods factory for immediate real-time push
+- [08-05] Notification panel lazy-loads on open (togglePanel) rather than on app init for reduced initial API calls
+- [08-05] Outside-click panel dismiss via HostListener document:click with ElementRef.contains check
 
 ### Pending Todos
 
@@ -313,5 +318,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 08-04-PLAN.md (CRM Event Notification Integration)
-Resume file: .planning/phases/08-real-time-and-notifications/08-04-SUMMARY.md
+Stopped at: Completed 08-05-PLAN.md (SignalR Client & Notification UI)
+Resume file: .planning/phases/08-real-time-and-notifications/08-05-SUMMARY.md
