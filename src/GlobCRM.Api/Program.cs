@@ -14,6 +14,7 @@ using GlobCRM.Infrastructure.CrmEntities;
 using GlobCRM.Infrastructure.Organizations;
 using GlobCRM.Infrastructure.Gmail;
 using GlobCRM.Infrastructure.Notifications;
+using GlobCRM.Infrastructure.Dashboards;
 using GlobCRM.Infrastructure.Feed;
 using GlobCRM.Infrastructure.Pdf;
 using Microsoft.AspNetCore.Identity;
@@ -65,6 +66,9 @@ builder.Services.AddSignalR();
 // Notification and feed subsystem services
 builder.Services.AddNotificationServices();
 builder.Services.AddFeedServices();
+
+// Dashboard and reporting subsystem services
+builder.Services.AddDashboardServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
