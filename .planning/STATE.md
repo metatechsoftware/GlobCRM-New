@@ -75,6 +75,7 @@ Progress: [███████████████████████
 | Phase 05 P06 | 3min | 2 tasks | 6 files |
 | Phase 05 P08 | 3min | 1 task | 4 files |
 | Phase 05 P09 | 2min | 1 task | 4 files |
+| Phase 05 P07 | 6min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -231,6 +232,8 @@ Recent decisions affecting current work:
 - [05-08] Priority color as 4px left border on Kanban cards for visual priority indication
 - [05-09] Activity calendar is month-only (no day/week) -- Phase 11 CALR-01+ adds comprehensive multi-entity calendar
 - [05-09] Priority-based coloring (Low=green, Medium=blue, High=orange, Urgent=red) instead of stage-based coloring
+- [Phase 05-07]: Activity detail uses mat-tab-group directly (not RelatedEntityTabsComponent) for full control over 6 custom tabs with dynamic badge counts
+- [Phase 05-07]: Timeline rendered inline with activity-specific event type icons (status_changed, comment_added, attachment_uploaded, time_logged, entity_linked) rather than reusing EntityTimelineComponent
 
 ### Pending Todos
 
