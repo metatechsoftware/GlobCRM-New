@@ -98,7 +98,10 @@ export const SETTINGS_ROUTES: Routes = [
   },
   {
     path: '',
-    redirectTo: 'roles',
+    loadComponent: () =>
+      import('./settings-hub.component').then(
+        (m) => m.SettingsHubComponent
+      ),
     pathMatch: 'full',
   },
 ];
