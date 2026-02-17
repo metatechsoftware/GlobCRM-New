@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
-Plan: 7 of 10 in current phase
+Plan: 8 of 10 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 05-03 complete (Activity API Controller)
+Last activity: 2026-02-17 — Plan 05-04 complete (Activity Sub-Resource Endpoints)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 4/10 plans (Phase 5)
+Progress: [██████████░░░░░░░░░░░░░░░░░░░░] 5/10 plans (Phase 5)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 40
+- Total plans completed: 41
 - Average duration: 6 min
 - Total execution time: ~2.5 hours
 
@@ -71,6 +71,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | Phase 05 P05 | 2min | 2 tasks | 3 files |
 | Phase 05 P02 | 3min | 2 tasks | 4 files |
 | Phase 05 P03 | 3min | 2 tasks | 2 files |
+| Phase 05 P04 | 4min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -214,6 +215,11 @@ Recent decisions affecting current work:
 - [05-03] IsWithinScope checks both OwnerId and AssignedToId for activity dual-ownership scope (matching repository pattern)
 - [05-03] Status changes only via dedicated PATCH /status endpoint (PUT update does not allow status change)
 - [05-03] Create/Update requests accept type/priority as strings with Enum.TryParse for flexible API input
+- [05-04] IFileStorageService injected for attachment upload/download/delete with tenant-partitioned paths
+- [05-04] Dangerous extensions (.exe, .bat, .cmd, .ps1, .sh) blocked at attachment upload time
+- [05-04] Entity link accepts Quote/Request types for forward compatibility alongside Contact/Company/Deal
+- [05-04] Author-only edit/delete on comments/time entries with admin override via User.IsInRole("Admin")
+- [05-04] Follow/unfollow uses Activity:View permission (not Update) so any viewer can follow
 
 ### Pending Todos
 
@@ -226,5 +232,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-03-PLAN.md (Activity API Controller)
-Resume file: .planning/phases/05-activities-and-workflow/05-03-SUMMARY.md
+Stopped at: Completed 05-04-PLAN.md (Activity Sub-Resource Endpoints)
+Resume file: .planning/phases/05-activities-and-workflow/05-04-SUMMARY.md
