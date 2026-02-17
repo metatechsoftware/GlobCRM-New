@@ -12,6 +12,7 @@ using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Invitations;
 using GlobCRM.Infrastructure.CrmEntities;
 using GlobCRM.Infrastructure.Organizations;
+using GlobCRM.Infrastructure.Gmail;
 using GlobCRM.Infrastructure.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -52,6 +53,8 @@ builder.Services.AddInvitationServices();
 builder.Services.AddCustomFieldServices();
 builder.Services.AddCrmEntityServices();
 builder.Services.AddPdfServices();
+builder.Services.AddGmailServices();
+builder.Services.AddHostedService<EmailSyncBackgroundService>();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();

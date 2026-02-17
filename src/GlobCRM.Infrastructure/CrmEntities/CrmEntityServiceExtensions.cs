@@ -12,8 +12,8 @@ namespace GlobCRM.Infrastructure.CrmEntities;
 public static class CrmEntityServiceExtensions
 {
     /// <summary>
-    /// Registers Company, Contact, Product, Pipeline, Deal, Activity, Quote, and Request
-    /// repository implementations as scoped services.
+    /// Registers Company, Contact, Product, Pipeline, Deal, Activity, Quote, Request,
+    /// EmailAccount, and EmailMessage repository implementations as scoped services.
     /// </summary>
     public static IServiceCollection AddCrmEntityServices(this IServiceCollection services)
     {
@@ -25,6 +25,8 @@ public static class CrmEntityServiceExtensions
         services.AddScoped<IActivityRepository, ActivityRepository>();
         services.AddScoped<IQuoteRepository, QuoteRepository>();
         services.AddScoped<IRequestRepository, RequestRepository>();
+        services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
+        services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
 
         return services;
     }
