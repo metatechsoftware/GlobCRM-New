@@ -72,6 +72,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'deals',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/deals/deals.routes').then(
+        (m) => m.DEAL_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
