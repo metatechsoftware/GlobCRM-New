@@ -47,6 +47,14 @@ export const PRODUCT_TABS: EntityTab[] = [
   { label: 'Quotes', icon: 'request_quote', enabled: false },
 ];
 
+export const DEAL_TABS: EntityTab[] = [
+  { label: 'Details', icon: 'info', enabled: true },
+  { label: 'Contacts', icon: 'people', enabled: true },
+  { label: 'Products', icon: 'inventory_2', enabled: true },
+  { label: 'Activities', icon: 'task_alt', enabled: false },
+  { label: 'Timeline', icon: 'timeline', enabled: true },
+];
+
 /**
  * Directive to mark template content for a specific tab index.
  * Used with ng-template to project content into the corresponding tab.

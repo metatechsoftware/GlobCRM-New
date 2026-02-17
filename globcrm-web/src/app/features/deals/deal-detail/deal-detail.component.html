@@ -1,0 +1,359 @@
+@if (isLoading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (deal()) {
+  <div class="detail-page">
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-left">
+        <a mat-icon-button routerLink="/deals" aria-label="Back to deals">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ deal()!.title }}</h1>
+        <mat-chip-set>
+          <mat-chip [style.--mdc-chip-elevated-container-color]="deal()!.stageColor + '22'"
+                    [style.color]="deal()!.stageColor">
+            {{ deal()!.stageName }}
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+      <div class="header-actions">
+        <button mat-stroked-button
+                *appHasPermission="'Deal:Edit'"
+                routerLink="edit">
+          <mat-icon>edit</mat-icon> Edit
+        </button>
+        <button mat-stroked-button color="warn"
+                *appHasPermission="'Deal:Delete'"
+                (click)="onDelete()">
+          <mat-icon>delete</mat-icon> Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Subheader: Key deal metrics -->
+    <div class="detail-subheader">
+      <div class="subheader-item">
+        <mat-icon>monetization_on</mat-icon>
+        <span>{{ formatValue(deal()!.value) }}</span>
+      </div>
+      <div class="subheader-item">
+        <mat-icon>speed</mat-icon>
+        <span>{{ formatProbability(deal()!.probability) }}</span>
+      </div>
+      @if (deal()!.expectedCloseDate) {
+        <div class="subheader-item">
+          <mat-icon>event</mat-icon>
+          <span>{{ deal()!.expectedCloseDate | date:'mediumDate' }}</span>
+        </div>
+      }
+      @if (deal()!.ownerName) {
+        <div class="subheader-item">
+          <mat-icon>person</mat-icon>
+          <span>{{ deal()!.ownerName }}</span>
+        </div>
+      }
+      @if (deal()!.companyName) {
+        <div class="subheader-item">
+          <mat-icon>business</mat-icon>
+          <a [routerLink]="['/companies', deal()!.companyId]">{{ deal()!.companyName }}</a>
+        </div>
+      }
+      <div class="subheader-item">
+        <mat-icon>account_tree</mat-icon>
+        <span>{{ deal()!.pipelineName }}</span>
+      </div>
+    </div>
+
+    <!-- Main content: Tabs + Timeline sidebar -->
+    <div class="detail-content">
+      <div class="detail-main">
+        <app-related-entity-tabs [tabs]="tabs" (tabChanged)="onTabChanged($event)">
+
+          <!-- Tab 0: Details -->
+          <ng-template>
+            <div class="details-grid">
+              <div class="detail-field full-width">
+                <span class="field-label">Description</span>
+                <span class="field-value">{{ deal()!.description || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Pipeline</span>
+                <span class="field-value">{{ deal()!.pipelineName }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Stage</span>
+                <span class="field-value stage-value">
+                  <span class="stage-dot" [style.background-color]="deal()!.stageColor"></span>
+                  {{ deal()!.stageName }}
+                </span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Value</span>
+                <span class="field-value">{{ formatValue(deal()!.value) }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Probability</span>
+                <span class="field-value">{{ formatProbability(deal()!.probability) }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Expected Close Date</span>
+                <span class="field-value">{{ deal()!.expectedCloseDate ? (deal()!.expectedCloseDate | date:'mediumDate') : '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Actual Close Date</span>
+                <span class="field-value">{{ deal()!.actualCloseDate ? (deal()!.actualCloseDate | date:'mediumDate') : '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Owner</span>
+                <span class="field-value">{{ deal()!.ownerName || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Company</span>
+                <span class="field-value">
+                  @if (deal()!.companyId) {
+                    <a [routerLink]="['/companies', deal()!.companyId]">{{ deal()!.companyName }}</a>
+                  } @else {
+                    -
+                  }
+                </span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Created</span>
+                <span class="field-value">{{ deal()!.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Last Updated</span>
+                <span class="field-value">{{ deal()!.updatedAt | date:'medium' }}</span>
+              </div>
+            </div>
+
+            <!-- Custom fields in readonly mode -->
+            <h3 class="section-title">Custom Fields</h3>
+            <app-custom-field-form
+              [entityType]="'Deal'"
+              [customFieldValues]="deal()!.customFields"
+              [readonly]="true" />
+          </ng-template>
+
+          <!-- Tab 1: Contacts -->
+          <ng-template>
+            <div class="linked-entity-tab">
+              <div class="tab-header">
+                <span class="tab-count">{{ deal()!.linkedContacts?.length || 0 }} contacts linked</span>
+                <button mat-stroked-button
+                        *appHasPermission="'Deal:Edit'"
+                        (click)="toggleContactSearch()">
+                  <mat-icon>{{ showContactSearch() ? 'close' : 'person_add' }}</mat-icon>
+                  {{ showContactSearch() ? 'Cancel' : 'Link Contact' }}
+                </button>
+              </div>
+
+              <!-- Contact search -->
+              @if (showContactSearch()) {
+                <div class="link-search-panel">
+                  <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search contacts</mat-label>
+                    <input matInput
+                           [value]="contactSearchTerm()"
+                           (input)="onContactSearchInput($any($event.target).value)"
+                           placeholder="Type to search contacts...">
+                    <mat-icon matSuffix>search</mat-icon>
+                  </mat-form-field>
+                  @if (contactSearchLoading()) {
+                    <div class="search-loading">
+                      <mat-spinner diameter="24"></mat-spinner>
+                    </div>
+                  }
+                  @if (contactSearchResults().length > 0) {
+                    <mat-list class="search-results">
+                      @for (contact of contactSearchResults(); track contact.id) {
+                        <mat-list-item class="search-result-item" (click)="linkContact(contact)">
+                          <mat-icon matListItemIcon>person</mat-icon>
+                          <span matListItemTitle>{{ contact.fullName }}</span>
+                          <span matListItemLine>
+                            @if (contact.email) { {{ contact.email }} }
+                          </span>
+                          <button mat-icon-button matListItemMeta aria-label="Link contact">
+                            <mat-icon>add_link</mat-icon>
+                          </button>
+                        </mat-list-item>
+                      }
+                    </mat-list>
+                  }
+                </div>
+              }
+
+              <!-- Linked contacts list -->
+              @if (!deal()!.linkedContacts?.length) {
+                <div class="tab-empty">
+                  <mat-icon>people_outline</mat-icon>
+                  <span>No contacts linked to this deal.</span>
+                </div>
+              } @else {
+                <mat-list>
+                  @for (contact of deal()!.linkedContacts; track contact.id) {
+                    <mat-list-item>
+                      <mat-icon matListItemIcon>person</mat-icon>
+                      <a matListItemTitle [routerLink]="['/contacts', contact.id]">
+                        {{ contact.name }}
+                      </a>
+                      <button mat-icon-button matListItemMeta
+                              *appHasPermission="'Deal:Edit'"
+                              aria-label="Unlink contact"
+                              (click)="unlinkContact(contact)">
+                        <mat-icon>link_off</mat-icon>
+                      </button>
+                    </mat-list-item>
+                  }
+                </mat-list>
+              }
+            </div>
+          </ng-template>
+
+          <!-- Tab 2: Products -->
+          <ng-template>
+            <div class="linked-entity-tab">
+              <div class="tab-header">
+                <span class="tab-count">
+                  {{ deal()!.linkedProducts?.length || 0 }} products linked
+                  @if (getProductsTotal() > 0) {
+                    &middot; Total: {{ formatValue(getProductsTotal()) }}
+                  }
+                </span>
+                <button mat-stroked-button
+                        *appHasPermission="'Deal:Edit'"
+                        (click)="toggleProductSearch()">
+                  <mat-icon>{{ showProductSearch() ? 'close' : 'add_shopping_cart' }}</mat-icon>
+                  {{ showProductSearch() ? 'Cancel' : 'Link Product' }}
+                </button>
+              </div>
+
+              <!-- Product search -->
+              @if (showProductSearch()) {
+                <div class="link-search-panel">
+                  <mat-form-field appearance="outline" class="search-field">
+                    <mat-label>Search products</mat-label>
+                    <input matInput
+                           [value]="productSearchTerm()"
+                           (input)="onProductSearchInput($any($event.target).value)"
+                           placeholder="Type to search products...">
+                    <mat-icon matSuffix>search</mat-icon>
+                  </mat-form-field>
+
+                  <div class="link-product-options">
+                    <mat-form-field appearance="outline" class="quantity-field">
+                      <mat-label>Quantity</mat-label>
+                      <input matInput type="number"
+                             [ngModel]="linkProductQuantity()"
+                             (ngModelChange)="linkProductQuantity.set($event)"
+                             min="1">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="price-field">
+                      <mat-label>Unit Price Override</mat-label>
+                      <input matInput type="number"
+                             [ngModel]="linkProductUnitPrice()"
+                             (ngModelChange)="linkProductUnitPrice.set($event)"
+                             placeholder="Use product default">
+                    </mat-form-field>
+                  </div>
+
+                  @if (productSearchLoading()) {
+                    <div class="search-loading">
+                      <mat-spinner diameter="24"></mat-spinner>
+                    </div>
+                  }
+                  @if (productSearchResults().length > 0) {
+                    <mat-list class="search-results">
+                      @for (product of productSearchResults(); track product.id) {
+                        <mat-list-item class="search-result-item" (click)="linkProduct(product)">
+                          <mat-icon matListItemIcon>inventory_2</mat-icon>
+                          <span matListItemTitle>{{ product.name }}</span>
+                          <span matListItemLine>
+                            {{ formatValue(product.unitPrice) }}
+                            @if (product.sku) { &middot; SKU: {{ product.sku }} }
+                          </span>
+                          <button mat-icon-button matListItemMeta aria-label="Link product">
+                            <mat-icon>add_link</mat-icon>
+                          </button>
+                        </mat-list-item>
+                      }
+                    </mat-list>
+                  }
+                </div>
+              }
+
+              <!-- Linked products list -->
+              @if (!deal()!.linkedProducts?.length) {
+                <div class="tab-empty">
+                  <mat-icon>inventory_2</mat-icon>
+                  <span>No products linked to this deal.</span>
+                </div>
+              } @else {
+                <div class="products-table">
+                  <div class="products-header">
+                    <span class="product-col-name">Product</span>
+                    <span class="product-col-qty">Qty</span>
+                    <span class="product-col-price">Unit Price</span>
+                    <span class="product-col-subtotal">Subtotal</span>
+                    <span class="product-col-actions"></span>
+                  </div>
+                  @for (product of deal()!.linkedProducts; track product.id) {
+                    <div class="products-row">
+                      <span class="product-col-name">
+                        <a [routerLink]="['/products', product.id]">{{ product.name }}</a>
+                      </span>
+                      <span class="product-col-qty">{{ product.quantity }}</span>
+                      <span class="product-col-price">{{ formatValue(product.unitPrice) }}</span>
+                      <span class="product-col-subtotal">{{ formatValue((product.unitPrice ?? 0) * product.quantity) }}</span>
+                      <span class="product-col-actions">
+                        <button mat-icon-button
+                                *appHasPermission="'Deal:Edit'"
+                                aria-label="Unlink product"
+                                (click)="unlinkProduct(product)">
+                          <mat-icon>link_off</mat-icon>
+                        </button>
+                      </span>
+                    </div>
+                  }
+                  <div class="products-footer">
+                    <span class="product-col-name"><strong>Total</strong></span>
+                    <span class="product-col-qty"></span>
+                    <span class="product-col-price"></span>
+                    <span class="product-col-subtotal"><strong>{{ formatValue(getProductsTotal()) }}</strong></span>
+                    <span class="product-col-actions"></span>
+                  </div>
+                </div>
+              }
+            </div>
+          </ng-template>
+
+          <!-- Tab 3: Activities (disabled - coming soon) -->
+          <!-- No template needed for disabled tabs -->
+
+          <!-- Tab 4: Timeline -->
+          <ng-template>
+            <app-entity-timeline
+              [entries]="timelineEntries()"
+              [isLoading]="timelineLoading()" />
+          </ng-template>
+        </app-related-entity-tabs>
+      </div>
+
+      <!-- Timeline sidebar -->
+      <div class="detail-sidebar">
+        <h3 class="sidebar-title">Timeline</h3>
+        <app-entity-timeline
+          [entries]="timelineEntries()"
+          [isLoading]="timelineLoading()" />
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="detail-not-found">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Deal not found</h2>
+    <a mat-stroked-button routerLink="/deals">Back to Deals</a>
+  </div>
+}

@@ -20,8 +20,8 @@ export const DEAL_ROUTES: Routes = [
   {
     path: ':id',
     loadComponent: () =>
-      import('./deal-form/deal-form.component').then(
-        (m) => m.DealFormComponent,
+      import('./deal-detail/deal-detail.component').then(
+        (m) => m.DealDetailComponent,
       ),
   },
   {
