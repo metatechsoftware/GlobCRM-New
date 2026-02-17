@@ -2,6 +2,7 @@ using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using FluentValidation;
 using GlobCRM.Api.Auth;
 using GlobCRM.Api.Controllers;
+using GlobCRM.Api.Hubs;
 using GlobCRM.Api.Middleware;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Infrastructure;
@@ -56,6 +57,9 @@ builder.Services.AddPdfServices();
 builder.Services.AddGmailServices();
 builder.Services.AddHostedService<EmailSyncBackgroundService>();
 
+// SignalR for real-time notifications and feed updates
+builder.Services.AddSignalR();
+
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
 
@@ -85,6 +89,9 @@ app.UseTenantResolution();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// SignalR hub endpoint -- must be after UseAuthorization, before MapControllers
+app.MapHub<CrmHub>("/hubs/crm");
 
 app.MapControllers();
 
