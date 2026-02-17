@@ -68,6 +68,7 @@ public class DealRepository : IDealRepository
         // 7. Apply pagination and include navigations
         var items = await query
             .Include(d => d.Stage)
+            .Include(d => d.Pipeline)
             .Include(d => d.Company)
             .Include(d => d.Owner)
             .Skip((queryParams.Page - 1) * queryParams.PageSize)
@@ -88,6 +89,7 @@ public class DealRepository : IDealRepository
     {
         return await _db.Deals
             .Include(d => d.Stage)
+            .Include(d => d.Pipeline)
             .Include(d => d.Company)
             .Include(d => d.Owner)
             .FirstOrDefaultAsync(d => d.Id == id);
