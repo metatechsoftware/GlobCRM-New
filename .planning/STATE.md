@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 9 of 11 (Dashboards & Reporting)
-Plan: 1 of 8 in current phase
+Plan: 4 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 09-01 (Domain Entities, Enums, Configs, Migration, RLS)
+Last activity: 2026-02-17 — Completed 09-04 (Dashboard Frontend Data Layer)
 
-Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░] 1/8 plans (Phase 9)
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 2/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -97,6 +97,7 @@ Progress: [████░░░░░░░░░░░░░░░░░░░
 | Phase 08 P07 | 2min | 2 tasks | 3 files |
 | Phase 08 P08 | 1min | 1 task | 2 files |
 | Phase 09 P01 | 4min | 2 tasks | 16 files |
+| Phase 09 P04 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -322,6 +323,9 @@ Recent decisions affecting current work:
 - [09-01] DashboardWidget is child entity with no TenantId -- inherits tenant isolation via Dashboard FK
 - [09-01] Widget Config stored as Dictionary<string,object> with System.Text.Json HasConversion for JSONB
 - [09-01] MetricType enum covers 20 metrics across Deals, Activities, Quotes, Contacts, Companies, Requests
+- [09-04] DashboardStore is component-provided (not root) for per-page instance isolation matching ViewStore/FeedStore pattern
+- [09-04] provideCharts(withDefaultRegisterables()) registered globally in app.config.ts for Chart.js availability
+- [09-04] Default date range set to current month (first day to today) for meaningful initial data display
 
 ### Pending Todos
 
@@ -334,5 +338,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-01-PLAN.md (Domain Entities, Enums, Configs, Migration, RLS)
-Resume file: .planning/phases/09-dashboards-and-reporting/09-01-SUMMARY.md
+Stopped at: Completed 09-04-PLAN.md (Dashboard Frontend Data Layer)
+Resume file: .planning/phases/09-dashboards-and-reporting/09-04-SUMMARY.md
