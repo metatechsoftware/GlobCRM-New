@@ -23,6 +23,7 @@ interface ImportState {
   uploadResponse: UploadResponse | null;
   previewResponse: PreviewResponse | null;
   progress: ImportProgress | null;
+  entityType: ImportEntityType;
   loading: boolean;
   error: string | null;
   step: number;
@@ -33,6 +34,7 @@ const initialState: ImportState = {
   uploadResponse: null,
   previewResponse: null,
   progress: null,
+  entityType: 'Contact',
   loading: false,
   error: null,
   step: 0,
@@ -74,7 +76,7 @@ export const ImportStore = signalStore(
     return {
       /** Upload a CSV file and store the response. */
       upload(file: File, entityType: ImportEntityType): void {
-        patchState(store, { loading: true, error: null });
+        patchState(store, { loading: true, error: null, entityType });
         importService.upload(file, entityType).subscribe({
           next: (response) => {
             patchState(store, {

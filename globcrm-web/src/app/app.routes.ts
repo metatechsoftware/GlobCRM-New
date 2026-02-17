@@ -120,6 +120,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'import',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/import/import.routes').then(
+        (m) => m.IMPORT_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',

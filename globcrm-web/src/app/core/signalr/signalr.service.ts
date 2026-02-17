@@ -4,6 +4,7 @@ import * as signalR from '@microsoft/signalr';
 import { AuthStore } from '../auth/auth.store';
 import { environment } from '../../../environments/environment.development';
 import { NotificationDto } from '../../features/notifications/notification.models';
+import { ImportProgress } from '../../features/import/import.models';
 
 export interface FeedItemDto {
   id: string;
@@ -49,6 +50,7 @@ export class SignalRService {
   private readonly notificationSubject = new Subject<NotificationDto>();
   private readonly feedUpdateSubject = new Subject<FeedItemDto>();
   private readonly feedCommentSubject = new Subject<FeedCommentDto>();
+  private readonly importProgressSubject = new Subject<ImportProgress>();
 
   /** Emits when a ReceiveNotification hub event is received. */
   readonly notification$ = this.notificationSubject.asObservable();
@@ -58,6 +60,9 @@ export class SignalRService {
 
   /** Emits when a FeedCommentAdded hub event is received. */
   readonly feedComment$ = this.feedCommentSubject.asObservable();
+
+  /** Emits when an ImportProgress hub event is received. */
+  readonly importProgress$ = this.importProgressSubject.asObservable();
 
   /**
    * Builds and starts the SignalR hub connection.
@@ -90,6 +95,10 @@ export class SignalRService {
 
     this.connection.on('FeedCommentAdded', (dto: FeedCommentDto) => {
       this.feedCommentSubject.next(dto);
+    });
+
+    this.connection.on('ImportProgress', (dto: ImportProgress) => {
+      this.importProgressSubject.next(dto);
     });
 
     // Connection state handlers
