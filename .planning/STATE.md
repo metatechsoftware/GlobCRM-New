@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 8 of 11 (Real-Time & Notifications)
-Plan: 3 of 7 in current phase
+Plan: 4 of 7 in current phase
 Status: Executing
-Last activity: 2026-02-17 — Completed 08-03 (Notification & Feed API Endpoints)
+Last activity: 2026-02-17 — Completed 08-04 (CRM Event Notification Integration)
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░] 3/7 plans (Phase 8)
+Progress: [████████████████░░░░░░░░░░░░░░] 4/7 plans (Phase 8)
 
 ## Performance Metrics
 
@@ -91,6 +91,7 @@ Progress: [████████████░░░░░░░░░░░
 | Phase 08 P01 | 4min | 2 tasks | 18 files |
 | Phase 08 P02 | 4min | 2 tasks | 10 files |
 | Phase 08 P03 | 3min | 2 tasks | 8 files |
+| Phase 08 P04 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -297,6 +298,9 @@ Recent decisions affecting current work:
 - [08-03] Feed delete restricted to author or Admin role (matching ActivityComment author-only pattern)
 - [08-03] @mention detection uses regex matching first name or username with fire-and-forget dispatch
 - [08-03] DueDateNotificationService uses IgnoreQueryFilters for cross-tenant scanning (background service has no tenant context)
+- [08-04] NotificationDispatcher gets explicit tenantId overload for background services where tenant context unavailable
+- [08-04] Deal stage notifications only sent to owner when owner differs from current user (no self-notifications)
+- [08-04] Activity assignment notifications only sent when assignee differs from current user and assignment changed
 
 ### Pending Todos
 
@@ -309,5 +313,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 08-03-PLAN.md (Notification & Feed API Endpoints)
-Resume file: .planning/phases/08-real-time-and-notifications/08-03-SUMMARY.md
+Stopped at: Completed 08-04-PLAN.md (CRM Event Notification Integration)
+Resume file: .planning/phases/08-real-time-and-notifications/08-04-SUMMARY.md
