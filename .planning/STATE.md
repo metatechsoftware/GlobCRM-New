@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
-Plan: 7 of 10 in current phase
+Plan: 10 of 10 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 05-06 complete (Activity List & Form)
+Last activity: 2026-02-17 — Plan 05-09 complete (Activity Calendar)
 
-Progress: [████████████░░░░░░░░░░░░░░░░░░] 6/10 plans (Phase 5)
+Progress: [█████████████████████████████░] 9/10 plans (Phase 5)
 
 ## Performance Metrics
 
@@ -73,6 +73,7 @@ Progress: [████████████░░░░░░░░░░░
 | Phase 05 P03 | 3min | 2 tasks | 2 files |
 | Phase 05 P04 | 4min | 2 tasks | 1 files |
 | Phase 05 P06 | 3min | 2 tasks | 6 files |
+| Phase 05 P09 | 2min | 1 task | 4 files |
 
 ## Accumulated Context
 
@@ -224,6 +225,8 @@ Recent decisions affecting current work:
 - [05-06] Activity form uses inline template/styles (single .ts file) matching deal-form pattern rather than separate .html/.scss files
 - [05-06] Kanban/Calendar route placeholders point to ActivityListComponent until dedicated components are built
 - [05-06] Activity form defaults: type=Task, priority=Medium for ergonomic quick creation
+- [05-09] Activity calendar is month-only (no day/week) -- Phase 11 CALR-01+ adds comprehensive multi-entity calendar
+- [05-09] Priority-based coloring (Low=green, Medium=blue, High=orange, Urgent=red) instead of stage-based coloring
 
 ### Pending Todos
 
@@ -236,5 +239,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-06-PLAN.md (Activity List & Form)
-Resume file: .planning/phases/05-activities-and-workflow/05-06-SUMMARY.md
+Stopped at: Completed 05-09-PLAN.md (Activity Calendar)
+Resume file: .planning/phases/05-activities-and-workflow/05-09-SUMMARY.md
