@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 4 of 11 (Deals & Pipelines)
-Plan: 4 of 9 in current phase
+Plan: 5 of 9 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 04-04 complete (Frontend Deal Data Layer)
+Last activity: 2026-02-17 — Plan 04-05 complete (Pipeline Settings UI)
 
-Progress: [██████] 1/9 plans (Phase 4)
+Progress: [██████████] 2/9 plans (Phase 4)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 30
+- Total plans completed: 31
 - Average duration: 6 min
 - Total execution time: ~2.0 hours
 
@@ -30,7 +30,7 @@ Progress: [██████] 1/9 plans (Phase 4)
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 1 | ~2min | 2min |
+| 04-deals-and-pipelines | 2 | ~6min | 3min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -59,6 +59,7 @@ Progress: [██████] 1/9 plans (Phase 4)
 | Phase 03 P09 | 2min | 1 task | 2 files |
 | Phase 04 P01 | 3min | 2 tasks | 18 files |
 | Phase 04 P04 | 2min | 2 tasks | 4 files |
+| Phase 04 P05 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -165,6 +166,9 @@ Recent decisions affecting current work:
 - [04-04] DealService.getList extends EntityQueryParams with pipelineId/stageId for pipeline-scoped list and Kanban views
 - [04-04] DealStore adds pipelineId to state with setPipelineId method for pipeline-specific deal loading
 - [04-04] PipelineService is a separate service from DealService (pipeline admin vs deal operations)
+- [04-05] Pipeline components use inline templates (single .ts file) for minimal file scope
+- [04-05] Stage probability stored as 0-100 percentage in form, converted to 0-1 decimal on save for backend compatibility
+- [04-05] Required fields per stage use MatExpansionPanel with checkbox grid for deal field requirements (DEAL-10)
 
 ### Pending Todos
 
@@ -177,5 +181,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 04-04-PLAN.md (Frontend Deal Data Layer)
-Resume file: .planning/phases/04-deals-and-pipelines/04-04-SUMMARY.md
+Stopped at: Completed 04-05-PLAN.md (Pipeline Settings UI)
+Resume file: .planning/phases/04-deals-and-pipelines/04-05-SUMMARY.md
