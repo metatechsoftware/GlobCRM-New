@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 5 Complete -- Ready for Phase 6
+**Current focus:** Phase 6 -- Quotes & Requests
 
 ## Current Position
 
-Phase: 5 of 11 (Activities & Workflow)
-Plan: 10 of 10 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Plan 05-10 complete (Activities Routing & Entity Tabs)
+Phase: 6 of 11 (Quotes & Requests)
+Plan: 4 of 7 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Plan 06-04 complete (Quote & Request Frontend Data Layer)
 
-Progress: [██████████████████████████████] 10/10 plans (Phase 5)
+Progress: [█████████████████░░░░░░░░░░░░░] 4/7 plans (Phase 6)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 41
+- Total plans completed: 42
 - Average duration: 6 min
 - Total execution time: ~2.5 hours
 
@@ -77,6 +77,7 @@ Progress: [███████████████████████
 | Phase 05 P09 | 2min | 1 task | 4 files |
 | Phase 05 P07 | 6min | 2 tasks | 4 files |
 | Phase 05 P10 | 7min | 2 tasks | 9 files |
+| Phase 06 P04 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -237,6 +238,8 @@ Recent decisions affecting current work:
 - [Phase 05-07]: Timeline rendered inline with activity-specific event type icons (status_changed, comment_added, attachment_uploaded, time_logged, entity_linked) rather than reusing EntityTimelineComponent
 - [05-10] Activities tab reordered before disabled tabs (Quotes, Notes) in COMPANY_TABS/CONTACT_TABS for correct contentChildren template indexing
 - [05-10] Entity-scoped activity loading uses activitiesLoaded signal guard to prevent redundant API calls on tab re-selection
+- [06-04] QuoteService uses HttpClient directly for PDF blob download (matching ActivityService attachment pattern)
+- [06-04] Both Quote and Request stores are component-provided with createdAt desc default sort
 
 ### Pending Todos
 
@@ -249,5 +252,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-10-PLAN.md (Activities Routing & Entity Tabs) -- Phase 5 complete
-Resume file: .planning/phases/05-activities-and-workflow/05-10-SUMMARY.md
+Stopped at: Completed 06-04-PLAN.md (Quote & Request Frontend Data Layer)
+Resume file: .planning/phases/06-quotes-and-requests/06-04-SUMMARY.md
