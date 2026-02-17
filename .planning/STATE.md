@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 8 in progress -- Real-Time & Notifications
+**Current focus:** Phase 8 complete -- Real-Time & Notifications
 
 ## Current Position
 
 Phase: 8 of 11 (Real-Time & Notifications)
-Plan: 7 of 7 in current phase
+Plan: 8 of 8 in current phase
 Status: Phase Complete
-Last activity: 2026-02-17 — Completed 08-07 (Notification Preferences & Final Integration)
+Last activity: 2026-02-17 — Completed 08-08 (Mark-as-Unread Gap Closure)
 
-Progress: [██████████████████████████████] 7/7 plans (Phase 8)
+Progress: [██████████████████████████████] 8/8 plans (Phase 8)
 
 ## Performance Metrics
 
@@ -95,6 +95,7 @@ Progress: [███████████████████████
 | Phase 08 P05 | 4min | 2 tasks | 9 files |
 | Phase 08 P06 | 4min | 2 tasks | 8 files |
 | Phase 08 P07 | 2min | 2 tasks | 3 files |
+| Phase 08 P08 | 1min | 1 task | 2 files |
 
 ## Accumulated Context
 
@@ -327,5 +328,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 08-07-PLAN.md (Notification Preferences & Final Integration) -- Phase 8 COMPLETE
-Resume file: .planning/phases/08-real-time-and-notifications/08-07-SUMMARY.md
+Stopped at: Completed 08-08-PLAN.md (Mark-as-Unread Gap Closure) -- Phase 8 fully COMPLETE (8/8 plans)
+Resume file: .planning/phases/08-real-time-and-notifications/08-08-SUMMARY.md
