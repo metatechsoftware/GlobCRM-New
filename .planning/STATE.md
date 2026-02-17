@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 6 Complete -- Ready for Phase 7
+**Current focus:** Phase 7 in progress -- Email Integration
 
 ## Current Position
 
-Phase: 6 of 11 (Quotes & Requests)
-Plan: 7 of 7 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Phase 6 complete (Quotes & Requests)
+Phase: 7 of 11 (Email Integration)
+Plan: 4 of 7 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Completed 07-04 (Email Frontend Data Layer)
 
-Progress: [██████████████████████████████] 7/7 plans (Phase 6)
+Progress: [█████████████████░░░░░░░░░░░░░] 4/7 plans (Phase 7)
 
 ## Performance Metrics
 
@@ -82,6 +82,7 @@ Progress: [███████████████████████
 | Phase 06 P02 | 5min | 2 tasks | 4 files |
 | Phase 06 P05 | 5min | 2 tasks | 2 files |
 | Phase 06 P06 | 5min | 2 tasks | 3 files |
+| Phase 07 P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -257,6 +258,10 @@ Recent decisions affecting current work:
 - [06-06] PDF download uses URL.createObjectURL with filename pattern Quote-{number}-v{version}.pdf
 - [06-06] Request form uses separate FormControl for contact/company autocomplete (not in main FormGroup) with Subject-based debounced search
 
+- [07-04] EmailService uses ApiService for all endpoints (no HttpClient blob downloads needed for email)
+- [07-04] EmailStore includes selectedThread and accountStatus alongside standard list/detail state
+- [07-04] Optimistic list updates for markAsRead and toggleStar (update list item locally after API success)
+
 ### Pending Todos
 
 None.
@@ -268,5 +273,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 06-06-PLAN.md (Quote Detail, Request List & Form)
-Resume file: .planning/phases/06-quotes-and-requests/06-06-SUMMARY.md
+Stopped at: Completed 07-04-PLAN.md (Email Frontend Data Layer)
+Resume file: .planning/phases/07-email-integration/07-04-SUMMARY.md
