@@ -1,0 +1,418 @@
+import {
+  Component,
+  ChangeDetectionStrategy,
+  OnInit,
+  OnDestroy,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  ReactiveFormsModule,
+  FormBuilder,
+  FormGroup,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { Subject, takeUntil } from 'rxjs';
+import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
+import { ActivityService } from '../activity.service';
+import {
+  ActivityDetailDto,
+  CreateActivityRequest,
+  UpdateActivityRequest,
+  ACTIVITY_TYPES,
+  ACTIVITY_PRIORITIES,
+  ActivityType,
+  ActivityPriority,
+} from '../activity.models';
+import {
+  ProfileService,
+  TeamMemberDto,
+} from '../../profile/profile.service';
+
+/**
+ * Activity create/edit form component.
+ * Renders activity fields with type, priority, assignee selection, and custom fields.
+ * Determines create vs edit mode from the presence of :id route param.
+ */
+@Component({
+  selector: 'app-activity-form',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    RouterLink,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatDatepickerModule,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    CustomFieldFormComponent,
+  ],
+  providers: [provideNativeDateAdapter()],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    :host {
+      display: block;
+    }
+
+    .entity-form-container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .form-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .form-header h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+    }
+
+    .form-loading {
+      display: flex;
+      justify-content: center;
+      padding: 64px;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+    }
+
+    .form-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px 16px;
+    }
+
+    .form-grid .full-width {
+      grid-column: 1 / -1;
+    }
+
+    .custom-fields-section {
+      margin-top: 24px;
+    }
+
+    .custom-fields-section h3 {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 500;
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  `,
+  template: `
+    <div class="entity-form-container">
+      <div class="form-header">
+        <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ isEditMode ? 'Edit Activity' : 'New Activity' }}</h1>
+      </div>
+
+      @if (isLoadingDetail()) {
+        <div class="form-loading">
+          <mat-spinner diameter="48"></mat-spinner>
+        </div>
+      } @else {
+        <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
+          <!-- Activity Info Section -->
+          <div class="form-section">
+            <h3>Activity Information</h3>
+            <div class="form-grid">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Subject</mat-label>
+                <input matInput formControlName="subject" required>
+                @if (activityForm.controls['subject'].hasError('required')) {
+                  <mat-error>Subject is required</mat-error>
+                }
+                @if (activityForm.controls['subject'].hasError('minlength')) {
+                  <mat-error>Subject must be at least 3 characters</mat-error>
+                }
+                @if (activityForm.controls['subject'].hasError('maxlength')) {
+                  <mat-error>Subject cannot exceed 500 characters</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Type</mat-label>
+                <mat-select formControlName="type" required>
+                  @for (t of activityTypes; track t.value) {
+                    <mat-option [value]="t.value">
+                      <mat-icon>{{ t.icon }}</mat-icon> {{ t.label }}
+                    </mat-option>
+                  }
+                </mat-select>
+                @if (activityForm.controls['type'].hasError('required')) {
+                  <mat-error>Type is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Priority</mat-label>
+                <mat-select formControlName="priority" required>
+                  @for (p of activityPriorities; track p.value) {
+                    <mat-option [value]="p.value">{{ p.label }}</mat-option>
+                  }
+                </mat-select>
+                @if (activityForm.controls['priority'].hasError('required')) {
+                  <mat-error>Priority is required</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Due Date</mat-label>
+                <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate">
+                <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
+                <mat-datepicker #dueDatePicker></mat-datepicker>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Assigned To</mat-label>
+                <mat-select formControlName="assignedToId">
+                  <mat-option [value]="null">Unassigned</mat-option>
+                  @for (member of teamMembers(); track member.id) {
+                    <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="4"
+                          cdkTextareaAutosize></textarea>
+              </mat-form-field>
+            </div>
+          </div>
+
+          <!-- Custom fields -->
+          <div class="custom-fields-section">
+            <h3>Custom Fields</h3>
+            <app-custom-field-form
+              [entityType]="'Activity'"
+              [customFieldValues]="existingCustomFields"
+              (valuesChanged)="onCustomFieldsChanged($event)" />
+          </div>
+
+          <!-- Form actions -->
+          <div class="form-actions">
+            <button mat-button type="button" routerLink="/activities">Cancel</button>
+            <button mat-raised-button color="primary" type="submit"
+                    [disabled]="activityForm.invalid || isSaving()">
+              @if (isSaving()) {
+                <mat-spinner diameter="20"></mat-spinner>
+              }
+              {{ isEditMode ? 'Save Changes' : 'Create Activity' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+  `,
+})
+export class ActivityFormComponent implements OnInit, OnDestroy {
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly fb = inject(FormBuilder);
+  private readonly activityService = inject(ActivityService);
+  private readonly profileService = inject(ProfileService);
+  private readonly snackBar = inject(MatSnackBar);
+
+  /** Expose constants for template. */
+  readonly activityTypes = ACTIVITY_TYPES;
+  readonly activityPriorities = ACTIVITY_PRIORITIES;
+
+  /** Whether this is an edit (vs create) form. */
+  isEditMode = false;
+
+  /** Activity ID for edit mode. */
+  private activityId = '';
+
+  /** Loading state for fetching activity detail in edit mode. */
+  isLoadingDetail = signal(false);
+
+  /** Saving/submitting state. */
+  isSaving = signal(false);
+
+  /** Existing custom field values for edit mode. */
+  existingCustomFields: Record<string, any> | undefined;
+
+  /** Custom field values captured from CustomFieldFormComponent. */
+  private customFieldValues: Record<string, any> = {};
+
+  /** Team members for assignee selection. */
+  teamMembers = signal<TeamMemberDto[]>([]);
+
+  /** Destroy subject for unsubscribing. */
+  private readonly destroy$ = new Subject<void>();
+
+  /** Reactive form with all core activity fields. */
+  activityForm: FormGroup = this.fb.group({
+    subject: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(500)]],
+    description: [''],
+    type: ['Task' as ActivityType, [Validators.required]],
+    priority: ['Medium' as ActivityPriority, [Validators.required]],
+    dueDate: [null as Date | null],
+    assignedToId: [null as string | null],
+  });
+
+  ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id') ?? '';
+    this.isEditMode = !!idParam && idParam !== 'new';
+    if (this.isEditMode) {
+      this.activityId = idParam;
+    }
+
+    // Load team members for assignee dropdown
+    this.profileService.getTeamDirectory({ pageSize: 100 }).subscribe({
+      next: (result) => this.teamMembers.set(result.items),
+      error: () => {},
+    });
+
+    if (this.isEditMode) {
+      this.loadActivityForEdit();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  /** Load existing activity data for editing. */
+  private loadActivityForEdit(): void {
+    this.isLoadingDetail.set(true);
+    this.activityService.getById(this.activityId).subscribe({
+      next: (activity) => {
+        this.activityForm.patchValue({
+          subject: activity.subject,
+          description: activity.description ?? '',
+          type: activity.type,
+          priority: activity.priority,
+          dueDate: activity.dueDate ? new Date(activity.dueDate) : null,
+          assignedToId: activity.assignedToId,
+        });
+
+        this.existingCustomFields = activity.customFields;
+        this.isLoadingDetail.set(false);
+      },
+      error: () => {
+        this.isLoadingDetail.set(false);
+        this.snackBar.open('Failed to load activity data', 'Close', {
+          duration: 5000,
+        });
+      },
+    });
+  }
+
+  /** Capture custom field value changes. */
+  onCustomFieldsChanged(values: Record<string, any>): void {
+    this.customFieldValues = values;
+  }
+
+  /** Submit the form -- create or update. */
+  onSubmit(): void {
+    if (this.activityForm.invalid) return;
+
+    this.isSaving.set(true);
+    const fv = this.activityForm.value;
+
+    // Format date to ISO string if present
+    const dueDate = fv.dueDate
+      ? new Date(fv.dueDate).toISOString().split('T')[0]
+      : null;
+
+    if (this.isEditMode) {
+      const request: UpdateActivityRequest = {
+        subject: fv.subject,
+        description: fv.description || null,
+        type: fv.type,
+        priority: fv.priority,
+        dueDate,
+        assignedToId: fv.assignedToId || null,
+        customFields: this.customFieldValues,
+      };
+
+      this.activityService.update(this.activityId, request).subscribe({
+        next: () => {
+          this.isSaving.set(false);
+          this.snackBar.open('Activity updated successfully', 'Close', {
+            duration: 3000,
+          });
+          this.router.navigate(['/activities', this.activityId]);
+        },
+        error: () => {
+          this.isSaving.set(false);
+          this.snackBar.open('Failed to update activity', 'Close', {
+            duration: 5000,
+          });
+        },
+      });
+    } else {
+      const request: CreateActivityRequest = {
+        subject: fv.subject,
+        description: fv.description || null,
+        type: fv.type,
+        priority: fv.priority,
+        dueDate,
+        assignedToId: fv.assignedToId || null,
+        customFields: this.customFieldValues,
+      };
+
+      this.activityService.create(request).subscribe({
+        next: (created) => {
+          this.isSaving.set(false);
+          this.snackBar.open('Activity created successfully', 'Close', {
+            duration: 3000,
+          });
+          this.router.navigate(['/activities', created.id]);
+        },
+        error: () => {
+          this.isSaving.set(false);
+          this.snackBar.open('Failed to create activity', 'Close', {
+            duration: 5000,
+          });
+        },
+      });
+    }
+  }
+}
