@@ -28,7 +28,8 @@ export const COMPANY_TABS: EntityTab[] = [
   { label: 'Contacts', icon: 'people', enabled: true },
   { label: 'Deals', icon: 'handshake', enabled: true },
   { label: 'Activities', icon: 'task_alt', enabled: true },
-  { label: 'Quotes', icon: 'request_quote', enabled: false },
+  { label: 'Quotes', icon: 'request_quote', enabled: true },
+  { label: 'Requests', icon: 'support_agent', enabled: true },
   { label: 'Notes', icon: 'note', enabled: false },
 ];
 
@@ -37,7 +38,8 @@ export const CONTACT_TABS: EntityTab[] = [
   { label: 'Company', icon: 'business', enabled: true },
   { label: 'Deals', icon: 'handshake', enabled: true },
   { label: 'Activities', icon: 'task_alt', enabled: true },
-  { label: 'Quotes', icon: 'request_quote', enabled: false },
+  { label: 'Quotes', icon: 'request_quote', enabled: true },
+  { label: 'Requests', icon: 'support_agent', enabled: true },
   { label: 'Emails', icon: 'email', enabled: false },
   { label: 'Notes', icon: 'note', enabled: false },
 ];
@@ -52,6 +54,7 @@ export const DEAL_TABS: EntityTab[] = [
   { label: 'Contacts', icon: 'people', enabled: true },
   { label: 'Products', icon: 'inventory_2', enabled: true },
   { label: 'Activities', icon: 'task_alt', enabled: true },
+  { label: 'Quotes', icon: 'request_quote', enabled: true },
   { label: 'Timeline', icon: 'timeline', enabled: true },
 ];
 

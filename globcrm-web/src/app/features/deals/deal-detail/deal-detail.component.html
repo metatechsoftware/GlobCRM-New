@@ -383,7 +383,56 @@
             }
           </ng-template>
 
-          <!-- Tab 4: Timeline -->
+          <!-- Tab 4: Quotes -->
+          <ng-template>
+            @if (quotesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (linkedQuotes().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>request_quote</mat-icon>
+                <span>No quotes linked to this deal.</span>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Quote #</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Grand Total</th>
+                    <th>Version</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (quote of linkedQuotes(); track quote.id) {
+                    <tr>
+                      <td><a [routerLink]="['/quotes', quote.id]">{{ quote.quoteNumber }}</a></td>
+                      <td>{{ quote.title }}</td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getQuoteStatusColor(quote.status) + '22'"
+                                    [style.color]="getQuoteStatusColor(quote.status)">
+                            {{ quote.status }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>{{ formatQuoteCurrency(quote.grandTotal) }}</td>
+                      <td>v{{ quote.versionNumber }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <div style="text-align: right; margin-top: 8px;">
+                <a mat-button color="primary" [routerLink]="['/quotes']" [queryParams]="{ dealId: deal()?.id }">
+                  View All Quotes
+                </a>
+              </div>
+            }
+          </ng-template>
+
+          <!-- Tab 5: Timeline -->
           <ng-template>
             <app-entity-timeline
               [entries]="timelineEntries()"

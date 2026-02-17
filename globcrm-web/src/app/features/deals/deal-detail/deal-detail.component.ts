@@ -35,6 +35,8 @@ import { ProductService } from '../../products/product.service';
 import { ProductDto } from '../../products/product.models';
 import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../activities/activity.models';
 import { ActivityService } from '../../activities/activity.service';
+import { QuoteService } from '../../quotes/quote.service';
+import { QuoteListDto, QUOTE_STATUSES } from '../../quotes/quote.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -77,6 +79,7 @@ export class DealDetailComponent implements OnInit {
   private readonly contactService = inject(ContactService);
   private readonly productService = inject(ProductService);
   private readonly activityService = inject(ActivityService);
+  private readonly quoteService = inject(QuoteService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -93,6 +96,11 @@ export class DealDetailComponent implements OnInit {
   linkedActivities = signal<ActivityListDto[]>([]);
   activitiesLoading = signal(false);
   activitiesLoaded = signal(false);
+
+  /** Quotes linked to this deal. */
+  linkedQuotes = signal<QuoteListDto[]>([]);
+  quotesLoading = signal(false);
+  quotesLoaded = signal(false);
 
   /** Tab configuration for deal detail. */
   readonly tabs = DEAL_TABS;
@@ -157,10 +165,13 @@ export class DealDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change -- lazy load activities when Activities tab is selected. */
+  /** Handle tab change -- lazy load activities/quotes when tab is selected. */
   onTabChanged(index: number): void {
     if (index === 3) {
       this.loadLinkedActivities();
+    }
+    if (index === 4) {
+      this.loadLinkedQuotes();
     }
   }
 
@@ -191,6 +202,41 @@ export class DealDetailComponent implements OnInit {
   /** Get priority color for activity chip. */
   getPriorityColor(priority: string): string {
     return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
+  }
+
+  /** Get quote status color. */
+  getQuoteStatusColor(status: string): string {
+    return QUOTE_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+  }
+
+  /** Format currency for quote totals. */
+  formatQuoteCurrency(value: number | null): string {
+    if (value == null) return '-';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 2,
+    }).format(value);
+  }
+
+  /** Load quotes linked to this deal (lazy on tab switch). */
+  private loadLinkedQuotes(): void {
+    if (this.quotesLoaded() || this.quotesLoading()) return;
+
+    this.quotesLoading.set(true);
+    this.quoteService
+      .getList({ filters: [{ fieldId: 'dealId', operator: 'eq', value: this.dealId }], page: 1, pageSize: 50 })
+      .subscribe({
+        next: (result) => {
+          this.linkedQuotes.set(result.items);
+          this.quotesLoading.set(false);
+          this.quotesLoaded.set(true);
+        },
+        error: () => {
+          this.quotesLoading.set(false);
+        },
+      });
   }
 
   /** Handle delete with confirmation dialog. */

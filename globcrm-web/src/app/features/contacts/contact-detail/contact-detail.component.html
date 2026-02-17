@@ -223,6 +223,105 @@
               </table>
             }
           </ng-template>
+
+          <!-- Quotes tab content (index 4) -->
+          <ng-template>
+            @if (quotesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (linkedQuotes().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>request_quote</mat-icon>
+                <span>No quotes linked to this contact.</span>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Quote #</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Grand Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (quote of linkedQuotes(); track quote.id) {
+                    <tr>
+                      <td><a [routerLink]="['/quotes', quote.id]">{{ quote.quoteNumber }}</a></td>
+                      <td>{{ quote.title }}</td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getQuoteStatusColor(quote.status) + '22'"
+                                    [style.color]="getQuoteStatusColor(quote.status)">
+                            {{ quote.status }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>{{ formatCurrency(quote.grandTotal) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <div style="text-align: right; margin-top: 8px;">
+                <a mat-button color="primary" [routerLink]="['/quotes']" [queryParams]="{ contactId: contact()?.id }">
+                  View All Quotes
+                </a>
+              </div>
+            }
+          </ng-template>
+
+          <!-- Requests tab content (index 5) -->
+          <ng-template>
+            @if (requestsLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (linkedRequests().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>support_agent</mat-icon>
+                <span>No requests linked to this contact.</span>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (req of linkedRequests(); track req.id) {
+                    <tr>
+                      <td><a [routerLink]="['/requests', req.id]">{{ req.subject }}</a></td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getRequestStatusColor(req.status) + '22'"
+                                    [style.color]="getRequestStatusColor(req.status)">
+                            {{ req.status }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getRequestPriorityColor(req.priority) + '22'"
+                                    [style.color]="getRequestPriorityColor(req.priority)">
+                            {{ req.priority }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+              <div style="text-align: right; margin-top: 8px;">
+                <a mat-button color="primary" [routerLink]="['/requests']" [queryParams]="{ contactId: contact()?.id }">
+                  View All Requests
+                </a>
+              </div>
+            }
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 
