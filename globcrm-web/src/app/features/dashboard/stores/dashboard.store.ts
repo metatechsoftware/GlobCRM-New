@@ -198,8 +198,8 @@ export const DashboardStore = signalStore(
         };
 
         api.updateDashboard(dashboard.id, req).subscribe({
-          next: (updated) => {
-            patchState(store, { activeDashboard: updated });
+          next: () => {
+            this.loadDashboard(dashboard.id);
           },
         });
       },
