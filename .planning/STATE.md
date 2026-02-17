@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
-Plan: 6 of 10 in current phase
+Plan: 7 of 10 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 05-02 complete (Activity Repository & Seed Data)
+Last activity: 2026-02-17 — Plan 05-03 complete (Activity API Controller)
 
-Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░] 3/10 plans (Phase 5)
+Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 4/10 plans (Phase 5)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 39
+- Total plans completed: 40
 - Average duration: 6 min
-- Total execution time: ~2.4 hours
+- Total execution time: ~2.5 hours
 
 **By Phase:**
 
@@ -70,6 +70,7 @@ Progress: [██████░░░░░░░░░░░░░░░░░
 | Phase 05 P01 | 3min | 2 tasks | 22 files |
 | Phase 05 P05 | 2min | 2 tasks | 3 files |
 | Phase 05 P02 | 3min | 2 tasks | 4 files |
+| Phase 05 P03 | 3min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -209,6 +210,10 @@ Recent decisions affecting current work:
 - [05-02] Activity ownership scope checks both OwnerId and AssignedToId (users see activities they own OR are assigned to, unlike Company/Deal)
 - [05-02] Entity-scoped filtering via LINQ Any() on ActivityLink navigation collection (not separate join query)
 - [05-02] TenantSeeder uses contactMap and dealMap alongside companyMap for cross-entity linking of ActivityLink records
+- [05-03] ActivityWorkflow is a static class in Domain/Entities (not a service) for zero-dependency transition validation
+- [05-03] IsWithinScope checks both OwnerId and AssignedToId for activity dual-ownership scope (matching repository pattern)
+- [05-03] Status changes only via dedicated PATCH /status endpoint (PUT update does not allow status change)
+- [05-03] Create/Update requests accept type/priority as strings with Enum.TryParse for flexible API input
 
 ### Pending Todos
 
@@ -221,5 +226,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-02-PLAN.md (Activity Repository & Seed Data)
-Resume file: .planning/phases/05-activities-and-workflow/05-02-SUMMARY.md
+Stopped at: Completed 05-03-PLAN.md (Activity API Controller)
+Resume file: .planning/phases/05-activities-and-workflow/05-03-SUMMARY.md
