@@ -65,9 +65,12 @@ await SeedRoleTemplatesAsync(app.Services);
 // Configure the HTTP request pipeline.
 app.UseSerilogRequestLogging();
 
-app.UseHttpsRedirection();
-
 app.UseCors("AllowAngularDev");
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // Finbuckle tenant resolution -- MUST come before UseAuthentication
 app.UseMultiTenant();

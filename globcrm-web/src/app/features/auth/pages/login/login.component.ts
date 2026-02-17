@@ -71,13 +71,9 @@ export class LoginComponent implements OnInit {
     const { email, password, rememberMe } = this.loginForm.value;
 
     this.authService.login({ email, password, rememberMe }).subscribe({
-      next: (response) => {
+      next: () => {
         this.isLoading.set(false);
-        // Load user info then navigate
-        this.authService.loadUserInfo().subscribe({
-          next: () => this.router.navigateByUrl(this.returnUrl),
-          error: () => this.router.navigateByUrl(this.returnUrl),
-        });
+        this.router.navigateByUrl(this.returnUrl);
       },
       error: (error) => {
         this.isLoading.set(false);
@@ -115,10 +111,7 @@ export class LoginComponent implements OnInit {
       .subscribe({
         next: () => {
           this.isLoading.set(false);
-          this.authService.loadUserInfo().subscribe({
-            next: () => this.router.navigateByUrl(this.returnUrl),
-            error: () => this.router.navigateByUrl(this.returnUrl),
-          });
+          this.router.navigateByUrl(this.returnUrl);
         },
         error: (error) => {
           this.isLoading.set(false);

@@ -1,6 +1,7 @@
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Infrastructure.Persistence;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlobCRM.Infrastructure.Authorization;
@@ -83,6 +84,7 @@ public static class RoleTemplateSeeder
         {
             await SeedTemplateRolesAsync(db, tenantId);
             await EnsurePermissionsForAllEntityTypesAsync(db, tenantId);
+            await EnsureAdminRoleAssignmentsAsync(db, tenantId);
         }
     }
 
@@ -141,6 +143,64 @@ public static class RoleTemplateSeeder
         }
 
         if (hasChanges)
+        {
+            await db.SaveChangesAsync();
+        }
+    }
+
+    /// <summary>
+    /// Ensures users with Identity "Admin" role have a UserRoleAssignment to the RBAC Admin template role.
+    /// Bridges the gap between Identity roles (used for [Authorize(Roles)]) and RBAC roles
+    /// (used for Permission policy checks). Idempotent.
+    /// </summary>
+    public static async Task EnsureAdminRoleAssignmentsAsync(ApplicationDbContext db, Guid tenantId)
+    {
+        // Find the RBAC Admin template role for this tenant
+        var adminRole = await db.Roles
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(r => r.TenantId == tenantId && r.IsTemplate && r.Name == "Admin");
+
+        if (adminRole == null) return;
+
+        // Find the Identity "Admin" role ID
+        var identityAdminRole = await db.Set<IdentityRole<Guid>>()
+            .FirstOrDefaultAsync(r => r.NormalizedName == "ADMIN");
+
+        if (identityAdminRole == null) return;
+
+        // Get all users in this tenant who have the Identity Admin role
+        var adminUserIds = await db.Set<IdentityUserRole<Guid>>()
+            .Join(
+                db.Users.IgnoreQueryFilters().Where(u => u.OrganizationId == tenantId),
+                ur => ur.UserId,
+                u => u.Id,
+                (ur, u) => new { ur.UserId, ur.RoleId })
+            .Where(x => x.RoleId == identityAdminRole.Id)
+            .Select(x => x.UserId)
+            .ToListAsync();
+
+        if (adminUserIds.Count == 0) return;
+
+        // Check which admin users already have a UserRoleAssignment to the RBAC Admin role
+        var existingAssignments = await db.UserRoleAssignments
+            .IgnoreQueryFilters()
+            .Where(ura => ura.RoleId == adminRole.Id && adminUserIds.Contains(ura.UserId))
+            .Select(ura => ura.UserId)
+            .ToListAsync();
+
+        var missingUserIds = adminUserIds.Except(existingAssignments).ToList();
+
+        foreach (var userId in missingUserIds)
+        {
+            db.UserRoleAssignments.Add(new UserRoleAssignment
+            {
+                Id = Guid.NewGuid(),
+                UserId = userId,
+                RoleId = adminRole.Id
+            });
+        }
+
+        if (missingUserIds.Count > 0)
         {
             await db.SaveChangesAsync();
         }

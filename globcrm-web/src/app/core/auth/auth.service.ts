@@ -44,16 +44,8 @@ export class AuthService implements OnDestroy {
       this.refreshToken(storedRefreshToken).subscribe({
         next: (response) => {
           this.handleLoginSuccess(response, true);
-          this.loadUserInfo().subscribe({
-            next: () => {
-              subscriber.next(undefined);
-              subscriber.complete();
-            },
-            error: () => {
-              subscriber.next(undefined);
-              subscriber.complete();
-            },
-          });
+          subscriber.next(undefined);
+          subscriber.complete();
         },
         error: () => {
           this.clearStoredTokens();
@@ -216,12 +208,18 @@ export class AuthService implements OnDestroy {
   }
 
   /**
-   * Handle successful login/refresh: set tokens, persist refresh token if rememberMe,
-   * schedule automatic token refresh at 80% of expiry time.
+   * Handle successful login/refresh: set tokens, extract user info from JWT,
+   * persist refresh token if rememberMe, schedule automatic token refresh.
    */
   private handleLoginSuccess(response: LoginResponse, rememberMe: boolean): void {
     this.authStore.setTokens(response.accessToken, response.refreshToken);
     this.authStore.setLoading(false);
+
+    // Decode JWT to extract user info (role, name, org) without a server round-trip
+    const userInfo = this.decodeUserInfoFromJwt(response.accessToken);
+    if (userInfo) {
+      this.authStore.setUser(userInfo);
+    }
 
     if (rememberMe) {
       localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
@@ -233,6 +231,32 @@ export class AuthService implements OnDestroy {
     // Load user permissions after successful authentication.
     // This ensures the PermissionStore is populated before any guards or directives check access.
     this.permissionStore.loadPermissions();
+  }
+
+  /**
+   * Decode the JWT payload to extract UserInfo including role.
+   * The Identity manage/info endpoint doesn't return role, but the JWT has it.
+   */
+  private decodeUserInfoFromJwt(token: string): UserInfo | null {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      // ClaimTypes.Role uses the full URI as the key
+      const role =
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
+        payload['role'] ??
+        '';
+      return {
+        id: payload['sub'] ?? '',
+        firstName: payload['firstName'] ?? '',
+        lastName: payload['lastName'] ?? '',
+        email: payload['email'] ?? '',
+        organizationId: payload['organizationId'] ?? '',
+        organizationName: payload['organizationName'] ?? '',
+        role: Array.isArray(role) ? role[0] : role,
+      };
+    } catch {
+      return null;
+    }
   }
 
   /**
