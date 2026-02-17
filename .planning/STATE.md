@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 8 complete -- Real-Time & Notifications
+**Current focus:** Phase 9 in progress -- Dashboards & Reporting
 
 ## Current Position
 
-Phase: 8 of 11 (Real-Time & Notifications)
-Plan: 8 of 8 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Completed 08-08 (Mark-as-Unread Gap Closure)
+Phase: 9 of 11 (Dashboards & Reporting)
+Plan: 1 of 8 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Completed 09-01 (Domain Entities, Enums, Configs, Migration, RLS)
 
-Progress: [██████████████████████████████] 8/8 plans (Phase 8)
+Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░] 1/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -96,6 +96,7 @@ Progress: [███████████████████████
 | Phase 08 P06 | 4min | 2 tasks | 8 files |
 | Phase 08 P07 | 2min | 2 tasks | 3 files |
 | Phase 08 P08 | 1min | 1 task | 2 files |
+| Phase 09 P01 | 4min | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -317,6 +318,11 @@ Recent decisions affecting current work:
 - [08-07] Default notification preferences generated client-side with all toggles enabled when API returns empty
 - [08-07] Feed navbar link between Emails and Team: Dashboard | Companies | Contacts | Products | Deals | Activities | Quotes | Requests | Emails | Feed | Team | Settings
 
+- [09-01] Dashboard follows SavedView OwnerId pattern (null = team-wide, non-null = personal)
+- [09-01] DashboardWidget is child entity with no TenantId -- inherits tenant isolation via Dashboard FK
+- [09-01] Widget Config stored as Dictionary<string,object> with System.Text.Json HasConversion for JSONB
+- [09-01] MetricType enum covers 20 metrics across Deals, Activities, Quotes, Contacts, Companies, Requests
+
 ### Pending Todos
 
 None.
@@ -328,5 +334,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 08-08-PLAN.md (Mark-as-Unread Gap Closure) -- Phase 8 fully COMPLETE (8/8 plans)
-Resume file: .planning/phases/08-real-time-and-notifications/08-08-SUMMARY.md
+Stopped at: Completed 09-01-PLAN.md (Domain Entities, Enums, Configs, Migration, RLS)
+Resume file: .planning/phases/09-dashboards-and-reporting/09-01-SUMMARY.md
