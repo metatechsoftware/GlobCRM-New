@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,8 @@ public class DealsController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly NotificationDispatcher _dispatcher;
+    private readonly IFeedRepository _feedRepository;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<DealsController> _logger;
 
@@ -38,6 +41,8 @@ public class DealsController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        NotificationDispatcher dispatcher,
+        IFeedRepository feedRepository,
         ApplicationDbContext db,
         ILogger<DealsController> logger)
     {
@@ -47,6 +52,8 @@ public class DealsController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _dispatcher = dispatcher;
+        _feedRepository = feedRepository;
         _db = db;
         _logger = logger;
     }
@@ -192,6 +199,26 @@ public class DealsController : ControllerBase
 
         _logger.LogInformation("Deal created: {DealTitle} ({DealId})", created.Title, created.Id);
 
+        // Dispatch feed event for deal creation
+        try
+        {
+            var feedItem = new FeedItem
+            {
+                TenantId = tenantId,
+                Type = FeedItemType.SystemEvent,
+                Content = $"Deal '{created.Title}' was created",
+                EntityType = "Deal",
+                EntityId = created.Id,
+                AuthorId = userId
+            };
+            await _feedRepository.CreateFeedItemAsync(feedItem);
+            await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch feed event for deal creation {DealId}", created.Id);
+        }
+
         // Reload with navigations for DTO
         var reloaded = await _dealRepository.GetByIdAsync(created.Id);
 
@@ -301,6 +328,50 @@ public class DealsController : ControllerBase
 
         _logger.LogInformation("Deal updated: {DealId}", id);
 
+        // Dispatch notifications for stage change
+        if (stageChanged)
+        {
+            try
+            {
+                var newStage = await _db.PipelineStages.FindAsync(request.PipelineStageId!.Value);
+                var stageName = newStage?.Name ?? "unknown stage";
+                var tenantId = _tenantProvider.GetTenantId()
+                    ?? throw new InvalidOperationException("No tenant context.");
+
+                // Notify deal owner about stage change
+                if (deal.OwnerId.HasValue && deal.OwnerId.Value != userId)
+                {
+                    await _dispatcher.DispatchAsync(new NotificationRequest
+                    {
+                        RecipientId = deal.OwnerId.Value,
+                        Type = NotificationType.DealStageChanged,
+                        Title = "Deal Stage Changed",
+                        Message = $"Deal '{deal.Title}' moved to {stageName}",
+                        EntityType = "Deal",
+                        EntityId = deal.Id,
+                        CreatedById = userId
+                    });
+                }
+
+                // Create feed event for stage change
+                var feedItem = new FeedItem
+                {
+                    TenantId = tenantId,
+                    Type = FeedItemType.SystemEvent,
+                    Content = $"Deal '{deal.Title}' moved to {stageName}",
+                    EntityType = "Deal",
+                    EntityId = deal.Id,
+                    AuthorId = userId
+                };
+                await _feedRepository.CreateFeedItemAsync(feedItem);
+                await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to dispatch notifications for deal stage change {DealId}", id);
+            }
+        }
+
         return NoContent();
     }
 
@@ -394,6 +465,45 @@ public class DealsController : ControllerBase
         await _dealRepository.UpdateAsync(deal);
 
         _logger.LogInformation("Deal {DealId} stage changed to {StageName}", id, newStage.Name);
+
+        // Dispatch notifications for stage change
+        try
+        {
+            var tenantId = _tenantProvider.GetTenantId()
+                ?? throw new InvalidOperationException("No tenant context.");
+
+            // Notify deal owner about stage change
+            if (deal.OwnerId.HasValue && deal.OwnerId.Value != userId)
+            {
+                await _dispatcher.DispatchAsync(new NotificationRequest
+                {
+                    RecipientId = deal.OwnerId.Value,
+                    Type = NotificationType.DealStageChanged,
+                    Title = "Deal Stage Changed",
+                    Message = $"Deal '{deal.Title}' moved to {newStage.Name}",
+                    EntityType = "Deal",
+                    EntityId = deal.Id,
+                    CreatedById = userId
+                });
+            }
+
+            // Create feed event for stage change
+            var feedItem = new FeedItem
+            {
+                TenantId = tenantId,
+                Type = FeedItemType.SystemEvent,
+                Content = $"Deal '{deal.Title}' moved to {newStage.Name}",
+                EntityType = "Deal",
+                EntityId = deal.Id,
+                AuthorId = userId
+            };
+            await _feedRepository.CreateFeedItemAsync(feedItem);
+            await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch notifications for deal stage change {DealId}", id);
+        }
 
         return NoContent();
     }

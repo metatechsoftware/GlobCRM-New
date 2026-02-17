@@ -1,9 +1,11 @@
+using System.Text.RegularExpressions;
 using FluentValidation;
 using GlobCRM.Domain.Common;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using GlobCRM.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authorization;
@@ -31,6 +33,8 @@ public class ActivitiesController : ControllerBase
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
     private readonly IFileStorageService _fileStorageService;
+    private readonly NotificationDispatcher _dispatcher;
+    private readonly IFeedRepository _feedRepository;
     private readonly ICompanyRepository _companyRepository;
     private readonly IContactRepository _contactRepository;
     private readonly IDealRepository _dealRepository;
@@ -44,6 +48,8 @@ public class ActivitiesController : ControllerBase
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
         IFileStorageService fileStorageService,
+        NotificationDispatcher dispatcher,
+        IFeedRepository feedRepository,
         ICompanyRepository companyRepository,
         IContactRepository contactRepository,
         IDealRepository dealRepository,
@@ -56,6 +62,8 @@ public class ActivitiesController : ControllerBase
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
         _fileStorageService = fileStorageService;
+        _dispatcher = dispatcher;
+        _feedRepository = feedRepository;
         _companyRepository = companyRepository;
         _contactRepository = contactRepository;
         _dealRepository = dealRepository;
@@ -186,6 +194,42 @@ public class ActivitiesController : ControllerBase
 
         _logger.LogInformation("Activity created: {Subject} ({ActivityId})", created.Subject, created.Id);
 
+        // Dispatch notifications for activity creation
+        try
+        {
+            // Notify assignee if assigned to someone other than the creator
+            if (created.AssignedToId.HasValue && created.AssignedToId.Value != userId)
+            {
+                await _dispatcher.DispatchAsync(new NotificationRequest
+                {
+                    RecipientId = created.AssignedToId.Value,
+                    Type = NotificationType.ActivityAssigned,
+                    Title = "Activity Assigned",
+                    Message = $"You were assigned to '{created.Subject}'",
+                    EntityType = "Activity",
+                    EntityId = created.Id,
+                    CreatedById = userId
+                });
+            }
+
+            // Create feed event for activity creation
+            var feedItem = new FeedItem
+            {
+                TenantId = tenantId,
+                Type = FeedItemType.SystemEvent,
+                Content = $"Activity '{created.Subject}' was created",
+                EntityType = "Activity",
+                EntityId = created.Id,
+                AuthorId = userId
+            };
+            await _feedRepository.CreateFeedItemAsync(feedItem);
+            await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch notifications for activity creation {ActivityId}", created.Id);
+        }
+
         // Reload with full navigations for DTO
         var reloaded = await _activityRepository.GetByIdWithDetailsAsync(created.Id);
 
@@ -237,6 +281,9 @@ public class ActivitiesController : ControllerBase
             }
         }
 
+        // Track assignee change before update
+        var previousAssignedToId = activity.AssignedToId;
+
         // Update fields (NOT status -- use PATCH /status for that)
         activity.Subject = request.Subject;
         activity.Description = request.Description;
@@ -251,6 +298,32 @@ public class ActivitiesController : ControllerBase
         await _activityRepository.UpdateAsync(activity);
 
         _logger.LogInformation("Activity updated: {ActivityId}", id);
+
+        // Dispatch notification if assignee changed to a new user
+        try
+        {
+            var assigneeChanged = request.AssignedToId.HasValue
+                && request.AssignedToId.Value != userId
+                && request.AssignedToId != previousAssignedToId;
+
+            if (assigneeChanged)
+            {
+                await _dispatcher.DispatchAsync(new NotificationRequest
+                {
+                    RecipientId = request.AssignedToId!.Value,
+                    Type = NotificationType.ActivityAssigned,
+                    Title = "Activity Assigned",
+                    Message = $"You were assigned to '{activity.Subject}'",
+                    EntityType = "Activity",
+                    EntityId = activity.Id,
+                    CreatedById = userId
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch assignment notification for activity {ActivityId}", id);
+        }
 
         // Reload with full navigations for DTO
         var reloaded = await _activityRepository.GetByIdWithDetailsAsync(id);
@@ -347,6 +420,29 @@ public class ActivitiesController : ControllerBase
         await _activityRepository.UpdateAsync(activity);
 
         _logger.LogInformation("Activity {ActivityId} status changed from {From} to {To}", id, currentStatus, newStatus);
+
+        // Dispatch feed event for status change
+        try
+        {
+            var tenantId = _tenantProvider.GetTenantId()
+                ?? throw new InvalidOperationException("No tenant context.");
+
+            var feedItem = new FeedItem
+            {
+                TenantId = tenantId,
+                Type = FeedItemType.SystemEvent,
+                Content = $"Activity '{activity.Subject}' status changed to {newStatus}",
+                EntityType = "Activity",
+                EntityId = activity.Id,
+                AuthorId = userId
+            };
+            await _feedRepository.CreateFeedItemAsync(feedItem);
+            await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch feed event for activity status change {ActivityId}", id);
+        }
 
         return NoContent();
     }
@@ -628,6 +724,43 @@ public class ActivitiesController : ControllerBase
         };
 
         _logger.LogInformation("Comment added to activity {ActivityId}", id);
+
+        // Detect @mentions and dispatch Mention notifications
+        try
+        {
+            var mentionMatches = Regex.Matches(request.Content, @"@(\w+)");
+            if (mentionMatches.Count > 0)
+            {
+                var mentionedUsernames = mentionMatches.Select(m => m.Groups[1].Value).Distinct().ToList();
+
+                // Look up matching users in the tenant
+                var tenantId = _tenantProvider.GetTenantId()
+                    ?? throw new InvalidOperationException("No tenant context.");
+
+                var matchedUsers = await _db.Users
+                    .Where(u => mentionedUsernames.Contains(u.UserName!) && u.Id != userId)
+                    .Select(u => new { u.Id, u.UserName })
+                    .ToListAsync();
+
+                foreach (var mentionedUser in matchedUsers)
+                {
+                    await _dispatcher.DispatchAsync(new NotificationRequest
+                    {
+                        RecipientId = mentionedUser.Id,
+                        Type = NotificationType.Mention,
+                        Title = "You were mentioned",
+                        Message = $"You were mentioned in a comment on '{activity.Subject}'",
+                        EntityType = "Activity",
+                        EntityId = activity.Id,
+                        CreatedById = userId
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch mention notifications for comment on activity {ActivityId}", id);
+        }
 
         return StatusCode(StatusCodes.Status201Created, dto);
     }
