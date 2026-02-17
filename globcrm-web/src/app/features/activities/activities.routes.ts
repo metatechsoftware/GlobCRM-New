@@ -14,10 +14,9 @@ export const ACTIVITY_ROUTES: Routes = [
   {
     path: 'calendar',
     loadComponent: () =>
-      import('./activity-list/activity-list.component').then(
-        (m) => m.ActivityListComponent,
+      import('./activity-calendar/activity-calendar.component').then(
+        (m) => m.ActivityCalendarComponent,
       ),
-    // Placeholder: will be replaced by ActivityCalendarComponent in a later plan
   },
   {
     path: 'new',

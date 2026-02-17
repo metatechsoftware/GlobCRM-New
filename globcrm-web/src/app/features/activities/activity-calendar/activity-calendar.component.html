@@ -1,0 +1,47 @@
+<div class="calendar-layout">
+  <!-- Header toolbar -->
+  <div class="calendar-header">
+    <h1>Activities</h1>
+
+    <div class="header-actions">
+      <!-- View mode switcher -->
+      <mat-button-toggle-group value="calendar" class="view-mode-toggle">
+        <mat-button-toggle value="list" routerLink="/activities">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban" routerLink="/activities/kanban">
+          <mat-icon>view_kanban</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="calendar">
+          <mat-icon>calendar_month</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- Create button -->
+      <a mat-flat-button color="primary" routerLink="/activities/new">
+        <mat-icon>add</mat-icon>
+        New Activity
+      </a>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="calendar-loading"></mat-progress-bar>
+  }
+
+  <!-- Calendar -->
+  <div class="calendar-container">
+    <full-calendar [options]="calendarOptions()" />
+  </div>
+
+  <!-- Priority color legend -->
+  <div class="priority-legend">
+    @for (item of priorityLegend; track item.value) {
+      <div class="legend-item">
+        <span class="legend-dot" [style.background-color]="item.color"></span>
+        <span class="legend-label">{{ item.label }}</span>
+      </div>
+    }
+  </div>
+</div>
