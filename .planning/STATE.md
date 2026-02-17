@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 4 of 11 (Deals & Pipelines)
-Plan: 5 of 9 in current phase
+Plan: 7 of 9 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 04-05 complete (Pipeline Settings UI)
+Last activity: 2026-02-17 — Plan 04-06 complete (Deal List and Form Pages)
 
-Progress: [██████████] 2/9 plans (Phase 4)
+Progress: [████████████████] 3/9 plans (Phase 4)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 32
+- Total plans completed: 33
 - Average duration: 6 min
-- Total execution time: ~2.0 hours
+- Total execution time: ~2.1 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [██████████] 2/9 plans (Phase 4)
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 3 | ~10min | 3min |
+| 04-deals-and-pipelines | 4 | ~16min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -61,6 +61,7 @@ Progress: [██████████] 2/9 plans (Phase 4)
 | Phase 04 P04 | 2min | 2 tasks | 4 files |
 | Phase 04 P02 | 4min | 2 tasks | 6 files |
 | Phase 04 P05 | 4min | 2 tasks | 3 files |
+| Phase 04 P06 | 6min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -174,6 +175,10 @@ Recent decisions affecting current work:
 - [04-05] Pipeline components use inline templates (single .ts file) for minimal file scope
 - [04-05] Stage probability stored as 0-100 percentage in form, converted to 0-1 decimal on save for backend compatibility
 - [04-05] Required fields per stage use MatExpansionPanel with checkbox grid for deal field requirements (DEAL-10)
+- [04-06] View mode switcher uses mat-button-toggle-group with routerLink for Kanban/Calendar navigation (placeholder until those components built)
+- [04-06] Owner selection loads team directory via ProfileService.getTeamDirectory (pageSize: 100) for simple mat-select dropdown
+- [04-06] Pipeline-Stage cascade uses PipelineService.getStages(pipelineId) for lightweight stage loading on pipeline change
+- [04-06] provideNativeDateAdapter at component level for deal form datepicker (consistent with CustomFieldFormComponent pattern)
 
 ### Pending Todos
 
@@ -186,5 +191,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 04-05-PLAN.md (Pipeline Settings UI)
-Resume file: .planning/phases/04-deals-and-pipelines/04-05-SUMMARY.md
+Stopped at: Completed 04-06-PLAN.md (Deal List and Form Pages)
+Resume file: .planning/phases/04-deals-and-pipelines/04-06-SUMMARY.md
