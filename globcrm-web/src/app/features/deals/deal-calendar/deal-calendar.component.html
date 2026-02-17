@@ -1,0 +1,44 @@
+<div class="calendar-layout">
+  <!-- Header toolbar -->
+  <div class="calendar-header">
+    <h1>Deals</h1>
+
+    <div class="header-actions">
+      <!-- Pipeline selector -->
+      <mat-form-field appearance="outline" class="pipeline-selector">
+        <mat-select
+          [value]="selectedPipelineId()"
+          (selectionChange)="onPipelineChanged($event.value)"
+          placeholder="All Pipelines">
+          <mat-option [value]="null">All Pipelines</mat-option>
+          @for (pipeline of pipelines(); track pipeline.id) {
+            <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <!-- View mode switcher -->
+      <mat-button-toggle-group value="calendar" class="view-mode-toggle">
+        <mat-button-toggle value="list" routerLink="/deals">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban" routerLink="/deals/kanban">
+          <mat-icon>view_kanban</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="calendar">
+          <mat-icon>calendar_month</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="calendar-loading"></mat-progress-bar>
+  }
+
+  <!-- Calendar -->
+  <div class="calendar-container">
+    <full-calendar [options]="calendarOptions()" />
+  </div>
+</div>
