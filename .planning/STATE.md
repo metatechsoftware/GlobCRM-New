@@ -78,6 +78,7 @@ Progress: [█████████████████░░░░░░
 | Phase 05 P07 | 6min | 2 tasks | 4 files |
 | Phase 05 P10 | 7min | 2 tasks | 9 files |
 | Phase 06 P04 | 3min | 2 tasks | 6 files |
+| Phase 06 P01 | 4min | 2 tasks | 21 files |
 
 ## Accumulated Context
 
@@ -240,6 +241,10 @@ Recent decisions affecting current work:
 - [05-10] Entity-scoped activity loading uses activitiesLoaded signal guard to prevent redundant API calls on tab re-selection
 - [06-04] QuoteService uses HttpClient directly for PDF blob download (matching ActivityService attachment pattern)
 - [06-04] Both Quote and Request stores are component-provided with createdAt desc default sort
+- [Phase 06]: Quote versioning uses self-referencing FK (OriginalQuoteId) with SetNull delete -- versions survive original deletion
+- [Phase 06]: QuoteLineItem stores computed amounts (LineTotal, DiscountAmount, TaxAmount, NetTotal) rather than computing on read
+- [Phase 06]: RequestWorkflow uses same static dictionary pattern as ActivityWorkflow for zero-dependency transition validation
+- [Phase 06]: QuoteLineItem child entity has no TenantId -- inherits tenant isolation via Quote FK (matching DealProduct pattern)
 
 ### Pending Todos
 
