@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 9 of 11 (Dashboards & Reporting)
-Plan: 4 of 8 in current phase
+Plan: 5 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 09-04 (Dashboard Frontend Data Layer)
+Last activity: 2026-02-17 — Completed 09-02 (Dashboard Services & Aggregation)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 2/8 plans (Phase 9)
+Progress: [████████████░░░░░░░░░░░░░░░░░░] 3/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -98,6 +98,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | Phase 08 P08 | 1min | 1 task | 2 files |
 | Phase 09 P01 | 4min | 2 tasks | 16 files |
 | Phase 09 P04 | 3min | 2 tasks | 6 files |
+| Phase 09 P02 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -326,6 +327,10 @@ Recent decisions affecting current work:
 - [09-04] DashboardStore is component-provided (not root) for per-page instance isolation matching ViewStore/FeedStore pattern
 - [09-04] provideCharts(withDefaultRegisterables()) registered globally in app.config.ts for Chart.js availability
 - [09-04] Default date range set to current month (first day to today) for meaningful initial data display
+- [09-02] DashboardRepository uses full-replacement strategy for widgets (delete all + insert new) matching Phase 02 permission update pattern
+- [09-02] DashboardAggregationService takes userId/scope/teamMemberIds as parameters -- controller resolves RBAC, service applies scope to queries
+- [09-02] Activity and Request aggregation scope checks both OwnerId and AssignedToId for dual-ownership (matching Phase 05/06 patterns)
+- [09-02] Batch ComputeMetricsAsync iterates sequentially (not parallel) to avoid EF Core DbContext concurrency issues
 
 ### Pending Todos
 
@@ -338,5 +343,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-04-PLAN.md (Dashboard Frontend Data Layer)
-Resume file: .planning/phases/09-dashboards-and-reporting/09-04-SUMMARY.md
+Stopped at: Completed 09-02-PLAN.md (Dashboard Services & Aggregation)
+Resume file: .planning/phases/09-dashboards-and-reporting/09-02-SUMMARY.md
