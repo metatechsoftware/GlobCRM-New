@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 10 of 11 (Data Operations)
-Plan: 3 of 6 in current phase
+Plan: 5 of 6 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 10-03 (Global Search Backend: Service & API)
+Last activity: 2026-02-17 — Completed 10-05 (Global Search Frontend Component)
 
-Progress: [██████████████░░░░░░░░░░░░░░░░] 3/6 plans (Phase 10)
+Progress: [████████████████████████░░░░░░] 5/6 plans (Phase 10)
 
 ## Performance Metrics
 
@@ -107,6 +107,7 @@ Progress: [██████████████░░░░░░░░░
 | Phase 10 P01 | 4min | 2 tasks | 19 files |
 | Phase 10 P03 | 3min | 2 tasks | 4 files |
 | Phase 10 P02 | 7min | 2 tasks | 8 files |
+| Phase 10 P05 | 2min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -366,6 +367,9 @@ Recent decisions affecting current work:
 - [10-03] Per-entity RBAC permission check in search (Company:View, Contact:View, Deal:View) not single search permission
 - [10-03] Team member IDs materialized to List<Guid> before search query for EF Core LINQ compatibility
 - [Phase 10-02]: CsvHelper 33.1.0 for dynamic record reading; IServiceScopeFactory batch processing per 100 rows; fire-and-forget Task.Run with SignalR ImportProgress
+- [10-05] GlobalSearchComponent uses local component signals (not root-provided store) per research anti-pattern guidance -- search state is ephemeral
+- [10-05] Search bar positioned between spacer and notification center in navbar for right-side grouping with action items
+- [10-05] RecentSearchesService as separate root-provided service with localStorage 10-item cap and silent error handling
 
 ### Pending Todos
 
@@ -378,5 +382,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 10-03-PLAN.md (Global Search Backend: Service & API)
-Resume file: .planning/phases/10-data-operations/10-03-SUMMARY.md
+Stopped at: Completed 10-05-PLAN.md (Global Search Frontend Component)
+Resume file: .planning/phases/10-data-operations/10-05-SUMMARY.md
