@@ -1,0 +1,190 @@
+import {
+  Component,
+  ChangeDetectionStrategy,
+  input,
+  computed,
+  ElementRef,
+  afterNextRender,
+  OnDestroy,
+  viewChild,
+} from '@angular/core';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData, ChartOptions, Chart } from 'chart.js';
+import { MetricResultDto } from '../../../models/dashboard.models';
+
+/**
+ * Chart.js color palette matching GlobCRM design system.
+ * Hex values required since Chart.js doesn't support CSS variables.
+ */
+const CHART_COLORS = [
+  '#D97B3A', // primary (orange)
+  '#9B85C4', // secondary (lavender)
+  '#6BA68E', // accent (sage)
+  '#6494BE', // info (blue)
+  '#6AAE6E', // success (green)
+  '#D4A840', // warning (gold)
+  '#CC6060', // danger (red)
+  '#A89888', // neutral (muted)
+];
+
+const CHART_COLORS_ALPHA = CHART_COLORS.map((c) => c + '33');
+
+/**
+ * Chart widget that renders bar, line, pie, or doughnut charts
+ * using ng2-charts/Chart.js. Handles responsive resize via ResizeObserver.
+ */
+@Component({
+  selector: 'app-chart-widget',
+  standalone: true,
+  imports: [BaseChartDirective],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styles: `
+    :host {
+      display: block;
+      height: 100%;
+      position: relative;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+    }
+  `,
+  template: `
+    <div class="chart-container">
+      <canvas
+        #chartCanvas
+        baseChart
+        [data]="chartData()"
+        [options]="chartOptions"
+        [type]="chartType()"
+      ></canvas>
+    </div>
+  `,
+})
+export class ChartWidgetComponent implements OnDestroy {
+  readonly chartType = input.required<'bar' | 'line' | 'pie' | 'doughnut'>();
+  readonly data = input<MetricResultDto | null>(null);
+  readonly title = input<string>('');
+
+  readonly chartDirective = viewChild(BaseChartDirective);
+
+  private resizeObserver: ResizeObserver | null = null;
+
+  readonly chartOptions: ChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom',
+        labels: {
+          usePointStyle: true,
+          padding: 12,
+          font: { size: 11 },
+        },
+      },
+      title: {
+        display: false,
+      },
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: { font: { size: 11 } },
+      },
+      y: {
+        beginAtZero: true,
+        grid: { color: 'rgba(0,0,0,0.05)' },
+        ticks: { font: { size: 11 } },
+      },
+    },
+  };
+
+  readonly chartData = computed<ChartData>(() => {
+    const metric = this.data();
+    const type = this.chartType();
+    const series = metric?.series ?? [];
+    const labels = series.map((s) => s.label);
+    const values = series.map((s) => s.value);
+
+    const isPieType = type === 'pie' || type === 'doughnut';
+
+    if (isPieType) {
+      return {
+        labels,
+        datasets: [
+          {
+            data: values,
+            backgroundColor: CHART_COLORS.slice(0, values.length),
+            borderWidth: 2,
+            borderColor: 'var(--color-surface, #fff)',
+          },
+        ],
+      };
+    }
+
+    const isLine = type === 'line';
+    return {
+      labels,
+      datasets: [
+        {
+          label: metric?.label ?? this.title(),
+          data: values,
+          backgroundColor: isLine
+            ? CHART_COLORS_ALPHA[0]
+            : CHART_COLORS.slice(0, values.length),
+          borderColor: isLine ? CHART_COLORS[0] : undefined,
+          borderWidth: isLine ? 2 : 0,
+          fill: isLine,
+          tension: isLine ? 0.3 : 0,
+          pointBackgroundColor: isLine ? CHART_COLORS[0] : undefined,
+          pointRadius: isLine ? 3 : undefined,
+        },
+      ],
+    };
+  });
+
+  constructor(private elementRef: ElementRef) {
+    afterNextRender(() => {
+      this.setupResizeObserver();
+      this.applyScaleOptions();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.resizeObserver = null;
+  }
+
+  /**
+   * Hide x/y scales for pie and doughnut charts since they are not applicable.
+   */
+  private applyScaleOptions(): void {
+    const type = this.chartType();
+    if (type === 'pie' || type === 'doughnut') {
+      (this.chartOptions as any).scales = {};
+    }
+  }
+
+  /**
+   * ResizeObserver ensures Chart.js updates correctly when the widget
+   * container is resized (e.g., gridster drag-resize).
+   * This avoids the known Chart.js resize pitfall from research.
+   */
+  private setupResizeObserver(): void {
+    this.resizeObserver = new ResizeObserver(() => {
+      const directive = this.chartDirective();
+      if (directive?.chart) {
+        directive.chart.resize();
+      }
+    });
+    this.resizeObserver.observe(this.elementRef.nativeElement);
+  }
+}
