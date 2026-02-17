@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 9 complete -- Dashboards & Reporting
+**Current focus:** Phase 10 in progress -- Data Operations (Import/Export & Search)
 
 ## Current Position
 
-Phase: 9 of 11 (Dashboards & Reporting)
-Plan: 8 of 8 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Completed 09-08 (Target Management & Widget Drill-Down)
+Phase: 10 of 11 (Data Operations)
+Plan: 1 of 6 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Completed 10-01 (Domain Foundation: Import Entities & Search Vectors)
 
-Progress: [██████████████████████████████] 8/8 plans (Phase 9)
+Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░] 1/6 plans (Phase 10)
 
 ## Performance Metrics
 
@@ -104,6 +104,7 @@ Progress: [███████████████████████
 | Phase 09 P06 | 3min | 2 tasks | 4 files |
 | Phase 09 P07 | 2min | 2 tasks | 3 files |
 | Phase 09 P08 | 3min | 2 tasks | 6 files |
+| Phase 10 P01 | 4min | 2 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -355,6 +356,10 @@ Recent decisions affecting current work:
 - [09-08] Period auto-date computation for Daily/Weekly/Monthly/Quarterly/Yearly with Monday-start weeks (ISO standard)
 - [09-08] provideNativeDateAdapter at component level for TargetFormDialogComponent datepicker (matching Phase 03 pattern)
 - [09-08] Snackbar-based delete confirmation for targets (lightweight, non-blocking UX)
+- [10-01] Npgsql 10.0.0 added to Domain project for NpgsqlTsVector type reference on entity SearchVector properties
+- [10-01] HasGeneratedTsVectorColumn returns EntityTypeBuilder -- HasColumnName set separately via Property()
+- [10-01] ImportFieldMapping value object in ImportJob.cs with JSONB List<T> storage via System.Text.Json HasConversion
+- [10-01] ImportJob.UserId nullable with SetNull FK -- import records survive user deletion
 
 ### Pending Todos
 
@@ -367,5 +372,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-08-PLAN.md (Target Management & Widget Drill-Down) -- Phase 9 complete
-Resume file: .planning/phases/09-dashboards-and-reporting/09-08-SUMMARY.md
+Stopped at: Completed 10-01-PLAN.md (Domain Foundation: Import Entities & Search Vectors)
+Resume file: .planning/phases/10-data-operations/10-01-SUMMARY.md
