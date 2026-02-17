@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 4 of 11 (Deals & Pipelines)
-Plan: 7 of 9 in current phase
+Plan: 9 of 9 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 04-06 complete (Deal List and Form Pages)
+Last activity: 2026-02-17 — Plan 04-08 complete (Deal Kanban Board)
 
-Progress: [████████████████] 3/9 plans (Phase 4)
+Progress: [████████████████████████████] 8/9 plans (Phase 4)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 33
+- Total plans completed: 34
 - Average duration: 6 min
-- Total execution time: ~2.1 hours
+- Total execution time: ~2.2 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [████████████████] 3/9 plans (Phase 4)
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 4 | ~16min | 4min |
+| 04-deals-and-pipelines | 5 | ~20min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -62,6 +62,7 @@ Progress: [████████████████] 3/9 plans (Phase 4)
 | Phase 04 P02 | 4min | 2 tasks | 6 files |
 | Phase 04 P05 | 4min | 2 tasks | 3 files |
 | Phase 04 P06 | 6min | 2 tasks | 6 files |
+| Phase 04 P08 | 4min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -179,6 +180,9 @@ Recent decisions affecting current work:
 - [04-06] Owner selection loads team directory via ProfileService.getTeamDirectory (pageSize: 100) for simple mat-select dropdown
 - [04-06] Pipeline-Stage cascade uses PipelineService.getStages(pipelineId) for lightweight stage loading on pipeline change
 - [04-06] provideNativeDateAdapter at component level for deal form datepicker (consistent with CustomFieldFormComponent pattern)
+- [04-08] CDK drag-drop with transferArrayItem for cross-column moves and moveItemInArray for within-column reorder
+- [04-08] Optimistic UI update pattern: move card immediately, revert on API failure with snackbar notification
+- [04-08] Pipeline selector loads all pipelines on init, selects default (isDefault=true) or first pipeline
 
 ### Pending Todos
 
@@ -191,5 +195,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 04-06-PLAN.md (Deal List and Form Pages)
-Resume file: .planning/phases/04-deals-and-pipelines/04-06-SUMMARY.md
+Stopped at: Completed 04-08-PLAN.md (Deal Kanban Board)
+Resume file: .planning/phases/04-deals-and-pipelines/04-08-SUMMARY.md
