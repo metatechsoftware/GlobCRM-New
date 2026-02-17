@@ -79,4 +79,17 @@ public class FeedRepository : IFeedRepository
             .OrderBy(c => c.CreatedAt)
             .ToListAsync();
     }
+
+    /// <inheritdoc />
+    public async Task DeleteAsync(Guid id)
+    {
+        var feedItem = await _db.FeedItems
+            .FirstOrDefaultAsync(f => f.Id == id);
+
+        if (feedItem != null)
+        {
+            _db.FeedItems.Remove(feedItem);
+            await _db.SaveChangesAsync();
+        }
+    }
 }

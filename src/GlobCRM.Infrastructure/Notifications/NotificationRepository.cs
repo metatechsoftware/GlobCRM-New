@@ -44,6 +44,13 @@ public class NotificationRepository : INotificationRepository
     }
 
     /// <inheritdoc />
+    public async Task<Notification?> GetByIdAsync(Guid notificationId)
+    {
+        return await _db.Notifications
+            .FirstOrDefaultAsync(n => n.Id == notificationId);
+    }
+
+    /// <inheritdoc />
     public async Task<int> GetUnreadCountAsync(Guid userId)
     {
         return await _db.Notifications
@@ -61,6 +68,20 @@ public class NotificationRepository : INotificationRepository
         {
             notification.IsRead = true;
             notification.ReadAt = DateTimeOffset.UtcNow;
+            await _db.SaveChangesAsync();
+        }
+    }
+
+    /// <inheritdoc />
+    public async Task MarkAsUnreadAsync(Guid notificationId)
+    {
+        var notification = await _db.Notifications
+            .FirstOrDefaultAsync(n => n.Id == notificationId);
+
+        if (notification != null)
+        {
+            notification.IsRead = false;
+            notification.ReadAt = null;
             await _db.SaveChangesAsync();
         }
     }

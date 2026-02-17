@@ -15,6 +15,11 @@ public interface INotificationRepository
     Task<PagedResult<Notification>> GetPagedAsync(Guid userId, int page, int pageSize);
 
     /// <summary>
+    /// Gets a single notification by ID.
+    /// </summary>
+    Task<Notification?> GetByIdAsync(Guid notificationId);
+
+    /// <summary>
     /// Gets the count of unread notifications for a user.
     /// </summary>
     Task<int> GetUnreadCountAsync(Guid userId);
@@ -23,6 +28,11 @@ public interface INotificationRepository
     /// Marks a single notification as read, setting IsRead=true and ReadAt to current time.
     /// </summary>
     Task MarkAsReadAsync(Guid notificationId);
+
+    /// <summary>
+    /// Marks a single notification as unread, setting IsRead=false and ReadAt to null.
+    /// </summary>
+    Task MarkAsUnreadAsync(Guid notificationId);
 
     /// <summary>
     /// Marks all unread notifications for a user as read.

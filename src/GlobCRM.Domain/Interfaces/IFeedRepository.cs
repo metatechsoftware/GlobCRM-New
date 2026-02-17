@@ -35,4 +35,9 @@ public interface IFeedRepository
     /// Includes Author navigation for display.
     /// </summary>
     Task<List<FeedComment>> GetCommentsAsync(Guid feedItemId);
+
+    /// <summary>
+    /// Deletes a feed item and all its comments (cascade delete).
+    /// </summary>
+    Task DeleteAsync(Guid id);
 }
