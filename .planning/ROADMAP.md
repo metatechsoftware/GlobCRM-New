@@ -190,10 +190,16 @@ Plans:
   5. System auto-links emails to known contacts by email address
   6. Emails appear in contact and company entity timelines
   7. User can view email threads with proper conversation threading
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- TBD
+- [ ] 07-01-PLAN.md -- Backend domain entities (EmailAccount, EmailMessage, EmailThread) + EF Core configs + migration + RLS
+- [ ] 07-02-PLAN.md -- Gmail infrastructure services (OAuth, token encryption, service factory, sync engine, send service) + NuGet packages
+- [ ] 07-03-PLAN.md -- Backend repositories + background sync service + API controllers (EmailAccounts + Emails)
+- [ ] 07-04-PLAN.md -- Frontend TypeScript models, API services (email + account), and EmailStore signal store
+- [ ] 07-05-PLAN.md -- Frontend email list (DynamicTable) + compose dialog + email account settings page
+- [ ] 07-06-PLAN.md -- Frontend email detail (thread view) + entity tab integration + routing + navbar
+- [ ] 07-07-PLAN.md -- End-to-end verification checkpoint (Google Cloud OAuth setup + full flow testing)
 
 ### Phase 8: Real-Time & Notifications
 **Goal**: SignalR-powered live updates and comprehensive notification system
@@ -276,7 +282,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 4. Deals & Pipelines | 10/10 | Complete | - |
 | 5. Activities & Workflow | 10/10 | Complete | - |
 | 6. Quotes & Requests | 7/7 | Complete | 2026-02-17 |
-| 7. Email Integration | 0/TBD | Not started | - |
+| 7. Email Integration | 0/7 | Not started | - |
 | 8. Real-Time & Notifications | 0/TBD | Not started | - |
 | 9. Dashboards & Reporting | 0/TBD | Not started | - |
 | 10. Data Operations | 0/TBD | Not started | - |
