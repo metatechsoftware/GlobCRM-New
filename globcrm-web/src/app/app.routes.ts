@@ -112,6 +112,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'feed',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/feed/feed.routes').then(
+        (m) => m.FEED_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
