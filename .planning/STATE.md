@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 7 Complete -- Ready for Phase 8
+**Current focus:** Phase 8 in progress -- Real-Time & Notifications
 
 ## Current Position
 
-Phase: 7 of 11 (Email Integration)
-Plan: 7 of 7 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Phase 7 complete (Email Integration)
+Phase: 8 of 11 (Real-Time & Notifications)
+Plan: 1 of 7 in current phase
+Status: Executing
+Last activity: 2026-02-17 — Completed 08-01 (Notification & Feed Domain Model)
 
-Progress: [██████████████████████████████] 7/7 plans (Phase 7)
+Progress: [████░░░░░░░░░░░░░░░░░░░░░░░░░░] 1/7 plans (Phase 8)
 
 ## Performance Metrics
 
@@ -88,6 +88,7 @@ Progress: [███████████████████████
 | Phase 07 P02 | 6min | 2 tasks | 9 files |
 | Phase 07 P06 | 5min | 2 tasks | 9 files |
 | Phase 07 P03 | 5min | 2 tasks | 7 files |
+| Phase 08 P01 | 4min | 2 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -284,6 +285,10 @@ Recent decisions affecting current work:
 - [07-03] Tenant resolution fallback in OAuth callback queries ApplicationUser.OrganizationId when subdomain not resolved
 - [07-03] EmailsController has no permission policies -- email access scoped by tenant query filter
 
+- [08-01] Notification.UserId is nullable Guid? to support SetNull FK delete behavior (non-nullable Guid incompatible with SetNull)
+- [08-01] FeedComment has no TenantId -- inherits tenant isolation via FeedItem FK (matching child entity pattern)
+- [08-01] NotificationPreference uses Cascade delete on UserId (prefs removed with user)
+
 ### Pending Todos
 
 None.
@@ -295,5 +300,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 07-07-PLAN.md (E2E Verification Checkpoint)
-Resume file: .planning/phases/07-email-integration/07-07-SUMMARY.md
+Stopped at: Completed 08-01-PLAN.md (Notification & Feed Domain Model)
+Resume file: .planning/phases/08-real-time-and-notifications/08-01-SUMMARY.md
