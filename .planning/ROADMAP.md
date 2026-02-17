@@ -167,10 +167,16 @@ Plans:
   4. User can link quotes to deals and contacts
   5. User can create requests with status workflow (new → in progress → resolved → closed)
   6. Requests have priority, category, and assigned owner with links to contacts and companies
-**Plans**: TBD
+**Plans**: 7 plans
 
 Plans:
-- TBD
+- [ ] 06-01-PLAN.md -- Backend domain entities (Quote, QuoteLineItem, Request) + enums + EF Core configs + migration + RLS
+- [ ] 06-02-PLAN.md -- Backend repositories (QuoteRepository + RequestRepository) + TenantSeeder seed data
+- [ ] 06-03-PLAN.md -- Backend controllers (QuotesController + RequestsController) + QuestPDF PDF generation
+- [ ] 06-04-PLAN.md -- Frontend TypeScript models, API services, and signal stores (Quote + Request)
+- [ ] 06-05-PLAN.md -- Frontend Quote list (DynamicTable) + Quote form (line items FormArray + live calculations)
+- [ ] 06-06-PLAN.md -- Frontend Quote detail (PDF download, versioning, status) + Request list + Request form
+- [ ] 06-07-PLAN.md -- Frontend Request detail + routes + navbar + entity detail tabs integration
 
 ### Phase 7: Email Integration
 **Goal**: Two-way Gmail sync with OAuth, threading, and automatic contact linking
