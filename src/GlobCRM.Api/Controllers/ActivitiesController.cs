@@ -14,10 +14,10 @@ namespace GlobCRM.Api.Controllers;
 
 /// <summary>
 /// REST endpoints for Activity CRUD, workflow status transitions, Kanban data,
-/// timeline aggregation, and allowed transitions. Ownership scope enforcement
-/// checks both OwnerId and AssignedToId (users see activities they own OR are assigned to).
-/// Sub-resource endpoints (comments, attachments, time entries, links, followers)
-/// are added in Plan 05-04.
+/// timeline aggregation, allowed transitions, and sub-resource endpoints for
+/// comments, attachments, time entries, entity links, and followers.
+/// Ownership scope enforcement checks both OwnerId and AssignedToId
+/// (users see activities they own OR are assigned to).
 /// </summary>
 [ApiController]
 [Route("api/activities")]
@@ -560,6 +560,345 @@ public class ActivitiesController : ControllerBase
         return Ok(allowed);
     }
 
+    // ---- Comments (ACTV-05) ----
+
+    /// <summary>
+    /// Adds a comment to an activity. AuthorId set from JWT.
+    /// </summary>
+    [HttpPost("{id:guid}/comments")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(typeof(ActivityCommentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddComment(Guid id, [FromBody] AddCommentRequest request)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        if (string.IsNullOrWhiteSpace(request.Content) || request.Content.Length < 1 || request.Content.Length > 5000)
+            return BadRequest(new { error = "Comment content must be between 1 and 5000 characters." });
+
+        var comment = new ActivityComment
+        {
+            ActivityId = id,
+            Content = request.Content.Trim(),
+            AuthorId = userId,
+        };
+
+        _db.ActivityComments.Add(comment);
+        await _db.SaveChangesAsync();
+
+        // Reload with Author navigation
+        var saved = await _db.ActivityComments
+            .Include(c => c.Author)
+            .FirstAsync(c => c.Id == comment.Id);
+
+        var dto = new ActivityCommentDto
+        {
+            Id = saved.Id,
+            Content = saved.Content,
+            AuthorName = saved.Author != null
+                ? $"{saved.Author.FirstName} {saved.Author.LastName}".Trim()
+                : null,
+            AuthorId = saved.AuthorId,
+            CreatedAt = saved.CreatedAt,
+            UpdatedAt = saved.UpdatedAt
+        };
+
+        _logger.LogInformation("Comment added to activity {ActivityId}", id);
+
+        return StatusCode(StatusCodes.Status201Created, dto);
+    }
+
+    /// <summary>
+    /// Edits a comment on an activity. Only the original author can edit their own comment.
+    /// </summary>
+    [HttpPut("{id:guid}/comments/{commentId:guid}")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(typeof(ActivityCommentDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateComment(Guid id, Guid commentId, [FromBody] AddCommentRequest request)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var comment = await _db.ActivityComments
+            .Include(c => c.Author)
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.ActivityId == id);
+
+        if (comment is null)
+            return NotFound(new { error = "Comment not found." });
+
+        // Only the author can edit their own comment
+        if (comment.AuthorId != userId)
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Only the comment author can edit this comment." });
+
+        if (string.IsNullOrWhiteSpace(request.Content) || request.Content.Length < 1 || request.Content.Length > 5000)
+            return BadRequest(new { error = "Comment content must be between 1 and 5000 characters." });
+
+        comment.Content = request.Content.Trim();
+        comment.UpdatedAt = DateTimeOffset.UtcNow;
+        await _db.SaveChangesAsync();
+
+        var dto = new ActivityCommentDto
+        {
+            Id = comment.Id,
+            Content = comment.Content,
+            AuthorName = comment.Author != null
+                ? $"{comment.Author.FirstName} {comment.Author.LastName}".Trim()
+                : null,
+            AuthorId = comment.AuthorId,
+            CreatedAt = comment.CreatedAt,
+            UpdatedAt = comment.UpdatedAt
+        };
+
+        _logger.LogInformation("Comment {CommentId} updated on activity {ActivityId}", commentId, id);
+
+        return Ok(dto);
+    }
+
+    /// <summary>
+    /// Deletes a comment from an activity. Only the author or admin can delete.
+    /// </summary>
+    [HttpDelete("{id:guid}/comments/{commentId:guid}")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteComment(Guid id, Guid commentId)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var comment = await _db.ActivityComments
+            .FirstOrDefaultAsync(c => c.Id == commentId && c.ActivityId == id);
+
+        if (comment is null)
+            return NotFound(new { error = "Comment not found." });
+
+        // Only the author or admin can delete
+        var isAdmin = User.IsInRole("Admin");
+        if (comment.AuthorId != userId && !isAdmin)
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Only the comment author or admin can delete this comment." });
+
+        _db.ActivityComments.Remove(comment);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Comment {CommentId} deleted from activity {ActivityId}", commentId, id);
+
+        return NoContent();
+    }
+
+    // ---- Time Entries (ACTV-07) ----
+
+    /// <summary>
+    /// Logs a time entry on an activity. UserId set from JWT.
+    /// Duration must be > 0 and <= 1440 (max 24 hours).
+    /// </summary>
+    [HttpPost("{id:guid}/time-entries")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(typeof(ActivityTimeEntryDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddTimeEntry(Guid id, [FromBody] AddTimeEntryRequest request)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        if (request.DurationMinutes <= 0 || request.DurationMinutes > 1440)
+            return BadRequest(new { error = "Duration must be between 1 and 1440 minutes (max 24 hours)." });
+
+        var timeEntry = new ActivityTimeEntry
+        {
+            ActivityId = id,
+            DurationMinutes = request.DurationMinutes,
+            Description = request.Description?.Trim(),
+            EntryDate = request.EntryDate,
+            UserId = userId,
+        };
+
+        _db.ActivityTimeEntries.Add(timeEntry);
+        await _db.SaveChangesAsync();
+
+        // Reload with User navigation
+        var saved = await _db.ActivityTimeEntries
+            .Include(te => te.User)
+            .FirstAsync(te => te.Id == timeEntry.Id);
+
+        var dto = new ActivityTimeEntryDto
+        {
+            Id = saved.Id,
+            DurationMinutes = saved.DurationMinutes,
+            Description = saved.Description,
+            EntryDate = saved.EntryDate,
+            UserName = saved.User != null
+                ? $"{saved.User.FirstName} {saved.User.LastName}".Trim()
+                : null,
+            CreatedAt = saved.CreatedAt
+        };
+
+        _logger.LogInformation("Time entry of {Duration}min added to activity {ActivityId}", request.DurationMinutes, id);
+
+        return StatusCode(StatusCodes.Status201Created, dto);
+    }
+
+    /// <summary>
+    /// Deletes a time entry from an activity. Only the creator or admin can delete.
+    /// </summary>
+    [HttpDelete("{id:guid}/time-entries/{entryId:guid}")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteTimeEntry(Guid id, Guid entryId)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var timeEntry = await _db.ActivityTimeEntries
+            .FirstOrDefaultAsync(te => te.Id == entryId && te.ActivityId == id);
+
+        if (timeEntry is null)
+            return NotFound(new { error = "Time entry not found." });
+
+        // Only the creator or admin can delete
+        var isAdmin = User.IsInRole("Admin");
+        if (timeEntry.UserId != userId && !isAdmin)
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Only the time entry creator or admin can delete this entry." });
+
+        _db.ActivityTimeEntries.Remove(timeEntry);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Time entry {EntryId} deleted from activity {ActivityId}", entryId, id);
+
+        return NoContent();
+    }
+
+    // ---- Followers (ACTV-10) ----
+
+    /// <summary>
+    /// Follows an activity. Any user with Activity:View can follow.
+    /// Idempotent: returns 200 if already following, 201 on new follow.
+    /// </summary>
+    [HttpPost("{id:guid}/followers")]
+    [Authorize(Policy = "Permission:Activity:View")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Follow(Guid id)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        // Check if already following (idempotent)
+        var existing = await _db.ActivityFollowers
+            .FirstOrDefaultAsync(f => f.ActivityId == id && f.UserId == userId);
+
+        if (existing is not null)
+            return Ok(new { message = "Already following this activity." });
+
+        var follower = new ActivityFollower
+        {
+            ActivityId = id,
+            UserId = userId,
+        };
+
+        _db.ActivityFollowers.Add(follower);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("User {UserId} followed activity {ActivityId}", userId, id);
+
+        return StatusCode(StatusCodes.Status201Created);
+    }
+
+    /// <summary>
+    /// Unfollows an activity. Removes the current user's follower record.
+    /// </summary>
+    [HttpDelete("{id:guid}/followers")]
+    [Authorize(Policy = "Permission:Activity:View")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> Unfollow(Guid id)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var follower = await _db.ActivityFollowers
+            .FirstOrDefaultAsync(f => f.ActivityId == id && f.UserId == userId);
+
+        if (follower is not null)
+        {
+            _db.ActivityFollowers.Remove(follower);
+            await _db.SaveChangesAsync();
+        }
+
+        _logger.LogInformation("User {UserId} unfollowed activity {ActivityId}", userId, id);
+
+        return NoContent();
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -905,6 +1244,34 @@ public record UpdateActivityRequest
 public record UpdateActivityStatusRequest
 {
     public string Status { get; init; } = string.Empty;
+}
+
+/// <summary>
+/// Request body for adding or editing a comment on an activity.
+/// </summary>
+public record AddCommentRequest
+{
+    public string Content { get; init; } = string.Empty;
+}
+
+/// <summary>
+/// Request body for logging a time entry on an activity.
+/// </summary>
+public record AddTimeEntryRequest
+{
+    public decimal DurationMinutes { get; init; }
+    public string? Description { get; init; }
+    public DateOnly EntryDate { get; init; }
+}
+
+/// <summary>
+/// Request body for linking an entity to an activity.
+/// </summary>
+public record AddActivityLinkRequest
+{
+    public string EntityType { get; init; } = string.Empty;
+    public Guid EntityId { get; init; }
+    public string? EntityName { get; init; }
 }
 
 // ---- FluentValidation ----
