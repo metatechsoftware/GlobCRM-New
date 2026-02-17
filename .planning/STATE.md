@@ -63,6 +63,7 @@ Progress: [███████████████████████
 | Phase 04 P05 | 4min | 2 tasks | 3 files |
 | Phase 04 P06 | 6min | 2 tasks | 6 files |
 | Phase 04 P08 | 4min | 2 tasks | 4 files |
+| Phase 04 P03 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -183,6 +184,8 @@ Recent decisions affecting current work:
 - [04-08] CDK drag-drop with transferArrayItem for cross-column moves and moveItemInArray for within-column reorder
 - [04-08] Optimistic UI update pattern: move card immediately, revert on API failure with snackbar notification
 - [04-08] Pipeline selector loads all pipelines on init, selects default (isDefault=true) or first pipeline
+- [Phase 04-03]: Pipeline controller uses admin-only Authorize(Roles = Admin) at controller level, not per-endpoint permission policies
+- [Phase 04-03]: Added Pipeline include to DealRepository GetPagedAsync and GetByIdAsync for PipelineName in DTOs
 
 ### Pending Todos
 
