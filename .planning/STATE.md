@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 4 (Deals & Pipelines) -- COMPLETE
+**Current focus:** Phase 5 (Activities & Workflow)
 
 ## Current Position
 
-Phase: 4 of 11 (Deals & Pipelines)
-Plan: 10 of 10 in current phase
-Status: Phase Complete
-Last activity: 2026-02-17 — Plan 04-10 complete (Gap Closure: stage_change type mismatch fix)
+Phase: 5 of 11 (Activities & Workflow)
+Plan: 5 of 10 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Plan 05-05 complete (Activity Frontend Data Layer)
 
-Progress: [██████████████████████████████] 10/10 plans (Phase 4)
+Progress: [███░░░░░░░░░░░░░░░░░░░░░░░░░░░] 1/10 plans (Phase 5)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 37
+- Total plans completed: 38
 - Average duration: 6 min
 - Total execution time: ~2.4 hours
 
@@ -67,6 +67,7 @@ Progress: [███████████████████████
 | Phase 04 P07 | 5min | 2 tasks | 7 files |
 | Phase 04 P09 | 4min | 2 tasks | 10 files |
 | Phase 04 P10 | 1min | 1 task | 1 files |
+| Phase 05 P05 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -197,6 +198,9 @@ Recent decisions affecting current work:
 - [04-09] Deals navbar link positioned between Products and Team (Dashboard | Companies | Contacts | Products | Deals | Team | Settings)
 - [04-09] Deals tab on Company/Contact detail pages uses placeholder with View Deals link passing companyId/contactId as query params
 - [04-10] Backend string fix only (stage_change -> stage_changed); no frontend changes needed since frontend already used correct key
+- [05-05] ActivityService uses HttpClient directly for FormData upload and blob download (ApiService only handles JSON)
+- [05-05] ActivityStore default sort is createdAt desc (most recent first), component-provided with ViewFilter-based filters
+- [05-05] Sub-entity API methods nested under parent path (/activities/{id}/comments, /attachments, /time-entries, /links, /followers)
 
 ### Pending Todos
 
@@ -209,5 +213,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 04-10-PLAN.md (Gap Closure: stage_change type mismatch fix) -- Phase 4 COMPLETE (all gaps closed)
-Resume file: .planning/phases/04-deals-and-pipelines/04-10-SUMMARY.md
+Stopped at: Completed 05-05-PLAN.md (Activity Frontend Data Layer)
+Resume file: .planning/phases/05-activities-and-workflow/05-05-SUMMARY.md
