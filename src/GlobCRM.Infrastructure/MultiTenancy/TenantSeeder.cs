@@ -1,6 +1,7 @@
 using System.Text.Json;
 using GlobCRM.Application.Common;
 using GlobCRM.Domain.Entities;
+using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.Extensions.Logging;
@@ -9,7 +10,7 @@ namespace GlobCRM.Infrastructure.MultiTenancy;
 
 /// <summary>
 /// Seeds initial data for newly created organizations.
-/// Creates Company, Contact, Product, Pipeline, PipelineStage, and Deal entities from a seed manifest.
+/// Creates Company, Contact, Product, Pipeline, PipelineStage, Deal, and Activity entities from a seed manifest.
 /// </summary>
 public class TenantSeeder : ITenantSeeder
 {
@@ -44,12 +45,13 @@ public class TenantSeeder : ITenantSeeder
         var seedManifest = CreateSeedManifest();
 
         _logger.LogInformation(
-            "Seed manifest created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, {DealCount} deals",
+            "Seed manifest created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, {DealCount} deals, {ActivityCount} activities",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
             seedManifest.Products.Count,
-            seedManifest.Deals.Count);
+            seedManifest.Deals.Count,
+            seedManifest.Activities.Count);
 
         // Create Company entities from manifest
         var companyMap = new Dictionary<string, Company>();
@@ -71,6 +73,7 @@ public class TenantSeeder : ITenantSeeder
         }
 
         // Create Contact entities from manifest, linking to companies
+        var contactMap = new Dictionary<string, Contact>();
         foreach (var contactSeed in seedManifest.Contacts)
         {
             var contact = new Contact
@@ -88,6 +91,7 @@ public class TenantSeeder : ITenantSeeder
                 UpdatedAt = DateTimeOffset.UtcNow
             };
             _db.Contacts.Add(contact);
+            contactMap[contactSeed.Email] = contact;
         }
 
         // Create Product entities from manifest
@@ -141,6 +145,7 @@ public class TenantSeeder : ITenantSeeder
         }
 
         // Create Deal entities from manifest
+        var dealMap = new Dictionary<string, Deal>();
         var dealOffset = 0;
         foreach (var dealSeed in seedManifest.Deals)
         {
@@ -162,19 +167,124 @@ public class TenantSeeder : ITenantSeeder
                 UpdatedAt = DateTimeOffset.UtcNow
             };
             _db.Deals.Add(deal);
+            dealMap[dealSeed.Title] = deal;
             dealOffset++;
+        }
+
+        // Create Activity entities from manifest (after deals, so we can link to seeded entities)
+        var activityList = new List<Activity>();
+        foreach (var activitySeed in seedManifest.Activities)
+        {
+            var activity = new Activity
+            {
+                TenantId = organizationId,
+                Subject = activitySeed.Subject,
+                Type = Enum.Parse<ActivityType>(activitySeed.Type),
+                Status = Enum.Parse<ActivityStatus>(activitySeed.Status),
+                Priority = Enum.Parse<ActivityPriority>(activitySeed.Priority),
+                DueDate = DateTimeOffset.UtcNow.AddDays(activitySeed.DueDateOffset),
+                CompletedAt = activitySeed.Status == "Done"
+                    ? DateTimeOffset.UtcNow.AddDays(activitySeed.DueDateOffset)
+                    : null,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.Activities.Add(activity);
+            activityList.Add(activity);
+        }
+
+        // Create ActivityLink records linking activities to seeded entities
+        var firstCompany = companyMap.GetValueOrDefault("TechVision Inc.");
+        var firstContact = contactMap.GetValueOrDefault("sarah.chen@example.com");
+        var firstDeal = dealMap.GetValueOrDefault("Enterprise CRM License");
+
+        if (activityList.Count >= 3)
+        {
+            // Activity 1 linked to first company
+            if (firstCompany != null)
+            {
+                _db.ActivityLinks.Add(new ActivityLink
+                {
+                    ActivityId = activityList[0].Id,
+                    EntityType = "Company",
+                    EntityId = firstCompany.Id,
+                    EntityName = firstCompany.Name,
+                    LinkedAt = DateTimeOffset.UtcNow
+                });
+            }
+
+            // Activity 2 linked to first contact
+            if (firstContact != null)
+            {
+                _db.ActivityLinks.Add(new ActivityLink
+                {
+                    ActivityId = activityList[1].Id,
+                    EntityType = "Contact",
+                    EntityId = firstContact.Id,
+                    EntityName = $"{firstContact.FirstName} {firstContact.LastName}",
+                    LinkedAt = DateTimeOffset.UtcNow
+                });
+            }
+
+            // Activity 3 linked to first deal
+            if (firstDeal != null)
+            {
+                _db.ActivityLinks.Add(new ActivityLink
+                {
+                    ActivityId = activityList[2].Id,
+                    EntityType = "Deal",
+                    EntityId = firstDeal.Id,
+                    EntityName = firstDeal.Title,
+                    LinkedAt = DateTimeOffset.UtcNow
+                });
+            }
+        }
+
+        // Create ActivityComment records on Activity 1
+        if (activityList.Count >= 1)
+        {
+            _db.ActivityComments.Add(new ActivityComment
+            {
+                ActivityId = activityList[0].Id,
+                Content = "Initial contact made, they seem interested",
+                CreatedAt = DateTimeOffset.UtcNow.AddHours(-2),
+                UpdatedAt = DateTimeOffset.UtcNow.AddHours(-2)
+            });
+
+            _db.ActivityComments.Add(new ActivityComment
+            {
+                ActivityId = activityList[0].Id,
+                Content = "Sent follow-up email with pricing details",
+                CreatedAt = DateTimeOffset.UtcNow.AddHours(-1),
+                UpdatedAt = DateTimeOffset.UtcNow.AddHours(-1)
+            });
+        }
+
+        // Create ActivityTimeEntry on Activity 2
+        if (activityList.Count >= 2)
+        {
+            _db.ActivityTimeEntries.Add(new ActivityTimeEntry
+            {
+                ActivityId = activityList[1].Id,
+                DurationMinutes = 45,
+                Description = "Reviewed quarterly metrics and prepared talking points",
+                EntryDate = DateOnly.FromDateTime(DateTime.UtcNow),
+                CreatedAt = DateTimeOffset.UtcNow
+            });
         }
 
         await _db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals",
+            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals, {ActivityCount} activities",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
             seedManifest.Products.Count,
             seedManifest.Pipeline.Stages.Count,
-            seedManifest.Deals.Count);
+            seedManifest.Deals.Count,
+            seedManifest.Activities.Count);
 
         _logger.LogDebug(
             "Seed manifest details for {OrgId}: {Manifest}",
@@ -290,6 +400,57 @@ public class TenantSeeder : ITenantSeeder
                     ContactRef = "sarah.chen@example.com",
                     CompanyRef = "TechVision Inc."
                 }
+            ],
+            Activities =
+            [
+                new ActivitySeed
+                {
+                    Subject = "Follow up with Acme Corp",
+                    Type = "Task",
+                    Status = "Assigned",
+                    Priority = "High",
+                    DueDateOffset = 3
+                },
+                new ActivitySeed
+                {
+                    Subject = "Quarterly review call",
+                    Type = "Call",
+                    Status = "InProgress",
+                    Priority = "Medium",
+                    DueDateOffset = 1
+                },
+                new ActivitySeed
+                {
+                    Subject = "Product demo for new client",
+                    Type = "Meeting",
+                    Status = "Accepted",
+                    Priority = "High",
+                    DueDateOffset = 7
+                },
+                new ActivitySeed
+                {
+                    Subject = "Prepare proposal document",
+                    Type = "Task",
+                    Status = "Review",
+                    Priority = "Medium",
+                    DueDateOffset = -1
+                },
+                new ActivitySeed
+                {
+                    Subject = "Update CRM records",
+                    Type = "Task",
+                    Status = "Done",
+                    Priority = "Low",
+                    DueDateOffset = -3
+                },
+                new ActivitySeed
+                {
+                    Subject = "Onboarding call with new contact",
+                    Type = "Call",
+                    Status = "Assigned",
+                    Priority = "Urgent",
+                    DueDateOffset = 2
+                }
             ]
         };
     }
@@ -308,6 +469,7 @@ public class SeedManifest
     public List<CompanySeed> Companies { get; set; } = [];
     public List<ProductSeed> Products { get; set; } = [];
     public List<DealSeed> Deals { get; set; } = [];
+    public List<ActivitySeed> Activities { get; set; } = [];
 }
 
 public class PipelineSeed
@@ -359,6 +521,20 @@ public class DealSeed
     public string Stage { get; set; } = string.Empty;
     public string ContactRef { get; set; } = string.Empty;
     public string CompanyRef { get; set; } = string.Empty;
+}
+
+/// <summary>
+/// Seed data record for Activity entities.
+/// Type, Status, and Priority are strings parsed to enums at creation time.
+/// DueDateOffset is days from now (negative = overdue).
+/// </summary>
+public class ActivitySeed
+{
+    public string Subject { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
+    public string Priority { get; set; } = string.Empty;
+    public int DueDateOffset { get; set; }
 }
 
 #endregion
