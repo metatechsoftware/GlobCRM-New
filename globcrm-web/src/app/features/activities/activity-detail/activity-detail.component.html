@@ -149,7 +149,80 @@
               <span class="tab-label"><mat-icon>comment</mat-icon> Comments ({{ activity()!.comments?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
-              <!-- Tab content implemented in Task 2 -->
+              <!-- Add comment form -->
+              <div class="comment-form">
+                <mat-form-field appearance="outline" class="comment-input">
+                  <mat-label>Add a comment</mat-label>
+                  <textarea matInput [formControl]="commentControl"
+                            placeholder="Write a comment..."
+                            rows="3"></textarea>
+                </mat-form-field>
+                <button mat-flat-button color="primary"
+                        [disabled]="!commentControl.value.trim()"
+                        (click)="addComment()">
+                  <mat-icon>send</mat-icon> Post
+                </button>
+              </div>
+
+              <!-- Comments list -->
+              @if (!activity()!.comments?.length) {
+                <div class="tab-empty">
+                  <mat-icon>chat_bubble_outline</mat-icon>
+                  <span>No comments yet. Be the first to comment.</span>
+                </div>
+              } @else {
+                <div class="comments-list">
+                  @for (comment of activity()!.comments; track comment.id) {
+                    <div class="comment-item">
+                      <div class="comment-avatar">
+                        <div class="avatar-initials">{{ comment.authorName[0] }}</div>
+                      </div>
+                      <div class="comment-body">
+                        <div class="comment-header">
+                          <span class="comment-author">{{ comment.authorName }}</span>
+                          <span class="comment-time">{{ comment.createdAt | date:'medium' }}</span>
+                          @if (comment.updatedAt !== comment.createdAt) {
+                            <span class="comment-edited">(edited)</span>
+                          }
+                        </div>
+                        @if (editingCommentId() === comment.id) {
+                          <div class="comment-edit-form">
+                            <mat-form-field appearance="outline" class="comment-edit-input">
+                              <textarea matInput [formControl]="editCommentControl" rows="3"></textarea>
+                            </mat-form-field>
+                            <div class="comment-edit-actions">
+                              <button mat-flat-button color="primary"
+                                      [disabled]="!editCommentControl.value.trim()"
+                                      (click)="saveEditComment(comment.id)">
+                                Save
+                              </button>
+                              <button mat-stroked-button (click)="cancelEditComment()">
+                                Cancel
+                              </button>
+                            </div>
+                          </div>
+                        } @else {
+                          <p class="comment-content">{{ comment.content }}</p>
+                        }
+                        <div class="comment-actions">
+                          @if (canEditComment(comment.authorId)) {
+                            <button mat-icon-button aria-label="Edit comment"
+                                    (click)="startEditComment(comment)">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                          }
+                          @if (canDeleteComment(comment.authorId)) {
+                            <button mat-icon-button aria-label="Delete comment"
+                                    (click)="deleteComment(comment.id)">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </mat-tab>
 
@@ -159,7 +232,54 @@
               <span class="tab-label"><mat-icon>attach_file</mat-icon> Attachments ({{ activity()!.attachments?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
-              <!-- Tab content implemented in Task 2 -->
+              <!-- Upload area -->
+              <div class="attachment-upload">
+                <input type="file" #fileInput hidden (change)="onFileSelected($event)">
+                <button mat-stroked-button (click)="fileInput.click()" [disabled]="isUploading()">
+                  <mat-icon>upload_file</mat-icon>
+                  {{ isUploading() ? 'Uploading...' : 'Upload File' }}
+                </button>
+                @if (isUploading()) {
+                  <mat-spinner diameter="24" class="upload-spinner"></mat-spinner>
+                }
+                <span class="upload-hint">Max file size: 25MB</span>
+              </div>
+
+              <!-- Attachments list -->
+              @if (!activity()!.attachments?.length) {
+                <div class="tab-empty">
+                  <mat-icon>cloud_upload</mat-icon>
+                  <span>No attachments yet. Upload a file to get started.</span>
+                </div>
+              } @else {
+                <div class="attachments-list">
+                  @for (attachment of activity()!.attachments; track attachment.id) {
+                    <div class="attachment-card">
+                      <div class="attachment-icon">
+                        <mat-icon>description</mat-icon>
+                      </div>
+                      <div class="attachment-info">
+                        <span class="attachment-name">{{ attachment.fileName }}</span>
+                        <span class="attachment-meta">
+                          {{ formatFileSize(attachment.fileSizeBytes) }}
+                          &middot; Uploaded by {{ attachment.uploadedByName }}
+                          &middot; {{ attachment.uploadedAt | date:'mediumDate' }}
+                        </span>
+                      </div>
+                      <div class="attachment-actions">
+                        <button mat-icon-button aria-label="Download"
+                                (click)="downloadAttachment(attachment.id, attachment.fileName)">
+                          <mat-icon>download</mat-icon>
+                        </button>
+                        <button mat-icon-button aria-label="Delete"
+                                (click)="deleteAttachment(attachment.id, attachment.fileName)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </mat-tab>
 
@@ -169,7 +289,69 @@
               <span class="tab-label"><mat-icon>schedule</mat-icon> Time Log ({{ formatTime(activity()!.totalTimeMinutes) }})</span>
             </ng-template>
             <div class="tab-body">
-              <!-- Tab content implemented in Task 2 -->
+              <!-- Total time summary -->
+              <div class="time-summary">
+                <mat-icon>timer</mat-icon>
+                <span>Total: <strong>{{ formatTime(activity()!.totalTimeMinutes) }}</strong></span>
+              </div>
+
+              <!-- Log time form -->
+              <div class="time-entry-form">
+                <mat-form-field appearance="outline" class="duration-field">
+                  <mat-label>Duration (minutes)</mat-label>
+                  <input matInput type="number" [formControl]="timeEntryForm.controls.durationMinutes"
+                         min="1" placeholder="e.g. 30">
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="description-field">
+                  <mat-label>Description</mat-label>
+                  <input matInput [formControl]="timeEntryForm.controls.description"
+                         placeholder="What did you work on?">
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="date-field">
+                  <mat-label>Date</mat-label>
+                  <input matInput [matDatepicker]="timePicker"
+                         [formControl]="timeEntryForm.controls.entryDate">
+                  <mat-datepicker-toggle matIconSuffix [for]="timePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #timePicker></mat-datepicker>
+                </mat-form-field>
+                <button mat-flat-button color="primary"
+                        [disabled]="timeEntryForm.invalid"
+                        (click)="addTimeEntry()">
+                  <mat-icon>add</mat-icon> Log Time
+                </button>
+              </div>
+
+              <!-- Time entries table -->
+              @if (!activity()!.timeEntries?.length) {
+                <div class="tab-empty">
+                  <mat-icon>hourglass_empty</mat-icon>
+                  <span>No time entries yet. Log your first time entry above.</span>
+                </div>
+              } @else {
+                <div class="time-entries-table">
+                  <div class="time-header">
+                    <span class="time-col-date">Date</span>
+                    <span class="time-col-duration">Duration</span>
+                    <span class="time-col-description">Description</span>
+                    <span class="time-col-user">Logged By</span>
+                    <span class="time-col-actions"></span>
+                  </div>
+                  @for (entry of activity()!.timeEntries; track entry.id) {
+                    <div class="time-row">
+                      <span class="time-col-date">{{ entry.entryDate | date:'mediumDate' }}</span>
+                      <span class="time-col-duration">{{ formatTime(entry.durationMinutes) }}</span>
+                      <span class="time-col-description">{{ entry.description || '-' }}</span>
+                      <span class="time-col-user">{{ entry.userName }}</span>
+                      <span class="time-col-actions">
+                        <button mat-icon-button aria-label="Delete time entry"
+                                (click)="deleteTimeEntry(entry.id)">
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </span>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </mat-tab>
 
@@ -179,7 +361,97 @@
               <span class="tab-label"><mat-icon>link</mat-icon> Links ({{ activity()!.links?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
-              <!-- Tab content implemented in Task 2 -->
+              <!-- Link entity controls -->
+              <div class="link-header">
+                <span class="tab-count">{{ activity()!.links?.length || 0 }} entities linked</span>
+                <button mat-stroked-button (click)="toggleLinkSearch()">
+                  <mat-icon>{{ showLinkSearch() ? 'close' : 'add_link' }}</mat-icon>
+                  {{ showLinkSearch() ? 'Cancel' : 'Link Entity' }}
+                </button>
+              </div>
+
+              <!-- Link search panel -->
+              @if (showLinkSearch()) {
+                <div class="link-search-panel">
+                  <div class="link-search-controls">
+                    <mat-form-field appearance="outline" class="link-type-field">
+                      <mat-label>Entity Type</mat-label>
+                      <mat-select [formControl]="linkTypeControl" (selectionChange)="onLinkTypeChange()">
+                        <mat-option value="Company">Company</mat-option>
+                        <mat-option value="Contact">Contact</mat-option>
+                        <mat-option value="Deal">Deal</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="link-search-field">
+                      <mat-label>Search {{ linkTypeControl.value }}</mat-label>
+                      <input matInput [formControl]="linkSearchControl"
+                             (input)="onLinkSearchInput($any($event.target).value)"
+                             placeholder="Type to search...">
+                      <mat-icon matSuffix>search</mat-icon>
+                    </mat-form-field>
+                  </div>
+                  @if (linkSearchLoading()) {
+                    <div class="search-loading">
+                      <mat-spinner diameter="24"></mat-spinner>
+                    </div>
+                  }
+                  @if (linkSearchResults().length > 0) {
+                    <div class="link-search-results">
+                      @for (result of linkSearchResults(); track result.id) {
+                        <div class="link-search-result" (click)="linkEntity(result.id, result.type, result.name)">
+                          <mat-icon>
+                            @switch (result.type) {
+                              @case ('Company') { business }
+                              @case ('Contact') { person }
+                              @case ('Deal') { handshake }
+                            }
+                          </mat-icon>
+                          <span class="result-name">{{ result.name }}</span>
+                          <span class="result-type-badge">{{ result.type }}</span>
+                          <mat-icon class="result-add">add_link</mat-icon>
+                        </div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Linked entities grouped by type -->
+              @if (!activity()!.links?.length) {
+                <div class="tab-empty">
+                  <mat-icon>link_off</mat-icon>
+                  <span>No linked entities. Use "Link Entity" to connect related records.</span>
+                </div>
+              } @else {
+                @for (group of linksByType(); track group.type) {
+                  <div class="link-group">
+                    <h4 class="link-group-title">
+                      <mat-icon>
+                        @switch (group.type) {
+                          @case ('Company') { business }
+                          @case ('Contact') { person }
+                          @case ('Deal') { handshake }
+                          @default { link }
+                        }
+                      </mat-icon>
+                      {{ group.type === 'Company' ? 'Companies' : group.type === 'Contact' ? 'Contacts' : group.type === 'Deal' ? 'Deals' : group.type }}
+                    </h4>
+                    @for (link of group.links; track link.id) {
+                      <div class="link-item">
+                        <a [routerLink]="[getEntityRoute(link.entityType), link.entityId]"
+                           class="link-entity-name">
+                          {{ link.entityName || link.entityId }}
+                        </a>
+                        <span class="link-timestamp">{{ link.linkedAt | date:'mediumDate' }}</span>
+                        <button mat-icon-button aria-label="Unlink"
+                                (click)="unlinkEntity(link.id)">
+                          <mat-icon>link_off</mat-icon>
+                        </button>
+                      </div>
+                    }
+                  </div>
+                }
+              }
             </div>
           </mat-tab>
 
@@ -189,7 +461,42 @@
               <span class="tab-label"><mat-icon>timeline</mat-icon> Timeline</span>
             </ng-template>
             <div class="tab-body">
-              <!-- Tab content implemented in Task 2 -->
+              @if (timelineLoading()) {
+                <div class="timeline-loading">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else if (sortedTimeline().length === 0) {
+                <div class="tab-empty">
+                  <mat-icon>history</mat-icon>
+                  <span>No activity yet</span>
+                </div>
+              } @else {
+                <div class="timeline-container">
+                  @for (entry of sortedTimeline(); track entry.id) {
+                    <div class="timeline-item">
+                      <div class="timeline-dot-container">
+                        <div class="timeline-dot" [style.background-color]="getTimelineColor(entry.type)">
+                          <mat-icon>{{ getTimelineIcon(entry.type) }}</mat-icon>
+                        </div>
+                        <div class="timeline-line"></div>
+                      </div>
+                      <div class="timeline-content">
+                        <div class="timeline-title">{{ entry.title }}</div>
+                        @if (entry.description) {
+                          <div class="timeline-description">{{ entry.description }}</div>
+                        }
+                        <div class="timeline-meta">
+                          <span>{{ entry.timestamp | date:'MMM d, y, h:mm a' }}</span>
+                          @if (entry.userName) {
+                            <span class="timeline-meta-separator"></span>
+                            <span>{{ entry.userName }}</span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
             </div>
           </mat-tab>
         </mat-tab-group>
