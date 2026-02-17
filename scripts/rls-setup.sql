@@ -292,6 +292,51 @@ COMMENT ON POLICY tenant_isolation_requests ON requests IS
 -- policies. They are accessed through FK joins from their tenant-filtered parent (quotes).
 
 -- =====================================================================
+-- email_accounts - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_accounts ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_accounts FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_accounts ON email_accounts
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_accounts ON email_accounts IS
+    'Ensures email account queries only return accounts for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- email_messages - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_messages ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_messages FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_messages ON email_messages
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_messages ON email_messages IS
+    'Ensures email message queries only return messages for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- email_threads - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_threads ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_threads FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_threads ON email_threads
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_threads ON email_threads IS
+    'Ensures email thread queries only return threads for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

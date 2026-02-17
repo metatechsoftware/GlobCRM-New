@@ -91,6 +91,11 @@ public class ApplicationDbContext
     public DbSet<QuoteStatusHistory> QuoteStatusHistories => Set<QuoteStatusHistory>();
     public DbSet<Request> Requests => Set<Request>();
 
+    // Email Integration DbSets
+    public DbSet<EmailAccount> EmailAccounts => Set<EmailAccount>();
+    public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
+    public DbSet<EmailThread> EmailThreads => Set<EmailThread>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -141,6 +146,11 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new QuoteLineItemConfiguration());
         modelBuilder.ApplyConfiguration(new QuoteStatusHistoryConfiguration());
         modelBuilder.ApplyConfiguration(new RequestConfiguration());
+
+        // Email Integration entity configurations
+        modelBuilder.ApplyConfiguration(new EmailAccountConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailMessageConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailThreadConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -218,5 +228,17 @@ public class ApplicationDbContext
 
         // Note: QuoteLineItem, QuoteStatusHistory do NOT need their own query filters --
         // they are filtered through their parent Quote FK which is already tenant-filtered.
+
+        // Global query filter: filter EmailAccounts by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailAccount>().HasQueryFilter(
+            e => _tenantProvider == null || _tenantProvider.GetTenantId() == null || e.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter EmailMessages by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailMessage>().HasQueryFilter(
+            e => _tenantProvider == null || _tenantProvider.GetTenantId() == null || e.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter EmailThreads by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailThread>().HasQueryFilter(
+            e => _tenantProvider == null || _tenantProvider.GetTenantId() == null || e.TenantId == _tenantProvider.GetTenantId());
     }
 }
