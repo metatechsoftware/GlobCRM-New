@@ -259,6 +259,39 @@ COMMENT ON POLICY tenant_isolation_activities ON activities IS
 -- policies. They are accessed through FK joins from their tenant-filtered parent (activities).
 
 -- =====================================================================
+-- quotes - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE quotes ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE quotes FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_quotes ON quotes
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_quotes ON quotes IS
+    'Ensures quote queries only return quotes for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- requests - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE requests ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE requests FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_requests ON requests
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_requests ON requests IS
+    'Ensures request queries only return requests for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: Child tables (quote_line_items, quote_status_history) do NOT need RLS
+-- policies. They are accessed through FK joins from their tenant-filtered parent (quotes).
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

@@ -85,6 +85,12 @@ public class ApplicationDbContext
     public DbSet<ActivityLink> ActivityLinks => Set<ActivityLink>();
     public DbSet<ActivityStatusHistory> ActivityStatusHistories => Set<ActivityStatusHistory>();
 
+    // Quotes & Requests DbSets
+    public DbSet<Quote> Quotes => Set<Quote>();
+    public DbSet<QuoteLineItem> QuoteLineItems => Set<QuoteLineItem>();
+    public DbSet<QuoteStatusHistory> QuoteStatusHistories => Set<QuoteStatusHistory>();
+    public DbSet<Request> Requests => Set<Request>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -129,6 +135,12 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new ActivityFollowerConfiguration());
         modelBuilder.ApplyConfiguration(new ActivityLinkConfiguration());
         modelBuilder.ApplyConfiguration(new ActivityStatusHistoryConfiguration());
+
+        // Quotes & Requests entity configurations
+        modelBuilder.ApplyConfiguration(new QuoteConfiguration());
+        modelBuilder.ApplyConfiguration(new QuoteLineItemConfiguration());
+        modelBuilder.ApplyConfiguration(new QuoteStatusHistoryConfiguration());
+        modelBuilder.ApplyConfiguration(new RequestConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -195,5 +207,16 @@ public class ApplicationDbContext
         // Note: ActivityComment, ActivityAttachment, ActivityTimeEntry, ActivityFollower,
         // ActivityLink, ActivityStatusHistory do NOT need their own query filters --
         // they are filtered through their parent Activity FK which is already tenant-filtered.
+
+        // Global query filter: filter Quotes by TenantId (tenant-scoped)
+        modelBuilder.Entity<Quote>().HasQueryFilter(
+            q => _tenantProvider == null || _tenantProvider.GetTenantId() == null || q.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Requests by TenantId (tenant-scoped)
+        modelBuilder.Entity<Request>().HasQueryFilter(
+            r => _tenantProvider == null || _tenantProvider.GetTenantId() == null || r.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: QuoteLineItem, QuoteStatusHistory do NOT need their own query filters --
+        // they are filtered through their parent Quote FK which is already tenant-filtered.
     }
 }
