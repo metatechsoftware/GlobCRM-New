@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 8 of 11 (Real-Time & Notifications)
-Plan: 2 of 7 in current phase
+Plan: 3 of 7 in current phase
 Status: Executing
-Last activity: 2026-02-17 — Completed 08-02 (SignalR Hub & Notification Services)
+Last activity: 2026-02-17 — Completed 08-03 (Notification & Feed API Endpoints)
 
-Progress: [████████░░░░░░░░░░░░░░░░░░░░░░] 2/7 plans (Phase 8)
+Progress: [████████████░░░░░░░░░░░░░░░░░░] 3/7 plans (Phase 8)
 
 ## Performance Metrics
 
@@ -90,6 +90,7 @@ Progress: [████████░░░░░░░░░░░░░░░
 | Phase 07 P03 | 5min | 2 tasks | 7 files |
 | Phase 08 P01 | 4min | 2 tasks | 18 files |
 | Phase 08 P02 | 4min | 2 tasks | 10 files |
+| Phase 08 P03 | 3min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -292,6 +293,10 @@ Recent decisions affecting current work:
 - [08-02] CrmHub placed in Infrastructure (not Api) to avoid circular dependency with NotificationDispatcher
 - [08-02] NotificationDispatcher email is fire-and-forget (try/catch) -- email failure does not fail dispatch
 - [08-02] Default notification email preference is enabled when no NotificationPreference record exists
+- [08-03] Controller DTOs defined as records in controller file (matching EmailsController pattern, not separate Dtos folder)
+- [08-03] Feed delete restricted to author or Admin role (matching ActivityComment author-only pattern)
+- [08-03] @mention detection uses regex matching first name or username with fire-and-forget dispatch
+- [08-03] DueDateNotificationService uses IgnoreQueryFilters for cross-tenant scanning (background service has no tenant context)
 
 ### Pending Todos
 
@@ -304,5 +309,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 08-02-PLAN.md (SignalR Hub & Notification Services)
-Resume file: .planning/phases/08-real-time-and-notifications/08-02-SUMMARY.md
+Stopped at: Completed 08-03-PLAN.md (Notification & Feed API Endpoints)
+Resume file: .planning/phases/08-real-time-and-notifications/08-03-SUMMARY.md
