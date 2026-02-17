@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 6 of 11 (Quotes & Requests)
-Plan: 5 of 7 in current phase
+Plan: 6 of 7 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 06-05 complete (Quote List & Form Components)
+Last activity: 2026-02-17 — Plan 06-06 complete (Quote Detail, Request List & Form)
 
-Progress: [████████████████████░░░░░░░░░░] 5/7 plans (Phase 6)
+Progress: [█████████████████████████░░░░░] 6/7 plans (Phase 6)
 
 ## Performance Metrics
 
@@ -81,6 +81,7 @@ Progress: [████████████████████░░░
 | Phase 06 P01 | 4min | 2 tasks | 21 files |
 | Phase 06 P02 | 5min | 2 tasks | 4 files |
 | Phase 06 P05 | 5min | 2 tasks | 2 files |
+| Phase 06 P06 | 5min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -252,6 +253,9 @@ Recent decisions affecting current work:
 - [06-05] Quote list uses inline template/styles with currency-formatted grandTotal via Intl.NumberFormat (matching product list pattern)
 - [06-05] Quote form line item totals use signal + valueChanges subscription for reactive computed display via calculateQuoteTotals
 - [06-05] Product search adds line item directly (auto-fill pattern) rather than per-row product dropdown
+- [06-06] Quote detail uses inline template with mat-tab-group for 4 tabs (Line Items, Details, Versions, Timeline)
+- [06-06] PDF download uses URL.createObjectURL with filename pattern Quote-{number}-v{version}.pdf
+- [06-06] Request form uses separate FormControl for contact/company autocomplete (not in main FormGroup) with Subject-based debounced search
 
 ### Pending Todos
 
@@ -264,5 +268,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 06-05-PLAN.md (Quote List & Form Components)
-Resume file: .planning/phases/06-quotes-and-requests/06-05-SUMMARY.md
+Stopped at: Completed 06-06-PLAN.md (Quote Detail, Request List & Form)
+Resume file: .planning/phases/06-quotes-and-requests/06-06-SUMMARY.md
