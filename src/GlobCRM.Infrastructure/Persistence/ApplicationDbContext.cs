@@ -68,6 +68,14 @@ public class ApplicationDbContext
     public DbSet<Contact> Contacts => Set<Contact>();
     public DbSet<Product> Products => Set<Product>();
 
+    // Deals & Pipelines DbSets
+    public DbSet<Pipeline> Pipelines => Set<Pipeline>();
+    public DbSet<PipelineStage> PipelineStages => Set<PipelineStage>();
+    public DbSet<Deal> Deals => Set<Deal>();
+    public DbSet<DealContact> DealContacts => Set<DealContact>();
+    public DbSet<DealProduct> DealProducts => Set<DealProduct>();
+    public DbSet<DealStageHistory> DealStageHistories => Set<DealStageHistory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -95,6 +103,14 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new CompanyConfiguration());
         modelBuilder.ApplyConfiguration(new ContactConfiguration());
         modelBuilder.ApplyConfiguration(new ProductConfiguration());
+
+        // Deals & Pipelines entity configurations
+        modelBuilder.ApplyConfiguration(new PipelineConfiguration());
+        modelBuilder.ApplyConfiguration(new PipelineStageConfiguration());
+        modelBuilder.ApplyConfiguration(new DealConfiguration());
+        modelBuilder.ApplyConfiguration(new DealContactConfiguration());
+        modelBuilder.ApplyConfiguration(new DealProductConfiguration());
+        modelBuilder.ApplyConfiguration(new DealStageHistoryConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -141,5 +157,17 @@ public class ApplicationDbContext
         // Global query filter: filter Products by TenantId (tenant-scoped)
         modelBuilder.Entity<Product>().HasQueryFilter(
             p => _tenantProvider == null || _tenantProvider.GetTenantId() == null || p.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Pipelines by TenantId (tenant-scoped)
+        modelBuilder.Entity<Pipeline>().HasQueryFilter(
+            p => _tenantProvider == null || _tenantProvider.GetTenantId() == null || p.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Deals by TenantId (tenant-scoped)
+        modelBuilder.Entity<Deal>().HasQueryFilter(
+            d => _tenantProvider == null || _tenantProvider.GetTenantId() == null || d.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: PipelineStage, DealContact, DealProduct, DealStageHistory
+        // do NOT need their own query filters -- they are filtered through their
+        // parent's FK relationship (Pipeline or Deal) which is already tenant-filtered.
     }
 }

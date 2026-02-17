@@ -206,6 +206,40 @@ COMMENT ON POLICY tenant_isolation_products ON products IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- pipelines - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE pipelines ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE pipelines FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_pipelines ON pipelines
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_pipelines ON pipelines IS
+    'Ensures pipeline queries only return pipelines for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- deals - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE deals ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE deals FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_deals ON deals
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_deals ON deals IS
+    'Ensures deal queries only return deals for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: Child tables (pipeline_stages, deal_contacts, deal_products,
+-- deal_stage_histories) do NOT need RLS policies. They are accessed through
+-- FK joins from their tenant-filtered parents (pipelines, deals).
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter
