@@ -87,6 +87,7 @@ Progress: [███████████████████████
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
 | Phase 07 P02 | 6min | 2 tasks | 9 files |
 | Phase 07 P06 | 5min | 2 tasks | 9 files |
+| Phase 07 P03 | 5min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -278,6 +279,10 @@ Recent decisions affecting current work:
 - [07-06] Entity email tabs use EmailService directly (not EmailStore) for simple lazy-loaded list
 - [07-06] Emails tab at index 6 in both CONTACT_TABS and COMPANY_TABS, before Notes
 - [07-06] Navbar Emails link between Requests and Team (Dashboard | Companies | Contacts | Products | Deals | Activities | Quotes | Requests | Emails | Team | Settings)
+- [07-03] OAuth callback is AllowAnonymous since Google redirects directly (not through SPA auth flow)
+- [07-03] OAuth state parameter encodes userId|nonce for CSRF protection and user identification in callback
+- [07-03] Tenant resolution fallback in OAuth callback queries ApplicationUser.OrganizationId when subdomain not resolved
+- [07-03] EmailsController has no permission policies -- email access scoped by tenant query filter
 
 ### Pending Todos
 
@@ -290,5 +295,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 07-06-PLAN.md (Email Detail, Routing, and Entity Integration)
-Resume file: .planning/phases/07-email-integration/07-06-SUMMARY.md
+Stopped at: Completed 07-03-PLAN.md (Email Repositories, Sync Service, API Controllers)
+Resume file: .planning/phases/07-email-integration/07-03-SUMMARY.md
