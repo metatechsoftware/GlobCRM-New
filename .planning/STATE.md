@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 10 in progress -- Data Operations (Import/Export & Search)
+**Current focus:** Phase 10 complete -- Data Operations (Import/Export & Search). Ready for Phase 11.
 
 ## Current Position
 
 Phase: 10 of 11 (Data Operations)
-Plan: 5 of 6 in current phase
-Status: In Progress
-Last activity: 2026-02-17 — Completed 10-05 (Global Search Frontend Component)
+Plan: 6 of 6 in current phase
+Status: Phase Complete
+Last activity: 2026-02-17 — Completed 10-06 (Import History and Settings Integration)
 
-Progress: [████████████████████████░░░░░░] 5/6 plans (Phase 10)
+Progress: [██████████████████████████████] 6/6 plans (Phase 10)
 
 ## Performance Metrics
 
@@ -109,6 +109,7 @@ Progress: [███████████████████████
 | Phase 10 P02 | 7min | 2 tasks | 8 files |
 | Phase 10 P05 | 2min | 2 tasks | 6 files |
 | Phase 10 P04 | 6min | 2 tasks | 11 files |
+| Phase 10 P06 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -371,6 +372,9 @@ Recent decisions affecting current work:
 - [10-05] GlobalSearchComponent uses local component signals (not root-provided store) per research anti-pattern guidance -- search state is ephemeral
 - [10-05] Search bar positioned between spacer and notification center in navbar for right-side grouping with action items
 - [10-05] RecentSearchesService as separate root-provided service with localStorage 10-item cap and silent error handling
+- [10-06] SettingsHubComponent created as settings landing page since no settings page existed (settings previously redirected to /settings/roles)
+- [10-06] Admin-only gating on Organization settings section via AuthStore.userRole check; Data Operations visible to all authenticated users
+- [10-06] Navbar settings link updated from /settings/roles to /settings for hub page navigation
 - [Phase 10-04]: ImportStore tracks entityType in state for mapping step context (not just upload response)
 - [Phase 10-04]: SignalR ImportProgress event added to SignalRService following existing Subject/Observable pattern
 - [Phase 10-04]: Custom fields use 'custom:' prefix in mapping dropdown value to distinguish from core fields; stripped before API call
@@ -386,5 +390,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 10-05-PLAN.md (Global Search Frontend Component)
-Resume file: .planning/phases/10-data-operations/10-05-SUMMARY.md
+Stopped at: Completed 10-06-PLAN.md (Import History and Settings Integration) -- Phase 10 complete
+Resume file: .planning/phases/10-data-operations/10-06-SUMMARY.md
