@@ -55,4 +55,10 @@ public class Contact
     /// Computed full name from first and last name.
     /// </summary>
     public string FullName => $"{FirstName} {LastName}".Trim();
+
+    // Navigation: Contact has many Quotes (one-to-many via Quote.ContactId)
+    public ICollection<Quote> Quotes { get; set; } = new List<Quote>();
+
+    // Navigation: Contact has many Requests (one-to-many via Request.ContactId)
+    public ICollection<Request> Requests { get; set; } = new List<Request>();
 }

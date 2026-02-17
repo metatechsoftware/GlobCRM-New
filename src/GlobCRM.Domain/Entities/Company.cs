@@ -56,4 +56,10 @@ public class Company
 
     // Navigation: Company has many Deals (one-to-many via Deal.CompanyId)
     public ICollection<Deal> Deals { get; set; } = new List<Deal>();
+
+    // Navigation: Company has many Quotes (one-to-many via Quote.CompanyId)
+    public ICollection<Quote> Quotes { get; set; } = new List<Quote>();
+
+    // Navigation: Company has many Requests (one-to-many via Request.CompanyId)
+    public ICollection<Request> Requests { get; set; } = new List<Request>();
 }
