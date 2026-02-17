@@ -19,9 +19,9 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 34
+- Total plans completed: 35
 - Average duration: 6 min
-- Total execution time: ~2.2 hours
+- Total execution time: ~2.3 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [███████████████████████
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 5 | ~20min | 4min |
+| 04-deals-and-pipelines | 6 | ~25min | 4min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -64,6 +64,7 @@ Progress: [███████████████████████
 | Phase 04 P06 | 6min | 2 tasks | 6 files |
 | Phase 04 P08 | 4min | 2 tasks | 4 files |
 | Phase 04 P03 | 4min | 2 tasks | 3 files |
+| Phase 04 P07 | 5min | 2 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -186,6 +187,10 @@ Recent decisions affecting current work:
 - [04-08] Pipeline selector loads all pipelines on init, selects default (isDefault=true) or first pipeline
 - [Phase 04-03]: Pipeline controller uses admin-only Authorize(Roles = Admin) at controller level, not per-endpoint permission policies
 - [Phase 04-03]: Added Pipeline include to DealRepository GetPagedAsync and GetByIdAsync for PipelineName in DTOs
+- [04-07] Inline search panel for contact/product linking instead of separate MatDialog components -- simpler UX, fewer files
+- [04-07] Products table uses CSS grid layout (not mat-table) for lightweight rendering with subtotal/total computation
+- [04-07] Deal detail route (:id) updated from DealFormComponent to DealDetailComponent
+- [04-07] Timeline shown redundantly in Tab 4 and sidebar for access from any active tab
 
 ### Pending Todos
 
