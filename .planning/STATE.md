@@ -82,6 +82,7 @@ Progress: [█████████████████░░░░░░
 | Phase 06 P02 | 5min | 2 tasks | 4 files |
 | Phase 06 P05 | 5min | 2 tasks | 2 files |
 | Phase 06 P06 | 5min | 2 tasks | 3 files |
+| Phase 07 P01 | 3min | 2 tasks | 18 files |
 | Phase 07 P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
@@ -258,6 +259,9 @@ Recent decisions affecting current work:
 - [06-06] PDF download uses URL.createObjectURL with filename pattern Quote-{number}-v{version}.pdf
 - [06-06] Request form uses separate FormControl for contact/company autocomplete (not in main FormGroup) with Subject-based debounced search
 
+- [07-01] ulong LastHistoryId maps to bigint in PostgreSQL for Gmail incremental sync history tracking
+- [07-01] Email address arrays (To/Cc/Bcc) stored as jsonb columns, not separate tables
+- [07-01] One EmailAccount per user per tenant enforced by unique composite index on (tenant_id, user_id)
 - [07-04] EmailService uses ApiService for all endpoints (no HttpClient blob downloads needed for email)
 - [07-04] EmailStore includes selectedThread and accountStatus alongside standard list/detail state
 - [07-04] Optimistic list updates for markAsRead and toggleStar (update list item locally after API success)
