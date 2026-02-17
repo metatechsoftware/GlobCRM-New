@@ -19,7 +19,7 @@ Progress: [██████████] 2/9 plans (Phase 4)
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 31
+- Total plans completed: 32
 - Average duration: 6 min
 - Total execution time: ~2.0 hours
 
@@ -30,7 +30,7 @@ Progress: [██████████] 2/9 plans (Phase 4)
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 2 | ~6min | 3min |
+| 04-deals-and-pipelines | 3 | ~10min | 3min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -59,6 +59,7 @@ Progress: [██████████] 2/9 plans (Phase 4)
 | Phase 03 P09 | 2min | 1 task | 2 files |
 | Phase 04 P01 | 3min | 2 tasks | 18 files |
 | Phase 04 P04 | 2min | 2 tasks | 4 files |
+| Phase 04 P02 | 4min | 2 tasks | 6 files |
 | Phase 04 P05 | 4min | 2 tasks | 3 files |
 
 ## Accumulated Context
@@ -166,6 +167,10 @@ Recent decisions affecting current work:
 - [04-04] DealService.getList extends EntityQueryParams with pipelineId/stageId for pipeline-scoped list and Kanban views
 - [04-04] DealStore adds pipelineId to state with setPipelineId method for pipeline-specific deal loading
 - [04-04] PipelineService is a separate service from DealService (pipeline admin vs deal operations)
+- [04-02] DealRepository follows CompanyRepository pattern exactly for filter/sort/pagination with ParameterReplacer expression composition
+- [04-02] Kanban query excludes terminal stages (IsWon/IsLost) by default with includeTerminal toggle
+- [04-02] PipelineStageSeed extended with DefaultProbability, IsWon, IsLost for complete stage metadata
+- [04-02] Deal seed data links to seeded companies and pipeline stages with future ExpectedCloseDate
 - [04-05] Pipeline components use inline templates (single .ts file) for minimal file scope
 - [04-05] Stage probability stored as 0-100 percentage in form, converted to 0-1 decimal on save for backend compatibility
 - [04-05] Required fields per stage use MatExpansionPanel with checkbox grid for deal field requirements (DEAL-10)
