@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 9 of 11 (Dashboards & Reporting)
 Plan: 7 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 09-03 (DashboardsController API)
+Last activity: 2026-02-17 — Completed 09-06 (Dashboard UI Components)
 
-Progress: [█████████████████████░░░░░░░░░] 6/8 plans (Phase 9)
+Progress: [████████████████████████░░░░░░] 7/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -101,6 +101,7 @@ Progress: [█████████████████████░░
 | Phase 09 P02 | 3min | 2 tasks | 5 files |
 | Phase 09 P05 | 3min | 2 tasks | 6 files |
 | Phase 09 P03 | 2min | 1 task | 1 files |
+| Phase 09 P06 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -340,6 +341,10 @@ Recent decisions affecting current work:
 - [09-03] Widget data endpoint resolves RBAC scope per metric's entity type via GetEntityTypeForMetric mapping (Deal, Activity, Quote, Contact, Company, Request)
 - [09-03] Target list computes current value per target by calling aggregation service with target's metric/date range (sequential to avoid DbContext concurrency)
 - [09-03] Leaderboard metrics (SalesLeaderboard, ActivityLeaderboard) fall back to Deal:View scope since they cross entity types
+- [09-06] Gridster uses verticalFixed gridType with 200px fixedRowHeight and explicit container height to prevent collapsed-height pitfall
+- [09-06] Widget config dialog uses deep copy of widget data to avoid mutating store state before user confirms
+- [09-06] Dashboard selector uses AuthStore.userRole to show/hide delete button on team dashboards (Admin only)
+- [09-06] Date range filter converts dates to UTC ISO strings using manual formatting to avoid timezone boundary issues
 
 ### Pending Todos
 
@@ -352,5 +357,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-03-PLAN.md (DashboardsController API)
-Resume file: .planning/phases/09-dashboards-and-reporting/09-03-SUMMARY.md
+Stopped at: Completed 09-06-PLAN.md (Dashboard UI Components)
+Resume file: .planning/phases/09-dashboards-and-reporting/09-06-SUMMARY.md
