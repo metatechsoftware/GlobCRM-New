@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 7 of 11 (Email Integration)
-Plan: 5 of 7 in current phase
+Plan: 6 of 7 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 07-05 (Email UI Pages)
+Last activity: 2026-02-17 — Completed 07-06 (Email Detail, Routing, and Entity Integration)
 
-Progress: [█████████████████████░░░░░░░░░] 5/7 plans (Phase 7)
+Progress: [█████████████████████████░░░░░] 6/7 plans (Phase 7)
 
 ## Performance Metrics
 
@@ -86,6 +86,7 @@ Progress: [█████████████████████░░
 | Phase 07 P04 | 2min | 2 tasks | 3 files |
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
 | Phase 07 P02 | 6min | 2 tasks | 9 files |
+| Phase 07 P06 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -272,6 +273,11 @@ Recent decisions affecting current work:
 - [07-05] OAuth redirect pattern: EmailService.connect() returns authorizationUrl, component redirects via window.location.href
 - [Phase 07-02]: GmailOAuthService uses GoogleAuthorizationCodeFlow.CreateAuthorizationCodeRequest (not GoogleAuthorizationCodeRequestUrl which doesn't exist)
 - [Phase 07-02]: GmailSyncService uses ApplicationDbContext directly for contact auto-linking (simpler than adding IContactRepository methods for infrastructure-level service)
+- [07-06] Email detail uses setTimeout polling to wait for detail load before loading thread by gmailThreadId
+- [07-06] Most recent message expanded by default in thread view, older messages collapsed
+- [07-06] Entity email tabs use EmailService directly (not EmailStore) for simple lazy-loaded list
+- [07-06] Emails tab at index 6 in both CONTACT_TABS and COMPANY_TABS, before Notes
+- [07-06] Navbar Emails link between Requests and Team (Dashboard | Companies | Contacts | Products | Deals | Activities | Quotes | Requests | Emails | Team | Settings)
 
 ### Pending Todos
 
@@ -284,5 +290,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 07-05-PLAN.md (Email UI Pages)
-Resume file: .planning/phases/07-email-integration/07-05-SUMMARY.md
+Stopped at: Completed 07-06-PLAN.md (Email Detail, Routing, and Entity Integration)
+Resume file: .planning/phases/07-email-integration/07-06-SUMMARY.md
