@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 4 (Deals & Pipelines)
+**Current focus:** Phase 4 (Deals & Pipelines) -- COMPLETE
 
 ## Current Position
 
 Phase: 4 of 11 (Deals & Pipelines)
 Plan: 9 of 9 in current phase
-Status: In Progress
-Last activity: 2026-02-17 — Plan 04-08 complete (Deal Kanban Board)
+Status: Phase Complete
+Last activity: 2026-02-17 — Plan 04-09 complete (Calendar View, Routing, Navbar & Deals Tabs)
 
-Progress: [████████████████████████████] 8/9 plans (Phase 4)
+Progress: [██████████████████████████████] 9/9 plans (Phase 4)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 35
+- Total plans completed: 36
 - Average duration: 6 min
-- Total execution time: ~2.3 hours
+- Total execution time: ~2.4 hours
 
 **By Phase:**
 
@@ -30,7 +30,7 @@ Progress: [███████████████████████
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
-| 04-deals-and-pipelines | 6 | ~25min | 4min |
+| 04-deals-and-pipelines | 9 | ~29min | 3min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -65,6 +65,7 @@ Progress: [███████████████████████
 | Phase 04 P08 | 4min | 2 tasks | 4 files |
 | Phase 04 P03 | 4min | 2 tasks | 3 files |
 | Phase 04 P07 | 5min | 2 tasks | 7 files |
+| Phase 04 P09 | 4min | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -191,6 +192,9 @@ Recent decisions affecting current work:
 - [04-07] Products table uses CSS grid layout (not mat-table) for lightweight rendering with subtotal/total computation
 - [04-07] Deal detail route (:id) updated from DealFormComponent to DealDetailComponent
 - [04-07] Timeline shown redundantly in Tab 4 and sidebar for access from any active tab
+- [04-09] FullCalendar dayGridMonth as default view with stage-color-coded events and click-to-navigate
+- [04-09] Deals navbar link positioned between Products and Team (Dashboard | Companies | Contacts | Products | Deals | Team | Settings)
+- [04-09] Deals tab on Company/Contact detail pages uses placeholder with View Deals link passing companyId/contactId as query params
 
 ### Pending Todos
 
@@ -203,5 +207,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 04-08-PLAN.md (Deal Kanban Board)
-Resume file: .planning/phases/04-deals-and-pipelines/04-08-SUMMARY.md
+Stopped at: Completed 04-09-PLAN.md (Calendar View, Routing, Navbar & Deals Tabs) -- Phase 4 COMPLETE
+Resume file: .planning/phases/04-deals-and-pipelines/04-09-SUMMARY.md
