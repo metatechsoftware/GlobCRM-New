@@ -115,10 +115,18 @@ Plans:
   5. User can view deals as list and calendar views
   6. User can link deals to contacts, companies, and products
   7. Deal detail page shows entity timeline with activities and stage history
-**Plans**: TBD
+**Plans**: 9 plans
 
 Plans:
-- TBD
+- [ ] 04-01-PLAN.md -- Backend domain entities (Pipeline, PipelineStage, Deal, DealContact, DealProduct, DealStageHistory) + EF Core configs + migration + RLS
+- [ ] 04-02-PLAN.md -- Backend repositories (Pipeline + Deal) + TenantSeeder seed data wiring
+- [ ] 04-03-PLAN.md -- Backend API controllers (PipelinesController + DealsController) with stage transitions + timeline
+- [ ] 04-04-PLAN.md -- Frontend TypeScript models, API services (deal + pipeline), and DealStore signal store
+- [ ] 04-05-PLAN.md -- Frontend pipeline admin settings pages (list + edit with stage management)
+- [ ] 04-06-PLAN.md -- Frontend deal list with dynamic table + deal create/edit form
+- [ ] 04-07-PLAN.md -- Frontend deal detail page with tabs, timeline, and entity linking
+- [ ] 04-08-PLAN.md -- Frontend Kanban board with CDK drag-drop stage transitions
+- [ ] 04-09-PLAN.md -- Frontend calendar view (FullCalendar) + routing + navbar + Deals tabs integration
 
 ### Phase 5: Activities & Workflow
 **Goal**: Full activity workflow with state machine, timeline, and calendar views
