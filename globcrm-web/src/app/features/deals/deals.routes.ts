@@ -11,6 +11,13 @@ export const DEAL_ROUTES: Routes = [
       ),
   },
   {
+    path: 'calendar',
+    loadComponent: () =>
+      import('./deal-calendar/deal-calendar.component').then(
+        (m) => m.DealCalendarComponent,
+      ),
+  },
+  {
     path: 'new',
     loadComponent: () =>
       import('./deal-form/deal-form.component').then(

@@ -1,46 +1,85 @@
-<mat-toolbar class="navbar" color="primary">
-  <a routerLink="/dashboard" class="brand-link">
-    <span class="brand-name">GlobCRM</span>
-  </a>
+<nav class="navbar">
+  <div class="navbar__inner">
+    <!-- Brand -->
+    <a routerLink="/dashboard" class="navbar__brand">
+      <span class="navbar__brand-mark">G</span>
+      <span class="navbar__brand-text">Glob<span class="navbar__brand-highlight">CRM</span></span>
+    </a>
 
-  @if (authStore.organizationName()) {
-    <span class="org-name">{{ authStore.organizationName() }}</span>
-  }
+    @if (authStore.organizationName()) {
+      <span class="navbar__org-badge">
+        <mat-icon class="navbar__org-icon">domain</mat-icon>
+        {{ authStore.organizationName() }}
+      </span>
+    }
 
-  <!-- Nav Links -->
-  <a mat-button routerLink="/dashboard" routerLinkActive="active-link">Dashboard</a>
-  <a mat-button routerLink="/companies" routerLinkActive="active-link">Companies</a>
-  <a mat-button routerLink="/contacts" routerLinkActive="active-link">Contacts</a>
-  <a mat-button routerLink="/products" routerLinkActive="active-link">Products</a>
-  <a mat-button routerLink="/team-directory" routerLinkActive="active-link">Team</a>
-  <a mat-button routerLink="/settings/roles" routerLinkActive="active-link">Settings</a>
-
-  <span class="spacer"></span>
-
-  <!-- User Menu -->
-  <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-button"
-          aria-label="User menu">
-    <span class="user-avatar">{{ userInitials }}</span>
-  </button>
-
-  <mat-menu #userMenu="matMenu" xPosition="before">
-    <div class="user-info-header">
-      <span class="user-name">{{ authStore.userName() }}</span>
-      <span class="user-role">{{ authStore.userRole() }}</span>
+    <!-- Nav Links -->
+    <div class="navbar__links">
+      <a routerLink="/dashboard" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">grid_view</mat-icon>
+        Dashboard
+      </a>
+      <a routerLink="/companies" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">business</mat-icon>
+        Companies
+      </a>
+      <a routerLink="/contacts" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">people</mat-icon>
+        Contacts
+      </a>
+      <a routerLink="/products" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">inventory_2</mat-icon>
+        Products
+      </a>
+      <a routerLink="/deals" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">handshake</mat-icon>
+        Deals
+      </a>
+      <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">groups</mat-icon>
+        Team
+      </a>
+      <a routerLink="/settings/roles" routerLinkActive="navbar__link--active" class="navbar__link">
+        <mat-icon class="navbar__link-icon">settings</mat-icon>
+        Settings
+      </a>
     </div>
-    <mat-divider></mat-divider>
-    <button mat-menu-item routerLink="/profile">
-      <mat-icon>person</mat-icon>
-      <span>My Profile</span>
+
+    <span class="navbar__spacer"></span>
+
+    <!-- User Menu -->
+    <button class="navbar__user-trigger" [matMenuTriggerFor]="userMenu"
+            aria-label="User menu">
+      <span class="navbar__avatar">{{ userInitials }}</span>
+      <div class="navbar__user-info">
+        <span class="navbar__user-name">{{ authStore.userName() }}</span>
+        <span class="navbar__user-role">{{ authStore.userRole() }}</span>
+      </div>
+      <mat-icon class="navbar__chevron">expand_more</mat-icon>
     </button>
-    <button mat-menu-item (click)="navigateToSecurity()">
-      <mat-icon>security</mat-icon>
-      <span>Security Settings</span>
-    </button>
-    <mat-divider></mat-divider>
-    <button mat-menu-item (click)="logout()">
-      <mat-icon>logout</mat-icon>
-      <span>Log Out</span>
-    </button>
-  </mat-menu>
-</mat-toolbar>
+
+    <mat-menu #userMenu="matMenu" xPosition="before" class="navbar__menu">
+      <div class="navbar__menu-header">
+        <span class="navbar__menu-avatar">{{ userInitials }}</span>
+        <div>
+          <div class="navbar__menu-name">{{ authStore.userName() }}</div>
+          <div class="navbar__menu-role">{{ authStore.userRole() }}</div>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item routerLink="/profile">
+        <mat-icon>person_outline</mat-icon>
+        <span>My Profile</span>
+      </button>
+      <button mat-menu-item (click)="navigateToSecurity()">
+        <mat-icon>shield</mat-icon>
+        <span>Security</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="logout()" class="navbar__menu-logout">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
+  </div>
+</nav>

@@ -205,6 +205,23 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       opacity: 0.5;
     }
 
+    .tab-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      padding: 48px 24px;
+      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      text-align: center;
+    }
+
+    .tab-placeholder mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      opacity: 0.4;
+    }
+
     .detail-not-found {
       display: flex;
       flex-direction: column;

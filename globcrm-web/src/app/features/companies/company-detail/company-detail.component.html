@@ -142,6 +142,17 @@
               }
             </div>
           </ng-template>
+
+          <!-- Deals tab content (index 2) -->
+          <ng-template>
+            <div class="tab-placeholder">
+              <mat-icon>handshake</mat-icon>
+              <p>View deals linked to this company</p>
+              <a mat-button color="primary" [routerLink]="['/deals']" [queryParams]="{ companyId: company()?.id }">
+                View Deals
+              </a>
+            </div>
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 
