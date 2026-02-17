@@ -76,6 +76,15 @@ public class ApplicationDbContext
     public DbSet<DealProduct> DealProducts => Set<DealProduct>();
     public DbSet<DealStageHistory> DealStageHistories => Set<DealStageHistory>();
 
+    // Activities DbSets
+    public DbSet<Activity> Activities => Set<Activity>();
+    public DbSet<ActivityComment> ActivityComments => Set<ActivityComment>();
+    public DbSet<ActivityAttachment> ActivityAttachments => Set<ActivityAttachment>();
+    public DbSet<ActivityTimeEntry> ActivityTimeEntries => Set<ActivityTimeEntry>();
+    public DbSet<ActivityFollower> ActivityFollowers => Set<ActivityFollower>();
+    public DbSet<ActivityLink> ActivityLinks => Set<ActivityLink>();
+    public DbSet<ActivityStatusHistory> ActivityStatusHistories => Set<ActivityStatusHistory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -111,6 +120,15 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new DealContactConfiguration());
         modelBuilder.ApplyConfiguration(new DealProductConfiguration());
         modelBuilder.ApplyConfiguration(new DealStageHistoryConfiguration());
+
+        // Activities entity configurations
+        modelBuilder.ApplyConfiguration(new ActivityConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityCommentConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityAttachmentConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityTimeEntryConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityFollowerConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityLinkConfiguration());
+        modelBuilder.ApplyConfiguration(new ActivityStatusHistoryConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -169,5 +187,13 @@ public class ApplicationDbContext
         // Note: PipelineStage, DealContact, DealProduct, DealStageHistory
         // do NOT need their own query filters -- they are filtered through their
         // parent's FK relationship (Pipeline or Deal) which is already tenant-filtered.
+
+        // Global query filter: filter Activities by TenantId (tenant-scoped)
+        modelBuilder.Entity<Activity>().HasQueryFilter(
+            a => _tenantProvider == null || _tenantProvider.GetTenantId() == null || a.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: ActivityComment, ActivityAttachment, ActivityTimeEntry, ActivityFollower,
+        // ActivityLink, ActivityStatusHistory do NOT need their own query filters --
+        // they are filtered through their parent Activity FK which is already tenant-filtered.
     }
 }

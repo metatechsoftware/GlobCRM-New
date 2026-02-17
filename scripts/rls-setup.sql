@@ -240,6 +240,25 @@ COMMENT ON POLICY tenant_isolation_deals ON deals IS
 -- FK joins from their tenant-filtered parents (pipelines, deals).
 
 -- =====================================================================
+-- activities - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE activities FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_activities ON activities
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_activities ON activities IS
+    'Ensures activity queries only return activities for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: Child tables (activity_comments, activity_attachments, activity_time_entries,
+-- activity_followers, activity_links, activity_status_histories) do NOT need RLS
+-- policies. They are accessed through FK joins from their tenant-filtered parent (activities).
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter
