@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 9 in progress -- Dashboards & Reporting
+**Current focus:** Phase 9 complete -- Dashboards & Reporting
 
 ## Current Position
 
 Phase: 9 of 11 (Dashboards & Reporting)
 Plan: 8 of 8 in current phase
-Status: In Progress
-Last activity: 2026-02-17 — Completed 09-07 (Dashboard Page Assembly)
+Status: Phase Complete
+Last activity: 2026-02-17 — Completed 09-08 (Target Management & Widget Drill-Down)
 
-Progress: [███████████████████████████░░░] 8/8 plans (Phase 9)
+Progress: [██████████████████████████████] 8/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -103,6 +103,7 @@ Progress: [███████████████████████
 | Phase 09 P03 | 2min | 1 task | 1 files |
 | Phase 09 P06 | 3min | 2 tasks | 4 files |
 | Phase 09 P07 | 2min | 2 tasks | 3 files |
+| Phase 09 P08 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -349,6 +350,11 @@ Recent decisions affecting current work:
 - [09-07] Inline CreateDashboardDialogComponent in same file as DashboardComponent for simple name+isTeamWide prompt
 - [09-07] Dashboard routes unchanged -- DashboardStore provided at component level (providers array), not route level
 - [09-07] Widget CRUD maps WidgetDto to CreateWidgetRequest for UpdateDashboardRequest full-replacement pattern
+- [09-08] Static METRIC_ROUTE_MAP on WidgetWrapperComponent maps all 20 MetricTypes to 6 entity routes for drill-down
+- [09-08] mat-tab-group with Dashboard and Targets tabs for clean layout separation (targets within dashboard context)
+- [09-08] Period auto-date computation for Daily/Weekly/Monthly/Quarterly/Yearly with Monday-start weeks (ISO standard)
+- [09-08] provideNativeDateAdapter at component level for TargetFormDialogComponent datepicker (matching Phase 03 pattern)
+- [09-08] Snackbar-based delete confirmation for targets (lightweight, non-blocking UX)
 
 ### Pending Todos
 
@@ -361,5 +367,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-07-PLAN.md (Dashboard Page Assembly)
-Resume file: .planning/phases/09-dashboards-and-reporting/09-07-SUMMARY.md
+Stopped at: Completed 09-08-PLAN.md (Target Management & Widget Drill-Down) -- Phase 9 complete
+Resume file: .planning/phases/09-dashboards-and-reporting/09-08-SUMMARY.md
