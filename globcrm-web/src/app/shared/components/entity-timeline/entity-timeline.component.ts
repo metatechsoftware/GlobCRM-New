@@ -20,6 +20,9 @@ export interface TimelineEntry {
     | 'contact_linked'
     | 'contact_unlinked'
     | 'deal_created'
+    | 'stage_changed'
+    | 'product_linked'
+    | 'product_unlinked'
     | 'activity'
     | 'note'
     | 'email';
@@ -39,6 +42,9 @@ const TIMELINE_ICONS: Record<string, string> = {
   contact_linked: 'person_add',
   contact_unlinked: 'person_remove',
   deal_created: 'handshake',
+  stage_changed: 'swap_horiz',
+  product_linked: 'add_shopping_cart',
+  product_unlinked: 'remove_shopping_cart',
   activity: 'task',
   note: 'note',
   email: 'email',
@@ -53,6 +59,9 @@ const TIMELINE_COLORS: Record<string, string> = {
   contact_linked: '#9c27b0',
   contact_unlinked: '#f44336',
   deal_created: '#ff9800',
+  stage_changed: '#ff5722',
+  product_linked: '#4caf50',
+  product_unlinked: '#f44336',
   activity: '#00bcd4',
   note: '#607d8b',
   email: '#3f51b5',

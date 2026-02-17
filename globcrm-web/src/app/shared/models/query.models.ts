@@ -34,6 +34,9 @@ export interface TimelineEntry {
     | 'contact_linked'
     | 'contact_unlinked'
     | 'deal_created'
+    | 'stage_changed'
+    | 'product_linked'
+    | 'product_unlinked'
     | 'activity'
     | 'note'
     | 'email';
