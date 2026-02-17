@@ -83,6 +83,13 @@ export const SETTINGS_ROUTES: Routes = [
       ),
   },
   {
+    path: 'email-accounts',
+    loadComponent: () =>
+      import('./email-accounts/email-account-settings.component').then(
+        (m) => m.EmailAccountSettingsComponent
+      ),
+  },
+  {
     path: '',
     redirectTo: 'roles',
     pathMatch: 'full',
