@@ -261,10 +261,15 @@ Plans:
   5. User can search across all entity types from a single search bar
   6. Search returns results grouped by entity type with partial matching
   7. Search is responsive (results as you type) and saves recent searches for quick access
-**Plans**: TBD
+**Plans**: 6 plans
 
 Plans:
-- TBD
+- [ ] 10-01-PLAN.md -- Backend domain entities (ImportJob, ImportJobError) + SearchVector tsvector on Company/Contact/Deal + EF Core configs + migration
+- [ ] 10-02-PLAN.md -- Backend CSV import services (CsvHelper parser, ImportService, DuplicateDetector) + ImportsController API endpoints
+- [ ] 10-03-PLAN.md -- Backend GlobalSearchService (PostgreSQL tsvector queries) + SearchController endpoint
+- [ ] 10-04-PLAN.md -- Frontend import wizard (models, service, store, 4-step stepper: upload/map/preview/progress)
+- [ ] 10-05-PLAN.md -- Frontend global search (navbar search bar, debounced type-ahead, grouped results, recent searches)
+- [ ] 10-06-PLAN.md -- Frontend import history, routing, settings page integration
 
 ### Phase 11: Polish & Completeness
 **Goal**: Calendar views, notes, attachments, news feed, and responsive web design
