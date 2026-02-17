@@ -5,6 +5,7 @@ using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
 using GlobCRM.Infrastructure.Persistence;
+using GlobCRM.Infrastructure.Storage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,10 @@ public class ActivitiesController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly IFileStorageService _fileStorageService;
+    private readonly ICompanyRepository _companyRepository;
+    private readonly IContactRepository _contactRepository;
+    private readonly IDealRepository _dealRepository;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<ActivitiesController> _logger;
 
@@ -38,6 +43,10 @@ public class ActivitiesController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        IFileStorageService fileStorageService,
+        ICompanyRepository companyRepository,
+        IContactRepository contactRepository,
+        IDealRepository dealRepository,
         ApplicationDbContext db,
         ILogger<ActivitiesController> logger)
     {
@@ -46,6 +55,10 @@ public class ActivitiesController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _fileStorageService = fileStorageService;
+        _companyRepository = companyRepository;
+        _contactRepository = contactRepository;
+        _dealRepository = dealRepository;
         _db = db;
         _logger = logger;
     }
@@ -899,6 +912,277 @@ public class ActivitiesController : ControllerBase
         return NoContent();
     }
 
+    // ---- Attachments (ACTV-06) ----
+
+    /// <summary>
+    /// Uploads a file attachment to an activity.
+    /// Max file size: 25MB. Dangerous extensions (.exe, .bat, .cmd, .ps1, .sh) rejected.
+    /// Uses IFileStorageService for tenant-partitioned file storage.
+    /// </summary>
+    [HttpPost("{id:guid}/attachments")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [RequestSizeLimit(26_214_400)] // 25MB + overhead
+    [ProducesResponseType(typeof(ActivityAttachmentDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UploadAttachment(Guid id, IFormFile file)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        if (file is null || file.Length == 0)
+            return BadRequest(new { error = "File is required." });
+
+        const long maxFileSize = 25 * 1024 * 1024; // 25MB
+        if (file.Length > maxFileSize)
+            return BadRequest(new { error = "File size exceeds the 25MB limit." });
+
+        // Reject dangerous extensions
+        var extension = Path.GetExtension(file.FileName)?.ToLowerInvariant();
+        var dangerousExtensions = new[] { ".exe", ".bat", ".cmd", ".ps1", ".sh" };
+        if (dangerousExtensions.Contains(extension))
+            return BadRequest(new { error = $"File type '{extension}' is not allowed." });
+
+        var tenantId = _tenantProvider.GetTenantId()
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        // Build storage path: {tenantId}/activities/{activityId}/{guid}_{originalFileName}
+        var storageName = $"{Guid.NewGuid()}_{file.FileName}";
+        var category = $"activities/{id}";
+
+        // Read file data
+        using var memoryStream = new MemoryStream();
+        await file.CopyToAsync(memoryStream);
+        var fileData = memoryStream.ToArray();
+
+        var storagePath = await _fileStorageService.SaveFileAsync(
+            tenantId.ToString(), category, storageName, fileData);
+
+        var attachment = new ActivityAttachment
+        {
+            ActivityId = id,
+            FileName = file.FileName,
+            StoragePath = storagePath,
+            ContentType = file.ContentType,
+            FileSizeBytes = file.Length,
+            UploadedById = userId,
+        };
+
+        _db.ActivityAttachments.Add(attachment);
+        await _db.SaveChangesAsync();
+
+        var dto = new ActivityAttachmentDto
+        {
+            Id = attachment.Id,
+            FileName = attachment.FileName,
+            ContentType = attachment.ContentType,
+            FileSizeBytes = attachment.FileSizeBytes,
+            UploadedByName = null, // Will be populated from Author nav on detail load
+            UploadedAt = attachment.UploadedAt
+        };
+
+        _logger.LogInformation("Attachment '{FileName}' uploaded to activity {ActivityId}", file.FileName, id);
+
+        return StatusCode(StatusCodes.Status201Created, dto);
+    }
+
+    /// <summary>
+    /// Downloads an attachment file from an activity.
+    /// Returns FileContentResult with correct ContentType and Content-Disposition header.
+    /// </summary>
+    [HttpGet("{id:guid}/attachments/{attachmentId:guid}/download")]
+    [Authorize(Policy = "Permission:Activity:View")]
+    [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DownloadAttachment(Guid id, Guid attachmentId)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var attachment = await _db.ActivityAttachments
+            .FirstOrDefaultAsync(a => a.Id == attachmentId && a.ActivityId == id);
+
+        if (attachment is null)
+            return NotFound(new { error = "Attachment not found." });
+
+        var fileData = await _fileStorageService.GetFileAsync(attachment.StoragePath);
+        if (fileData is null)
+            return NotFound(new { error = "Attachment file not found in storage." });
+
+        return File(fileData, attachment.ContentType, attachment.FileName);
+    }
+
+    /// <summary>
+    /// Deletes an attachment from an activity. Only the uploader or admin can delete.
+    /// Removes both the file from storage and the database record.
+    /// </summary>
+    [HttpDelete("{id:guid}/attachments/{attachmentId:guid}")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> DeleteAttachment(Guid id, Guid attachmentId)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var attachment = await _db.ActivityAttachments
+            .FirstOrDefaultAsync(a => a.Id == attachmentId && a.ActivityId == id);
+
+        if (attachment is null)
+            return NotFound(new { error = "Attachment not found." });
+
+        // Only the uploader or admin can delete
+        var isAdmin = User.IsInRole("Admin");
+        if (attachment.UploadedById != userId && !isAdmin)
+            return StatusCode(StatusCodes.Status403Forbidden, new { error = "Only the uploader or admin can delete this attachment." });
+
+        // Delete file from storage first, then remove record
+        await _fileStorageService.DeleteFileAsync(attachment.StoragePath);
+
+        _db.ActivityAttachments.Remove(attachment);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Attachment {AttachmentId} deleted from activity {ActivityId}", attachmentId, id);
+
+        return NoContent();
+    }
+
+    // ---- Entity Links (ACTV-12) ----
+
+    private static readonly string[] AllowedEntityTypes = { "Contact", "Company", "Deal", "Quote", "Request" };
+
+    /// <summary>
+    /// Links an entity (Contact, Company, Deal) to an activity.
+    /// If entityName is not provided, looks up the entity name for denormalization.
+    /// Prevents duplicate links (same entityType + entityId on same activity).
+    /// </summary>
+    [HttpPost("{id:guid}/links")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(typeof(ActivityLinkDto), StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> AddLink(Guid id, [FromBody] AddActivityLinkRequest request)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        // Validate entityType
+        if (!AllowedEntityTypes.Contains(request.EntityType, StringComparer.OrdinalIgnoreCase))
+            return BadRequest(new { error = $"Invalid entityType: {request.EntityType}. Must be one of: {string.Join(", ", AllowedEntityTypes)}." });
+
+        // Prevent duplicate links
+        var duplicate = await _db.ActivityLinks
+            .AnyAsync(l => l.ActivityId == id &&
+                           l.EntityType == request.EntityType &&
+                           l.EntityId == request.EntityId);
+
+        if (duplicate)
+            return BadRequest(new { error = $"This {request.EntityType} is already linked to this activity." });
+
+        // Resolve entity name for denormalization if not provided
+        var entityName = request.EntityName;
+        if (string.IsNullOrWhiteSpace(entityName))
+        {
+            entityName = await ResolveEntityNameAsync(request.EntityType, request.EntityId);
+        }
+
+        var link = new ActivityLink
+        {
+            ActivityId = id,
+            EntityType = request.EntityType,
+            EntityId = request.EntityId,
+            EntityName = entityName,
+        };
+
+        _db.ActivityLinks.Add(link);
+        await _db.SaveChangesAsync();
+
+        var dto = new ActivityLinkDto
+        {
+            Id = link.Id,
+            EntityType = link.EntityType,
+            EntityId = link.EntityId,
+            EntityName = link.EntityName,
+            LinkedAt = link.LinkedAt
+        };
+
+        _logger.LogInformation("{EntityType} {EntityId} linked to activity {ActivityId}",
+            request.EntityType, request.EntityId, id);
+
+        return StatusCode(StatusCodes.Status201Created, dto);
+    }
+
+    /// <summary>
+    /// Removes an entity link from an activity.
+    /// </summary>
+    [HttpDelete("{id:guid}/links/{linkId:guid}")]
+    [Authorize(Policy = "Permission:Activity:Update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> RemoveLink(Guid id, Guid linkId)
+    {
+        var activity = await _activityRepository.GetByIdAsync(id);
+        if (activity is null)
+            return NotFound(new { error = "Activity not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Activity", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var link = await _db.ActivityLinks
+            .FirstOrDefaultAsync(l => l.Id == linkId && l.ActivityId == id);
+
+        if (link is null)
+            return NotFound(new { error = "Link not found." });
+
+        _db.ActivityLinks.Remove(link);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Link {LinkId} removed from activity {ActivityId}", linkId, id);
+
+        return NoContent();
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -959,6 +1243,22 @@ public class ActivitiesController : ControllerBase
             .ToListAsync();
 
         return memberIds;
+    }
+
+    /// <summary>
+    /// Resolves an entity name for denormalization in ActivityLink.
+    /// Looks up the entity by type and ID from the appropriate repository.
+    /// Returns null if entity not found.
+    /// </summary>
+    private async Task<string?> ResolveEntityNameAsync(string entityType, Guid entityId)
+    {
+        return entityType switch
+        {
+            "Company" => (await _companyRepository.GetByIdAsync(entityId))?.Name,
+            "Contact" => (await _contactRepository.GetByIdAsync(entityId))?.FullName,
+            "Deal" => (await _dealRepository.GetByIdAsync(entityId))?.Title,
+            _ => null
+        };
     }
 }
 
