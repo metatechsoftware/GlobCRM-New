@@ -27,10 +27,9 @@ export const ACTIVITY_ROUTES: Routes = [
   {
     path: ':id',
     loadComponent: () =>
-      import('./activity-form/activity-form.component').then(
-        (m) => m.ActivityFormComponent,
+      import('./activity-detail/activity-detail.component').then(
+        (m) => m.ActivityDetailComponent,
       ),
-    // Placeholder: will be replaced by ActivityDetailComponent in a later plan
   },
   {
     path: ':id/edit',

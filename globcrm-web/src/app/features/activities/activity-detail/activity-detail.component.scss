@@ -1,0 +1,268 @@
+:host {
+  display: block;
+}
+
+.detail-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 64px;
+}
+
+.detail-page {
+  padding: 16px 24px;
+}
+
+// ─── Header ──────────────────────────────────────────────────────
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.header-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.following {
+  background-color: var(--mat-sys-primary-container, #e3f2fd) !important;
+}
+
+// ─── Status Transitions ──────────────────────────────────────────
+
+.status-transitions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  padding-left: 48px;
+}
+
+.transition-label {
+  font-size: 13px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  font-weight: 500;
+}
+
+.transition-btn {
+  font-size: 13px;
+}
+
+// ─── Main Layout ─────────────────────────────────────────────────
+
+.detail-content {
+  display: flex;
+  gap: 24px;
+}
+
+.detail-main {
+  flex: 1;
+  min-width: 0;
+}
+
+// ─── Tabs ────────────────────────────────────────────────────────
+
+.tab-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.tab-body {
+  padding: 16px 0;
+}
+
+// ─── Details Tab ─────────────────────────────────────────────────
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+}
+
+.field-label {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+.field-value {
+  font-size: 14px;
+  color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+
+  &.overdue {
+    color: #f44336;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+}
+
+.description-text {
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.overdue-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: #f44336;
+}
+
+.priority-badge,
+.status-badge {
+  font-weight: 500;
+}
+
+// ─── Info Sidebar ────────────────────────────────────────────────
+
+.detail-sidebar {
+  width: 300px;
+  flex-shrink: 0;
+}
+
+.sidebar-card {
+  background: var(--mat-sys-surface-container-low, #f5f5f5);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.sidebar-title {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sidebar-field {
+  margin-bottom: 14px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.sidebar-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  display: block;
+  margin-bottom: 4px;
+}
+
+.sidebar-value {
+  font-size: 14px;
+  color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+
+  &.overdue {
+    color: #f44336;
+  }
+}
+
+.user-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar-initials {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--mat-sys-primary, #1976d2);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+
+.overdue-badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  background: #f4433622;
+  color: #f44336;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+// ─── Not Found ───────────────────────────────────────────────────
+
+.detail-not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 64px;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .detail-content {
+    flex-direction: column;
+  }
+
+  .detail-sidebar {
+    width: 100%;
+  }
+
+  .details-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .status-transitions {
+    padding-left: 0;
+    flex-wrap: wrap;
+  }
+}
