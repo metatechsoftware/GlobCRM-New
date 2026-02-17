@@ -53,4 +53,7 @@ public class Company
 
     // Navigation: Company has many Contacts (one-to-many via Contact.CompanyId)
     public ICollection<Contact> Contacts { get; set; } = new List<Contact>();
+
+    // Navigation: Company has many Deals (one-to-many via Deal.CompanyId)
+    public ICollection<Deal> Deals { get; set; } = new List<Deal>();
 }
