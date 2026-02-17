@@ -106,6 +106,7 @@ Progress: [██████████████░░░░░░░░░
 | Phase 09 P08 | 3min | 2 tasks | 6 files |
 | Phase 10 P01 | 4min | 2 tasks | 19 files |
 | Phase 10 P03 | 3min | 2 tasks | 4 files |
+| Phase 10 P02 | 7min | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -364,6 +365,7 @@ Recent decisions affecting current work:
 - [10-03] Prefix matching via BuildPrefixQuery appending :* to each token joined with & for AND semantics
 - [10-03] Per-entity RBAC permission check in search (Company:View, Contact:View, Deal:View) not single search permission
 - [10-03] Team member IDs materialized to List<Guid> before search query for EF Core LINQ compatibility
+- [Phase 10-02]: CsvHelper 33.1.0 for dynamic record reading; IServiceScopeFactory batch processing per 100 rows; fire-and-forget Task.Run with SignalR ImportProgress
 
 ### Pending Todos
 
