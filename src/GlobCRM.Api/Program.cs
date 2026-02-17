@@ -57,6 +57,7 @@ builder.Services.AddCrmEntityServices();
 builder.Services.AddPdfServices();
 builder.Services.AddGmailServices();
 builder.Services.AddHostedService<EmailSyncBackgroundService>();
+builder.Services.AddHostedService<DueDateNotificationService>();
 
 // SignalR for real-time notifications and feed updates
 builder.Services.AddSignalR();
