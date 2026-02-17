@@ -10,16 +10,16 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
-Plan: 5 of 10 in current phase
+Plan: 6 of 10 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 05-05 complete (Activity Frontend Data Layer)
+Last activity: 2026-02-17 — Plan 05-02 complete (Activity Repository & Seed Data)
 
-Progress: [███░░░░░░░░░░░░░░░░░░░░░░░░░░░] 1/10 plans (Phase 5)
+Progress: [██████░░░░░░░░░░░░░░░░░░░░░░░░] 3/10 plans (Phase 5)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 38
+- Total plans completed: 39
 - Average duration: 6 min
 - Total execution time: ~2.4 hours
 
@@ -69,6 +69,7 @@ Progress: [███░░░░░░░░░░░░░░░░░░░░
 | Phase 04 P10 | 1min | 1 task | 1 files |
 | Phase 05 P01 | 3min | 2 tasks | 22 files |
 | Phase 05 P05 | 2min | 2 tasks | 3 files |
+| Phase 05 P02 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -205,6 +206,9 @@ Recent decisions affecting current work:
 - [05-05] ActivityService uses HttpClient directly for FormData upload and blob download (ApiService only handles JSON)
 - [05-05] ActivityStore default sort is createdAt desc (most recent first), component-provided with ViewFilter-based filters
 - [05-05] Sub-entity API methods nested under parent path (/activities/{id}/comments, /attachments, /time-entries, /links, /followers)
+- [05-02] Activity ownership scope checks both OwnerId and AssignedToId (users see activities they own OR are assigned to, unlike Company/Deal)
+- [05-02] Entity-scoped filtering via LINQ Any() on ActivityLink navigation collection (not separate join query)
+- [05-02] TenantSeeder uses contactMap and dealMap alongside companyMap for cross-entity linking of ActivityLink records
 
 ### Pending Todos
 
@@ -217,5 +221,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-05-PLAN.md (Activity Frontend Data Layer)
-Resume file: .planning/phases/05-activities-and-workflow/05-05-SUMMARY.md
+Stopped at: Completed 05-02-PLAN.md (Activity Repository & Seed Data)
+Resume file: .planning/phases/05-activities-and-workflow/05-02-SUMMARY.md
