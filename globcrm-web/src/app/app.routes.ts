@@ -88,6 +88,22 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'quotes',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/quotes/quotes.routes').then(
+        (m) => m.QUOTE_ROUTES
+      ),
+  },
+  {
+    path: 'requests',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/requests/requests.routes').then(
+        (m) => m.REQUEST_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
