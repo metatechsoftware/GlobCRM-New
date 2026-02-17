@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 10 of 11 (Data Operations)
-Plan: 1 of 6 in current phase
+Plan: 3 of 6 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 10-01 (Domain Foundation: Import Entities & Search Vectors)
+Last activity: 2026-02-17 — Completed 10-03 (Global Search Backend: Service & API)
 
-Progress: [█████░░░░░░░░░░░░░░░░░░░░░░░░░] 1/6 plans (Phase 10)
+Progress: [██████████████░░░░░░░░░░░░░░░░] 3/6 plans (Phase 10)
 
 ## Performance Metrics
 
@@ -105,6 +105,7 @@ Progress: [█████░░░░░░░░░░░░░░░░░░
 | Phase 09 P07 | 2min | 2 tasks | 3 files |
 | Phase 09 P08 | 3min | 2 tasks | 6 files |
 | Phase 10 P01 | 4min | 2 tasks | 19 files |
+| Phase 10 P03 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -360,6 +361,9 @@ Recent decisions affecting current work:
 - [10-01] HasGeneratedTsVectorColumn returns EntityTypeBuilder -- HasColumnName set separately via Property()
 - [10-01] ImportFieldMapping value object in ImportJob.cs with JSONB List<T> storage via System.Text.Json HasConversion
 - [10-01] ImportJob.UserId nullable with SetNull FK -- import records survive user deletion
+- [10-03] Prefix matching via BuildPrefixQuery appending :* to each token joined with & for AND semantics
+- [10-03] Per-entity RBAC permission check in search (Company:View, Contact:View, Deal:View) not single search permission
+- [10-03] Team member IDs materialized to List<Guid> before search query for EF Core LINQ compatibility
 
 ### Pending Todos
 
@@ -372,5 +376,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 10-01-PLAN.md (Domain Foundation: Import Entities & Search Vectors)
-Resume file: .planning/phases/10-data-operations/10-01-SUMMARY.md
+Stopped at: Completed 10-03-PLAN.md (Global Search Backend: Service & API)
+Resume file: .planning/phases/10-data-operations/10-03-SUMMARY.md
