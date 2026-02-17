@@ -17,6 +17,7 @@ using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Dashboards;
 using GlobCRM.Infrastructure.Feed;
 using GlobCRM.Infrastructure.Pdf;
+using GlobCRM.Infrastructure.Search;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
 
@@ -69,6 +70,9 @@ builder.Services.AddFeedServices();
 
 // Dashboard and reporting subsystem services
 builder.Services.AddDashboardServices();
+
+// Search subsystem services
+builder.Services.AddSearchServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
