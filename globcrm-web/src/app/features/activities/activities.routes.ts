@@ -6,10 +6,9 @@ export const ACTIVITY_ROUTES: Routes = [
   {
     path: 'kanban',
     loadComponent: () =>
-      import('./activity-list/activity-list.component').then(
-        (m) => m.ActivityListComponent,
+      import('./activity-kanban/activity-kanban.component').then(
+        (m) => m.ActivityKanbanComponent,
       ),
-    // Placeholder: will be replaced by ActivityKanbanComponent in a later plan
   },
   {
     path: 'calendar',

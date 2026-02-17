@@ -1,0 +1,97 @@
+<div class="kanban-layout">
+  <!-- Header toolbar -->
+  <div class="kanban-header">
+    <h1>Activities</h1>
+
+    <div class="header-actions">
+      <!-- View mode switcher -->
+      <mat-button-toggle-group value="kanban" class="view-mode-toggle">
+        <mat-button-toggle value="list" routerLink="/activities">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban">
+          <mat-icon>view_kanban</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="calendar" routerLink="/activities/calendar">
+          <mat-icon>calendar_month</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- New Activity button -->
+      <button mat-raised-button color="primary"
+              *appHasPermission="'Activity:Create'"
+              routerLink="/activities/new">
+        <mat-icon>add</mat-icon> New Activity
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="kanban-loading"></mat-progress-bar>
+  }
+
+  <!-- Kanban board -->
+  <div class="kanban-board" cdkDropListGroup>
+    @for (column of columns(); track column.status) {
+      <div class="kanban-column">
+        <div class="column-header" [style.border-top-color]="column.color">
+          <div class="column-header-left">
+            <span class="column-title">{{ column.label }}</span>
+            <span class="column-count">{{ column.activities.length }}</span>
+          </div>
+        </div>
+        <div cdkDropList
+             [cdkDropListData]="column.activities"
+             [id]="column.status"
+             (cdkDropListDropped)="onDrop($event)"
+             class="column-body">
+          @for (activity of column.activities; track activity.id) {
+            <div cdkDrag class="activity-card"
+                 [style.border-left-color]="getPriorityColor(activity.priority)"
+                 (click)="openActivity(activity.id)">
+              <div class="card-top-row">
+                <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                <span class="card-subject">{{ truncate(activity.subject) }}</span>
+              </div>
+
+              <div class="card-meta">
+                <span class="priority-chip"
+                      [style.background-color]="getPriorityColor(activity.priority)"
+                      [style.color]="'#fff'">
+                  {{ activity.priority }}
+                </span>
+
+                @if (activity.dueDate) {
+                  <span class="card-due-date" [class.overdue]="isOverdue(activity.dueDate)">
+                    <mat-icon class="meta-icon">event</mat-icon>
+                    {{ activity.dueDate | date:'MMM d' }}
+                  </span>
+                }
+              </div>
+
+              @if (activity.assignedToName) {
+                <div class="card-assignee">
+                  <mat-icon class="meta-icon">person</mat-icon>
+                  {{ activity.assignedToName }}
+                </div>
+              }
+
+              <!-- Drag preview -->
+              <div *cdkDragPreview class="activity-card-preview">
+                <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                <span class="card-subject">{{ truncate(activity.subject, 40) }}</span>
+              </div>
+
+              <!-- Drag placeholder -->
+              <div *cdkDragPlaceholder class="activity-card-placeholder"></div>
+            </div>
+          }
+          @if (column.activities.length === 0) {
+            <div class="column-empty">No activities</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
