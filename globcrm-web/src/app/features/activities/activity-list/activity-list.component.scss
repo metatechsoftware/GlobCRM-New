@@ -1,0 +1,20 @@
+@use '../../../../styles/entity-list';
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-mode-toggle {
+  ::ng-deep .mat-button-toggle-label-content {
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 768px) {
+  .header-actions {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}

@@ -1,0 +1,56 @@
+<div class="entity-list-layout">
+  <app-view-sidebar
+    [entityType]="'Activity'"
+    (viewSelected)="onViewSelected($event)" />
+
+  <div class="entity-list-content">
+    <div class="list-header">
+      <h1>Activities</h1>
+
+      <div class="header-actions">
+        <!-- View mode switcher -->
+        <mat-button-toggle-group value="list" class="view-mode-toggle">
+          <mat-button-toggle value="list">
+            <mat-icon>view_list</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="kanban" routerLink="/activities/kanban">
+            <mat-icon>view_kanban</mat-icon>
+          </mat-button-toggle>
+          <mat-button-toggle value="calendar" routerLink="/activities/calendar">
+            <mat-icon>calendar_month</mat-icon>
+          </mat-button-toggle>
+        </mat-button-toggle-group>
+
+        <!-- New Activity button -->
+        <button mat-raised-button color="primary"
+                *appHasPermission="'Activity:Create'"
+                routerLink="new">
+          <mat-icon>add</mat-icon> New Activity
+        </button>
+      </div>
+    </div>
+
+    <app-filter-chips
+      [filters]="activityStore.filters()"
+      [columnDefinitions]="columnDefs()"
+      (filterRemoved)="onFilterRemoved($event)"
+      (filtersCleared)="onFiltersCleared()" />
+
+    <app-filter-panel
+      [columnDefinitions]="columnDefs()"
+      [activeFilters]="activityStore.filters()"
+      (filtersChanged)="onFilterApplied($event)" />
+
+    <app-dynamic-table
+      entityType="Activity"
+      [data]="activityStore.items()"
+      [columns]="activeViewColumns()"
+      [columnDefinitions]="columnDefs()"
+      [totalCount]="activityStore.totalCount()"
+      [pageSize]="activityStore.pageSize()"
+      [loading]="activityStore.isLoading()"
+      (sortChanged)="onSortChanged($event)"
+      (pageChanged)="onPageChanged($event)"
+      (rowEditClicked)="onRowEditClicked($event)" />
+  </div>
+</div>

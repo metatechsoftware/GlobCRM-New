@@ -80,6 +80,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'activities',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/activities/activities.routes').then(
+        (m) => m.ACTIVITY_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
