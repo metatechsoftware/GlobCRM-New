@@ -16,6 +16,7 @@ using GlobCRM.Infrastructure.Gmail;
 using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Dashboards;
 using GlobCRM.Infrastructure.Feed;
+using GlobCRM.Infrastructure.Import;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Search;
 using Microsoft.AspNetCore.Identity;
@@ -73,6 +74,9 @@ builder.Services.AddDashboardServices();
 
 // Search subsystem services
 builder.Services.AddSearchServices();
+
+// Import subsystem services
+builder.Services.AddImportServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
