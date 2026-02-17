@@ -5,21 +5,21 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phase 3 (Core CRM Entities)
+**Current focus:** Phase 4 (Deals & Pipelines)
 
 ## Current Position
 
-Phase: 3 of 11 (Core CRM Entities)
-Plan: 9 of 9 in current phase (LAST PLAN)
-Status: Awaiting E2E Verification
-Last activity: 2026-02-17 — Plan 03-09 code complete, awaiting human E2E verify
+Phase: 4 of 11 (Deals & Pipelines)
+Plan: 4 of 9 in current phase
+Status: In Progress
+Last activity: 2026-02-17 — Plan 04-04 complete (Frontend Deal Data Layer)
 
-Progress: [██████████████] 9/9 plans (Phase 3) -- pending user verification
+Progress: [██████] 1/9 plans (Phase 4)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 29
+- Total plans completed: 30
 - Average duration: 6 min
 - Total execution time: ~2.0 hours
 
@@ -30,6 +30,7 @@ Progress: [██████████████] 9/9 plans (Phase 3) -- pe
 | 01-foundation | 8 | ~56min | 7min |
 | 02-core-infrastructure | 11 | ~73min | 7min |
 | 03-core-crm-entities | 9 | ~40min | 4min |
+| 04-deals-and-pipelines | 1 | ~2min | 2min |
 
 **Recent Trend:**
 - Last 5 plans: 01-04 (7min), 01-05 (7min), 01-06 (7min), 01-07 (8min), 01-08 (E2E verify)
@@ -56,6 +57,7 @@ Progress: [██████████████] 9/9 plans (Phase 3) -- pe
 | Phase 03 P07 | 12min | 2 tasks | 8 files |
 | Phase 03 P08 | 5min | 2 tasks | 8 files |
 | Phase 03 P09 | 2min | 1 task | 2 files |
+| Phase 04 P04 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -155,6 +157,9 @@ Recent decisions affecting current work:
 - [03-07] Added Emails disabled tab to CONTACT_TABS per plan specification (Phase 7 placeholder)
 - [03-09] Navbar link order: Dashboard | Companies | Contacts | Products | Team | Settings (entity pages between dashboard and admin)
 - [03-09] All entity routes use authGuard; permission enforcement at component level via directives
+- [04-04] DealService.getList extends EntityQueryParams with pipelineId/stageId for pipeline-scoped list and Kanban views
+- [04-04] DealStore adds pipelineId to state with setPipelineId method for pipeline-specific deal loading
+- [04-04] PipelineService is a separate service from DealService (pipeline admin vs deal operations)
 
 ### Pending Todos
 
@@ -167,5 +172,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 03-09-PLAN.md (Navigation & E2E Verification) -- Phase 3 code complete, awaiting user E2E verification
-Resume file: .planning/phases/03-core-crm-entities/03-09-SUMMARY.md
+Stopped at: Completed 04-04-PLAN.md (Frontend Deal Data Layer)
+Resume file: .planning/phases/04-deals-and-pipelines/04-04-SUMMARY.md
