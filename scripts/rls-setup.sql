@@ -385,6 +385,39 @@ COMMENT ON POLICY tenant_isolation_feed_items ON feed_items IS
 -- FK joins from its tenant-filtered parent (feed_items).
 
 -- =====================================================================
+-- dashboards - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE dashboards ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE dashboards FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_dashboards ON dashboards
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_dashboards ON dashboards IS
+    'Ensures dashboard queries only return dashboards for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- targets - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE targets ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE targets FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_targets ON targets
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_targets ON targets IS
+    'Ensures target queries only return targets for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: dashboard_widgets does NOT need an RLS policy. It is accessed through
+-- FK joins from its tenant-filtered parent (dashboards).
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

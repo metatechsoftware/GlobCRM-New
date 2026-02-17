@@ -102,6 +102,11 @@ public class ApplicationDbContext
     public DbSet<FeedItem> FeedItems => Set<FeedItem>();
     public DbSet<FeedComment> FeedComments => Set<FeedComment>();
 
+    // Dashboards & Reporting DbSets
+    public DbSet<Dashboard> Dashboards => Set<Dashboard>();
+    public DbSet<DashboardWidget> DashboardWidgets => Set<DashboardWidget>();
+    public DbSet<Target> Targets => Set<Target>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -163,6 +168,11 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new NotificationPreferenceConfiguration());
         modelBuilder.ApplyConfiguration(new FeedItemConfiguration());
         modelBuilder.ApplyConfiguration(new FeedCommentConfiguration());
+
+        // Dashboards & Reporting entity configurations
+        modelBuilder.ApplyConfiguration(new DashboardConfiguration());
+        modelBuilder.ApplyConfiguration(new DashboardWidgetConfiguration());
+        modelBuilder.ApplyConfiguration(new TargetConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -267,5 +277,16 @@ public class ApplicationDbContext
 
         // Note: FeedComment does NOT need its own query filter --
         // it is filtered through its parent FeedItem FK which is already tenant-filtered.
+
+        // Global query filter: filter Dashboards by TenantId (tenant-scoped)
+        modelBuilder.Entity<Dashboard>().HasQueryFilter(
+            d => _tenantProvider == null || _tenantProvider.GetTenantId() == null || d.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Targets by TenantId (tenant-scoped)
+        modelBuilder.Entity<Target>().HasQueryFilter(
+            t => _tenantProvider == null || _tenantProvider.GetTenantId() == null || t.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: DashboardWidget does NOT need its own query filter --
+        // it is filtered through its parent Dashboard FK which is already tenant-filtered.
     }
 }
