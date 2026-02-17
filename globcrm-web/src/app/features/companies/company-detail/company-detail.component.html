@@ -153,6 +153,60 @@
               </a>
             </div>
           </ng-template>
+
+          <!-- Activities tab content (index 3) -->
+          <ng-template>
+            @if (activitiesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (linkedActivities().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>task_alt</mat-icon>
+                <span>No activities linked to this company.</span>
+                <a mat-stroked-button routerLink="/activities/new">Create Activity</a>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Assigned To</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (activity of linkedActivities(); track activity.id) {
+                    <tr>
+                      <td><a [routerLink]="['/activities', activity.id]">{{ activity.subject }}</a></td>
+                      <td>{{ activity.type }}</td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getStatusColor(activity.status) + '22'"
+                                    [style.color]="getStatusColor(activity.status)">
+                            {{ activity.status }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getPriorityColor(activity.priority) + '22'"
+                                    [style.color]="getPriorityColor(activity.priority)">
+                            {{ activity.priority }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>{{ activity.dueDate ? (activity.dueDate | date:'mediumDate') : '-' }}</td>
+                      <td>{{ activity.assignedToName || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 

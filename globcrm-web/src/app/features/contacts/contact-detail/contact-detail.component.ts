@@ -6,7 +6,9 @@ import {
   signal,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -20,6 +22,8 @@ import { EntityTimelineComponent } from '../../../shared/components/entity-timel
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { ContactService } from '../contact.service';
 import { ContactDetailDto } from '../contact.models';
+import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../activities/activity.models';
+import { ActivityService } from '../../activities/activity.service';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -32,7 +36,9 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
   standalone: true,
   imports: [
     RouterLink,
+    DatePipe,
     MatButtonModule,
+    MatChipsModule,
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
@@ -222,6 +228,54 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       opacity: 0.4;
     }
 
+    .tab-loading, .tab-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 32px;
+      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+    }
+
+    .tab-empty mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      opacity: 0.5;
+    }
+
+    .activities-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .activities-table th {
+      text-align: left;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      padding: 8px 12px;
+      border-bottom: 2px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+    }
+
+    .activities-table td {
+      padding: 10px 12px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      vertical-align: middle;
+    }
+
+    .activities-table a {
+      color: var(--mat-sys-primary, #1976d2);
+      text-decoration: none;
+    }
+
+    .activities-table a:hover {
+      text-decoration: underline;
+    }
+
     .detail-not-found {
       display: flex;
       flex-direction: column;
@@ -256,6 +310,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly contactService = inject(ContactService);
+  private readonly activityService = inject(ActivityService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
 
@@ -266,6 +321,11 @@ export class ContactDetailComponent implements OnInit {
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
   timelineLoading = signal(false);
+
+  /** Activities linked to this contact. */
+  linkedActivities = signal<ActivityListDto[]>([]);
+  activitiesLoading = signal(false);
+  activitiesLoaded = signal(false);
 
   /** Tab configuration for contact detail. */
   readonly tabs = CONTACT_TABS;
@@ -312,10 +372,41 @@ export class ContactDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change. */
+  /** Handle tab change -- lazy load activities when Activities tab is selected. */
   onTabChanged(index: number): void {
-    // Company tab data comes from the contact detail DTO itself,
-    // so no lazy loading is needed here.
+    // Company tab data comes from the contact detail DTO itself.
+    if (index === 3) {
+      this.loadLinkedActivities();
+    }
+  }
+
+  /** Load activities linked to this contact (lazy on tab switch). */
+  private loadLinkedActivities(): void {
+    if (this.activitiesLoaded() || this.activitiesLoading()) return;
+
+    this.activitiesLoading.set(true);
+    this.activityService
+      .getList({ linkedEntityType: 'Contact', linkedEntityId: this.contactId, page: 1, pageSize: 50 })
+      .subscribe({
+        next: (result) => {
+          this.linkedActivities.set(result.items);
+          this.activitiesLoading.set(false);
+          this.activitiesLoaded.set(true);
+        },
+        error: () => {
+          this.activitiesLoading.set(false);
+        },
+      });
+  }
+
+  /** Get status color for activity chip. */
+  getStatusColor(status: string): string {
+    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+  }
+
+  /** Get priority color for activity chip. */
+  getPriorityColor(priority: string): string {
+    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
   }
 
   /** Handle delete with confirmation dialog. */

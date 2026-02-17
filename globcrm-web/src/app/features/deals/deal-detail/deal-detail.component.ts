@@ -33,6 +33,8 @@ import { ContactService } from '../../contacts/contact.service';
 import { ContactDto } from '../../contacts/contact.models';
 import { ProductService } from '../../products/product.service';
 import { ProductDto } from '../../products/product.models';
+import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../activities/activity.models';
+import { ActivityService } from '../../activities/activity.service';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -74,6 +76,7 @@ export class DealDetailComponent implements OnInit {
   private readonly dealService = inject(DealService);
   private readonly contactService = inject(ContactService);
   private readonly productService = inject(ProductService);
+  private readonly activityService = inject(ActivityService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -85,6 +88,11 @@ export class DealDetailComponent implements OnInit {
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
   timelineLoading = signal(false);
+
+  /** Activities linked to this deal. */
+  linkedActivities = signal<ActivityListDto[]>([]);
+  activitiesLoading = signal(false);
+  activitiesLoaded = signal(false);
 
   /** Tab configuration for deal detail. */
   readonly tabs = DEAL_TABS;
@@ -149,10 +157,40 @@ export class DealDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change. */
+  /** Handle tab change -- lazy load activities when Activities tab is selected. */
   onTabChanged(index: number): void {
-    // All tab data comes from deal detail DTO + timeline,
-    // both loaded on init. No lazy loading needed.
+    if (index === 3) {
+      this.loadLinkedActivities();
+    }
+  }
+
+  /** Load activities linked to this deal (lazy on tab switch). */
+  private loadLinkedActivities(): void {
+    if (this.activitiesLoaded() || this.activitiesLoading()) return;
+
+    this.activitiesLoading.set(true);
+    this.activityService
+      .getList({ linkedEntityType: 'Deal', linkedEntityId: this.dealId, page: 1, pageSize: 50 })
+      .subscribe({
+        next: (result) => {
+          this.linkedActivities.set(result.items);
+          this.activitiesLoading.set(false);
+          this.activitiesLoaded.set(true);
+        },
+        error: () => {
+          this.activitiesLoading.set(false);
+        },
+      });
+  }
+
+  /** Get status color for activity chip. */
+  getStatusColor(status: string): string {
+    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+  }
+
+  /** Get priority color for activity chip. */
+  getPriorityColor(priority: string): string {
+    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
   }
 
   /** Handle delete with confirmation dialog. */
