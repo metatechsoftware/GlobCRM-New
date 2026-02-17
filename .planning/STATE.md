@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 5 of 11 (Activities & Workflow)
-Plan: 8 of 10 in current phase
+Plan: 7 of 10 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 05-04 complete (Activity Sub-Resource Endpoints)
+Last activity: 2026-02-17 — Plan 05-06 complete (Activity List & Form)
 
-Progress: [██████████░░░░░░░░░░░░░░░░░░░░] 5/10 plans (Phase 5)
+Progress: [████████████░░░░░░░░░░░░░░░░░░] 6/10 plans (Phase 5)
 
 ## Performance Metrics
 
@@ -72,6 +72,7 @@ Progress: [██████████░░░░░░░░░░░░░
 | Phase 05 P02 | 3min | 2 tasks | 4 files |
 | Phase 05 P03 | 3min | 2 tasks | 2 files |
 | Phase 05 P04 | 4min | 2 tasks | 1 files |
+| Phase 05 P06 | 3min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -220,6 +221,9 @@ Recent decisions affecting current work:
 - [05-04] Entity link accepts Quote/Request types for forward compatibility alongside Contact/Company/Deal
 - [05-04] Author-only edit/delete on comments/time entries with admin override via User.IsInRole("Admin")
 - [05-04] Follow/unfollow uses Activity:View permission (not Update) so any viewer can follow
+- [05-06] Activity form uses inline template/styles (single .ts file) matching deal-form pattern rather than separate .html/.scss files
+- [05-06] Kanban/Calendar route placeholders point to ActivityListComponent until dedicated components are built
+- [05-06] Activity form defaults: type=Task, priority=Medium for ergonomic quick creation
 
 ### Pending Todos
 
@@ -232,5 +236,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 05-04-PLAN.md (Activity Sub-Resource Endpoints)
-Resume file: .planning/phases/05-activities-and-workflow/05-04-SUMMARY.md
+Stopped at: Completed 05-06-PLAN.md (Activity List & Form)
+Resume file: .planning/phases/05-activities-and-workflow/05-06-SUMMARY.md
