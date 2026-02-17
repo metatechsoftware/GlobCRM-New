@@ -67,6 +67,7 @@ Progress: [███░░░░░░░░░░░░░░░░░░░░
 | Phase 04 P07 | 5min | 2 tasks | 7 files |
 | Phase 04 P09 | 4min | 2 tasks | 10 files |
 | Phase 04 P10 | 1min | 1 task | 1 files |
+| Phase 05 P01 | 3min | 2 tasks | 22 files |
 | Phase 05 P05 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
@@ -198,6 +199,9 @@ Recent decisions affecting current work:
 - [04-09] Deals navbar link positioned between Products and Team (Dashboard | Companies | Contacts | Products | Deals | Team | Settings)
 - [04-09] Deals tab on Company/Contact detail pages uses placeholder with View Deals link passing companyId/contactId as query params
 - [04-10] Backend string fix only (stage_change -> stage_changed); no frontend changes needed since frontend already used correct key
+- [05-01] ActivityStatusHistory uses enum values (not FK) unlike DealStageHistory -- activities have fixed workflow states, not configurable stages
+- [05-01] ActivityLink is polymorphic (EntityType string + EntityId Guid) with no FK constraints for flexible entity linking
+- [05-01] ActivityFollower uses Cascade delete on User FK (user removal clears follows) unlike other user FKs which use SetNull
 - [05-05] ActivityService uses HttpClient directly for FormData upload and blob download (ApiService only handles JSON)
 - [05-05] ActivityStore default sort is createdAt desc (most recent first), component-provided with ViewFilter-based filters
 - [05-05] Sub-entity API methods nested under parent path (/activities/{id}/comments, /attachments, /time-entries, /links, /followers)
