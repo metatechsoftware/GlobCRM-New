@@ -9,8 +9,7 @@ namespace GlobCRM.Infrastructure.MultiTenancy;
 
 /// <summary>
 /// Seeds initial data for newly created organizations.
-/// Creates Company, Contact, and Product entities from a seed manifest.
-/// Pipeline and Deal seeding deferred until those entities exist (Phase 4+).
+/// Creates Company, Contact, Product, Pipeline, PipelineStage, and Deal entities from a seed manifest.
 /// </summary>
 public class TenantSeeder : ITenantSeeder
 {
@@ -45,7 +44,7 @@ public class TenantSeeder : ITenantSeeder
         var seedManifest = CreateSeedManifest();
 
         _logger.LogInformation(
-            "Seed manifest created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, {DealCount} deals (deferred)",
+            "Seed manifest created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, {DealCount} deals",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
@@ -110,19 +109,72 @@ public class TenantSeeder : ITenantSeeder
             _db.Products.Add(product);
         }
 
+        // Create Pipeline entity from manifest
+        var pipeline = new Pipeline
+        {
+            TenantId = organizationId,
+            Name = seedManifest.Pipeline.Name,
+            IsDefault = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+        _db.Pipelines.Add(pipeline);
+
+        // Create PipelineStage entities from manifest
+        var stageMap = new Dictionary<string, PipelineStage>();
+        foreach (var stageSeed in seedManifest.Pipeline.Stages)
+        {
+            var stage = new PipelineStage
+            {
+                PipelineId = pipeline.Id,
+                Name = stageSeed.Name,
+                SortOrder = stageSeed.Order,
+                Color = stageSeed.Color,
+                DefaultProbability = stageSeed.DefaultProbability,
+                IsWon = stageSeed.IsWon,
+                IsLost = stageSeed.IsLost,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.PipelineStages.Add(stage);
+            stageMap[stageSeed.Name] = stage;
+        }
+
+        // Create Deal entities from manifest
+        var dealOffset = 0;
+        foreach (var dealSeed in seedManifest.Deals)
+        {
+            var dealStage = stageMap.GetValueOrDefault(dealSeed.Stage);
+            var dealCompany = companyMap.GetValueOrDefault(dealSeed.CompanyRef);
+
+            var deal = new Deal
+            {
+                TenantId = organizationId,
+                Title = dealSeed.Title,
+                Value = dealSeed.Value,
+                PipelineId = pipeline.Id,
+                PipelineStageId = dealStage?.Id ?? stageMap.Values.First().Id,
+                Probability = dealStage?.DefaultProbability ?? 0.10m,
+                CompanyId = dealCompany?.Id,
+                ExpectedCloseDate = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30 + (dealOffset * 30))),
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.Deals.Add(deal);
+            dealOffset++;
+        }
+
         await _db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products",
+            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
-            seedManifest.Products.Count);
-
-        // Deal and Pipeline seeding deferred until those entities exist (Phase 4+)
-        _logger.LogDebug(
-            "Deal and pipeline seeding deferred for organization {OrgId} -- entities not yet available",
-            organizationId);
+            seedManifest.Products.Count,
+            seedManifest.Pipeline.Stages.Count,
+            seedManifest.Deals.Count);
 
         _logger.LogDebug(
             "Seed manifest details for {OrgId}: {Manifest}",
@@ -143,12 +195,12 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Sales Pipeline",
                 Stages =
                 [
-                    new PipelineStageSeed { Name = "Lead", Order = 1, Color = "#90caf9" },
-                    new PipelineStageSeed { Name = "Qualified", Order = 2, Color = "#42a5f5" },
-                    new PipelineStageSeed { Name = "Proposal", Order = 3, Color = "#1976d2" },
-                    new PipelineStageSeed { Name = "Negotiation", Order = 4, Color = "#1565c0" },
-                    new PipelineStageSeed { Name = "Closed Won", Order = 5, Color = "#00897b" },
-                    new PipelineStageSeed { Name = "Closed Lost", Order = 6, Color = "#ef5350" }
+                    new PipelineStageSeed { Name = "Lead", Order = 1, Color = "#90caf9", DefaultProbability = 0.10m },
+                    new PipelineStageSeed { Name = "Qualified", Order = 2, Color = "#42a5f5", DefaultProbability = 0.25m },
+                    new PipelineStageSeed { Name = "Proposal", Order = 3, Color = "#1976d2", DefaultProbability = 0.50m },
+                    new PipelineStageSeed { Name = "Negotiation", Order = 4, Color = "#1565c0", DefaultProbability = 0.75m },
+                    new PipelineStageSeed { Name = "Closed Won", Order = 5, Color = "#00897b", DefaultProbability = 1.00m, IsWon = true },
+                    new PipelineStageSeed { Name = "Closed Lost", Order = 6, Color = "#ef5350", DefaultProbability = 0.00m, IsLost = true }
                 ]
             },
             Contacts =
@@ -269,6 +321,9 @@ public class PipelineStageSeed
     public string Name { get; set; } = string.Empty;
     public int Order { get; set; }
     public string Color { get; set; } = string.Empty;
+    public decimal DefaultProbability { get; set; }
+    public bool IsWon { get; set; }
+    public bool IsLost { get; set; }
 }
 
 public class ContactSeed
