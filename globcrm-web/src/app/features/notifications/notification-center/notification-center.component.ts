@@ -65,6 +65,17 @@ import { NotificationDto } from '../notification.models';
                     <div class="notification-center__item-message">{{ truncateMessage(notification.message) }}</div>
                     <div class="notification-center__item-time">{{ getRelativeTime(notification.createdAt) }}</div>
                   </div>
+                  @if (notification.isRead) {
+                    <button
+                      mat-icon-button
+                      class="notification-center__unread-btn"
+                      (click)="onMarkAsUnread($event, notification)"
+                      title="Mark as unread"
+                      aria-label="Mark as unread"
+                    >
+                      <mat-icon>markunread</mat-icon>
+                    </button>
+                  }
                 </div>
               }
             }
@@ -209,6 +220,27 @@ import { NotificationDto } from '../notification.models';
       color: var(--color-text-muted);
       margin-top: var(--space-1);
     }
+
+    .notification-center__unread-btn {
+      flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      align-self: center;
+      opacity: 0;
+      transition: opacity var(--duration-fast) var(--ease-default);
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: var(--color-text-muted);
+      }
+    }
+
+    .notification-center__item:hover .notification-center__unread-btn {
+      opacity: 1;
+    }
   `],
 })
 export class NotificationCenterComponent {
@@ -270,6 +302,12 @@ export class NotificationCenterComponent {
   /** Mark all notifications as read. */
   onMarkAllAsRead(): void {
     this.store.markAllAsRead();
+  }
+
+  /** Mark a single notification as unread. Stops propagation to prevent navigation. */
+  onMarkAsUnread(event: MouseEvent, notification: NotificationDto): void {
+    event.stopPropagation();
+    this.store.markAsUnread(notification.id);
   }
 
   /** Handle notification click: mark as read and navigate to entity. */

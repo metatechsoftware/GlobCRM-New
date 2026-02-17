@@ -96,6 +96,24 @@ export const NotificationStore = signalStore(
         });
       },
 
+      /** Marks a notification as unread and updates local state. */
+      markAsUnread(id: string): void {
+        notificationService.markAsUnread(id).subscribe({
+          next: () => {
+            const notifications = store.notifications().map((n) =>
+              n.id === id ? { ...n, isRead: false } : n
+            );
+            const wasRead = store.notifications().find((n) => n.id === id && n.isRead);
+            patchState(store, {
+              notifications,
+              unreadCount: wasRead
+                ? store.unreadCount() + 1
+                : store.unreadCount(),
+            });
+          },
+        });
+      },
+
       /** Marks all notifications as read. */
       markAllAsRead(): void {
         notificationService.markAllAsRead().subscribe({
