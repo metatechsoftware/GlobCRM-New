@@ -90,6 +90,13 @@ export const SETTINGS_ROUTES: Routes = [
       ),
   },
   {
+    path: 'notification-preferences',
+    loadComponent: () =>
+      import('./notification-preferences/notification-preferences.component').then(
+        (m) => m.NotificationPreferencesComponent
+      ),
+  },
+  {
     path: '',
     redirectTo: 'roles',
     pathMatch: 'full',
