@@ -19,7 +19,7 @@ export const QUOTE_STATUSES: { value: QuoteStatus; label: string; color: string 
 export const QUOTE_TRANSITIONS: Record<QuoteStatus, QuoteStatus[]> = {
   Draft: ['Sent'],
   Sent: ['Accepted', 'Rejected', 'Expired', 'Draft'],
-  Accepted: ['Draft'],
+  Accepted: [],
   Rejected: ['Draft'],
   Expired: ['Draft'],
 };
