@@ -1,13 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
+import { NotificationCenterComponent } from '../../../features/notifications/notification-center/notification-center.component';
 
 @Component({
   selector: 'app-navbar',
@@ -16,11 +16,11 @@ import { AuthService } from '../../../core/auth/auth.service';
     CommonModule,
     RouterLink,
     RouterLinkActive,
-    MatToolbarModule,
     MatButtonModule,
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
+    NotificationCenterComponent,
   ],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
