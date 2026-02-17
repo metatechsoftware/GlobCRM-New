@@ -57,6 +57,7 @@ Progress: [██████] 1/9 plans (Phase 4)
 | Phase 03 P07 | 12min | 2 tasks | 8 files |
 | Phase 03 P08 | 5min | 2 tasks | 8 files |
 | Phase 03 P09 | 2min | 1 task | 2 files |
+| Phase 04 P01 | 3min | 2 tasks | 18 files |
 | Phase 04 P04 | 2min | 2 tasks | 4 files |
 
 ## Accumulated Context
@@ -157,6 +158,10 @@ Recent decisions affecting current work:
 - [03-07] Added Emails disabled tab to CONTACT_TABS per plan specification (Phase 7 placeholder)
 - [03-09] Navbar link order: Dashboard | Companies | Contacts | Products | Team | Settings (entity pages between dashboard and admin)
 - [03-09] All entity routes use authGuard; permission enforcement at component level via directives
+- [04-01] Child entities (PipelineStage, DealContact, DealProduct, DealStageHistory) have no TenantId -- tenant isolation inherited via parent FK
+- [04-01] Pipeline.TeamId uses SetNull delete behavior -- pipeline survives team deletion but loses team scope
+- [04-01] Deal uses Restrict delete on PipelineId and PipelineStageId -- prevents pipeline/stage deletion with active deals
+- [04-01] DealProduct.UnitPrice is nullable decimal(18,4) -- null means use Product.UnitPrice as default
 - [04-04] DealService.getList extends EntityQueryParams with pipelineId/stageId for pipeline-scoped list and Kanban views
 - [04-04] DealStore adds pipelineId to state with setPipelineId method for pipeline-specific deal loading
 - [04-04] PipelineService is a separate service from DealService (pipeline admin vs deal operations)
