@@ -1,3 +1,5 @@
+using NpgsqlTypes;
+
 namespace GlobCRM.Domain.Entities;
 
 /// <summary>
@@ -90,6 +92,12 @@ public class Deal
     /// Optional description or notes about the deal.
     /// </summary>
     public string? Description { get; set; }
+
+    /// <summary>
+    /// PostgreSQL tsvector column for full-text search across Title, Description.
+    /// Generated and maintained by the database via HasGeneratedTsVectorColumn.
+    /// </summary>
+    public NpgsqlTsVector SearchVector { get; set; } = null!;
 
     /// <summary>
     /// Marks records created by TenantSeeder for bulk deletion of demo data.

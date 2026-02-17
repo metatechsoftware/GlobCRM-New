@@ -1,3 +1,5 @@
+using NpgsqlTypes;
+
 namespace GlobCRM.Domain.Entities;
 
 /// <summary>
@@ -41,6 +43,12 @@ public class Company
     /// Custom fields stored as JSONB. Keys are custom field definition IDs.
     /// </summary>
     public Dictionary<string, object?> CustomFields { get; set; } = new();
+
+    /// <summary>
+    /// PostgreSQL tsvector column for full-text search across Name, Industry, Email, City.
+    /// Generated and maintained by the database via HasGeneratedTsVectorColumn.
+    /// </summary>
+    public NpgsqlTsVector SearchVector { get; set; } = null!;
 
     /// <summary>
     /// Marks records created by TenantSeeder for bulk deletion of demo data.
