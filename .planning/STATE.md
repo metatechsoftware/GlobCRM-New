@@ -12,7 +12,7 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 6 of 11 (Quotes & Requests)
 Plan: 5 of 7 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Plan 06-02 complete (Quote & Request Repositories + Seed Data)
+Last activity: 2026-02-17 — Plan 06-05 complete (Quote List & Form Components)
 
 Progress: [████████████████████░░░░░░░░░░] 5/7 plans (Phase 6)
 
@@ -80,6 +80,7 @@ Progress: [████████████████████░░░
 | Phase 06 P04 | 3min | 2 tasks | 6 files |
 | Phase 06 P01 | 4min | 2 tasks | 21 files |
 | Phase 06 P02 | 5min | 2 tasks | 4 files |
+| Phase 06 P05 | 5min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -248,6 +249,9 @@ Recent decisions affecting current work:
 - [Phase 06]: QuoteLineItem child entity has no TenantId -- inherits tenant isolation via Quote FK (matching DealProduct pattern)
 - [06-02] QuoteRepository and RequestRepository DI registration in CrmEntityServiceExtensions (existing pattern) not DependencyInjection.cs
 - [06-02] RequestRepository uses dual-ownership scope (OwnerId + AssignedToId) matching Activity pattern for assigned entities
+- [06-05] Quote list uses inline template/styles with currency-formatted grandTotal via Intl.NumberFormat (matching product list pattern)
+- [06-05] Quote form line item totals use signal + valueChanges subscription for reactive computed display via calculateQuoteTotals
+- [06-05] Product search adds line item directly (auto-fill pattern) rather than per-row product dropdown
 
 ### Pending Todos
 
@@ -260,5 +264,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 06-02-PLAN.md (Quote & Request Repositories + Seed Data)
-Resume file: .planning/phases/06-quotes-and-requests/06-02-SUMMARY.md
+Stopped at: Completed 06-05-PLAN.md (Quote List & Form Components)
+Resume file: .planning/phases/06-quotes-and-requests/06-05-SUMMARY.md
