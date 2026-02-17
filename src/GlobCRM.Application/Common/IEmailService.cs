@@ -32,4 +32,14 @@ public interface IEmailService
     /// <param name="role">Role being assigned (Admin or Member).</param>
     /// <param name="joinUrl">Full URL for accepting the invitation.</param>
     Task SendInvitationEmailAsync(string email, string orgName, string inviterName, string role, string joinUrl);
+
+    /// <summary>
+    /// Sends a notification email to a user (e.g., activity assigned, deal stage changed).
+    /// </summary>
+    /// <param name="email">Recipient email address.</param>
+    /// <param name="userName">Display name of the recipient.</param>
+    /// <param name="title">Notification title (e.g., "New activity assigned").</param>
+    /// <param name="message">Notification message body with context.</param>
+    /// <param name="entityUrl">Optional relative URL for "View in GlobCRM" deep link.</param>
+    Task SendNotificationEmailAsync(string email, string userName, string title, string message, string? entityUrl);
 }

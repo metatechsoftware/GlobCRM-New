@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Extensions.Logging;
 
-namespace GlobCRM.Api.Hubs;
+namespace GlobCRM.Infrastructure.Notifications;
 
 /// <summary>
 /// SignalR hub for real-time CRM notifications and feed updates.
 /// Server-push only for v1 -- no client-to-server methods.
 /// Connected clients are added to tenant and user groups for targeted delivery.
+/// Located in Infrastructure (not Api) to enable IHubContext injection by NotificationDispatcher
+/// without circular project references.
 /// </summary>
 [Authorize]
 public class CrmHub : Hub

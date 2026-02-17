@@ -99,6 +99,80 @@ public class SendGridEmailSender : IEmailService
         await SendEmailAsync(email, $"You're invited to join {orgName} on GlobCRM", html, "invitation");
     }
 
+    /// <inheritdoc />
+    public async Task SendNotificationEmailAsync(string email, string userName, string title, string message, string? entityUrl)
+    {
+        _logger.LogInformation("=== NOTIFICATION EMAIL ===\nTo: {Email}\nTitle: {Title}\nEntityUrl: {EntityUrl}\n==========================", email, title, entityUrl);
+
+        var html = BuildNotificationEmailHtml(userName, title, message, entityUrl);
+
+        await SendEmailAsync(email, $"{title} - GlobCRM", html, "notification");
+    }
+
+    /// <summary>
+    /// Builds a branded inline HTML notification email matching existing GlobCRM email style.
+    /// </summary>
+    private string BuildNotificationEmailHtml(string userName, string title, string message, string? entityUrl)
+    {
+        var buttonHtml = !string.IsNullOrEmpty(entityUrl)
+            ? $@"<tr>
+                    <td style=""padding: 20px 0 0 0;"">
+                        <a href=""https://{_baseUrl}{entityUrl}""
+                           style=""display: inline-block; background-color: #4F46E5; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;"">
+                            View in GlobCRM
+                        </a>
+                    </td>
+                </tr>"
+            : "";
+
+        return $@"<!DOCTYPE html>
+<html>
+<head><meta charset=""utf-8""><meta name=""viewport"" content=""width=device-width, initial-scale=1.0""></head>
+<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;"">
+<table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"" style=""background-color: #f4f4f5;"">
+<tr>
+<td style=""padding: 40px 20px;"">
+<table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""560"" style=""margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"">
+    <tr>
+        <td style=""padding: 32px 40px 24px; border-bottom: 1px solid #e4e4e7;"">
+            <span style=""font-size: 20px; font-weight: 700; color: #4F46E5;"">GlobCRM</span>
+        </td>
+    </tr>
+    <tr>
+        <td style=""padding: 32px 40px;"">
+            <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 8px;"">
+                        {System.Net.WebUtility.HtmlEncode(title)}
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #71717a; padding-bottom: 16px;"">
+                        Hi {System.Net.WebUtility.HtmlEncode(userName)},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6;"">
+                        {System.Net.WebUtility.HtmlEncode(message)}
+                    </td>
+                </tr>
+                {buttonHtml}
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style=""padding: 24px 40px; border-top: 1px solid #e4e4e7; font-size: 12px; color: #a1a1aa; text-align: center;"">
+            You received this email because of your notification preferences in GlobCRM.
+        </td>
+    </tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>";
+    }
+
     /// <summary>
     /// Sends an email via SendGrid with structured logging for delivery tracking.
     /// </summary>

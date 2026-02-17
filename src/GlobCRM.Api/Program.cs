@@ -2,7 +2,6 @@ using Finbuckle.MultiTenant.AspNetCore.Extensions;
 using FluentValidation;
 using GlobCRM.Api.Auth;
 using GlobCRM.Api.Controllers;
-using GlobCRM.Api.Hubs;
 using GlobCRM.Api.Middleware;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Infrastructure;
@@ -14,6 +13,8 @@ using GlobCRM.Infrastructure.Invitations;
 using GlobCRM.Infrastructure.CrmEntities;
 using GlobCRM.Infrastructure.Organizations;
 using GlobCRM.Infrastructure.Gmail;
+using GlobCRM.Infrastructure.Notifications;
+using GlobCRM.Infrastructure.Feed;
 using GlobCRM.Infrastructure.Pdf;
 using Microsoft.AspNetCore.Identity;
 using Serilog;
@@ -59,6 +60,10 @@ builder.Services.AddHostedService<EmailSyncBackgroundService>();
 
 // SignalR for real-time notifications and feed updates
 builder.Services.AddSignalR();
+
+// Notification and feed subsystem services
+builder.Services.AddNotificationServices();
+builder.Services.AddFeedServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
