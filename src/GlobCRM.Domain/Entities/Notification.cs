@@ -18,9 +18,9 @@ public class Notification
 
     /// <summary>
     /// The user who should receive this notification.
-    /// Set to null if the user is deleted (SET NULL on delete).
+    /// Nullable to support SET NULL on delete when user is removed.
     /// </summary>
-    public Guid UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     /// <summary>
     /// Category of the notification for filtering and preference matching.

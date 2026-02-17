@@ -96,6 +96,12 @@ public class ApplicationDbContext
     public DbSet<EmailMessage> EmailMessages => Set<EmailMessage>();
     public DbSet<EmailThread> EmailThreads => Set<EmailThread>();
 
+    // Notifications & Feed DbSets
+    public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<NotificationPreference> NotificationPreferences => Set<NotificationPreference>();
+    public DbSet<FeedItem> FeedItems => Set<FeedItem>();
+    public DbSet<FeedComment> FeedComments => Set<FeedComment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -151,6 +157,12 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new EmailAccountConfiguration());
         modelBuilder.ApplyConfiguration(new EmailMessageConfiguration());
         modelBuilder.ApplyConfiguration(new EmailThreadConfiguration());
+
+        // Notifications & Feed entity configurations
+        modelBuilder.ApplyConfiguration(new NotificationConfiguration());
+        modelBuilder.ApplyConfiguration(new NotificationPreferenceConfiguration());
+        modelBuilder.ApplyConfiguration(new FeedItemConfiguration());
+        modelBuilder.ApplyConfiguration(new FeedCommentConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -240,5 +252,20 @@ public class ApplicationDbContext
         // Global query filter: filter EmailThreads by TenantId (tenant-scoped)
         modelBuilder.Entity<EmailThread>().HasQueryFilter(
             e => _tenantProvider == null || _tenantProvider.GetTenantId() == null || e.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Notifications by TenantId (tenant-scoped)
+        modelBuilder.Entity<Notification>().HasQueryFilter(
+            n => _tenantProvider == null || _tenantProvider.GetTenantId() == null || n.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter NotificationPreferences by TenantId (tenant-scoped)
+        modelBuilder.Entity<NotificationPreference>().HasQueryFilter(
+            np => _tenantProvider == null || _tenantProvider.GetTenantId() == null || np.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter FeedItems by TenantId (tenant-scoped)
+        modelBuilder.Entity<FeedItem>().HasQueryFilter(
+            f => _tenantProvider == null || _tenantProvider.GetTenantId() == null || f.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: FeedComment does NOT need its own query filter --
+        // it is filtered through its parent FeedItem FK which is already tenant-filtered.
     }
 }

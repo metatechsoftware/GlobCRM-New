@@ -337,6 +337,54 @@ COMMENT ON POLICY tenant_isolation_email_threads ON email_threads IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- notifications - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE notifications FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_notifications ON notifications
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_notifications ON notifications IS
+    'Ensures notification queries only return notifications for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- notification_preferences - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE notification_preferences ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE notification_preferences FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_notification_preferences ON notification_preferences
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_notification_preferences ON notification_preferences IS
+    'Ensures notification preferences are isolated per tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- feed_items - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE feed_items ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE feed_items FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_feed_items ON feed_items
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_feed_items ON feed_items IS
+    'Ensures feed item queries only return items for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: feed_comments does NOT need an RLS policy. It is accessed through
+-- FK joins from its tenant-filtered parent (feed_items).
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter
