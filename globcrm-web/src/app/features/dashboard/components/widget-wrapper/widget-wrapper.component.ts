@@ -1,13 +1,15 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  inject,
   input,
   output,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { WidgetDto, MetricResultDto, TargetDto } from '../../models/dashboard.models';
+import { WidgetDto, MetricResultDto, MetricType, TargetDto } from '../../models/dashboard.models';
 import { KpiCardComponent } from '../widgets/kpi-card/kpi-card.component';
 import { ChartWidgetComponent } from '../widgets/chart-widget/chart-widget.component';
 import { LeaderboardComponent } from '../widgets/leaderboard/leaderboard.component';
@@ -120,6 +122,14 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       overflow: hidden;
       min-height: 0;
     }
+
+    .widget-wrapper__content--drilldown {
+      cursor: pointer;
+    }
+
+    .widget-wrapper__content--drilldown:hover {
+      background: var(--color-highlight, rgba(217, 123, 58, 0.04));
+    }
   `,
   template: `
     <div class="widget-wrapper">
@@ -149,7 +159,11 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
           </mat-menu>
         }
       </div>
-      <div class="widget-wrapper__content">
+      <div
+        class="widget-wrapper__content"
+        [class.widget-wrapper__content--drilldown]="!isEditing() && drilldownRoute"
+        (click)="onDrillDown()"
+      >
         @switch (widget().type) {
           @case ('KpiCard') {
             <app-kpi-card
@@ -214,4 +228,45 @@ export class WidgetWrapperComponent {
 
   readonly edit = output<void>();
   readonly remove = output<void>();
+
+  private readonly router = inject(Router);
+
+  /** Map of MetricType to entity route for drill-down navigation. */
+  private static readonly METRIC_ROUTE_MAP: Record<MetricType, string> = {
+    DealCount: '/deals',
+    DealPipelineValue: '/deals',
+    DealsByStage: '/deals',
+    DealsWon: '/deals',
+    DealsLost: '/deals',
+    WinRate: '/deals',
+    AverageDealValue: '/deals',
+    SalesLeaderboard: '/deals',
+    ActivityCount: '/activities',
+    ActivitiesByType: '/activities',
+    ActivitiesByStatus: '/activities',
+    ActivitiesCompleted: '/activities',
+    OverdueActivities: '/activities',
+    ActivityLeaderboard: '/activities',
+    QuoteTotal: '/quotes',
+    QuotesByStatus: '/quotes',
+    ContactsCreated: '/contacts',
+    CompaniesCreated: '/companies',
+    RequestsByStatus: '/requests',
+    RequestsByPriority: '/requests',
+  };
+
+  /** Resolved drill-down route for the current widget's metric type. */
+  get drilldownRoute(): string | null {
+    const metricType = this.widget().config['metricType'] as MetricType | undefined;
+    if (!metricType) return null;
+    return WidgetWrapperComponent.METRIC_ROUTE_MAP[metricType] ?? null;
+  }
+
+  /** Navigate to the entity list page on click (view mode only). */
+  onDrillDown(): void {
+    if (this.isEditing()) return;
+    const route = this.drilldownRoute;
+    if (!route) return;
+    this.router.navigate([route]);
+  }
 }

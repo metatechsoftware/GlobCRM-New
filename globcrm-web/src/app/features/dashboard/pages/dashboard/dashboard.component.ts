@@ -16,9 +16,11 @@ import {
   CreateDashboardRequest,
   UpdateDashboardRequest,
 } from '../../models/dashboard.models';
+import { MatTabsModule } from '@angular/material/tabs';
 import { DashboardGridComponent } from '../../components/dashboard-grid/dashboard-grid.component';
 import { DashboardSelectorComponent } from '../../components/dashboard-selector/dashboard-selector.component';
 import { DateRangeFilterComponent } from '../../components/date-range-filter/date-range-filter.component';
+import { TargetManagementComponent } from '../../components/target-management/target-management.component';
 import {
   WidgetConfigDialogComponent,
   WidgetConfigDialogData,
@@ -73,9 +75,11 @@ export class CreateDashboardDialogComponent {
     MatIconModule,
     MatDialogModule,
     MatSnackBarModule,
+    MatTabsModule,
     DashboardGridComponent,
     DashboardSelectorComponent,
     DateRangeFilterComponent,
+    TargetManagementComponent,
   ],
   providers: [DashboardStore],
   templateUrl: './dashboard.component.html',

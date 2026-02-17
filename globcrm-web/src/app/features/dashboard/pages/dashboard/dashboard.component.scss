@@ -58,6 +58,13 @@
   justify-content: flex-end;
 }
 
+// ─── Tabs ────────────────────────────────────────────────
+.dashboard__tabs {
+  ::ng-deep .mat-mdc-tab-body-content {
+    overflow: visible;
+  }
+}
+
 // ─── Toolbar (edit mode) ─────────────────────────────────
 .dashboard__toolbar {
   padding: var(--space-3) 0;

@@ -31,44 +31,53 @@
     </div>
   </header>
 
-  <!-- Add Widget button (edit mode only) -->
-  @if (store.isEditing()) {
-    <div class="dashboard__toolbar">
-      <button mat-stroked-button (click)="onAddWidget()">
-        <mat-icon>add</mat-icon>
-        Add Widget
-      </button>
-    </div>
-  }
+  <!-- Tabs: Dashboard and Targets -->
+  <mat-tab-group class="dashboard__tabs" animationDuration="200ms">
+    <mat-tab label="Dashboard">
+      <!-- Add Widget button (edit mode only) -->
+      @if (store.isEditing()) {
+        <div class="dashboard__toolbar">
+          <button mat-stroked-button (click)="onAddWidget()">
+            <mat-icon>add</mat-icon>
+            Add Widget
+          </button>
+        </div>
+      }
 
-  <!-- Dashboard Grid -->
-  @if (store.activeDashboard(); as dashboard) {
-    @if (store.isLoading()) {
-      <div class="dashboard__loading">
-        <mat-icon>hourglass_empty</mat-icon>
-        Loading dashboard...
-      </div>
-    } @else {
-      <app-dashboard-grid
-        [widgets]="dashboard.widgets"
-        [widgetData]="store.widgetData()"
-        [targets]="store.targets()"
-        [isEditing]="store.isEditing()"
-        (layoutChanged)="onLayoutChanged($event)"
-        (editWidget)="onEditWidget($event)"
-        (removeWidget)="onRemoveWidget($event)"
-      />
-    }
-  } @else if (!store.isLoading()) {
-    <!-- No dashboards exist yet -->
-    <div class="dashboard__empty">
-      <mat-icon>dashboard_customize</mat-icon>
-      <h2>No dashboards yet</h2>
-      <p>Create your first dashboard to start tracking KPIs and metrics.</p>
-      <button mat-flat-button color="primary" (click)="onCreateDashboard()">
-        <mat-icon>add</mat-icon>
-        Create Dashboard
-      </button>
-    </div>
-  }
+      <!-- Dashboard Grid -->
+      @if (store.activeDashboard(); as dashboard) {
+        @if (store.isLoading()) {
+          <div class="dashboard__loading">
+            <mat-icon>hourglass_empty</mat-icon>
+            Loading dashboard...
+          </div>
+        } @else {
+          <app-dashboard-grid
+            [widgets]="dashboard.widgets"
+            [widgetData]="store.widgetData()"
+            [targets]="store.targets()"
+            [isEditing]="store.isEditing()"
+            (layoutChanged)="onLayoutChanged($event)"
+            (editWidget)="onEditWidget($event)"
+            (removeWidget)="onRemoveWidget($event)"
+          />
+        }
+      } @else if (!store.isLoading()) {
+        <!-- No dashboards exist yet -->
+        <div class="dashboard__empty">
+          <mat-icon>dashboard_customize</mat-icon>
+          <h2>No dashboards yet</h2>
+          <p>Create your first dashboard to start tracking KPIs and metrics.</p>
+          <button mat-flat-button color="primary" (click)="onCreateDashboard()">
+            <mat-icon>add</mat-icon>
+            Create Dashboard
+          </button>
+        </div>
+      }
+    </mat-tab>
+
+    <mat-tab label="Targets">
+      <app-target-management [targets]="store.targets()" />
+    </mat-tab>
+  </mat-tab-group>
 </div>
