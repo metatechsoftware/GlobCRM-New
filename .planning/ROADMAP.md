@@ -237,10 +237,17 @@ Plans:
   4. Dashboard supports date range filters and drill-down into underlying data
   5. Admin can create team-wide dashboards visible to all users
   6. User can create personal dashboards for individual tracking
-**Plans**: TBD
+**Plans**: 8 plans
 
 Plans:
-- TBD
+- [ ] 09-01-PLAN.md -- Backend domain entities (Dashboard, DashboardWidget, Target) + enums + EF Core configs + migration + RLS
+- [ ] 09-02-PLAN.md -- Backend repositories + DashboardAggregationService (20 metrics) + DI registration
+- [ ] 09-03-PLAN.md -- Backend DashboardsController (dashboard CRUD + batched widget data + target CRUD)
+- [ ] 09-04-PLAN.md -- Frontend npm packages (ng2-charts, chart.js, angular-gridster2) + models + API service + signal store
+- [ ] 09-05-PLAN.md -- Frontend widget components (KPI card, chart, leaderboard, table, target progress) + widget wrapper
+- [ ] 09-06-PLAN.md -- Frontend dashboard grid (angular-gridster2) + widget config dialog + dashboard selector + date range filter
+- [ ] 09-07-PLAN.md -- Frontend dashboard page (replaces existing static dashboard) + routing
+- [ ] 09-08-PLAN.md -- Frontend target management + widget drill-down navigation + dashboard integration
 
 ### Phase 10: Data Operations
 **Goal**: CSV import with field mapping and global search across all entities
@@ -291,6 +298,6 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 6. Quotes & Requests | 7/7 | Complete | 2026-02-17 |
 | 7. Email Integration | 7/7 | Complete | 2026-02-17 |
 | 8. Real-Time & Notifications | 0/8 | Not started | - |
-| 9. Dashboards & Reporting | 0/TBD | Not started | - |
+| 9. Dashboards & Reporting | 0/8 | Not started | - |
 | 10. Data Operations | 0/TBD | Not started | - |
 | 11. Polish & Completeness | 0/TBD | Not started | - |
