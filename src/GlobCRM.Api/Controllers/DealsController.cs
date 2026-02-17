@@ -663,7 +663,7 @@ public class DealsController : ControllerBase
             entries.Add(new DealTimelineEntryDto
             {
                 Id = history.Id,
-                Type = "stage_change",
+                Type = "stage_changed",
                 Title = $"Stage changed: {history.FromStage.Name} -> {history.ToStage.Name}",
                 Description = $"Deal moved from '{history.FromStage.Name}' to '{history.ToStage.Name}'.",
                 Timestamp = history.ChangedAt,
