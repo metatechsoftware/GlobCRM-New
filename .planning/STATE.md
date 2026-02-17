@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 7 of 11 (Email Integration)
-Plan: 4 of 7 in current phase
+Plan: 5 of 7 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 07-04 (Email Frontend Data Layer)
+Last activity: 2026-02-17 — Completed 07-05 (Email UI Pages)
 
-Progress: [█████████████████░░░░░░░░░░░░░] 4/7 plans (Phase 7)
+Progress: [█████████████████████░░░░░░░░░] 5/7 plans (Phase 7)
 
 ## Performance Metrics
 
@@ -84,6 +84,7 @@ Progress: [█████████████████░░░░░░
 | Phase 06 P06 | 5min | 2 tasks | 3 files |
 | Phase 07 P01 | 3min | 2 tasks | 18 files |
 | Phase 07 P04 | 2min | 2 tasks | 3 files |
+| Phase 07 P05 | 3min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -265,6 +266,9 @@ Recent decisions affecting current work:
 - [07-04] EmailService uses ApiService for all endpoints (no HttpClient blob downloads needed for email)
 - [07-04] EmailStore includes selectedThread and accountStatus alongside standard list/detail state
 - [07-04] Optimistic list updates for markAsRead and toggleStar (update list item locally after API success)
+- [07-05] Email account settings route has no adminGuard -- email connection is per-user, not admin-only
+- [07-05] Compose dialog uses optional MAT_DIALOG_DATA injection for both new compose and reply scenarios
+- [07-05] OAuth redirect pattern: EmailService.connect() returns authorizationUrl, component redirects via window.location.href
 
 ### Pending Todos
 
@@ -277,5 +281,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 07-04-PLAN.md (Email Frontend Data Layer)
-Resume file: .planning/phases/07-email-integration/07-04-SUMMARY.md
+Stopped at: Completed 07-05-PLAN.md (Email UI Pages)
+Resume file: .planning/phases/07-email-integration/07-05-SUMMARY.md
