@@ -130,5 +130,18 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
         builder.HasIndex(c => c.CustomFields)
             .HasMethod("gin")
             .HasDatabaseName("idx_contacts_custom_fields_gin");
+
+        // Full-text search: generated tsvector column with GIN index
+        builder.HasGeneratedTsVectorColumn(
+            c => c.SearchVector,
+            "english",
+            c => new { c.FirstName, c.LastName, c.Email, c.JobTitle });
+
+        builder.Property(c => c.SearchVector)
+            .HasColumnName("search_vector");
+
+        builder.HasIndex(c => c.SearchVector)
+            .HasMethod("GIN")
+            .HasDatabaseName("idx_contacts_search_vector");
     }
 }

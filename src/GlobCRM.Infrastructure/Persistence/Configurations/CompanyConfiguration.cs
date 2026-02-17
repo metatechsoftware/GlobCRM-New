@@ -116,5 +116,18 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         builder.HasIndex(c => c.OwnerId)
             .HasDatabaseName("idx_companies_owner");
+
+        // Full-text search: generated tsvector column with GIN index
+        builder.HasGeneratedTsVectorColumn(
+            c => c.SearchVector,
+            "english",
+            c => new { c.Name, c.Industry, c.Email, c.City });
+
+        builder.Property(c => c.SearchVector)
+            .HasColumnName("search_vector");
+
+        builder.HasIndex(c => c.SearchVector)
+            .HasMethod("GIN")
+            .HasDatabaseName("idx_companies_search_vector");
     }
 }

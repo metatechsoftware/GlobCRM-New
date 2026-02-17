@@ -107,6 +107,10 @@ public class ApplicationDbContext
     public DbSet<DashboardWidget> DashboardWidgets => Set<DashboardWidget>();
     public DbSet<Target> Targets => Set<Target>();
 
+    // Import DbSets
+    public DbSet<ImportJob> ImportJobs => Set<ImportJob>();
+    public DbSet<ImportJobError> ImportJobErrors => Set<ImportJobError>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -173,6 +177,10 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new DashboardConfiguration());
         modelBuilder.ApplyConfiguration(new DashboardWidgetConfiguration());
         modelBuilder.ApplyConfiguration(new TargetConfiguration());
+
+        // Import entity configurations
+        modelBuilder.ApplyConfiguration(new ImportJobConfiguration());
+        modelBuilder.ApplyConfiguration(new ImportJobErrorConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -288,5 +296,12 @@ public class ApplicationDbContext
 
         // Note: DashboardWidget does NOT need its own query filter --
         // it is filtered through its parent Dashboard FK which is already tenant-filtered.
+
+        // Global query filter: filter ImportJobs by TenantId (tenant-scoped)
+        modelBuilder.Entity<ImportJob>().HasQueryFilter(
+            j => _tenantProvider == null || _tenantProvider.GetTenantId() == null || j.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: ImportJobError does NOT need its own query filter --
+        // it is filtered through its parent ImportJob FK which is already tenant-filtered.
     }
 }

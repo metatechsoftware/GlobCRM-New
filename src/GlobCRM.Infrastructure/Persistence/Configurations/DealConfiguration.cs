@@ -122,5 +122,18 @@ public class DealConfiguration : IEntityTypeConfiguration<Deal>
         builder.HasIndex(d => d.CustomFields)
             .HasMethod("gin")
             .HasDatabaseName("idx_deals_custom_fields_gin");
+
+        // Full-text search: generated tsvector column with GIN index
+        builder.HasGeneratedTsVectorColumn(
+            d => d.SearchVector,
+            "english",
+            d => new { d.Title, d.Description });
+
+        builder.Property(d => d.SearchVector)
+            .HasColumnName("search_vector");
+
+        builder.HasIndex(d => d.SearchVector)
+            .HasMethod("GIN")
+            .HasDatabaseName("idx_deals_search_vector");
     }
 }
