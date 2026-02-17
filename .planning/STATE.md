@@ -108,6 +108,7 @@ Progress: [███████████████████████
 | Phase 10 P03 | 3min | 2 tasks | 4 files |
 | Phase 10 P02 | 7min | 2 tasks | 8 files |
 | Phase 10 P05 | 2min | 2 tasks | 6 files |
+| Phase 10 P04 | 6min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -370,6 +371,9 @@ Recent decisions affecting current work:
 - [10-05] GlobalSearchComponent uses local component signals (not root-provided store) per research anti-pattern guidance -- search state is ephemeral
 - [10-05] Search bar positioned between spacer and notification center in navbar for right-side grouping with action items
 - [10-05] RecentSearchesService as separate root-provided service with localStorage 10-item cap and silent error handling
+- [Phase 10-04]: ImportStore tracks entityType in state for mapping step context (not just upload response)
+- [Phase 10-04]: SignalR ImportProgress event added to SignalRService following existing Subject/Observable pattern
+- [Phase 10-04]: Custom fields use 'custom:' prefix in mapping dropdown value to distinguish from core fields; stripped before API call
 
 ### Pending Todos
 
