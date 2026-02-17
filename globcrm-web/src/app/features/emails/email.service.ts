@@ -40,7 +40,7 @@ export class EmailService {
   }
 
   getThread(gmailThreadId: string): Observable<EmailThreadDto> {
-    return this.api.get<EmailThreadDto>(`${this.emailBasePath}/threads/${gmailThreadId}`);
+    return this.api.get<EmailThreadDto>(`${this.emailBasePath}/thread/${gmailThreadId}`);
   }
 
   send(request: SendEmailRequest): Observable<EmailDetailDto> {
