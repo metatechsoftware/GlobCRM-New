@@ -85,6 +85,7 @@ Progress: [█████████████████████░░
 | Phase 07 P01 | 3min | 2 tasks | 18 files |
 | Phase 07 P04 | 2min | 2 tasks | 3 files |
 | Phase 07 P05 | 3min | 2 tasks | 4 files |
+| Phase 07 P02 | 6min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -269,6 +270,8 @@ Recent decisions affecting current work:
 - [07-05] Email account settings route has no adminGuard -- email connection is per-user, not admin-only
 - [07-05] Compose dialog uses optional MAT_DIALOG_DATA injection for both new compose and reply scenarios
 - [07-05] OAuth redirect pattern: EmailService.connect() returns authorizationUrl, component redirects via window.location.href
+- [Phase 07-02]: GmailOAuthService uses GoogleAuthorizationCodeFlow.CreateAuthorizationCodeRequest (not GoogleAuthorizationCodeRequestUrl which doesn't exist)
+- [Phase 07-02]: GmailSyncService uses ApplicationDbContext directly for contact auto-linking (simpler than adding IContactRepository methods for infrastructure-level service)
 
 ### Pending Todos
 
