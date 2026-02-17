@@ -142,10 +142,19 @@ Plans:
   7. User can follow/watch activities to receive notifications on changes
   8. User can link activities to contacts, companies, deals, quotes, and requests
   9. Entity detail pages show activity timeline with all linked activities
-**Plans**: TBD
+**Plans**: 10 plans
 
 Plans:
-- TBD
+- [ ] 05-01-PLAN.md -- Backend domain entities (Activity + 6 child entities) + enums + EF Core configs + migration + RLS
+- [ ] 05-02-PLAN.md -- Backend repository (ActivityRepository with filter/sort/scope/Kanban) + TenantSeeder seed data
+- [ ] 05-03-PLAN.md -- Backend ActivitiesController core CRUD + status workflow + Kanban data + timeline
+- [ ] 05-04-PLAN.md -- Backend sub-resource endpoints (comments, attachments, time entries, links, followers)
+- [ ] 05-05-PLAN.md -- Frontend TypeScript models, ActivityService (21 methods), and ActivityStore signal store
+- [ ] 05-06-PLAN.md -- Frontend activity list (DynamicTable) + activity create/edit form
+- [ ] 05-07-PLAN.md -- Frontend activity detail page with 6 tabs (details, comments, attachments, time log, links, timeline)
+- [ ] 05-08-PLAN.md -- Frontend Kanban board with fixed workflow columns and CDK drag-drop
+- [ ] 05-09-PLAN.md -- Frontend calendar view (FullCalendar dayGridMonth with priority coloring)
+- [ ] 05-10-PLAN.md -- Integration: routes, navbar, entity detail Activities tab enablement
 
 ### Phase 6: Quotes & Requests
 **Goal**: Line-item quote builder with PDF generation and support request tracking
@@ -259,7 +268,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 2. Core Infrastructure | 0/14 | Not started | - |
 | 3. Core CRM Entities | 0/9 | Not started | - |
 | 4. Deals & Pipelines | 0/TBD | Not started | - |
-| 5. Activities & Workflow | 0/TBD | Not started | - |
+| 5. Activities & Workflow | 0/10 | Planned | - |
 | 6. Quotes & Requests | 0/TBD | Not started | - |
 | 7. Email Integration | 0/TBD | Not started | - |
 | 8. Real-Time & Notifications | 0/TBD | Not started | - |
