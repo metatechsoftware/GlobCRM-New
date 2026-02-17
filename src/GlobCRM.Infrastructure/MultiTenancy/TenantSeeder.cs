@@ -10,7 +10,7 @@ namespace GlobCRM.Infrastructure.MultiTenancy;
 
 /// <summary>
 /// Seeds initial data for newly created organizations.
-/// Creates Company, Contact, Product, Pipeline, PipelineStage, Deal, and Activity entities from a seed manifest.
+/// Creates Company, Contact, Product, Pipeline, PipelineStage, Deal, Activity, Quote, and Request entities from a seed manifest.
 /// </summary>
 public class TenantSeeder : ITenantSeeder
 {
@@ -95,6 +95,7 @@ public class TenantSeeder : ITenantSeeder
         }
 
         // Create Product entities from manifest
+        var productMap = new Dictionary<string, Product>();
         foreach (var productSeed in seedManifest.Products)
         {
             var product = new Product
@@ -111,6 +112,7 @@ public class TenantSeeder : ITenantSeeder
                 UpdatedAt = DateTimeOffset.UtcNow
             };
             _db.Products.Add(product);
+            productMap[productSeed.Name] = product;
         }
 
         // Create Pipeline entity from manifest
@@ -274,10 +276,212 @@ public class TenantSeeder : ITenantSeeder
             });
         }
 
+        // Create Quote entities with line items
+        var seedDate = DateOnly.FromDateTime(DateTime.UtcNow);
+        var seedFirstCompany = companyMap.GetValueOrDefault("TechVision Inc.");
+        var seedSecondCompany = companyMap.GetValueOrDefault("CloudScale Solutions");
+        var seedFirstContact = contactMap.GetValueOrDefault("sarah.chen@example.com");
+        var seedSecondContact = contactMap.GetValueOrDefault("aisha.patel@example.com");
+        var seedFirstDeal = dealMap.GetValueOrDefault("Enterprise CRM License");
+        var seedProduct1 = productMap.GetValueOrDefault("CRM Enterprise License");
+        var seedProduct2 = productMap.GetValueOrDefault("Premium Support");
+
+        // Helper: compute line item totals
+        static QuoteLineItem CreateLineItem(Guid quoteId, string description, int sortOrder,
+            decimal quantity, decimal unitPrice, decimal discountPercent, decimal taxPercent, Guid? productId = null)
+        {
+            var lineTotal = quantity * unitPrice;
+            var discountAmount = lineTotal * discountPercent / 100m;
+            var taxAmount = (lineTotal - discountAmount) * taxPercent / 100m;
+            var netTotal = lineTotal - discountAmount + taxAmount;
+
+            return new QuoteLineItem
+            {
+                QuoteId = quoteId,
+                ProductId = productId,
+                Description = description,
+                SortOrder = sortOrder,
+                Quantity = quantity,
+                UnitPrice = unitPrice,
+                DiscountPercent = discountPercent,
+                TaxPercent = taxPercent,
+                LineTotal = lineTotal,
+                DiscountAmount = discountAmount,
+                TaxAmount = taxAmount,
+                NetTotal = netTotal
+            };
+        }
+
+        // Quote 1: "Website Redesign Proposal" -- Draft, linked to first company and contact
+        var quote1 = new Quote
+        {
+            TenantId = organizationId,
+            QuoteNumber = "Q-0001",
+            Title = "Website Redesign Proposal",
+            Description = "Complete website redesign including UX research, frontend development, and QA testing.",
+            Status = QuoteStatus.Draft,
+            IssueDate = seedDate,
+            ExpiryDate = seedDate.AddDays(30),
+            VersionNumber = 1,
+            CompanyId = seedFirstCompany?.Id,
+            ContactId = seedFirstContact?.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var q1Line1 = CreateLineItem(quote1.Id, "UI/UX Design", 1, 1m, 5000m, 0m, 10m);
+        var q1Line2 = CreateLineItem(quote1.Id, "Frontend Development", 2, 80m, 150m, 5m, 10m);
+        var q1Line3 = CreateLineItem(quote1.Id, "QA Testing", 3, 20m, 100m, 0m, 10m);
+
+        quote1.Subtotal = q1Line1.LineTotal + q1Line2.LineTotal + q1Line3.LineTotal;
+        quote1.DiscountTotal = q1Line1.DiscountAmount + q1Line2.DiscountAmount + q1Line3.DiscountAmount;
+        quote1.TaxTotal = q1Line1.TaxAmount + q1Line2.TaxAmount + q1Line3.TaxAmount;
+        quote1.GrandTotal = quote1.Subtotal - quote1.DiscountTotal + quote1.TaxTotal;
+
+        _db.Quotes.Add(quote1);
+        _db.QuoteLineItems.Add(q1Line1);
+        _db.QuoteLineItems.Add(q1Line2);
+        _db.QuoteLineItems.Add(q1Line3);
+
+        // Quote 2: "Annual Support Contract" -- Sent, linked to second company
+        var quote2 = new Quote
+        {
+            TenantId = organizationId,
+            QuoteNumber = "Q-0002",
+            Title = "Annual Support Contract",
+            Description = "24/7 premium support with dedicated account manager for one year.",
+            Status = QuoteStatus.Sent,
+            IssueDate = seedDate.AddDays(-5),
+            ExpiryDate = seedDate.AddDays(25),
+            VersionNumber = 1,
+            CompanyId = seedSecondCompany?.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3)
+        };
+
+        var q2Line1 = CreateLineItem(quote2.Id, "Premium Support (Annual)", 1, 12m, 99.99m, 10m, 10m);
+        var q2Line2 = CreateLineItem(quote2.Id, "Dedicated Account Manager", 2, 1m, 2400m, 0m, 10m);
+
+        quote2.Subtotal = q2Line1.LineTotal + q2Line2.LineTotal;
+        quote2.DiscountTotal = q2Line1.DiscountAmount + q2Line2.DiscountAmount;
+        quote2.TaxTotal = q2Line1.TaxAmount + q2Line2.TaxAmount;
+        quote2.GrandTotal = quote2.Subtotal - quote2.DiscountTotal + quote2.TaxTotal;
+
+        _db.Quotes.Add(quote2);
+        _db.QuoteLineItems.Add(q2Line1);
+        _db.QuoteLineItems.Add(q2Line2);
+
+        // QuoteStatusHistory for Quote 2: Draft -> Sent
+        _db.QuoteStatusHistories.Add(new QuoteStatusHistory
+        {
+            QuoteId = quote2.Id,
+            FromStatus = QuoteStatus.Draft,
+            ToStatus = QuoteStatus.Sent,
+            ChangedAt = DateTimeOffset.UtcNow.AddDays(-3)
+        });
+
+        // Quote 3: "Product Bundle Offer" -- Accepted, linked to first deal, uses seeded products
+        var quote3 = new Quote
+        {
+            TenantId = organizationId,
+            QuoteNumber = "Q-0003",
+            Title = "Product Bundle Offer",
+            Description = "Enterprise license bundle with premium support at special pricing.",
+            Status = QuoteStatus.Accepted,
+            IssueDate = seedDate.AddDays(-10),
+            ExpiryDate = seedDate.AddDays(20),
+            VersionNumber = 1,
+            DealId = seedFirstDeal?.Id,
+            CompanyId = seedFirstCompany?.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-10),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-2)
+        };
+
+        var q3Line1 = CreateLineItem(quote3.Id, "CRM Enterprise License", 1, 10m, 499.99m, 15m, 10m,
+            seedProduct1?.Id);
+        var q3Line2 = CreateLineItem(quote3.Id, "Premium Support", 2, 10m, 99.99m, 10m, 10m,
+            seedProduct2?.Id);
+
+        quote3.Subtotal = q3Line1.LineTotal + q3Line2.LineTotal;
+        quote3.DiscountTotal = q3Line1.DiscountAmount + q3Line2.DiscountAmount;
+        quote3.TaxTotal = q3Line1.TaxAmount + q3Line2.TaxAmount;
+        quote3.GrandTotal = quote3.Subtotal - quote3.DiscountTotal + quote3.TaxTotal;
+
+        _db.Quotes.Add(quote3);
+        _db.QuoteLineItems.Add(q3Line1);
+        _db.QuoteLineItems.Add(q3Line2);
+
+        // QuoteStatusHistory for Quote 3: Draft -> Sent, Sent -> Accepted
+        _db.QuoteStatusHistories.Add(new QuoteStatusHistory
+        {
+            QuoteId = quote3.Id,
+            FromStatus = QuoteStatus.Draft,
+            ToStatus = QuoteStatus.Sent,
+            ChangedAt = DateTimeOffset.UtcNow.AddDays(-7)
+        });
+        _db.QuoteStatusHistories.Add(new QuoteStatusHistory
+        {
+            QuoteId = quote3.Id,
+            FromStatus = QuoteStatus.Sent,
+            ToStatus = QuoteStatus.Accepted,
+            ChangedAt = DateTimeOffset.UtcNow.AddDays(-2)
+        });
+
+        // Create Request entities
+        // Request 1: "Login page not loading on mobile" -- New, High, Bug, linked to first contact
+        _db.Requests.Add(new Request
+        {
+            TenantId = organizationId,
+            Subject = "Login page not loading on mobile",
+            Description = "Users report the login page does not render properly on mobile Safari and Chrome. White screen after splash.",
+            Status = RequestStatus.New,
+            Priority = RequestPriority.High,
+            Category = "Bug",
+            ContactId = seedFirstContact?.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddHours(-6),
+            UpdatedAt = DateTimeOffset.UtcNow.AddHours(-6)
+        });
+
+        // Request 2: "Need export to CSV feature" -- InProgress, Medium, Feature, linked to first company
+        _db.Requests.Add(new Request
+        {
+            TenantId = organizationId,
+            Subject = "Need export to CSV feature",
+            Description = "Customer requests ability to export contact and deal lists to CSV for reporting purposes.",
+            Status = RequestStatus.InProgress,
+            Priority = RequestPriority.Medium,
+            Category = "Feature",
+            CompanyId = seedFirstCompany?.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1)
+        });
+
+        // Request 3: "Billing inquiry for Q3" -- Resolved, Low, Billing, linked to second contact and company
+        _db.Requests.Add(new Request
+        {
+            TenantId = organizationId,
+            Subject = "Billing inquiry for Q3",
+            Description = "Customer has questions about Q3 invoice discrepancy. Resolved after review of payment records.",
+            Status = RequestStatus.Resolved,
+            Priority = RequestPriority.Low,
+            Category = "Billing",
+            ContactId = seedSecondContact?.Id,
+            CompanyId = seedSecondCompany?.Id,
+            ResolvedAt = DateTimeOffset.UtcNow.AddHours(-3),
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddHours(-3)
+        });
+
         await _db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals, {ActivityCount} activities",
+            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals, {ActivityCount} activities, 3 quotes, 3 requests",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
