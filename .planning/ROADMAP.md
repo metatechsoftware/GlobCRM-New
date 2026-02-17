@@ -214,7 +214,7 @@ Plans:
   6. User can view activity stream showing system events (deals moved, tasks completed, contacts added)
   7. User can create social posts visible to team and comment on feed items
   8. Feed combines activity stream and social posts in chronological order while respecting RBAC
-**Plans**: 7 plans
+**Plans**: 8 plans
 
 Plans:
 - [ ] 08-01-PLAN.md -- Backend domain entities (Notification, NotificationPreference, FeedItem, FeedComment) + enums + EF Core configs + migration + RLS
@@ -224,6 +224,7 @@ Plans:
 - [ ] 08-05-PLAN.md -- Frontend SignalR client + notification feature (models, service, store, notification center bell icon)
 - [ ] 08-06-PLAN.md -- Frontend feed feature (models, service, store, feed list + post form + comments)
 - [ ] 08-07-PLAN.md -- Frontend notification preferences settings + feed routing + navbar integration
+- [ ] 08-08-PLAN.md -- Gap closure: Wire markAsUnread in NotificationStore + add mark-as-unread UI button
 
 ### Phase 9: Dashboards & Reporting
 **Goal**: Configurable dashboards with widgets, KPIs, targets, and drill-down
@@ -289,7 +290,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 5. Activities & Workflow | 10/10 | Complete | - |
 | 6. Quotes & Requests | 7/7 | Complete | 2026-02-17 |
 | 7. Email Integration | 7/7 | Complete | 2026-02-17 |
-| 8. Real-Time & Notifications | 0/7 | Not started | - |
+| 8. Real-Time & Notifications | 0/8 | Not started | - |
 | 9. Dashboards & Reporting | 0/TBD | Not started | - |
 | 10. Data Operations | 0/TBD | Not started | - |
 | 11. Polish & Completeness | 0/TBD | Not started | - |
