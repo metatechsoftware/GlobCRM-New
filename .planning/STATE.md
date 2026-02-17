@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 9 of 11 (Dashboards & Reporting)
-Plan: 6 of 8 in current phase
+Plan: 7 of 8 in current phase
 Status: In Progress
-Last activity: 2026-02-17 — Completed 09-05 (Dashboard Widget Components)
+Last activity: 2026-02-17 — Completed 09-03 (DashboardsController API)
 
-Progress: [██████████████████░░░░░░░░░░░░] 5/8 plans (Phase 9)
+Progress: [█████████████████████░░░░░░░░░] 6/8 plans (Phase 9)
 
 ## Performance Metrics
 
@@ -100,6 +100,7 @@ Progress: [██████████████████░░░░░
 | Phase 09 P04 | 3min | 2 tasks | 6 files |
 | Phase 09 P02 | 3min | 2 tasks | 5 files |
 | Phase 09 P05 | 3min | 2 tasks | 6 files |
+| Phase 09 P03 | 2min | 1 task | 1 files |
 
 ## Accumulated Context
 
@@ -335,6 +336,10 @@ Recent decisions affecting current work:
 - [09-05] ChartWidgetComponent uses ResizeObserver on host element for Chart.js resize handling (avoids known pitfall)
 - [09-05] Chart color palette: 8 hex values matching design system tokens (primary, secondary, accent, info, success, warning, danger, neutral)
 - [09-05] TargetProgressComponent uses CSS conic-gradient for circular progress (no extra library dependency)
+- [09-03] Dashboard ownership: personal dashboards editable by owner only, team-wide dashboards editable by admin only (read access for all team-wide)
+- [09-03] Widget data endpoint resolves RBAC scope per metric's entity type via GetEntityTypeForMetric mapping (Deal, Activity, Quote, Contact, Company, Request)
+- [09-03] Target list computes current value per target by calling aggregation service with target's metric/date range (sequential to avoid DbContext concurrency)
+- [09-03] Leaderboard metrics (SalesLeaderboard, ActivityLeaderboard) fall back to Deal:View scope since they cross entity types
 
 ### Pending Todos
 
@@ -347,5 +352,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-17
-Stopped at: Completed 09-05-PLAN.md (Dashboard Widget Components)
-Resume file: .planning/phases/09-dashboards-and-reporting/09-05-SUMMARY.md
+Stopped at: Completed 09-03-PLAN.md (DashboardsController API)
+Resume file: .planning/phases/09-dashboards-and-reporting/09-03-SUMMARY.md
