@@ -62,4 +62,7 @@ public class Company
 
     // Navigation: Company has many Requests (one-to-many via Request.CompanyId)
     public ICollection<Request> Requests { get; set; } = new List<Request>();
+
+    // Navigation: Company has many EmailMessages (one-to-many via EmailMessage.LinkedCompanyId)
+    public ICollection<EmailMessage> EmailMessages { get; set; } = new List<EmailMessage>();
 }

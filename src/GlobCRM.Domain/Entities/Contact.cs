@@ -61,4 +61,7 @@ public class Contact
 
     // Navigation: Contact has many Requests (one-to-many via Request.ContactId)
     public ICollection<Request> Requests { get; set; } = new List<Request>();
+
+    // Navigation: Contact has many EmailMessages (one-to-many via EmailMessage.LinkedContactId)
+    public ICollection<EmailMessage> EmailMessages { get; set; } = new List<EmailMessage>();
 }
