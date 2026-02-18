@@ -76,7 +76,7 @@
     <!-- Main content: Tabs left, Info sidebar right -->
     <div class="detail-content">
       <div class="detail-main">
-        <mat-tab-group [(selectedIndex)]="activeTab" animationDuration="200ms">
+        <mat-tab-group [(selectedIndex)]="activeTab" animationDuration="200ms" (selectedIndexChange)="onTabChange($event)">
           <!-- Tab 0: Details -->
           <mat-tab>
             <ng-template mat-tab-label>
@@ -496,6 +496,49 @@
                     </div>
                   }
                 </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Tab 6: Notes -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <span class="tab-label"><mat-icon>note</mat-icon> Notes</span>
+            </ng-template>
+            <div class="tab-body">
+              @if (notesLoading()) {
+                <div style="display: flex; justify-content: center; padding: 32px;">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else if (activityNotes().length === 0) {
+                <div style="text-align: center; padding: 48px 24px; color: rgba(0,0,0,0.5);">
+                  No notes for this activity.
+                  <br /><br />
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Activity', entityId: activity()?.id, entityName: activity()?.subject }">
+                    Add Note
+                  </a>
+                </div>
+              } @else {
+                <div style="margin-bottom: 12px; text-align: right;">
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Activity', entityId: activity()?.id, entityName: activity()?.subject }">
+                    Add Note
+                  </a>
+                </div>
+                @for (note of activityNotes(); track note.id) {
+                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                    <div style="flex: 1; min-width: 0;">
+                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--mat-sys-primary, #1976d2); text-decoration: none;">{{ note.title }}</a>
+                      <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                    </div>
+                    <div style="font-size: 12px; color: rgba(0,0,0,0.5); white-space: nowrap;">
+                      {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
+                    </div>
+                  </div>
+                }
               }
             </div>
           </mat-tab>

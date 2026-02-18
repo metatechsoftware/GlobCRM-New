@@ -367,6 +367,58 @@
               </div>
             }
           </ng-template>
+
+          <!-- Notes tab content (index 7) -->
+          <ng-template>
+            @if (notesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (contactNotes().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>note</mat-icon>
+                <span>No notes for this contact.</span>
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Contact', entityId: contact()?.id, entityName: contact()?.fullName }">
+                  Add Note
+                </a>
+              </div>
+            } @else {
+              <div style="margin-bottom: 12px; text-align: right;">
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Contact', entityId: contact()?.id, entityName: contact()?.fullName }">
+                  <mat-icon>add</mat-icon> Add Note
+                </a>
+              </div>
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Preview</th>
+                    <th>Author</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (note of contactNotes(); track note.id) {
+                    <tr>
+                      <td><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></td>
+                      <td style="color: rgba(0,0,0,0.6); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
+                      <td>{{ note.authorName || '-' }}</td>
+                      <td style="white-space: nowrap;">{{ formatNoteDate(note.createdAt) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </ng-template>
+
+          <!-- Attachments tab content (index 8) -->
+          <ng-template>
+            <app-entity-attachments [entityType]="'contact'" [entityId]="contact()?.id ?? ''" />
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 

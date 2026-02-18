@@ -18,6 +18,9 @@ import { DatePipe } from '@angular/common';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { EntityTimelineComponent } from '../../../shared/components/entity-timeline/entity-timeline.component';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
+import { NoteService } from '../../notes/note.service';
+import { NoteListDto } from '../../notes/note.models';
 import { RequestService } from '../request.service';
 import {
   RequestDetailDto,
@@ -50,6 +53,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     HasPermissionDirective,
     EntityTimelineComponent,
     CustomFieldFormComponent,
+    EntityAttachmentsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -313,7 +317,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
         </div>
 
         <!-- Tabs -->
-        <mat-tab-group animationDuration="0ms">
+        <mat-tab-group animationDuration="0ms" (selectedIndexChange)="onTabSelected($event)">
           <!-- Details Tab -->
           <mat-tab label="Details">
             <div class="details-section">
@@ -346,6 +350,53 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
               }
             </div>
           </mat-tab>
+
+          <!-- Notes Tab -->
+          <mat-tab label="Notes">
+            <div style="padding: 16px 0;">
+              @if (notesLoading()) {
+                <div class="loading-container">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else if (requestNotes().length === 0) {
+                <div class="empty-state">
+                  No notes for this request.
+                  <br /><br />
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Request', entityId: request()?.id, entityName: request()?.subject }">
+                    Add Note
+                  </a>
+                </div>
+              } @else {
+                <div style="margin-bottom: 12px; text-align: right;">
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Request', entityId: request()?.id, entityName: request()?.subject }">
+                    Add Note
+                  </a>
+                </div>
+                @for (note of requestNotes(); track note.id) {
+                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                    <div style="flex: 1; min-width: 0;">
+                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--mat-sys-primary, #1976d2); text-decoration: none;">{{ note.title }}</a>
+                      <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                    </div>
+                    <div style="font-size: 12px; color: rgba(0,0,0,0.5); white-space: nowrap;">
+                      {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Attachments Tab -->
+          <mat-tab label="Attachments">
+            <div style="padding: 16px 0;">
+              <app-entity-attachments [entityType]="'request'" [entityId]="request()?.id ?? ''" />
+            </div>
+          </mat-tab>
         </mat-tab-group>
       </div>
     } @else {
@@ -360,6 +411,7 @@ export class RequestDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly requestService = inject(RequestService);
+  private readonly noteService = inject(NoteService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
 
@@ -370,6 +422,11 @@ export class RequestDetailComponent implements OnInit {
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
   timelineLoading = signal(false);
+
+  /** Notes linked to this request. */
+  requestNotes = signal<NoteListDto[]>([]);
+  notesLoading = signal(false);
+  notesLoaded = signal(false);
 
   /** Current request ID from route. */
   private requestId = '';
@@ -418,6 +475,42 @@ export class RequestDetailComponent implements OnInit {
         this.timelineLoading.set(false);
       },
     });
+  }
+
+  /** Load notes linked to this request (lazy on tab switch). */
+  loadRequestNotes(): void {
+    if (this.notesLoaded() || this.notesLoading()) return;
+
+    this.notesLoading.set(true);
+    this.noteService
+      .getEntityNotes('Request', this.requestId)
+      .subscribe({
+        next: (notes) => {
+          this.requestNotes.set(notes);
+          this.notesLoading.set(false);
+          this.notesLoaded.set(true);
+        },
+        error: () => {
+          this.notesLoading.set(false);
+        },
+      });
+  }
+
+  /** Handle tab selection for lazy loading notes. */
+  onTabSelected(index: number): void {
+    if (index === 2) {
+      this.loadRequestNotes();
+    }
+  }
+
+  /** Format note date for display. */
+  formatNoteDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(dateStr));
   }
 
   /** Get status color from REQUEST_STATUSES constant. */

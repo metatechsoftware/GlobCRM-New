@@ -438,6 +438,58 @@
               [entries]="timelineEntries()"
               [isLoading]="timelineLoading()" />
           </ng-template>
+
+          <!-- Tab 6: Notes -->
+          <ng-template>
+            @if (notesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (dealNotes().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>note</mat-icon>
+                <span>No notes for this deal.</span>
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Deal', entityId: deal()?.id, entityName: deal()?.title }">
+                  Add Note
+                </a>
+              </div>
+            } @else {
+              <div style="margin-bottom: 12px; text-align: right;">
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Deal', entityId: deal()?.id, entityName: deal()?.title }">
+                  <mat-icon>add</mat-icon> Add Note
+                </a>
+              </div>
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Preview</th>
+                    <th>Author</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (note of dealNotes(); track note.id) {
+                    <tr>
+                      <td><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></td>
+                      <td style="color: rgba(0,0,0,0.6); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
+                      <td>{{ note.authorName || '-' }}</td>
+                      <td style="white-space: nowrap;">{{ formatNoteDate(note.createdAt) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </ng-template>
+
+          <!-- Tab 7: Attachments -->
+          <ng-template>
+            <app-entity-attachments [entityType]="'deal'" [entityId]="deal()?.id ?? ''" />
+          </ng-template>
         </app-related-entity-tabs>
       </div>
 

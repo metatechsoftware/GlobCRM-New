@@ -25,6 +25,8 @@ import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { NoteService } from '../../notes/note.service';
+import { NoteListDto } from '../../notes/note.models';
 import { ActivityService } from '../activity.service';
 import {
   ActivityDetailDto,
@@ -104,6 +106,7 @@ export class ActivityDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly activityService = inject(ActivityService);
+  private readonly noteService = inject(NoteService);
   private readonly companyService = inject(CompanyService);
   private readonly contactService = inject(ContactService);
   private readonly dealService = inject(DealService);
@@ -119,6 +122,11 @@ export class ActivityDetailComponent implements OnInit {
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
   timelineLoading = signal(false);
+
+  /** Notes linked to this activity. */
+  activityNotes = signal<NoteListDto[]>([]);
+  notesLoading = signal(false);
+  notesLoaded = signal(false);
 
   /** Current active tab index. */
   activeTab = signal(0);
@@ -292,6 +300,42 @@ export class ActivityDetailComponent implements OnInit {
         this.timelineLoading.set(false);
       },
     });
+  }
+
+  /** Load notes linked to this activity (lazy on tab switch). */
+  loadActivityNotes(): void {
+    if (this.notesLoaded() || this.notesLoading()) return;
+
+    this.notesLoading.set(true);
+    this.noteService
+      .getEntityNotes('Activity', this.activityId)
+      .subscribe({
+        next: (notes) => {
+          this.activityNotes.set(notes);
+          this.notesLoading.set(false);
+          this.notesLoaded.set(true);
+        },
+        error: () => {
+          this.notesLoading.set(false);
+        },
+      });
+  }
+
+  /** Handle tab change for lazy loading notes (index 6 = Notes). */
+  onTabChange(index: number): void {
+    if (index === 6) {
+      this.loadActivityNotes();
+    }
+  }
+
+  /** Format note date for display. */
+  formatNoteDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(dateStr));
   }
 
   /** Transition activity to a new status. */

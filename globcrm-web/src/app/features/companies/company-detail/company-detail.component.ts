@@ -32,6 +32,9 @@ import { RequestService } from '../../requests/request.service';
 import { RequestListDto, REQUEST_STATUSES, REQUEST_PRIORITIES } from '../../requests/request.models';
 import { EmailService } from '../../emails/email.service';
 import { EmailListDto } from '../../emails/email.models';
+import { NoteService } from '../../notes/note.service';
+import { NoteListDto } from '../../notes/note.models';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -55,6 +58,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     RelatedEntityTabsComponent,
     EntityTimelineComponent,
     CustomFieldFormComponent,
+    EntityAttachmentsComponent,
   ],
   templateUrl: './company-detail.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -283,6 +287,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly quoteService = inject(QuoteService);
   private readonly requestService = inject(RequestService);
   private readonly emailService = inject(EmailService);
+  private readonly noteService = inject(NoteService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
 
@@ -313,6 +318,11 @@ export class CompanyDetailComponent implements OnInit {
   companyEmails = signal<EmailListDto[]>([]);
   emailsLoading = signal(false);
   emailsLoaded = signal(false);
+
+  /** Notes linked to this company. */
+  companyNotes = signal<NoteListDto[]>([]);
+  notesLoading = signal(false);
+  notesLoaded = signal(false);
 
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
@@ -395,6 +405,9 @@ export class CompanyDetailComponent implements OnInit {
     }
     if (index === 6) {
       this.loadCompanyEmails();
+    }
+    if (index === 7) {
+      this.loadCompanyNotes();
     }
   }
 
@@ -508,6 +521,35 @@ export class CompanyDetailComponent implements OnInit {
           this.emailsLoading.set(false);
         },
       });
+  }
+
+  /** Load notes linked to this company (lazy on tab switch). */
+  private loadCompanyNotes(): void {
+    if (this.notesLoaded() || this.notesLoading()) return;
+
+    this.notesLoading.set(true);
+    this.noteService
+      .getEntityNotes('Company', this.companyId)
+      .subscribe({
+        next: (notes) => {
+          this.companyNotes.set(notes);
+          this.notesLoading.set(false);
+          this.notesLoaded.set(true);
+        },
+        error: () => {
+          this.notesLoading.set(false);
+        },
+      });
+  }
+
+  /** Format note date for display. */
+  formatNoteDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(dateStr));
   }
 
   /** Format email date for display. */

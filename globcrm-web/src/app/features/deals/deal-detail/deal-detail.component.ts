@@ -37,6 +37,9 @@ import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../a
 import { ActivityService } from '../../activities/activity.service';
 import { QuoteService } from '../../quotes/quote.service';
 import { QuoteListDto, QUOTE_STATUSES } from '../../quotes/quote.models';
+import { NoteService } from '../../notes/note.service';
+import { NoteListDto } from '../../notes/note.models';
+import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 
@@ -67,6 +70,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     RelatedEntityTabsComponent,
     EntityTimelineComponent,
     CustomFieldFormComponent,
+    EntityAttachmentsComponent,
   ],
   templateUrl: './deal-detail.component.html',
   styleUrl: './deal-detail.component.scss',
@@ -80,6 +84,7 @@ export class DealDetailComponent implements OnInit {
   private readonly productService = inject(ProductService);
   private readonly activityService = inject(ActivityService);
   private readonly quoteService = inject(QuoteService);
+  private readonly noteService = inject(NoteService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
@@ -101,6 +106,11 @@ export class DealDetailComponent implements OnInit {
   linkedQuotes = signal<QuoteListDto[]>([]);
   quotesLoading = signal(false);
   quotesLoaded = signal(false);
+
+  /** Notes linked to this deal. */
+  dealNotes = signal<NoteListDto[]>([]);
+  notesLoading = signal(false);
+  notesLoaded = signal(false);
 
   /** Tab configuration for deal detail. */
   readonly tabs = DEAL_TABS;
@@ -165,13 +175,16 @@ export class DealDetailComponent implements OnInit {
     });
   }
 
-  /** Handle tab change -- lazy load activities/quotes when tab is selected. */
+  /** Handle tab change -- lazy load activities/quotes/notes when tab is selected. */
   onTabChanged(index: number): void {
     if (index === 3) {
       this.loadLinkedActivities();
     }
     if (index === 4) {
       this.loadLinkedQuotes();
+    }
+    if (index === 6) {
+      this.loadDealNotes();
     }
   }
 
@@ -207,6 +220,35 @@ export class DealDetailComponent implements OnInit {
   /** Get quote status color. */
   getQuoteStatusColor(status: string): string {
     return QUOTE_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+  }
+
+  /** Load notes linked to this deal (lazy on tab switch). */
+  private loadDealNotes(): void {
+    if (this.notesLoaded() || this.notesLoading()) return;
+
+    this.notesLoading.set(true);
+    this.noteService
+      .getEntityNotes('Deal', this.dealId)
+      .subscribe({
+        next: (notes) => {
+          this.dealNotes.set(notes);
+          this.notesLoading.set(false);
+          this.notesLoaded.set(true);
+        },
+        error: () => {
+          this.notesLoading.set(false);
+        },
+      });
+  }
+
+  /** Format note date for display. */
+  formatNoteDate(dateStr: string): string {
+    if (!dateStr) return '';
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(new Date(dateStr));
   }
 
   /** Format currency for quote totals. */
