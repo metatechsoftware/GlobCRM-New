@@ -2,7 +2,7 @@
 
 ## What This Is
 
-GlobCRM is a modern, multi-tenant SaaS CRM for mid-size organizations (10–50 users) spanning sales, support, and operations. Teams manage their entire customer lifecycle — companies, contacts, deals, quotes, activities, email, and KPIs — through fast, consistent pages with dynamic tables, global search, and clean relational navigation. Available on web (Angular) and native mobile (.NET MAUI).
+GlobCRM is a modern, multi-tenant SaaS CRM for mid-size organizations (10-50 users) spanning sales, support, and operations. Teams manage their entire customer lifecycle — companies, contacts, deals, quotes, activities, email, and KPIs — through fast, consistent pages with dynamic tables, global search, and clean relational navigation. Built with Angular 19 (web) and .NET 10 (backend) on PostgreSQL 17.
 
 ## Core Value
 
@@ -12,76 +12,88 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 
 ### Validated
 
-(None yet — ship to validate)
+- ✓ Companies, Contacts, Products, Quotes, Requests, Deals, Calendar, Notes, Activities/Tasks, Mail, News Feed, Targets/KPIs, Attachments, Notifications, Imports, Dynamic Tables — v1.0
+- ✓ Dynamic table columns (core fields + admin-defined custom fields) on every list page — v1.0
+- ✓ Per-user saved Views (column layouts, sorting, filters, grouping) with team-wide defaults + personal overrides — v1.0
+- ✓ Rich custom field types: text, number, date, dropdown, checkbox, multi-select, currency, file attachment, relation — v1.0
+- ✓ Global search across all entities — v1.0
+- ✓ Relational navigation (Company → Contacts, Quotes, Activities timeline) — v1.0
+- ✓ Full activity workflow: assigned → accepted → in progress → review → done, with comments, attachments, time tracking, audit trail — v1.0
+- ✓ Activities viewable as list, board (Kanban), and calendar — v1.0
+- ✓ Entity-linked activity timelines — v1.0
+- ✓ Configurable deal pipelines with custom stages per team (Kanban view) — v1.0
+- ✓ Line-item quotes with products, quantities, discounts, tax, totals, PDF generation — v1.0
+- ✓ Two-way email sync with Gmail (OAuth, see inbox, send from CRM, auto-link to contacts) — v1.0
+- ✓ News Feed combining activity stream and social posts with comments — v1.0
+- ✓ Configurable dashboards with charts, leaderboards, and drill-down for Targets/KPIs — v1.0
+- ✓ Granular RBAC: custom roles with per-entity permissions and field-level access — v1.0
+- ✓ Email + password authentication with optional 2FA — v1.0
+- ✓ Notifications: in-app (bell icon + notification center), email, real-time via SignalR — v1.0
+- ✓ Data import functionality (CSV with field mapping, duplicate detection) — v1.0
+- ✓ Multi-tenant SaaS with isolated data per organization (triple-layer defense) — v1.0
+- ✓ Responsive web app (Angular) for desktop, tablet, and mobile browsers — v1.0
 
 ### Active
 
-- [ ] Companies, Contacts, Products, Quotes, Requests, Deals, Calendar, Notes, Activities/Tasks, Mail, News Feed, Targets/KPIs, Attachments, Notifications, Imports, Dynamic Tables
-- [ ] Dynamic table columns (core fields + admin-defined custom fields) on every list page
-- [ ] Per-user saved Views (column layouts, sorting, filters, grouping) with team-wide defaults + personal overrides
-- [ ] Rich custom field types: text, number, date, dropdown, checkbox, multi-select, currency, formula/computed, file attachment, relation to other entities
-- [ ] Global search across all entities
-- [ ] Relational navigation (e.g., Company → Contacts, Quotes, Activities timeline)
-- [ ] Full activity workflow: assigned → accepted → in progress → review → done, with comments, attachments, time tracking, full audit trail
-- [ ] Activities viewable as list, board (Kanban), and calendar
-- [ ] Entity-linked activity timelines
-- [ ] Configurable deal pipelines with custom stages per team (Kanban view)
-- [ ] Line-item quotes with products, quantities, discounts, tax, totals, PDF generation
-- [ ] Two-way email sync with Gmail and Outlook (OAuth, see inbox, send from CRM, auto-link to contacts)
-- [ ] News Feed combining activity stream (deals moved, tasks completed, contacts added) and social posts (team announcements, comments)
-- [ ] Configurable dashboards with charts, leaderboards, and drill-down into data for Targets/KPIs
-- [ ] Granular RBAC: custom roles with per-entity permissions (view/create/edit/delete) and field-level access
-- [ ] Email + password authentication with optional 2FA
-- [ ] Notifications: in-app (bell icon + notification center), email, push (mobile), real-time live updates
-- [ ] Data import functionality
-- [ ] Multi-tenant SaaS with isolated data per organization
 - [ ] Native mobile apps (iOS/Android) via .NET MAUI
-- [ ] Responsive web app (Angular) for desktop
+- [ ] Outlook/Microsoft 365 email integration (Microsoft Graph API)
+- [ ] Email templates and sequences
+- [ ] Formula/computed custom fields
+- [ ] Workflow automation (trigger-based actions)
+- [ ] Duplicate detection and merge for contacts and companies
+- [ ] SSO/SAML/OIDC integration
+- [ ] Bulk operations across list views
+- [ ] Webhooks for external integrations
+- [ ] Advanced reporting builder
 
 ### Out of Scope
 
-- SSO/SAML/OIDC — email+password sufficient for v1, enterprise SSO deferred
-- Real-time chat/messaging — not core to CRM value
-- Video calls — integrate with external tools instead
-- AI/ML features — predictive scoring, auto-categorization deferred
-- Third-party marketplace/plugins — custom integrations deferred
-- White-labeling — single brand for v1
+- Real-time chat/messaging — not core to CRM value; integrate with Slack/Teams
+- Video calls — integrate with external tools (Zoom, Teams)
+- AI/ML features — predictive scoring, auto-categorization deferred until data volume supports it
+- Third-party marketplace/plugins — webhooks + API sufficient
+- White-labeling — single brand for now
+- Full email client — sync + send-from-CRM is the right scope
+- Multi-language/i18n — English-only for now
 
 ## Context
 
-**Domain:** CRM for mid-size organizations with sales, support, and operations teams. Users are sales reps, account managers, support agents, team leads, and admins. Daily workflows involve managing contacts, progressing deals through pipelines, completing assigned activities, sending/receiving email, and tracking KPIs.
+**Shipped v1.0 MVP** with ~124,200 LOC across 927 files.
+- **Backend:** .NET 10 Web API (~75,600 C#), Clean Architecture (4 layers), EF Core + PostgreSQL 17
+- **Frontend:** Angular 19 (~48,600 TS/HTML/SCSS), 18 lazy-loaded feature areas, standalone components with OnPush
+- **Infrastructure:** Triple-layer multi-tenancy (Finbuckle + EF Core filters + PostgreSQL RLS), SignalR real-time, SendGrid email, QuestPDF, SkiaSharp
 
-**Key interaction pattern:** Dynamic tables are the primary UI pattern. Every list page (Companies, Contacts, Products, Quotes, Requests, Activities, Notes, Deals) uses the same configurable table component with adjustable columns, saved Views, sorting, filtering, and grouping. This pattern must be built once and reused everywhere.
+**Key interaction pattern:** Dynamic tables on every list page with configurable columns, saved Views, filters, and custom fields.
 
-**Custom fields architecture:** PostgreSQL JSONB columns store custom field values. Admin-defined field schemas support text, number, date, dropdown, checkbox, multi-select, currency, formula/computed, file attachment, and relation types. Custom fields appear alongside core fields in dynamic tables and are filterable/sortable.
-
-**Activity workflow:** Central to daily operations. Full lifecycle: assigned → accepted → in progress → review → done. Includes comments, attachments, time tracking, and an auditable activity feed. Activities link to any entity (Company, Contact, Deal, Quote, Request) and appear in entity timelines.
-
-**Email integration:** Two-way sync via Gmail API and Microsoft Graph API. OAuth-based connection. Emails appear in contact/company timelines, can be sent from CRM, and auto-link to known contacts by email address.
-
-**Multi-tenancy:** Schema-per-tenant or row-level isolation in PostgreSQL. Each organization has isolated data. Tenant context resolved from subdomain or JWT claims.
+**Tech stack:** Angular 19 (web), .NET 10 (backend), PostgreSQL 17 (database), Angular Material M3 + Tailwind CSS (styling), SignalR (real-time), Chart.js + angular-gridster2 (dashboards), FullCalendar (calendar), ngx-quill (rich text), CsvHelper (imports)
 
 ## Constraints
 
-- **Tech Stack**: Angular (frontend), .NET Core 10 Web API (backend), PostgreSQL (database), .NET MAUI (mobile) — team ecosystem decision
-- **Multi-tenant**: Must support data isolation per organization from day one
-- **API-first**: Backend must expose a clean REST API consumed by both Angular web app and MAUI mobile apps
-- **Custom fields**: PostgreSQL JSONB for flexible schema; must be queryable and indexable
-- **Email sync**: Requires OAuth flows for Gmail (Google API) and Outlook (Microsoft Graph API)
-- **Real-time**: SignalR for live updates and notifications across web and mobile
+- **Tech Stack**: Angular (frontend), .NET Core 10 Web API (backend), PostgreSQL (database), .NET MAUI (mobile)
+- **Multi-tenant**: Data isolation per organization via triple-layer defense
+- **API-first**: REST API consumed by both Angular web app and future MAUI mobile apps
+- **Custom fields**: PostgreSQL JSONB for flexible schema; queryable and indexable with GIN
+- **Email sync**: Requires OAuth flows for Gmail (done) and Outlook (future)
+- **Real-time**: SignalR for live updates and notifications
 
 ## Key Decisions
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Angular over React/Vue | Team preference, strong enterprise patterns | — Pending |
-| .NET Core 10 backend | Team expertise, strong typing, enterprise ecosystem | — Pending |
-| PostgreSQL over SQL Server | Open source, superior JSONB support for custom fields | — Pending |
-| .NET MAUI for mobile | Stay in .NET ecosystem, share models with backend | — Pending |
-| JSONB for custom fields | Flexible schema without EAV table complexity, queryable | — Pending |
-| SignalR for real-time | Native .NET integration, supports WebSocket + fallbacks | — Pending |
-| Granular RBAC over simple roles | Mid-size orgs need per-entity and field-level permissions | — Pending |
-| Full activity workflow | Operational clarity is a core differentiator | — Pending |
+| Angular over React/Vue | Team preference, strong enterprise patterns | ✓ Good — 18 feature areas with consistent patterns |
+| .NET Core 10 backend | Team expertise, strong typing, enterprise ecosystem | ✓ Good — Clean Architecture with 4 layers works well |
+| PostgreSQL over SQL Server | Open source, superior JSONB support for custom fields | ✓ Good — JSONB + GIN + tsvector + RLS all leveraged |
+| .NET MAUI for mobile | Stay in .NET ecosystem, share models with backend | — Pending (v2) |
+| JSONB for custom fields | Flexible schema without EAV table complexity, queryable | ✓ Good — GIN-indexed, works across all entities |
+| SignalR for real-time | Native .NET integration, supports WebSocket + fallbacks | ✓ Good — notifications + feed updates work well |
+| Granular RBAC over simple roles | Mid-size orgs need per-entity and field-level permissions | ✓ Good — enforced at API + UI level with scope checks |
+| Full activity workflow | Operational clarity is a core differentiator | ✓ Good — 5-state machine with comments/attachments/time |
+| Triple-layer tenant isolation | Defense-in-depth for data security | ✓ Good — Finbuckle + EF Core filters + PostgreSQL RLS |
+| Component-provided signal stores | Per-page isolation avoids state leaking across features | ✓ Good — consistent pattern across all 18 features |
+| Inline templates for simple components | Minimal file count, co-located template+logic | ✓ Good — reduced file sprawl without sacrificing readability |
+| QuestPDF for quote generation | Free, fluent API, .NET native | ✓ Good — generates professional quote PDFs |
+| FullCalendar for calendar views | Feature-rich, supports day/week/month + drag-drop | ✓ Good — used in deals, activities, and unified calendar |
+| CSS-only responsive (no MatSidenav) | Avoid layout restructuring of app.component | ✓ Good — slide-in drawer works on mobile/tablet |
 
 ---
-*Last updated: 2026-02-16 after initialization*
+*Last updated: 2026-02-18 after v1.0 milestone*
