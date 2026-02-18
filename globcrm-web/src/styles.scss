@@ -1,125 +1,322 @@
-// GlobCRM Global Styles
-// Custom Theming for Angular Material
+// ============================================================
+// GlobCRM Global Styles — Warm Modernism
+// Design tokens + Angular Material theme + refined base styles
+// ============================================================
+
 @use '@angular/material' as mat;
+@import 'styles/tokens.css';
 
-// GlobCRM brand colors
-$globcrm-primary: #1976d2; // Deep blue
-$globcrm-accent: #00897b; // Teal
-$globcrm-warn: #e53935; // Red
-
+// ─── Angular Material Theme ───────────────────────────────
 html {
   @include mat.theme((
     color: (
       theme-type: light,
-      primary: mat.$azure-palette,
+      primary: mat.$orange-palette,
       tertiary: mat.$cyan-palette,
     ),
-    typography: Roboto,
-    density: 0,
+    typography: Inter,
+    density: -1,
   ));
 }
 
-// Base reset and typography
+[data-theme="dark"],
+.dark {
+  @include mat.theme((
+    color: (
+      theme-type: dark,
+      primary: mat.$orange-palette,
+      tertiary: mat.$cyan-palette,
+    ),
+    typography: Inter,
+    density: -1,
+  ));
+}
+
+// ─── Base ─────────────────────────────────────────────────
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html,
 body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, 'Helvetica Neue', sans-serif;
-  background-color: #fafafa;
-  color: rgba(0, 0, 0, 0.87);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-// Spacing utilities
-.m-0 { margin: 0; }
-.m-1 { margin: 0.25rem; }
-.m-2 { margin: 0.5rem; }
-.m-3 { margin: 1rem; }
-.m-4 { margin: 1.5rem; }
-.m-5 { margin: 3rem; }
-
-.mt-0 { margin-top: 0; }
-.mt-1 { margin-top: 0.25rem; }
-.mt-2 { margin-top: 0.5rem; }
-.mt-3 { margin-top: 1rem; }
-.mt-4 { margin-top: 1.5rem; }
-.mt-5 { margin-top: 3rem; }
-
-.mb-0 { margin-bottom: 0; }
-.mb-1 { margin-bottom: 0.25rem; }
-.mb-2 { margin-bottom: 0.5rem; }
-.mb-3 { margin-bottom: 1rem; }
-.mb-4 { margin-bottom: 1.5rem; }
-.mb-5 { margin-bottom: 3rem; }
-
-.mx-auto { margin-left: auto; margin-right: auto; }
-
-.p-0 { padding: 0; }
-.p-1 { padding: 0.25rem; }
-.p-2 { padding: 0.5rem; }
-.p-3 { padding: 1rem; }
-.p-4 { padding: 1.5rem; }
-.p-5 { padding: 3rem; }
-
-// Layout utilities
-.d-flex { display: flex; }
-.flex-column { flex-direction: column; }
-.flex-row { flex-direction: row; }
-.align-center { align-items: center; }
-.justify-center { justify-content: center; }
-.justify-between { justify-content: space-between; }
-.flex-1 { flex: 1; }
-.gap-1 { gap: 0.5rem; }
-.gap-2 { gap: 1rem; }
-.gap-3 { gap: 1.5rem; }
-
-// Typography utilities
-.text-center { text-align: center; }
-.text-left { text-align: left; }
-.text-right { text-align: right; }
-.text-muted { color: rgba(0, 0, 0, 0.54); }
-.text-primary { color: $globcrm-primary; }
-.text-accent { color: $globcrm-accent; }
-.text-warn { color: $globcrm-warn; }
-.font-weight-bold { font-weight: 500; }
-
-// Width utilities
-.w-100 { width: 100%; }
-.w-auto { width: auto; }
-
-// GlobCRM specific
-.globcrm-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 1rem;
+// ─── Typography ───────────────────────────────────────────
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-text);
+  font-weight: var(--font-semibold);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.2px;
 }
 
-.globcrm-card {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+h1 { font-size: var(--text-2xl); font-weight: var(--font-bold); letter-spacing: -0.5px; }
+h2 { font-size: var(--text-xl); }
+h3 { font-size: var(--text-lg); }
+h4 { font-size: var(--text-md); }
+
+a {
+  color: var(--color-text-link);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-default);
+
+  &:hover {
+    color: var(--color-text-link-hover);
+  }
 }
 
-// Full-width Material form fields
+p {
+  margin: 0 0 var(--space-4);
+  line-height: var(--leading-relaxed);
+}
+
+strong, b {
+  font-weight: var(--font-semibold);
+}
+
+small {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+// ─── Selection ────────────────────────────────────────────
+::selection {
+  background: var(--color-primary-soft);
+  color: var(--color-primary-text);
+}
+
+// ─── Focus (WCAG AA) ─────────────────────────────────────
+:focus-visible {
+  outline: 2px solid var(--color-border-focus);
+  outline-offset: 2px;
+}
+
+// ─── Scrollbar ────────────────────────────────────────────
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: var(--radius-full);
+  transition: background var(--duration-fast) var(--ease-default);
+
+  &:hover {
+    background: var(--color-border-strong);
+  }
+}
+
+// Show scrollbar on hover of scrollable containers
+.table-container,
+.view-sidebar {
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+  &:hover::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+  }
+}
+
+// ─── Material Overrides ──────────────────────────────────
 .mat-mdc-form-field {
   width: 100%;
 }
 
-// Scrollbar styling
-::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+// Refined Material card styling
+.mat-mdc-card {
+  --mdc-elevated-card-container-shape: var(--radius-lg);
+  border: 1px solid var(--color-border-subtle);
 }
 
-::-webkit-scrollbar-track {
-  background: #f1f1f1;
+// Refined Material menu
+.mat-mdc-menu-panel {
+  border: 1px solid var(--color-border-subtle);
+  box-shadow: var(--shadow-lg) !important;
+  border-radius: var(--radius-md) !important;
 }
 
-::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 4px;
+// Refined Material dialog
+.mat-mdc-dialog-container .mdc-dialog__surface {
+  border-radius: var(--radius-lg) !important;
+}
 
-  &:hover {
-    background: #a8a8a8;
+// ─── GlobCRM Utilities ────────────────────────────────────
+.globcrm-container {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding: 0 var(--container-padding);
+}
+
+.globcrm-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+  padding: var(--space-6);
+}
+
+.globcrm-card-raised {
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-6);
+}
+
+// ─── Semantic Utilities ───────────────────────────────────
+.text-primary   { color: var(--color-primary-text); }
+.text-secondary { color: var(--color-text-secondary); }
+.text-muted     { color: var(--color-text-muted); }
+.text-success   { color: var(--color-success-text); }
+.text-warning   { color: var(--color-warning-text); }
+.text-danger    { color: var(--color-danger-text); }
+.text-info      { color: var(--color-info-text); }
+
+.bg-primary-soft   { background: var(--color-primary-soft); }
+.bg-secondary-soft { background: var(--color-secondary-soft); }
+.bg-success-soft   { background: var(--color-success-soft); }
+.bg-warning-soft   { background: var(--color-warning-soft); }
+.bg-danger-soft    { background: var(--color-danger-soft); }
+.bg-info-soft      { background: var(--color-info-soft); }
+
+// ─── Badge utility ────────────────────────────────────────
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-0-5) var(--space-2);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: var(--font-medium);
+  line-height: 1.4;
+
+  &--primary   { background: var(--color-primary-soft); color: var(--color-primary-text); }
+  &--secondary { background: var(--color-secondary-soft); color: var(--color-secondary-text); }
+  &--success   { background: var(--color-success-soft); color: var(--color-success-text); }
+  &--warning   { background: var(--color-warning-soft); color: var(--color-warning-text); }
+  &--danger    { background: var(--color-danger-soft); color: var(--color-danger-text); }
+  &--info      { background: var(--color-info-soft); color: var(--color-info-text); }
+}
+
+// ─── Divider utility ──────────────────────────────────────
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border-subtle);
+  margin: var(--space-4) 0;
+}
+
+// ─── Responsive Utilities ────────────────────────────────
+.hide-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
   }
+}
+
+.hide-tablet {
+  @media (max-width: 1024px) {
+    display: none !important;
+  }
+}
+
+.show-mobile-only {
+  display: none !important;
+
+  @media (max-width: 768px) {
+    display: block !important;
+  }
+}
+
+.show-mobile-only-flex {
+  display: none !important;
+
+  @media (max-width: 768px) {
+    display: flex !important;
+  }
+}
+
+// ─── Responsive: Entity Pages & Layouts ──────────────────
+
+// Entity detail pages: reduce padding, full-width on mobile
+@media (max-width: 768px) {
+  .globcrm-container {
+    padding: 0 var(--space-2);
+  }
+
+  .globcrm-card,
+  .globcrm-card-raised {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  // Page headers: wrap title + actions on mobile
+  .page-header,
+  [class*="page-header"],
+  [class*="list-header"] {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  // Form layouts: stack fields vertically
+  .form-row,
+  [class*="form-row"],
+  .field-row {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  // Mat-dialog: near-full-width on mobile
+  .mat-mdc-dialog-container .mdc-dialog__surface {
+    max-width: calc(100vw - 32px) !important;
+    margin: var(--space-4);
+  }
+
+  // Heading sizes reduced on mobile
+  h1 { font-size: var(--text-xl); }
+  h2 { font-size: var(--text-lg); }
+  h3 { font-size: var(--text-md); }
+}
+
+// Tablet: modest padding reduction
+@media (max-width: 1024px) and (min-width: 769px) {
+  .globcrm-container {
+    padding: 0 var(--space-3);
+  }
+
+  .globcrm-card,
+  .globcrm-card-raised {
+    padding: var(--space-4);
+  }
+}
+
+// ─── Responsive: Tab Groups ──────────────────────────────
+// Angular Material tab headers are scrollable by default.
+// Ensure tab labels do not overflow on small screens.
+@media (max-width: 768px) {
+  .mat-mdc-tab-labels {
+    .mat-mdc-tab {
+      min-width: 0;
+      padding: 0 var(--space-3);
+      font-size: var(--text-xs);
+    }
+  }
+}
+
+// ─── Prevent body horizontal overflow ────────────────────
+html, body {
+  overflow-x: hidden;
 }
