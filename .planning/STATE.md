@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 11 of 11 (Polish & Completeness)
 Plan: 6 of 7 in current phase
 Status: In progress — executing Phase 11 plans
-Last activity: 2026-02-18 — Completed 11-06-PLAN.md (Responsive Design)
+Last activity: 2026-02-18 — Completed 11-01-PLAN.md (Notes & Attachments Domain)
 
-Progress: Phases 1-10 complete + Phase 11 plan 06 done
+Progress: Phases 1-10 complete + Phase 11 plans 01, 06 done
 
 ## Performance Metrics
 
@@ -111,6 +111,7 @@ Progress: Phases 1-10 complete + Phase 11 plan 06 done
 | Phase 10 P04 | 6min | 2 tasks | 11 files |
 | Phase 10 P06 | 3min | 2 tasks | 5 files |
 | Phase 11 P06 | 3min | 2 tasks | 5 files |
+| Phase 11 P01 | 4min | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -379,6 +380,10 @@ Recent decisions affecting current work:
 - [Phase 10-04]: ImportStore tracks entityType in state for mapping step context (not just upload response)
 - [Phase 10-04]: SignalR ImportProgress event added to SignalRService following existing Subject/Observable pattern
 - [Phase 10-04]: Custom fields use 'custom:' prefix in mapping dropdown value to distinguish from core fields; stripped before API call
+- [11-01] Note and Attachment are tenant-scoped entities (not child entities) with own TenantId, query filters, and RLS policies
+- [11-01] Polymorphic entity linking via EntityType string + EntityId Guid (matching ActivityLink pattern, no FK constraints)
+- [11-01] ImageServiceExtensions.AddImageServices accepts IConfiguration for conditional storage provider (Local vs Azure) DI registration
+- [11-01] AzureBlobStorageService registered as Scoped (not Singleton) since BlobServiceClient is connection-string-scoped
 - [11-06] CSS-only slide-in drawer instead of MatSidenav to avoid restructuring app.component.html layout
 - [11-06] BreakpointObserver with toSignal for reactive isMobile detection (Angular CDK best practice, not window.resize)
 - [11-06] Scroll hint gradient on mobile tables for horizontal scroll affordance
@@ -395,5 +400,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 11-06-PLAN.md (Responsive Design)
-Resume file: .planning/phases/11-polish-and-completeness/11-06-SUMMARY.md
+Stopped at: Completed 11-01-PLAN.md (Notes & Attachments Domain)
+Resume file: .planning/phases/11-polish-and-completeness/11-01-SUMMARY.md
