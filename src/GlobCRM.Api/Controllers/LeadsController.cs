@@ -703,6 +703,302 @@ public class LeadsController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Conversion Endpoints ----
+
+    /// <summary>
+    /// Checks for duplicate contacts (by email) and companies (by name) before conversion.
+    /// Uses the lead's existing data for matching.
+    /// </summary>
+    [HttpGet("{id:guid}/convert/check-duplicates")]
+    [Authorize(Policy = "Permission:Lead:Update")]
+    [ProducesResponseType(typeof(CheckDuplicatesResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> CheckDuplicates(Guid id)
+    {
+        var lead = await _leadRepository.GetByIdAsync(id);
+        if (lead is null)
+            return NotFound(new { error = "Lead not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Lead", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(lead.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var contactMatches = new List<ContactMatchDto>();
+        var companyMatches = new List<CompanyMatchDto>();
+
+        // Check email against existing contacts (case-insensitive exact match)
+        if (!string.IsNullOrWhiteSpace(lead.Email))
+        {
+            var emailLower = lead.Email.ToLowerInvariant();
+            var matchingContacts = await _db.Contacts
+                .Where(c => c.Email != null && c.Email.ToLower() == emailLower)
+                .Include(c => c.Company)
+                .ToListAsync();
+
+            contactMatches = matchingContacts.Select(c => new ContactMatchDto
+            {
+                Id = c.Id,
+                FullName = c.FullName,
+                Email = c.Email,
+                CompanyName = c.Company?.Name
+            }).ToList();
+        }
+
+        // Check CompanyName against existing companies (case-insensitive contains)
+        if (!string.IsNullOrWhiteSpace(lead.CompanyName))
+        {
+            var companyNameLower = lead.CompanyName.ToLowerInvariant();
+            var matchingCompanies = await _db.Companies
+                .Where(c => c.Name.ToLower().Contains(companyNameLower))
+                .ToListAsync();
+
+            companyMatches = matchingCompanies.Select(c => new CompanyMatchDto
+            {
+                Id = c.Id,
+                Name = c.Name,
+                Phone = c.Phone,
+                Website = c.Website
+            }).ToList();
+        }
+
+        return Ok(new CheckDuplicatesResult
+        {
+            ContactMatches = contactMatches,
+            CompanyMatches = companyMatches
+        });
+    }
+
+    /// <summary>
+    /// Converts a lead to a contact (required), optional company, and optional deal.
+    /// Single SaveChangesAsync for atomicity. Creates LeadConversion record and
+    /// moves lead to the Converted stage.
+    /// </summary>
+    [HttpPost("{id:guid}/convert")]
+    [Authorize(Policy = "Permission:Lead:Update")]
+    [ProducesResponseType(typeof(ConvertLeadResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Convert(Guid id, [FromBody] ConvertLeadRequest request)
+    {
+        var lead = await _leadRepository.GetByIdAsync(id);
+        if (lead is null)
+            return NotFound(new { error = "Lead not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Lead", "Update");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(lead.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        // Validate lead is not already converted or lost
+        var currentStage = await _db.LeadStages.FindAsync(lead.LeadStageId);
+        if (currentStage is not null && (currentStage.IsConverted || currentStage.IsLost))
+            return BadRequest(new { error = "Cannot convert a lead that is already converted or lost." });
+
+        if (lead.IsConverted)
+            return BadRequest(new { error = "This lead has already been converted." });
+
+        // Validate request
+        var validator = new ConvertLeadValidator();
+        var validationResult = await validator.ValidateAsync(request);
+        if (!validationResult.IsValid)
+        {
+            return BadRequest(new
+            {
+                errors = validationResult.Errors
+                    .Select(e => new { field = e.PropertyName, message = e.ErrorMessage })
+            });
+        }
+
+        var tenantId = _tenantProvider.GetTenantId()
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        // a. Create Contact from request fields
+        var contact = new Contact
+        {
+            TenantId = tenantId,
+            FirstName = request.FirstName,
+            LastName = request.LastName,
+            Email = request.Email,
+            Phone = request.Phone,
+            MobilePhone = request.MobilePhone,
+            JobTitle = request.JobTitle,
+            OwnerId = userId
+        };
+
+        Guid? companyId = null;
+
+        // b. Handle company: existing or new
+        if (request.ExistingCompanyId.HasValue)
+        {
+            // Link to existing company
+            var existingCompany = await _db.Companies.FindAsync(request.ExistingCompanyId.Value);
+            if (existingCompany is null)
+                return BadRequest(new { error = "Specified company not found." });
+
+            contact.CompanyId = request.ExistingCompanyId.Value;
+            companyId = request.ExistingCompanyId.Value;
+        }
+        else if (request.CreateCompany)
+        {
+            // Create new company
+            var company = new Company
+            {
+                TenantId = tenantId,
+                Name = request.NewCompanyName!,
+                Website = request.NewCompanyWebsite,
+                Phone = request.NewCompanyPhone
+            };
+            _db.Companies.Add(company);
+            contact.CompanyId = company.Id;
+            companyId = company.Id;
+        }
+
+        _db.Contacts.Add(contact);
+
+        // c. Handle deal creation
+        Guid? dealId = null;
+        if (request.CreateDeal)
+        {
+            // Find the first stage of the specified pipeline (or default pipeline)
+            Pipeline? pipeline = null;
+            if (request.DealPipelineId.HasValue)
+            {
+                pipeline = await _db.Pipelines
+                    .Include(p => p.Stages)
+                    .FirstOrDefaultAsync(p => p.Id == request.DealPipelineId.Value);
+            }
+            else
+            {
+                pipeline = await _db.Pipelines
+                    .Include(p => p.Stages)
+                    .FirstOrDefaultAsync(p => p.IsDefault);
+            }
+
+            if (pipeline is null)
+                return BadRequest(new { error = "Pipeline not found. Specify a valid pipeline for deal creation." });
+
+            var firstStage = pipeline.Stages.OrderBy(s => s.SortOrder).FirstOrDefault();
+            if (firstStage is null)
+                return BadRequest(new { error = "Pipeline has no stages." });
+
+            var deal = new Deal
+            {
+                TenantId = tenantId,
+                Title = request.DealTitle!,
+                Value = request.DealValue,
+                PipelineId = pipeline.Id,
+                PipelineStageId = firstStage.Id,
+                CompanyId = companyId,
+                OwnerId = userId,
+                Probability = firstStage.DefaultProbability
+            };
+            _db.Deals.Add(deal);
+
+            // Link contact to deal via DealContact
+            var dealContact = new DealContact
+            {
+                DealId = deal.Id,
+                ContactId = contact.Id
+            };
+            _db.DealContacts.Add(dealContact);
+
+            dealId = deal.Id;
+        }
+
+        // d. Create LeadConversion record
+        var conversion = new LeadConversion
+        {
+            LeadId = lead.Id,
+            ContactId = contact.Id,
+            CompanyId = companyId,
+            DealId = dealId,
+            ConvertedByUserId = userId
+        };
+        _db.LeadConversions.Add(conversion);
+
+        // e. Mark lead as converted
+        lead.IsConverted = true;
+        lead.ConvertedAt = DateTimeOffset.UtcNow;
+        lead.ConvertedByUserId = userId;
+        lead.ConvertedContactId = contact.Id;
+        lead.ConvertedCompanyId = companyId;
+        lead.ConvertedDealId = dealId;
+
+        // f. Move lead to the Converted stage
+        var convertedStage = await _db.LeadStages.FirstOrDefaultAsync(s => s.IsConverted);
+        if (convertedStage is not null)
+        {
+            var stageHistory = new LeadStageHistory
+            {
+                LeadId = lead.Id,
+                FromStageId = lead.LeadStageId,
+                ToStageId = convertedStage.Id,
+                ChangedByUserId = userId,
+                Notes = "Lead converted"
+            };
+            _db.LeadStageHistories.Add(stageHistory);
+
+            lead.LeadStageId = convertedStage.Id;
+        }
+
+        lead.UpdatedAt = DateTimeOffset.UtcNow;
+
+        // g. Single SaveChangesAsync -- atomic transaction
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation("Lead {LeadId} converted: Contact={ContactId}, Company={CompanyId}, Deal={DealId}",
+            id, contact.Id, companyId, dealId);
+
+        // Dispatch feed event + notifications in try/catch
+        try
+        {
+            var feedItem = new FeedItem
+            {
+                TenantId = tenantId,
+                Type = FeedItemType.SystemEvent,
+                Content = $"Lead '{lead.FullName}' was converted to a contact",
+                EntityType = "Lead",
+                EntityId = lead.Id,
+                AuthorId = userId
+            };
+            await _feedRepository.CreateFeedItemAsync(feedItem);
+            await _dispatcher.DispatchToTenantFeedAsync(tenantId, new { feedItem.Id, feedItem.Content, feedItem.EntityType, feedItem.EntityId });
+
+            // Notify lead owner about conversion
+            if (lead.OwnerId.HasValue && lead.OwnerId.Value != userId)
+            {
+                await _dispatcher.DispatchAsync(new NotificationRequest
+                {
+                    RecipientId = lead.OwnerId.Value,
+                    Type = NotificationType.DealStageChanged,
+                    Title = "Lead Converted",
+                    Message = $"Lead '{lead.FullName}' was converted to a contact",
+                    EntityType = "Lead",
+                    EntityId = lead.Id,
+                    CreatedById = userId
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to dispatch feed/notification for lead conversion {LeadId}", id);
+        }
+
+        return Ok(new ConvertLeadResult
+        {
+            ContactId = contact.Id,
+            CompanyId = companyId,
+            DealId = dealId
+        });
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -1032,6 +1328,74 @@ public record ReopenLeadRequest
     public Guid StageId { get; init; }
 }
 
+/// <summary>
+/// Request body for converting a lead to contact + optional company + optional deal.
+/// </summary>
+public record ConvertLeadRequest
+{
+    // Contact fields (required, pre-filled from lead)
+    public string FirstName { get; init; } = string.Empty;
+    public string LastName { get; init; } = string.Empty;
+    public string? Email { get; init; }
+    public string? Phone { get; init; }
+    public string? MobilePhone { get; init; }
+    public string? JobTitle { get; init; }
+
+    // Company choice: existing or new
+    public Guid? ExistingCompanyId { get; init; }
+    public bool CreateCompany { get; init; }
+    public string? NewCompanyName { get; init; }
+    public string? NewCompanyWebsite { get; init; }
+    public string? NewCompanyPhone { get; init; }
+
+    // Deal choice
+    public bool CreateDeal { get; init; }
+    public string? DealTitle { get; init; }
+    public decimal? DealValue { get; init; }
+    public Guid? DealPipelineId { get; init; }
+}
+
+/// <summary>
+/// Result of duplicate check for lead conversion.
+/// </summary>
+public record CheckDuplicatesResult
+{
+    public List<ContactMatchDto> ContactMatches { get; init; } = new();
+    public List<CompanyMatchDto> CompanyMatches { get; init; } = new();
+}
+
+/// <summary>
+/// DTO for a matching contact found during duplicate check.
+/// </summary>
+public record ContactMatchDto
+{
+    public Guid Id { get; init; }
+    public string FullName { get; init; } = string.Empty;
+    public string? Email { get; init; }
+    public string? CompanyName { get; init; }
+}
+
+/// <summary>
+/// DTO for a matching company found during duplicate check.
+/// </summary>
+public record CompanyMatchDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string? Phone { get; init; }
+    public string? Website { get; init; }
+}
+
+/// <summary>
+/// Result of lead conversion.
+/// </summary>
+public record ConvertLeadResult
+{
+    public Guid ContactId { get; init; }
+    public Guid? CompanyId { get; init; }
+    public Guid? DealId { get; init; }
+}
+
 // ---- FluentValidation ----
 
 /// <summary>
@@ -1085,5 +1449,34 @@ public class UpdateLeadValidator : AbstractValidator<UpdateLeadRequest>
 
         RuleFor(x => x.LeadStageId)
             .NotEmpty().WithMessage("Lead stage is required.");
+    }
+}
+
+/// <summary>
+/// FluentValidation validator for ConvertLeadRequest.
+/// </summary>
+public class ConvertLeadValidator : AbstractValidator<ConvertLeadRequest>
+{
+    public ConvertLeadValidator()
+    {
+        RuleFor(x => x.FirstName)
+            .NotEmpty().WithMessage("First name is required.")
+            .MaximumLength(100).WithMessage("First name must be at most 100 characters.");
+
+        RuleFor(x => x.LastName)
+            .NotEmpty().WithMessage("Last name is required.")
+            .MaximumLength(100).WithMessage("Last name must be at most 100 characters.");
+
+        RuleFor(x => x.NewCompanyName)
+            .NotEmpty().WithMessage("Company name is required when creating a new company.")
+            .When(x => x.CreateCompany);
+
+        RuleFor(x => x.DealTitle)
+            .NotEmpty().WithMessage("Deal title is required when creating a deal.")
+            .When(x => x.CreateDeal);
+
+        RuleFor(x => x.DealPipelineId)
+            .NotEmpty().WithMessage("Pipeline is required when creating a deal.")
+            .When(x => x.CreateDeal);
     }
 }
