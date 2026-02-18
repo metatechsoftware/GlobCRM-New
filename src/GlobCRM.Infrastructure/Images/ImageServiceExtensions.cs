@@ -1,4 +1,5 @@
 using GlobCRM.Infrastructure.Storage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace GlobCRM.Infrastructure.Images;
@@ -9,11 +10,24 @@ namespace GlobCRM.Infrastructure.Images;
 public static class ImageServiceExtensions
 {
     /// <summary>
-    /// Registers AvatarService (scoped) and IFileStorageService (singleton) in DI.
+    /// Registers AvatarService (scoped) and IFileStorageService in DI.
+    /// IFileStorageService provider is selected based on FileStorage:Provider configuration:
+    ///   - "Azure": AzureBlobStorageService (scoped, requires FileStorage:Azure:ConnectionString)
+    ///   - "Local" (default): LocalFileStorageService (singleton, uses FileStorage:BasePath)
     /// </summary>
-    public static IServiceCollection AddImageServices(this IServiceCollection services)
+    public static IServiceCollection AddImageServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+        var provider = configuration["FileStorage:Provider"] ?? "Local";
+
+        if (string.Equals(provider, "Azure", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddScoped<IFileStorageService, AzureBlobStorageService>();
+        }
+        else
+        {
+            services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+        }
+
         services.AddScoped<AvatarService>();
 
         return services;

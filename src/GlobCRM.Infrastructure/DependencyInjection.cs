@@ -162,7 +162,7 @@ public static class DependencyInjection
         services.AddPermissionAuthorization();
 
         // ---- Image processing and file storage ----
-        services.AddImageServices();
+        services.AddImageServices(configuration);
 
         return services;
     }
