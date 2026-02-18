@@ -1,1111 +1,586 @@
-# PITFALLS.md
-Research: Critical Mistakes in Multi-Tenant SaaS CRM Projects
+# Domain Pitfalls
 
-## Document Purpose
-Identify domain-specific pitfalls for GlobCRM to prevent costly mistakes during development. Each pitfall includes warning signs, prevention strategies, and phase mapping.
-
----
-
-## 1. Multi-Tenancy & Data Isolation
-
-### P1.1: Tenant Data Leakage Through Inadequate Isolation
-**Description:** Failing to enforce tenant boundaries at every data access layer, leading to cross-tenant data exposure.
-
-**Warning Signs:**
-- Database queries without tenant_id filters
-- Global search features that span tenants
-- Cached data without tenant context
-- Shared worker queues processing without tenant validation
-- API endpoints that don't validate tenant ownership
-
-**Prevention Strategy:**
-- Implement tenant_id as mandatory filter in all queries (Row-Level Security in PostgreSQL)
-- Create base repository pattern that automatically injects tenant context
-- Use PostgreSQL policies to enforce tenant isolation at database level
-- Add integration tests that attempt cross-tenant access
-- Implement tenant context middleware that validates every request
-- Never rely solely on application-level filtering
-
-**Phase to Address:** Foundation (Phase 1) - must be architectural from day one
-
-**Impact if Ignored:** Critical security breach, regulatory violations (GDPR, SOC 2), complete loss of customer trust
+**Domain:** v1.1 Automation & Intelligence features for multi-tenant SaaS CRM
+**Researched:** 2026-02-18
+**Scope:** Workflow automation, email templates/sequences, formula fields, duplicate detection & merge, webhooks, advanced reporting builder -- all integrated with existing triple-layer multi-tenancy (Finbuckle + EF Core filters + PostgreSQL RLS) and RBAC permission system.
 
 ---
 
-### P1.2: Shared Schema Performance Degradation
-**Description:** Single shared schema becomes bottleneck as tenant count and data volume grow, especially with JSONB custom fields.
+## Critical Pitfalls
 
-**Warning Signs:**
-- Query performance degrades as tenant count increases
-- Index bloat affecting all tenants
-- Long-running queries from one tenant impacting others
-- Table statistics becoming unreliable
-- Vacuum operations taking excessive time
-
-**Prevention Strategy:**
-- Design partitioning strategy from start (partition by tenant_id or tenant ranges)
-- Implement proper JSONB indexing (GIN/GiST indexes on custom field paths)
-- Monitor query performance per tenant with pg_stat_statements
-- Set up connection pooling with tenant-aware routing
-- Establish per-tenant resource limits
-- Plan for schema sharding when tenant count exceeds threshold (typically 1000+ active tenants)
-
-**Phase to Address:** Foundation (Phase 1) for architecture, Early Expansion (Phase 2) for monitoring
-
-**Impact if Ignored:** System-wide slowdowns, "noisy neighbor" problems, inability to scale
+Mistakes that cause data loss, security breaches, system outages, or architectural rewrites.
 
 ---
 
-## 2. Custom Fields & Dynamic Schema
+### Pitfall 1: Workflow Automation Infinite Loops
 
-### P2.1: JSONB Query Performance Hell
-**Description:** Treating JSONB as schemaless storage without proper indexing and query optimization leads to full table scans.
+**What goes wrong:** A workflow triggers an entity update (e.g., "when deal stage changes, update custom field"), which itself triggers another workflow (e.g., "when custom field changes, update deal stage"), creating an infinite recursive loop. The system burns CPU, fills the database with audit records, floods SignalR with notifications, and may crash the process or exhaust database connections. In a multi-tenant system, one tenant's runaway workflow takes down the entire system for all tenants.
 
-**Warning Signs:**
-- Filter/search operations on custom fields are slow
-- Reports with custom field criteria timeout
-- Inability to use custom fields in complex queries
-- Missing or incorrect index usage in EXPLAIN plans
-- Users complaining about search performance
+**Why it happens:** Workflow engines that fire entity-change events without tracking execution context. The system cannot distinguish between a "user-initiated change" and a "workflow-initiated change" because both go through the same save path.
 
-**Prevention Strategy:**
-- Create GIN indexes on JSONB columns: `CREATE INDEX idx_contacts_custom ON contacts USING gin (custom_fields jsonb_path_ops);`
-- Index frequently-queried paths: `CREATE INDEX idx_custom_email ON contacts USING btree ((custom_fields->>'email_verified'));`
-- Limit custom field nesting depth (max 2-3 levels)
-- Implement custom field type validation at application layer
-- Cache custom field definitions and validation rules
-- Consider materialized views for frequently-queried custom field combinations
-- Document performance implications of custom field usage
+**Consequences:**
+- CPU exhaustion and process crash (noisy neighbor for all tenants)
+- Database connection pool exhaustion from rapid-fire queries
+- SignalR broadcast storm: thousands of notifications per second to connected clients
+- Audit log / feed_items table explosion (millions of rows in seconds)
+- `AuditableEntityInterceptor` fires on every save, creating cascading timestamp updates
 
-**Phase to Address:** Foundation (Phase 1) for indexing strategy, Core CRM (Phase 2) for optimization
+**Prevention:**
+1. **Execution context tracking:** Every workflow execution must carry a `WorkflowExecutionContext` with a unique `executionId`, `depth` counter, and `triggeredByWorkflowId`. Pass this context through all entity-update code paths.
+2. **Hard depth limit:** Enforce a maximum recursion depth of 5 (configurable per tenant). When depth exceeds the limit, halt execution, log a warning, and mark the workflow as "circuit-broken."
+3. **Per-execution visited set:** Track which (entityId, workflowId) pairs have already been processed in the current execution chain. Skip duplicates.
+4. **Per-tenant execution rate limit:** Cap the number of workflow executions per tenant per minute (e.g., 100/min for standard tier). Use .NET 10's partitioned rate limiting with `PartitionedRateLimiter<string>` keyed by tenant ID.
+5. **Background execution with queue:** Never execute workflows synchronously in the HTTP request pipeline. Use a queue (in-process `Channel<T>` or Hangfire) so the original API call returns immediately and workflow processing happens asynchronously.
+6. **Separate "workflow-initiated" save path:** Create a distinct method like `UpdateEntityFromWorkflow(entity, context)` that explicitly skips workflow trigger evaluation when depth > 0, or that only allows re-triggering with incremented depth.
 
-**Impact if Ignored:** Unusable custom fields, user frustration, inability to scale beyond small datasets
+**Detection:**
+- Monitor `workflow_executions` table for chains with depth > 3
+- Alert on workflow execution rate exceeding 50/min for any single tenant
+- Log workflow execution chain as structured data: `{executionId, depth, parentWorkflowId, triggeredBy}`
+- Dashboard widget showing "workflow executions per hour by tenant"
 
----
-
-### P2.2: Uncontrolled Custom Field Proliferation
-**Description:** Allowing unlimited custom fields without governance leads to schema chaos and maintenance nightmares.
-
-**Warning Signs:**
-- Hundreds of custom fields per entity
-- Duplicate or abandoned custom fields
-- Inconsistent data types across similar fields
-- Performance degradation from JSONB document size
-- Import/export operations failing due to field count
-
-**Prevention Strategy:**
-- Set reasonable limits per entity (e.g., 50-100 custom fields)
-- Implement custom field lifecycle management (active/deprecated/archived)
-- Require field naming conventions and descriptions
-- Build custom field usage analytics
-- Provide field deduplication detection
-- Charge for custom fields beyond base limit (business constraint)
-- Regular audit and cleanup processes
-
-**Phase to Address:** Core CRM (Phase 2) for limits, Early Expansion (Phase 3) for governance
-
-**Impact if Ignored:** Unmaintainable system, data quality issues, poor user experience
+**Feature:** Workflow Automation
+**Phase to address:** First -- must be designed into the workflow engine from the start, not bolted on later.
 
 ---
 
-### P2.3: Type System Mismatch Between Custom Fields and Operations
-**Description:** Treating all custom fields as strings instead of maintaining type fidelity breaks filtering, sorting, and business logic.
+### Pitfall 2: Tenant Context Loss in Background Jobs
 
-**Warning Signs:**
-- Date custom fields sorted alphabetically
-- Numeric calculations failing on custom number fields
-- Boolean fields requiring string comparison
-- Inability to use standard UI controls for typed fields
-- Data validation happening too late (at query time vs entry time)
+**What goes wrong:** Workflows, email sequences, webhook deliveries, and report generation all run as background jobs. These jobs execute outside an HTTP request, so Finbuckle's middleware (Layer 1 of triple-layer defense) never runs. The `TenantDbConnectionInterceptor` requires `ITenantProvider.GetTenantId()` to set `app.current_tenant` on the PostgreSQL session, but `ITenantProvider` resolves from HttpContext. Background jobs have no HttpContext, so:
+- EF Core global query filters use a null tenant ID, potentially returning all tenants' data or no data
+- PostgreSQL RLS policies receive a null `app.current_tenant`, blocking all queries (rows invisible)
+- Worse: if a previous request's connection is reused from the pool, the *wrong* tenant's session variable may still be set
 
-**Prevention Strategy:**
-- Define explicit type system for custom fields (string, number, date, boolean, picklist, lookup, etc.)
-- Store type metadata separately from field values
-- Validate and coerce data at write time
-- Generate appropriate UI controls based on field type
-- Cast JSONB values properly in queries: `(custom_fields->>'age')::integer`
-- Implement type-aware comparison operators
+**Why it happens:** The v1.0 architecture correctly resolves tenant from HTTP requests via `TenantProvider` which reads from Finbuckle. Background jobs bypass this entirely. The existing `NotificationDispatcher.DispatchAsync(request, tenantId)` overload shows awareness of this problem for notifications, but a systematic solution is needed for all v1.1 background processing.
 
-**Phase to Address:** Foundation (Phase 1) - core to custom field architecture
+**Consequences:**
+- Workflow actions execute against wrong tenant's data (catastrophic data leak)
+- Email sequences send emails to wrong tenant's contacts
+- Webhook payloads contain cross-tenant data
+- Report queries return data from other tenants
+- RLS may silently return zero rows, causing workflows to fail silently with no error
 
-**Impact if Ignored:** Broken user workflows, unreliable data, poor reporting
+**Prevention:**
+1. **Explicit tenant context wrapper for all background jobs:** Create a `TenantScope` class that, given a tenant ID:
+   - Creates a new DI scope via `IServiceScopeFactory`
+   - Resolves a `TenantProvider` and sets the tenant ID explicitly
+   - Ensures the `ApplicationDbContext` in that scope gets the correct tenant
+   - The `TenantDbConnectionInterceptor` then sets `app.current_tenant` correctly
+2. **Store tenant ID in every job payload:** All background job records (workflow executions, email sequence steps, webhook deliveries) must persist `TenantId` as a non-nullable column. Never rely on ambient context.
+3. **Validate tenant context before processing:** At the start of every background job handler, assert that `ITenantProvider.GetTenantId()` returns the expected value. Fail loudly if it does not match.
+4. **Connection pool isolation:** Ensure background job connections do not reuse pooled connections from a different tenant without re-setting `app.current_tenant`. The `TenantDbConnectionInterceptor` already handles this on `ConnectionOpened`, but verify with integration tests.
+5. **Integration test:** Write a test that enqueues a background job for Tenant A, then immediately processes a job for Tenant B, and verifies no data leakage occurs.
 
----
+**Detection:**
+- Audit log entries where `TenantId` on the action result differs from the `TenantId` on the triggering record
+- Background job failures with "No rows returned" when rows definitely exist (RLS blocking due to wrong tenant)
+- Structured logging: every background job log line must include `TenantId`
 
-## 3. RBAC & Security
-
-### P3.1: Over-Simplified Permission Model
-**Description:** Implementing only role-based access without field-level, record-level, or action-level granularity.
-
-**Warning Signs:**
-- All or nothing access to entities
-- Cannot hide sensitive fields (salary, personal data) from some roles
-- Cannot restrict access to specific records (territory-based, hierarchy-based)
-- Permissions hardcoded in UI rather than enforced at API layer
-- Workarounds like duplicate entities for different access levels
-
-**Prevention Strategy:**
-- Implement layered permission model:
-  - Role-based (who can access what entities)
-  - Field-level (hide/view/edit specific fields)
-  - Record-level (ownership, territory, hierarchy rules)
-  - Action-level (create, read, update, delete, share, export)
-- Design permission evaluation engine that combines all layers
-- Cache permission matrices per user session
-- Enforce permissions at database view layer where possible
-- Build permission inheritance model (roles → teams → individuals)
-- Include permission context in all API responses
-
-**Phase to Address:** Foundation (Phase 1) for architecture, Core CRM (Phase 2) for field-level
-
-**Impact if Ignored:** Inflexible security model, cannot meet enterprise requirements, security gaps
+**Feature:** All features (workflow, email sequences, webhooks, reports)
+**Phase to address:** First -- build the `TenantScope` infrastructure before implementing any background processing features.
 
 ---
 
-### P3.2: Missing Audit Trail for Permission Changes
-**Description:** Not tracking who changed permissions/roles and when, making security audits impossible.
+### Pitfall 3: Report Query Builder Tenant Data Leakage
 
-**Warning Signs:**
-- Cannot answer "who gave X access to Y?"
-- No record of permission escalation events
-- Compliance audit failures
-- Inability to detect insider threats
-- No rollback capability for permission changes
+**What goes wrong:** The advanced reporting builder lets users construct custom queries (choose entity, filters, groupings, aggregations). If the query builder generates raw SQL or uses `FromSqlRaw`/`FromSqlInterpolated`, EF Core global query filters are bypassed. Even if LINQ is used, a bug in the dynamic query construction could accidentally call `IgnoreQueryFilters()` or construct a query that joins to an unfiltered table. One tenant's admin could craft a report that returns another tenant's data.
 
-**Prevention Strategy:**
-- Implement comprehensive audit logging for all permission operations
-- Track: user, timestamp, action, before/after state, reason/justification
-- Include permission changes in general audit trail system
-- Create alerts for suspicious permission changes (admin role grants, bulk changes)
-- Build audit trail UI for security admins
-- Immutable audit log (append-only, separate database)
-- Retain audit data according to compliance requirements
+**Why it happens:** Dynamic query construction is inherently risky because the query shape is user-controlled. Unlike normal CRUD endpoints where the code path is fixed and reviewed, the report builder constructs queries programmatically based on user input. The combinatorial explosion of possible query shapes makes it nearly impossible to review every path.
 
-**Phase to Address:** Core CRM (Phase 2) for basic audit, Early Expansion (Phase 3) for advanced analytics
+**Consequences:**
+- Cross-tenant data exposure (security breach, regulatory violation)
+- SQL injection if user input is interpolated into raw SQL
+- N+1 queries from naive query construction (e.g., loading related entities in a loop)
+- Query timeout from unoptimized joins across large tables
 
-**Impact if Ignored:** Compliance failures, security breaches undetected, no accountability
+**Prevention:**
+1. **Never use raw SQL in the report builder.** Build all report queries using LINQ and the EF Core query pipeline so global query filters always apply. If raw SQL is absolutely needed, manually add `WHERE tenant_id = @tenantId` to every table reference -- but prefer LINQ.
+2. **Whitelist-based query construction:** The report builder should only allow selecting from a predefined set of entity types and fields. Map user selections to strongly-typed LINQ expressions, never to string-based SQL fragments. Example: user selects "Contact.Email" --> map to `query.Select(c => c.Email)`, not `$"SELECT {userInput} FROM contacts"`.
+3. **Rely on PostgreSQL RLS as the safety net:** Since `TenantDbConnectionInterceptor` sets `app.current_tenant` on every connection, RLS will catch any query filter bypass. But do not rely on this as the primary defense -- it is the last line.
+4. **Query complexity limits:** Cap the number of joins (max 5), result rows (max 10,000 with pagination), and execution time (30-second timeout). Use `SET statement_timeout = '30s'` for report queries.
+5. **Never expose `IgnoreQueryFilters()` in any code path reachable from the report builder.** Grep the codebase for `IgnoreQueryFilters` and ensure none of those paths are accessible from dynamic query construction.
+6. **Parameterize all user inputs:** Even in LINQ, ensure filter values are parameterized (EF Core does this by default, but verify when building dynamic `Expression<Func<T, bool>>`).
 
----
+**Detection:**
+- Integration tests that create data for two tenants, run every report type, and verify zero cross-tenant rows
+- Query logging: log the generated SQL for every report execution, with structured fields for tenant ID and user ID
+- Periodic audit: automated scan for `IgnoreQueryFilters` calls in the codebase
 
-### P3.3: Race Conditions in Permission Checks
-**Description:** Permission evaluated at read time but changed before write time, creating security gaps in multi-user scenarios.
-
-**Warning Signs:**
-- Users reporting they "lost access" to records they're actively editing
-- Permission checks passing in UI but failing at save
-- Data corruption from concurrent permission changes
-- Optimistic locking failures related to permission changes
-
-**Prevention Strategy:**
-- Implement permission tokens with short TTL
-- Re-validate permissions at write time
-- Use optimistic locking with permission version tracking
-- Return permission context with data reads
-- Handle permission denials gracefully with user feedback
-- Implement WebSocket notifications for permission changes affecting active sessions
-
-**Phase to Address:** Core CRM (Phase 2) - before multi-user workflows mature
-
-**Impact if Ignored:** Security vulnerabilities, poor user experience, data integrity issues
+**Feature:** Advanced Reporting Builder
+**Phase to address:** Reporting Builder phase -- but design the query builder architecture with these constraints from the start.
 
 ---
 
-## 4. Email Integration
+### Pitfall 4: Duplicate Merge Data Loss and Broken References
 
-### P4.1: Email Sync Data Volume Explosion
-**Description:** Syncing entire email history for all users without filtering strategy overwhelms storage and processing.
+**What goes wrong:** When merging two duplicate contacts (or companies), the "losing" record is deleted after its data is transferred to the "winner." But the system has many FK relationships: `DealContact.ContactId`, `Activity.ContactId`, `EmailMessage` linked to contacts, `Note` linked to contacts, `QuoteLineItem` linked via deals, custom field `Relation` type fields pointing to the merged entity, feed items referencing the entity, notifications, webhook subscription filters, workflow trigger conditions, and potentially the new email sequence enrollments. Missing even one FK update means:
+- Orphaned records with dangling FK references (if FK constraints are nullable)
+- Constraint violation errors (if FK constraints are NOT NULL)
+- Activities, emails, and notes disappear from the merged entity's timeline
+- Workflows that reference the deleted entity's ID break silently
+- Reports show incorrect counts (entity referenced in old records but deleted)
 
-**Warning Signs:**
-- Database size growing exponentially
-- Email sync taking hours per user
-- Storage costs skyrocketing
-- Search and filter operations timing out
-- Users with large mailboxes (100k+ emails) breaking the system
+**Why it happens:** The CRM entity graph is deeply interconnected. v1.0 has 50+ entity types with numerous relationships. Developers enumerate the "obvious" FKs (deals, activities, notes) but miss less obvious ones (feed_items.EntityId, notifications.EntityId, saved_view filters referencing specific entity IDs, custom field Relation values stored in JSONB).
 
-**Prevention Strategy:**
-- Implement smart sync policies:
-  - Only sync emails from/to CRM contacts
-  - Date range limits (e.g., last 6 months active, older archived)
-  - Size limits per email
-  - Selective folder sync (exclude trash, spam)
-- Provide user controls for sync preferences
-- Implement incremental sync with change detection
-- Archive old emails to cold storage
-- Set up email attachment storage with CDN
-- Use separate database/schema for email data
+**Consequences:**
+- Permanent data loss (activities, emails, notes disconnected from the contact)
+- Broken timelines (the timeline endpoint assembles events from multiple sources; missing links = missing events)
+- Workflow/email sequence failures when they reference the deleted entity
+- Incorrect reporting data (merged entity's history is incomplete)
+- User frustration: "Where did my emails go after the merge?"
 
-**Phase to Address:** Early Expansion (Phase 3) - email sync is complex, don't rush it
+**Prevention:**
+1. **Build a comprehensive FK reference map:** Before implementing merge, enumerate every table/column that can reference a Contact or Company ID. Include:
+   - Direct FKs: `deal_contacts`, `activities`, `notes`, `attachments`, `quotes`, `email_messages`
+   - Polymorphic references: `feed_items.entity_id`, `notifications.entity_id` (where `entity_type = 'Contact'`)
+   - JSONB references: Custom field values of type `Relation` that point to the entity
+   - New v1.1 tables: `workflow_trigger_conditions`, `email_sequence_enrollments`, `webhook_subscriptions`
+2. **Merge operation as a transaction:** Wrap the entire merge in a single database transaction. Update all FKs, then soft-delete the losing record (do not hard-delete). Keep the losing record marked as `MergedIntoId = winnerId` for audit trail and potential undo.
+3. **Soft-delete with redirect:** When any code path resolves an entity by ID and gets a soft-deleted merged record, follow the `MergedIntoId` redirect to the winner. This prevents broken links from code that cached the old ID.
+4. **Merge preview endpoint:** Before executing, return a summary: "This will reassign 12 deals, 45 activities, 23 emails, 8 notes to the surviving record." Let the user confirm.
+5. **Conflict resolution UI:** When both records have different values for the same field (e.g., different phone numbers), let the user choose which value to keep per field, not just "keep winner's values."
+6. **Custom field JSONB merge:** For Relation-type custom fields pointing to the losing entity, update the JSONB value. Use PostgreSQL's `jsonb_set` function in a single UPDATE to avoid loading all entities into memory.
 
-**Impact if Ignored:** Unsustainable storage costs, system performance degradation, failed syncs
+**Detection:**
+- After merge, query all FK reference points and verify zero references to the deleted entity ID remain
+- Integration test: create two contacts with full relationship graph, merge them, verify all relationships point to the winner
+- Monitor for 404 errors on entity detail pages (user bookmarked the old URL)
 
----
-
-### P4.2: Email Threading and Deduplication Failures
-**Description:** Poor email threading logic creates duplicate records and broken conversation views.
-
-**Warning Signs:**
-- Same email appearing multiple times
-- Broken reply chains
-- Unable to trace conversation history
-- Multiple CRM records for single conversation
-- Email associations to wrong contacts/deals
-
-**Prevention Strategy:**
-- Use proper email threading identifiers:
-  - Message-ID header (unique identifier)
-  - In-Reply-To header (parent message)
-  - References header (entire thread)
-  - Subject line normalization (Re:, Fwd: handling)
-- Implement deduplication at sync time
-- Build conversation reconstruction algorithm
-- Store email relationships (replied_to, forwarded_from)
-- Handle edge cases (multiple recipients, cross-thread replies)
-- Test with real-world email data (Gmail threads, Outlook conversations)
-
-**Phase to Address:** Early Expansion (Phase 3) - critical for email feature quality
-
-**Impact if Ignored:** Confusing UX, duplicate data, lost context, poor adoption
+**Feature:** Duplicate Detection & Merge
+**Phase to address:** Duplicate Detection & Merge phase -- but the soft-delete/redirect pattern should be designed early since it affects entity resolution across the entire system.
 
 ---
 
-### P4.3: OAuth Token Management and Refresh Failures
-**Description:** Poor handling of OAuth token expiration and refresh leads to constant re-authentication requests.
+### Pitfall 5: Webhook SSRF (Server-Side Request Forgery)
 
-**Warning Signs:**
-- Users constantly asked to reconnect email
-- Sync failures with "authentication required" errors
-- Token refresh failing silently
-- No notification when email connection breaks
-- Security tokens stored insecurely
+**What goes wrong:** The webhook feature allows tenant admins to register arbitrary URLs that the system will call (POST with event payload) when entity events occur. An attacker registers a webhook URL pointing to `http://169.254.169.254/latest/meta-data/` (AWS metadata endpoint), `http://localhost:5233/api/admin/...` (internal API), or `http://10.0.0.1/internal-service`. The server dutifully makes the HTTP request from its own network, bypassing firewalls and accessing internal resources the attacker should not reach.
 
-**Prevention Strategy:**
-- Implement robust token refresh mechanism:
-  - Proactive refresh before expiration
-  - Retry logic with exponential backoff
-  - Graceful degradation when refresh fails
-- Encrypt tokens at rest (never plain text)
-- Monitor token health per user
-- Notify users of auth failures with clear re-auth flow
-- Implement token revocation handling
-- Test token edge cases (revoked access, password change, 2FA changes)
-- Handle provider-specific quirks (Gmail vs Outlook token lifetimes)
+**Why it happens:** Webhook implementations accept user-provided URLs and make server-side HTTP requests to them. Without URL validation, the server becomes a proxy for the attacker.
 
-**Phase to Address:** Early Expansion (Phase 3) - before email beta
+**Consequences:**
+- Exposure of cloud provider credentials (AWS/Azure metadata endpoints)
+- Access to internal services not exposed to the internet
+- Port scanning of internal networks
+- Potential for further exploitation via SSRF chains
 
-**Impact if Ignored:** User frustration, broken email sync, support burden, security risks
+**Prevention:**
+1. **URL validation on registration:**
+   - Allow only `https://` scheme (block `http://`, `file://`, `ftp://`, `gopher://`)
+   - Resolve the hostname to an IP address and reject RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and multicast ranges
+   - Re-resolve DNS on every webhook delivery (not just registration) to prevent DNS rebinding attacks
+   - Reject URLs with IP addresses (require hostnames)
+2. **Network isolation:** Run webhook delivery workers in a separate network segment / container with no access to internal services. Egress-only to the public internet.
+3. **Response handling:** Do not return the response body from webhook calls to the user (prevent data exfiltration). Only return status code, latency, and success/failure.
+4. **Redirect limits:** Follow a maximum of 3 redirects. On each redirect, re-validate the target URL against the same rules. Block redirects to private IPs.
+5. **Timeout:** Set a short HTTP timeout (10 seconds) to prevent connection to slow/hanging internal services.
 
----
+**Detection:**
+- Log all webhook delivery URLs with resolved IP addresses
+- Alert on webhook registrations to private IP ranges (should be blocked, but alert if validation is bypassed)
+- Monitor webhook delivery latency spikes (may indicate slow internal service scanning)
 
-### P4.4: Email Parsing and Sanitization Vulnerabilities
-**Description:** Inadequate email content parsing and sanitization creates XSS vulnerabilities and rendering issues.
-
-**Warning Signs:**
-- Email HTML breaking CRM UI
-- Script execution in email content
-- Broken email formatting
-- CSS from emails affecting application styles
-- Email attachments with malicious content not detected
-
-**Prevention Strategy:**
-- Use battle-tested HTML sanitization library (DOMPurify, HtmlSanitizer)
-- Strip/sandbox JavaScript completely
-- Isolate email rendering in iframe sandbox
-- Remove external CSS/images by default (user opt-in for privacy)
-- Implement Content Security Policy for email viewer
-- Scan attachments with anti-virus API before storage
-- Limit email HTML features (no plugins, objects, forms)
-- Test with known malicious email samples
-
-**Phase to Address:** Early Expansion (Phase 3) - security critical before launch
-
-**Impact if Ignored:** XSS attacks, security breaches, UI corruption, compliance violations
+**Feature:** Webhooks
+**Phase to address:** Webhooks phase -- URL validation must be in the first implementation, not added later.
 
 ---
 
-## 5. Real-Time Features (SignalR)
+### Pitfall 6: Formula Field Circular Dependencies and Evaluation Storms
 
-### P5.1: Connection State Management Chaos
-**Description:** Poor handling of connection lifecycle (disconnects, reconnects, duplicate connections) breaks real-time features.
+**What goes wrong:** Formula/computed custom fields reference other fields, including other formula fields. Field A's formula references Field B, and Field B's formula references Field A (direct cycle). Or: Field A -> Field B -> Field C -> Field A (indirect cycle). When the system attempts to evaluate any field in the cycle, it enters infinite recursion. Even without cycles, deeply nested formula chains (A -> B -> C -> D -> E -> F) create evaluation storms when the root field changes, requiring re-computation of the entire chain for every record.
 
-**Warning Signs:**
-- Users receiving duplicate notifications
-- Notifications not arriving after page refresh
-- Memory leaks from abandoned connections
-- Users stuck in "connecting" state
-- Notification delivery inconsistent
+**Why it happens:** Users define formula fields one at a time and do not visualize the dependency graph. The system does not validate the graph at definition time, only discovering cycles at evaluation time (or worse, hitting a stack overflow).
 
-**Prevention Strategy:**
-- Implement connection state machine (connecting, connected, reconnecting, disconnected)
-- Store connection mapping (user → connection IDs) with TTL
-- Clean up stale connections automatically
-- Implement connection groups by tenant for isolation
-- Add client-side reconnection logic with exponential backoff
-- Handle page visibility API (pause notifications when tab hidden)
-- Test connection edge cases (network switch, sleep/wake, browser background)
-- Implement heartbeat/keepalive mechanism
+**Consequences:**
+- Stack overflow / infinite recursion during field evaluation
+- CPU exhaustion when a bulk update touches a field referenced by deep formula chains
+- Stale computed values if evaluation errors are silently swallowed
+- Incorrect reports and dashboards showing stale or partially-evaluated formula values
 
-**Phase to Address:** Core CRM (Phase 2) for basic notifications, Early Expansion (Phase 3) for robustness
+**Prevention:**
+1. **Build a dependency graph at definition time:** When a formula field is created or updated, parse the formula to extract all field references. Build a directed graph of field dependencies. Use topological sort to detect cycles. Reject formulas that create cycles with a clear error message: "This formula creates a circular dependency: Field A -> Field B -> Field A."
+2. **Maximum dependency depth:** Limit formula chains to 5 levels deep. A formula field cannot reference another formula field that is already at depth 4.
+3. **Topological evaluation order:** When a field value changes, use the dependency graph to determine which formula fields need re-evaluation and in what order. Evaluate in topological order (leaf dependencies first, then fields that depend on them).
+4. **Lazy evaluation with caching:** Store computed values in the entity's `CustomFields` JSONB alongside raw values, marked with a `_computed` suffix or in a separate JSONB column. Re-evaluate only when a dependency changes, not on every read.
+5. **Evaluation timeout:** Cap formula evaluation at 100ms per field per record. If evaluation exceeds this, mark the field as "error" and log the issue.
+6. **Restrict formula language:** Use a safe expression evaluator (not `eval()` or Roslyn compilation). Allow only arithmetic, string operations, field references, and simple conditionals. No loops, no function definitions, no external calls. Consider `NCalc` or a custom parser.
+7. **Bulk update performance:** When a bulk import updates 10,000 records, do not evaluate formula fields row-by-row. Batch the evaluation: collect all changed fields, determine affected formula fields, then evaluate in bulk using set-based operations where possible.
 
-**Impact if Ignored:** Unreliable notifications, resource leaks, poor user experience
+**Detection:**
+- Validate dependency graph on every formula field save (reject cycles immediately)
+- Monitor formula evaluation time per tenant
+- Alert on formula evaluation errors (stale values are worse than errors)
 
----
-
-### P5.2: Real-Time Update Race Conditions
-**Description:** Concurrent updates from multiple users create conflicting UI state and data corruption.
-
-**Warning Signs:**
-- Users overwriting each other's changes
-- UI showing stale data after real-time update
-- Optimistic UI updates not rolling back on failure
-- Merge conflicts not detected or resolved
-- "Lost update" problem in concurrent editing
-
-**Prevention Strategy:**
-- Implement optimistic concurrency control:
-  - Version numbers or timestamps on all entities
-  - Detect conflicts on save (version mismatch)
-  - Provide merge conflict resolution UI
-- Use operational transformation or CRDTs for collaborative editing
-- Send full object version with real-time updates
-- Implement client-side state reconciliation
-- Show "user X is editing" indicators
-- Add record locking for critical operations
-- Test with multiple concurrent users
-
-**Phase to Address:** Core CRM (Phase 2) - critical for data integrity
-
-**Impact if Ignored:** Data loss, user frustration, data integrity issues
+**Feature:** Formula/Computed Custom Fields
+**Phase to address:** Formula Fields phase -- dependency graph validation must be the first thing built, before the evaluation engine.
 
 ---
 
-### P5.3: Real-Time Performance Degradation
-**Description:** Broadcasting updates to all connected clients scales poorly, overwhelming servers and clients.
+## Moderate Pitfalls
 
-**Warning Signs:**
-- SignalR server CPU spikes
-- Client browsers freezing during high activity
-- Notification delays increasing with user count
-- Memory usage growing with active connections
-- Message queues backing up
-
-**Prevention Strategy:**
-- Implement smart filtering at server side:
-  - Only send updates user has permission to see
-  - Filter by user's active view/context
-  - Group notifications (batch updates every N seconds)
-- Use SignalR groups/channels efficiently:
-  - Tenant-level groups
-  - Entity-level groups (contact_123_watchers)
-  - Activity-level groups (deal_pipeline_viewers)
-- Implement client-side throttling/debouncing
-- Use binary protocols for large payloads
-- Consider message queue (RabbitMQ, Redis) for high-volume scenarios
-- Set up SignalR scale-out (Redis backplane) early
-- Monitor message delivery latency
-
-**Phase to Address:** Core CRM (Phase 2) for architecture, Early Expansion (Phase 3) for scale-out
-
-**Impact if Ignored:** System slowdown under load, poor user experience, scaling limitations
+Mistakes that cause significant bugs, performance issues, or difficult debugging, but are recoverable without rewrites.
 
 ---
 
-## 6. Deal Pipeline & Workflow
+### Pitfall 7: Email Sequence Timing and Deliverability
 
-### P6.1: Hardcoded Pipeline Stages
-**Description:** Pipeline stages and rules hardcoded instead of configurable, preventing customization.
+**What goes wrong:** Email sequences send automated follow-up emails on a schedule (e.g., Day 1: Welcome, Day 3: Follow-up, Day 7: Check-in). Multiple issues arise:
+- **Timing drift:** If the sequence scheduler runs every 5 minutes, emails may send up to 5 minutes late. Over a 7-day sequence, this is acceptable. But if sequences are per-minute, the scheduler's polling interval matters.
+- **Deliverability collapse:** All tenants' sequences fire at the same time (e.g., all "Day 3" emails at midnight UTC). The shared SendGrid account gets rate-limited or flagged for bulk sending, causing all emails to bounce or be delayed.
+- **Contact unsubscribe ignored:** A contact unsubscribes (or is merged/deleted) while an email sequence is in progress. The next scheduled email still sends.
+- **Duplicate enrollment:** A contact is enrolled in the same sequence twice (e.g., workflow fires twice due to a bug), receiving duplicate emails.
 
-**Warning Signs:**
-- Cannot add/remove/rename pipeline stages
-- Stage transition rules in application code
-- Different industries require different pipelines
-- Validation rules hardcoded per stage
-- Cannot have multiple pipelines
+**Prevention:**
+1. **Jittered send times:** When enrolling a contact in a sequence, add a random jitter of +/- 30 minutes to each step's scheduled time. This spreads load across time and avoids bulk-sending spikes.
+2. **Per-tenant sending rate limits:** Cap each tenant's email sends to a reasonable rate (e.g., 100/hour). Queue excess emails and drain gradually.
+3. **Pre-send validation:** Before sending each sequence step, verify:
+   - Contact still exists and is not soft-deleted or merged
+   - Contact has not unsubscribed
+   - Contact's email is still valid (not bounced in a previous send)
+   - The sequence enrollment is still active (not paused or cancelled)
+4. **Idempotent enrollment:** Use a unique constraint on `(sequence_id, contact_id)` to prevent duplicate enrollments. If a workflow tries to enroll an already-active contact, skip or update the existing enrollment.
+5. **Sequence step deduplication:** Each step execution should have an idempotency key. If the scheduler processes the same step twice (due to retry), the second execution is a no-op.
+6. **SendGrid/email provider integration:** Use the existing `IEmailService` abstraction, but add rate-limiting middleware. Track bounce rates per tenant and auto-pause sequences if bounce rate exceeds 5%.
 
-**Prevention Strategy:**
-- Design pipeline configuration system from start:
-  - Stages as data (name, order, color, rules)
-  - Transition rules as data (allowed moves, required fields, automation triggers)
-  - Multiple pipelines per tenant
-  - Stage-specific field requirements
-- Build pipeline designer UI
-- Store pipeline configuration in database
-- Implement validation engine that reads pipeline rules
-- Support pipeline templates for common industries
-- Version pipeline changes (don't break historical data)
+**Detection:**
+- Monitor email send rate per tenant per hour
+- Alert on bounce rate exceeding 3% for any tenant
+- Dashboard showing sequence completion rates (enrollments vs. completions vs. drops)
+- Log every sequence step execution with contact ID, sequence ID, step number, and result
 
-**Phase to Address:** Core CRM (Phase 2) - core feature differentiator
-
-**Impact if Ignored:** Inflexible product, cannot address diverse markets, competitive disadvantage
-
----
-
-### P6.2: Lost Activity History During Pipeline Changes
-**Description:** Reconfiguring pipelines corrupts historical data and reporting.
-
-**Warning Signs:**
-- Reports breaking after pipeline stage rename
-- Historical deals showing deleted stage names
-- Trend analysis impossible across pipeline changes
-- Deal age calculations incorrect
-- Stage transition history lost
-
-**Prevention Strategy:**
-- Separate current state from history:
-  - Store stage history with timestamps (deal moved from A → B on date X)
-  - Reference stage definitions by ID, not name
-  - Keep deleted stages in database (soft delete)
-  - Version pipeline configurations
-- Build migration tools for pipeline changes
-- Provide "effective date" for pipeline changes (don't retroactively apply)
-- Historical reports use stage names as of that time period
-- Warn admins about reporting impact of pipeline changes
-
-**Phase to Address:** Core CRM (Phase 2) - before pipeline customization
-
-**Impact if Ignored:** Lost historical data, broken reporting, compliance issues
+**Feature:** Email Templates & Sequences
+**Phase to address:** Email Templates & Sequences phase.
 
 ---
 
-### P6.3: Activity Workflow State Machine Bugs
-**Description:** Incomplete state machine for activities (tasks, meetings, calls) allows invalid state transitions.
+### Pitfall 8: Workflow Actions Bypassing RBAC Permission Checks
 
-**Warning Signs:**
-- Completed tasks being edited
-- Deleted activities still appearing
-- Status inconsistencies (completed but no completion date)
-- Notification logic failing due to unexpected states
-- Cannot track activity lifecycle properly
+**What goes wrong:** A workflow executes an action (e.g., "update deal stage to Won" or "create a follow-up activity") using the system's service account, not the user who triggered the workflow. The action succeeds even though the user who triggered it does not have permission to update deals or create activities. This violates the RBAC model and allows privilege escalation.
 
-**Prevention Strategy:**
-- Define explicit state machine for each activity type:
-  - Valid states: planned, in_progress, completed, cancelled, deleted
-  - Valid transitions: planned → in_progress → completed
-  - Immutable transitions (completed cannot go back to planned)
-  - Required fields per state (completed requires outcome, duration)
-- Implement state transition validation at API layer
-- Audit all state changes
-- Use database constraints where possible: `CHECK (completed_at IS NOT NULL OR status != 'completed')`
-- Build state machine visualization for developers
-- Test all possible state transitions
+**Why it happens:** Workflow actions are executed by a background service that has full system access. The `PermissionAuthorizationHandler` checks permissions based on `ClaimsPrincipal` from the HTTP context, but background jobs have no HTTP context and no user claims.
 
-**Phase to Address:** Core CRM (Phase 2) - before workflow features launch
+**Consequences:**
+- Users can create workflows that perform actions they are not authorized to do directly
+- Audit trails show "system" as the actor instead of the triggering user
+- Tenant admins cannot control what workflows are allowed to do through the existing permission model
 
-**Impact if Ignored:** Data inconsistencies, broken business logic, poor reporting
+**Prevention:**
+1. **Workflow permission model:** Define which actions a workflow can perform as part of its configuration. Only Admin users should be able to create/edit workflows (controlled by a new `Workflow:Manage` permission).
+2. **Option: Execute as triggering user vs. execute as system:**
+   - "Execute as triggering user": Evaluate the triggering user's permissions before each action. If the user lacks `Deal:Edit` permission, the "update deal" action fails and is logged.
+   - "Execute as system": The workflow runs with full tenant-scoped access (still isolated by tenant, but no RBAC check). This is simpler but requires that only admins can create workflows.
+   - **Recommendation:** Start with "execute as system" + admin-only workflow management. It is simpler and matches what most CRM platforms do (Salesforce, HubSpot). Document the security model clearly.
+3. **Audit trail:** Every workflow-initiated action must record both the `triggeredByUserId` (the user whose action fired the trigger) and the `executedBySystem: true` flag. The existing `AuditableEntityInterceptor` sets `CreatedAt`/`UpdatedAt` but not `CreatedBy`/`UpdatedBy` -- ensure workflow actions also set these to the triggering user for traceability.
+4. **Scope restriction:** Even "execute as system" must respect tenant isolation. The background job must use the `TenantScope` wrapper (see Pitfall 2) so all actions are scoped to the correct tenant.
 
----
+**Detection:**
+- Audit log review: filter for actions where `executedBy = system` and verify the triggering workflow is authorized
+- Permission change alerts: when a user's permissions are downgraded, check if they have active workflows performing actions they can no longer do
 
-## 7. Performance & Scalability
-
-### P7.1: N+1 Query Problem with Custom Fields and Relationships
-**Description:** Loading lists of records triggers hundreds of additional queries for custom fields, relationships, and permissions.
-
-**Warning Signs:**
-- Page load times increase linearly with record count
-- Database connection pool exhaustion
-- Hundreds of queries for single page load
-- API response times over 1-2 seconds for list views
-- Database CPU spikes during list loads
-
-**Prevention Strategy:**
-- Implement eager loading for relationships:
-  - Use EF Core Include() for related entities
-  - Batch load custom field definitions
-  - Prefetch permissions for current user
-- Use data loader pattern for GraphQL-style batching
-- Implement query result caching (Redis)
-- Build materialized views for common list queries
-- Use pagination with proper cursor-based or offset pagination
-- Monitor query patterns with Application Insights
-- Set up query performance budgets (alerts if queries > threshold)
-
-**Phase to Address:** Foundation (Phase 1) for architecture, Core CRM (Phase 2) for optimization
-
-**Impact if Ignored:** Slow application, poor user experience, inability to scale
+**Feature:** Workflow Automation
+**Phase to address:** Workflow Automation phase -- must be decided during workflow engine design.
 
 ---
 
-### P7.2: Missing Database Indexing Strategy
-**Description:** Inadequate indexes on foreign keys, filter columns, and sort columns causing full table scans.
+### Pitfall 9: Webhook Delivery Retry Storms
 
-**Warning Signs:**
-- Queries taking seconds instead of milliseconds
-- Database CPU consistently high
-- EXPLAIN plans showing Seq Scan
-- Filters on common fields (status, owner, created_date) slow
-- Search functionality unusable
+**What goes wrong:** A tenant registers a webhook endpoint that is temporarily down (returns 500 or times out). The system retries with exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s... But if the endpoint is down for hours, and the tenant has many active entities generating events, the retry queue grows unboundedly. When the endpoint comes back up, the system fires all queued deliveries at once, overwhelming the endpoint (and the system's outbound HTTP connection pool). Meanwhile, if 100 tenants have webhooks and 5 are down, the retry queue consumes memory/storage and the delivery worker spends most of its time on failing requests.
 
-**Prevention Strategy:**
-- Index all foreign keys automatically: `tenant_id, created_by, owner_id, account_id, contact_id`
-- Index all filter/search columns: `status, stage, type, category`
-- Create composite indexes for common filter combinations: `(tenant_id, status, created_at)`
-- Index JSONB paths for custom fields (covered in P2.1)
-- Create partial indexes for filtered queries: `CREATE INDEX ON deals (tenant_id, amount) WHERE status = 'open';`
-- Monitor unused indexes (remove to reduce write overhead)
-- Set up pg_stat_statements for query analysis
-- Regular VACUUM and ANALYZE maintenance
-- Include covering indexes for common queries
+**Prevention:**
+1. **Exponential backoff with jitter:** Use `delay = min(base * 2^attempt + random_jitter, max_delay)` where max_delay = 1 hour. Jitter prevents synchronized retries.
+2. **Maximum retry count:** Stop retrying after 5 attempts (spans approximately 1 hour total). Move the delivery to a dead-letter queue (DLQ). Provide a UI for tenants to view failed deliveries and manually retry.
+3. **Circuit breaker per endpoint:** After 3 consecutive failures to the same endpoint URL, mark it as "circuit-broken." Stop sending new events to that endpoint. Periodically (every 15 minutes) send a health-check probe. When the probe succeeds, resume delivery. Notify the tenant via in-app notification that their webhook endpoint is failing.
+4. **Outbound connection pool limits:** Use a named `HttpClient` via `IHttpClientFactory` with connection pooling. Set `MaxConnectionsPerServer = 5` to prevent overwhelming any single endpoint.
+5. **Queue depth limits:** Cap the delivery queue at 1,000 pending deliveries per endpoint. If the queue is full, drop new events for that endpoint (with logging) rather than growing the queue indefinitely.
+6. **Delivery status tracking:** Persist every delivery attempt with timestamp, HTTP status code, response time, and any error message. Expose this in the UI so tenants can debug their webhook endpoints.
 
-**Phase to Address:** Foundation (Phase 1) for core indexes, ongoing optimization throughout
+**Detection:**
+- Monitor retry queue depth per endpoint and per tenant
+- Alert on endpoints in circuit-broken state for more than 1 hour
+- Dashboard showing webhook delivery success rate, p95 latency, and retry rate
 
-**Impact if Ignored:** Unusable application at scale, poor performance from day one
+**Feature:** Webhooks
+**Phase to address:** Webhooks phase.
 
 ---
 
-### P7.3: Unbounded Result Sets
-**Description:** API endpoints returning unlimited records without pagination or result limits.
+### Pitfall 10: SignalR Broadcast Storm from Workflow/Automation Events
 
-**Warning Signs:**
-- Endpoints timing out with large datasets
-- OOM exceptions on server
-- Client browsers freezing rendering large lists
-- Export operations failing
-- Search returning thousands of results
+**What goes wrong:** v1.0 sends SignalR events for entity changes (`FeedUpdate`, `ReceiveNotification`). When workflows execute, a single user action can cascade into dozens of entity updates (workflow updates 5 deals, creates 3 activities, sends 2 emails). Each update triggers a SignalR broadcast to the tenant group. The connected Angular clients receive 10+ events in rapid succession, each triggering a store update and UI re-render. The UI flickers, the browser becomes sluggish, and the SignalR connection may back up.
 
-**Prevention Strategy:**
-- Enforce pagination on all list endpoints (default 50, max 200)
-- Implement cursor-based pagination for real-time data
-- Return total count separately (cheap count estimation for large sets)
-- Implement "load more" / infinite scroll patterns
-- Add result limits to all queries (safety net)
-- Build async export for large datasets (email download link)
-- Implement result set warnings ("showing 200 of 5000 results")
-- Use streaming for large data operations
+**Prevention:**
+1. **Batch/debounce workflow events:** When a workflow execution produces multiple entity changes, collect all changes into a single batched event. Send one SignalR message with the list of changes, rather than one message per change.
+2. **Throttle per tenant:** Rate-limit SignalR messages to a maximum of 10 per second per tenant group. Buffer excess messages and flush at the next interval.
+3. **Payload minimization:** Workflow-generated events should send minimal payloads (`{entityType, entityId, action}`) rather than full entity DTOs. Let the client fetch updated data if it is currently viewing that entity.
+4. **Client-side debounce:** In the Angular `SignalRService`, debounce incoming events by entity type. If 5 `FeedUpdate` events arrive within 500ms, process only the last one (or a merged set).
+5. **Suppress non-visible updates:** If a workflow updates an entity that no connected user is currently viewing, the client can skip the re-fetch. Use the Angular store's knowledge of "currently viewed entity" to decide whether to act on an event.
 
-**Phase to Address:** Foundation (Phase 1) - API design principle
+**Detection:**
+- Monitor SignalR message rate per tenant group
+- Client-side logging: count SignalR events received per second and warn if > 20
+- Server-side: log workflow execution event counts per batch
 
-**Impact if Ignored:** Performance issues, scalability limits, poor UX
+**Feature:** Workflow Automation (with SignalR integration)
+**Phase to address:** Workflow Automation phase -- design the event batching from the start.
 
 ---
 
-## 8. Data Quality & Integrity
+### Pitfall 11: Report Builder N+1 Queries and Performance
 
-### P8.1: Missing Data Validation at API Layer
-**Description:** Relying on UI validation alone allows bad data through API, imports, and integrations.
+**What goes wrong:** The report builder constructs LINQ queries dynamically. A user builds a report: "All deals with their primary contact email and company name." The naive implementation loads deals, then for each deal loads the contact (N+1), then for each contact loads the company (N+1 again). For 1,000 deals, this generates 2,001 database queries. With PostgreSQL RLS adding overhead to every query, this becomes extremely slow.
 
-**Warning Signs:**
-- Invalid email addresses in database
-- Phone numbers in inconsistent formats
-- Required fields null despite UI requirements
-- Date ranges inverted (end before start)
-- Negative amounts in currency fields
+**Prevention:**
+1. **Eager loading by default:** All report queries must use `.Include()` for related entities referenced in the report columns. Build the include chain dynamically based on which columns the user selected.
+2. **Projection-only queries:** Reports should never load full entity graphs. Use `.Select()` to project only the columns needed for the report. This generates a single SQL query with joins, not multiple queries.
+3. **Query plan analysis:** Log the generated SQL for every report execution. Periodically review with `EXPLAIN ANALYZE`. Set up automated detection for queries with > 10 joins or execution time > 5 seconds.
+4. **Materialized aggregations:** For aggregate reports (sum of deal values by stage, count of contacts by company), pre-compute aggregations in a background job and store in a `report_cache` table. Serve from cache if the data is less than 15 minutes old.
+5. **Result set limits:** Cap report results at 10,000 rows with mandatory pagination. For export (CSV), stream results using EF Core's `AsAsyncEnumerable()` to avoid loading everything into memory.
+6. **Timeout enforcement:** Set `CommandTimeout = 30` on the `DbCommand` for report queries. If a report query takes more than 30 seconds, cancel it and return an error to the user.
+7. **Custom fields in reports:** JSONB field access (`custom_fields->>'field_name'`) does not benefit from standard B-tree indexes unless a specific expression index exists. For frequently-reported custom fields, consider creating expression indexes. For ad-hoc custom field queries, accept the performance trade-off and document it.
 
-**Prevention Strategy:**
-- Implement validation at multiple layers:
-  - Client-side (immediate feedback)
-  - API/controller level (fluent validation)
-  - Business logic layer (complex rules)
-  - Database constraints (last resort)
-- Use .NET FluentValidation for API validation
-- Define validation rules per entity type
-- Return clear validation error messages
-- Validate custom fields based on type metadata
-- Implement cross-field validation (end_date > start_date)
-- Test API validation independently of UI
+**Detection:**
+- EF Core query logging: flag any query batch with > 5 queries (indicates N+1)
+- Slow query log: PostgreSQL's `log_min_duration_statement = 5000` to catch queries over 5 seconds
+- Per-report execution timing in structured logs
 
-**Phase to Address:** Foundation (Phase 1) - before any data entry
-
-**Impact if Ignored:** Data quality problems, broken business logic, reporting issues
+**Feature:** Advanced Reporting Builder
+**Phase to address:** Reporting Builder phase.
 
 ---
 
-### P8.2: Soft Delete Without Proper Handling
-**Description:** Soft deletes not properly filtered in queries, causing "deleted" records to appear.
+### Pitfall 12: Duplicate Detection False Positives Blocking Legitimate Records
 
-**Warning Signs:**
-- Deleted records showing in lists
-- Count operations including deleted records
-- Foreign key references to deleted records breaking
-- Search returning deleted items
-- Audit trail showing resurrections
+**What goes wrong:** Overly aggressive duplicate detection rules (e.g., "same first name and last name = duplicate") flag too many false positives. When duplicate detection runs on record creation, it blocks users from creating legitimate contacts ("John Smith at Company A" is flagged as duplicate of "John Smith at Company B"). Users get frustrated and either stop using the CRM or find workarounds (misspelling names to avoid detection). Alternatively, overly relaxed rules miss real duplicates, defeating the feature's purpose.
 
-**Prevention Strategy:**
-- Implement consistent soft delete pattern:
-  - `deleted_at` timestamp column
-  - Global query filter in EF Core: `builder.HasQueryFilter(e => e.DeletedAt == null)`
-  - Explicit `IgnoreQueryFilters()` when need deleted records
-- Create separate endpoints for "trash" view
-- Implement permanent delete (hard delete after retention period)
-- Handle cascading soft deletes carefully
-- Audit soft delete and restore operations
-- Consider archive table approach for old deleted data
+**Prevention:**
+1. **Confidence scoring, not binary matching:** Instead of "duplicate: yes/no," return a confidence score (0-100%). Use weighted criteria:
+   - Email match: +40 points (emails are near-unique)
+   - Phone match: +25 points
+   - Name + company match: +20 points
+   - Name only match: +10 points (high false positive rate)
+   - Address match: +15 points
+2. **Threshold-based actions:**
+   - Score >= 90%: Auto-flag as likely duplicate, suggest merge in UI
+   - Score 60-89%: Show warning on create/edit, let user proceed
+   - Score < 60%: No action (save normally)
+3. **Never auto-merge without confirmation:** Always present duplicates to the user with a comparison view. Auto-merge is too risky for data loss.
+4. **Configurable rules per tenant:** Let admins customize which fields participate in duplicate detection and their weights. Different industries have different duplicate patterns.
+5. **Performance:** Duplicate detection queries against the entire contact/company table. For large tenants (100k+ contacts), use PostgreSQL trigram indexes (`pg_trgm` extension) for fuzzy matching, or pre-compute phonetic codes (Soundex/Metaphone) in a separate column for name matching.
+6. **Exclude from detection:** Allow users to explicitly mark two records as "not duplicates" so they are not re-flagged.
 
-**Phase to Address:** Foundation (Phase 1) - data architecture decision
+**Detection:**
+- Track false positive rate: how often users dismiss duplicate warnings
+- Monitor duplicate detection query performance per tenant
+- A/B test detection rules: compare detection rates with different weight configurations
 
-**Impact if Ignored:** Data integrity issues, confusing UX, broken business logic
-
----
-
-### P8.3: Inconsistent Duplicate Detection
-**Description:** No or inconsistent duplicate detection leads to redundant records and data quality issues.
-
-**Warning Signs:**
-- Multiple contact records for same person
-- Duplicate companies with slight name variations
-- Merge operations required frequently
-- Data quality degrading over time
-- Import operations creating duplicates
-
-**Prevention Strategy:**
-- Implement duplicate detection:
-  - Fuzzy matching on key fields (name, email, phone)
-  - Show potential duplicates before save
-  - Background duplicate detection job
-  - Merge workflow with conflict resolution
-  - Track merge history (merged_into_id)
-- Use algorithms appropriate to field type:
-  - Email: exact match (normalized)
-  - Name: Levenshtein distance, Soundex
-  - Phone: normalized comparison
-  - Address: component-wise fuzzy match
-- Provide admin tools for mass deduplication
-- Set unique constraints where appropriate
-- Implement data quality scoring
-
-**Phase to Address:** Core CRM (Phase 2) for basic detection, Early Expansion (Phase 3) for advanced
-
-**Impact if Ignored:** Poor data quality, user frustration, reporting inaccuracy
+**Feature:** Duplicate Detection & Merge
+**Phase to address:** Duplicate Detection & Merge phase.
 
 ---
 
-## 9. Integration & API Design
+## Minor Pitfalls
 
-### P9.1: No API Versioning Strategy
-**Description:** Breaking API changes without versioning destroys integrations and third-party apps.
-
-**Warning Signs:**
-- Integration partners complaining about broken integrations
-- Cannot deploy changes without coordinating with all API consumers
-- No way to deprecate old endpoints
-- API documentation out of sync with reality
-- Fear of making any API changes
-
-**Prevention Strategy:**
-- Implement API versioning from day one:
-  - URL-based: `/api/v1/contacts`, `/api/v2/contacts`
-  - Or header-based: `API-Version: 2`
-- Semantic versioning for breaking vs non-breaking changes
-- Maintain at least 2 versions simultaneously
-- Clear deprecation policy (6-12 month sunset window)
-- Document all breaking changes in migration guide
-- Return API version in response headers
-- Monitor version usage metrics
-- Automated tests for version compatibility
-
-**Phase to Address:** Foundation (Phase 1) - API design principle
-
-**Impact if Ignored:** Cannot evolve product, broken integrations, angry partners
+Issues that cause friction, minor bugs, or suboptimal UX but are straightforward to fix.
 
 ---
 
-### P9.2: Inadequate Rate Limiting
-**Description:** No or poor rate limiting allows resource exhaustion and DDoS vulnerabilities.
+### Pitfall 13: Email Template Variable Injection / XSS
 
-**Warning Signs:**
-- Single user/integration consuming all resources
-- API becoming unresponsive under load
-- Database connection pool exhaustion
-- Legitimate users impacted by one bad actor
-- High hosting costs from abuse
+**What goes wrong:** Email templates use variable placeholders like `{{contact.firstName}}`, `{{deal.name}}`. When the template is rendered, the placeholder is replaced with the actual value. If a contact's name contains `<script>alert('XSS')</script>` or the template is rendered as HTML in the CRM's preview UI without escaping, it creates an XSS vulnerability. Additionally, if a user crafts a template with `{{contact.email}}` and sends it in a sequence, the recipient sees the raw email address (a privacy concern if the template is forwarded).
 
-**Prevention Strategy:**
-- Implement multi-tier rate limiting:
-  - Per API key: 1000 requests/hour
-  - Per user: 100 requests/minute
-  - Per tenant: 10000 requests/hour
-  - Per endpoint: specific limits (search more restrictive than read)
-- Use Redis for distributed rate limiting
-- Return rate limit headers: `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Reset`
-- Implement exponential backoff guidance
-- Different limits per plan tier (free, pro, enterprise)
-- Allow rate limit increase requests
-- Monitor and alert on rate limit hits
-- Document rate limits clearly
+**Prevention:**
+1. **HTML-escape all variable values** when rendering templates for email send and UI preview. Use a template engine that escapes by default (e.g., Handlebars with HTML escaping enabled, Scriban with HTML encoding).
+2. **Restrict available variables:** Only expose a whitelisted set of variables per entity type. Do not expose internal fields (IDs, tenant IDs, system fields).
+3. **Sanitize template HTML:** When admins save an email template, sanitize the HTML to remove `<script>`, `onclick`, and other dangerous attributes. Use a library like HtmlSanitizer for .NET.
+4. **Preview rendering:** When showing a template preview in the Angular app, render using `[innerHTML]` with Angular's built-in sanitization, or better, render server-side and return safe HTML.
 
-**Phase to Address:** Foundation (Phase 1) for basic limits, Early Expansion (Phase 3) for sophistication
-
-**Impact if Ignored:** Resource exhaustion, downtime, high costs, DDoS vulnerability
+**Feature:** Email Templates & Sequences
+**Phase to address:** Email Templates & Sequences phase.
 
 ---
 
-### P9.3: Webhook Delivery Failures and Retries
-**Description:** Webhook integrations fail silently or retry improperly, losing events.
+### Pitfall 14: Webhook Payload Leaking Sensitive Data
 
-**Warning Signs:**
-- Integration partners reporting missing events
-- Events sent multiple times (idempotency issues)
-- No visibility into webhook delivery status
-- Webhooks failing permanently after transient errors
-- Webhook queues backing up
+**What goes wrong:** When a webhook fires for a "contact created" event, the payload includes the full entity DTO, which may contain sensitive fields that the webhook consumer should not see (e.g., internal notes, custom fields with financial data, field-level permission-restricted fields). The webhook consumer is an external system with no concept of the CRM's RBAC field-level permissions.
 
-**Prevention Strategy:**
-- Implement robust webhook system:
-  - Async delivery with job queue
-  - Retry with exponential backoff (3 attempts over 1 hour)
-  - Dead letter queue for permanent failures
-  - Webhook delivery status tracking (sent, delivered, failed)
-  - Event ordering guarantees where needed
-- Support webhook signatures (HMAC) for security
-- Provide webhook testing tools
-- Build webhook monitoring dashboard
-- Implement webhook replay functionality
-- Timeout webhook calls (5-10 seconds max)
-- Allow webhook filtering (only relevant events)
+**Prevention:**
+1. **Webhook payload schema configuration:** When registering a webhook, let the admin choose which fields to include in the payload (whitelist approach), or at minimum, respect field-level permissions of the "Webhook" role.
+2. **Default to minimal payload:** By default, send only `{entityType, entityId, action, timestamp}`. Let the consumer call back to the API with an API key to fetch full details (with proper auth).
+3. **Never include:** tenant IDs, internal user IDs, RBAC role information, or audit metadata in webhook payloads.
+4. **HMAC signing:** Sign every webhook payload with a per-subscription secret so the consumer can verify authenticity. Include a timestamp to prevent replay attacks.
 
-**Phase to Address:** Early Expansion (Phase 3) - when integration ecosystem grows
-
-**Impact if Ignored:** Unreliable integrations, lost events, support burden
+**Feature:** Webhooks
+**Phase to address:** Webhooks phase.
 
 ---
 
-## 10. Testing & Quality Assurance
+### Pitfall 15: Formula Fields Referencing Deleted Custom Field Definitions
 
-### P10.1: Insufficient Multi-Tenancy Testing
-**Description:** Testing only with single tenant misses critical isolation and cross-tenant bugs.
+**What goes wrong:** A formula field references custom field `X` in its formula expression. An admin later deletes custom field `X`. The formula field's evaluation fails at runtime because the referenced field no longer exists. If the error is silently swallowed, the computed value becomes stale or null without explanation.
 
-**Warning Signs:**
-- Cross-tenant data leakage found in production
-- Performance issues when multiple tenants active
-- Tenant-specific features breaking other tenants
-- Cannot reproduce bugs without specific tenant data
+**Prevention:**
+1. **Reference validation on field deletion:** When deleting a custom field definition, check if any formula fields reference it. If so, block deletion with an error: "Cannot delete field 'X' because it is referenced by formula field 'Y'." Or force the admin to update the formula first.
+2. **On-save validation:** When saving a formula, validate that all referenced fields exist and are of compatible types.
+3. **Graceful degradation:** If a referenced field is somehow deleted (e.g., database manipulation), the formula evaluator should return `#REF!` error value (similar to Excel) rather than crashing or returning null silently.
+4. **Cascade warnings:** When deleting a field, show the admin a list of all dependent formula fields that will break.
 
-**Prevention Strategy:**
-- Multi-tenant test strategy:
-  - Every integration test runs with multiple tenants
-  - Test data includes tenant_a and tenant_b data
-  - Assert queries never return cross-tenant data
-  - Test concurrent operations across tenants
-  - Test with different tenant configurations
-- Build tenant isolation verification tests
-- Test tenant-specific customizations don't bleed
-- Performance test with realistic tenant distribution
-- Chaos engineering: random tenant data injection
-- Automated security scanning for tenant isolation
-
-**Phase to Address:** Foundation (Phase 1) - testing strategy from start
-
-**Impact if Ignored:** Security breaches, data leakage, hard-to-reproduce bugs
+**Feature:** Formula/Computed Custom Fields
+**Phase to address:** Formula Fields phase.
 
 ---
 
-### P10.2: Missing Performance Testing
-**Description:** No performance testing until production reveals scalability issues.
+### Pitfall 16: Report Builder Allowing Unbounded Cross-Entity Joins
 
-**Warning Signs:**
-- Production slowdowns surprise team
-- No baseline for performance comparison
-- Cannot identify performance regressions
-- Scaling up doesn't improve performance
-- Database becomes bottleneck unexpectedly
+**What goes wrong:** A user builds a report joining Contacts -> Deals -> Activities -> Notes -> Attachments (5-level deep join). For a tenant with 50k contacts, 100k deals, 500k activities, this generates a query with millions of intermediate rows. PostgreSQL spends minutes on the join, consuming CPU and I/O. Other tenants' queries are delayed (noisy neighbor). The query may also exceed PostgreSQL's `work_mem` and spill to disk.
 
-**Prevention Strategy:**
-- Implement performance testing:
-  - Load testing with realistic data volumes (100k contacts, 1M activities)
-  - Stress testing to find breaking points
-  - Endurance testing (memory leaks, connection leaks)
-  - Spike testing (sudden traffic increase)
-- Use tools: k6, JMeter, or Azure Load Testing
-- Performance test critical paths:
-  - List views with filters
-  - Search operations
-  - Report generation
-  - Email sync operations
-  - Real-time notification delivery
-- Set performance budgets (e.g., list views < 500ms)
-- Automated performance tests in CI/CD
-- Monitor performance trends over time
+**Prevention:**
+1. **Limit join depth:** Maximum 3 levels of entity joins in a single report (e.g., Contact -> Deal -> Activity is OK, but Contact -> Deal -> Activity -> Note is the limit).
+2. **Cardinality warnings:** When a user adds a join, estimate the result set size and warn if it exceeds 100k rows: "This report may be slow due to large data volume. Consider adding filters."
+3. **Statement timeout:** Set `SET statement_timeout = '30s'` on report query connections. Cancel queries that exceed the limit.
+4. **Per-tenant query concurrency:** Allow only 2 concurrent report queries per tenant. Queue additional requests.
+5. **Explain-before-execute:** For reports with > 2 joins, run `EXPLAIN` first, check the estimated row count, and reject if > 500k estimated rows.
 
-**Phase to Address:** Core CRM (Phase 2) before beta, ongoing throughout
-
-**Impact if Ignored:** Production performance crises, cannot scale, poor user experience
+**Feature:** Advanced Reporting Builder
+**Phase to address:** Reporting Builder phase.
 
 ---
 
-### P10.3: Inadequate Email Integration Testing
-**Description:** Email sync not tested with real-world email complexity and edge cases.
+### Pitfall 17: Workflow Trigger Conditions on JSONB Custom Fields -- Performance
 
-**Warning Signs:**
-- Email sync breaking with certain providers
-- Specific email formats causing errors
-- Character encoding issues in production
-- Attachment handling failures
-- Threading breaking with real emails
+**What goes wrong:** A workflow trigger condition says "when custom field 'Priority Score' > 80, send email." This translates to a query like `WHERE (custom_fields->>'priority_score')::numeric > 80` on every entity update. If the table has 100k rows and the JSONB path is not indexed, this full-table scan runs on every single entity update to evaluate whether the trigger condition is met.
 
-**Prevention Strategy:**
-- Build comprehensive email test suite:
-  - Real email samples from Gmail, Outlook, other providers
-  - Edge cases: huge emails, special characters, attachments
-  - Malformed emails (test error handling)
-  - Various MIME types and encodings
-  - Email with embedded images, HTML complexity
-  - Thread reconstruction scenarios
-- Test OAuth flows completely:
-  - Initial auth, token refresh, revocation
-  - Multi-account scenarios
-  - Provider-specific quirks
-- Use email testing sandbox (Mailtrap, Mailosaur)
-- Test sync performance with large mailboxes
-- Test incremental sync, full sync, error recovery
+**Prevention:**
+1. **Event-driven evaluation, not poll-driven:** Do not query the database to find matching entities. Instead, evaluate trigger conditions against the specific entity that was just updated. The workflow engine receives the changed entity and evaluates conditions in memory.
+2. **Pre-compiled condition evaluators:** Parse trigger conditions at workflow save time into compiled expressions (`Expression<Func<Entity, bool>>`). At runtime, invoke the compiled delegate against the entity DTO, not the database.
+3. **Indexing for batch operations:** If batch evaluation is needed (e.g., "find all contacts where custom field X changed today"), create expression indexes on frequently-used JSONB paths: `CREATE INDEX idx_contacts_priority ON contacts ((custom_fields->>'priority_score'))`.
+4. **Limit trigger conditions per workflow:** Maximum 5 conditions per trigger. Complex conditions increase evaluation time and make debugging difficult.
 
-**Phase to Address:** Early Expansion (Phase 3) - before email beta
-
-**Impact if Ignored:** Broken email integration, poor adoption, support burden
+**Feature:** Workflow Automation
+**Phase to address:** Workflow Automation phase.
 
 ---
 
-## 11. DevOps & Deployment
+### Pitfall 18: New Entity Tables Missing RLS Policies
 
-### P11.1: Missing Database Migration Strategy
-**Description:** No proper database schema migration process leads to deployment failures and data loss.
+**What goes wrong:** v1.1 introduces new database tables: `workflow_definitions`, `workflow_executions`, `workflow_actions`, `email_templates`, `email_sequences`, `email_sequence_enrollments`, `email_sequence_steps`, `formula_field_definitions`, `duplicate_detection_rules`, `merge_audit_logs`, `webhook_subscriptions`, `webhook_deliveries`, `report_definitions`, `report_executions`. Each of these is tenant-scoped and needs:
+1. EF Core global query filter (`HasQueryFilter(e => e.TenantId == tenantId)`)
+2. PostgreSQL RLS policy in `scripts/rls-setup.sql`
 
-**Warning Signs:**
-- Deployments require manual database changes
-- Schema drift between environments
-- Rollback process unclear or impossible
-- Data migrations losing data
-- Downtime required for every schema change
+If any table is missed, that table has no tenant isolation at the database level. The EF Core filter provides Layer 2 protection, but a raw SQL query or a bug bypassing the filter would expose all tenants' data.
 
-**Prevention Strategy:**
-- Use EF Core Migrations properly:
-  - Version control all migrations
-  - Test migrations against production-size data
-  - Write both Up and Down migrations
-  - Never edit existing migrations (create new ones)
-  - Include data migrations where needed
-- Implement zero-downtime deployment pattern:
-  - Expand-contract pattern for schema changes
-  - Deploy compatible schema first, then code
-  - Add columns as nullable, fill data, then make required
-- Test rollback procedures
-- Backup before major migrations
-- Monitor migration duration (alert if slow)
-- Practice migrations in staging first
+**Prevention:**
+1. **Checklist for every new entity:**
+   - [ ] Entity has `TenantId` property (Guid, non-nullable)
+   - [ ] `ApplicationDbContext.OnModelCreating` adds `HasQueryFilter(e => e.TenantId == _tenantId)`
+   - [ ] `scripts/rls-setup.sql` has `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` + `CREATE POLICY`
+   - [ ] Migration sets `tenant_id` column as NOT NULL with no default
+   - [ ] Integration test verifies tenant isolation
+2. **Automated verification:** Add a startup check or integration test that queries `pg_catalog.pg_policies` and verifies every tenant-scoped table has an RLS policy. Fail the test if any table is missing.
+3. **Child table analysis:** Determine which new tables are "child tables" (accessed only via FK join from a tenant-filtered parent) and which are "root tables" (queried directly). Root tables need RLS; child tables may not if they are always accessed through a filtered parent. Document the decision for each table.
 
-**Phase to Address:** Foundation (Phase 1) - before first deployment
+**Detection:**
+- CI/CD check: compare the list of tables with `tenant_id` column against the list of tables with RLS policies. Any mismatch fails the build.
+- Code review checklist: every PR adding a new entity must include both the EF Core filter and the RLS policy update.
 
-**Impact if Ignored:** Deployment failures, data loss, extended downtime
+**Feature:** All features
+**Phase to address:** Every phase that introduces new entities -- verify as part of each phase's implementation.
 
 ---
 
-### P11.2: Configuration Management Chaos
-**Description:** Configuration scattered across multiple locations, hardcoded values, no environment parity.
+### Pitfall 19: Workflow and Email Sequence State Management Across Deployments
 
-**Warning Signs:**
-- Different configuration format per component
-- Secrets in source control
-  - Cannot spin up new environment easily
-- Configuration changes require code deploys
-- No way to feature flag components
+**What goes wrong:** A deployment restarts the application while:
+- A workflow execution chain is mid-flight (3 of 5 actions completed)
+- An email sequence has 500 contacts waiting for their "Day 3" email to send
+- A webhook delivery retry is queued for the 3rd attempt
 
-**Prevention Strategy:**
-- Centralize configuration management:
-  - Use Azure App Configuration or similar
-  - Environment-specific overrides (dev, staging, prod)
-  - Secrets in Azure Key Vault
-  - Feature flags for gradual rollout
-- Configuration as code:
-  - Version controlled config structure
-  - Validated configuration schema
-  - Type-safe configuration classes in .NET
-- Implement configuration hot reload where safe
-- Document all configuration options
-- Use managed identity for Azure resources
-- Never commit secrets (use git-secrets or similar)
+If these are stored only in memory (in-process queues, `Channel<T>`, or in-memory state), they are lost on deployment. If they are in a database but without proper status tracking, they may be replayed from the beginning (sending duplicate emails, executing duplicate workflow actions).
 
-**Phase to Address:** Foundation (Phase 1) - infrastructure setup
+**Prevention:**
+1. **Persist all execution state to the database:**
+   - Workflow executions: each action has a `status` (pending, running, completed, failed) persisted to the database. On restart, resume from the last incomplete action.
+   - Email sequence enrollments: each step has a `scheduledAt`, `sentAt`, `status`. On restart, the scheduler picks up steps where `status = 'pending' AND scheduledAt <= now`.
+   - Webhook deliveries: each delivery attempt is persisted with `attemptNumber`, `status`, `nextRetryAt`. On restart, retry failed deliveries where `nextRetryAt <= now`.
+2. **Idempotent execution:** Every action must be safe to execute twice (in case the process crashes after executing but before marking as "completed"). Use idempotency keys (e.g., `{workflowExecutionId}_{actionIndex}`) to deduplicate.
+3. **Graceful shutdown:** On `IHostApplicationLifetime.ApplicationStopping`, drain the in-process queue. Wait up to 30 seconds for running jobs to complete. Mark incomplete jobs as "interrupted" for restart pickup.
+4. **Do not use in-memory-only queues for critical work:** Use a persistent queue (database table, Redis, or Hangfire storage). `Channel<T>` is acceptable only for non-critical, fire-and-forget work (like SignalR event buffering).
 
-**Impact if Ignored:** Security breaches, deployment friction, cannot scale operations
+**Feature:** Workflow Automation, Email Sequences, Webhooks
+**Phase to address:** Each feature's phase -- but design the persistence pattern once and reuse it.
 
 ---
 
-### P11.3: Inadequate Monitoring and Alerting
-**Description:** No visibility into system health leads to outages discovered by users.
+### Pitfall 20: Angular Frontend Performance with Complex Workflow/Report Builders
 
-**Warning Signs:**
-- Users reporting issues before team knows
-- Cannot diagnose production issues
-- No metrics on system performance
-- Alerts missing or too noisy
-- Cannot track user journeys through system
+**What goes wrong:** The workflow builder UI (drag-and-drop trigger/action configuration) and the report builder UI (entity picker, field selector, filter builder, preview) are complex interactive components. Common Angular-specific issues:
+- **Change detection storms:** The workflow builder renders a visual graph with many nodes. Each node is a component. A single workflow change triggers change detection on every node component, causing jank.
+- **Memory leaks:** The report preview subscribes to data streams. If the user navigates away without the subscription being cleaned up, the subscription continues running, accumulating memory.
+- **Signal Store bloat:** Putting the entire workflow definition (with potentially 50+ actions) into a Signal Store causes excessive signal emissions on any change, since Angular signals emit on every mutation.
 
-**Prevention Strategy:**
-- Implement comprehensive observability:
-  - Application Insights for .NET application monitoring
-  - Structured logging (Serilog with tenant_id context)
-  - Custom metrics for business operations
-  - Distributed tracing across services
-  - Real User Monitoring (RUM) for Angular app
-- Set up meaningful alerts:
-  - Error rate thresholds
-  - Performance degradation
-  - Dependency failures (database, email APIs)
-  - Security events (failed auth, permission escalation)
-- Build operational dashboards:
-  - System health overview
-  - Per-tenant metrics
-  - Real-time operation tracking
-- Implement log aggregation and search
-- Set up on-call rotation and runbooks
+**Prevention:**
+1. **OnPush everywhere** (already the convention -- maintain it for all new components).
+2. **Isolate builder state:** Use local component state for the builder's transient UI state (drag positions, hover states). Use the Signal Store only for the persisted workflow/report definition.
+3. **Immutable updates:** When updating a workflow action, create a new array reference (not mutate in place) so Angular's change detection can quickly determine what changed.
+4. **Debounce auto-save:** If the builder auto-saves on change, debounce by 2 seconds to avoid rapid API calls during drag-and-drop.
+5. **Virtual scrolling for report results:** Use `CdkVirtualScrollViewport` for report result tables with 10,000+ rows. Do not render all rows to the DOM.
+6. **Cleanup:** Use `DestroyRef` and `takeUntilDestroyed()` for all subscriptions in builder components. For `effect()`, Angular handles cleanup automatically, but verify with the component's `OnDestroy`.
 
-**Phase to Address:** Foundation (Phase 1) for basics, continuous improvement
-
-**Impact if Ignored:** Extended outages, poor incident response, cannot optimize
+**Feature:** Workflow Automation, Advanced Reporting Builder
+**Phase to address:** Each feature's frontend implementation phase.
 
 ---
 
-## 12. User Experience & Adoption
+## Phase-Specific Warnings
 
-### P12.1: Over-Engineering Customization
-**Description:** Making everything customizable creates overwhelming complexity and poor UX.
-
-**Warning Signs:**
-- Users confused by too many options
-- Configuration taking weeks not hours
-- Support overwhelmed with "how do I" questions
-- Power users can use product, others cannot
-- Customization options contradict each other
-
-**Prevention Strategy:**
-- Follow 80/20 rule: default configuration works for 80% of use cases
-- Progressive disclosure: start simple, expose advanced features as needed
-- Provide templates/presets for common scenarios
-- Limit customization where it doesn't add value
-- User testing with non-technical users
-- "Opinionated defaults" philosophy
-- Customization hierarchy: global → role → user
-- Validation prevents conflicting configurations
-- Reset to defaults option always available
-
-**Phase to Address:** Core CRM (Phase 2) - UX design phase
-
-**Impact if Ignored:** Poor adoption, high training cost, support burden
+| Phase Topic | Likely Pitfall | Mitigation |
+|-------------|---------------|------------|
+| Email Templates & Sequences | Timing drift, deliverability collapse from bulk sends, sending to deleted/merged contacts | Jittered send times, per-tenant rate limits, pre-send validation checks (Pitfalls 7, 13) |
+| Formula/Computed Fields | Circular dependencies crash the system, stale values in reports, deletion of referenced fields | Dependency graph with cycle detection at save time, topological evaluation order (Pitfalls 6, 15) |
+| Workflow Automation | Infinite loops exhaust system resources, bypass RBAC, SignalR broadcast storm | Execution context tracking with depth limits, admin-only management, event batching (Pitfalls 1, 8, 10, 17) |
+| Duplicate Detection & Merge | Data loss from broken FK references, false positives frustrate users | Comprehensive FK map, soft-delete with redirect, confidence scoring (Pitfalls 4, 12) |
+| Webhooks | SSRF attacks, retry storms overwhelm system, sensitive data leakage | URL validation with IP filtering, circuit breakers, minimal payload defaults (Pitfalls 5, 9, 14) |
+| Advanced Reporting Builder | Tenant data leakage through query filter bypass, N+1 queries, unbounded joins | LINQ-only construction, query complexity limits, statement timeouts (Pitfalls 3, 11, 16) |
+| All Features (cross-cutting) | Tenant context loss in background jobs, missing RLS on new tables, state loss on deployment | TenantScope wrapper, RLS checklist, persistent execution state (Pitfalls 2, 18, 19) |
 
 ---
 
-### P12.2: Missing Bulk Operations
-**Description:** No bulk edit, bulk delete, or mass update capabilities forces tedious one-by-one operations.
+## Integration Pitfalls with Existing Architecture
 
-**Warning Signs:**
-- Users complaining about repetitive tasks
-- Workarounds like export/import for updates
-- Low productivity on data cleanup tasks
-- Requests for bulk operations in every feedback session
+### Integration 1: New Features Must Integrate with Existing NotificationDispatcher
 
-**Prevention Strategy:**
-- Design bulk operations from start:
-  - Bulk select (all on page, all matching filter)
-  - Bulk edit (update common fields)
-  - Bulk delete (with confirmation)
-  - Bulk ownership transfer
-  - Bulk status change
-  - Bulk tag/categorize
-- Show progress for long-running bulk operations
-- Implement undo/rollback for bulk operations
-- Permission checks on bulk operations (might escalate to admin)
-- Audit log bulk operations with details
-- Background jobs for large bulk operations
-- Preview changes before applying
+All v1.1 features should dispatch notifications through the existing `NotificationDispatcher` (DB + SignalR + optional email). But workflow actions that create many entities in a loop will call `DispatchAsync` many times, hitting the database on each call. Batch notification creation or defer notifications to after the workflow execution completes.
 
-**Phase to address:** Core CRM (Phase 2) - before productivity features
+### Integration 2: New Features Must Set Correct Feed Items
 
-**Impact if Ignored:** User frustration, low productivity, poor adoption
+v1.0 creates `FeedItem` records for entity changes. Workflow-initiated changes should create feed items attributed to the workflow (not the system), with a note like "Updated by workflow 'Deal Close Automation'." Without this, the news feed becomes confusing ("System updated 50 records" with no context).
+
+### Integration 3: Custom Field Validator Must Handle Formula Fields
+
+The existing `CustomFieldValidator` validates user-provided custom field values against definitions. Formula/computed fields should be excluded from input validation (users do not provide values for them) but included in output serialization. The validator needs a new `IsComputed` check to skip validation for formula fields.
+
+### Integration 4: Saved Views Must Support New Entity Types
+
+If workflows, email templates, or reports become listable entities with their own list pages (likely for admin management), the `SavedView` system needs to support these new entity types for column configuration, filtering, and sorting.
+
+### Integration 5: EF Core Migration Ordering
+
+v1.1 will add many new tables. Migrations must be ordered carefully to avoid FK reference errors. Create base tables (workflow_definitions) before dependent tables (workflow_executions, workflow_actions). Run migrations against both `ApplicationDbContext` and potentially `TenantDbContext` if any new tables are organization-level (like webhook rate limit configurations).
 
 ---
 
-### P12.3: Poor Mobile Experience
-**Description:** Treating .NET MAUI mobile app as afterthought creates disconnected experience.
+## Sources
 
-**Warning Signs:**
-- Mobile app missing features in web app
-- Inconsistent UX between web and mobile
-- Mobile performance poor
-- Mobile offline support missing
-- Users avoiding mobile app
-
-**Prevention Strategy:**
-- Mobile-first API design:
-  - Efficient payload sizes
-  - Batch operations for multiple requests
-  - Offline-capable endpoints
-  - Mobile-specific endpoints where needed
-- Progressive Web App (PWA) as fallback
-- Shared data models between platforms
-- Offline-first architecture with sync
-- Mobile-specific features: camera for docs, contacts sync, push notifications
-- Test on actual devices (not just emulators)
-- Monitor mobile performance separately
-- Mobile usage analytics
-
-**Phase to Address:** Early Expansion (Phase 3) - when mobile app developed
-
-**Impact if Ignored:** Poor mobile adoption, user frustration, competitive disadvantage
-
----
-
-## Summary: Phase-Critical Pitfalls
-
-### Must Address in Foundation (Phase 1):
-- P1.1: Tenant data isolation architecture
-- P1.2: Shared schema performance strategy
-- P2.1: JSONB indexing strategy
-- P2.3: Custom field type system
-- P3.1: Permission model architecture
-- P7.1: N+1 query prevention
-- P7.2: Database indexing
-- P7.3: API pagination
-- P8.1: API validation
-- P8.2: Soft delete pattern
-- P9.1: API versioning
-- P9.2: Basic rate limiting
-- P10.1: Multi-tenant testing
-- P11.1: Database migrations
-- P11.2: Configuration management
-- P11.3: Basic monitoring
-
-### Must Address in Core CRM (Phase 2):
-- P2.2: Custom field governance
-- P3.2: Permission audit trail
-- P3.3: Permission race conditions
-- P5.1: Real-time connection management
-- P5.2: Real-time race conditions
-- P5.3: Real-time performance
-- P6.1: Configurable pipelines
-- P6.2: Pipeline change history
-- P6.3: Activity state machine
-- P8.3: Duplicate detection
-- P10.2: Performance testing
-- P12.1: Customization UX
-- P12.2: Bulk operations
-
-### Must Address in Early Expansion (Phase 3):
-- P4.1: Email sync data strategy
-- P4.2: Email threading
-- P4.3: OAuth token management
-- P4.4: Email sanitization
-- P9.3: Webhook reliability
-- P10.3: Email integration testing
-- P12.3: Mobile experience
-
----
-
-## Using This Document
-
-**For Architecture Decisions:**
-Review Phase 1 pitfalls before finalizing technical architecture. These are non-negotiable foundations.
-
-**For Sprint Planning:**
-Check relevant pitfalls when planning features. Prevention is cheaper than remediation.
-
-**For Code Review:**
-Reference specific pitfalls when reviewing risky areas (multi-tenancy, permissions, real-time).
-
-**For Testing:**
-Use pitfall warning signs as test case inspiration.
-
-**For Incident Response:**
-When production issues occur, check if they match known pitfall patterns.
-
----
-
-*Document Version: 1.0*
-*Last Updated: 2026-02-16*
-*Research Focus: Multi-tenant SaaS CRM with dynamic custom fields, RBAC, email sync, real-time features*
+- [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
+- [Hookdeck: Webhooks at Scale](https://hookdeck.com/blog/webhooks-at-scale)
+- [Insycle: Data Retention When Merging Duplicates](https://blog.insycle.com/data-retention-merging-duplicates)
+- [Inngest: Fixing Multi-Tenant Queueing Problems](https://www.inngest.com/blog/fixing-multi-tenant-queueing-concurrency-problems)
+- [Microsoft: EF Core Multi-tenancy](https://learn.microsoft.com/en-us/ef/core/miscellaneous/multitenancy)
+- [Microsoft: EF Core Global Query Filters](https://learn.microsoft.com/en-us/ef/core/querying/filters)
+- [Microsoft: SignalR Performance](https://learn.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance)
+- [Microsoft: DbContext Lifetime and Configuration](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/)
+- [elmah.io: .NET 10 Multi-Tenant Rate Limiting](https://blog.elmah.io/new-in-net-10-and-c-14-multi-tenant-rate-limiting/)
+- [Dynamics 365: Calculated Fields and Circular Dependencies](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/define-calculated-fields)
+- [RT Dynamic: CRM Deduplication Guide 2025](https://www.rtdynamic.com/blog/crm-deduplication-guide-2025/)
+- [Inogic: Duplicate Detection and Merge in Dynamics 365](https://www.inogic.com/blog/2025/10/step-by-step-guide-to-duplicate-detection-and-merge-rules-in-dynamics-365-crm/)
+- [Hangfire Discussion: Multi-Tenant Architecture](https://discuss.hangfire.io/t/hangfire-multi-tenant-architecture-per-tenant-recurring-jobs-vs-dynamic-enqueueing-at-scale/11400)
+- [Code Maze: Prevent SQL Injection with EF Core](https://code-maze.com/prevent-sql-injection-with-ef-core-dapper-and-ado-net/)
+- Existing GlobCRM v1.0 codebase: `TenantDbConnectionInterceptor.cs`, `PermissionService.cs`, `CrmHub.cs`, `NotificationDispatcher.cs`, `CustomFieldValidator.cs`, `rls-setup.sql`

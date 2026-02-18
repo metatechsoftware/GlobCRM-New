@@ -1,285 +1,277 @@
 # Project Research Summary
 
-**Project:** GlobCRM - Multi-Tenant SaaS CRM
-**Domain:** Enterprise CRM Platform
-**Researched:** 2026-02-16
+**Project:** GlobCRM v1.1 — Automation, Intelligence, and Extensibility
+**Domain:** Multi-Tenant SaaS CRM Automation (Workflow Engine, Email Sequences, Formula Fields, Duplicate Detection, Webhooks, Advanced Reporting)
+**Researched:** 2026-02-18
 **Confidence:** HIGH
 
 ## Executive Summary
 
-GlobCRM is a multi-tenant SaaS CRM platform designed for mid-size organizations (10-50 concurrent users per tenant) with requirements spanning contact management, configurable deal pipelines, full activity workflows, two-way email integration, real-time collaboration, and native mobile apps. Research indicates this is a mature domain with well-established patterns, but success depends on architectural decisions made in the foundation phase - particularly around multi-tenancy isolation, custom field handling, and RBAC implementation.
+GlobCRM v1.1 transforms the shipped v1.0 CRUD-focused CRM into an automation-first platform. The core architectural shift is from request/response data management to event-driven processing: entity changes become the universal trigger for workflows, webhooks, formula recalculation, and duplicate detection. All six v1.1 feature areas are interconnected through a shared infrastructure — a domain event interceptor hooked into EF Core's `SaveChangesAsync` pipeline, and Hangfire for durable background processing. The existing Clean Architecture (Angular 19 / .NET 10 / PostgreSQL 17) remains unchanged; v1.1 plugs into existing layers rather than replacing them.
 
-The recommended approach uses a **shared database with tenant discriminator pattern** (PostgreSQL with Row-Level Security), **Angular 19 for web** with SignalR for real-time capabilities, **.NET Core 10 backend** following clean architecture principles, and **.NET MAUI for native mobile apps**. This stack is battle-tested for SaaS CRM systems and provides excellent performance, strong typing, and code sharing across platforms. Critical architectural elements include JSONB columns for custom fields (with proper indexing), triple-layer tenant isolation (middleware, EF Core filters, PostgreSQL RLS), OAuth-based email sync via background jobs, and API-first design to support both web and mobile clients.
+The recommended approach is to build foundational infrastructure first (Hangfire job server + email template renderer + formula evaluator), then layer higher-order features on top. Email Templates and Formula Fields are independent leaf nodes that everything else depends on. Workflow Automation is the orchestration hub that connects templates, sequences, webhooks, and notifications. This dependency order dictates a natural phase structure: foundation first, then the automation engine, then sequences/webhooks in parallel, then duplicate detection (most complex data mutation), and finally the reporting builder (benefits from all preceding data). The stack additions are minimal: 5 NuGet packages and 1 npm package on top of the existing 17 NuGet packages.
 
-The key risks are tenant data leakage (requires defense-in-depth), JSONB query performance (requires proper indexing strategy from day one), email sync complexity (OAuth token management, threading, data volume), and real-time connection state management. These risks are well-documented with proven mitigation strategies. The recommended build order starts with multi-tenancy and auth foundations, progresses through core CRM entities with custom fields, then adds deal pipelines and activities, followed by email integration, real-time features, and finally mobile apps. This sequence ensures foundational stability before adding complex features.
+The primary risks are cross-cutting and architectural. Tenant context must be explicitly propagated into all background jobs or catastrophic cross-tenant data leakage occurs. Workflow engines that do not track execution depth create infinite loops that exhaust system resources across all tenants. Merge operations that miss FK references permanently destroy contact history. None of these risks are recoverable without data loss — they must be designed in from the start, not bolted on later. The research is unanimous: implement the `TenantScope` job wrapper and the workflow depth limiter before writing any feature-specific code.
 
 ## Key Findings
 
 ### Recommended Stack
 
-GlobCRM's technology stack follows enterprise SaaS best practices with modern, production-proven technologies. The combination of Angular 19, .NET Core 10, PostgreSQL 17, and .NET MAUI provides strong typing throughout the stack, excellent performance, and significant code sharing between web backend and mobile apps. The stack supports all required features including multi-tenancy, custom fields via JSONB, real-time updates via SignalR, and two-way email sync via OAuth.
+The existing .NET 10 / Angular 19 / PostgreSQL 17 stack handles all v1.1 needs with only targeted additions. No architectural changes are required. The five NuGet additions are: **Hangfire** (PostgreSQL-backed durable job processing for delayed scheduling, retry, and monitoring), **Fluid.Core** (sandboxed Liquid template engine for user-editable email templates — RazorLight stays for system emails only), **NCalcSync** (expression evaluator for formula fields and workflow conditions), **FuzzySharp** (in-memory fuzzy string scoring for duplicate detection candidates), and **Microsoft.Extensions.Http.Resilience** (Polly-based resilient HTTP for webhook delivery). On the frontend, **@foblex/flow** provides the Angular-native visual workflow builder canvas.
 
-**Core technologies:**
-- **Angular 19**: Frontend framework with standalone components, signals for reactivity, excellent TypeScript support, and mature ecosystem (NgRx for state, Angular Material + PrimeNG for UI components)
-- **.NET Core 10**: Backend framework with high performance, clean architecture support, first-class PostgreSQL integration via EF Core, built-in SignalR for real-time, excellent async/await model
-- **PostgreSQL 17**: Database with JSONB for custom fields, Row-Level Security for tenant isolation, schema-based multi-tenancy support, full-text search, GIN/GiST indexes for performance
-- **.NET MAUI**: Mobile framework for native iOS/Android apps with shared C# codebase, offline SQLite support, platform-specific capabilities (camera, contacts), push notifications via FCM
-- **SignalR**: Real-time communication with WebSocket support, automatic fallback to long polling, Redis backplane for horizontal scaling, tenant-scoped groups for efficient broadcasting
-- **Finbuckle.MultiTenant 8.x**: Multi-tenancy middleware with schema-per-tenant support, automatic EF Core filtering, subdomain/header/claim-based tenant resolution
-- **OpenIddict 5.x**: OAuth2/OIDC provider (free, certified) for authentication across web and mobile apps, token management, refresh token flow
-- **Hangfire 1.8.x**: Background job processing for email sync, scheduled reports, data imports, with persistent storage in PostgreSQL and monitoring dashboard
-- **FluentValidation 11.x**: API validation framework with reusable validators, complex conditional logic, automatic ASP.NET Core integration
-- **Serilog 4.x**: Structured logging with PostgreSQL sink, tenant context injection, queryable logs, multiple output targets
+**Core technology additions:**
+- **Hangfire 1.8.23 (PostgreSQL storage)**: Durable background jobs — the backbone of all async processing. Required for delayed email sequence steps, webhook retry with backoff, workflow action execution, and nightly duplicate scans. Uses existing PostgreSQL database, no new infrastructure.
+- **Fluid.Core 2.31.0**: Liquid template engine for user-authored email templates. Sandboxed by design (no C# injection). 8x faster than DotLiquid. Coexists with RazorLight (system emails unchanged).
+- **NCalcSync 5.11.0**: Expression evaluator for formula fields (`[deal_value] * [probability]`) and workflow conditions (`[stage] == 'Won' && [value] > 10000`). Pure computation, no external dependencies. Placed in Application layer.
+- **FuzzySharp 2.0.2 + pg_trgm (built-in)**: Two-tier duplicate detection: PostgreSQL `pg_trgm` GIN indexes pre-filter candidates at database level; FuzzySharp computes weighted composite scores (name: 40%, email: 30%, phone: 20%, company: 10%) in memory.
+- **Microsoft.Extensions.Http.Resilience 10.3.0**: Webhook delivery resilience — retry with exponential backoff + jitter, circuit breaker, timeout. Official Microsoft replacement for deprecated `Http.Polly`.
+- **@foblex/flow 18.1.2**: Angular-native flow editor for visual workflow builder. MIT licensed, supports Angular Signals. Medium confidence — verify Angular 19.2.x compatibility before committing; fallback is a linear trigger → conditions → actions form layout.
 
-**Version confidence:** HIGH for most packages. Note that .NET 10 LTS release should be verified (expected November 2025) and all package versions should be checked against official sources before implementation.
+Explicitly rejected: MediatR (hand-rolled command/handler pattern is already established), Redis (Hangfire uses PostgreSQL storage; add only when scaling to multiple servers), Elasticsearch (pg_trgm handles fuzzy matching at CRM scale), Monaco Editor (formula editor is a simple mat-autocomplete overlay, not a code editor), raw Polly (use `Microsoft.Extensions.Http.Resilience` which wraps it).
 
 ### Expected Features
 
-GlobCRM's feature set is comprehensive, covering all table stakes for CRM systems plus key differentiators. Research identified 35 table stakes features (users expect these), 18 differentiators (competitive advantages), and 8 anti-features to avoid.
+Research across HubSpot, Pipedrive, Zoho, Salesforce Dynamics 365, and Freshsales with HIGH confidence established the following feature set:
 
-**Must have (table stakes):**
-- Contact & Company CRUD with relationships - foundation for all CRM operations
-- Deal/opportunity tracking with pipeline stages, value, probability, expected close
-- Activity logging (calls, meetings, tasks) with assignment, due dates, completion tracking
-- Notes and attachments on all entities - users expect free-text notes and file uploads everywhere
-- Search across entities - global search bar with cross-entity results
-- List views with sorting/filtering - multi-column sort, quick filters, saved filters
-- CSV data import with field mapping, duplicate detection, progress tracking, error handling
-- Email + password authentication with registration, login, password reset
-- User roles (Admin, Manager, Rep) with permission inheritance and access control
-- Dashboard with at-a-glance summary - my activities, my deals, recent items
-- Calendar view for activities - day/week/month views, drag-and-drop
-- Basic reporting - pipeline value, conversion rates, activity summaries
-- In-app notifications with bell icon, notification center, read/unread state
-- Data export (CSV/Excel) - users need to get data out for analysis
-- Responsive web design - mobile-usable web interface with touch-friendly controls
-- Audit trail basics - who changed what, when on all records
+**Must have (table stakes for v1.1):**
+- **Workflow Automation** — event-based triggers (record created/updated, field changed), date-based triggers, field update / notify / create task / send email / fire webhook / enroll in sequence actions, execution log, enable/disable toggle
+- **Email Templates** — rich text editor with Liquid merge fields, template categories, preview with sample data, clone
+- **Email Sequences** — multi-step builder with delays, manual + workflow enrollment, auto-unenroll on reply, open/click tracking, sequence analytics
+- **Formula / Computed Custom Fields** — arithmetic, date difference, string concatenation, IF/THEN, real-time recalculation on save, circular dependency detection
+- **Duplicate Detection & Merge** — on-demand scan, real-time warning on create, configurable match rules, fuzzy matching, side-by-side merge UI, relationship transfer, merge audit trail
+- **Webhooks** — subscription management, HMAC-SHA256 signing, retry with exponential backoff, delivery log, manual retry, test endpoint
+- **Advanced Reporting Builder** — entity + field selection, filter builder, grouping/aggregation, related entity fields (1 level), chart + table view, save/share/export
 
 **Should have (competitive differentiators):**
-- **Dynamic table columns with saved Views** - core GlobCRM differentiator; per-user column selection, ordering, sizing, filters saved as Views; reusable across entities
-- **Rich custom fields** (formula, relation, currency) - JSONB storage; formula fields compute from other fields; relation fields link entities; admins adapt CRM without developer help
-- **Full activity workflow** (assigned → accepted → in progress → review → done) - state machine with role-based transitions, operational clarity beyond simple task tracking
-- **Configurable deal pipelines per team** - different sales processes for different products/teams; admin-defined stages with probabilities, required fields per stage
-- **Two-way email sync** (Gmail + Outlook) - OAuth integration with background sync, auto-link to contacts, send from CRM, messages automatically appear in timeline
-- **Real-time live updates** (SignalR) - deal stage changes, new activities, notifications pushed instantly without page refresh
-- **Combined news feed** (activity + social) - team communication + system events in one stream
-- **Configurable dashboards with drill-down** - drag-and-drop widgets, chart types, date range filters, click-through to underlying data
-- **Granular RBAC with field-level access** - custom roles, per-entity CRUD permissions, hide/read-only specific fields for regulated industries
-- **Quote builder with line items + PDF** - product catalog, quantity, discount, tax calculation, PDF template, versioning
-- **Native mobile apps** (.NET MAUI) - full CRM experience on the go with offline support, push notifications, camera for attachments
-- **Kanban board view** for deals + activities - visual pipeline management with drag-and-drop stage changes
-- **Targets/KPIs with leaderboards** - numeric goals, progress bars, team rankings, time-based (weekly/monthly/quarterly) for gamification
+- Workflow-triggered email sequence enrollment (connects automation and sequences — most mid-tier CRMs treat these separately)
+- Computed fields usable in report builder filters and aggregations (Pipedrive limits these to display-only)
+- Webhook action in workflows (single trigger drives both internal logic and external integration)
+- Upgrade existing CSV import duplicate detection to use new fuzzy matching engine
+- Prebuilt workflow templates (5-10 common patterns: "New lead follow-up", "Deal won", "Stale deal reminder")
+- Report drill-down: click chart bar to see filtered underlying records via existing dynamic table
 
-**Defer (v2+):**
-- AI-powered lead scoring - requires large dataset to train, unreliable with small orgs, black box decisions (use manual scoring rules with formula fields instead)
-- Workflow automation builder (visual) - high complexity to build well; start with configurable triggers in v1, build automation engine in v2
-- Social media integration - APIs unreliable/expensive, data quality issues, privacy concerns (provide link fields to profiles instead)
-- Marketplace/plugin system - enormous maintenance overhead, security risks, versioning nightmares (use webhooks + API for integrations)
+**Defer to v1.2:**
+- Scheduled report delivery (email on schedule)
+- Sequence A/B testing
+- Cross-entity workflow triggers ("when a deal's company gets updated")
+- Cross-entity formula fields (formula on Contact referencing related Deal fields)
+- Bulk merge with batch processing
+- Per-contact timezone for sequence send windows
 
 ### Architecture Approach
 
-The architecture follows clean architecture principles with clear separation between domain logic, application coordination, infrastructure implementation, and presentation. The system uses a **shared database with tenant discriminator** approach (TenantId column on all tables) backed by PostgreSQL Row-Level Security for defense-in-depth. This provides cost-effective multi-tenancy for mid-size organizations while maintaining strong isolation guarantees. Custom fields are stored in JSONB columns with GIN indexes for query performance. Authentication uses OpenIddict for OAuth2/OIDC with JWT tokens. Authorization implements a layered RBAC model (role-based, field-level, record-level, action-level). Real-time features use SignalR with tenant-scoped groups and Redis backplane for horizontal scaling. Email integration uses OAuth with background job sync (Hangfire) and proper threading via Message-ID headers. The API is stateless to support horizontal scaling.
+v1.1 introduces three new cross-cutting concerns layered on the existing Clean Architecture: (1) a domain event system wired into `SaveChangesAsync` via `DomainEventInterceptor`; (2) Hangfire as the durable background processing backbone shared by all async features; (3) a dynamic expression evaluation layer via NCalc for formula fields, workflow conditions, and report query filters. All six features share these three infrastructure elements, which is why they must be built first.
 
 **Major components:**
-1. **Multi-Tenancy Infrastructure** - Tenant resolution middleware, EF Core global query filters, PostgreSQL RLS policies; triple-layer defense ensures no cross-tenant data leakage
-2. **Custom Fields System** - JSONB storage with type metadata (string, number, date, boolean, picklist, lookup), validation at write time, GIN indexes for query performance, cached schemas
-3. **Authentication & Authorization** - OpenIddict OAuth2/OIDC provider, JWT tokens, layered RBAC (roles → field-level → record-level → action-level), permission caching in Redis
-4. **Core CRM Entities** - Contact, Account, Deal, Activity (base class for tasks/meetings/calls/notes), CustomFieldDefinition, Pipeline, Role, AuditLog as aggregate roots
-5. **Email Integration** - OAuth token management with proactive refresh, background sync jobs, Graph API (Outlook) and Gmail API services, email threading logic, attachment storage in blob storage
-6. **Real-Time Layer** - SignalR hubs (Notification, Activity, Deal), tenant-scoped groups, connection state management, Redis backplane for scale-out
-7. **CQRS Pattern** - Command handlers for writes (CreateContactCommand), Query handlers for reads (GetContactByIdQuery), separate read models for complex queries/reports
-8. **Background Jobs** - Hangfire for email sync, notification digests, data exports, audit cleanup; persistent storage in PostgreSQL with monitoring dashboard
-
-**Build dependencies:** Foundation (multi-tenancy + auth) must be complete before core entities. Core entities (Contact, Account, Product) with custom fields must exist before Deal pipeline. Deal pipeline required for Quote builder. Activities and email sync can be built in parallel after core entities. Real-time layer enhances all features and can be added incrementally. Mobile app requires stable API and should be built after web features mature.
+1. **DomainEventInterceptor** (Infrastructure) — captures entity changes before save, dispatches domain events after successful save. Triggers workflows, webhooks, duplicate checks, and formula recalculation from a single integration point. Critical: events captured in `SavingChangesAsync` (OriginalValues available) but dispatched in `SavedChangesAsync` (entity persisted).
+2. **WorkflowEngine** (Infrastructure) — evaluates NCalc conditions against domain events, dispatches quick actions synchronously and slow actions (email, webhook, sequence enrollment) as Hangfire jobs. Must track execution depth to prevent infinite loops.
+3. **Hangfire Job Server** (Infrastructure) — PostgreSQL-backed, 4 named queues (default, webhooks, emails, workflows), `TenantJobFilter` sets tenant context before every job execution. Used by: WorkflowActionJob, WebhookDeliveryJob, SequenceStepJob, DuplicateScanJob.
+4. **FormulaEvaluator** (Application) — NCalc-based expression evaluator with CRM-specific functions (IF, CONCAT, DATEDIFF, TODAY, ROUND). Evaluate on-read, never store computed values in JSONB.
+5. **FluidEmailTemplateRenderer** (Infrastructure) — renders Liquid templates with entity context. Coexists with existing RazorEmailRenderer for system emails.
+6. **DuplicateDetectionService** (Infrastructure) — pg_trgm SQL pre-filter + FuzzySharp weighted composite scoring. Two-tier design avoids loading all records into memory.
+7. **WebhookDeliveryService** (Infrastructure) — HMAC-SHA256 signed HTTP delivery via resilient HttpClient pipeline. Circuit breaker per endpoint after 3 consecutive failures.
+8. **ReportQueryBuilder** (Infrastructure) — translates JSON report definitions to EF Core IQueryable chains (never raw SQL). Tenant isolation automatic via global query filters.
+9. **12 new domain entities** — WorkflowDefinition, WorkflowExecutionLog, EmailTemplate, EmailSequence, EmailSequenceStep, SequenceEnrollment, SequenceStepLog, DuplicateCandidate, DuplicateRule, WebhookSubscription, WebhookDeliveryLog, ReportDefinition. All tenant-scoped with triple-layer isolation (TenantId + EF Core filter + PostgreSQL RLS).
 
 ### Critical Pitfalls
 
-Research identified 58 domain-specific pitfalls across 12 categories. The Phase 1 (Foundation) pitfalls are architectural decisions that cannot be changed later without massive refactoring.
+1. **Tenant context loss in background jobs** (Pitfall 2) — Hangfire jobs run outside HTTP request scope, so Finbuckle middleware never runs. Without explicit `TenantScope` wrapper that sets `ITenantProvider` from the job's `tenantId` parameter, EF Core global filters and PostgreSQL RLS receive null tenant context, causing cross-tenant data leakage or silent empty result sets. Build `TenantScope` infrastructure before any background processing feature.
 
-1. **Tenant Data Leakage Through Inadequate Isolation** - Failing to enforce tenant boundaries at every data access layer leads to cross-tenant data exposure and complete loss of customer trust. **Prevention:** Implement triple-layer defense (middleware sets tenant context, EF Core global query filters inject TenantId, PostgreSQL RLS policies enforce at database level). Add integration tests that attempt cross-tenant access. Never rely solely on application-level filtering.
+2. **Workflow infinite loops** (Pitfall 1) — Workflows that update entities trigger further workflow evaluations. Without depth tracking, a two-workflow cycle burns CPU, exhausts database connections, floods SignalR, and fills audit tables within seconds — for all tenants simultaneously. Enforce execution depth limit (max 5), per-execution visited-set tracking, and per-tenant rate limiting (100 executions/min) from day one of workflow engine implementation.
 
-2. **JSONB Query Performance Hell** - Treating JSONB as schemaless storage without proper indexing leads to full table scans and unusable custom fields. **Prevention:** Create GIN indexes on JSONB columns immediately (`CREATE INDEX idx_contacts_custom ON contacts USING gin (custom_fields jsonb_path_ops)`). Index frequently-queried paths with btree indexes. Limit custom field nesting depth to 2-3 levels. Cache custom field definitions. Consider materialized views for frequently-queried combinations.
+3. **Duplicate merge broken FK references** (Pitfall 4) — Merging contacts requires updating every table that references the losing entity by ID, including polymorphic references (`feed_items.entity_id`, `notifications.entity_id`), JSONB Relation-type custom field values, and new v1.1 tables (sequence enrollments, workflow conditions). Missing any FK permanently destroys the merged entity's history. Use soft-delete with `MergedIntoId` redirect + full transaction + pre-merge FK enumeration + user confirmation with impact preview.
 
-3. **Over-Simplified Permission Model** - Implementing only role-based access without field-level, record-level, or action-level granularity creates inflexible security that cannot meet enterprise requirements. **Prevention:** Design layered permission model from start (role-based + field-level + record-level + action-level). Cache permission matrices per user session. Enforce permissions at database view layer where possible. Include permission context in all API responses.
+4. **Report builder tenant data leakage** (Pitfall 3) — Dynamic query construction risks bypassing EF Core global query filters via `FromSqlRaw`, raw SQL fragments, or accidental `IgnoreQueryFilters()`. Use LINQ-only report queries with whitelist field mapping; never expose raw SQL construction. PostgreSQL RLS is the safety net, not the primary defense.
 
-4. **Email Sync Data Volume Explosion** - Syncing entire email history for all users without filtering overwhelms storage and processing. **Prevention:** Only sync emails from/to CRM contacts. Implement date range limits (last 6 months active, older archived). Set size limits per email. Provide user controls for sync preferences. Use separate database/schema for email data. Archive old emails to cold storage.
+5. **Webhook SSRF** (Pitfall 5) — Tenants can register webhook URLs pointing to cloud metadata endpoints (`169.254.169.254`), loopback, or internal services. Validate on registration AND re-resolve DNS on each delivery (DNS rebinding). Allow `https://` only, reject RFC1918 private ranges, limit redirects. Must be in first webhook implementation.
 
-5. **Real-Time Connection State Management Chaos** - Poor handling of connection lifecycle (disconnects, reconnects, duplicate connections) breaks real-time features and causes memory leaks. **Prevention:** Implement connection state machine (connecting, connected, reconnecting, disconnected). Store connection mapping (user → connection IDs) with TTL. Clean up stale connections automatically. Implement connection groups by tenant for isolation. Add client-side reconnection logic with exponential backoff.
-
-6. **N+1 Query Problem with Custom Fields** - Loading lists of records triggers hundreds of additional queries for custom fields, relationships, and permissions, making the application unusable. **Prevention:** Use EF Core Include() for eager loading. Batch load custom field definitions. Prefetch permissions for current user. Implement query result caching. Use pagination with proper cursor-based or offset pagination. Set up query performance budgets with alerts.
-
-7. **Missing Database Indexing Strategy** - Inadequate indexes on foreign keys, filter columns, and sort columns cause full table scans and slow queries. **Prevention:** Index all foreign keys automatically (tenant_id, created_by, owner_id, account_id, contact_id). Index all filter/search columns (status, stage, type, category). Create composite indexes for common filter combinations like `(tenant_id, status, created_at)`. Create partial indexes for filtered queries. Monitor with pg_stat_statements.
-
-8. **Insufficient Multi-Tenancy Testing** - Testing only with single tenant misses critical isolation and cross-tenant bugs that appear in production. **Prevention:** Every integration test runs with multiple tenants (tenant_a and tenant_b data). Assert queries never return cross-tenant data. Test concurrent operations across tenants. Test with different tenant configurations. Build automated tenant isolation verification tests.
+6. **Formula circular dependencies** (Pitfall 6) — Formula field A references field B which references field A causes infinite recursion on evaluation. Validate dependency graph on every formula save using topological sort; reject cycles immediately with clear error. Maximum dependency chain depth of 5.
 
 ## Implications for Roadmap
 
-Based on research, suggested phase structure with 8 phases over approximately 20 weeks:
+Based on the feature dependency graph from FEATURES.md and the build order analysis from ARCHITECTURE.md, the research recommends a 6-phase structure:
 
-### Phase 1: Foundation (Weeks 1-3)
-**Rationale:** Multi-tenancy, authentication, and database architecture are foundational decisions that cannot be changed later. All subsequent features depend on these being correct. Pitfalls P1.1, P1.2, P2.1, P2.3, P3.1, P7.1, P7.2, P7.3, P8.1, P8.2 must be addressed in this phase.
+### Phase 1: Foundation — Hangfire + Email Templates + Formula Fields
 
-**Delivers:** Database schema with multi-tenancy (Tenants, Users, Roles, Permissions tables), PostgreSQL RLS policies, .NET Core project structure (Domain, Application, Infrastructure, API layers), tenant resolution middleware, EF Core tenant-scoped DbContext, JWT authentication, basic authorization policies, Angular project structure with auth module, HTTP interceptors, route guards.
+**Rationale:** Email Templates and Formula Fields have no dependencies on other v1.1 features and are required by every subsequent phase. Hangfire is the async processing backbone required by all subsequent features. This is the mandatory starting point. The `TenantScope` background job wrapper and the Hangfire `TenantJobFilter` must be implemented here — before any feature adds background processing.
 
-**Addresses (from FEATURES.md):** Email + password auth, user roles (Admin, Manager, Rep), tenant isolation infrastructure.
+**Delivers:** Tenant-safe background job infrastructure with TenantJobFilter; user-editable email templates with Liquid merge fields, rich text editing, preview, and template categories; formula/computed custom fields with NCalc evaluation, circular dependency detection via topological sort, on-read evaluation strategy, and formula validation on save.
 
-**Avoids (from PITFALLS.md):** P1.1 (tenant data leakage), P7.1 (N+1 queries - architecture), P7.2 (missing indexes), P7.3 (unbounded results), P8.1 (missing validation), P8.2 (soft delete pattern), P11.1 (migration strategy), P11.2 (config management).
+**Addresses:** Email Templates (all table stakes), Formula Fields (all table stakes), Hangfire integration (shared infrastructure)
 
-**Stack elements (from STACK.md):** PostgreSQL 17 with RLS, .NET Core 10 with EF Core, Finbuckle.MultiTenant, OpenIddict, Angular 19, FluentValidation, Serilog.
+**Avoids:** Pitfall 2 (TenantScope wrapper complete before downstream features add background jobs). Pitfall 6 (formula dependency graph + cycle detection from day one). Pitfall 15 (block deletion of custom fields referenced by formulas).
 
-### Phase 2: Core CRM Entities (Weeks 4-6)
-**Rationale:** Contact and Account entities are the foundation of all CRM functionality. Custom fields system must be built with proper JSONB indexing and type system before any entity can use it. RBAC implementation must be complete before feature development accelerates. Dependencies: Requires Phase 1 (auth + multi-tenancy) complete.
+**Research flag:** Standard patterns — well-documented libraries (Hangfire, Fluid, NCalc). Skip research-phase; proceed directly to planning.
 
-**Delivers:** Contact entity with CRUD operations, Account entity with CRUD operations, CustomFieldDefinition system with type metadata (string, number, date, boolean, picklist, lookup), JSONB handling in EF Core with GIN indexes, dynamic field validation service, permission evaluation service with caching, role management APIs, Angular modules for Contacts and Accounts with dynamic forms, admin UI for custom field and role configuration.
+---
 
-**Addresses (from FEATURES.md):** Contact & Company CRUD, contact-company relationships, search across entities, list views with sorting/filtering, notes on any entity, rich custom fields (differentiator), granular RBAC with field-level access (differentiator).
+### Phase 2: Workflow Automation Engine
 
-**Avoids (from PITFALLS.md):** P2.1 (JSONB performance), P2.2 (custom field proliferation - limits), P2.3 (type system mismatch), P3.1 (permission model), P3.2 (permission audit trail), P7.1 (N+1 queries - implementation), P8.3 (duplicate detection basics).
+**Rationale:** The largest and most complex phase. Depends on Phase 1 (Hangfire for action dispatch, Email Templates for "send email" action). The DomainEventInterceptor is the integration point for workflows AND webhooks AND duplicate detection — it must be designed here to serve all downstream consumers. This is the architectural cornerstone of v1.1.
 
-**Stack elements (from STACK.md):** EF Core with JSONB mapping, ngx-formly for dynamic forms, FluentValidation for custom field validation, Redis for permission caching.
+**Delivers:** DomainEventInterceptor wired to `SaveChangesAsync`; WorkflowEngine with NCalc condition evaluation; WorkflowActionJob covering field update, create activity, send notification, send email, fire webhook, and start sequence actions; workflow builder UI with trigger/condition/action form (using @foblex/flow or linear fallback); execution log with full audit trail; enable/disable toggle; prebuilt workflow templates (5-10 patterns).
 
-### Phase 3: Deals & Pipelines (Weeks 7-8)
-**Rationale:** Deal pipeline is core CRM functionality and a key differentiator with configurable stages. Must support multiple pipelines per tenant with stage-specific validation rules. Dependencies: Requires Phase 2 (Contacts, Accounts, Custom Fields).
+**Addresses:** Workflow Automation (all table stakes sub-features), workflow-triggered sequence enrollment (differentiator), webhook action in workflows (differentiator)
 
-**Delivers:** Pipeline and PipelineStage entities with configuration API, Deal entity with stage tracking and custom fields, deal CRUD operations with stage transition validation, deal stage transition logic with required field enforcement, Kanban board view with drag-and-drop, deal detail view, product catalog entity for quote builder foundation.
+**Avoids:** Pitfall 1 (execution depth limit, per-execution visited-set, per-tenant rate limiting designed in from the start). Pitfall 8 (admin-only workflow management, "execute as system with tenant isolation" model). Pitfall 10 (SignalR event batching for workflow-generated entity changes). Pitfall 17 (event-driven condition evaluation, not database polling).
 
-**Addresses (from FEATURES.md):** Deal/opportunity tracking, configurable deal pipelines per team (differentiator), Kanban board view (differentiator), pipeline stages with value and probability.
+**Research flag:** Needs deeper research during planning — DomainEventInterceptor interaction with existing AuditableEntityInterceptor, @foblex/flow Angular 19.2.x compatibility verification, workflow execution state machine completeness.
 
-**Avoids (from PITFALLS.md):** P6.1 (hardcoded pipeline stages), P6.2 (lost activity history during pipeline changes), P6.3 (activity workflow state machine - design only).
+---
 
-**Stack elements (from STACK.md):** Angular Material + PrimeNG for Kanban UI, EF Core state tracking for deal stage history.
+### Phase 3: Email Sequences
 
-### Phase 4: Activities & Timeline (Weeks 9-10)
-**Rationale:** Activity system is the operational backbone of CRM. Full workflow (assigned → accepted → in progress → review → done) is a key differentiator requiring proper state machine design. Dependencies: Requires Phase 2 (Contacts, Accounts), Phase 3 (Deals).
+**Rationale:** Depends on Phase 1 (email templates for step content, Hangfire for delayed scheduling). Benefits from Phase 2 (workflows can trigger sequence enrollment). Relatively self-contained after foundation is in place — primarily adding enrollment management and step scheduling on top of existing email infrastructure.
 
-**Delivers:** Activity base entity with polymorphic types (Task, Meeting, Call, Note), activity CRUD operations with state machine validation, activity assignment and due dates, AuditLog entity with EF Core interceptor for automatic change tracking, timeline UI component with filtering and search, activity creation forms for each type, calendar view for activities (day/week/month with drag-and-drop).
+**Delivers:** Multi-step sequence builder with delays; manual enrollment and workflow-triggered enrollment with idempotency constraint on `(sequence_id, contact_id)`; auto-unenroll on reply via Gmail sync integration; open/click tracking via pixel and link wrapping; sequence analytics (enrolled → opened → clicked → replied funnel); pause/resume individual enrollments; business hours send window; jittered send times.
 
-**Addresses (from FEATURES.md):** Activity logging (calls, meetings, tasks), full activity workflow (differentiator), notes on any entity, calendar view, audit trail basics, activity assignment.
+**Addresses:** Email Sequences (all table stakes sub-features)
 
-**Avoids (from PITFALLS.md):** P6.3 (activity state machine), P3.2 (audit trail for all changes).
+**Avoids:** Pitfall 7 (jittered send times, pre-send contact validation for deleted/merged/unsubscribed contacts, per-tenant sending rate limits). Pitfall 13 (HTML escaping of Liquid template output, HtmlSanitizer for template HTML).
 
-**Stack elements (from STACK.md):** EF Core interceptors for audit logging, Angular Material calendar components, date-fns for date handling.
+**Research flag:** Auto-unenroll on reply requires careful integration with existing Gmail sync service — needs planning-phase review of email address matching logic and false positive handling.
 
-### Phase 5: Email Integration (Weeks 11-13)
-**Rationale:** Email sync is complex (OAuth, threading, data volume, token refresh) and should not be rushed. Must be built after core entities are stable. This is the highest-risk phase with pitfalls P4.1-P4.4. Dependencies: Requires Phase 2 (Contacts), Phase 4 (Activities for email activity records).
+---
 
-**Delivers:** OAuth callback endpoints for Gmail and Outlook, token storage with encryption and proactive refresh logic, Graph API service for Outlook, Gmail API service, email sync background job (Hangfire) with incremental sync, email threading logic using Message-ID headers, EmailMessage entity with relationships, email list and detail views with sanitized HTML rendering, send email functionality, link emails to contacts/deals, attachment storage in blob storage (Azure Blob/S3).
+### Phase 4: Webhooks
 
-**Addresses (from FEATURES.md):** Two-way email sync Gmail + Outlook (differentiator), email threading, email attachments, send from CRM.
+**Rationale:** Depends on Phase 1 (Hangfire for delivery jobs). Benefits from Phase 2 (DomainEventInterceptor publishes events that WebhookPublisher subscribes to). Relatively self-contained delivery pipeline. Simpler backend than workflows; simpler frontend (subscription CRUD + delivery log viewer) than most other phases.
 
-**Avoids (from PITFALLS.md):** P4.1 (email data volume explosion), P4.2 (email threading failures), P4.3 (OAuth token management), P4.4 (email parsing vulnerabilities).
+**Delivers:** WebhookSubscription CRUD (admin-only); event type selection per subscription; HMAC-SHA256 payload signing with replay-attack timestamp; WebhookDeliveryService with Polly resilience pipeline; delivery log with per-attempt tracking (status, HTTP code, response time, payload); manual retry UI; test webhook endpoint (ping); SSRF URL validation on registration and each delivery.
 
-**Stack elements (from STACK.md):** Hangfire for background jobs, MailKit for IMAP/SMTP, Microsoft Graph SDK, Gmail API client, Azure Blob Storage/S3, HtmlSanitizer for XSS prevention.
+**Addresses:** Webhooks (all table stakes sub-features)
 
-**Research flag:** Needs deeper research during planning - OAuth flows are provider-specific, threading algorithms vary by provider, sanitization requires security review.
+**Avoids:** Pitfall 5 (SSRF prevention — `https://` only, RFC1918 rejection, DNS re-resolution on each delivery, 3-redirect limit). Pitfall 9 (circuit breaker per endpoint after 3 consecutive failures, max 5 retry attempts over ~1 hour, 1,000-delivery queue cap per endpoint). Pitfall 14 (minimal payload by default, admin-configurable field inclusion).
 
-### Phase 6: Real-Time & Notifications (Weeks 14-15)
-**Rationale:** Real-time features enhance all previous phases (deal updates, activity changes, email arrivals). SignalR integration is cross-cutting and should be added after core features are stable. Dependencies: Requires all previous phases (consumes their domain events).
+**Research flag:** Standard patterns — well-documented webhook delivery architecture. Skip research-phase.
 
-**Delivers:** SignalR hubs (NotificationHub, ActivityHub, DealHub) with tenant-scoped groups, Redis backplane for scale-out, connection state management with automatic cleanup, Notification entity and service, domain event handlers that dispatch notifications, notification preferences per user, Angular SignalR client service with reconnection logic, toast notifications component, live updates in lists (contacts, deals show changes from other users), email and push notification infrastructure (send via SendGrid/SES, FCM for push).
+---
 
-**Addresses (from FEATURES.md):** Real-time live updates (differentiator), in-app notifications, email notifications, push notifications (mobile), combined news feed.
+### Phase 5: Duplicate Detection & Merge
 
-**Avoids (from PITFALLS.md):** P5.1 (connection state chaos), P5.2 (real-time race conditions), P5.3 (real-time performance degradation).
+**Rationale:** Depends on Phase 2 (DomainEventInterceptor fires on entity creation for real-time duplicate checks). Most complex data mutation phase — merge touches every FK relationship in the system, including new v1.1 tables created in Phases 1-4. Building this after other phases are complete means the full FK surface is known when writing the merge relationship transfer logic.
 
-**Stack elements (from STACK.md):** SignalR with Redis backplane, @microsoft/signalr client, StackExchange.Redis, SendGrid/Amazon SES, Plugin.Firebase for FCM.
+**Delivers:** `CREATE EXTENSION pg_trgm` migration + GIN trigram indexes on contacts (email, name) and companies (name, domain); DuplicateDetectionService (two-tier: pg_trgm pre-filter + FuzzySharp weighted scoring); on-demand bulk duplicate scan as Hangfire recurring job (daily 2 AM); real-time duplicate warning on contact/company create; configurable match rules per tenant (admin); side-by-side merge UI with field-level conflict resolution; relationship transfer covering all FKs including feed_items, notifications, sequence enrollments; soft-delete with `MergedIntoId` redirect; merge audit trail; enhanced CSV import duplicate detection; "not a duplicate" explicit dismissal.
 
-### Phase 7: Mobile App (Weeks 16-18)
-**Rationale:** Mobile app requires stable API and should be built after web features are mature. .NET MAUI allows code sharing with backend. Dependencies: Requires Phases 1-5 (consumes existing APIs).
+**Addresses:** Duplicate Detection & Merge (all table stakes sub-features), enhanced import duplicate detection (differentiator), bulk duplicate review (table stakes)
 
-**Delivers:** .NET MAUI project structure with shared business logic, platform-specific implementations (iOS/Android), local SQLite database for offline data, sync engine with conflict resolution using version numbers, queue for offline operations, contact and deal views, activity logging with camera for attachments, push notifications via FCM, OAuth authentication flow for mobile, secure token storage (Keychain/KeyStore).
+**Avoids:** Pitfall 4 (comprehensive FK reference map documented before implementation; soft-delete with `MergedIntoId` redirect; full transaction; merge preview with impact counts; JSONB Relation-type value update via `jsonb_set`). Pitfall 12 (confidence scoring 0-100% not binary, threshold-based UX: >=90% auto-flag, 60-89% warning, <60% silent, never auto-merge).
 
-**Addresses (from FEATURES.md):** Native mobile apps (differentiator), offline support, push notifications, camera for attachments, mobile-first experience.
+**Research flag:** Needs planning-phase review — the complete FK reference map across all entities (v1.0 + v1.1) should be documented as a dedicated planning artifact before implementation begins. This is the most likely place for data loss to occur if a FK is missed.
 
-**Avoids (from PITFALLS.md):** P12.3 (poor mobile experience).
+---
 
-**Stack elements (from STACK.md):** .NET MAUI, sqlite-net-pcl, CommunityToolkit.Maui, Refit for API calls, IdentityModel.OidcClient, Plugin.Firebase.
+### Phase 6: Advanced Reporting Builder
 
-**Research flag:** Needs testing on actual devices - offline sync conflict resolution requires validation with real-world scenarios.
+**Rationale:** Last phase because it benefits from all preceding data being operational (formula fields from Phase 1, workflow execution data from Phase 2, sequence analytics from Phase 3, webhook delivery stats from Phase 4). Reporting is also the feature with the highest tenant data leakage risk from dynamic query construction; building it last means tenant isolation patterns are proven and stable across the codebase.
 
-### Phase 8: Reporting & Advanced Features (Weeks 19-20)
-**Rationale:** Reporting, bulk operations, and admin tools complete the feature set for v1 launch. These are polish features that depend on data being in the system. Dependencies: Requires all previous phases.
+**Delivers:** ReportDefinition entity + CRUD; ReportQueryBuilder (LINQ-only, whitelist field mapping); entity source + field + filter + grouping + aggregation configuration UI; related entity fields (1 level, e.g., Contact → Company.Name); Chart.js visualization reusing existing dashboard charts; table view with CSV export via existing CsvHelper; save + share reports (owner, name, config JSON, IsShared flag); date range parameter with preset ranges; report drill-down to filtered dynamic table; CdkVirtualScrollViewport for large result sets.
 
-**Delivers:** Configurable dashboard widgets (drag-and-drop), chart components for dashboards (PrimeNG charts), drill-down from charts to underlying data, KPIs and targets with leaderboards, CSV/Excel export with large dataset handling (background job + email link), CSV import with field mapping, duplicate detection, progress tracking, bulk operations (edit, delete, assign, status change) with preview, quote builder with line items, product catalog, PDF generation (QuestPDF), tenant settings management UI, user management UI, system health dashboard.
+**Addresses:** Advanced Reporting Builder (all table stakes sub-features), report drill-down differentiator, computed fields in reports differentiator
 
-**Addresses (from FEATURES.md):** Configurable dashboards (differentiator), targets/KPIs with leaderboards (differentiator), quote builder with PDF (differentiator), bulk operations, data import, data export, basic reporting.
+**Avoids:** Pitfall 3 (LINQ-only construction, never `FromSqlRaw`, whitelist field mapping). Pitfall 11 (eager loading via dynamic `.Include()` chains, `.Select()` projections, 10,000-row cap with pagination, 30-second statement timeout, `AsAsyncEnumerable()` for CSV streaming). Pitfall 16 (maximum 3-level join depth, cardinality warnings at 100k estimated rows, 2 concurrent queries per tenant).
 
-**Avoids (from PITFALLS.md):** P12.1 (over-engineering customization), P12.2 (missing bulk operations), P8.3 (duplicate detection).
+**Research flag:** Dynamic LINQ expression tree building for complex aggregations with JSONB custom fields needs validation during planning — EF Core translation edge cases with `GroupBy` over JSONB paths may require fallback to raw parameterized SQL with manual tenant filter.
 
-**Stack elements (from STACK.md):** PrimeNG charts, QuestPDF for PDF generation, Hangfire for background export jobs, ngx-formly for import field mapping.
+---
 
 ### Phase Ordering Rationale
 
-- **Foundation first (Phase 1):** Multi-tenancy and auth are architectural foundations that cannot be retrofitted. All pitfalls marked "Phase 1" in PITFALLS.md are non-negotiable.
-- **Core entities before workflows (Phase 2 → 3 → 4):** Contacts and Accounts must exist before Deals (deals link to contacts/accounts). Custom fields must be designed correctly before any entity uses them. Deals must exist before Activities can reference them.
-- **Email after core (Phase 5):** Email integration is complex with many pitfalls. Building it early would delay core CRM value. Activities must exist to create email activity records.
-- **Real-time enhancement (Phase 6):** SignalR enhances all previous features. Building it after core features are stable allows incremental enhancement without blocking progress.
-- **Mobile after API maturity (Phase 7):** Mobile app consumes existing APIs. Don't start mobile until web API is stable and well-tested.
-- **Polish last (Phase 8):** Reporting and bulk operations depend on data being in the system. Quote builder depends on deals and products existing.
+The dependency chain from FEATURES.md maps directly to this phase order:
+- Phase 1 installs the three shared libraries (Hangfire, NCalc, Fluid) plus the two leaf-node features (Email Templates, Formula Fields) that every subsequent phase depends on
+- Phase 2 (Workflow Engine) is the hub that references Phase 1 outputs; it also installs DomainEventInterceptor which Phases 4 and 5 consume
+- Phase 3 (Sequences) and Phase 4 (Webhooks) are independent of each other — Sequences is placed before Webhooks because the reply-detection Gmail integration is more complex and benefits from earlier delivery
+- Phase 5 (Duplicate Detection) is placed after Phases 1-4 so the full FK surface area from all v1.1 tables is known when building the merge relationship transfer logic
+- Phase 6 (Reporting) comes last; it is the only phase that explicitly benefits from data produced by all other phases being operational, and it has the highest inherent security risk from dynamic query construction
+
+Cross-cutting implementation priorities spanning all phases:
+- **TenantScope wrapper**: Implement in Phase 1, required by every subsequent phase
+- **RLS checklist per entity**: Apply to every new entity in every phase (Pitfall 18)
+- **Idempotent job design**: Apply from Phase 1 forward to survive deployments (Pitfall 19)
+- **OnPush change detection**: Maintain for all new Angular components (Pitfall 20)
 
 ### Research Flags
 
-Phases likely needing deeper research during planning:
-- **Phase 5 (Email Integration):** OAuth flows are provider-specific (Microsoft Graph API vs Gmail API have different token formats, scopes, refresh behavior). Email threading algorithms vary. HTML sanitization requires security review. Consider `/gsd:research-phase email-oauth` before implementation.
-- **Phase 7 (Mobile App):** Offline sync conflict resolution strategies are complex. Test scenarios with real devices (network switching, app backgrounding, concurrent edits). Consider `/gsd:research-phase offline-sync` for conflict resolution algorithms.
+**Needs research-phase during planning:**
+- **Phase 2 (Workflow Automation):** DomainEventInterceptor interaction with existing AuditableEntityInterceptor (both are SaveChangesInterceptors — verify ordering); @foblex/flow Angular 19.2.x runtime compatibility verification; workflow execution state machine edge cases (partial failure, compensation)
+- **Phase 3 (Email Sequences):** Gmail sync service integration for reply detection — email address matching against active enrollments, false positive/negative handling
+- **Phase 5 (Duplicate Detection):** Complete FK reference map across all v1.0 + v1.1 entities — document as explicit planning artifact before implementation begins
+- **Phase 6 (Reporting):** Dynamic LINQ expression tree building with JSONB custom field aggregations — validate EF Core translation limits before committing to approach
 
-Phases with standard patterns (skip research-phase):
-- **Phase 1 (Foundation):** Multi-tenancy with Finbuckle is well-documented. OpenIddict has extensive examples. PostgreSQL RLS is standard pattern.
-- **Phase 2 (Core CRM):** CRUD with EF Core is standard. JSONB handling well-documented. NgRx state management has established patterns.
-- **Phase 3 (Deals & Pipelines):** Kanban UI with drag-and-drop is solved problem (PrimeNG has components). State machine validation is straightforward.
-- **Phase 4 (Activities & Timeline):** Calendar components exist in Angular Material. EF Core audit interceptors are standard pattern.
-- **Phase 6 (Real-Time):** SignalR with Redis backplane is well-documented. Connection state management patterns are established.
-- **Phase 8 (Reporting):** Dashboard libraries (PrimeNG charts) handle most complexity. CSV import/export is standard. QuestPDF has good documentation.
+**Standard patterns, skip research-phase:**
+- **Phase 1 (Foundation):** Hangfire, Fluid, and NCalc are all well-documented with official guides and verified NuGet versions. Patterns are established.
+- **Phase 4 (Webhooks):** Webhook delivery architecture is well-established industry pattern. HMAC signing, exponential retry, and circuit breakers are standard.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technologies are production-proven for SaaS CRM. Angular 19, .NET Core 10, PostgreSQL 17, .NET MAUI are mature with excellent documentation. Minor uncertainty around .NET 10 release date (expected Nov 2025) - verify before starting. Package versions need verification against official sources. |
-| Features | HIGH | Feature research based on competitive analysis (HubSpot, Pipedrive, Salesforce, Zoho) and industry reports. Table stakes features are well-established. Differentiators (dynamic tables, rich custom fields, full activity workflow, configurable pipelines, real-time) are validated competitive advantages. Anti-features identified from common mistakes. |
-| Architecture | HIGH | Shared database with tenant discriminator is proven pattern for this scale. Clean architecture with CQRS is well-documented. JSONB for custom fields is standard approach. SignalR with Redis backplane scales to thousands of concurrent users. Build dependencies are clear from ARCHITECTURE.md. |
-| Pitfalls | HIGH | 58 pitfalls identified from domain expertise and real-world CRM projects. Each pitfall includes warning signs, prevention strategies, and phase mapping. Phase 1 pitfalls (16 total) are architectural foundations verified by multiple sources. Email integration pitfalls (P4.1-P4.4) are based on known OAuth and threading complexity. |
+| Stack | HIGH | All NuGet package versions verified on NuGet.org with release dates. pg_trgm is a core PostgreSQL 17 extension. Single medium-confidence item: @foblex/flow Angular 19.2.x compatibility needs runtime verification. Fallback path (linear form builder) is well-defined. |
+| Features | HIGH | Multi-source verification across 5+ major CRM platforms (HubSpot, Pipedrive, Zoho, Salesforce Dynamics 365, Freshsales). Table stakes vs. differentiators vs. anti-features are clearly established with citation to each platform. |
+| Architecture | HIGH | Based on direct analysis of existing GlobCRM v1.0 codebase patterns (AuditableEntityInterceptor, TenantDbConnectionInterceptor, NotificationDispatcher, CrmHub) plus verified patterns for Hangfire multi-tenancy, EF Core interceptors, NCalc, and Fluid. All component boundaries are consistent with existing layer conventions. |
+| Pitfalls | HIGH | Sourced from OWASP (SSRF), official Microsoft documentation (EF Core multi-tenancy, SignalR performance), vendor-specific CRM guides (Dynamics 365 calculated fields), and direct GlobCRM v1.0 codebase analysis. Critical pitfalls include specific prevention code patterns, not just general advice. |
 
-**Overall confidence:** HIGH
-
-Research is comprehensive and based on proven patterns. The main areas requiring validation during implementation are:
+**Overall confidence: HIGH**
 
 ### Gaps to Address
 
-- **OAuth provider-specific behavior:** Microsoft Graph API and Gmail API have different token formats, refresh mechanisms, and scopes. Phase 5 planning should include research into specific API quirks and rate limits for each provider.
-
-- **Offline sync conflict resolution:** Phase 7 (Mobile) needs validation of conflict resolution strategies with real devices and network conditions. Research during planning should explore operational transformation vs last-write-wins vs manual merge strategies.
-
-- **Performance with realistic data volumes:** While indexing strategy is defined, actual query performance should be validated with realistic tenant data (100k contacts, 1M activities). Load testing in Phase 2 will reveal if additional materialized views or denormalization is needed.
-
-- **.NET 10 release verification:** Research assumes .NET 10 LTS releases November 2025. If project starts before release, use .NET 8 LTS (supported until November 2026) and plan upgrade path. Verify all package versions support target .NET version.
-
-- **Custom field formula engine:** FEATURES.md mentions formula custom fields, but implementation complexity not fully explored. Phase 2 planning should research formula parsing, circular reference detection, and performance implications. Consider starting with simple formulas only.
-
-- **Email HTML rendering security:** Phase 5 must include security review of HTML sanitization approach. Test with known malicious email samples. Consider iframe sandbox vs sanitization library tradeoffs.
+- **@foblex/flow Angular 19.2.x compatibility:** Verify in Phase 2 planning before committing to the visual workflow builder. Fallback (linear form-based builder using existing Angular Material + CDK) is well-defined and lower-risk. Decision should be made before Phase 2 planning begins.
+- **DomainEventInterceptor ordering with AuditableEntityInterceptor:** Both intercept `SaveChangesAsync`. EF Core processes SaveChangesInterceptors in registration order. Verify that audit timestamps are set before domain events are captured (so event payloads include correct `UpdatedAt` values). Test with integration tests.
+- **Workflow execution state machine for partial failures:** If a workflow executes 3 of 5 actions and the 4th fails (e.g., SendGrid returns 500), the state machine needs explicit handling: retry the failed action only, mark remaining actions as skipped, or roll back all. Decide during Phase 2 planning.
+- **Gmail reply detection accuracy for sequence auto-unenroll:** Matching inbound email addresses against active enrollments has false negative risk (contact replies from different address) and false positive risk (different contact with similar email). Thresholds and fallback behavior need explicit design in Phase 3 planning.
+- **ReportQueryBuilder EF Core translation limits:** Dynamic `.GroupBy()` + `.Select()` with JSONB field access through expression trees may hit EF Core 10 translation limitations. Fallback to raw parameterized SQL with manual `WHERE tenant_id = @tenantId` remains available and is documented in ARCHITECTURE.md.
+- **Hangfire dashboard access control:** The Hangfire dashboard at `/hangfire` must be restricted to system administrators (not tenant admins). The `HangfireAdminAuthFilter` integration with the existing identity system needs explicit design in Phase 1.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- **STACK.md** - Comprehensive technology research with version numbers, rationale for each choice, confidence ratings, package recommendations, deployment architecture
-- **FEATURES.md** - Feature analysis based on competitive research (HubSpot, Pipedrive, Salesforce, Zoho, Freshsales, Close CRM), G2 category reports, dependency mapping
-- **ARCHITECTURE.md** - Architecture patterns for multi-tenant SaaS CRM, component boundaries, data flow, build order with detailed phase breakdown (8 phases, 20 weeks)
-- **PITFALLS.md** - 58 domain-specific pitfalls across 12 categories with warning signs, prevention strategies, phase mapping, impact assessment
-- Official documentation: Angular (angular.dev), .NET (learn.microsoft.com/dotnet), PostgreSQL (postgresql.org), .NET MAUI (learn.microsoft.com/dotnet/maui)
-- Clean Architecture patterns: Jason Taylor's CleanArchitecture template (github.com/jasontaylordev/CleanArchitecture)
-- Multi-tenancy patterns: Finbuckle.MultiTenant documentation (finbuckle.com/multitenant), PostgreSQL schemas (postgresql.org/docs)
+
+**Stack Research:**
+- [Hangfire.AspNetCore 1.8.23 on NuGet.org](https://www.nuget.org/packages/hangfire.aspnetcore/) — verified released 2026-02-05
+- [Hangfire.PostgreSql 1.21.1 on NuGet.org](https://www.nuget.org/packages/Hangfire.PostgreSql/) — verified
+- [Fluid.Core 2.31.0 on NuGet.org](https://www.nuget.org/packages/Fluid.Core/) — verified released 2025-11-07
+- [NCalcSync 5.11.0 on NuGet.org](https://www.nuget.org/packages/NCalcSync) — verified
+- [FuzzySharp 2.0.2 on NuGet.org](https://www.nuget.org/packages/FuzzySharp) — verified
+- [Microsoft.Extensions.Http.Resilience 10.3.0 on NuGet.org](https://www.nuget.org/packages/Microsoft.Extensions.Http.Resilience/) — verified
+- [PostgreSQL pg_trgm Documentation](https://www.postgresql.org/docs/current/pgtrgm.html) — core extension, PostgreSQL 17
+
+**Feature Research:**
+- [HubSpot Workflows Guide](https://knowledge.hubspot.com/workflows/create-workflows) — trigger types, action catalog
+- [HubSpot Sequences](https://knowledge.hubspot.com/sequences/create-and-edit-sequences) — sequence creation, enrollment, tracking
+- [Pipedrive Formula Fields Documentation](https://support.pipedrive.com/en/article/custom-fields-formula-fields) — formula syntax, limitations
+- [Dynamics 365 Duplicate Detection](https://www.inogic.com/blog/2025/10/step-by-step-guide-to-duplicate-detection-and-merge-rules-in-dynamics-365-crm/) — merge flow
+- [Zoho CRM Workflow Rules](https://help.zoho.com/portal/en/kb/crm/automate-business-processes/workflow-management/articles/configuring-workflow-rules) — trigger types
+- [Webhook Architecture Design](https://beeceptor.com/docs/webhook-feature-design/) — subscription, delivery, retry patterns
+
+**Architecture Research:**
+- [Hangfire Documentation](https://docs.hangfire.io/en/latest/) — PostgreSQL storage, multi-tenant patterns
+- [Fluid Template Engine (GitHub)](https://github.com/sebastienros/fluid) — rendering, context, filters
+- [NCalc Documentation](https://ncalc.github.io/ncalc/) — expression parsing, custom functions
+- [Microsoft Resilient HTTP Apps (.NET)](https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience) — Polly pipeline configuration
+- Existing GlobCRM v1.0 codebase — AuditableEntityInterceptor, TenantDbConnectionInterceptor, NotificationDispatcher, CrmHub patterns
+
+**Pitfalls Research:**
+- [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
+- [Microsoft: EF Core Multi-tenancy](https://learn.microsoft.com/en-us/ef/core/miscellaneous/multitenancy)
+- [Microsoft: EF Core Global Query Filters](https://learn.microsoft.com/en-us/ef/core/querying/filters)
+- [Microsoft: SignalR Performance](https://learn.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance)
+- [Dynamics 365: Calculated Fields and Circular Dependencies](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/define-calculated-fields)
+- [Hangfire Discussion: Multi-Tenant Architecture](https://discuss.hangfire.io/t/hangfire-multi-tenant-architecture-per-tenant-recurring-jobs-vs-dynamic-enqueueing-at-scale/11400)
+- [Hookdeck: Webhooks at Scale](https://hookdeck.com/blog/webhooks-at-scale)
 
 ### Secondary (MEDIUM confidence)
-- Technology stack comparisons: Reddit r/dotnet, Angular community discussions, PostgreSQL mailing lists
-- CRM industry patterns: Gartner and Forrester reports on CRM features and market trends
-- Email integration patterns: OAuth2 implementation guides for Microsoft Graph and Gmail APIs
-- SignalR scaling patterns: ASP.NET Core SignalR documentation on Redis backplane and scale-out
 
-### Tertiary (LOW confidence, needs validation)
-- Performance benchmarks: Assumes 200ms p95 for CRUD operations, 1000 req/s per tenant based on similar projects - should be validated with load testing
-- Cost estimates: Monthly infrastructure costs ($500-1000 for 50 tenants) are rough estimates - actual costs depend on hosting choices and usage patterns
-- Development timeline: 20-week estimate assumes experienced team - adjust based on actual team composition and part-time availability
+- [@foblex/flow npm registry](https://www.npmjs.com/package/@foblex/flow) — Angular-native flow editor; Angular 19 compatibility stated but not integration-tested against 19.2.x
+- [Webhook Best Practices (Svix)](https://www.svix.com/resources/webhook-best-practices/retries/) — retry schedule recommendations
+- [FuzzySharp GitHub](https://github.com/JakeBayer/FuzzySharp) — .NET port of Python FuzzyWuzzy, field weighting approach
+- [CRM Deduplication Guide 2025](https://www.rtdynamic.com/blog/crm-deduplication-guide-2025/) — algorithm selection and thresholds
+- [Inngest: Fixing Multi-Tenant Queueing Problems](https://www.inngest.com/blog/fixing-multi-tenant-queueing-concurrency-problems) — per-tenant rate limiting patterns
+
+### Tertiary (LOW confidence — validate during planning)
+
+- Dynamic LINQ expression tree approach for report queries with JSONB fields — pattern established but EF Core translation edge cases unknown until integration-tested
+- Gmail reply detection matching logic for sequence auto-unenroll — integration with existing Gmail sync service needs explicit design review during Phase 3 planning
 
 ---
-*Research completed: 2026-02-16*
+*Research completed: 2026-02-18*
 *Ready for roadmap: yes*

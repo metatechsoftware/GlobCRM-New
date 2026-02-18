@@ -1,812 +1,489 @@
-# Technology Stack Research: GlobCRM
+# Technology Stack: GlobCRM v1.1 Automation & Intelligence
 
-**Research Date:** 2026-02-16
-**Project:** Multi-tenant SaaS CRM
-**Core Stack:** Angular + .NET Core 10 + PostgreSQL + .NET MAUI
+**Project:** GlobCRM v1.1 -- Automation, Intelligence, and Extensibility
+**Researched:** 2026-02-18
+**Scope:** Stack ADDITIONS for v1.1 features only. Core stack (Angular 19, .NET 10, PostgreSQL 17) is validated and unchanged.
 
 ---
 
 ## Executive Summary
 
-This document defines the recommended technology stack for GlobCRM, a multi-tenant SaaS CRM platform. The stack is optimized for:
-- **Scalability**: Support for 10-50 concurrent users per tenant with growth potential
-- **Multi-tenancy**: Database-per-schema isolation with shared infrastructure
-- **Real-time capabilities**: SignalR for notifications and live updates
-- **Mobile-first**: .NET MAUI for native iOS/Android apps
-- **Developer productivity**: Strong typing, modern tooling, and active communities
+v1.1 adds six interconnected capabilities: workflow automation, email templates/sequences, formula/computed custom fields, duplicate detection & merge, webhooks, and advanced reporting. The existing stack handles most of the infrastructure needs. The key additions are:
 
-**Version Note**: Knowledge cutoff January 2025. Verify all versions against official documentation before implementation.
+1. **Hangfire** for reliable background job processing (workflow actions, webhook delivery, email sequences)
+2. **Fluid** (Liquid) for user-editable email templates (replacing RazorLight for user-facing templates only)
+3. **NCalc** for formula/computed field evaluation
+4. **FuzzySharp** + PostgreSQL `pg_trgm` for duplicate detection
+5. **Microsoft.Extensions.Http.Resilience** (built on Polly) for resilient webhook delivery
+6. **@foblex/flow** for the visual workflow builder UI
 
----
-
-## 1. Frontend Stack (Angular)
-
-### Core Framework
-- **Angular 19** (Latest LTS as of Jan 2025)
-  - **Rationale**: Standalone components (default), signals for reactivity, improved SSR, better DX
-  - **Why NOT Angular 18**: Missing latest performance optimizations and signal-based APIs
-  - **Confidence**: ⭐⭐⭐⭐⭐ (Production-ready, LTS support)
-
-### State Management
-- **NgRx 19** with SignalStore
-  - `@ngrx/store`: ^19.0.0
-  - `@ngrx/effects`: ^19.0.0
-  - `@ngrx/entity`: ^19.0.0
-  - `@ngrx/store-devtools`: ^19.0.0
-  - `@ngrx/signals`: ^19.0.0 (NEW: signal-based state)
-  - **Rationale**:
-    - SignalStore provides simpler, more performant state management for feature stores
-    - NgRx Store for global state (auth, tenant context, user preferences)
-    - Strong TypeScript support, time-travel debugging, Redux DevTools integration
-  - **Alternative**: TanStack Query (Angular Query) for server state only
-  - **Why NOT**: Akita (stagnant), plain services (scales poorly), RxJS alone (boilerplate hell)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### UI Component Library
-- **Angular Material 19** (Primary)
-  - `@angular/material`: ^19.0.0
-  - `@angular/cdk`: ^19.0.0
-  - **Rationale**:
-    - Official Angular components, excellent accessibility (WCAG 2.1 AA)
-    - Customizable via theming, supports dynamic themes for multi-tenant branding
-    - CDK provides low-level primitives for custom components
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **PrimeNG 19** (Supplemental for data-heavy components)
-  - `primeng`: ^19.0.0
-  - `primeicons`: ^7.0.0
-  - **Rationale**:
-    - Advanced data tables with virtual scrolling, filtering, sorting
-    - Chart library for dashboards
-    - Calendar/scheduler components for activity management
-  - **Why NOT**: DevExtreme (expensive), AG Grid (overkill for CRM), Syncfusion (licensing complexity)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Forms & Validation
-- **Angular Reactive Forms** (built-in)
-- **ngx-formly 7.x**
-  - `@ngx-formly/core`: ^7.0.0
-  - `@ngx-formly/material`: ^7.0.0
-  - **Rationale**:
-    - Dynamic form generation for custom fields (JSONB-backed)
-    - JSON-driven forms for configurable deal pipelines
-    - Reduces boilerplate by 70%+
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### HTTP & API Integration
-- **Built-in HttpClient** with interceptors
-- **@microsoft/signalr 8.x** for real-time
-  - `@microsoft/signalr`: ^8.0.0
-  - **Rationale**: Bi-directional communication for notifications, live activity updates
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Authentication & Security
-- **angular-oauth2-oidc 18.x**
-  - `angular-oauth2-oidc`: ^18.0.0
-  - **Rationale**:
-    - Standards-compliant OAuth2/OIDC client
-    - Integrates with Identity Server or external providers (Auth0, Azure AD)
-    - Token refresh handling, PKCE flow support
-  - **Alternative**: Auth0 Angular SDK (if using Auth0)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Date/Time Handling
-- **date-fns 4.x** (NOT moment.js)
-  - `date-fns`: ^4.0.0
-  - **Rationale**:
-    - Tree-shakeable, immutable, 13KB vs moment's 67KB
-    - Excellent timezone support via `date-fns-tz`
-  - **Why NOT**: Moment.js (deprecated), Day.js (smaller community)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Rich Text Editing
-- **Quill 2.x** or **TinyMCE 7.x**
-  - `quill`: ^2.0.0 or `tinymce`: ^7.0.0
-  - **Rationale**:
-    - Quill: Lightweight, extensible, open-source (MIT)
-    - TinyMCE: More features, commercial support available
-    - Required for email composition, notes, descriptions
-  - **Confidence**: ⭐⭐⭐⭐
-
-### PDF Generation (Client-side)
-- **jsPDF 2.x** + **html2canvas 1.x**
-  - `jspdf`: ^2.5.0
-  - `html2canvas`: ^1.4.0
-  - **Rationale**: Client-side preview, server-side generation (primary)
-  - **Confidence**: ⭐⭐⭐
-
-### Email Integration UI
-- **ngx-email-builder** or custom components
-  - **Rationale**: Template builder for email campaigns
-  - **Confidence**: ⭐⭐⭐ (May need customization)
-
-### Testing
-- **Jest 29.x** (NOT Karma/Jasmine)
-  - `jest`: ^29.7.0
-  - `@testing-library/angular`: ^17.0.0
-  - **Rationale**:
-    - 3x faster than Karma, better watch mode, snapshot testing
-    - Testing Library promotes accessible, user-centric tests
-  - **Why NOT**: Karma (deprecated in Angular 16+)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **Playwright 1.x** (E2E)
-  - `@playwright/test`: ^1.50.0
-  - **Rationale**:
-    - Cross-browser testing, auto-wait, network interception
-    - Replaces Protractor (officially deprecated)
-  - **Why NOT**: Cypress (licensing for parallelization), Protractor (dead)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Build & Tooling
-- **Angular CLI 19** with esbuild
-  - **Rationale**:
-    - esbuild provides 10x faster builds vs webpack
-    - Default in Angular 17+
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **ESLint 9.x** + **Prettier 3.x**
-  - `eslint`: ^9.0.0
-  - `prettier`: ^3.2.0
-  - `@angular-eslint/eslint-plugin`: ^19.0.0
-  - **Rationale**: Standard linting + formatting
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Performance Monitoring
-- **@sentry/angular 8.x**
-  - `@sentry/angular`: ^8.0.0
-  - **Rationale**: Error tracking, performance monitoring, release tracking
-  - **Alternative**: Application Insights (if Azure-hosted)
-  - **Confidence**: ⭐⭐⭐⭐
+No architectural changes to the existing 4-layer Clean Architecture. All new features plug into the existing Infrastructure and Application layers.
 
 ---
 
-## 2. Backend Stack (.NET Core 10)
+## What We Already Have (DO NOT Add)
 
-### Core Framework
-- **.NET 10** (LTS expected Nov 2025)
-  - **Note**: As of Jan 2025, .NET 9 is current. Verify .NET 10 release status.
-  - **Rationale**:
-    - LTS support (3 years), improved performance, native AOT
-    - Enhanced minimal APIs, better OpenAPI integration
-  - **Confidence**: ⭐⭐⭐⭐ (Pending release verification)
+These existing components cover significant v1.1 needs with zero additions:
 
-### Web API
-- **ASP.NET Core Web API** (minimal APIs for simple endpoints, controllers for complex)
-  - **Rationale**:
-    - Minimal APIs for CRUD operations (less boilerplate)
-    - MVC controllers for complex business logic (better organization)
-    - Built-in OpenAPI/Swagger support
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### ORM & Database Access
-- **Entity Framework Core 10**
-  - `Microsoft.EntityFrameworkCore`: ^10.0.0
-  - `Microsoft.EntityFrameworkCore.Design`: ^10.0.0
-  - `Npgsql.EntityFrameworkCore.PostgreSQL`: ^10.0.0
-  - **Rationale**:
-    - First-class PostgreSQL support via Npgsql
-    - JSONB column mapping for custom fields
-    - Migrations for schema versioning
-    - Interceptors for audit trail, soft deletes, tenant isolation
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **Dapper 2.x** (Supplemental for read-heavy queries)
-  - `Dapper`: ^2.1.0
-  - **Rationale**:
-    - 10x faster than EF Core for complex reporting queries
-    - Use for dashboards, reports, analytics
-    - NOT for writes (EF handles change tracking, audit)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Multi-Tenancy
-- **Finbuckle.MultiTenant 8.x**
-  - `Finbuckle.MultiTenant`: ^8.0.0
-  - `Finbuckle.MultiTenant.AspNetCore`: ^8.0.0
-  - `Finbuckle.MultiTenant.EntityFrameworkCore`: ^8.0.0
-  - **Rationale**:
-    - Schema-per-tenant isolation (PostgreSQL schemas)
-    - Middleware for tenant resolution (subdomain, header, claim)
-    - EF Core integration for automatic tenant filtering
-  - **Alternative**: Custom implementation (more control, more work)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Authentication & Authorization
-- **ASP.NET Core Identity**
-  - `Microsoft.AspNetCore.Identity.EntityFrameworkCore`: ^10.0.0
-  - **Rationale**: Built-in user management, password hashing, lockout
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **IdentityServer/Duende IdentityServer 7.x** or **OpenIddict 5.x**
-  - `Duende.IdentityServer`: ^7.0.0 (commercial license required for production)
-  - `OpenIddict`: ^5.0.0 (open-source, free)
-  - **Rationale**:
-    - OAuth2/OIDC provider for SPA + mobile apps
-    - OpenIddict recommended (free, actively maintained, certified)
-  - **Alternative**: Auth0, Azure AD B2C (managed services)
-  - **Why NOT**: IdentityServer4 (deprecated)
-  - **Confidence**: ⭐⭐⭐⭐⭐ (OpenIddict), ⭐⭐⭐ (Duende licensing complexity)
-
-- **PolicyServer or custom policy-based authorization**
-  - Built-in: `[Authorize(Policy = "...")]`
-  - **Rationale**: RBAC with field-level access via custom policies
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Real-Time Communication
-- **ASP.NET Core SignalR**
-  - Built-in, no additional packages
-  - **Rationale**:
-    - WebSockets for notifications, live activity updates
-    - Automatic fallback to long polling
-    - Redis backplane for multi-server scaling
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Background Jobs
-- **Hangfire 1.8.x** or **Quartz.NET 3.x**
-  - `Hangfire.Core`: ^1.8.0
-  - `Hangfire.AspNetCore`: ^1.8.0
-  - `Hangfire.PostgreSql`: ^1.20.0
-  - **Rationale**:
-    - Persistent jobs (email sync, data imports, reports)
-    - Dashboard for monitoring
-    - Hangfire preferred (better UI, simpler setup)
-  - **Alternative**: Azure Functions/AWS Lambda (serverless)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Email Sending
-- **MailKit 4.x** (NOT SmtpClient)
-  - `MailKit`: ^4.0.0
-  - `MimeKit`: ^4.0.0
-  - **Rationale**:
-    - OAuth2 support (Gmail, Outlook)
-    - IMAP for email sync (two-way)
-    - SmtpClient is deprecated
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **SendGrid SDK 9.x** or **Amazon SES SDK** (transactional emails)
-  - `SendGrid`: ^9.29.0
-  - **Rationale**: Reliable delivery, tracking, templates
-  - **Confidence**: ⭐⭐⭐⭐
-
-### PDF Generation (Server-side)
-- **QuestPDF 2024.x** (Recommended)
-  - `QuestPDF`: ^2024.x
-  - **Rationale**:
-    - Fluent API, high-performance, modern
-    - MIT license (verify for commercial use)
-  - **Alternative**: DinkToPdf (wrapper for wkhtmltopdf), IronPdf (expensive)
-  - **Why NOT**: SelectPdf (outdated), iTextSharp (AGPL licensing issues)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Validation
-- **FluentValidation 11.x**
-  - `FluentValidation.AspNetCore`: ^11.3.0
-  - **Rationale**:
-    - Cleaner validation rules vs data annotations
-    - Reusable validators, complex conditional logic
-    - Automatic integration with ASP.NET Core
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### API Documentation
-- **Swashbuckle.AspNetCore 6.x** or **NSwag 14.x**
-  - `Swashbuckle.AspNetCore`: ^6.6.0
-  - **Rationale**:
-    - OpenAPI 3.0 spec generation
-    - Swagger UI for interactive docs
-    - Swashbuckle preferred (simpler, more popular)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Logging
-- **Serilog 4.x**
-  - `Serilog.AspNetCore`: ^8.0.0
-  - `Serilog.Sinks.PostgreSQL`: ^2.3.0
-  - `Serilog.Sinks.Console`: ^6.0.0
-  - `Serilog.Sinks.Seq`: ^8.0.0 (optional, for centralized logs)
-  - **Rationale**:
-    - Structured logging, queryable logs in PostgreSQL
-    - Sinks for console, file, Seq, Application Insights
-  - **Why NOT**: Built-in logging (less powerful), NLog (less popular)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Caching
-- **Redis (StackExchange.Redis 2.x)**
-  - `StackExchange.Redis`: ^2.8.0
-  - `Microsoft.Extensions.Caching.StackExchangeRedis`: ^10.0.0
-  - **Rationale**:
-    - Distributed cache for multi-server deployments
-    - Session storage, SignalR backplane
-  - **Alternative**: In-memory cache (single-server only)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Mapping
-- **Mapster 7.x** (NOT AutoMapper)
-  - `Mapster`: ^7.4.0
-  - `Mapster.DependencyInjection`: ^1.0.0
-  - **Rationale**:
-    - 3x faster than AutoMapper, better DX
-    - Source generators for compile-time mappings
-  - **Why NOT**: AutoMapper (slower, more magic), manual mapping (tedious)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Testing
-- **xUnit 2.x**
-  - `xunit`: ^2.9.0
-  - `xunit.runner.visualstudio`: ^2.8.0
-  - **Rationale**: Standard for .NET, better DX than NUnit
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **Moq 4.x** or **NSubstitute 5.x**
-  - `Moq`: ^4.20.0
-  - **Rationale**: Mocking framework for unit tests
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **Testcontainers 3.x** (integration tests)
-  - `Testcontainers`: ^3.9.0
-  - `Testcontainers.PostgreSql`: ^3.9.0
-  - **Rationale**: Real PostgreSQL in Docker for integration tests
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Monitoring
-- **Application Insights SDK** (if Azure)
-  - `Microsoft.ApplicationInsights.AspNetCore`: ^2.22.0
-  - **Alternative**: Sentry, Datadog, Prometheus + Grafana
-  - **Confidence**: ⭐⭐⭐⭐
+| Existing Component | v1.1 Usage |
+|---|---|
+| **RazorLight 2.3.1** | System email templates (verification, password reset). Keep for these. |
+| **SendGrid 9.29.3** | Email sending for sequences and workflow-triggered emails. |
+| **SignalR** | Real-time notifications when workflows trigger, webhook delivery status updates. |
+| **BackgroundService pattern** | Already used for EmailSync and DueDateNotification. Pattern extends to workflow processing. |
+| **EF Core 10.0.3 + Npgsql 10.0.0** | All new entities (workflows, templates, webhooks, reports) store in PostgreSQL. |
+| **JSONB + GIN indexes** | Workflow definitions, template variables, report configs store as JSONB. |
+| **tsvector full-text search** | Existing on Company, Contact, Deal. Complemented by pg_trgm for fuzzy duplicate matching. |
+| **FluentValidation 12.1.1** | Validates workflow definitions, template content, formula syntax. |
+| **Angular CDK Drag-Drop** | Already used in Kanban boards. Reused for workflow step reordering. |
+| **Chart.js + ng2-charts** | Advanced reports render through existing chart infrastructure. |
+| **@ngrx/signals** | Signal stores for workflow builder, template editor, report builder features. |
+| **Angular Material M3** | All new UI forms, dialogs, and editors use existing Material components. |
+| **Serilog** | Structured logging for workflow execution audit trails. |
+| **IHttpClientFactory** | Not currently registered but available in .NET 10. Needed for webhook HTTP calls. |
 
 ---
 
-## 3. Database Stack (PostgreSQL)
+## Recommended Stack Additions
 
-### Core Database
-- **PostgreSQL 17.x** (verify latest stable version)
-  - **Rationale**:
-    - JSONB for custom fields (indexable, queryable)
-    - Row-level security for fine-grained access control
-    - Schemas for multi-tenant isolation
-    - Full-text search, GIN/GiST indexes, CTEs
-  - **Why NOT**: MySQL (weaker JSON support), SQL Server (expensive at scale)
-  - **Confidence**: ⭐⭐⭐⭐⭐
+### 1. Background Job Processing: Hangfire
 
-### Extensions
-- **pgcrypto** (encryption functions)
-- **pg_trgm** (trigram similarity for fuzzy search)
-- **uuid-ossp** (UUID generation)
-- **pg_stat_statements** (query performance monitoring)
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| Hangfire.AspNetCore | 1.8.23 | Infrastructure | Job server integration with ASP.NET Core DI |
+| Hangfire.PostgreSql | 1.21.1 | Infrastructure | PostgreSQL storage for job persistence |
 
-### Connection Pooling
-- **Npgsql 10.x** (built-in pooling)
-  - `Npgsql`: ^10.0.0
-  - **Rationale**: Built-in ADO.NET provider, excellent EF Core integration
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why Hangfire over continuing with BackgroundService:**
+- The existing `BackgroundService` pattern works for simple periodic tasks (email sync every 5 min). Workflow automation needs **delayed jobs** (send email in 3 days), **fire-and-forget jobs** (trigger webhook now), **recurring jobs** (check conditions hourly), and **continuations** (after step A completes, run step B). BackgroundService cannot do any of these without reinventing a job queue.
+- Hangfire persists jobs in PostgreSQL (reuses existing database), survives app restarts, provides automatic retries with configurable backoff, and includes a built-in monitoring dashboard at `/hangfire`.
+- No new infrastructure dependency -- uses the same PostgreSQL 17 connection string.
 
-- **PgBouncer** (external pooler for high concurrency)
-  - **Rationale**: Connection multiplexing, reduces database load
-  - **Use when**: >1000 concurrent connections expected
-  - **Confidence**: ⭐⭐⭐⭐
+**Why NOT Quartz.NET:** Quartz is better for complex cron-based scheduling but lacks Hangfire's persistence model, retry mechanism, and monitoring dashboard. Workflow automation needs job persistence and retry more than complex cron expressions.
 
-### Migration Tools
-- **EF Core Migrations** (primary)
-  - **Rationale**: Version-controlled schema changes, integrated with EF
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NOT Temporal:** Overkill for CRM workflows. Temporal is for long-running distributed workflows across microservices. GlobCRM is a monolith.
 
-- **DbUp 5.x** or **FluentMigrator 5.x** (alternative for complex migrations)
-  - `DbUp`: ^5.0.0
-  - **Rationale**: SQL-based migrations, better for data migrations
-  - **Confidence**: ⭐⭐⭐
+**Integration points:**
+- Workflow engine enqueues Hangfire jobs for each action step
+- Email sequences schedule delayed jobs for follow-up emails
+- Webhook delivery uses fire-and-forget with automatic retry
+- Report generation runs as background jobs for large datasets
 
-### Backup & Recovery
-- **pgBackRest** or **WAL-G**
-  - **Rationale**: Point-in-time recovery, incremental backups
-  - **Alternative**: Managed backups (Azure Database for PostgreSQL, AWS RDS)
-  - **Confidence**: ⭐⭐⭐⭐
+**Multi-tenancy consideration:** Every Hangfire job must carry `TenantId` as a job parameter. Create a `TenantJobFilter` that sets the tenant context before job execution, following the same pattern as `EmailSyncBackgroundService` (create scope, resolve scoped services).
 
-### Monitoring
-- **pgAdmin 4** (GUI)
-- **pg_stat_statements** + **pgBadger** (query analysis)
-- **Prometheus + postgres_exporter** (metrics)
+**Confidence:** HIGH -- Hangfire 1.8.23 released 2026-02-05, actively maintained, PostgreSQL storage mature at v1.21.1. Widely used in .NET CRM/SaaS applications.
 
 ---
 
-## 4. Mobile Stack (.NET MAUI)
+### 2. User-Editable Email Templates: Fluid (Liquid)
 
-### Core Framework
-- **.NET MAUI 10** (ships with .NET 10)
-  - **Rationale**:
-    - Single codebase for iOS + Android
-    - Native performance, native UI controls
-    - Shared business logic with backend (C#)
-  - **Confidence**: ⭐⭐⭐⭐
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| Fluid.Core | 2.31.0 | Infrastructure | Liquid template parsing and rendering |
 
-### UI Framework
-- **MAUI Built-in Controls** + **Community Toolkit**
-  - `CommunityToolkit.Maui`: ^9.0.0
-  - `CommunityToolkit.Mvvm`: ^8.3.0
-  - **Rationale**:
-    - Community Toolkit adds missing controls (popup, toast, etc.)
-    - MVVM source generators reduce boilerplate
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why Fluid for user templates vs keeping RazorLight for everything:**
+- RazorLight (already in project at 2.3.1) compiles Razor/C# templates. This is powerful but **unsafe for user-editable content** -- users could inject C# code. RazorLight also has not had a release since 2023-01-16.
+- Fluid implements the Liquid template language (originally from Shopify), which is **sandboxed by design** -- no arbitrary code execution, only variable substitution and simple logic (`{% if %}`, `{% for %}`). This is exactly what CRM email templates need: `Hello {{contact.first_name}}, your deal {{deal.name}} has moved to {{deal.stage}}`.
+- Fluid is 8x faster than DotLiquid and allocates 14x less memory. Actively maintained (v2.31.0 released 2025-11-07).
+- Template syntax is widely known from Shopify, HubSpot, and other CRM/marketing tools, so users will recognize it.
 
-### State Management
-- **MVVM Toolkit** (built-in via Community Toolkit)
-  - `CommunityToolkit.Mvvm`: ^8.3.0
-  - **Rationale**: Source generators, observable properties, commands
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**What stays with RazorLight:** System templates (verification emails, password reset, notification emails) that are developer-controlled `.cshtml` files remain on RazorLight. These are not user-editable.
 
-### API Communication
-- **Refit 7.x**
-  - `Refit`: ^7.0.0
-  - `Refit.HttpClientFactory`: ^7.0.0
-  - **Rationale**:
-    - Type-safe REST client from OpenAPI spec
-    - Automatic serialization, retry policies
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**What uses Fluid:** User-created email templates, email sequences, workflow notification content, merge field rendering in any user-facing template.
 
-### Real-Time
-- **Microsoft.AspNetCore.SignalR.Client 10.x**
-  - `Microsoft.AspNetCore.SignalR.Client`: ^10.0.0
-  - **Rationale**: Same as web client, consistent API
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NOT Scriban:** Scriban is also excellent but Liquid syntax is more widely known among CRM users. Scriban's extended syntax adds power users don't need and that could confuse them.
 
-### Local Database
-- **SQLite (built-in)** via **sqlite-net-pcl**
-  - `sqlite-net-pcl`: ^1.9.0
-  - **Rationale**:
-    - Offline data storage (contacts, activities)
-    - Sync with server when online
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NOT Handlebars.NET:** Less actively maintained, no sandboxing guarantees, fewer built-in filters.
 
-### Authentication
-- **IdentityModel.OidcClient 6.x**
-  - `IdentityModel.OidcClient`: ^6.0.0
-  - **Rationale**: OAuth2/OIDC client for mobile
-  - **Confidence**: ⭐⭐⭐⭐
+**Integration points:**
+- `FluidTemplateRenderer` service in Infrastructure layer renders user templates with entity data as context
+- Workflow "Send Email" action resolves template, renders with Fluid, sends via SendGrid
+- Template editor UI provides merge field picker (e.g., `{{contact.email}}`, `{{deal.amount | currency}}`)
 
-### Secure Storage
-- **MAUI SecureStorage API** (built-in)
-  - **Rationale**: Keychain (iOS), KeyStore (Android)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Push Notifications
-- **Firebase Cloud Messaging (FCM)** via **Plugin.Firebase**
-  - `Plugin.Firebase`: ^3.0.0
-  - **Rationale**: Cross-platform push notifications
-  - **Alternative**: Azure Notification Hubs
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Charts & Graphs
-- **Syncfusion MAUI Charts** (free with community license)
-  - `Syncfusion.Maui.Charts`: ^27.1.0
-  - **Rationale**: Rich charting for dashboard
-  - **Alternative**: Microcharts (simpler), LiveCharts (open-source)
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Camera & Media
-- **MAUI MediaPicker API** (built-in)
-- **Plugin.Maui.Audio** for voice memos
-  - **Rationale**: Attach photos, documents to activities
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Testing
-- **xUnit** + **Appium 5.x** (UI automation)
-  - `Appium.WebDriver`: ^5.0.0
-  - **Rationale**: Cross-platform mobile UI testing
-  - **Confidence**: ⭐⭐⭐
+**Confidence:** HIGH -- Fluid.Core 2.31.0 verified on NuGet, targets .NET Standard 2.0+ (compatible with .NET 10). Liquid is the de facto standard for user-editable templates in SaaS products.
 
 ---
 
-## 5. DevOps & Infrastructure
+### 3. Formula/Computed Field Evaluation: NCalc
 
-### Version Control
-- **Git** with **GitHub** or **Azure DevOps**
-  - **Rationale**: Standard, CI/CD integrations
-  - **Confidence**: ⭐⭐⭐⭐⭐
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| NCalcSync | 5.11.0 | Application | Expression parsing and evaluation for computed fields |
 
-### CI/CD
-- **GitHub Actions** or **Azure Pipelines**
-  - **Rationale**:
-    - Automated builds, tests, deployments
-    - Docker image building
-    - Database migrations
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NCalc:**
+- NCalc evaluates mathematical and logical expressions with custom functions and variables: `[deal_amount] * [discount_percentage] / 100`, `IF([status] = 'Won', [amount], 0)`, `DATEDIFF([close_date], TODAY())`.
+- Supports custom function registration -- we can add CRM-specific functions like `COALESCE()`, `CONCATENATE()`, `DATEDIFF()`, `TODAY()`, `NOW()`, `UPPER()`, `LOWER()`, `ROUND()`, `SUM()` (aggregate over related entities).
+- Lightweight, zero external dependencies, fast evaluation (no compilation step).
+- NCalcSync (synchronous) is correct for field evaluation -- no I/O involved, pure computation.
 
-### Containerization
-- **Docker** + **Docker Compose** (dev)
-  - **Rationale**: Consistent dev environments
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NOT mXparser:** mXparser is focused on mathematical expressions only. NCalc handles string operations, boolean logic, and custom functions needed for CRM computed fields.
 
-- **Kubernetes** (production, optional)
-  - **Alternative**: Azure Container Apps, AWS ECS, managed services
-  - **Rationale**: Auto-scaling, rolling deployments
-  - **When**: >100 tenants or complex microservices
-  - **Confidence**: ⭐⭐⭐
+**Why NOT CodingSeb.ExpressionEvaluator:** Evaluates C# expressions -- too powerful, security risk for user-defined formulas.
 
-### API Gateway (optional)
-- **YARP 2.x** (Yet Another Reverse Proxy)
-  - `Yarp.ReverseProxy`: ^2.0.0
-  - **Rationale**:
-    - .NET-native reverse proxy
-    - Rate limiting, load balancing, routing
-  - **Alternative**: Nginx, Traefik, Azure API Management
-  - **Confidence**: ⭐⭐⭐⭐
+**Why NOT Z.Expressions.Eval:** Commercial license required, evaluates full C# (unsafe for user input).
 
-### Monitoring & Observability
-- **Sentry** (errors) or **Application Insights** (Azure)
-- **Prometheus + Grafana** (metrics)
-- **Seq** or **Elasticsearch + Kibana** (logs)
-  - **Rationale**: Full observability stack
-  - **Confidence**: ⭐⭐⭐⭐
+**Integration points:**
+- New `CustomFieldType.Formula = 9` enum value added to existing `CustomFieldType`
+- `FormulaEvaluator` service in Application layer takes formula string + entity data, returns computed value
+- `CustomFieldDefinition` gets a `FormulaExpression` property (nullable, only for Formula type fields)
+- Computed values are calculated on read (not stored) -- they reference other field values that may change
+- Frontend formula editor provides function autocomplete and field reference picker
 
-### CDN
-- **Cloudflare** or **Azure CDN**
-  - **Rationale**: Static assets (Angular build), DDoS protection
-  - **Confidence**: ⭐⭐⭐⭐
+**Where it lives:** Application layer (not Infrastructure) because formula evaluation is pure business logic with no external dependencies. NCalc has no infrastructure concerns.
 
-### Email Infrastructure
-- **SendGrid** or **Amazon SES** (sending)
-- **Mailgun** or **Postmark** (alternative)
-- **MailKit** (receiving via IMAP)
-  - **Rationale**: Reliable, scalable, affordable
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### File Storage
-- **Azure Blob Storage** or **AWS S3**
-  - `Azure.Storage.Blobs`: ^12.22.0
-  - **Rationale**:
-    - Document attachments, email attachments
-    - Scalable, cheap, CDN integration
-  - **Alternative**: MinIO (self-hosted)
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Search (optional, for full-text)
-- **Elasticsearch 8.x** or **Typesense**
-  - **Rationale**: Advanced search (fuzzy, faceted, ranking)
-  - **When**: >10k records, complex search requirements
-  - **Alternative**: PostgreSQL full-text search (good enough for MVP)
-  - **Confidence**: ⭐⭐⭐
+**Confidence:** HIGH -- NCalcSync 5.11.0 on NuGet, targets .NET 8+ and .NET Standard 2.0, actively maintained (ncalc/ncalc GitHub org). Well-established library with 10+ years of production use.
 
 ---
 
-## 6. Development Tools
+### 4. Duplicate Detection: FuzzySharp + PostgreSQL pg_trgm
 
-### IDEs
-- **Visual Studio 2025** (backend, mobile)
-- **Visual Studio Code** + **Angular Language Service** (frontend)
-  - **Rationale**: Best-in-class tooling for each platform
-  - **Confidence**: ⭐⭐⭐⭐⭐
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| FuzzySharp | 2.0.2 | Infrastructure | In-memory fuzzy string matching (Levenshtein, Jaro-Winkler) |
+| PostgreSQL pg_trgm | Built-in extension | Database | Database-level trigram similarity with GIN indexing |
 
-### API Testing
-- **Postman** or **Insomnia** or **REST Client (VS Code)**
-  - **Rationale**: Interactive API testing
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Two-tier approach (database pre-filter + application-level scoring):**
 
-### Database GUI
-- **pgAdmin 4** or **DBeaver** or **DataGrip**
-  - **Rationale**: Visual query builder, schema design
-  - **Confidence**: ⭐⭐⭐⭐
+**Tier 1 -- pg_trgm at the database level:**
+- PostgreSQL's `pg_trgm` extension provides `similarity()` and `%` operator for trigram-based fuzzy matching, with GIN index support for fast lookups on large datasets.
+- Use `CREATE EXTENSION IF NOT EXISTS pg_trgm;` (one-time migration).
+- Create GIN trigram indexes on `contacts.first_name`, `contacts.last_name`, `contacts.email`, `companies.name`, `companies.domain`.
+- SQL query: `SELECT * FROM contacts WHERE similarity(email, @email) > 0.6 OR (first_name % @first_name AND last_name % @last_name)` -- returns candidates quickly using the index.
+- This handles the "find candidates" step efficiently even with 100K+ records per tenant.
 
-### Code Quality
-- **SonarQube** or **SonarCloud**
-  - **Rationale**: Static analysis, code coverage, security scanning
-  - **Confidence**: ⭐⭐⭐⭐
+**Tier 2 -- FuzzySharp for scoring and ranking:**
+- FuzzySharp (C# port of Python FuzzyWuzzy) provides `Fuzz.Ratio()`, `Fuzz.PartialRatio()`, `Fuzz.TokenSortRatio()`, `Fuzz.WeightedRatio()` for nuanced string comparison.
+- After pg_trgm returns candidates (typically 10-50 rows), FuzzySharp computes a weighted composite score across multiple fields (name: 40%, email: 30%, phone: 20%, company: 10%).
+- Scoring thresholds: >90 = auto-flag as duplicate, 70-90 = suggest for review, <70 = not a duplicate.
 
----
+**Why NOT FuzzySharp alone:** Cannot use FuzzySharp at the database level -- would require loading all records into memory. pg_trgm pre-filters using indexes.
 
-## 7. Architecture Patterns
+**Why NOT pg_trgm alone:** Trigram similarity is a blunt instrument. FuzzySharp's weighted ratio and token sort handle transpositions ("John Smith" vs "Smith, John") and partial matches better.
 
-### Backend Patterns
-- **Clean Architecture** (recommended)
-  - Layers: Domain → Application → Infrastructure → Presentation
-  - **Rationale**: Testability, maintainability, low coupling
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Why NOT Elasticsearch:** Adding a full search engine for duplicate detection is overkill. PostgreSQL pg_trgm with GIN indexes handles the scale (10K-100K contacts per tenant) efficiently.
 
-- **CQRS** (optional, for complex read/write patterns)
-  - Use with **MediatR 12.x**
-  - **When**: Complex queries, event sourcing
-  - **Confidence**: ⭐⭐⭐
+**Integration points:**
+- `DuplicateDetectionService` in Infrastructure runs pg_trgm query, then FuzzySharp scoring
+- Called on contact/company create and import (existing CSV import already has basic duplicate detection)
+- Background job (Hangfire) for full-scan duplicate detection across all records
+- Merge UI presents duplicates with confidence score and field-by-field comparison
 
-- **Repository Pattern** (with EF Core)
-  - **Rationale**: Abstracts data access, easier testing
-  - **Note**: Generic repositories are an anti-pattern with EF Core
-  - **Confidence**: ⭐⭐⭐⭐
-
-### Frontend Patterns
-- **Feature Module Pattern** (Angular)
-  - **Rationale**: Code organization, lazy loading
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-- **Presentational vs Container Components**
-  - **Rationale**: Separation of concerns, reusability
-  - **Confidence**: ⭐⭐⭐⭐⭐
-
-### Multi-Tenancy Pattern
-- **Schema-per-Tenant** (PostgreSQL schemas)
-  - **Rationale**:
-    - Data isolation, compliance (GDPR, HIPAA)
-    - Per-tenant backups, easier migrations
-  - **Alternative**: Row-level (TenantId column) - simpler but less isolated
-  - **Confidence**: ⭐⭐⭐⭐⭐
+**Confidence:** HIGH -- pg_trgm is a core PostgreSQL extension (not third-party). FuzzySharp 2.0.2 is stable, no dependencies, well-tested port of proven Python library.
 
 ---
 
-## 8. What NOT to Use
+### 5. Webhook Delivery: Microsoft.Extensions.Http.Resilience (Polly-based)
 
-### Avoid These Libraries/Patterns
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| Microsoft.Extensions.Http.Resilience | 10.3.0 | Infrastructure | Resilient HttpClient with retry, circuit breaker, timeout for webhook delivery |
 
-1. **AutoMapper** → Use Mapster (faster, better DX)
-2. **Moment.js** → Use date-fns (smaller, maintained)
-3. **Angular Universal SSR** → Unless SEO is critical (adds complexity)
-4. **Karma** → Use Jest (faster, modern)
-5. **Protractor** → Use Playwright (actively maintained)
-6. **IdentityServer4** → Use OpenIddict (free, certified)
-7. **iTextSharp/iText 7** → Use QuestPDF (licensing issues)
-8. **Generic Repositories with EF Core** → Use DbContext directly (less abstraction overhead)
-9. **Angular ViewChild queries everywhere** → Use signals + model inputs
-10. **RxJS for everything** → Use signals for state, RxJS for async events only
-11. **Microservices on day 1** → Start monolith, extract services as needed
-12. **GraphQL** → Unless client needs extreme flexibility (adds complexity)
-13. **MongoDB** → PostgreSQL JSONB provides same benefits with ACID guarantees
-14. **SignalR for all API calls** → Use HTTP for request/response, SignalR for push only
+**Why Microsoft.Extensions.Http.Resilience:**
+- Webhook delivery requires retry with exponential backoff + jitter (industry standard: 5s, 25s, 125s, 625s, 3125s), circuit breaker (stop sending to consistently failing endpoints), and timeout (don't wait forever for slow endpoints).
+- `Microsoft.Extensions.Http.Resilience` is Microsoft's official resilience layer for `IHttpClientFactory`, built on Polly 8.x. It provides pre-configured resilience pipelines (standard resilience handler) with sensible defaults that can be customized.
+- This replaces the deprecated `Microsoft.Extensions.Http.Polly` package. The new package offers a higher-level API with built-in standard resilience patterns.
+- The project currently has no resilience library -- this fills the gap for webhooks and could also benefit other HTTP calls (Gmail API, SendGrid API).
 
----
+**Why Microsoft.Extensions.Http.Resilience over raw Polly:**
+- `Microsoft.Extensions.Http.Resilience` wraps Polly 8.x and integrates directly with `IHttpClientFactory` and ASP.NET Core DI. It provides a `AddStandardResilienceHandler()` method that configures retry, circuit breaker, and timeout in one call. For custom configurations, it exposes the full Polly pipeline builder.
+- No need to separately install `Polly` -- it is a transitive dependency of `Microsoft.Extensions.Http.Resilience`.
 
-## 9. Deployment Architecture
+**Why IHttpClientFactory (not raw HttpClient):**
+- The project currently uses `HttpClient` directly only in Gmail services. For webhook delivery, `IHttpClientFactory` provides proper connection pooling, DNS rotation, and resilience pipeline integration.
+- Register a named client `"WebhookClient"` with resilience pipeline.
 
-### Recommended Hosting (MVP)
+**Why NOT building retry from scratch:** Exponential backoff with jitter, circuit breaker state management, and timeout composition are tricky to get right. The Microsoft resilience package is battle-tested and the recommended .NET approach.
 
-**Option A: Azure (Integrated Stack)**
-- **Frontend**: Azure Static Web Apps or Azure App Service
-- **Backend**: Azure App Service (Linux) with auto-scaling
-- **Database**: Azure Database for PostgreSQL Flexible Server
-- **Mobile**: App Store + Google Play
-- **Cache**: Azure Cache for Redis
-- **Storage**: Azure Blob Storage
-- **Monitoring**: Application Insights
+**Webhook delivery architecture:**
+1. Entity event fires (create, update, delete) or workflow triggers webhook action
+2. `WebhookDispatcher` enqueues a Hangfire fire-and-forget job
+3. Hangfire job resolves `IHttpClientFactory`, creates request with HMAC-SHA256 signature
+4. Resilience pipeline handles retry (5 attempts, exponential backoff + jitter, max 1 hour)
+5. After all retries exhausted, log to `webhook_delivery_logs` table with failure details
+6. Dead letter: admin can view failed deliveries and manually retry from UI
 
-**Option B: AWS (Cost-optimized)**
-- **Frontend**: AWS Amplify or S3 + CloudFront
-- **Backend**: AWS ECS Fargate or App Runner
-- **Database**: AWS RDS for PostgreSQL
-- **Mobile**: App Store + Google Play
-- **Cache**: Amazon ElastiCache (Redis)
-- **Storage**: Amazon S3
-- **Monitoring**: CloudWatch + X-Ray
-
-**Option C: Hybrid (Best of both)**
-- **Frontend**: Vercel (Angular)
-- **Backend**: Fly.io or Railway (Docker)
-- **Database**: Neon or Supabase (managed PostgreSQL)
-- **Mobile**: App Store + Google Play
-- **Cache**: Upstash (serverless Redis)
-- **Storage**: Cloudflare R2 or Backblaze B2
-- **Monitoring**: Sentry + Betterstack
-
-**Confidence**: ⭐⭐⭐⭐ (all options proven for SaaS at this scale)
+**Confidence:** HIGH -- Microsoft.Extensions.Http.Resilience 10.3.0 is Microsoft-maintained, built on Polly 8.x (.NET Foundation project). This is the officially recommended approach for resilient HTTP in .NET 10.
 
 ---
 
-## 10. Migration Path & Versioning Strategy
+### 6. Visual Workflow Builder UI: @foblex/flow
 
-### Version Compatibility
-- **Backend & Frontend**: Semantic versioning (semver)
-- **API**: Versioning via URL (`/api/v1/...`) or headers
-- **Database**: EF Core migrations with rollback plans
-- **Mobile**: Minimum supported version enforcement
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| @foblex/flow | 18.1.2 | Frontend | Flow-based visual editor for workflow trigger-condition-action chains |
 
-### Breaking Change Strategy
-- **API**: Deprecation period (3 months), sunset notifications
-- **Database**: Backward-compatible migrations (add columns, don't drop)
-- **Mobile**: Force update for critical security issues
+**Why @foblex/flow:**
+- Angular-native library built for exactly this use case: visual node-based editors with drag-and-drop nodes and connections.
+- Supports standalone components, Angular Signals, SSR, and zoneless mode -- aligns perfectly with the project's Angular 19 patterns.
+- Provides drag-and-drop node placement, connection drawing between nodes, zoom/pan, customizable node templates (use Angular Material components inside nodes), and event-driven architecture.
+- MIT licensed, actively maintained (v18.1.2 as of Feb 2026).
 
----
+**Why NOT building from scratch with CDK Drag-Drop:**
+- Angular CDK Drag-Drop handles list reordering and free-form dragging, but does NOT handle connection lines between nodes, path routing, zoom/pan canvas, or the visual graph data model. Building a workflow canvas from CDK primitives would take weeks.
 
-## 11. Security Considerations
+**Why NOT react-flow / xyflow:** React-only library. Would require a React wrapper inside Angular, creating an impedance mismatch.
 
-### OWASP Top 10 Mitigations
-1. **Injection**: Parameterized queries (EF Core), input validation (FluentValidation)
-2. **Broken Authentication**: OAuth2/OIDC, MFA support, secure token storage
-3. **Sensitive Data Exposure**: HTTPS everywhere, encryption at rest (Azure/AWS), pgcrypto
-4. **XML External Entities**: N/A (JSON APIs)
-5. **Broken Access Control**: Policy-based auth, row-level security (PostgreSQL)
-6. **Security Misconfiguration**: Least privilege, security headers (HSTS, CSP)
-7. **XSS**: Angular sanitization (built-in), Content Security Policy
-8. **Insecure Deserialization**: Use System.Text.Json, avoid BinaryFormatter
-9. **Components with Known Vulnerabilities**: Dependabot, npm audit, dotnet list package --vulnerable
-10. **Insufficient Logging**: Structured logging (Serilog), audit trail (EF interceptors)
+**Why NOT Joint.js / mxGraph:** jQuery-based or vanilla JS libraries that don't integrate well with Angular's change detection and signals. Wrapper components would be brittle.
 
-### Additional Security
-- **Rate Limiting**: ASP.NET Core middleware or YARP
-- **CORS**: Configured per environment
-- **CSRF**: Anti-forgery tokens for state-changing operations
-- **SQL Injection**: EF Core parameterization, no raw SQL
-- **Secrets Management**: Azure Key Vault, AWS Secrets Manager, or .NET User Secrets (dev)
+**Integration points:**
+- Workflow builder page renders @foblex/flow canvas
+- Custom node components (Trigger, Condition, Action) use Angular Material forms inside flow nodes
+- Workflow definition serializes to JSON (stored as JSONB in `workflow_definitions` table)
+- Flow canvas is read-only when viewing workflow execution history
+
+**Confidence:** MEDIUM -- @foblex/flow is the best Angular-native option but is a smaller community library. Verify that v18.1.2 works with Angular 19.2.x before committing. Fallback: build a simpler list-based workflow builder (trigger -> conditions -> actions as a vertical list) using existing Angular Material + CDK, upgrade to visual flow later.
 
 ---
 
-## 12. Performance Targets
+### 7. Formula Editor UI (Frontend)
 
-### Frontend
-- **First Contentful Paint**: <1.5s
-- **Time to Interactive**: <3.5s
-- **Lighthouse Score**: >90
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| No new dependency | -- | Frontend | Build with Angular Material + custom component |
 
-### Backend
-- **API Response Time (p95)**: <200ms (CRUD), <1s (reports)
-- **Throughput**: 1000 req/s per tenant
-- **Database Queries**: <50ms (indexed), <500ms (complex aggregations)
+**Recommendation: Custom formula editor, NOT Monaco Editor.**
 
-### Mobile
-- **App Launch**: <2s
-- **Sync Time**: <5s for 1000 records
+Monaco Editor is 5MB+ and designed for code editing. Formula fields in a CRM need a simple text input with:
+- Autocomplete for field references (`[deal_amount]`, `[contact.email]`)
+- Function autocomplete (`SUM()`, `IF()`, `CONCATENATE()`)
+- Syntax validation feedback (red border + error message)
+- Preview of computed result
 
----
+This is achievable with Angular Material's `mat-form-field` + a custom `mat-autocomplete` overlay triggered by `[` or function names. Total custom code: ~200-300 lines of TypeScript. Adding Monaco for this would be 50x the bundle size for 5% of the functionality.
 
-## 13. Cost Estimates (MVP, 50 tenants @ 20 users each)
+**If formula complexity grows later** (nested functions, multi-line expressions): add `ngx-monaco-editor-v2` (latest version supports Angular 19) at that point. Not needed for v1.1 MVP.
 
-### Monthly Infrastructure
-- **Hosting**: $200-500 (App Service/ECS + Database + Redis)
-- **Storage**: $20-50 (100GB files)
-- **Email**: $50-100 (SendGrid, 100k emails/mo)
-- **Monitoring**: $50-100 (Sentry, Application Insights)
-- **CDN**: $20-50 (bandwidth)
-- **Total**: ~$500-1000/month
-
-### Scaling (500 tenants)
-- **Total**: ~$2000-4000/month
+**Confidence:** HIGH -- custom approach is simpler, lighter, and consistent with existing UI patterns.
 
 ---
 
-## 14. Verification Checklist
+### 8. Advanced Report Builder (Frontend)
 
-- [ ] **.NET 10 Release Status**: Verify LTS release date and version (expected Nov 2025)
-- [ ] **Angular 19 Stability**: Confirm LTS status (expected May 2025)
-- [ ] **PostgreSQL 17**: Check latest stable version
-- [ ] **Duende IdentityServer Licensing**: Confirm commercial license requirements
-- [ ] **QuestPDF Licensing**: Verify MIT license for commercial use
-- [ ] **OpenIddict Certification**: Confirm OAuth2/OIDC certification
-- [ ] **All Package Versions**: Run `npm outdated` and `dotnet list package --outdated` before implementation
+| Technology | Version | Layer | Purpose |
+|---|---|---|---|
+| No new dependency | -- | Frontend | Build with existing Angular Material + reactive forms |
 
----
+**Recommendation: Custom query/filter builder using Angular Material, NOT angular2-query-builder.**
 
-## 15. References & Further Reading
+`angular2-query-builder` (v0.6.2) was last published 6 years ago and only supports Angular 10-15. The maintained fork `@eliot-ragueneau/ngx-query-builder` exists but brings PrimeNG as a dependency, conflicting with our Angular Material design system.
 
-### Official Documentation
-- [Angular Docs](https://angular.dev)
-- [.NET Documentation](https://learn.microsoft.com/en-us/dotnet/)
-- [PostgreSQL Documentation](https://www.postgresql.org/docs/)
-- [.NET MAUI Documentation](https://learn.microsoft.com/en-us/dotnet/maui/)
+The report builder needs:
+- Entity/field selector (mat-select)
+- Filter condition builder (field + operator + value rows, add/remove with Angular CDK)
+- Aggregation picker (count, sum, avg, min, max)
+- Grouping selector
+- Chart type selector
+- Date range picker (mat-date-range-input)
 
-### Stack Patterns
-- [Clean Architecture (Jason Taylor)](https://github.com/jasontaylordev/CleanArchitecture)
-- [Multi-tenancy in ASP.NET Core](https://www.finbuckle.com/multitenant)
-- [PostgreSQL Multi-tenancy Patterns](https://www.postgresql.org/docs/current/ddl-schemas.html)
+All of these are standard Angular Material form components. The filter condition builder pattern already exists in the project's `FilterPanelComponent`. Extend that pattern for the report builder.
 
-### Community
-- [Angular Community](https://community.angular.dev)
-- [.NET Reddit](https://reddit.com/r/dotnet)
-- [PostgreSQL Mailing Lists](https://www.postgresql.org/list/)
+**Backend report engine:** No new dependency needed. Use EF Core for simple reports and raw SQL via `Npgsql` (already in Domain project) for complex aggregation queries. The report definition (entity, filters, grouping, aggregation) serializes to JSON, and a `ReportQueryBuilder` service in Infrastructure translates it to parameterized SQL.
+
+**Confidence:** HIGH -- custom approach reuses existing patterns and avoids dependency on unmaintained or incompatible libraries.
 
 ---
 
-## 16. Next Steps
+## Complete Additions Summary
 
-1. **Verify Versions**: Check all package versions against official sources (priority)
-2. **Prototype Auth Flow**: Implement OpenIddict + angular-oauth2-oidc (high-risk)
-3. **Test Multi-tenancy**: Validate Finbuckle with PostgreSQL schemas (high-risk)
-4. **SignalR POC**: Test real-time notifications across web + mobile (medium-risk)
-5. **Email Integration POC**: MailKit OAuth2 flow for Gmail/Outlook (medium-risk)
+### Backend (.NET) -- Add to GlobCRM.Infrastructure.csproj
+
+```xml
+<!-- Background job processing -->
+<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
+<PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
+
+<!-- User-editable email templates (Liquid syntax) -->
+<PackageReference Include="Fluid.Core" Version="2.31.0" />
+
+<!-- Resilient HTTP for webhook delivery (built on Polly 8.x) -->
+<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
+
+<!-- Fuzzy string matching for duplicate detection -->
+<PackageReference Include="FuzzySharp" Version="2.0.2" />
+```
+
+### Backend (.NET) -- Add to GlobCRM.Application.csproj
+
+```xml
+<!-- Formula/computed field expression evaluation -->
+<PackageReference Include="NCalcSync" Version="5.11.0" />
+```
+
+### Frontend (Angular) -- npm install
+
+```bash
+npm install @foblex/flow@18.1.2
+```
+
+### Database (PostgreSQL) -- Migration
+
+```sql
+-- Enable trigram extension for fuzzy duplicate detection
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
+-- Create trigram GIN indexes for duplicate detection
+CREATE INDEX idx_contacts_name_trgm ON contacts USING GIN (
+  (first_name || ' ' || last_name) gin_trgm_ops
+);
+CREATE INDEX idx_contacts_email_trgm ON contacts USING GIN (email gin_trgm_ops);
+CREATE INDEX idx_companies_name_trgm ON companies USING GIN (name gin_trgm_ops);
+CREATE INDEX idx_companies_domain_trgm ON companies USING GIN (domain gin_trgm_ops);
+```
 
 ---
 
-**Document Status**: Draft for review
-**Confidence Level**: ⭐⭐⭐⭐ (High, pending version verification)
-**Last Updated**: 2026-02-16
-**Reviewed By**: Pending
+## Alternatives Considered
+
+| Category | Recommended | Alternative | Why Not |
+|---|---|---|---|
+| Background Jobs | Hangfire 1.8.23 | Quartz.NET 3.x | No built-in persistence dashboard, no retry mechanism, more complex setup |
+| Background Jobs | Hangfire 1.8.23 | BackgroundService (existing) | Cannot schedule delayed/recurring jobs, no persistence across restarts |
+| Background Jobs | Hangfire 1.8.23 | Temporal | Overkill for monolith CRM, requires separate server |
+| User Templates | Fluid 2.31.0 | RazorLight (existing) | Unsafe for user-editable content (C# injection), last release 2023 |
+| User Templates | Fluid 2.31.0 | DotLiquid | 8x slower, 14x more memory, less actively maintained |
+| User Templates | Fluid 2.31.0 | Scriban | Good library but Liquid syntax more recognized by CRM users |
+| Formula Engine | NCalcSync 5.11.0 | mXparser 6.1.0 | Math-only, no string/boolean operations or custom functions |
+| Formula Engine | NCalcSync 5.11.0 | Z.Expressions.Eval | Commercial license, evaluates full C# (security risk) |
+| Formula Engine | NCalcSync 5.11.0 | CodingSeb.ExpressionEvaluator | Too powerful (full C# eval), security risk for user formulas |
+| Duplicate Detection | FuzzySharp 2.0.2 + pg_trgm | Elasticsearch | New infrastructure dependency for a focused use case |
+| Duplicate Detection | FuzzySharp 2.0.2 + pg_trgm | FuzzySharp only | Cannot index at DB level, requires loading all records to memory |
+| Webhook Resilience | Http.Resilience 10.3.0 | Microsoft.Extensions.Http.Polly | Deprecated in favor of Http.Resilience |
+| Webhook Resilience | Http.Resilience 10.3.0 | Custom retry loop | Error-prone, missing circuit breaker, reinventing the wheel |
+| Workflow UI | @foblex/flow 18.1.2 | CDK Drag-Drop only | No connection lines, zoom/pan, or graph data model |
+| Workflow UI | @foblex/flow 18.1.2 | react-flow / xyflow | React-only, would need wrapper in Angular app |
+| Workflow UI | @foblex/flow 18.1.2 | Joint.js | jQuery-based, poor Angular integration |
+| Report Query Builder | Custom (Angular Material) | angular2-query-builder 0.6.2 | Last updated 6 years ago, max Angular 15 |
+| Report Query Builder | Custom (Angular Material) | Syncfusion QueryBuilder | Commercial license, heavy bundle, design system mismatch |
+| Formula Editor | Custom (mat-autocomplete) | Monaco Editor | 5MB+ for a simple formula input, massive overkill |
 
 ---
 
-## Appendix: Confidence Level Key
+## What NOT to Add
 
-- ⭐⭐⭐⭐⭐ **Production-proven**: Battle-tested, widely adopted, stable APIs
-- ⭐⭐⭐⭐ **Recommended**: Solid choice, minor caveats or less mature
-- ⭐⭐⭐ **Viable**: Works but has trade-offs or requires customization
-- ⭐⭐ **Experimental**: Use with caution, may change significantly
-- ⭐ **Avoid**: Not recommended for this use case
+| Do NOT Add | Reason |
+|---|---|
+| **MediatR** | The project uses hand-rolled command/handler pattern. Adding MediatR for v1.1 would require refactoring all existing commands. Workflow events use Hangfire job dispatch instead. |
+| **Event Bus (MassTransit, NServiceBus)** | Monolith architecture. Workflow actions dispatch directly via Hangfire. Event bus is for microservices. |
+| **Elasticsearch** | PostgreSQL pg_trgm + tsvector handles duplicate detection and search at CRM scale. |
+| **Redis** | Not needed yet. Hangfire uses PostgreSQL storage. SignalR runs in-process. Add Redis when scaling to multiple server instances. |
+| **Dapper** | Mentioned in v1.0 research but never adopted. Report queries can use raw SQL via Npgsql (already in Domain project) or EF Core's `FromSqlRaw()`. |
+| **PrimeNG** | Mentioned in v1.0 research but never adopted. All UI is Angular Material. Keep it that way. |
+| **ngx-formly** | Mentioned in v1.0 research but never adopted. Custom field forms are hand-built with Angular Material. |
+| **Monaco Editor** | Formula editor is a simple input with autocomplete, not a code editor. |
+| **Quill extensions** | Email template editor uses Liquid syntax (plain text with merge fields), not rich text. The existing ngx-quill is for notes/descriptions, not templates. |
+| **GraphQL** | REST API serves all report builder needs. Report definitions are stored as JSON, executed server-side. |
+| **Polly (standalone)** | Use Microsoft.Extensions.Http.Resilience instead -- it wraps Polly 8.x and integrates with IHttpClientFactory. No need to install Polly separately. |
+| **Microsoft.Extensions.Http.Polly** | Deprecated. Use Microsoft.Extensions.Http.Resilience (its replacement). |
+
+---
+
+## Integration Map: How New Libraries Connect
+
+```
+User Action (Frontend)
+  |
+  v
+API Controller
+  |
+  v
+Workflow Engine (Application Layer)
+  |--- Evaluates conditions using NCalcSync
+  |--- Dispatches actions:
+  |      |--- "Send Email" --> Fluid renders template --> SendGrid sends
+  |      |--- "Fire Webhook" --> Hangfire job --> Resilient HttpClient
+  |      |--- "Update Field" --> EF Core entity update
+  |      |--- "Create Activity" --> Existing activity service
+  |
+  v
+Hangfire (Infrastructure Layer)
+  |--- Persists jobs in PostgreSQL
+  |--- Handles retry, scheduling, delayed execution
+  |--- Email sequence: schedules next email as delayed job
+
+Duplicate Detection (Infrastructure Layer)
+  |--- pg_trgm SQL query (Tier 1: database pre-filter)
+  |--- FuzzySharp scoring (Tier 2: in-memory ranking)
+  |--- Returns scored candidates to UI
+
+Report Builder (Infrastructure Layer)
+  |--- Reads report definition JSON
+  |--- Builds parameterized SQL from definition
+  |--- Executes via EF Core / raw Npgsql
+  |--- Returns aggregated data to Chart.js frontend
+```
+
+---
+
+## Version Verification Status
+
+| Package | Version | Verified Source | Status |
+|---|---|---|---|
+| Hangfire.AspNetCore | 1.8.23 | NuGet.org (released 2026-02-05) | VERIFIED |
+| Hangfire.PostgreSql | 1.21.1 | NuGet.org | VERIFIED |
+| Fluid.Core | 2.31.0 | NuGet.org (released 2025-11-07) | VERIFIED |
+| NCalcSync | 5.11.0 | NuGet.org | VERIFIED |
+| FuzzySharp | 2.0.2 | NuGet.org | VERIFIED |
+| Microsoft.Extensions.Http.Resilience | 10.3.0 | NuGet.org | VERIFIED |
+| @foblex/flow | 18.1.2 | npm registry (checked live) | VERIFIED |
+| pg_trgm | Built-in | PostgreSQL 17 docs | VERIFIED |
+
+---
+
+## Dependency Impact Assessment
+
+### Bundle Size Impact (Frontend)
+
+| Addition | Estimated Size | Impact |
+|---|---|---|
+| @foblex/flow | ~80-120 KB (gzipped) | Moderate -- only loaded in workflow builder route (lazy-loaded) |
+| No Monaco Editor | 0 KB saved | Avoided 5MB+ addition |
+| No PrimeNG / QueryBuilder | 0 KB saved | Avoided 200KB+ addition |
+
+**Total frontend addition: ~100 KB** (lazy-loaded, not on critical path).
+
+### Package Count Impact (Backend)
+
+| Current NuGet packages | 17 |
+|---|---|
+| New packages | 5 |
+| Total after v1.1 | 22 |
+
+All new packages are well-maintained, MIT/Apache licensed, and have no conflicting transitive dependencies with existing packages.
+
+### Database Impact
+
+| Addition | Impact |
+|---|---|
+| pg_trgm extension | One-time `CREATE EXTENSION`, no schema changes |
+| Trigram GIN indexes | 4 new indexes on existing tables, small storage overhead |
+| Hangfire schema | Hangfire auto-creates its tables (hangfire.job, hangfire.state, etc.) in a `hangfire` schema |
+| New entity tables | ~8-10 new tables for workflows, templates, webhooks, reports |
+
+---
+
+## Sources
+
+### NuGet Packages
+- [Hangfire.AspNetCore 1.8.23](https://www.nuget.org/packages/hangfire.aspnetcore/)
+- [Hangfire.PostgreSql 1.21.1](https://www.nuget.org/packages/Hangfire.PostgreSql/)
+- [Fluid.Core 2.31.0](https://www.nuget.org/packages/Fluid.Core/)
+- [NCalcSync 5.11.0](https://www.nuget.org/packages/NCalcSync)
+- [FuzzySharp 2.0.2](https://www.nuget.org/packages/FuzzySharp)
+- [Microsoft.Extensions.Http.Resilience 10.3.0](https://www.nuget.org/packages/Microsoft.Extensions.Http.Resilience/)
+
+### npm Packages
+- [@foblex/flow](https://www.npmjs.com/package/@foblex/flow) -- Angular flow-based UI library
+- [Foblex Flow Documentation](https://flow.foblex.com/)
+
+### PostgreSQL
+- [pg_trgm Documentation](https://www.postgresql.org/docs/current/pgtrgm.html)
+
+### Architecture References
+- [Hangfire Documentation](https://docs.hangfire.io/en/latest/)
+- [Fluid Template Engine (GitHub)](https://github.com/sebastienros/fluid)
+- [NCalc Documentation](https://ncalc.github.io/ncalc/)
+- [Polly Documentation](https://www.pollydocs.org/)
+- [Microsoft Resilient HTTP Apps (.NET)](https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience)
+- [Webhook Retry Best Practices (Svix)](https://www.svix.com/resources/webhook-best-practices/retries/)
+- [Webhook Delivery Platform Architecture](https://james-carr.org/posts/2025-12-31-advent-of-eip-day-8-webhook-delivery-platform/)
+- [FuzzySharp (GitHub)](https://github.com/JakeBayer/FuzzySharp)
+- [Microsoft.Extensions.Http.Polly deprecation (GitHub Issue)](https://github.com/dotnet/aspnetcore/issues/57209)
