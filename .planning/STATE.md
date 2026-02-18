@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 Phase: 11 of 11 (Polish & Completeness)
 Plan: 7 of 7 in current phase
 Status: In progress — executing Phase 11 plans
-Last activity: 2026-02-18 — Completed 11-04-PLAN.md (Entity Attachments Frontend)
+Last activity: 2026-02-18 — Completed 11-05-PLAN.md (Calendar Frontend)
 
-Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 04, 06 done
+Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 04, 05, 06 done
 
 ## Performance Metrics
 
@@ -114,6 +114,7 @@ Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 04, 06 done
 | Phase 11 P01 | 4min | 2 tasks | 11 files |
 | Phase 11 P02 | 6min | 2 tasks | 12 files |
 | Phase 11 P04 | 2min | 2 tasks | 3 files |
+| Phase 11 P05 | 5min | 2 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -398,6 +399,10 @@ Recent decisions affecting current work:
 - [11-06] BreakpointObserver with toSignal for reactive isMobile detection (Angular CDK best practice, not window.resize)
 - [11-06] Scroll hint gradient on mobile tables for horizontal scroll affordance
 - [11-06] Column resize handles hidden on touch devices via pointer: coarse media query
+- [11-05] CalendarService uses ApiService for GET /api/calendar queries; drag-drop reschedule uses ActivityService.getById + PUT (no PATCH /due-date endpoint)
+- [11-05] DateClickArg imported from @fullcalendar/interaction (not @fullcalendar/core where EventDropArg lives)
+- [11-05] Filter effect() with 150ms debounce to prevent rapid API calls on filter changes
+- [11-05] Calendar navbar link positioned after Feed, before Team (entity -> tools -> admin ordering)
 
 ### Pending Todos
 
@@ -410,5 +415,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 11-04-PLAN.md (Entity Attachments Frontend)
-Resume file: .planning/phases/11-polish-and-completeness/11-04-SUMMARY.md
+Stopped at: Completed 11-05-PLAN.md (Calendar Frontend)
+Resume file: .planning/phases/11-polish-and-completeness/11-05-SUMMARY.md
