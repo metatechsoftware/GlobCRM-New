@@ -71,6 +71,7 @@ export class NavbarComponent {
       items: [
         { route: '/companies', icon: 'business', label: 'Companies' },
         { route: '/contacts', icon: 'people', label: 'Contacts' },
+        { route: '/leads', icon: 'person_search', label: 'Leads' },
         { route: '/products', icon: 'inventory_2', label: 'Products' },
         { route: '/deals', icon: 'handshake', label: 'Deals' },
       ]

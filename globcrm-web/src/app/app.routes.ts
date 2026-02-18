@@ -65,6 +65,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'leads',
+    canActivate: [authGuard, permissionGuard('Lead', 'View')],
+    loadChildren: () =>
+      import('./features/leads/leads.routes').then(
+        (m) => m.LEAD_ROUTES
+      ),
+  },
+  {
     path: 'products',
     canActivate: [authGuard, permissionGuard('Product', 'View')],
     loadChildren: () =>
