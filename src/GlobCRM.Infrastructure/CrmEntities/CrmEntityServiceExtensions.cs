@@ -14,7 +14,7 @@ public static class CrmEntityServiceExtensions
 {
     /// <summary>
     /// Registers Company, Contact, Product, Pipeline, Deal, Activity, Quote, Request,
-    /// EmailAccount, EmailMessage, and Note repository implementations as scoped services.
+    /// EmailAccount, EmailMessage, Note, and Lead repository implementations as scoped services.
     /// </summary>
     public static IServiceCollection AddCrmEntityServices(this IServiceCollection services)
     {
@@ -29,6 +29,7 @@ public static class CrmEntityServiceExtensions
         services.AddScoped<IEmailAccountRepository, EmailAccountRepository>();
         services.AddScoped<IEmailMessageRepository, EmailMessageRepository>();
         services.AddScoped<INoteRepository, NoteRepository>();
+        services.AddScoped<ILeadRepository, LeadRepository>();
 
         return services;
     }

@@ -111,6 +111,13 @@ public class ApplicationDbContext
     public DbSet<ImportJob> ImportJobs => Set<ImportJob>();
     public DbSet<ImportJobError> ImportJobErrors => Set<ImportJobError>();
 
+    // Leads DbSets
+    public DbSet<Lead> Leads => Set<Lead>();
+    public DbSet<LeadStage> LeadStages => Set<LeadStage>();
+    public DbSet<LeadSource> LeadSources => Set<LeadSource>();
+    public DbSet<LeadStageHistory> LeadStageHistories => Set<LeadStageHistory>();
+    public DbSet<LeadConversion> LeadConversions => Set<LeadConversion>();
+
     // Notes & Attachments DbSets
     public DbSet<Note> Notes => Set<Note>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
@@ -185,6 +192,13 @@ public class ApplicationDbContext
         // Import entity configurations
         modelBuilder.ApplyConfiguration(new ImportJobConfiguration());
         modelBuilder.ApplyConfiguration(new ImportJobErrorConfiguration());
+
+        // Leads entity configurations
+        modelBuilder.ApplyConfiguration(new LeadConfiguration());
+        modelBuilder.ApplyConfiguration(new LeadStageConfiguration());
+        modelBuilder.ApplyConfiguration(new LeadSourceConfiguration());
+        modelBuilder.ApplyConfiguration(new LeadStageHistoryConfiguration());
+        modelBuilder.ApplyConfiguration(new LeadConversionConfiguration());
 
         // Notes & Attachments entity configurations
         modelBuilder.ApplyConfiguration(new NoteConfiguration());
@@ -311,6 +325,21 @@ public class ApplicationDbContext
 
         // Note: ImportJobError does NOT need its own query filter --
         // it is filtered through its parent ImportJob FK which is already tenant-filtered.
+
+        // Global query filter: filter Leads by TenantId (tenant-scoped)
+        modelBuilder.Entity<Lead>().HasQueryFilter(
+            l => _tenantProvider == null || _tenantProvider.GetTenantId() == null || l.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter LeadStages by TenantId (tenant-scoped)
+        modelBuilder.Entity<LeadStage>().HasQueryFilter(
+            s => _tenantProvider == null || _tenantProvider.GetTenantId() == null || s.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter LeadSources by TenantId (tenant-scoped)
+        modelBuilder.Entity<LeadSource>().HasQueryFilter(
+            s => _tenantProvider == null || _tenantProvider.GetTenantId() == null || s.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: LeadStageHistory and LeadConversion do NOT need their own query filters --
+        // they are filtered through their parent Lead FK which is already tenant-filtered.
 
         // Global query filter: filter Notes by TenantId (tenant-scoped)
         modelBuilder.Entity<Note>().HasQueryFilter(
