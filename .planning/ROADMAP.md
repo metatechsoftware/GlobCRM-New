@@ -2,7 +2,7 @@
 
 ## Milestones
 
-- ✅ **v1.0 MVP** — Phases 1-11 (shipped 2026-02-18)
+- ✅ **v1.0 MVP** — Phases 1-12 (shipped 2026-02-18, gap closure phase 12 added)
 
 ## Phases
 
@@ -27,6 +27,17 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 
 </details>
 
+### Phase 12: v1.0 Bug Fixes & Integration Polish
+**Goal:** Close all audit gaps — fix 3 code bugs, add missing navigation, improve architectural consistency
+**Gap Closure:** Closes all gaps from v1.0-MILESTONE-AUDIT.md
+**Tasks:**
+1. Fix Gmail connect HTTP method (email.service.ts POST → GET) — unblocks email E2E flow
+2. Fix quote transitions mismatch (quote.models.ts Accepted: ['Draft'] → []) — removes invalid UI button
+3. Fix dashboard saveLayout null response (dashboard.store.ts patch → reload) — prevents grid disappearing
+4. Add /import to navbar navGroups — makes import feature discoverable
+5. Move ConfirmDeleteDialogComponent to shared/components/ — fixes architectural coupling
+6. Add permissionGuard to CRM feature routes in app.routes.ts — improves UX for restricted users
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -42,3 +53,4 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 | 9. Dashboards & Reporting | v1.0 | 8/8 | Complete | 2026-02-17 |
 | 10. Data Operations | v1.0 | 6/6 | Complete | 2026-02-17 |
 | 11. Polish & Completeness | v1.0 | 7/7 | Complete | 2026-02-18 |
+| 12. Bug Fixes & Integration Polish | v1.0 | 0/6 | Planned | - |
