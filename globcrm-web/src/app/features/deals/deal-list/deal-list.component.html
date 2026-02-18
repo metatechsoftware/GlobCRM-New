@@ -61,9 +61,12 @@
       [totalCount]="dealStore.totalCount()"
       [pageSize]="dealStore.pageSize()"
       [loading]="dealStore.isLoading()"
+      (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
       (rowEditClicked)="onRowEditClicked($event)"
+      (rowViewClicked)="onRowClicked($event)"
+      (rowDeleteClicked)="onDeleteDeal($event)"
       (searchChanged)="onSearchChanged($event)"
       (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>

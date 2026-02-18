@@ -26,7 +26,9 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
 import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
+import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 import { ContactStore } from '../contact.store';
+import { ContactService } from '../contact.service';
 import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
 import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
@@ -55,6 +57,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
 export class ContactListComponent implements OnInit {
   readonly contactStore = inject(ContactStore);
   private readonly viewStore = inject(ViewStore);
+  private readonly contactService = inject(ContactService);
   private readonly customFieldService = inject(CustomFieldService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
@@ -162,6 +165,11 @@ export class ContactListComponent implements OnInit {
     }
   }
 
+  /** Handle column visibility toggle from column picker. */
+  onColumnsVisibilityChanged(columns: ViewColumn[]): void {
+    this.viewColumns.set(columns);
+  }
+
   /** Handle search change from dynamic table. */
   onSearchChanged(search: string): void {
     this.contactStore.setSearch(search);
@@ -222,6 +230,22 @@ export class ContactListComponent implements OnInit {
   /** Handle row click -- navigate to detail page. */
   onRowClicked(row: any): void {
     this.router.navigate(['/contacts', row.id]);
+  }
+
+  /** Handle row delete click -- soft delete with confirmation. */
+  onRowDeleteClicked(row: any): void {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: { name: row.fullName },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.contactService.delete(row.id).subscribe({
+          next: () => this.contactStore.loadPage(),
+          error: () => {},
+        });
+      }
+    });
   }
 
   /** Open create dialog instead of navigating to /contacts/new. */

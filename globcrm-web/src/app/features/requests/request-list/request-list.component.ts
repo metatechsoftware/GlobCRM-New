@@ -104,10 +104,12 @@ import { RequestService } from '../request.service';
           [totalCount]="requestStore.totalCount()"
           [pageSize]="requestStore.pageSize()"
           [loading]="requestStore.isLoading()"
+          (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
-          (rowClicked)="onRowClicked($event)"
           (rowEditClicked)="onRowEditClicked($event)"
+          (rowViewClicked)="onRowClicked($event)"
+          (rowDeleteClicked)="onDeleteRequest($event)"
           (searchChanged)="onSearchChanged($event)"
           (customFieldCreated)="onCustomFieldCreated($event)" />
       </div>
@@ -220,6 +222,11 @@ export class RequestListComponent implements OnInit {
       const primarySort = view.sorts[0];
       this.requestStore.setSort(primarySort.fieldId, primarySort.direction);
     }
+  }
+
+  /** Handle column visibility toggle from column picker. */
+  onColumnsVisibilityChanged(columns: ViewColumn[]): void {
+    this.viewColumns.set(columns);
   }
 
   /** Handle search change from dynamic table. */

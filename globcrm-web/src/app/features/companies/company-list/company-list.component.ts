@@ -26,7 +26,9 @@ import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
 import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
 import { MatDialog } from '@angular/material/dialog';
+import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 import { CompanyStore } from '../company.store';
+import { CompanyService } from '../company.service';
 import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
 import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
@@ -55,6 +57,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
 export class CompanyListComponent implements OnInit {
   readonly companyStore = inject(CompanyStore);
   private readonly viewStore = inject(ViewStore);
+  private readonly companyService = inject(CompanyService);
   private readonly customFieldService = inject(CustomFieldService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
@@ -161,6 +164,11 @@ export class CompanyListComponent implements OnInit {
     }
   }
 
+  /** Handle column visibility toggle from column picker. */
+  onColumnsVisibilityChanged(columns: ViewColumn[]): void {
+    this.viewColumns.set(columns);
+  }
+
   /** Handle search change from dynamic table. */
   onSearchChanged(search: string): void {
     this.companyStore.setSearch(search);
@@ -217,6 +225,22 @@ export class CompanyListComponent implements OnInit {
   /** Handle row click -- navigate to detail page. */
   onRowClicked(row: any): void {
     this.router.navigate(['/companies', row.id]);
+  }
+
+  /** Handle row delete click -- soft delete with confirmation. */
+  onRowDeleteClicked(row: any): void {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: { name: row.name },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.companyService.delete(row.id).subscribe({
+          next: () => this.companyStore.loadPage(),
+          error: () => {},
+        });
+      }
+    });
   }
 
   /** Open create dialog instead of navigating to /companies/new. */

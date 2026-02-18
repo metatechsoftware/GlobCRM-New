@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  viewChild,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -34,7 +36,7 @@ import { SearchHit, SearchResponse } from './search.models';
         #searchInput
         type="text"
         class="search-input"
-        placeholder="Search companies, contacts, deals..."
+        placeholder="Search... (Ctrl+K)"
         [value]="searchTerm()"
         (input)="onSearch($event)"
         (focus)="onFocus()"
@@ -43,6 +45,12 @@ import { SearchHit, SearchResponse } from './search.models';
       @if (isLoading()) {
         <mat-icon class="loading-icon">hourglass_empty</mat-icon>
       }
+      @if (!isLoading() && !isOpen()) {
+        <kbd class="shortcut-hint">
+          <span>{{ isMac ? '⌘' : 'Ctrl' }}</span>
+          <span>K</span>
+        </kbd>
+      }
 
       <!-- Search Results Overlay -->
       @if (isOpen() && results() && results()!.groups.length > 0) {
@@ -50,8 +58,12 @@ import { SearchHit, SearchResponse } from './search.models';
           @for (group of results()!.groups; track group.entityType) {
             <div class="search-group">
               <div class="group-header">{{ group.entityType }}s</div>
-              @for (hit of group.items; track hit.id) {
-                <a class="search-hit" (click)="selectResult(hit)">
+              @for (hit of group.items; track hit.id; let i = $index) {
+                <a
+                  class="search-hit"
+                  [class.active]="flatIndex(group, i) === activeIndex()"
+                  (click)="selectResult(hit)"
+                  (mouseenter)="activeIndex.set(flatIndex(group, i))">
                   <mat-icon class="entity-icon">{{ getEntityIcon(hit.entityType) }}</mat-icon>
                   <div class="hit-content">
                     <span class="hit-title">{{ hit.title }}</span>
@@ -66,8 +78,18 @@ import { SearchHit, SearchResponse } from './search.models';
         </div>
       }
 
+      <!-- Error State -->
+      @if (isOpen() && searchError()) {
+        <div class="search-overlay">
+          <div class="search-error">
+            <mat-icon>error_outline</mat-icon>
+            <span>Search failed. Please try again.</span>
+          </div>
+        </div>
+      }
+
       <!-- No Results -->
-      @if (isOpen() && results() && results()!.groups.length === 0 && searchTerm().length >= 2) {
+      @if (isOpen() && !searchError() && results() && results()!.groups.length === 0 && searchTerm().length >= 2) {
         <div class="search-overlay">
           <div class="no-results">No results found for "{{ searchTerm() }}"</div>
         </div>
@@ -149,6 +171,29 @@ import { SearchHit, SearchResponse } from './search.models';
       to { transform: rotate(360deg); }
     }
 
+    .shortcut-hint {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+      flex-shrink: 0;
+
+      span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 4px;
+        font-size: 11px;
+        font-family: inherit;
+        color: var(--color-text-muted);
+        background: var(--color-bg-tertiary, rgba(0, 0, 0, 0.06));
+        border: 1px solid var(--color-border-subtle);
+        border-radius: 4px;
+        line-height: 1;
+      }
+    }
+
     .search-overlay {
       position: absolute;
       top: calc(100% + var(--space-2));
@@ -194,7 +239,8 @@ import { SearchHit, SearchResponse } from './search.models';
       color: inherit;
       transition: background-color var(--duration-fast) var(--ease-default);
 
-      &:hover {
+      &:hover,
+      &.active {
         background: var(--color-highlight);
       }
     }
@@ -235,6 +281,22 @@ import { SearchHit, SearchResponse } from './search.models';
       text-align: center;
       color: var(--color-text-muted);
       font-size: var(--text-sm);
+    }
+
+    .search-error {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      padding: var(--space-6);
+      color: var(--color-danger-text, #dc2626);
+      font-size: var(--text-sm);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
     }
 
     .recent-header {
@@ -302,12 +364,25 @@ export class GlobalSearchComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
 
+  readonly searchInput = viewChild<ElementRef>('searchInput');
+
   readonly searchTerm = signal('');
   readonly results = signal<SearchResponse | null>(null);
   readonly isOpen = signal(false);
   readonly isLoading = signal(false);
   readonly recentSearches = signal<string[]>([]);
   readonly showRecent = signal(false);
+  readonly searchError = signal(false);
+  readonly activeIndex = signal(-1);
+
+  readonly isMac = navigator.platform.toUpperCase().includes('MAC');
+
+  /** Flat list of all hits across groups for keyboard navigation. */
+  readonly allHits = computed<SearchHit[]>(() => {
+    const res = this.results();
+    if (!res) return [];
+    return res.groups.flatMap((g) => g.items);
+  });
 
   private readonly searchSubject = new Subject<string>();
   private readonly subscription: Subscription;
@@ -318,10 +393,17 @@ export class GlobalSearchComponent implements OnDestroy {
         debounceTime(300),
         distinctUntilChanged(),
         filter((term) => term.length >= 2),
-        tap(() => this.isLoading.set(true)),
+        tap(() => {
+          this.isLoading.set(true);
+          this.searchError.set(false);
+        }),
         switchMap((term) =>
           this.searchService.search(term).pipe(
-            catchError(() => of({ groups: [], totalCount: 0 } as SearchResponse))
+            catchError((err) => {
+              console.error('Global search failed:', err);
+              this.searchError.set(true);
+              return of({ groups: [], totalCount: 0 } as SearchResponse);
+            })
           )
         )
       )
@@ -330,6 +412,7 @@ export class GlobalSearchComponent implements OnDestroy {
         this.isLoading.set(false);
         this.isOpen.set(true);
         this.showRecent.set(false);
+        this.activeIndex.set(-1);
       });
   }
 
@@ -345,6 +428,7 @@ export class GlobalSearchComponent implements OnDestroy {
       this.results.set(null);
       this.isOpen.set(false);
       this.isLoading.set(false);
+      this.searchError.set(false);
     }
 
     this.searchSubject.next(value);
@@ -381,12 +465,45 @@ export class GlobalSearchComponent implements OnDestroy {
   close(): void {
     this.isOpen.set(false);
     this.showRecent.set(false);
+    this.activeIndex.set(-1);
   }
 
   onKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       this.close();
+      return;
     }
+
+    const hits = this.allHits();
+    if (hits.length === 0) return;
+
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      const next = this.activeIndex() + 1;
+      this.activeIndex.set(next >= hits.length ? 0 : next);
+    } else if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const prev = this.activeIndex() - 1;
+      this.activeIndex.set(prev < 0 ? hits.length - 1 : prev);
+    } else if (event.key === 'Enter') {
+      const idx = this.activeIndex();
+      if (idx >= 0 && idx < hits.length) {
+        event.preventDefault();
+        this.selectResult(hits[idx]);
+      }
+    }
+  }
+
+  /** Compute the flat index for a hit within a specific group. */
+  flatIndex(group: { entityType: string }, indexInGroup: number): number {
+    const res = this.results();
+    if (!res) return -1;
+    let offset = 0;
+    for (const g of res.groups) {
+      if (g.entityType === group.entityType) return offset + indexInGroup;
+      offset += g.items.length;
+    }
+    return -1;
   }
 
   getEntityIcon(type: string): string {
@@ -397,6 +514,14 @@ export class GlobalSearchComponent implements OnDestroy {
         return 'person';
       case 'Deal':
         return 'handshake';
+      case 'Product':
+        return 'inventory_2';
+      case 'Activity':
+        return 'task_alt';
+      case 'Quote':
+        return 'request_quote';
+      case 'Request':
+        return 'support_agent';
       default:
         return 'search';
     }
@@ -410,6 +535,19 @@ export class GlobalSearchComponent implements OnDestroy {
       !this.elementRef.nativeElement.contains(event.target)
     ) {
       this.close();
+    }
+  }
+
+  /** Ctrl+K / Cmd+K to focus search. */
+  @HostListener('document:keydown', ['$event'])
+  onGlobalKeydown(event: KeyboardEvent): void {
+    if (event.key === 'k' && (event.metaKey || event.ctrlKey)) {
+      event.preventDefault();
+      const input = this.searchInput();
+      if (input) {
+        input.nativeElement.focus();
+        input.nativeElement.select();
+      }
     }
   }
 }

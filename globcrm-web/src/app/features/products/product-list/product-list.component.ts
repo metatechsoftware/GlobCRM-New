@@ -26,7 +26,9 @@ import {
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
 import { ViewStore } from '../../../shared/components/saved-views/view.store';
+import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 import { ProductStore } from '../product.store';
+import { ProductService } from '../product.service';
 import { ProductDto } from '../product.models';
 import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
 import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
@@ -83,6 +85,7 @@ export class ProductListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   readonly productStore = inject(ProductStore);
+  private readonly productService = inject(ProductService);
   readonly viewStore = inject(ViewStore);
   private readonly customFieldService = inject(CustomFieldService);
 
@@ -220,6 +223,25 @@ export class ProductListComponent implements OnInit {
 
   onRowEditClicked(row: any): void {
     this.router.navigate(['/products', row.id]);
+  }
+
+  onRowViewClicked(row: any): void {
+    this.router.navigate(['/products', row.id]);
+  }
+
+  onRowDeleteClicked(row: any): void {
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      data: { name: row.name },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed) => {
+      if (confirmed) {
+        this.productService.delete(row.id).subscribe({
+          next: () => this.productStore.loadPage(),
+          error: () => {},
+        });
+      }
+    });
   }
 
   navigateToNewProduct(): void {

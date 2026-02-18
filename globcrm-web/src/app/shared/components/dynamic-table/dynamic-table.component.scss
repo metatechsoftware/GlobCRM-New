@@ -199,9 +199,9 @@ th.add-column-header {
 
 // ─── Actions Column ───────────────────────────────────────
 .actions-column {
-  width: 64px;
-  min-width: 64px;
-  max-width: 64px;
+  width: 130px;
+  min-width: 130px;
+  max-width: 130px;
   text-align: center;
   position: sticky;
   right: 0;
@@ -217,6 +217,34 @@ th.add-column-header {
     bottom: 0;
     width: 1px;
     background: var(--color-border-subtle);
+  }
+}
+
+.actions-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+
+  button {
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .delete-btn {
+    color: var(--color-text-muted);
+    transition: color var(--duration-fast) var(--ease-default);
+
+    &:hover {
+      color: var(--color-danger, #ef4444);
+    }
   }
 }
 

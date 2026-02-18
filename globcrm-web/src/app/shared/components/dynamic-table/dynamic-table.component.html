@@ -74,11 +74,27 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef class="actions-column">Actions</th>
         <td mat-cell *matCellDef="let row" class="actions-column">
-          <button mat-icon-button
-                  (click)="rowEditClicked.emit(row)"
-                  aria-label="Edit row">
-            <mat-icon>edit</mat-icon>
-          </button>
+          <div class="actions-cell">
+            <button mat-icon-button
+                    (click)="rowViewClicked.emit(row)"
+                    matTooltip="View details"
+                    aria-label="View details">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button mat-icon-button
+                    (click)="rowEditClicked.emit(row)"
+                    matTooltip="Edit"
+                    aria-label="Edit row">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button
+                    (click)="rowDeleteClicked.emit(row); $event.stopPropagation()"
+                    matTooltip="Delete"
+                    aria-label="Delete row"
+                    class="delete-btn">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
         </td>
       </ng-container>
 

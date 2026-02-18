@@ -48,9 +48,12 @@
       [totalCount]="activityStore.totalCount()"
       [pageSize]="activityStore.pageSize()"
       [loading]="activityStore.isLoading()"
+      (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
       (rowEditClicked)="onRowEditClicked($event)"
+      (rowViewClicked)="onRowClicked($event)"
+      (rowDeleteClicked)="onDeleteActivity($event)"
       (searchChanged)="onSearchChanged($event)"
       (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>

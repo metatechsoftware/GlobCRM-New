@@ -195,6 +195,11 @@ export class DealListComponent implements OnInit {
     }
   }
 
+  /** Handle column visibility toggle from column picker. */
+  onColumnsVisibilityChanged(columns: ViewColumn[]): void {
+    this.viewColumns.set(columns);
+  }
+
   /** Handle search change from dynamic table. */
   onSearchChanged(search: string): void {
     this.dealStore.setSearch(search);

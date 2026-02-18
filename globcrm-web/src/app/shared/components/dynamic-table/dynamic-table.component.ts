@@ -23,6 +23,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
 import { ColumnPickerComponent } from './column-picker.component';
 import { QuickAddFieldComponent } from './quick-add-field.component';
@@ -54,6 +55,7 @@ import {
     MatIconModule,
     MatButtonModule,
     MatProgressBarModule,
+    MatTooltipModule,
     ColumnResizeDirective,
     ColumnPickerComponent,
     QuickAddFieldComponent,
@@ -81,6 +83,8 @@ export class DynamicTableComponent {
   sortChanged = output<ViewSort>();
   pageChanged = output<{ page: number; pageSize: number }>();
   rowEditClicked = output<any>();
+  rowViewClicked = output<any>();
+  rowDeleteClicked = output<any>();
   searchChanged = output<string>();
   customFieldCreated = output<CustomFieldDefinition>();
 

@@ -31,9 +31,12 @@
       [totalCount]="companyStore.totalCount()"
       [pageSize]="companyStore.pageSize()"
       [loading]="companyStore.isLoading()"
+      (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
       (rowEditClicked)="onRowEditClicked($event)"
+      (rowViewClicked)="onRowClicked($event)"
+      (rowDeleteClicked)="onRowDeleteClicked($event)"
       (searchChanged)="onSearchChanged($event)"
       (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>

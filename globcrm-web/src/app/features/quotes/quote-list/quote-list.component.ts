@@ -103,9 +103,12 @@ import { QuoteListDto, QUOTE_STATUSES } from '../quote.models';
           [totalCount]="quoteStore.totalCount()"
           [pageSize]="quoteStore.pageSize()"
           [loading]="quoteStore.isLoading()"
+          (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
-          (rowEditClicked)="onRowClicked($event)"
+          (rowEditClicked)="onRowEditClicked($event)"
+          (rowViewClicked)="onRowClicked($event)"
+          (rowDeleteClicked)="onDeleteQuote($event)"
           (searchChanged)="onSearchChanged($event)"
           (customFieldCreated)="onCustomFieldCreated($event)" />
       </div>
@@ -247,6 +250,11 @@ export class QuoteListComponent implements OnInit {
       const primarySort = view.sorts[0];
       this.quoteStore.setSort(primarySort.fieldId, primarySort.direction);
     }
+  }
+
+  /** Handle column visibility toggle from column picker. */
+  onColumnsVisibilityChanged(columns: ViewColumn[]): void {
+    this.viewColumns.set(columns);
   }
 
   /** Handle search change from dynamic table. */
