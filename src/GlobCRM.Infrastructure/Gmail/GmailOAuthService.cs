@@ -53,9 +53,10 @@ public class GmailOAuthService
         var codeRequestUrl = flow.CreateAuthorizationCodeRequest(_redirectUri);
         codeRequestUrl.State = state;
 
-        // Force consent screen and offline access to always get refresh token
+        // Force consent screen to always get refresh token
+        // Note: access_type=offline is already set by GoogleAuthorizationCodeFlow
         var url = codeRequestUrl.Build().ToString();
-        url += "&access_type=offline&prompt=consent";
+        url += "&prompt=consent";
 
         _logger.LogDebug("Generated Gmail OAuth authorization URL for state {State}", state);
         return url;

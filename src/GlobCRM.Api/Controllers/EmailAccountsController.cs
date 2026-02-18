@@ -27,6 +27,7 @@ public class EmailAccountsController : ControllerBase
     private readonly GmailSyncService _syncService;
     private readonly ITenantProvider _tenantProvider;
     private readonly ILogger<EmailAccountsController> _logger;
+    private readonly string _frontendUrl;
 
     public EmailAccountsController(
         GmailOAuthService oauthService,
@@ -35,6 +36,7 @@ public class EmailAccountsController : ControllerBase
         GmailServiceFactory serviceFactory,
         GmailSyncService syncService,
         ITenantProvider tenantProvider,
+        IConfiguration configuration,
         ILogger<EmailAccountsController> logger)
     {
         _oauthService = oauthService;
@@ -44,6 +46,7 @@ public class EmailAccountsController : ControllerBase
         _syncService = syncService;
         _tenantProvider = tenantProvider;
         _logger = logger;
+        _frontendUrl = configuration["App:FrontendUrl"] ?? "http://localhost:4200";
     }
 
     /// <summary>
@@ -112,12 +115,12 @@ public class EmailAccountsController : ControllerBase
         if (!string.IsNullOrEmpty(error))
         {
             _logger.LogWarning("Gmail OAuth error: {Error}", error);
-            return Redirect("/settings/email-accounts?error=" + Uri.EscapeDataString(error));
+            return Redirect($"{_frontendUrl}/settings/email-accounts?error=" + Uri.EscapeDataString(error));
         }
 
         if (string.IsNullOrEmpty(code) || string.IsNullOrEmpty(state))
         {
-            return Redirect("/settings/email-accounts?error=invalid_callback");
+            return Redirect($"{_frontendUrl}/settings/email-accounts?error=invalid_callback");
         }
 
         // Parse state to extract userId
@@ -125,7 +128,7 @@ public class EmailAccountsController : ControllerBase
         if (stateParts.Length != 2 || !Guid.TryParse(stateParts[0], out var userId))
         {
             _logger.LogWarning("Invalid OAuth state parameter: {State}", state);
-            return Redirect("/settings/email-accounts?error=invalid_state");
+            return Redirect($"{_frontendUrl}/settings/email-accounts?error=invalid_state");
         }
 
         try
@@ -186,12 +189,12 @@ public class EmailAccountsController : ControllerBase
 
             _logger.LogInformation("Gmail account connected for user {UserId}: {GmailAddress}", userId, gmailAddress);
 
-            return Redirect("/settings/email-accounts?connected=true");
+            return Redirect($"{_frontendUrl}/settings/email-accounts?connected=true");
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Gmail OAuth callback failed for user {UserId}", userId);
-            return Redirect("/settings/email-accounts?error=" + Uri.EscapeDataString(ex.Message));
+            return Redirect($"{_frontendUrl}/settings/email-accounts?error=" + Uri.EscapeDataString(ex.Message));
         }
     }
 
