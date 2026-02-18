@@ -131,12 +131,17 @@ app.MapHub<CrmHub>("/hubs/crm");
 
 app.MapControllers();
 
-// Built-in Identity endpoints (register, confirm email, forgot password, 2FA, refresh)
-app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
-
 // Custom login endpoint with JWT claims and rememberMe
 app.MapPost("/api/auth/login-extended", CustomLoginEndpoint.HandleLogin)
     .AllowAnonymous();
+
+// Custom refresh endpoint (works with our custom JWT login flow)
+// Uses /refresh-extended to avoid ambiguous route match with built-in Identity /refresh
+app.MapPost("/api/auth/refresh-extended", CustomRefreshEndpoint.Handle)
+    .AllowAnonymous();
+
+// Built-in Identity endpoints (register, confirm email, forgot password, 2FA)
+app.MapGroup("/api/auth").MapIdentityApi<ApplicationUser>();
 
 // Logout endpoint with audit logging -- token invalidation is future enhancement
 app.MapPost("/api/auth/logout", LogoutEndpoint.Handle)

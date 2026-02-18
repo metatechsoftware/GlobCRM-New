@@ -34,9 +34,12 @@ export class AuthService implements OnDestroy {
 
   /**
    * Attempt to restore session from stored refresh token on app init.
+   * Checks localStorage first (rememberMe), then sessionStorage (session-only).
    */
   initializeAuth(): Observable<void> {
-    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    const storedRefreshToken =
+      localStorage.getItem(REFRESH_TOKEN_KEY) ??
+      sessionStorage.getItem(REFRESH_TOKEN_KEY);
     if (!storedRefreshToken) {
       return of(undefined);
     }
@@ -136,7 +139,7 @@ export class AuthService implements OnDestroy {
   }
 
   refreshToken(refreshToken: string): Observable<LoginResponse> {
-    return this.api.post<LoginResponse>('/api/auth/refresh', { refreshToken });
+    return this.api.post<LoginResponse>('/api/auth/refresh-extended', { refreshToken });
   }
 
   get2faInfo(): Observable<TwoFactorInfo> {
@@ -225,6 +228,11 @@ export class AuthService implements OnDestroy {
     if (rememberMe) {
       localStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
       localStorage.setItem(REMEMBER_ME_KEY, 'true');
+      sessionStorage.removeItem(REFRESH_TOKEN_KEY);
+    } else {
+      sessionStorage.setItem(REFRESH_TOKEN_KEY, response.refreshToken);
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      localStorage.removeItem(REMEMBER_ME_KEY);
     }
 
     this.scheduleTokenRefresh(response.expiresIn, response.refreshToken);
@@ -266,5 +274,6 @@ export class AuthService implements OnDestroy {
   private clearStoredTokens(): void {
     localStorage.removeItem(REFRESH_TOKEN_KEY);
     localStorage.removeItem(REMEMBER_ME_KEY);
+    sessionStorage.removeItem(REFRESH_TOKEN_KEY);
   }
 }

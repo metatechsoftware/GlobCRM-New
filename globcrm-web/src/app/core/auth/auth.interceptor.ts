@@ -9,19 +9,23 @@ import { AuthService } from './auth.service';
  */
 const AUTH_ENDPOINTS = [
   '/api/auth/login',
+  '/api/auth/login-extended',
   '/api/auth/register',
-  '/api/auth/refresh',
+  '/api/auth/refresh-extended',
   '/api/auth/forgotPassword',
   '/api/auth/resetPassword',
   '/api/auth/confirmEmail',
   '/api/auth/resendConfirmationEmail',
-  '/api/organizations',
-  '/api/organizations/join',
+];
+
+const AUTH_ENDPOINT_PREFIXES = [
   '/api/organizations/check-subdomain',
 ];
 
 function isAuthEndpoint(url: string): boolean {
-  return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
+  const path = url.split('?')[0];
+  return AUTH_ENDPOINTS.some((ep) => path.endsWith(ep)) ||
+    AUTH_ENDPOINT_PREFIXES.some((prefix) => path.includes(prefix));
 }
 
 function addAuthHeaders(req: HttpRequest<unknown>, token: string, tenantId: string | null): HttpRequest<unknown> {
@@ -62,9 +66,11 @@ export const authInterceptor: HttpInterceptorFn = (
             // Update tokens in the store
             authStore.setTokens(response.accessToken, response.refreshToken);
 
-            // Persist refresh token if user had rememberMe
+            // Persist refresh token to the appropriate storage
             if (localStorage.getItem('globcrm_remember_me') === 'true') {
               localStorage.setItem('globcrm_refresh_token', response.refreshToken);
+            } else {
+              sessionStorage.setItem('globcrm_refresh_token', response.refreshToken);
             }
 
             // Retry the original request with the new access token
