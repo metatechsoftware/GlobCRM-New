@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 13 of 20 (Leads)
-Plan: —
-Status: Ready to plan
-Last activity: 2026-02-18 — v1.1 roadmap created (8 phases, 57 requirements mapped)
+Plan: 1 of 4 complete
+Status: Executing
+Last activity: 2026-02-18 — Completed 13-01 (Lead domain model + data layer)
 
-Progress: [████████████████████████░░░░░░░░░░░░░░░░] 60% (v1.0: 96/96 plans)
+Progress: [████████████████████████░░░░░░░░░░░░░░░░] 60% (v1.0: 96/96 plans, v1.1: 1 plan)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 0
-- v1.1 plans total: TBD (determined during phase planning)
+- v1.1 plans completed: 1
+- v1.1 plans total: 4+ (Phase 13: 4 plans)
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -36,6 +36,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [v1.1] DomainEventInterceptor built in Phase 14 (Foundation) — shared by webhooks, workflows, and duplicate detection
 - [v1.1] Leads first (Phase 13) — follows established v1.0 CRUD patterns, quick win before new infrastructure
 - [v1.1] Hangfire with PostgreSQL storage — no Redis needed at current scale
+- [13-01] LeadStage separate from PipelineStage -- simpler model without probability/required-fields
+- [13-01] Lead.CompanyName is string (not FK) -- leads may reference non-existent companies
+- [13-01] LeadConversion one-to-one with Lead via unique index on LeadId
 
 ### Pending Todos
 
@@ -51,6 +54,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Phase 13 context gathered
-Resume file: .planning/phases/13-leads/13-CONTEXT.md
-Next step: `/gsd:plan-phase 13` to plan the Leads phase
+Stopped at: Completed 13-01-PLAN.md (Lead domain model + data layer)
+Resume file: .planning/phases/13-leads/13-01-SUMMARY.md
+Next step: Execute 13-02-PLAN.md (Lead API controllers)
