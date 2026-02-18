@@ -120,6 +120,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'calendar',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/calendar/calendar.routes').then(
+        (m) => m.CALENDAR_ROUTES
+      ),
+  },
+  {
     path: 'import',
     canActivate: [authGuard],
     loadChildren: () =>
