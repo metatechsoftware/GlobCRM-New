@@ -58,6 +58,14 @@
           <mat-icon class="navbar__link-icon">dynamic_feed</mat-icon>
           Feed
         </a>
+        <a routerLink="/calendar" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">calendar_month</mat-icon>
+          Calendar
+        </a>
+        <a routerLink="/notes" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">note</mat-icon>
+          Notes
+        </a>
         <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
           <mat-icon class="navbar__link-icon">groups</mat-icon>
           Team
@@ -189,6 +197,11 @@
          class="navbar__mobile-link" (click)="closeSidenav()">
         <mat-icon>dynamic_feed</mat-icon>
         <span>Feed</span>
+      </a>
+      <a routerLink="/calendar" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>calendar_month</mat-icon>
+        <span>Calendar</span>
       </a>
       <a routerLink="/team-directory" routerLinkActive="navbar__mobile-link--active"
          class="navbar__mobile-link" (click)="closeSidenav()">

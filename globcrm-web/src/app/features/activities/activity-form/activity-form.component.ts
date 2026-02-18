@@ -310,6 +310,12 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
 
     if (this.isEditMode) {
       this.loadActivityForEdit();
+    } else {
+      // In create mode, pre-fill dueDate from queryParams (e.g., from calendar date click)
+      const dueDateParam = this.route.snapshot.queryParamMap.get('dueDate');
+      if (dueDateParam) {
+        this.activityForm.patchValue({ dueDate: new Date(dueDateParam) });
+      }
     }
   }
 

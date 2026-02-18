@@ -1,0 +1,63 @@
+<div class="calendar-layout">
+  <!-- Page header -->
+  <div class="calendar-header">
+    <div class="header-title">
+      <mat-icon class="header-icon">calendar_month</mat-icon>
+      <h1>Calendar</h1>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Entity Type</mat-label>
+      <mat-select [value]="filterEntityType()" (selectionChange)="onEntityTypeChanged($event.value)">
+        @for (et of entityTypes; track et.value) {
+          <mat-option [value]="et.value">{{ et.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Activity Type</mat-label>
+      <mat-select [value]="filterType()" (selectionChange)="onTypeChanged($event.value)">
+        <mat-option [value]="null">All Types</mat-option>
+        @for (t of activityTypes; track t.value) {
+          <mat-option [value]="t.value">
+            <mat-icon>{{ t.icon }}</mat-icon> {{ t.label }}
+          </mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="filter-field">
+      <mat-label>Owner</mat-label>
+      <mat-select [value]="filterOwnerId()" (selectionChange)="onOwnerChanged($event.value)">
+        <mat-option [value]="null">All Owners</mat-option>
+        @for (member of teamMembers(); track member.id) {
+          <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="calendar-loading"></mat-progress-bar>
+  }
+
+  <!-- Calendar -->
+  <div class="calendar-container">
+    <full-calendar [options]="calendarOptions()" />
+  </div>
+
+  <!-- Priority color legend -->
+  <div class="priority-legend">
+    @for (item of priorityLegend; track item.value) {
+      <div class="legend-item">
+        <span class="legend-dot" [style.background-color]="item.color"></span>
+        <span class="legend-label">{{ item.label }}</span>
+      </div>
+    }
+  </div>
+</div>
