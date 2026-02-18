@@ -111,6 +111,10 @@ public class ApplicationDbContext
     public DbSet<ImportJob> ImportJobs => Set<ImportJob>();
     public DbSet<ImportJobError> ImportJobErrors => Set<ImportJobError>();
 
+    // Notes & Attachments DbSets
+    public DbSet<Note> Notes => Set<Note>();
+    public DbSet<Attachment> Attachments => Set<Attachment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -181,6 +185,10 @@ public class ApplicationDbContext
         // Import entity configurations
         modelBuilder.ApplyConfiguration(new ImportJobConfiguration());
         modelBuilder.ApplyConfiguration(new ImportJobErrorConfiguration());
+
+        // Notes & Attachments entity configurations
+        modelBuilder.ApplyConfiguration(new NoteConfiguration());
+        modelBuilder.ApplyConfiguration(new AttachmentConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -303,5 +311,13 @@ public class ApplicationDbContext
 
         // Note: ImportJobError does NOT need its own query filter --
         // it is filtered through its parent ImportJob FK which is already tenant-filtered.
+
+        // Global query filter: filter Notes by TenantId (tenant-scoped)
+        modelBuilder.Entity<Note>().HasQueryFilter(
+            n => _tenantProvider == null || _tenantProvider.GetTenantId() == null || n.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Attachments by TenantId (tenant-scoped)
+        modelBuilder.Entity<Attachment>().HasQueryFilter(
+            a => _tenantProvider == null || _tenantProvider.GetTenantId() == null || a.TenantId == _tenantProvider.GetTenantId());
     }
 }
