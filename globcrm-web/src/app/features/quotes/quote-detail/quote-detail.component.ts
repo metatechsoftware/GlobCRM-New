@@ -88,7 +88,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .quote-number {
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
@@ -99,8 +99,8 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       border-radius: 12px;
       font-size: 12px;
       font-weight: 500;
-      background: var(--mat-sys-surface-variant, #e0e0e0);
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      background: var(--color-bg-secondary);
+      color: var(--color-text-secondary);
     }
 
     .status-chip {
@@ -125,7 +125,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       gap: 8px;
       margin-bottom: 24px;
       padding: 12px 16px;
-      background: var(--mat-sys-surface-container, #f5f5f5);
+      background: var(--color-bg-secondary);
       border-radius: 8px;
     }
 
@@ -142,14 +142,14 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
 
     .info-card {
       padding: 16px;
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
       border-radius: 8px;
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--color-border);
     }
 
     .info-card .label {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -163,11 +163,11 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     .info-card .value.grand-total {
       font-size: 24px;
       font-weight: 600;
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
     }
 
     .info-card a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
       text-decoration: none;
     }
 
@@ -189,8 +189,8 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-      border-bottom: 2px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      color: var(--color-text-secondary);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .line-items-table th.num-col {
@@ -200,7 +200,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     .line-items-table td {
       padding: 10px 12px;
       font-size: 14px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .line-items-table td.num-col {
@@ -209,7 +209,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .line-items-table tbody tr:hover {
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
     }
 
     .totals-summary {
@@ -227,7 +227,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
 
     .totals-grid .total-label {
       font-size: 14px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .totals-grid .total-value {
@@ -241,8 +241,8 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       font-size: 18px;
       font-weight: 600;
       padding-top: 8px;
-      border-top: 2px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
-      color: var(--mat-sys-primary, #1976d2);
+      border-top: 2px solid var(--color-border);
+      color: var(--color-primary);
     }
 
     /* Details tab */
@@ -254,7 +254,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       margin: 0 0 8px;
       font-size: 14px;
       font-weight: 600;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .details-section p {
@@ -275,11 +275,11 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       align-items: center;
       gap: 16px;
       padding: 12px 16px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .version-item:hover {
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
     }
 
     .version-item .version-num {
@@ -289,7 +289,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .version-item .version-num.current {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
     }
 
     .version-item .version-info {
@@ -298,13 +298,13 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
 
     .version-item .version-date {
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .empty-state {
       text-align: center;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .transition-buttons {
@@ -534,7 +534,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
                           View
                         </a>
                       } @else {
-                        <span style="font-size: 12px; color: var(--mat-sys-on-surface-variant, rgba(0,0,0,0.6));">
+                        <span style="font-size: 12px; color: var(--color-text-secondary);">
                           Current
                         </span>
                       }
@@ -584,12 +584,12 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
                   </a>
                 </div>
                 @for (note of quoteNotes(); track note.id) {
-                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-border-subtle);">
                     <div style="flex: 1; min-width: 0;">
-                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--mat-sys-primary, #1976d2); text-decoration: none;">{{ note.title }}</a>
-                      <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--color-primary); text-decoration: none;">{{ note.title }}</a>
+                      <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
                     </div>
-                    <div style="font-size: 12px; color: rgba(0,0,0,0.5); white-space: nowrap;">
+                    <div style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">
                       {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
                     </div>
                   </div>
@@ -746,7 +746,7 @@ export class QuoteDetailComponent implements OnInit {
 
   /** Get status color from QUOTE_STATUSES constant. */
   getStatusColor(status: QuoteStatus): string {
-    return QUOTE_STATUSES.find((s) => s.value === status)?.color ?? '#757575';
+    return QUOTE_STATUSES.find((s) => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get status label from QUOTE_STATUSES constant. */

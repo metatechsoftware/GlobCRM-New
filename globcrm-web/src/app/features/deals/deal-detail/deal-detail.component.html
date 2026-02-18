@@ -476,7 +476,7 @@
                   @for (note of dealNotes(); track note.id) {
                     <tr>
                       <td><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></td>
-                      <td style="color: rgba(0,0,0,0.6); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
+                      <td style="color: var(--color-text-secondary); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
                       <td>{{ note.authorName || '-' }}</td>
                       <td style="white-space: nowrap;">{{ formatNoteDate(note.createdAt) }}</td>
                     </tr>

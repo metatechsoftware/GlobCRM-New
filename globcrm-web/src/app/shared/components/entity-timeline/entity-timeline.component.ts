@@ -54,17 +54,17 @@ const TIMELINE_ICONS: Record<string, string> = {
  * Maps timeline entry types to theme colors for the timeline dot.
  */
 const TIMELINE_COLORS: Record<string, string> = {
-  created: '#4caf50',
-  updated: '#2196f3',
-  contact_linked: '#9c27b0',
-  contact_unlinked: '#f44336',
-  deal_created: '#ff9800',
-  stage_changed: '#ff5722',
-  product_linked: '#4caf50',
-  product_unlinked: '#f44336',
-  activity: '#00bcd4',
-  note: '#607d8b',
-  email: '#3f51b5',
+  created: 'var(--color-success)',
+  updated: 'var(--color-info)',
+  contact_linked: 'var(--color-secondary)',
+  contact_unlinked: 'var(--color-danger)',
+  deal_created: 'var(--color-warning)',
+  stage_changed: 'var(--color-primary)',
+  product_linked: 'var(--color-success)',
+  product_unlinked: 'var(--color-danger)',
+  activity: 'var(--color-accent)',
+  note: 'var(--color-text-secondary)',
+  email: 'var(--color-info)',
 };
 
 /**
@@ -101,7 +101,7 @@ const TIMELINE_COLORS: Record<string, string> = {
       align-items: center;
       gap: 8px;
       padding: 32px 16px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       text-align: center;
     }
 
@@ -163,7 +163,7 @@ const TIMELINE_COLORS: Record<string, string> = {
       top: 32px;
       bottom: -24px;
       width: 2px;
-      background-color: var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      background-color: var(--color-border);
     }
 
     .timeline-content {
@@ -175,13 +175,13 @@ const TIMELINE_COLORS: Record<string, string> = {
     .timeline-title {
       font-size: 14px;
       font-weight: 500;
-      color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+      color: var(--color-text);
       line-height: 1.4;
     }
 
     .timeline-description {
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-top: 2px;
       line-height: 1.4;
     }
@@ -192,14 +192,14 @@ const TIMELINE_COLORS: Record<string, string> = {
       align-items: center;
       margin-top: 4px;
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.5));
+      color: var(--color-text-muted);
     }
 
     .timeline-meta-separator {
       width: 3px;
       height: 3px;
       border-radius: 50%;
-      background-color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.3));
+      background-color: var(--color-text-muted);
     }
   `,
   template: `
@@ -269,6 +269,6 @@ export class EntityTimelineComponent {
    * Get the dot background color for a timeline entry type.
    */
   getColor(type: string): string {
-    return TIMELINE_COLORS[type] ?? '#757575';
+    return TIMELINE_COLORS[type] ?? 'var(--color-text-muted)';
   }
 }

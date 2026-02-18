@@ -65,13 +65,13 @@ interface MappingRow {
       padding: 8px 12px;
       font-weight: 500;
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-      border-bottom: 2px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      color: var(--color-text-secondary);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .mapping-table td {
       padding: 8px 12px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      border-bottom: 1px solid var(--color-border-subtle);
       vertical-align: middle;
     }
 
@@ -82,13 +82,13 @@ interface MappingRow {
 
     .sample-data {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-top: 4px;
     }
 
     .sample-data span {
       display: inline-block;
-      background: var(--mat-sys-surface-variant, rgba(0, 0, 0, 0.04));
+      background: var(--color-surface-hover);
       border-radius: 4px;
       padding: 2px 6px;
       margin-right: 4px;
@@ -101,14 +101,14 @@ interface MappingRow {
 
     .arrow-cell {
       text-align: center;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.4));
+      color: var(--color-text-muted);
     }
 
     .duplicate-section {
       margin-top: 24px;
       padding: 16px;
       border-radius: 8px;
-      background: var(--mat-sys-surface-variant, rgba(0, 0, 0, 0.04));
+      background: var(--color-surface-hover);
     }
 
     .duplicate-section h3 {
@@ -125,7 +125,7 @@ interface MappingRow {
 
     .duplicate-description {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-left: 32px;
       margin-top: -4px;
     }
@@ -138,7 +138,7 @@ interface MappingRow {
     }
 
     .error-msg {
-      color: var(--mat-sys-error, #B3261E);
+      color: var(--color-danger);
       margin-top: 12px;
       font-size: 14px;
     }
@@ -178,7 +178,7 @@ interface MappingRow {
                         <mat-option [value]="field.key">
                           {{ field.label }}
                           @if (field.required) {
-                            <span style="color: var(--mat-sys-error, red);"> *</span>
+                            <span style="color: var(--color-danger);"> *</span>
                           }
                         </mat-option>
                       }

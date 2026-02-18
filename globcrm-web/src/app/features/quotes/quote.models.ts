@@ -9,11 +9,11 @@
 export type QuoteStatus = 'Draft' | 'Sent' | 'Accepted' | 'Rejected' | 'Expired';
 
 export const QUOTE_STATUSES: { value: QuoteStatus; label: string; color: string }[] = [
-  { value: 'Draft', label: 'Draft', color: '#9e9e9e' },
-  { value: 'Sent', label: 'Sent', color: '#2196f3' },
-  { value: 'Accepted', label: 'Accepted', color: '#4caf50' },
-  { value: 'Rejected', label: 'Rejected', color: '#f44336' },
-  { value: 'Expired', label: 'Expired', color: '#ff9800' },
+  { value: 'Draft', label: 'Draft', color: 'var(--color-text-muted)' },
+  { value: 'Sent', label: 'Sent', color: 'var(--color-info)' },
+  { value: 'Accepted', label: 'Accepted', color: 'var(--color-success)' },
+  { value: 'Rejected', label: 'Rejected', color: 'var(--color-danger)' },
+  { value: 'Expired', label: 'Expired', color: 'var(--color-warning)' },
 ];
 
 export const QUOTE_TRANSITIONS: Record<QuoteStatus, QuoteStatus[]> = {

@@ -74,12 +74,12 @@ import { ProductDto } from '../product.models';
       align-items: center;
       gap: 16px;
       margin-bottom: 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
     .detail-subheader .separator {
-      color: var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      color: var(--color-border);
     }
 
     .loading-container {
@@ -113,12 +113,12 @@ import { ProductDto } from '../product.models';
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .field-value {
       font-size: 14px;
-      color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+      color: var(--color-text);
     }
 
     .description-field {

@@ -50,7 +50,7 @@ import { MatIconModule } from '@angular/material/icon';
 
     .kpi-card__icon[data-color="primary"] {
       background: var(--color-primary-soft, #FDEBD4);
-      color: var(--color-primary-text, #B85C1A);
+      color: var(--color-primary-text, #C2410C);
     }
 
     .kpi-card__icon[data-color="secondary"] {
@@ -86,7 +86,7 @@ import { MatIconModule } from '@angular/material/icon';
     .kpi-card__title {
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-medium, 500);
-      color: var(--color-text-secondary, #7A6B5D);
+      color: var(--color-text-secondary, #6B7280);
       margin: 0;
       line-height: var(--leading-tight, 1.25);
     }
@@ -94,7 +94,7 @@ import { MatIconModule } from '@angular/material/icon';
     .kpi-card__value {
       font-size: var(--text-2xl, 1.5rem);
       font-weight: var(--font-bold, 700);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
       margin: 0;
       line-height: var(--leading-tight, 1.25);
     }
@@ -106,21 +106,21 @@ import { MatIconModule } from '@angular/material/icon';
     .kpi-card__progress-bar {
       width: 100%;
       height: 6px;
-      background: var(--color-border-subtle, #F0E8E0);
+      background: var(--color-border-subtle, #F3F4F6);
       border-radius: var(--radius-full, 9999px);
       overflow: hidden;
     }
 
     .kpi-card__progress-fill {
       height: 100%;
-      background: var(--color-primary, #D97B3A);
+      background: var(--color-primary, #F97316);
       border-radius: var(--radius-full, 9999px);
       transition: width var(--duration-normal, 200ms) var(--ease-default);
     }
 
     .kpi-card__progress-text {
       font-size: var(--text-xs, 0.75rem);
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
       margin-top: var(--space-1, 4px);
     }
   `,

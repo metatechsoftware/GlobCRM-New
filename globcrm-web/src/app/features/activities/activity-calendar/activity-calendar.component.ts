@@ -106,11 +106,11 @@ export class ActivityCalendarComponent implements OnInit {
   /** Get color for a priority level. */
   private getPriorityColor(priority: string): string {
     const colors: Record<string, string> = {
-      Low: '#4caf50',
-      Medium: '#2196f3',
-      High: '#ff9800',
-      Urgent: '#f44336',
+      Low: 'var(--color-success)',
+      Medium: 'var(--color-info)',
+      High: 'var(--color-warning)',
+      Urgent: 'var(--color-danger)',
     };
-    return colors[priority] ?? '#757575';
+    return colors[priority] ?? 'var(--color-text-muted)';
   }
 }

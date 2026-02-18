@@ -38,19 +38,19 @@ import { QuillModule, QuillModules } from 'ngx-quill';
     }
 
     .editor-container {
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--color-border);
       border-radius: 4px;
       overflow: hidden;
     }
 
     .editor-container:focus-within {
-      border-color: var(--mat-sys-primary, #1976d2);
+      border-color: var(--color-border-focus);
       border-width: 2px;
     }
 
     :host ::ng-deep .ql-toolbar {
       border: none !important;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12)) !important;
+      border-bottom: 1px solid var(--color-border) !important;
     }
 
     :host ::ng-deep .ql-container {

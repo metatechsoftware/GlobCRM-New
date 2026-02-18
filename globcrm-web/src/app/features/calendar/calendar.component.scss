@@ -25,7 +25,7 @@
   font-size: 28px;
   width: 28px;
   height: 28px;
-  color: var(--mat-sys-primary, #1976d2);
+  color: var(--color-primary);
 }
 
 // Filter bar
@@ -50,10 +50,10 @@
 }
 
 .calendar-container {
-  background: var(--mat-sys-surface, #fff);
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
 }
 
 // Priority color legend
@@ -79,7 +79,7 @@
 
 .legend-label {
   font-size: 13px;
-  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  color: var(--color-text-secondary);
 }
 
 // FullCalendar event styling
@@ -123,7 +123,7 @@
   }
 
   .fc-day-today {
-    background-color: var(--mat-sys-primary-container, rgba(25, 118, 210, 0.08)) !important;
+    background-color: var(--color-highlight) !important;
   }
 
   // Time grid slot styling
@@ -133,7 +133,7 @@
 
   .fc-timegrid-axis-cushion {
     font-size: 12px;
-    color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+    color: var(--color-text-secondary);
   }
 }
 

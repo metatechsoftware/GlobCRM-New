@@ -47,40 +47,7 @@ import { ContactStore } from '../contact.store';
   providers: [ViewStore, ContactStore],
   templateUrl: './contact-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .entity-list-layout {
-      display: flex;
-      height: 100%;
-      min-height: 0;
-    }
-
-    .entity-list-content {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      min-width: 0;
-      padding: 16px 24px;
-    }
-
-    .list-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 16px;
-    }
-
-    .list-header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    @media (max-width: 768px) {
-      .entity-list-layout {
-        flex-direction: column;
-      }
-    }
-  `,
+  styleUrl: '../../../../styles/_entity-list.scss',
 })
 export class ContactListComponent implements OnInit {
   readonly contactStore = inject(ContactStore);

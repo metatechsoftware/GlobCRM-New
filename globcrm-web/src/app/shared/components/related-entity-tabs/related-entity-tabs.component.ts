@@ -116,7 +116,7 @@ export const DEAL_TABS: EntityTab[] = [
     .coming-soon {
       font-size: 11px;
       font-weight: normal;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.5));
+      color: var(--color-text-muted);
       margin-left: 2px;
     }
 
@@ -130,7 +130,7 @@ export const DEAL_TABS: EntityTab[] = [
       align-items: center;
       gap: 12px;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.5));
+      color: var(--color-text-muted);
       text-align: center;
     }
 

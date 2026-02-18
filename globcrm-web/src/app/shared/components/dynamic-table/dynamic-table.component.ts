@@ -4,6 +4,7 @@ import {
   computed,
   input,
   output,
+  signal,
   viewChild,
 } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
@@ -18,12 +19,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import {
-  CdkDragDrop,
-  CdkDropList,
-  CdkDrag,
-  moveItemInArray,
-} from '@angular/cdk/drag-drop';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
 import { ColumnPickerComponent } from './column-picker.component';
 import {
@@ -52,8 +47,6 @@ import {
     MatIconModule,
     MatButtonModule,
     MatProgressBarModule,
-    CdkDropList,
-    CdkDrag,
     ColumnResizeDirective,
     ColumnPickerComponent,
   ],
@@ -85,8 +78,15 @@ export class DynamicTableComponent {
   readonly sort = viewChild(MatSort);
   readonly paginator = viewChild(MatPaginator);
 
+  // Drag state
+  draggedFieldId = signal<string | null>(null);
+  private dragColumnOrder = signal<string[] | null>(null);
+
   // Computed: visible columns sorted by sortOrder, plus actions column
   displayedColumns = computed<string[]>(() => {
+    const dragOrder = this.dragColumnOrder();
+    if (dragOrder) return [...dragOrder, 'actions'];
+
     const visible = this.columns()
       .filter((c) => c.visible)
       .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -142,24 +142,71 @@ export class DynamicTableComponent {
   }
 
   /**
-   * Handle column reorder via CDK drag-drop.
+   * Start dragging a column header.
    */
-  onColumnDrop(event: CdkDragDrop<string[]>): void {
-    const displayed = [...this.displayedColumns()];
-    // Remove 'actions' for reorder
-    const cols = displayed.filter((c) => c !== 'actions');
-    moveItemInArray(cols, event.previousIndex, event.currentIndex);
+  onDragStart(event: DragEvent, fieldId: string): void {
+    this.draggedFieldId.set(fieldId);
 
-    // Update sortOrder on ViewColumn objects
-    const updated = this.columns().map((col) => {
-      const newIndex = cols.indexOf(col.fieldId);
-      if (newIndex >= 0) {
-        return { ...col, sortOrder: newIndex };
-      }
-      return col;
-    });
+    // Initialize mutable column order from current visible columns
+    const order = this.columns()
+      .filter((c) => c.visible)
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((c) => c.fieldId);
+    this.dragColumnOrder.set(order);
 
-    this.columnOrderChanged.emit(updated);
+    if (event.dataTransfer) {
+      event.dataTransfer.effectAllowed = 'move';
+      event.dataTransfer.setData('text/plain', fieldId);
+    }
+  }
+
+  /**
+   * Column header entered — snap the dragged column to this position.
+   */
+  onDragEnter(event: DragEvent, targetFieldId: string): void {
+    event.preventDefault();
+    const draggedId = this.draggedFieldId();
+    const order = this.dragColumnOrder();
+    if (!draggedId || !order || draggedId === targetFieldId) return;
+
+    const fromIndex = order.indexOf(draggedId);
+    const toIndex = order.indexOf(targetFieldId);
+    if (fromIndex === -1 || toIndex === -1) return;
+
+    const newOrder = [...order];
+    newOrder.splice(fromIndex, 1);
+    newOrder.splice(toIndex, 0, draggedId);
+    this.dragColumnOrder.set(newOrder);
+  }
+
+  /**
+   * Allow drop on column headers.
+   */
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    if (event.dataTransfer) {
+      event.dataTransfer.dropEffect = 'move';
+    }
+  }
+
+  /**
+   * Finish drag — emit final column order and clear drag state.
+   */
+  onDragEnd(): void {
+    const order = this.dragColumnOrder();
+    if (order) {
+      const updated = this.columns().map((col) => {
+        const newIndex = order.indexOf(col.fieldId);
+        if (newIndex >= 0) {
+          return { ...col, sortOrder: newIndex };
+        }
+        return col;
+      });
+      this.columnOrderChanged.emit(updated);
+    }
+
+    this.draggedFieldId.set(null);
+    this.dragColumnOrder.set(null);
   }
 
   /**

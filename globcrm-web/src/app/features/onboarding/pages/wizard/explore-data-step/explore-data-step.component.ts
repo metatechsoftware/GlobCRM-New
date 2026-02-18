@@ -32,25 +32,25 @@ export class ExploreDataStepComponent {
       icon: 'contacts',
       label: '5 sample contacts',
       description: 'Pre-loaded contacts to explore contact management features.',
-      color: '#1976d2',
+      color: 'var(--color-info)',
     },
     {
       icon: 'business',
       label: '2 sample companies',
       description: 'Example companies linked to contacts and deals.',
-      color: '#00897b',
+      color: 'var(--color-accent)',
     },
     {
       icon: 'handshake',
       label: '1 demo deal',
       description: 'A deal in your pipeline to explore the sales workflow.',
-      color: '#e65100',
+      color: 'var(--color-primary)',
     },
     {
       icon: 'view_kanban',
       label: 'Default sales pipeline',
       description: '5 stages: Lead, Qualified, Proposal, Negotiation, Closed.',
-      color: '#6a1b9a',
+      color: 'var(--color-secondary)',
     },
   ];
 

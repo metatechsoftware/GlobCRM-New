@@ -1,0 +1,53 @@
+frontendConfigVersion: 1
+stack:
+  framework: "angular"
+  metaFramework: "none"          # Angular CLI, SSR via @angular/ssr when needed
+  language: "typescript"
+  styling: "tailwind"            # To be installed; currently plain SCSS
+  uiPrimitives: "angular-material" # Already in use across 30+ components
+  icons: "lucide"                # To be installed (lucide-angular)
+  state: "signals"               # @ngrx/signals already in use (7 stores)
+  dataFetching: "none"           # Angular HttpClient (built-in)
+  forms: "none"                  # Angular Reactive Forms (built-in)
+quality:
+  accessibilityTarget: "wcag-aa"
+  testing:
+    unit: "karma"                # Karma + Jasmine already configured
+    e2e: "playwright"            # To be installed
+  storybook: false
+design:
+  vibe: "enterprise"
+  themeMode: "light-dark"
+  radius: "soft"
+  motion: "subtle"
+responsive:
+  strategy: "desktop-first"      # CRM is primarily desktop; responsive for tablet/mobile
+  breakpoints:
+    - name: sm
+      minWidth: 640
+    - name: md
+      minWidth: 768
+    - name: lg
+      minWidth: 1024
+    - name: xl
+      minWidth: 1280
+content:
+  tone: "neutral"
+  i18n: true
+browserSupport:
+  baseline: "evergreen"
+notes:
+  assumptions:
+    - "Angular Material kept as UI primitives (deeply embedded in 30+ components); PrimeNG preference noted but migration not practical"
+    - "Tailwind to be added alongside Angular Material for utility/layout classes, not to replace Material theming"
+    - "Lucide icons (lucide-angular) to be installed; currently using Material Icons"
+    - "@ngrx/signals is the established state management pattern (7 stores exist)"
+    - "Angular Reactive Forms used for all form handling (built-in)"
+    - "HttpClient used for data fetching (built-in)"
+    - "Desktop-first responsive strategy since CRM users primarily work on desktop"
+    - "Playwright to be installed for E2E testing"
+    - "SSR deferred; can add @angular/ssr later when needed"
+    - "Subtle motion (Angular animations already installed) for transitions and feedback"
+  openQuestions:
+    - "Should PrimeNG be added specifically for data tables (p-table) alongside Angular Material for other components?"
+    - "Which i18n library? @angular/localize (built-in) or ngx-translate?"

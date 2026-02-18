@@ -1,0 +1,189 @@
+// ─── CrmButton ────────────────────────────────────────────
+// Token-based button with variant, size, loading, and icon support.
+// Uses CSS custom properties from styles/tokens.css.
+
+:host {
+  display: inline-block;
+}
+
+// ─── Base ─────────────────────────────────────────────────
+.crm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  border: 1.5px solid transparent;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: var(--font-medium);
+  line-height: 1;
+  white-space: nowrap;
+  user-select: none;
+  position: relative;
+  transition:
+    background-color var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default),
+    opacity var(--duration-fast) var(--ease-default);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// ─── Sizes ────────────────────────────────────────────────
+.crm-btn--sm {
+  height: 30px;
+  padding: 0 var(--space-3);
+  font-size: var(--text-xs);
+  border-radius: var(--radius-sm);
+
+  .crm-btn__icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.crm-btn--md {
+  height: 36px;
+  padding: 0 var(--space-4);
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+
+  .crm-btn__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.crm-btn--lg {
+  height: 44px;
+  padding: 0 var(--space-6);
+  font-size: var(--text-base);
+  border-radius: var(--radius-md);
+
+  .crm-btn__icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+// ─── Variants ─────────────────────────────────────────────
+
+// Primary: solid orange
+.crm-btn--primary {
+  background-color: var(--color-primary);
+  color: var(--color-primary-fg);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-hover);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-primary-active);
+  }
+}
+
+// Secondary: soft lavender
+.crm-btn--secondary {
+  background-color: var(--color-secondary-soft);
+  color: var(--color-secondary-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-secondary);
+    color: var(--color-secondary-fg);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-secondary-hover);
+    color: var(--color-secondary-fg);
+  }
+}
+
+// Outline: bordered, transparent bg
+.crm-btn--outline {
+  background-color: transparent;
+  border-color: var(--color-border);
+  color: var(--color-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-surface-active);
+  }
+}
+
+// Ghost: no border, no bg
+.crm-btn--ghost {
+  background-color: transparent;
+  color: var(--color-text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-highlight);
+    color: var(--color-text);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-surface-active);
+  }
+}
+
+// Danger: pastel red
+.crm-btn--danger {
+  background-color: var(--color-danger);
+  color: var(--color-primary-fg);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-danger-text);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-danger-text);
+    opacity: 0.9;
+  }
+}
+
+// ─── Full width ───────────────────────────────────────────
+.crm-btn--full {
+  width: 100%;
+}
+
+// ─── Loading ──────────────────────────────────────────────
+.crm-btn__spinner {
+  position: absolute;
+
+  ::ng-deep circle {
+    stroke: currentColor;
+  }
+}
+
+.crm-btn__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: opacity var(--duration-fast) var(--ease-default);
+
+  &--loading {
+    opacity: 0;
+  }
+}
+
+// ─── Icon alignment ───────────────────────────────────────
+.crm-btn__icon {
+  flex-shrink: 0;
+  overflow: hidden;
+
+  &--left {
+    margin-left: calc(-1 * var(--space-1));
+  }
+  &--right {
+    margin-right: calc(-1 * var(--space-1));
+  }
+}

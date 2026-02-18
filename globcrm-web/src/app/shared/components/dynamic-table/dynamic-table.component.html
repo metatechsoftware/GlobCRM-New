@@ -32,11 +32,17 @@
               (columnResized)="onColumnResized($event)"
               [style.width]="getColumnWidth(col.fieldId)"
               [style.min-width]="getColumnWidth(col.fieldId)"
-              cdkDrag
-              cdkDragLockAxis="x">
+              draggable="true"
+              (dragstart)="onDragStart($event, col.fieldId)"
+              (dragenter)="onDragEnter($event, col.fieldId)"
+              (dragover)="onDragOver($event)"
+              (dragend)="onDragEnd()"
+              [class.is-dragging]="draggedFieldId() === col.fieldId">
             {{ getColumnLabel(col.fieldId) }}
           </th>
-          <td mat-cell *matCellDef="let row" [style.width]="getColumnWidth(col.fieldId)">
+          <td mat-cell *matCellDef="let row"
+              [style.width]="getColumnWidth(col.fieldId)"
+              [attr.data-field]="col.fieldId">
             {{ getCellValue(row, col.fieldId) }}
           </td>
         </ng-container>
@@ -56,10 +62,7 @@
 
       <!-- Header and data rows -->
       <tr mat-header-row
-          *matHeaderRowDef="displayedColumns()"
-          cdkDropList
-          cdkDropListOrientation="horizontal"
-          (cdkDropListDropped)="onColumnDrop($event)">
+          *matHeaderRowDef="displayedColumns()">
       </tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns()"></tr>
 

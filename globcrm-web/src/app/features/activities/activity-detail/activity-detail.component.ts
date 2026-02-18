@@ -249,7 +249,7 @@ export class ActivityDetailComponent implements OnInit {
 
   /** Get timeline color for event type. */
   getTimelineColor(type: string): string {
-    return ACTIVITY_TIMELINE_COLORS[type] ?? '#757575';
+    return ACTIVITY_TIMELINE_COLORS[type] ?? 'var(--color-text-muted)';
   }
 
   /** Get route path for entity type. */

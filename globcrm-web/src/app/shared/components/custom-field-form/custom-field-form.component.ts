@@ -85,7 +85,7 @@ interface FieldGroup {
     }
 
     .custom-field-form-empty {
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       text-align: center;
       padding: 24px;
       font-size: 14px;
@@ -99,7 +99,7 @@ interface FieldGroup {
       margin: 0 0 12px 0;
       font-size: 16px;
       font-weight: 500;
-      color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+      color: var(--color-text);
     }
 
     .field-grid {
@@ -119,7 +119,7 @@ interface FieldGroup {
 
     .currency-prefix {
       font-size: 14px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .file-field {
@@ -129,12 +129,12 @@ interface FieldGroup {
     .file-field label {
       display: block;
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 4px;
     }
 
     .file-field-placeholder {
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       font-size: 13px;
       font-style: italic;
     }

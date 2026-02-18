@@ -10,17 +10,17 @@ export type RequestStatus = 'New' | 'InProgress' | 'Resolved' | 'Closed';
 export type RequestPriority = 'Low' | 'Medium' | 'High' | 'Urgent';
 
 export const REQUEST_STATUSES: { value: RequestStatus; label: string; color: string }[] = [
-  { value: 'New', label: 'New', color: '#2196f3' },
-  { value: 'InProgress', label: 'In Progress', color: '#ff9800' },
-  { value: 'Resolved', label: 'Resolved', color: '#4caf50' },
-  { value: 'Closed', label: 'Closed', color: '#9e9e9e' },
+  { value: 'New', label: 'New', color: 'var(--color-info)' },
+  { value: 'InProgress', label: 'In Progress', color: 'var(--color-primary)' },
+  { value: 'Resolved', label: 'Resolved', color: 'var(--color-success)' },
+  { value: 'Closed', label: 'Closed', color: 'var(--color-text-muted)' },
 ];
 
 export const REQUEST_PRIORITIES: { value: RequestPriority; label: string; color: string }[] = [
-  { value: 'Low', label: 'Low', color: '#4caf50' },
-  { value: 'Medium', label: 'Medium', color: '#2196f3' },
-  { value: 'High', label: 'High', color: '#ff9800' },
-  { value: 'Urgent', label: 'Urgent', color: '#f44336' },
+  { value: 'Low', label: 'Low', color: 'var(--color-success)' },
+  { value: 'Medium', label: 'Medium', color: 'var(--color-info)' },
+  { value: 'High', label: 'High', color: 'var(--color-warning)' },
+  { value: 'Urgent', label: 'Urgent', color: 'var(--color-danger)' },
 ];
 
 export const REQUEST_CATEGORIES: string[] = [

@@ -8,10 +8,23 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
+import { SidebarStateService } from '../../services/sidebar-state.service';
 import { NotificationCenterComponent } from '../../../features/notifications/notification-center/notification-center.component';
 import { GlobalSearchComponent } from '../global-search/global-search.component';
+
+interface NavItem {
+  route: string;
+  icon: string;
+  label: string;
+}
+
+interface NavGroup {
+  label: string;
+  items: NavItem[];
+}
 
 @Component({
   selector: 'app-navbar',
@@ -24,6 +37,7 @@ import { GlobalSearchComponent } from '../global-search/global-search.component'
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
+    MatTooltipModule,
     NotificationCenterComponent,
     GlobalSearchComponent,
   ],
@@ -35,16 +49,57 @@ export class NavbarComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  readonly sidebarState = inject(SidebarStateService);
 
-  /** Reactive signal: true when viewport is 768px or narrower */
   isMobile = toSignal(
     this.breakpointObserver.observe(['(max-width: 768px)'])
       .pipe(map(result => result.matches)),
     { initialValue: false }
   );
 
-  /** Controls the mobile navigation drawer open/close state */
-  sidenavOpen = signal(false);
+  mobileOpen = signal(false);
+
+  readonly navGroups: NavGroup[] = [
+    {
+      label: '',
+      items: [
+        { route: '/dashboard', icon: 'grid_view', label: 'Dashboard' },
+      ]
+    },
+    {
+      label: 'CRM',
+      items: [
+        { route: '/companies', icon: 'business', label: 'Companies' },
+        { route: '/contacts', icon: 'people', label: 'Contacts' },
+        { route: '/products', icon: 'inventory_2', label: 'Products' },
+        { route: '/deals', icon: 'handshake', label: 'Deals' },
+      ]
+    },
+    {
+      label: 'Work',
+      items: [
+        { route: '/activities', icon: 'task_alt', label: 'Activities' },
+        { route: '/quotes', icon: 'request_quote', label: 'Quotes' },
+        { route: '/requests', icon: 'support_agent', label: 'Requests' },
+        { route: '/notes', icon: 'note', label: 'Notes' },
+      ]
+    },
+    {
+      label: 'Connect',
+      items: [
+        { route: '/emails', icon: 'email', label: 'Emails' },
+        { route: '/feed', icon: 'dynamic_feed', label: 'Feed' },
+        { route: '/calendar', icon: 'calendar_month', label: 'Calendar' },
+      ]
+    },
+    {
+      label: 'Admin',
+      items: [
+        { route: '/team-directory', icon: 'groups', label: 'Team' },
+        { route: '/settings', icon: 'settings', label: 'Settings' },
+      ]
+    },
+  ];
 
   get userInitials(): string {
     const user = this.authStore.user();
@@ -54,12 +109,16 @@ export class NavbarComponent {
     return (first + last).toUpperCase();
   }
 
-  toggleSidenav(): void {
-    this.sidenavOpen.update(v => !v);
+  toggleCollapse(): void {
+    this.sidebarState.toggle();
   }
 
-  closeSidenav(): void {
-    this.sidenavOpen.set(false);
+  toggleMobile(): void {
+    this.mobileOpen.update(v => !v);
+  }
+
+  closeMobile(): void {
+    this.mobileOpen.set(false);
   }
 
   logout(): void {

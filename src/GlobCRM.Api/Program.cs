@@ -20,6 +20,7 @@ using GlobCRM.Infrastructure.Import;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Search;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -82,6 +83,23 @@ builder.Services.AddImportServices();
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
 
 var app = builder.Build();
+
+// CLI: reseed demo data (run with: dotnet run -- --reseed)
+if (args.Contains("--reseed"))
+{
+    using var scope = app.Services.CreateScope();
+    var seeder = scope.ServiceProvider.GetRequiredService<GlobCRM.Application.Common.ITenantSeeder>();
+    var tenantDb = scope.ServiceProvider.GetRequiredService<GlobCRM.Infrastructure.Persistence.TenantDbContext>();
+    var orgs = await tenantDb.Organizations.ToListAsync();
+    foreach (var org in orgs)
+    {
+        Console.WriteLine($"Reseeding organization: {org.Name} ({org.Id})");
+        await seeder.ReseedOrganizationDataAsync(org.Id);
+        Console.WriteLine($"  Done.");
+    }
+    Console.WriteLine($"Reseeded {orgs.Count} organization(s). Exiting.");
+    return;
+}
 
 // Seed default roles on startup
 await SeedRolesAsync(app.Services);

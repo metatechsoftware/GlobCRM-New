@@ -41,7 +41,7 @@ import { ImportEntityType } from '../import.models';
     }
 
     .drop-zone {
-      border: 2px dashed var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 2px dashed var(--color-border);
       border-radius: 12px;
       padding: 48px 24px;
       text-align: center;
@@ -51,25 +51,25 @@ import { ImportEntityType } from '../import.models';
 
     .drop-zone:hover,
     .drop-zone.drag-over {
-      border-color: var(--mat-sys-primary, #6750A4);
-      background-color: var(--mat-sys-primary-container, rgba(103, 80, 164, 0.08));
+      border-color: var(--color-primary);
+      background-color: var(--color-primary-soft);
     }
 
     .drop-zone mat-icon {
       font-size: 48px;
       width: 48px;
       height: 48px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 16px;
     }
 
     .drop-zone p {
       margin: 0;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .drop-zone .browse-link {
-      color: var(--mat-sys-primary, #6750A4);
+      color: var(--color-primary);
       font-weight: 500;
       text-decoration: underline;
       cursor: pointer;
@@ -81,12 +81,12 @@ import { ImportEntityType } from '../import.models';
       gap: 12px;
       padding: 16px;
       border-radius: 8px;
-      background: var(--mat-sys-surface-variant, rgba(0, 0, 0, 0.04));
+      background: var(--color-surface-hover);
       margin-top: 16px;
     }
 
     .file-info mat-icon {
-      color: var(--mat-sys-primary, #6750A4);
+      color: var(--color-primary);
     }
 
     .file-details {
@@ -99,11 +99,11 @@ import { ImportEntityType } from '../import.models';
 
     .file-meta {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .error-msg {
-      color: var(--mat-sys-error, #B3261E);
+      color: var(--color-danger);
       margin-top: 12px;
       font-size: 14px;
     }
@@ -157,7 +157,7 @@ import { ImportEntityType } from '../import.models';
             </div>
           </div>
           @if (store.hasUpload()) {
-            <mat-icon style="color: var(--mat-sys-primary, green)">check_circle</mat-icon>
+            <mat-icon style="color: var(--color-success)">check_circle</mat-icon>
           }
         </div>
       }

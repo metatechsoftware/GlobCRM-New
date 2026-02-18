@@ -49,7 +49,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       flex-direction: column;
       height: 100%;
       background: var(--color-surface, #FFFFFF);
-      border: 1px solid var(--color-border-subtle, #F0E8E0);
+      border: 1px solid var(--color-border-subtle, #F3F4F6);
       border-radius: var(--radius-lg, 12px);
       overflow: hidden;
     }
@@ -59,7 +59,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       align-items: center;
       gap: var(--space-2, 8px);
       padding: var(--space-3, 12px) var(--space-4, 16px);
-      border-bottom: 1px solid var(--color-border-subtle, #F0E8E0);
+      border-bottom: 1px solid var(--color-border-subtle, #F3F4F6);
       min-height: 44px;
       flex-shrink: 0;
     }
@@ -68,7 +68,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       cursor: grab;
       display: flex;
       align-items: center;
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
     }
 
     .widget-drag-handle:active {
@@ -86,7 +86,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       margin: 0;
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -101,14 +101,14 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       border: none;
       background: transparent;
       border-radius: var(--radius-sm, 4px);
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
       cursor: pointer;
       padding: 0;
     }
 
     .widget-wrapper__menu-btn:hover {
-      background: var(--color-highlight, rgba(217, 123, 58, 0.08));
-      color: var(--color-text, #3D2E22);
+      background: var(--color-highlight, rgba(249, 115, 22, 0.08));
+      color: var(--color-text, #111827);
     }
 
     .widget-wrapper__menu-btn mat-icon {
@@ -128,7 +128,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
     }
 
     .widget-wrapper__content--drilldown:hover {
-      background: var(--color-highlight, rgba(217, 123, 58, 0.04));
+      background: var(--color-highlight, rgba(249, 115, 22, 0.04));
     }
   `,
   template: `

@@ -209,17 +209,17 @@ export class DealDetailComponent implements OnInit {
 
   /** Get status color for activity chip. */
   getStatusColor(status: string): string {
-    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get priority color for activity chip. */
   getPriorityColor(priority: string): string {
-    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
+    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get quote status color. */
   getQuoteStatusColor(status: string): string {
-    return QUOTE_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+    return QUOTE_STATUSES.find(s => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Load notes linked to this deal (lazy on tab switch). */

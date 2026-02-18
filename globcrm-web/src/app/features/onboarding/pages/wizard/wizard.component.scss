@@ -12,18 +12,18 @@
 .wizard-title {
   font-size: 2rem;
   font-weight: 700;
-  color: #1976d2;
+  color: var(--color-primary);
   margin: 0 0 0.5rem 0;
 }
 
 .wizard-subtitle {
   font-size: 1.1rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-text-secondary);
   margin: 0 0 1rem 0;
 }
 
 .skip-all-button {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--color-text-muted);
   font-size: 0.875rem;
 
   mat-icon {

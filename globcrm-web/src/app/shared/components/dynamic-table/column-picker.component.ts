@@ -42,8 +42,8 @@ import {
       padding: 8px 16px;
       font-weight: 500;
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border);
     }
   `,
 })

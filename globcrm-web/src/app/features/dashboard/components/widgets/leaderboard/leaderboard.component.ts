@@ -45,7 +45,7 @@ interface LeaderboardEntry {
     }
 
     .leaderboard__entry:nth-child(even) {
-      background: var(--color-highlight, rgba(217, 123, 58, 0.08));
+      background: var(--color-highlight, rgba(249, 115, 22, 0.08));
     }
 
     .leaderboard__rank {
@@ -58,8 +58,8 @@ interface LeaderboardEntry {
       border-radius: var(--radius-full, 9999px);
       font-size: var(--text-xs, 0.75rem);
       font-weight: var(--font-bold, 700);
-      background: var(--color-border-subtle, #F0E8E0);
-      color: var(--color-text-secondary, #7A6B5D);
+      background: var(--color-border-subtle, #F3F4F6);
+      color: var(--color-text-secondary, #6B7280);
     }
 
     .leaderboard__rank--gold {
@@ -81,7 +81,7 @@ interface LeaderboardEntry {
       flex: 1;
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-medium, 500);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -90,7 +90,7 @@ interface LeaderboardEntry {
     .leaderboard__value {
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-primary-text, #B85C1A);
+      color: var(--color-primary-text, #C2410C);
       white-space: nowrap;
     }
 
@@ -99,7 +99,7 @@ interface LeaderboardEntry {
       align-items: center;
       justify-content: center;
       height: 100%;
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
       font-size: var(--text-sm, 0.8125rem);
       padding: var(--space-4, 16px);
     }

@@ -208,9 +208,9 @@ export class ImagePreviewDialogComponent {
       gap: 8px;
       padding: 8px 12px;
       margin-bottom: 12px;
-      background: #fce4ec;
+      background: var(--color-danger-soft);
       border-radius: 4px;
-      color: #c62828;
+      color: var(--color-danger-text);
       font-size: 13px;
     }
 

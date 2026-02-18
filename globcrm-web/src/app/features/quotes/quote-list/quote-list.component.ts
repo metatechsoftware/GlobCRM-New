@@ -71,7 +71,6 @@ import { QuoteListDto, QUOTE_STATUSES } from '../quote.models';
       <app-view-sidebar
         [entityType]="'Quote'"
         (viewSelected)="onViewSelected($event)" />
-
       <div class="entity-list-content">
         <div class="list-header">
           <h1>Quotes</h1>

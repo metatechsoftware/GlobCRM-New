@@ -126,7 +126,7 @@ const SELECT_OPERATORS: OperatorOption[] = [
       align-items: center;
       gap: 8px;
       padding-top: 8px;
-      border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border-top: 1px solid var(--color-border);
     }
 
     .spacer {
@@ -136,7 +136,7 @@ const SELECT_OPERATORS: OperatorOption[] = [
     .filter-count {
       margin-left: 4px;
       font-weight: normal;
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
     }
   `,
 })

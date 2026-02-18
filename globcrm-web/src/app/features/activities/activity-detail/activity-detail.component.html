@@ -511,7 +511,7 @@
                   <mat-spinner diameter="32"></mat-spinner>
                 </div>
               } @else if (activityNotes().length === 0) {
-                <div style="text-align: center; padding: 48px 24px; color: rgba(0,0,0,0.5);">
+                <div style="text-align: center; padding: 48px 24px; color: var(--color-text-muted);">
                   No notes for this activity.
                   <br /><br />
                   <a mat-stroked-button
@@ -531,10 +531,10 @@
                 @for (note of activityNotes(); track note.id) {
                   <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
                     <div style="flex: 1; min-width: 0;">
-                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--mat-sys-primary, #1976d2); text-decoration: none;">{{ note.title }}</a>
-                      <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--color-primary); text-decoration: none;">{{ note.title }}</a>
+                      <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
                     </div>
-                    <div style="font-size: 12px; color: rgba(0,0,0,0.5); white-space: nowrap;">
+                    <div style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">
                       {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
                     </div>
                   </div>

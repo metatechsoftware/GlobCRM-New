@@ -1,5 +1,5 @@
 .role-edit-container {
-  padding: 24px;
+  padding: var(--space-6);
   max-width: 1000px;
   margin: 0 auto;
 }
@@ -7,13 +7,13 @@
 .page-header {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-bottom: 24px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
 
   h1 {
     margin: 0;
-    font-size: 24px;
-    font-weight: 500;
+    font-size: var(--text-2xl);
+    font-weight: var(--font-medium);
   }
 }
 
@@ -22,11 +22,11 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 0;
+  padding: var(--space-16) 0;
 
   p {
-    margin-top: 16px;
-    color: rgba(0, 0, 0, 0.6);
+    margin-top: var(--space-4);
+    color: var(--color-text-secondary);
   }
 }
 
@@ -35,30 +35,30 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 64px 0;
+  padding: var(--space-16) 0;
 
   .error-icon {
     font-size: 48px;
     width: 48px;
     height: 48px;
-    color: #f44336;
+    color: var(--color-danger);
   }
 
   p {
-    margin: 16px 0;
-    color: rgba(0, 0, 0, 0.6);
+    margin: var(--space-4) 0;
+    color: var(--color-text-secondary);
   }
 }
 
 .role-form-card {
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .role-form {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
 }
 
 .full-width {
@@ -68,12 +68,12 @@
 .form-error {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 16px;
-  padding: 12px;
-  background-color: #fce4ec;
-  border-radius: 4px;
-  color: #c62828;
+  gap: var(--space-2);
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  background-color: var(--color-danger-soft);
+  border-radius: var(--radius-sm);
+  color: var(--color-danger-text);
 
   mat-icon {
     font-size: 20px;

@@ -74,7 +74,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
     .target-card__name {
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
       text-align: center;
       margin: 0;
       line-height: var(--leading-tight, 1.25);
@@ -89,20 +89,20 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 
     .target-card__current {
       font-weight: var(--font-bold, 700);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
     }
 
     .target-card__separator {
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
     }
 
     .target-card__target-val {
-      color: var(--color-text-secondary, #7A6B5D);
+      color: var(--color-text-secondary, #6B7280);
     }
 
     .target-card__period {
       font-size: var(--text-xs, 0.75rem);
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
       text-transform: capitalize;
     }
 
@@ -113,7 +113,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
       justify-content: center;
       height: 100%;
       gap: var(--space-2, 8px);
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
     }
 
     .target-card__empty mat-icon {
@@ -177,11 +177,11 @@ export class TargetProgressComponent {
     const color = this.statusColor();
     const fillColor =
       color === 'green'
-        ? 'var(--color-success, #6AAE6E)'
+        ? 'var(--color-success, #22C55E)'
         : color === 'yellow'
-          ? 'var(--color-warning, #D4A840)'
-          : 'var(--color-danger, #CC6060)';
-    const trackColor = 'var(--color-border-subtle, #F0E8E0)';
+          ? 'var(--color-warning, #F59E0B)'
+          : 'var(--color-danger, #EF4444)';
+    const trackColor = 'var(--color-border-subtle, #F3F4F6)';
     return `conic-gradient(${fillColor} ${pct * 3.6}deg, ${trackColor} ${pct * 3.6}deg)`;
   });
 

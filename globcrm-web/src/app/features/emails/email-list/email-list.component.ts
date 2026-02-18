@@ -99,11 +99,11 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
       }
 
       .starred {
-        color: #f9a825;
+        color: var(--color-warning);
       }
 
       .unstarred {
-        color: #bdbdbd;
+        color: var(--color-text-muted);
       }
     }
 
@@ -114,15 +114,15 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
     }
 
     .read-indicator .unread {
-      color: #1976d2;
+      color: var(--color-primary);
     }
 
     .read-indicator .read {
-      color: #bdbdbd;
+      color: var(--color-text-muted);
     }
 
     .attachment-icon {
-      color: #757575;
+      color: var(--color-text-muted);
       font-size: 16px;
       width: 16px;
       height: 16px;
@@ -133,7 +133,6 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
       <app-view-sidebar
         [entityType]="'Email'"
         (viewSelected)="onViewSelected($event)" />
-
       <div class="entity-list-content">
         <div class="list-header">
           <h1>Emails</h1>

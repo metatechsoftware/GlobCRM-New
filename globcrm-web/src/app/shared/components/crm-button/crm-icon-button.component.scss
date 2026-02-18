@@ -1,0 +1,136 @@
+// ─── CrmIconButton ────────────────────────────────────────
+// Circular icon-only button, token-based styling.
+
+:host {
+  display: inline-flex;
+}
+
+// ─── Base ─────────────────────────────────────────────────
+.crm-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-full);
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  color: var(--color-text-secondary);
+  position: relative;
+  transition:
+    background-color var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default);
+
+  &:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  mat-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+// ─── Sizes ────────────────────────────────────────────────
+.crm-icon-btn--sm {
+  width: 28px;
+  height: 28px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.crm-icon-btn--md {
+  width: 36px;
+  height: 36px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.crm-icon-btn--lg {
+  width: 44px;
+  height: 44px;
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// ─── Variants ─────────────────────────────────────────────
+
+// Default: subtle ghost
+.crm-icon-btn--default {
+  &:hover:not(:disabled) {
+    background-color: var(--color-highlight);
+    color: var(--color-text);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-surface-active);
+  }
+}
+
+// Primary: orange tint on hover
+.crm-icon-btn--primary {
+  color: var(--color-primary-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-primary-soft);
+    color: var(--color-primary);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-primary-soft-hover);
+  }
+}
+
+// Danger: red tint on hover
+.crm-icon-btn--danger {
+  color: var(--color-text-secondary);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-danger-soft);
+    color: var(--color-danger-text);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-danger-soft);
+    color: var(--color-danger);
+  }
+}
+
+// Outline: bordered circle
+.crm-icon-btn--outline {
+  border-color: var(--color-border);
+
+  &:hover:not(:disabled) {
+    background-color: var(--color-surface-hover);
+    border-color: var(--color-border-strong);
+    color: var(--color-text);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--color-surface-active);
+  }
+}
+
+// ─── Loading ──────────────────────────────────────────────
+.crm-icon-btn__spinner {
+  ::ng-deep circle {
+    stroke: currentColor;
+  }
+}

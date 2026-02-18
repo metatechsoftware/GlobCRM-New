@@ -97,8 +97,11 @@ public static class RoleTemplateSeeder
     /// </summary>
     public static async Task EnsurePermissionsForAllEntityTypesAsync(ApplicationDbContext db, Guid tenantId)
     {
+        // Load roles and existing permissions with AsNoTracking to avoid change-tracker
+        // interference that causes DbUpdateConcurrencyException on unmodified rows
         var templateRoles = await db.Roles
             .IgnoreQueryFilters()
+            .AsNoTracking()
             .Include(r => r.Permissions)
             .Where(r => r.TenantId == tenantId && r.IsTemplate)
             .ToListAsync();
@@ -106,7 +109,7 @@ public static class RoleTemplateSeeder
         if (templateRoles.Count == 0) return;
 
         var entityTypes = Enum.GetNames<EntityType>();
-        var hasChanges = false;
+        var newPermissions = new List<RolePermission>();
 
         foreach (var role in templateRoles)
         {
@@ -128,7 +131,7 @@ public static class RoleTemplateSeeder
 
                     if (!exists)
                     {
-                        role.Permissions.Add(new RolePermission
+                        newPermissions.Add(new RolePermission
                         {
                             Id = Guid.NewGuid(),
                             RoleId = role.Id,
@@ -136,14 +139,14 @@ public static class RoleTemplateSeeder
                             Operation = operation,
                             Scope = scopeResolver(operation)
                         });
-                        hasChanges = true;
                     }
                 }
             }
         }
 
-        if (hasChanges)
+        if (newPermissions.Count > 0)
         {
+            db.Set<RolePermission>().AddRange(newPermissions);
             await db.SaveChangesAsync();
         }
     }

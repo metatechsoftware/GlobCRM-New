@@ -3,10 +3,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background-color: #fdecea;
+  background-color: var(--color-danger-soft);
   border-radius: 4px;
   margin-bottom: 1rem;
-  color: #d32f2f;
+  color: var(--color-danger-text);
   font-size: 0.875rem;
 
   mat-icon {
@@ -21,10 +21,10 @@
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  background-color: #e3f2fd;
+  background-color: var(--color-info-soft);
   border-radius: 4px;
   margin-bottom: 1rem;
-  color: #1565c0;
+  color: var(--color-primary);
   font-size: 0.875rem;
 
   mat-icon {

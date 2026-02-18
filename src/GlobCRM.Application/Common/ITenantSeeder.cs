@@ -14,4 +14,10 @@ public interface ITenantSeeder
     /// </summary>
     /// <param name="organizationId">The ID of the newly created organization.</param>
     Task SeedOrganizationDataAsync(Guid organizationId);
+
+    /// <summary>
+    /// Clears all existing seed data and re-seeds the organization.
+    /// Useful for resetting demo data during testing.
+    /// </summary>
+    Task ReseedOrganizationDataAsync(Guid organizationId);
 }

@@ -62,7 +62,7 @@ export interface AvatarCropDialogData {
     }
 
     .error-message {
-      color: #d32f2f;
+      color: var(--color-danger-text);
       margin-top: 8px;
     }
   `],

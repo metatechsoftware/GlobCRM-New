@@ -44,7 +44,7 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
       margin: 0 0 24px;
       font-size: 24px;
       font-weight: 600;
-      color: var(--color-text, #212121);
+      color: var(--color-text);
     }
 
     .account-card {
@@ -67,11 +67,11 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
     }
 
     .status-icon.disconnected {
-      color: #9e9e9e;
+      color: var(--color-text-muted);
     }
 
     .status-icon.connected {
-      color: #4caf50;
+      color: var(--color-success);
     }
 
     .status-title {
@@ -81,7 +81,7 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
     }
 
     .status-description {
-      color: #757575;
+      color: var(--color-text-muted);
       font-size: 14px;
       max-width: 400px;
       line-height: 1.5;
@@ -90,7 +90,7 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
     .gmail-address {
       font-size: 16px;
       font-weight: 500;
-      color: #424242;
+      color: var(--color-text);
     }
 
     .sync-status-badge {
@@ -102,18 +102,18 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
       color: #fff;
     }
 
-    .sync-status-badge.active { background: #4caf50; }
-    .sync-status-badge.error { background: #f44336; }
-    .sync-status-badge.paused { background: #9e9e9e; }
+    .sync-status-badge.active { background: var(--color-success); }
+    .sync-status-badge.error { background: var(--color-danger); }
+    .sync-status-badge.paused { background: var(--color-text-muted); }
 
     .error-message {
-      color: #f44336;
+      color: var(--color-danger);
       font-size: 13px;
       margin-top: 4px;
     }
 
     .last-sync {
-      color: #757575;
+      color: var(--color-text-muted);
       font-size: 13px;
     }
 

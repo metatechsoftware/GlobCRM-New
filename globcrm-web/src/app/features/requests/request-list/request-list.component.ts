@@ -72,7 +72,6 @@ import { RequestService } from '../request.service';
       <app-view-sidebar
         [entityType]="'Request'"
         (viewSelected)="onViewSelected($event)" />
-
       <div class="entity-list-content">
         <div class="list-header">
           <h1>Requests</h1>

@@ -81,11 +81,11 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
       padding-left: 48px;
       margin-bottom: 24px;
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .thread-meta a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
       text-decoration: none;
     }
 
@@ -114,7 +114,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     .message-card {
       border-radius: 8px;
       overflow: hidden;
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--color-border);
       transition: box-shadow 0.2s ease;
     }
 
@@ -123,7 +123,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     }
 
     .message-card.inbound {
-      border-left: 4px solid #1976d2;
+      border-left: 4px solid var(--color-primary);
     }
 
     .message-card.outbound {
@@ -140,7 +140,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     }
 
     .message-header:hover {
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
     }
 
     .direction-icon {
@@ -150,7 +150,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     }
 
     .direction-icon.inbound {
-      color: #1976d2;
+      color: var(--color-primary);
     }
 
     .direction-icon.outbound {
@@ -171,14 +171,14 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     }
 
     .sender-address {
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       font-weight: 400;
       font-size: 12px;
     }
 
     .message-preview {
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -187,7 +187,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
 
     .message-date {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       white-space: nowrap;
     }
 
@@ -204,15 +204,15 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     }
 
     .status-unread {
-      color: #1976d2;
+      color: var(--color-primary);
     }
 
     .status-starred {
-      color: #f9a825;
+      color: var(--color-warning);
     }
 
     .status-attachment {
-      color: #757575;
+      color: var(--color-text-muted);
     }
 
     .message-body {
@@ -221,7 +221,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
 
     .message-recipients {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 12px;
     }
 
@@ -244,7 +244,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     .empty-state {
       text-align: center;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     @media (max-width: 768px) {

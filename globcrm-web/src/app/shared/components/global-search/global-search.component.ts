@@ -108,7 +108,7 @@ import { SearchHit, SearchResponse } from './search.models';
       &.active {
         background: var(--color-surface);
         border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(217, 123, 58, 0.1);
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
         width: 360px;
       }
     }
@@ -159,8 +159,8 @@ import { SearchHit, SearchResponse } from './search.models';
       border: 1px solid var(--color-border-subtle);
       border-radius: var(--radius-lg);
       box-shadow:
-        0 4px 16px rgba(61, 46, 34, 0.08),
-        0 8px 32px rgba(61, 46, 34, 0.04);
+        0 4px 16px rgba(0, 0, 0, 0.08),
+        0 8px 32px rgba(0, 0, 0, 0.04);
       max-height: 400px;
       overflow-y: auto;
       z-index: 1000;

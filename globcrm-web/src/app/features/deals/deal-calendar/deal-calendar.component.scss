@@ -44,10 +44,10 @@
 }
 
 .calendar-container {
-  background: var(--mat-sys-surface, #fff);
-  border-radius: 8px;
-  padding: 16px;
-  border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
 }
 
 // FullCalendar event styling
@@ -85,6 +85,6 @@
   }
 
   .fc-day-today {
-    background-color: var(--mat-sys-primary-container, rgba(25, 118, 210, 0.08)) !important;
+    background-color: var(--color-highlight) !important;
   }
 }

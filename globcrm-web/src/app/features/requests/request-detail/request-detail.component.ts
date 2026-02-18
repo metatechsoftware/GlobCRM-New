@@ -124,7 +124,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       gap: 8px;
       margin-bottom: 24px;
       padding: 12px 16px;
-      background: var(--mat-sys-surface-container, #f5f5f5);
+      background: var(--color-bg-secondary);
       border-radius: 8px;
     }
 
@@ -141,14 +141,14 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
 
     .info-card {
       padding: 16px;
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
       border-radius: 8px;
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--color-border);
     }
 
     .info-card .label {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -160,7 +160,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .info-card a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
       text-decoration: none;
     }
 
@@ -177,7 +177,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       margin: 0 0 8px;
       font-size: 14px;
       font-weight: 600;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .details-section p {
@@ -189,7 +189,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     .empty-state {
       text-align: center;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .transition-buttons {
@@ -377,12 +377,12 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
                   </a>
                 </div>
                 @for (note of requestNotes(); track note.id) {
-                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
+                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-border-subtle);">
                     <div style="flex: 1; min-width: 0;">
-                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--mat-sys-primary, #1976d2); text-decoration: none;">{{ note.title }}</a>
-                      <div style="font-size: 13px; color: rgba(0,0,0,0.6); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--color-primary); text-decoration: none;">{{ note.title }}</a>
+                      <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
                     </div>
-                    <div style="font-size: 12px; color: rgba(0,0,0,0.5); white-space: nowrap;">
+                    <div style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">
                       {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
                     </div>
                   </div>
@@ -515,7 +515,7 @@ export class RequestDetailComponent implements OnInit {
 
   /** Get status color from REQUEST_STATUSES constant. */
   getStatusColor(status: string): string {
-    return REQUEST_STATUSES.find((s) => s.value === status)?.color ?? '#757575';
+    return REQUEST_STATUSES.find((s) => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get status label from REQUEST_STATUSES constant. */
@@ -525,7 +525,7 @@ export class RequestDetailComponent implements OnInit {
 
   /** Get priority color from REQUEST_PRIORITIES constant. */
   getPriorityColor(priority: string): string {
-    return REQUEST_PRIORITIES.find((p) => p.value === priority)?.color ?? '#757575';
+    return REQUEST_PRIORITIES.find((p) => p.value === priority)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get priority label from REQUEST_PRIORITIES constant. */

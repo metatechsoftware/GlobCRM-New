@@ -105,7 +105,7 @@ import {
       margin: 0 0 12px;
       font-size: 16px;
       font-weight: 500;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .form-grid {
@@ -134,7 +134,7 @@ import {
       gap: 8px;
       margin-top: 24px;
       padding-top: 16px;
-      border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border-top: 1px solid var(--color-border);
     }
 
     @media (max-width: 768px) {

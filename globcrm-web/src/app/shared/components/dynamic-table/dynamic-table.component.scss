@@ -1,9 +1,18 @@
 // ─── Dynamic Table: Warm Modernism ──────────────────────
 
+:host {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .dynamic-table-wrapper {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  flex: 1;
+  min-height: 0;
   background: var(--color-surface);
   border: 1px solid var(--color-border-subtle);
   border-radius: var(--radius-lg);
@@ -34,11 +43,40 @@
 // ─── Table Container ──────────────────────────────────────
 .table-container {
   flex: 1;
+  min-height: 0;
   overflow: auto;
   position: relative;
 
+  // Custom scrollbar
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border-subtle);
+    border-radius: 4px;
+
+    &:hover {
+      background: var(--color-text-muted);
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  // Firefox scrollbar
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-subtle) transparent;
+
   table {
-    width: 100%;
+    min-width: 100%;
+    width: max-content;
     table-layout: fixed;
   }
 }
@@ -59,14 +97,11 @@ th.mat-mdc-header-cell {
   letter-spacing: 0.3px;
   text-transform: uppercase;
 
-  &.cdk-drag-preview {
-    background: var(--color-surface-hover);
-    box-shadow: var(--shadow-md);
-    border-radius: var(--radius-sm);
-  }
+  cursor: grab;
 
-  &.cdk-drag-placeholder {
-    opacity: 0.3;
+  &.is-dragging {
+    opacity: 0.4;
+    background: var(--color-surface-hover);
   }
 }
 
@@ -94,13 +129,26 @@ th.mat-mdc-header-cell {
 // ─── Row Styles ───────────────────────────────────────────
 tr.mat-mdc-row {
   transition: background-color var(--duration-fast) var(--ease-default);
+  background: var(--color-surface);
+
+  .actions-column {
+    background: var(--color-surface);
+  }
 
   &:nth-child(even) {
-    background: var(--color-bg);
+    background: var(--color-primary-soft);
+
+    .actions-column {
+      background: var(--color-primary-soft);
+    }
   }
 
   &:hover {
-    background: var(--color-highlight);
+    background: var(--color-primary-soft-hover);
+
+    .actions-column {
+      background: var(--color-primary-soft-hover);
+    }
   }
 }
 
@@ -112,6 +160,12 @@ td.mat-mdc-cell {
   max-width: 300px;
   font-size: var(--text-sm);
   color: var(--color-text);
+
+  // Email fields rendered in primary color
+  &[data-field="email"] {
+    color: var(--color-primary-text);
+    font-weight: var(--font-medium);
+  }
 }
 
 // ─── Actions Column ───────────────────────────────────────
@@ -120,6 +174,26 @@ td.mat-mdc-cell {
   min-width: 64px;
   max-width: 64px;
   text-align: center;
+  position: sticky;
+  right: 0;
+  z-index: 5;
+  background: inherit;
+
+  // Subtle left border to separate from scrollable area
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--color-border-subtle);
+  }
+}
+
+// Header actions cell needs higher z-index (sticky in both directions)
+th.actions-column {
+  z-index: 15;
 }
 
 // ─── Empty State ──────────────────────────────────────────
@@ -143,15 +217,13 @@ mat-progress-bar {
 
 // ─── Responsive: Tablet & Mobile ──────────────────────────
 
-// Tablet (768px - 1024px): compact cells, horizontal scroll enabled
+// Tablet (768px - 1024px): compact cells
 @media (max-width: 1024px) {
   .table-container {
-    overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 
     table {
       min-width: 800px;
-      table-layout: auto;
     }
   }
 

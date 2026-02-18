@@ -47,12 +47,12 @@ import { ImportStore } from '../stores/import.store';
     }
 
     .summary-card.valid {
-      background: var(--mat-sys-primary-container, rgba(76, 175, 80, 0.1));
+      background: var(--color-success-soft);
       border: 1px solid rgba(76, 175, 80, 0.3);
     }
 
     .summary-card.invalid {
-      background: var(--mat-sys-error-container, rgba(244, 67, 54, 0.1));
+      background: var(--color-danger-soft);
       border: 1px solid rgba(244, 67, 54, 0.3);
     }
 
@@ -81,7 +81,7 @@ import { ImportStore } from '../stores/import.store';
 
     .card-label {
       font-size: 14px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .error-table {
@@ -94,13 +94,13 @@ import { ImportStore } from '../stores/import.store';
       text-align: left;
       padding: 8px;
       font-weight: 500;
-      background: var(--mat-sys-surface-variant, rgba(0, 0, 0, 0.04));
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      background: var(--color-surface-hover);
+      border-bottom: 1px solid var(--color-border);
     }
 
     .error-table td {
       padding: 8px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.06));
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .loading-container {
@@ -119,7 +119,7 @@ import { ImportStore } from '../stores/import.store';
     }
 
     .error-msg {
-      color: var(--mat-sys-error, #B3261E);
+      color: var(--color-danger);
       margin-top: 12px;
       font-size: 14px;
     }

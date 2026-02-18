@@ -117,7 +117,7 @@ import { ProductDto } from '../../products/product.models';
       margin: 0 0 12px;
       font-size: 16px;
       font-weight: 500;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .form-grid {
@@ -147,7 +147,7 @@ import { ProductDto } from '../../products/product.models';
 
     .entity-option-detail {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     /* Line items section */
@@ -159,7 +159,7 @@ import { ProductDto } from '../../products/product.models';
       margin: 0 0 12px;
       font-size: 16px;
       font-weight: 500;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .line-items-header {
@@ -169,8 +169,8 @@ import { ProductDto } from '../../products/product.models';
       padding: 8px 0;
       font-weight: 500;
       font-size: 13px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      color: var(--color-text-secondary);
+      border-bottom: 1px solid var(--color-border);
     }
 
     .line-item-row {
@@ -179,7 +179,7 @@ import { ProductDto } from '../../products/product.models';
       gap: 8px;
       align-items: center;
       padding: 4px 0;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .line-item-row mat-form-field {
@@ -225,7 +225,7 @@ import { ProductDto } from '../../products/product.models';
 
     .totals-label {
       text-align: right;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 
@@ -237,7 +237,7 @@ import { ProductDto } from '../../products/product.models';
     .totals-grid .grand-total-label {
       font-weight: 600;
       font-size: 16px;
-      color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+      color: var(--color-text);
     }
 
     .totals-grid .grand-total-value {
@@ -248,7 +248,7 @@ import { ProductDto } from '../../products/product.models';
     .totals-divider {
       grid-column: 1 / -1;
       height: 1px;
-      background: var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      background: var(--color-border);
     }
 
     .form-actions {
@@ -257,7 +257,7 @@ import { ProductDto } from '../../products/product.models';
       gap: 8px;
       margin-top: 24px;
       padding-top: 16px;
-      border-top: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border-top: 1px solid var(--color-border);
     }
 
     @media (max-width: 768px) {

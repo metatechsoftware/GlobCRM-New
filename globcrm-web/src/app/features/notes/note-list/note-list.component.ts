@@ -58,7 +58,6 @@ import { NoteListDto } from '../note.models';
       <app-view-sidebar
         [entityType]="'Note'"
         (viewSelected)="onViewSelected($event)" />
-
       <div class="entity-list-content">
         <div class="list-header">
           <h1>Notes</h1>

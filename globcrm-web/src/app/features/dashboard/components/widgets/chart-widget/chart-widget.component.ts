@@ -17,14 +17,14 @@ import { MetricResultDto } from '../../../models/dashboard.models';
  * Hex values required since Chart.js doesn't support CSS variables.
  */
 const CHART_COLORS = [
-  '#D97B3A', // primary (orange)
-  '#9B85C4', // secondary (lavender)
-  '#6BA68E', // accent (sage)
-  '#6494BE', // info (blue)
-  '#6AAE6E', // success (green)
-  '#D4A840', // warning (gold)
-  '#CC6060', // danger (red)
-  '#A89888', // neutral (muted)
+  '#F97316', // primary (orange)
+  '#8B5CF6', // secondary (violet)
+  '#14B8A6', // accent (teal)
+  '#3B82F6', // info (blue)
+  '#22C55E', // success (green)
+  '#F59E0B', // warning (amber)
+  '#EF4444', // danger (red)
+  '#9CA3AF', // neutral (muted)
 ];
 
 const CHART_COLORS_ALPHA = CHART_COLORS.map((c) => c + '33');

@@ -1,223 +1,148 @@
-<nav class="navbar">
-  <div class="navbar__inner">
+<!-- ============================================================
+     Desktop: Fixed Left Sidebar + Content Header
+     ============================================================ -->
+@if (!isMobile()) {
+  <!-- Sidebar -->
+  <aside class="sidebar" [class.sidebar--collapsed]="sidebarState.isCollapsed()">
     <!-- Brand -->
-    <a routerLink="/dashboard" class="navbar__brand">
-      <span class="navbar__brand-mark">G</span>
-      @if (!isMobile()) {
-        <span class="navbar__brand-text">Glob<span class="navbar__brand-highlight">CRM</span></span>
-      }
+    <a routerLink="/dashboard" class="sidebar__brand">
+      <span class="sidebar__brand-mark">G</span>
+      <span class="sidebar__brand-text">Glob<span class="sidebar__brand-accent">CRM</span></span>
     </a>
 
-    @if (!isMobile() && authStore.organizationName()) {
-      <span class="navbar__org-badge">
-        <mat-icon class="navbar__org-icon">domain</mat-icon>
-        {{ authStore.organizationName() }}
-      </span>
-    }
-
-    <!-- Desktop Nav Links -->
-    @if (!isMobile()) {
-      <div class="navbar__links">
-        <a routerLink="/dashboard" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">grid_view</mat-icon>
-          Dashboard
-        </a>
-        <a routerLink="/companies" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">business</mat-icon>
-          Companies
-        </a>
-        <a routerLink="/contacts" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">people</mat-icon>
-          Contacts
-        </a>
-        <a routerLink="/products" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">inventory_2</mat-icon>
-          Products
-        </a>
-        <a routerLink="/deals" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">handshake</mat-icon>
-          Deals
-        </a>
-        <a routerLink="/activities" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">task_alt</mat-icon>
-          Activities
-        </a>
-        <a routerLink="/quotes" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">request_quote</mat-icon>
-          Quotes
-        </a>
-        <a routerLink="/requests" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">support_agent</mat-icon>
-          Requests
-        </a>
-        <a routerLink="/notes" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">note</mat-icon>
-          Notes
-        </a>
-        <a routerLink="/emails" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">email</mat-icon>
-          Emails
-        </a>
-        <a routerLink="/feed" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">dynamic_feed</mat-icon>
-          Feed
-        </a>
-        <a routerLink="/calendar" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">calendar_month</mat-icon>
-          Calendar
-        </a>
-        <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">groups</mat-icon>
-          Team
-        </a>
-        <a routerLink="/settings" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">settings</mat-icon>
-          Settings
-        </a>
+    <!-- Org Badge -->
+    @if (authStore.organizationName()) {
+      <div class="sidebar__org">
+        <mat-icon>domain</mat-icon>
+        <span class="sidebar__org-text">{{ authStore.organizationName() }}</span>
       </div>
     }
 
-    <!-- Mobile Hamburger Button -->
-    @if (isMobile()) {
-      <button class="navbar__hamburger" (click)="toggleSidenav()" aria-label="Toggle navigation menu">
-        <mat-icon>{{ sidenavOpen() ? 'close' : 'menu' }}</mat-icon>
+    <!-- Navigation -->
+    <nav class="sidebar__nav">
+      @for (group of navGroups; track group.label) {
+        @if (group.label) {
+          <div class="sidebar__group-label">{{ group.label }}</div>
+          <div class="sidebar__group-divider"></div>
+        }
+        @for (item of group.items; track item.route) {
+          <a [routerLink]="item.route"
+             routerLinkActive="sidebar__link--active"
+             class="sidebar__link"
+             [matTooltip]="sidebarState.isCollapsed() ? item.label : ''"
+             matTooltipPosition="right">
+            <mat-icon class="sidebar__link-icon">{{ item.icon }}</mat-icon>
+            <span class="sidebar__link-text">{{ item.label }}</span>
+          </a>
+        }
+      }
+    </nav>
+
+    <!-- Footer -->
+    <div class="sidebar__footer">
+      <button class="sidebar__collapse-btn" (click)="toggleCollapse()"
+              [attr.aria-label]="sidebarState.isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+        <mat-icon>{{ sidebarState.isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
       </button>
-    }
+    </div>
+  </aside>
 
-    <span class="navbar__spacer"></span>
-
-    <!-- Global Search -->
+  <!-- Content Header -->
+  <header class="content-header" [class.content-header--collapsed]="sidebarState.isCollapsed()">
     <app-global-search />
-
-    <!-- Notification Center -->
+    <span class="content-header__spacer"></span>
     <app-notification-center />
 
-    <!-- User Menu -->
-    <button class="navbar__user-trigger" [matMenuTriggerFor]="userMenu"
+    <!-- User Trigger -->
+    <button class="content-header__user" [matMenuTriggerFor]="userMenu"
             aria-label="User menu">
-      <span class="navbar__avatar">{{ userInitials }}</span>
-      @if (!isMobile()) {
-        <div class="navbar__user-info">
-          <span class="navbar__user-name">{{ authStore.userName() }}</span>
-          <span class="navbar__user-role">{{ authStore.userRole() }}</span>
-        </div>
-      }
-      <mat-icon class="navbar__chevron">expand_more</mat-icon>
-    </button>
-
-    <mat-menu #userMenu="matMenu" xPosition="before" class="navbar__menu">
-      <div class="navbar__menu-header">
-        <span class="navbar__menu-avatar">{{ userInitials }}</span>
-        <div>
-          <div class="navbar__menu-name">{{ authStore.userName() }}</div>
-          <div class="navbar__menu-role">{{ authStore.userRole() }}</div>
-        </div>
+      <span class="content-header__avatar">{{ userInitials }}</span>
+      <div class="content-header__user-info">
+        <span class="content-header__user-name">{{ authStore.userName() }}</span>
+        <span class="content-header__user-role">{{ authStore.userRole() }}</span>
       </div>
-      <mat-divider></mat-divider>
-      <button mat-menu-item routerLink="/profile">
-        <mat-icon>person_outline</mat-icon>
-        <span>My Profile</span>
-      </button>
-      <button mat-menu-item (click)="navigateToSecurity()">
-        <mat-icon>shield</mat-icon>
-        <span>Security</span>
-      </button>
-      <mat-divider></mat-divider>
-      <button mat-menu-item (click)="logout()" class="navbar__menu-logout">
-        <mat-icon>logout</mat-icon>
-        <span>Sign Out</span>
-      </button>
-    </mat-menu>
-  </div>
-</nav>
+      <mat-icon class="content-header__chevron">expand_more</mat-icon>
+    </button>
+  </header>
+}
 
-<!-- Mobile Navigation Drawer -->
+<!-- ============================================================
+     Mobile: Top Bar + Overlay Sidebar Drawer
+     ============================================================ -->
 @if (isMobile()) {
-  <!-- Backdrop -->
-  @if (sidenavOpen()) {
-    <div class="navbar__mobile-backdrop" (click)="closeSidenav()"></div>
+  <!-- Mobile Top Bar -->
+  <header class="topbar">
+    <button class="topbar__hamburger" (click)="toggleMobile()" aria-label="Toggle navigation menu">
+      <mat-icon>{{ mobileOpen() ? 'close' : 'menu' }}</mat-icon>
+    </button>
+    <a routerLink="/dashboard" class="topbar__brand">
+      <span class="sidebar__brand-mark sidebar__brand-mark--sm">G</span>
+      <span class="sidebar__brand-text">Glob<span class="sidebar__brand-accent">CRM</span></span>
+    </a>
+    <span class="topbar__spacer"></span>
+    <app-global-search />
+    <app-notification-center />
+    <button class="topbar__avatar" [matMenuTriggerFor]="userMenu" aria-label="User menu">
+      {{ userInitials }}
+    </button>
+  </header>
+
+  <!-- Mobile Backdrop -->
+  @if (mobileOpen()) {
+    <div class="sidebar__backdrop" (click)="closeMobile()"></div>
   }
 
-  <!-- Drawer -->
-  <div class="navbar__mobile-drawer" [class.navbar__mobile-drawer--open]="sidenavOpen()">
+  <!-- Mobile Drawer -->
+  <aside class="sidebar sidebar--mobile" [class.sidebar--mobile-open]="mobileOpen()">
     @if (authStore.organizationName()) {
-      <div class="navbar__mobile-org">
-        <mat-icon class="navbar__org-icon">domain</mat-icon>
-        {{ authStore.organizationName() }}
+      <div class="sidebar__org sidebar__org--mobile">
+        <mat-icon>domain</mat-icon>
+        <span class="sidebar__org-text">{{ authStore.organizationName() }}</span>
       </div>
     }
 
-    <nav class="navbar__mobile-nav">
-      <a routerLink="/dashboard" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>grid_view</mat-icon>
-        <span>Dashboard</span>
-      </a>
-      <a routerLink="/companies" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>business</mat-icon>
-        <span>Companies</span>
-      </a>
-      <a routerLink="/contacts" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>people</mat-icon>
-        <span>Contacts</span>
-      </a>
-      <a routerLink="/products" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>inventory_2</mat-icon>
-        <span>Products</span>
-      </a>
-      <a routerLink="/deals" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>handshake</mat-icon>
-        <span>Deals</span>
-      </a>
-      <a routerLink="/activities" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>task_alt</mat-icon>
-        <span>Activities</span>
-      </a>
-      <a routerLink="/quotes" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>request_quote</mat-icon>
-        <span>Quotes</span>
-      </a>
-      <a routerLink="/requests" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>support_agent</mat-icon>
-        <span>Requests</span>
-      </a>
-      <a routerLink="/notes" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>note</mat-icon>
-        <span>Notes</span>
-      </a>
-      <a routerLink="/emails" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>email</mat-icon>
-        <span>Emails</span>
-      </a>
-      <a routerLink="/feed" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>dynamic_feed</mat-icon>
-        <span>Feed</span>
-      </a>
-      <a routerLink="/calendar" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>calendar_month</mat-icon>
-        <span>Calendar</span>
-      </a>
-      <a routerLink="/team-directory" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>groups</mat-icon>
-        <span>Team</span>
-      </a>
-      <a routerLink="/settings" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>settings</mat-icon>
-        <span>Settings</span>
-      </a>
+    <nav class="sidebar__nav">
+      @for (group of navGroups; track group.label) {
+        @if (group.label) {
+          <div class="sidebar__group-label">{{ group.label }}</div>
+        }
+        @for (item of group.items; track item.route) {
+          <a [routerLink]="item.route"
+             routerLinkActive="sidebar__link--active"
+             class="sidebar__link"
+             (click)="closeMobile()">
+            <mat-icon class="sidebar__link-icon">{{ item.icon }}</mat-icon>
+            <span class="sidebar__link-text">{{ item.label }}</span>
+          </a>
+        }
+      }
     </nav>
-  </div>
+  </aside>
 }
+
+<!-- ============================================================
+     Shared User Menu (used by both desktop and mobile)
+     ============================================================ -->
+<mat-menu #userMenu="matMenu" xPosition="before" class="sidebar-user-menu">
+  <div class="sidebar-user-menu__header">
+    <span class="sidebar-user-menu__avatar">{{ userInitials }}</span>
+    <div>
+      <div class="sidebar-user-menu__name">{{ authStore.userName() }}</div>
+      <div class="sidebar-user-menu__role">{{ authStore.userRole() }}</div>
+    </div>
+  </div>
+  <mat-divider></mat-divider>
+  <button mat-menu-item routerLink="/profile">
+    <mat-icon>person_outline</mat-icon>
+    <span>My Profile</span>
+  </button>
+  <button mat-menu-item (click)="navigateToSecurity()">
+    <mat-icon>shield</mat-icon>
+    <span>Security</span>
+  </button>
+  <mat-divider></mat-divider>
+  <button mat-menu-item (click)="logout()" class="sidebar-user-menu__logout">
+    <mat-icon>logout</mat-icon>
+    <span>Sign Out</span>
+  </button>
+</mat-menu>

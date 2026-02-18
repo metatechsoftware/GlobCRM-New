@@ -86,7 +86,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       gap: 8px;
       margin-bottom: 24px;
       padding: 12px 16px;
-      background: var(--mat-sys-surface-container, #f5f5f5);
+      background: var(--color-bg-secondary);
       border-radius: 8px;
     }
 
@@ -103,14 +103,14 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
 
     .meta-card {
       padding: 16px;
-      background: var(--mat-sys-surface-container-low, #fafafa);
+      background: var(--color-surface-hover);
       border-radius: 8px;
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border: 1px solid var(--color-border);
     }
 
     .meta-card .label {
       font-size: 12px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
@@ -122,7 +122,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .meta-card a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
       text-decoration: none;
     }
 
@@ -131,8 +131,8 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .note-body {
-      background: var(--mat-sys-surface, #fff);
-      border: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: 8px;
       padding: 24px;
       font-size: 14px;
@@ -161,13 +161,13 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
     }
 
     .note-body ::ng-deep a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
     }
 
     .empty-state {
       text-align: center;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     @media (max-width: 768px) {

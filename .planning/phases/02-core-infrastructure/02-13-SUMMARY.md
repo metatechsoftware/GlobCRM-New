@@ -73,7 +73,7 @@ Each task was committed atomically:
 
 1. **Task 1: Apply permissionGuard to settings routes and add *appHasPermission to all settings list templates** - `81de05e` (feat)
 
-**Plan metadata:** [pending] (docs: complete plan)
+**Plan metadata:** `1c4ac88` (docs: complete plan)
 
 ## Files Created/Modified
 - `globcrm-web/src/app/core/permissions/admin.guard.ts` - Role-based CanActivateFn guard checking AuthStore.userRole() === 'Admin'

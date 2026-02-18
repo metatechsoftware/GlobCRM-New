@@ -1,57 +1,38 @@
-<div class="view-sidebar">
-  <h3 class="sidebar-title">Views</h3>
+<div class="view-tabs">
+  <div class="view-tabs-scroll">
+    @for (view of viewStore.teamViews(); track view.id) {
+      <button
+        class="view-tab"
+        [class.active]="view.id === viewStore.activeViewId()"
+        (click)="selectView(view)">
+        <mat-icon class="tab-icon">
+          @if (view.isTeamDefault) {
+            star
+          } @else {
+            view_list
+          }
+        </mat-icon>
+        {{ view.name }}
+      </button>
+    }
 
-  <!-- Team Views -->
-  <div class="view-group">
-    <h4 class="group-title">Team Views</h4>
-    <mat-nav-list dense>
-      @for (view of viewStore.teamViews(); track view.id) {
-        <mat-list-item
-          [class.active]="view.id === viewStore.activeViewId()"
-          (click)="selectView(view)">
-          <mat-icon matListItemIcon>
-            @if (view.isTeamDefault) {
-              star
-            } @else {
-              view_list
-            }
-          </mat-icon>
-          <span matListItemTitle>{{ view.name }}</span>
-        </mat-list-item>
-      }
-      @if (viewStore.teamViews().length === 0) {
-        <mat-list-item disabled>
-          <span matListItemTitle class="no-views">No team views</span>
-        </mat-list-item>
-      }
-    </mat-nav-list>
+    @if (viewStore.teamViews().length > 0 && viewStore.personalViews().length > 0) {
+      <span class="tab-divider"></span>
+    }
+
+    @for (view of viewStore.personalViews(); track view.id) {
+      <button
+        class="view-tab"
+        [class.active]="view.id === viewStore.activeViewId()"
+        (click)="selectView(view)">
+        <mat-icon class="tab-icon">person</mat-icon>
+        {{ view.name }}
+      </button>
+    }
   </div>
 
-  <!-- Personal Views -->
-  <div class="view-group">
-    <h4 class="group-title">Personal Views</h4>
-    <mat-nav-list dense>
-      @for (view of viewStore.personalViews(); track view.id) {
-        <mat-list-item
-          [class.active]="view.id === viewStore.activeViewId()"
-          (click)="selectView(view)">
-          <mat-icon matListItemIcon>person</mat-icon>
-          <span matListItemTitle>{{ view.name }}</span>
-        </mat-list-item>
-      }
-      @if (viewStore.personalViews().length === 0) {
-        <mat-list-item disabled>
-          <span matListItemTitle class="no-views">No personal views</span>
-        </mat-list-item>
-      }
-    </mat-nav-list>
-  </div>
-
-  <!-- Save current view button -->
-  <div class="sidebar-actions">
-    <button mat-button class="save-view-btn" (click)="saveView()">
-      <mat-icon>save</mat-icon>
-      Save Current View
-    </button>
-  </div>
+  <button class="view-tab save-tab" (click)="saveView()">
+    <mat-icon class="tab-icon">add</mat-icon>
+    Save View
+  </button>
 </div>

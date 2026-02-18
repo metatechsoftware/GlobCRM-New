@@ -115,7 +115,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       align-items: center;
       gap: 4px;
       font-size: 14px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .subheader-item mat-icon {
@@ -166,12 +166,12 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .field-value {
       font-size: 14px;
-      color: var(--mat-sys-on-surface, rgba(0, 0, 0, 0.87));
+      color: var(--color-text);
     }
 
     .section-title {
@@ -190,7 +190,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       align-items: center;
       gap: 8px;
       padding: 32px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .tab-empty mat-icon {
@@ -206,7 +206,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       align-items: center;
       gap: 12px;
       padding: 48px 24px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       text-align: center;
     }
 
@@ -228,20 +228,20 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
       padding: 8px 12px;
-      border-bottom: 2px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.12));
+      border-bottom: 2px solid var(--color-border);
     }
 
     .activities-table td {
       padding: 10px 12px;
       font-size: 14px;
-      border-bottom: 1px solid var(--mat-sys-outline-variant, rgba(0, 0, 0, 0.08));
+      border-bottom: 1px solid var(--color-border-subtle);
       vertical-align: middle;
     }
 
     .activities-table a {
-      color: var(--mat-sys-primary, #1976d2);
+      color: var(--color-primary);
       text-decoration: none;
     }
 
@@ -255,7 +255,7 @@ import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.com
       align-items: center;
       gap: 16px;
       padding: 64px;
-      color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+      color: var(--color-text-secondary);
     }
 
     .detail-not-found mat-icon {
@@ -432,27 +432,27 @@ export class CompanyDetailComponent implements OnInit {
 
   /** Get status color for activity chip. */
   getStatusColor(status: string): string {
-    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+    return ACTIVITY_STATUSES.find(s => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get priority color for activity chip. */
   getPriorityColor(priority: string): string {
-    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
+    return ACTIVITY_PRIORITIES.find(p => p.value === priority)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get quote status color. */
   getQuoteStatusColor(status: string): string {
-    return QUOTE_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+    return QUOTE_STATUSES.find(s => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get request status color. */
   getRequestStatusColor(status: string): string {
-    return REQUEST_STATUSES.find(s => s.value === status)?.color ?? '#757575';
+    return REQUEST_STATUSES.find(s => s.value === status)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Get request priority color. */
   getRequestPriorityColor(priority: string): string {
-    return REQUEST_PRIORITIES.find(p => p.value === priority)?.color ?? '#757575';
+    return REQUEST_PRIORITIES.find(p => p.value === priority)?.color ?? 'var(--color-text-muted)';
   }
 
   /** Format currency value. */

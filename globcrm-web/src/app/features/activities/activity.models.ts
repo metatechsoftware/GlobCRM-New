@@ -12,11 +12,11 @@ export type ActivityPriority = 'Low' | 'Medium' | 'High' | 'Urgent';
 // ─── Workflow Constants ─────────────────────────────────────────────────────
 
 export const ACTIVITY_STATUSES: { value: ActivityStatus; label: string; color: string }[] = [
-  { value: 'Assigned', label: 'Assigned', color: '#2196f3' },
-  { value: 'Accepted', label: 'Accepted', color: '#ff9800' },
-  { value: 'InProgress', label: 'In Progress', color: '#9c27b0' },
-  { value: 'Review', label: 'Review', color: '#00bcd4' },
-  { value: 'Done', label: 'Done', color: '#4caf50' },
+  { value: 'Assigned', label: 'Assigned', color: 'var(--color-info)' },
+  { value: 'Accepted', label: 'Accepted', color: 'var(--color-primary)' },
+  { value: 'InProgress', label: 'In Progress', color: 'var(--color-secondary)' },
+  { value: 'Review', label: 'Review', color: 'var(--color-accent)' },
+  { value: 'Done', label: 'Done', color: 'var(--color-success)' },
 ];
 
 export const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string }[] = [
@@ -26,10 +26,10 @@ export const ACTIVITY_TYPES: { value: ActivityType; label: string; icon: string 
 ];
 
 export const ACTIVITY_PRIORITIES: { value: ActivityPriority; label: string; color: string }[] = [
-  { value: 'Low', label: 'Low', color: '#4caf50' },
-  { value: 'Medium', label: 'Medium', color: '#2196f3' },
-  { value: 'High', label: 'High', color: '#ff9800' },
-  { value: 'Urgent', label: 'Urgent', color: '#f44336' },
+  { value: 'Low', label: 'Low', color: 'var(--color-success)' },
+  { value: 'Medium', label: 'Medium', color: 'var(--color-info)' },
+  { value: 'High', label: 'High', color: 'var(--color-warning)' },
+  { value: 'Urgent', label: 'Urgent', color: 'var(--color-danger)' },
 ];
 
 export const ALLOWED_TRANSITIONS: Record<ActivityStatus, ActivityStatus[]> = {

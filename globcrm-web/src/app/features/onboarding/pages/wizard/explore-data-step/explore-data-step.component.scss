@@ -17,11 +17,11 @@
   font-size: 40px;
   width: 40px;
   height: 40px;
-  color: #1976d2;
+  color: var(--color-primary);
 }
 
 .step-description {
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--color-text-secondary);
   font-size: 0.9rem;
   margin: 0;
   max-width: 500px;
@@ -40,13 +40,13 @@
   display: flex;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #fafafa;
+  background-color: var(--color-bg-secondary);
   border-radius: 8px;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  transition: border-color 0.2s;
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color var(--duration-normal);
 
   &:hover {
-    border-color: rgba(0, 0, 0, 0.16);
+    border-color: var(--color-border);
   }
 }
 
@@ -67,7 +67,7 @@
 
   p {
     font-size: 0.8rem;
-    color: rgba(0, 0, 0, 0.54);
+    color: var(--color-text-muted);
     margin: 0;
     line-height: 1.4;
   }
@@ -78,11 +78,11 @@
   justify-content: flex-end;
   gap: 0.75rem;
   padding-top: 1rem;
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-top: 1px solid var(--color-border-subtle);
 }
 
 .skip-button {
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--color-text-muted);
 }
 
 .finish-button {

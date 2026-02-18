@@ -55,7 +55,7 @@ import {
       margin: 0;
       font-size: var(--text-xl, 1.25rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
     }
 
     .targets__grid {
@@ -67,7 +67,7 @@ import {
     .targets__card {
       position: relative;
       background: var(--color-surface, #FFFFFF);
-      border: 1px solid var(--color-border-subtle, #F0E8E0);
+      border: 1px solid var(--color-border-subtle, #F3F4F6);
       border-radius: var(--radius-lg, 12px);
       overflow: hidden;
       transition: box-shadow 0.15s ease;
@@ -100,20 +100,20 @@ import {
       border: none;
       background: var(--color-surface, #FFFFFF);
       border-radius: var(--radius-sm, 4px);
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
       cursor: pointer;
       padding: 0;
       box-shadow: var(--shadow-xs, 0 1px 2px rgba(0,0,0,0.05));
     }
 
     .targets__card-action-btn:hover {
-      background: var(--color-highlight, rgba(217, 123, 58, 0.08));
-      color: var(--color-text, #3D2E22);
+      background: var(--color-highlight, rgba(249, 115, 22, 0.08));
+      color: var(--color-text, #111827);
     }
 
     .targets__card-action-btn--delete:hover {
       background: var(--color-danger-soft, rgba(204, 96, 96, 0.08));
-      color: var(--color-danger, #CC6060);
+      color: var(--color-danger, #EF4444);
     }
 
     .targets__card-action-btn mat-icon {
@@ -130,7 +130,7 @@ import {
       gap: var(--space-3, 12px);
       padding: var(--space-12, 48px) 0;
       text-align: center;
-      color: var(--color-text-muted, #A89888);
+      color: var(--color-text-muted, #9CA3AF);
     }
 
     .targets__empty mat-icon {
@@ -144,7 +144,7 @@ import {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text, #3D2E22);
+      color: var(--color-text, #111827);
     }
 
     .targets__empty p {

@@ -139,17 +139,17 @@ const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
       font-size: 13px;
       text-transform: uppercase;
       letter-spacing: 0.5px;
-      color: #666;
-      border-bottom: 2px solid #e0e0e0;
+      color: var(--color-text-secondary);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .preferences-table td {
       padding: 14px 16px;
-      border-bottom: 1px solid #f0f0f0;
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
     .preferences-table tbody tr:nth-child(even) {
-      background: #fafafa;
+      background: var(--color-surface-hover);
     }
 
     .type-col {
