@@ -20,6 +20,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import { RoleDto } from '../../../core/permissions/permission.models';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
   selector: 'app-role-list',
@@ -202,24 +203,3 @@ export class CloneRoleDialogComponent {
   newName = '';
 }
 
-// ---- Confirm Delete Dialog ----
-
-@Component({
-  selector: 'app-confirm-delete-dialog',
-  standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
-  template: `
-    <h2 mat-dialog-title>Confirm Delete</h2>
-    <mat-dialog-content>
-      <p>Are you sure you want to delete the {{ data.type }} "{{ data.name }}"?</p>
-      <p>This action cannot be undone.</p>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button color="warn" [mat-dialog-close]="true">Delete</button>
-    </mat-dialog-actions>
-  `,
-})
-export class ConfirmDeleteDialogComponent {
-  readonly data: { name: string; type: string } = inject(MAT_DIALOG_DATA);
-}
