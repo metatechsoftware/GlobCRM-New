@@ -31,7 +31,7 @@
 
 **Milestone Goal:** Add workflow automation, email templates/sequences, computed fields, duplicate detection, webhooks, advanced reporting, and a Leads entity — all integrated as a connected system where workflows orchestrate emails, webhooks, and sequences, and reports leverage computed fields.
 
-- [ ] **Phase 13: Leads** - Full lead management with CRUD, dynamic table, pipeline stages, and lead-to-contact conversion
+- [x] **Phase 13: Leads** - Full lead management with CRUD, dynamic table, pipeline stages, and lead-to-contact conversion
 - [ ] **Phase 14: Foundation Infrastructure & Email Templates** - Hangfire background jobs, TenantScope wrapper, DomainEventInterceptor, Fluid template engine, and rich email templates with merge fields
 - [ ] **Phase 15: Formula / Computed Custom Fields** - NCalc expression evaluator, formula field type with arithmetic/date/string/conditional support, on-read evaluation, and circular dependency detection
 - [ ] **Phase 16: Duplicate Detection & Merge** - Two-tier fuzzy matching (pg_trgm + FuzzySharp), configurable rules, side-by-side merge UI, and full relationship transfer
@@ -55,10 +55,10 @@
 **Plans**: 4 plans
 
 Plans:
-- [ ] 13-01-PLAN.md — Backend domain entities, EF configurations, repository, migration, RLS, and seed data
-- [ ] 13-02-PLAN.md — Backend API controllers (CRUD, stage transitions, conversion, Kanban, timeline, admin)
-- [ ] 13-03-PLAN.md — Frontend models, service, store, routes, list page, and Kanban board
-- [ ] 13-04-PLAN.md — Frontend detail page with stepper, create/edit form, and conversion dialog
+- [x] 13-01-PLAN.md — Backend domain entities, EF configurations, repository, migration, RLS, and seed data
+- [x] 13-02-PLAN.md — Backend API controllers (CRUD, stage transitions, conversion, Kanban, timeline, admin)
+- [x] 13-03-PLAN.md — Frontend models, service, store, routes, list page, and Kanban board
+- [x] 13-04-PLAN.md — Frontend detail page with stepper, create/edit form, and conversion dialog
 
 ### Phase 14: Foundation Infrastructure & Email Templates
 **Goal**: Shared background processing infrastructure is operational and tenant-safe, and users can create rich email templates with merge fields for use by downstream features (sequences, workflows)
@@ -161,7 +161,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 10. Data Operations | v1.0 | 6/6 | Complete | 2026-02-17 |
 | 11. Polish & Completeness | v1.0 | 7/7 | Complete | 2026-02-18 |
 | 12. Bug Fixes & Integration Polish | v1.0 | 2/2 | Complete | 2026-02-18 |
-| 13. Leads | 3/4 | In Progress|  | - |
+| 13. Leads | v1.1 | 4/4 | Complete | 2026-02-18 |
 | 14. Foundation Infrastructure & Email Templates | v1.1 | 0/? | Not started | - |
 | 15. Formula / Computed Custom Fields | v1.1 | 0/? | Not started | - |
 | 16. Duplicate Detection & Merge | v1.1 | 0/? | Not started | - |

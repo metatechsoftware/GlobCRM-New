@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 13 (Leads)
+**Current focus:** v1.1 Automation & Intelligence — Phase 13 complete, ready for Phase 14
 
 ## Current Position
 
-Phase: 13 of 20 (Leads)
-Plan: 3 of 4 complete
-Status: Executing
-Last activity: 2026-02-18 — Completed 13-03 (Lead Angular frontend)
+Phase: 13 of 20 (Leads) -- COMPLETE
+Plan: 4 of 4 complete
+Status: Phase Complete
+Last activity: 2026-02-18 — Completed 13-04 (Lead detail, form, conversion UI)
 
-Progress: [██████████████████████████░░░░░░░░░░░░░░] 65% (v1.0: 96/96 plans, v1.1: 3 plans)
+Progress: [████████████████████████████░░░░░░░░░░░░] 67% (v1.0: 96/96 plans, v1.1: 4/4 Phase 13 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 3
-- v1.1 plans total: 4+ (Phase 13: 4 plans)
+- v1.1 plans completed: 4
+- v1.1 plans total: 4+ (Phase 13: 4 plans complete)
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -45,6 +45,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [13-03] Kanban groups leads client-side from flat API response via computed signal (stagesWithLeads)
 - [13-03] Forward-only drag enforcement done client-side by SortOrder comparison before API call
 - [13-03] Converted stage drop rejected entirely -- users must use Convert Lead action on detail page
+- [13-04] Custom horizontal stepper (not MatStepper) for lead pipeline visualization -- full control over stage colors, icons, forward-only click
+- [13-04] Conversion dialog uses sectioned form (not multi-step wizard) -- simpler UX with Contact/Company/Deal sections in single view
+- [13-04] Duplicate check on dialog open shows informational warnings only -- actual dedup merge deferred to Phase 16
+- [13-04] Company section in conversion dialog offers both link-existing (autocomplete) and create-new options
 
 ### Pending Todos
 
@@ -60,6 +64,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 13-03-PLAN.md (Lead Angular frontend)
-Resume file: .planning/phases/13-leads/13-03-SUMMARY.md
-Next step: Execute 13-04-PLAN.md (Lead detail, form, conversion UI)
+Stopped at: Completed 13-04-PLAN.md (Lead detail, form, conversion UI) -- Phase 13 COMPLETE
+Resume file: .planning/phases/13-leads/13-04-SUMMARY.md
+Next step: Plan Phase 14 (Foundation Infrastructure & Email Templates)
