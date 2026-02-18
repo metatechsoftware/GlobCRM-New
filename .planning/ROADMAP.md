@@ -69,7 +69,13 @@ Plans:
   2. DomainEventInterceptor captures entity create/update/delete events from SaveChangesAsync and dispatches them after successful save — available for webhooks, workflows, and duplicate detection in later phases
   3. User can create and edit rich text email templates with a WYSIWYG editor, insert merge fields (contact, deal, company data), organize templates into categories, preview with real entity data, and clone existing templates
   4. Email templates render correctly with Liquid template engine (Fluid), resolving all merge fields to actual entity values
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Backend infrastructure (Hangfire, DomainEventInterceptor, TenantJobFilter) + EmailTemplate domain entities, EF config, migration, RLS, Fluid render/merge services, RBAC
+- [ ] 14-02-PLAN.md — Email template API controllers (CRUD, preview, test send, clone), category API, merge fields API, Program.cs wiring, Hangfire dashboard, TenantSeeder starter templates
+- [ ] 14-03-PLAN.md — Frontend models, service, store, routes, Unlayer editor with merge field panel, template list page with thumbnails
+- [ ] 14-04-PLAN.md — Frontend preview dialog (desktop/mobile toggle, real entity selector, test send), clone dialog, category filter polish, navbar navigation
 
 ### Phase 15: Formula / Computed Custom Fields
 **Goal**: Admins can define formula-based custom fields that automatically compute values from other fields, extending the custom field system with calculated intelligence
