@@ -3,67 +3,78 @@
     <!-- Brand -->
     <a routerLink="/dashboard" class="navbar__brand">
       <span class="navbar__brand-mark">G</span>
-      <span class="navbar__brand-text">Glob<span class="navbar__brand-highlight">CRM</span></span>
+      @if (!isMobile()) {
+        <span class="navbar__brand-text">Glob<span class="navbar__brand-highlight">CRM</span></span>
+      }
     </a>
 
-    @if (authStore.organizationName()) {
+    @if (!isMobile() && authStore.organizationName()) {
       <span class="navbar__org-badge">
         <mat-icon class="navbar__org-icon">domain</mat-icon>
         {{ authStore.organizationName() }}
       </span>
     }
 
-    <!-- Nav Links -->
-    <div class="navbar__links">
-      <a routerLink="/dashboard" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">grid_view</mat-icon>
-        Dashboard
-      </a>
-      <a routerLink="/companies" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">business</mat-icon>
-        Companies
-      </a>
-      <a routerLink="/contacts" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">people</mat-icon>
-        Contacts
-      </a>
-      <a routerLink="/products" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">inventory_2</mat-icon>
-        Products
-      </a>
-      <a routerLink="/deals" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">handshake</mat-icon>
-        Deals
-      </a>
-      <a routerLink="/activities" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">task_alt</mat-icon>
-        Activities
-      </a>
-      <a routerLink="/quotes" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">request_quote</mat-icon>
-        Quotes
-      </a>
-      <a routerLink="/requests" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">support_agent</mat-icon>
-        Requests
-      </a>
-      <a routerLink="/emails" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">email</mat-icon>
-        Emails
-      </a>
-      <a routerLink="/feed" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">dynamic_feed</mat-icon>
-        Feed
-      </a>
-      <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">groups</mat-icon>
-        Team
-      </a>
-      <a routerLink="/settings" routerLinkActive="navbar__link--active" class="navbar__link">
-        <mat-icon class="navbar__link-icon">settings</mat-icon>
-        Settings
-      </a>
-    </div>
+    <!-- Desktop Nav Links -->
+    @if (!isMobile()) {
+      <div class="navbar__links">
+        <a routerLink="/dashboard" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">grid_view</mat-icon>
+          Dashboard
+        </a>
+        <a routerLink="/companies" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">business</mat-icon>
+          Companies
+        </a>
+        <a routerLink="/contacts" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">people</mat-icon>
+          Contacts
+        </a>
+        <a routerLink="/products" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">inventory_2</mat-icon>
+          Products
+        </a>
+        <a routerLink="/deals" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">handshake</mat-icon>
+          Deals
+        </a>
+        <a routerLink="/activities" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">task_alt</mat-icon>
+          Activities
+        </a>
+        <a routerLink="/quotes" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">request_quote</mat-icon>
+          Quotes
+        </a>
+        <a routerLink="/requests" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">support_agent</mat-icon>
+          Requests
+        </a>
+        <a routerLink="/emails" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">email</mat-icon>
+          Emails
+        </a>
+        <a routerLink="/feed" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">dynamic_feed</mat-icon>
+          Feed
+        </a>
+        <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">groups</mat-icon>
+          Team
+        </a>
+        <a routerLink="/settings" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">settings</mat-icon>
+          Settings
+        </a>
+      </div>
+    }
+
+    <!-- Mobile Hamburger Button -->
+    @if (isMobile()) {
+      <button class="navbar__hamburger" (click)="toggleSidenav()" aria-label="Toggle navigation menu">
+        <mat-icon>{{ sidenavOpen() ? 'close' : 'menu' }}</mat-icon>
+      </button>
+    }
 
     <span class="navbar__spacer"></span>
 
@@ -77,10 +88,12 @@
     <button class="navbar__user-trigger" [matMenuTriggerFor]="userMenu"
             aria-label="User menu">
       <span class="navbar__avatar">{{ userInitials }}</span>
-      <div class="navbar__user-info">
-        <span class="navbar__user-name">{{ authStore.userName() }}</span>
-        <span class="navbar__user-role">{{ authStore.userRole() }}</span>
-      </div>
+      @if (!isMobile()) {
+        <div class="navbar__user-info">
+          <span class="navbar__user-name">{{ authStore.userName() }}</span>
+          <span class="navbar__user-role">{{ authStore.userRole() }}</span>
+        </div>
+      }
       <mat-icon class="navbar__chevron">expand_more</mat-icon>
     </button>
 
@@ -109,3 +122,84 @@
     </mat-menu>
   </div>
 </nav>
+
+<!-- Mobile Navigation Drawer -->
+@if (isMobile()) {
+  <!-- Backdrop -->
+  @if (sidenavOpen()) {
+    <div class="navbar__mobile-backdrop" (click)="closeSidenav()"></div>
+  }
+
+  <!-- Drawer -->
+  <div class="navbar__mobile-drawer" [class.navbar__mobile-drawer--open]="sidenavOpen()">
+    @if (authStore.organizationName()) {
+      <div class="navbar__mobile-org">
+        <mat-icon class="navbar__org-icon">domain</mat-icon>
+        {{ authStore.organizationName() }}
+      </div>
+    }
+
+    <nav class="navbar__mobile-nav">
+      <a routerLink="/dashboard" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>grid_view</mat-icon>
+        <span>Dashboard</span>
+      </a>
+      <a routerLink="/companies" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>business</mat-icon>
+        <span>Companies</span>
+      </a>
+      <a routerLink="/contacts" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>people</mat-icon>
+        <span>Contacts</span>
+      </a>
+      <a routerLink="/products" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>inventory_2</mat-icon>
+        <span>Products</span>
+      </a>
+      <a routerLink="/deals" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>handshake</mat-icon>
+        <span>Deals</span>
+      </a>
+      <a routerLink="/activities" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>task_alt</mat-icon>
+        <span>Activities</span>
+      </a>
+      <a routerLink="/quotes" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>request_quote</mat-icon>
+        <span>Quotes</span>
+      </a>
+      <a routerLink="/requests" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>support_agent</mat-icon>
+        <span>Requests</span>
+      </a>
+      <a routerLink="/emails" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>email</mat-icon>
+        <span>Emails</span>
+      </a>
+      <a routerLink="/feed" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>dynamic_feed</mat-icon>
+        <span>Feed</span>
+      </a>
+      <a routerLink="/team-directory" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>groups</mat-icon>
+        <span>Team</span>
+      </a>
+      <a routerLink="/settings" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>settings</mat-icon>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </div>
+}
