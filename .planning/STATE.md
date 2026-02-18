@@ -9,9 +9,10 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 
 ## Current Position
 
-Phase: v1.0 complete (11 phases, 94 plans)
-Status: MILESTONE COMPLETE
-Last activity: 2026-02-18 — v1.0 MVP milestone archived
+Phase: 12-bug-fixes-and-integration-polish
+Current Plan: 1 of 2 complete
+Status: IN PROGRESS
+Last activity: 2026-02-18 — Completed 12-01 (Frontend Bug Fixes)
 
 ## Accumulated Context
 
@@ -19,6 +20,9 @@ Last activity: 2026-02-18 — v1.0 MVP milestone archived
 
 Decisions are logged in PROJECT.md Key Decisions table.
 All v1.0 decisions documented in `.planning/milestones/v1.0-ROADMAP.md`.
+
+- [12-01] authGuard always first in canActivate array to ensure PermissionStore loads after authentication
+- [12-01] Only 8 CRM entity routes get permissionGuard; utility routes excluded
 
 ### Pending Todos
 
@@ -28,8 +32,14 @@ None.
 
 None.
 
+### Performance Metrics
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 12    | 01   | 3min     | 2     | 3     |
+
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: v1.0 MVP milestone archived
-Next step: `/gsd:new-milestone` for v1.1 planning
+Stopped at: Completed 12-01-PLAN.md
+Next step: Execute 12-02-PLAN.md
