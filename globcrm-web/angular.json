@@ -54,11 +54,13 @@
               }
             ],
             "styles": [
+              "node_modules/quill/dist/quill.snow.css",
               "src/styles.scss"
             ],
             "scripts": [],
             "allowedCommonJsDependencies": [
-              "qrcode"
+              "qrcode",
+              "lodash.isequal"
             ]
           },
           "configurations": {
