@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-16)
 ## Current Position
 
 Phase: 11 of 11 (Polish & Completeness)
-Plan: 6 of 7 in current phase
+Plan: 7 of 7 in current phase
 Status: In progress — executing Phase 11 plans
-Last activity: 2026-02-18 — Completed 11-02-PLAN.md (Notes, Attachments, Calendar API)
+Last activity: 2026-02-18 — Completed 11-04-PLAN.md (Entity Attachments Frontend)
 
-Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 06 done
+Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 04, 06 done
 
 ## Performance Metrics
 
@@ -113,6 +113,7 @@ Progress: Phases 1-10 complete + Phase 11 plans 01, 02, 06 done
 | Phase 11 P06 | 3min | 2 tasks | 5 files |
 | Phase 11 P01 | 4min | 2 tasks | 11 files |
 | Phase 11 P02 | 6min | 2 tasks | 12 files |
+| Phase 11 P04 | 2min | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -389,6 +390,10 @@ Recent decisions affecting current work:
 - [11-02] AttachmentsController uses polymorphic route /api/{entityType}/{entityId}/attachments for any entity type
 - [11-02] CalendarController queries ApplicationDbContext.Activities directly for lightweight date-range query (no pagination)
 - [11-02] Note added to EntityType enum for automatic RBAC permission seeding via RoleTemplateSeeder
+- [11-04] AttachmentService uses HttpClient directly (not ApiService) for FormData upload and blob download matching ActivityService pattern
+- [11-04] EntityAttachmentsComponent uses effect() watching entityId input for reactive attachment loading
+- [11-04] ImagePreviewDialogComponent as private standalone component in same file (single-file pattern)
+- [11-04] Object URL lifecycle managed via tracking array with cleanup on destroy and dialog close
 - [11-06] CSS-only slide-in drawer instead of MatSidenav to avoid restructuring app.component.html layout
 - [11-06] BreakpointObserver with toSignal for reactive isMobile detection (Angular CDK best practice, not window.resize)
 - [11-06] Scroll hint gradient on mobile tables for horizontal scroll affordance
@@ -405,5 +410,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 11-02-PLAN.md (Notes, Attachments, Calendar API)
-Resume file: .planning/phases/11-polish-and-completeness/11-02-SUMMARY.md
+Stopped at: Completed 11-04-PLAN.md (Entity Attachments Frontend)
+Resume file: .planning/phases/11-polish-and-completeness/11-04-SUMMARY.md
