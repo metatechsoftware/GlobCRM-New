@@ -107,6 +107,16 @@ public class ApplicationUser : IdentityUser<Guid>
     public UserPreferencesData Preferences { get; set; } = new();
 
     /// <summary>
+    /// Hashed refresh token for session persistence across page reloads.
+    /// </summary>
+    public string? RefreshToken { get; set; }
+
+    /// <summary>
+    /// When the current refresh token expires.
+    /// </summary>
+    public DateTimeOffset? RefreshTokenExpiresAt { get; set; }
+
+    /// <summary>
     /// Full display name derived from first and last name.
     /// </summary>
     public string FullName => $"{FirstName} {LastName}".Trim();

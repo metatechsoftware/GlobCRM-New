@@ -121,7 +121,9 @@ public static class CustomLoginEndpoint
         var accessToken = GenerateJwtToken(user, organization, roles, accessTokenExpiration, configuration);
         var refreshToken = GenerateRefreshToken();
 
-        // Update user's LastLoginAt timestamp
+        // Store refresh token and update LastLoginAt
+        user.RefreshToken = HashToken(refreshToken);
+        user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.Add(refreshTokenExpiration);
         user.LastLoginAt = DateTimeOffset.UtcNow;
         await userManager.UpdateAsync(user);
 
@@ -132,7 +134,7 @@ public static class CustomLoginEndpoint
             RefreshToken: refreshToken));
     }
 
-    private static string GenerateJwtToken(
+    internal static string GenerateJwtToken(
         ApplicationUser user,
         Organization? organization,
         IList<string> roles,
@@ -176,11 +178,20 @@ public static class CustomLoginEndpoint
     /// <summary>
     /// Generates a cryptographically random refresh token.
     /// </summary>
-    private static string GenerateRefreshToken()
+    internal static string GenerateRefreshToken()
     {
         var randomBytes = new byte[64];
         using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);
+    }
+
+    /// <summary>
+    /// SHA256 hash of token for secure storage (never store raw refresh tokens).
+    /// </summary>
+    internal static string HashToken(string token)
+    {
+        var bytes = System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(token));
+        return Convert.ToBase64String(bytes);
     }
 }
