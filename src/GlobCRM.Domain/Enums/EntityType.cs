@@ -12,5 +12,6 @@ public enum EntityType
     Activity,
     Quote,
     Request,
-    Product
+    Product,
+    Note
 }

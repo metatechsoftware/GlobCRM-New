@@ -25,6 +25,7 @@ namespace GlobCRM.Api.Controllers;
 public class QuotesController : ControllerBase
 {
     private readonly IQuoteRepository _quoteRepository;
+    private readonly INoteRepository _noteRepository;
     private readonly IPermissionService _permissionService;
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
@@ -34,6 +35,7 @@ public class QuotesController : ControllerBase
 
     public QuotesController(
         IQuoteRepository quoteRepository,
+        INoteRepository noteRepository,
         IPermissionService permissionService,
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
@@ -42,6 +44,7 @@ public class QuotesController : ControllerBase
         ILogger<QuotesController> logger)
     {
         _quoteRepository = quoteRepository;
+        _noteRepository = noteRepository;
         _permissionService = permissionService;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
@@ -585,6 +588,22 @@ public class QuotesController : ControllerBase
                 UserName = history.ChangedBy != null
                     ? $"{history.ChangedBy.FirstName} {history.ChangedBy.LastName}".Trim()
                     : null
+            });
+        }
+
+        // 3. Notes on this entity
+        var noteEntries = await _noteRepository.GetEntityNotesForTimelineAsync("Quote", id);
+        foreach (var note in noteEntries)
+        {
+            entries.Add(new QuoteTimelineEntryDto
+            {
+                Id = note.Id,
+                Type = "note",
+                Title = $"Note: {note.Title}",
+                Description = note.PlainTextBody,
+                Timestamp = note.CreatedAt,
+                UserId = note.AuthorId,
+                UserName = note.AuthorName
             });
         }
 

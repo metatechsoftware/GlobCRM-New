@@ -23,6 +23,7 @@ namespace GlobCRM.Api.Controllers;
 public class RequestsController : ControllerBase
 {
     private readonly IRequestRepository _requestRepository;
+    private readonly INoteRepository _noteRepository;
     private readonly IPermissionService _permissionService;
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
@@ -32,6 +33,7 @@ public class RequestsController : ControllerBase
 
     public RequestsController(
         IRequestRepository requestRepository,
+        INoteRepository noteRepository,
         IPermissionService permissionService,
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
@@ -40,6 +42,7 @@ public class RequestsController : ControllerBase
         ILogger<RequestsController> logger)
     {
         _requestRepository = requestRepository;
+        _noteRepository = noteRepository;
         _permissionService = permissionService;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
@@ -414,6 +417,22 @@ public class RequestsController : ControllerBase
                 Title = "Request closed",
                 Description = "Request was closed.",
                 Timestamp = entity.ClosedAt.Value,
+            });
+        }
+
+        // 4. Notes on this entity
+        var noteEntries = await _noteRepository.GetEntityNotesForTimelineAsync("Request", id);
+        foreach (var note in noteEntries)
+        {
+            entries.Add(new RequestTimelineEntryDto
+            {
+                Id = note.Id,
+                Type = "note",
+                Title = $"Note: {note.Title}",
+                Description = note.PlainTextBody,
+                Timestamp = note.CreatedAt,
+                UserId = note.AuthorId,
+                UserName = note.AuthorName
             });
         }
 

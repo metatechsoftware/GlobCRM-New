@@ -25,6 +25,7 @@ public class DealsController : ControllerBase
 {
     private readonly IDealRepository _dealRepository;
     private readonly IPipelineRepository _pipelineRepository;
+    private readonly INoteRepository _noteRepository;
     private readonly IPermissionService _permissionService;
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
@@ -37,6 +38,7 @@ public class DealsController : ControllerBase
     public DealsController(
         IDealRepository dealRepository,
         IPipelineRepository pipelineRepository,
+        INoteRepository noteRepository,
         IPermissionService permissionService,
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
@@ -48,6 +50,7 @@ public class DealsController : ControllerBase
     {
         _dealRepository = dealRepository;
         _pipelineRepository = pipelineRepository;
+        _noteRepository = noteRepository;
         _permissionService = permissionService;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
@@ -807,6 +810,22 @@ public class DealsController : ControllerBase
                 Title = $"Product linked: {dp.Product.Name}",
                 Description = $"Product '{dp.Product.Name}' was linked to this deal.",
                 Timestamp = dp.LinkedAt
+            });
+        }
+
+        // 6. Notes on this entity
+        var noteEntries = await _noteRepository.GetEntityNotesForTimelineAsync("Deal", id);
+        foreach (var note in noteEntries)
+        {
+            entries.Add(new DealTimelineEntryDto
+            {
+                Id = note.Id,
+                Type = "note",
+                Title = $"Note: {note.Title}",
+                Description = note.PlainTextBody,
+                Timestamp = note.CreatedAt,
+                UserId = note.AuthorId,
+                UserName = note.AuthorName
             });
         }
 

@@ -24,6 +24,7 @@ public class ContactsController : ControllerBase
 {
     private readonly IContactRepository _contactRepository;
     private readonly ICompanyRepository _companyRepository;
+    private readonly INoteRepository _noteRepository;
     private readonly IPermissionService _permissionService;
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
@@ -34,6 +35,7 @@ public class ContactsController : ControllerBase
     public ContactsController(
         IContactRepository contactRepository,
         ICompanyRepository companyRepository,
+        INoteRepository noteRepository,
         IPermissionService permissionService,
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
@@ -43,6 +45,7 @@ public class ContactsController : ControllerBase
     {
         _contactRepository = contactRepository;
         _companyRepository = companyRepository;
+        _noteRepository = noteRepository;
         _permissionService = permissionService;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
@@ -342,6 +345,22 @@ public class ContactsController : ControllerBase
                 Title = $"Linked to {contact.Company.Name}",
                 Description = $"Contact was linked to company '{contact.Company.Name}'.",
                 Timestamp = contact.CreatedAt
+            });
+        }
+
+        // Notes on this entity
+        var noteEntries = await _noteRepository.GetEntityNotesForTimelineAsync("Contact", id);
+        foreach (var note in noteEntries)
+        {
+            entries.Add(new TimelineEntryDto
+            {
+                Id = note.Id,
+                Type = "note",
+                Title = $"Note: {note.Title}",
+                Description = note.PlainTextBody,
+                Timestamp = note.CreatedAt,
+                UserId = note.AuthorId,
+                UserName = note.AuthorName
             });
         }
 

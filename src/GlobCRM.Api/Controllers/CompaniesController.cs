@@ -23,6 +23,7 @@ public class CompaniesController : ControllerBase
 {
     private readonly ICompanyRepository _companyRepository;
     private readonly IContactRepository _contactRepository;
+    private readonly INoteRepository _noteRepository;
     private readonly IPermissionService _permissionService;
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
@@ -33,6 +34,7 @@ public class CompaniesController : ControllerBase
     public CompaniesController(
         ICompanyRepository companyRepository,
         IContactRepository contactRepository,
+        INoteRepository noteRepository,
         IPermissionService permissionService,
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
@@ -42,6 +44,7 @@ public class CompaniesController : ControllerBase
     {
         _companyRepository = companyRepository;
         _contactRepository = contactRepository;
+        _noteRepository = noteRepository;
         _permissionService = permissionService;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
@@ -329,6 +332,22 @@ public class CompaniesController : ControllerBase
                 UserName = contact.Owner != null
                     ? $"{contact.Owner.FirstName} {contact.Owner.LastName}".Trim()
                     : null
+            });
+        }
+
+        // Notes on this entity
+        var noteEntries = await _noteRepository.GetEntityNotesForTimelineAsync("Company", id);
+        foreach (var note in noteEntries)
+        {
+            entries.Add(new TimelineEntryDto
+            {
+                Id = note.Id,
+                Type = "note",
+                Title = $"Note: {note.Title}",
+                Description = note.PlainTextBody,
+                Timestamp = note.CreatedAt,
+                UserId = note.AuthorId,
+                UserName = note.AuthorName
             });
         }
 
