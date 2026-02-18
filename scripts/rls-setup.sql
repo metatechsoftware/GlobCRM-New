@@ -240,6 +240,55 @@ COMMENT ON POLICY tenant_isolation_deals ON deals IS
 -- FK joins from their tenant-filtered parents (pipelines, deals).
 
 -- =====================================================================
+-- leads - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE leads ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE leads FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_leads ON leads
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_leads ON leads IS
+    'Ensures lead queries only return leads for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- lead_stages - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE lead_stages ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE lead_stages FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_lead_stages ON lead_stages
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_lead_stages ON lead_stages IS
+    'Ensures lead stage queries only return stages for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- lead_sources - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE lead_sources ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE lead_sources FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_lead_sources ON lead_sources
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_lead_sources ON lead_sources IS
+    'Ensures lead source queries only return sources for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: Child tables (lead_stage_histories, lead_conversions) do NOT need
+-- RLS policies. They are accessed through FK joins from their tenant-filtered
+-- parent (leads).
+
+-- =====================================================================
 -- activities - filtered by tenant_id
 -- =====================================================================
 ALTER TABLE activities ENABLE ROW LEVEL SECURITY;

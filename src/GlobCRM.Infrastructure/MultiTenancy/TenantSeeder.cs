@@ -152,6 +152,27 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Lead seed data ──────────────────────────
+        // Lead children first
+        var seedLeadIds = await _db.Leads
+            .Where(l => l.TenantId == organizationId && l.IsSeedData)
+            .Select(l => l.Id)
+            .ToListAsync();
+
+        if (seedLeadIds.Count > 0)
+        {
+            await _db.LeadConversions
+                .Where(lc => seedLeadIds.Contains(lc.LeadId))
+                .ExecuteDeleteAsync();
+            await _db.LeadStageHistories
+                .Where(lsh => seedLeadIds.Contains(lsh.LeadId))
+                .ExecuteDeleteAsync();
+        }
+
+        await _db.Leads.Where(l => l.TenantId == organizationId && l.IsSeedData).ExecuteDeleteAsync();
+        await _db.LeadSources.Where(s => s.TenantId == organizationId && s.IsSeedData).ExecuteDeleteAsync();
+        await _db.LeadStages.Where(s => s.TenantId == organizationId && s.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing CRM seed data (original cleanup) ──────
         // Delete in reverse dependency order to avoid FK violations
 
@@ -976,10 +997,104 @@ public class TenantSeeder : ITenantSeeder
             }
         }
 
+        // ── Lead Stages ─────────────────────────────────────────────
+        var leadStageMap = new Dictionary<string, LeadStage>();
+        var leadStages = new (string Name, int Order, string Color, bool IsConverted, bool IsLost)[]
+        {
+            ("New", 0, "#2196f3", false, false),
+            ("Contacted", 1, "#ff9800", false, false),
+            ("Qualified", 2, "#4caf50", false, false),
+            ("Lost", 3, "#f44336", false, true),
+            ("Converted", 4, "#9c27b0", true, false)
+        };
+
+        foreach (var (name, order, color, isConverted, isLost) in leadStages)
+        {
+            var leadStage = new LeadStage
+            {
+                TenantId = organizationId,
+                Name = name,
+                SortOrder = order,
+                Color = color,
+                IsConverted = isConverted,
+                IsLost = isLost,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.LeadStages.Add(leadStage);
+            leadStageMap[name] = leadStage;
+        }
+
+        // ── Lead Sources ────────────────────────────────────────────
+        var leadSourceMap = new Dictionary<string, LeadSource>();
+        var leadSources = new (string Name, int Order, bool IsDefault)[]
+        {
+            ("Website", 0, true),
+            ("Referral", 1, false),
+            ("LinkedIn", 2, false),
+            ("Cold Call", 3, false),
+            ("Trade Show", 4, false),
+            ("Email Campaign", 5, false),
+            ("Other", 6, false)
+        };
+
+        foreach (var (name, order, isDefault) in leadSources)
+        {
+            var leadSource = new LeadSource
+            {
+                TenantId = organizationId,
+                Name = name,
+                SortOrder = order,
+                IsDefault = isDefault,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            };
+            _db.LeadSources.Add(leadSource);
+            leadSourceMap[name] = leadSource;
+        }
+
+        // ── Leads ─────────────────────────────────────────────────
+        var leadList = new (string First, string Last, string Email, string? Phone, string? Company, string? JobTitle, string Stage, string Source, LeadTemperature Temp, Guid OwnerId, int DaysAgo)[]
+        {
+            ("Alex", "Turner", "alex.turner@example.com", "+1-555-3001", "Horizon Tech", "VP Engineering", "New", "Website", LeadTemperature.Hot, jake.Id, -2),
+            ("Maria", "Gonzalez", "maria.gonzalez@example.com", "+1-555-3002", "Bright Solutions", "Head of Sales", "New", "LinkedIn", LeadTemperature.Warm, priya.Id, -1),
+            ("Wei", "Zhang", "wei.zhang@example.com", "+86-10-55503003", "Eastwind Manufacturing", "Procurement Director", "Contacted", "Trade Show", LeadTemperature.Hot, jake.Id, -5),
+            ("Fatima", "Al-Hassan", "fatima.alhassan@example.com", "+971-4-5503004", "Gulf Commerce Ltd", "CEO", "Contacted", "Referral", LeadTemperature.Warm, emily.Id, -4),
+            ("James", "O'Brien", "james.obrien@example.com", "+353-1-5503005", "Celtic Analytics", "Data Science Lead", "Qualified", "Email Campaign", LeadTemperature.Hot, priya.Id, -7),
+            ("Sophia", "Petrova", "sophia.petrova@example.com", "+7-495-5503006", "NexGen Software", "COO", "Qualified", "Cold Call", LeadTemperature.Warm, olivia.Id, -6),
+            ("Rafael", "Santos", "rafael.santos@example.com", "+55-11-55503007", "SunPeak Ventures", "Investment Director", "New", "Referral", LeadTemperature.Cold, emily.Id, -3),
+            ("Hannah", "Mueller", "hannah.mueller@example.com", "+49-30-5503008", "Eurotech GmbH", "IT Manager", "Contacted", "Website", LeadTemperature.Warm, jake.Id, -8),
+            ("Raj", "Patel", "raj.patel@example.com", "+91-22-55503009", "Indus Systems", "CTO", "New", "LinkedIn", LeadTemperature.Hot, priya.Id, 0),
+            ("Emma", "Wilson", "emma.wilson@example.com", "+44-20-5503010", "Sterling Partners", "Managing Partner", "Qualified", "Trade Show", LeadTemperature.Cold, olivia.Id, -10),
+        };
+
+        foreach (var (first, last, email, phone, company, jobTitle, stage, source, temp, ownerId, daysAgo) in leadList)
+        {
+            _db.Leads.Add(new Lead
+            {
+                TenantId = organizationId,
+                FirstName = first,
+                LastName = last,
+                Email = email,
+                Phone = phone,
+                CompanyName = company,
+                JobTitle = jobTitle,
+                LeadStageId = leadStageMap[stage].Id,
+                LeadSourceId = leadSourceMap[source].Id,
+                Temperature = temp,
+                OwnerId = ownerId,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow.AddDays(daysAgo),
+                UpdatedAt = DateTimeOffset.UtcNow
+            });
+        }
+
         await _db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals, {ActivityCount} activities, 5 quotes, {RequestCount} requests, {NoteCount} notes",
+            "Seed data created for organization {OrgId}: {CompanyCount} companies, {ContactCount} contacts, {ProductCount} products, 1 pipeline with {StageCount} stages, {DealCount} deals, {ActivityCount} activities, 5 quotes, {RequestCount} requests, {NoteCount} notes, {LeadStageCount} lead stages, {LeadSourceCount} lead sources, {LeadCount} leads",
             organizationId,
             seedManifest.Companies.Count,
             seedManifest.Contacts.Count,
@@ -988,7 +1103,10 @@ public class TenantSeeder : ITenantSeeder
             seedManifest.Deals.Count,
             seedManifest.Activities.Count,
             requests.Count,
-            notes.Count);
+            notes.Count,
+            leadStages.Length,
+            leadSources.Length,
+            leadList.Length);
 
         // ══════════════════════════════════════════════════════════
         // STEP 6: DealContacts - link contacts to deals
