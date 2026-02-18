@@ -1,0 +1,221 @@
+<h2 mat-dialog-title>
+  <mat-icon>swap_horiz</mat-icon>
+  Convert Lead: {{ data.lead.fullName }}
+</h2>
+
+<mat-dialog-content>
+
+  <!-- Loading duplicate check -->
+  @if (duplicateLoading()) {
+    <div class="loading-section">
+      <mat-spinner diameter="32"></mat-spinner>
+      <span>Checking for duplicates...</span>
+    </div>
+  }
+
+  <!-- Section 1: Contact (always visible, required) -->
+  <div class="convert-section">
+    <div class="section-header">
+      <mat-icon>person</mat-icon>
+      <h3>Contact</h3>
+      <span class="required-badge">Required</span>
+    </div>
+
+    <form [formGroup]="contactForm">
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>First Name</mat-label>
+          <input matInput formControlName="firstName" required>
+          @if (contactForm.controls['firstName'].hasError('required')) {
+            <mat-error>First name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Last Name</mat-label>
+          <input matInput formControlName="lastName" required>
+          @if (contactForm.controls['lastName'].hasError('required')) {
+            <mat-error>Last name is required</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email">
+          @if (contactForm.controls['email'].hasError('email')) {
+            <mat-error>Invalid email format</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Mobile Phone</mat-label>
+          <input matInput formControlName="mobilePhone">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Job Title</mat-label>
+          <input matInput formControlName="jobTitle">
+        </mat-form-field>
+      </div>
+    </form>
+
+    <!-- Duplicate contact warning -->
+    @if (hasContactMatches && !duplicateLoading()) {
+      <div class="duplicate-warning">
+        <mat-icon>warning</mat-icon>
+        <div>
+          @for (match of duplicateResult()!.contactMatches; track match.id) {
+            <p>
+              A contact with this email already exists:
+              <strong>{{ match.fullName }}</strong>
+              ({{ match.email }}).
+              This will create a new contact regardless.
+            </p>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Section 2: Company (optional toggle) -->
+  <div class="convert-section">
+    <div class="section-header">
+      <mat-icon>business</mat-icon>
+      <h3>Company</h3>
+      <mat-slide-toggle
+        [checked]="createCompanyEnabled()"
+        (change)="onCompanyToggle($event.checked)"
+        labelPosition="before">
+        Create or link a company
+      </mat-slide-toggle>
+    </div>
+
+    @if (createCompanyEnabled()) {
+      <!-- Duplicate company warning -->
+      @if (hasCompanyMatches && !duplicateLoading()) {
+        <div class="duplicate-warning">
+          <mat-icon>warning</mat-icon>
+          <div>
+            @for (match of duplicateResult()!.companyMatches; track match.id) {
+              <p>
+                Company "{{ match.name }}" already exists.
+                You can link to the existing company instead of creating a new one.
+              </p>
+            }
+          </div>
+        </div>
+      }
+
+      <mat-radio-group
+        [value]="companyMode()"
+        (change)="onCompanyModeChange($event.value)"
+        class="company-mode-group">
+        <mat-radio-button value="link">Link to existing company</mat-radio-button>
+        <mat-radio-button value="create">Create new company</mat-radio-button>
+      </mat-radio-group>
+
+      @if (companyMode() === 'link') {
+        <div class="company-search">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Search companies</mat-label>
+            <input matInput
+                   [formControl]="companySearchControl"
+                   [matAutocomplete]="companyAuto"
+                   placeholder="Type to search companies...">
+            <mat-autocomplete #companyAuto="matAutocomplete"
+                              [displayWith]="displayCompanyName"
+                              (optionSelected)="onCompanySelected($event)">
+              @for (company of companySearchResults(); track company.id) {
+                <mat-option [value]="company">
+                  <div class="company-option">
+                    <span class="company-option-name">{{ company.name }}</span>
+                    @if (company.industry) {
+                      <span class="company-option-detail">{{ company.industry }}</span>
+                    }
+                  </div>
+                </mat-option>
+              }
+            </mat-autocomplete>
+          </mat-form-field>
+        </div>
+      }
+
+      @if (companyMode() === 'create') {
+        <form [formGroup]="companyForm" class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Company Name</mat-label>
+            <input matInput formControlName="newCompanyName">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Website</mat-label>
+            <input matInput formControlName="newCompanyWebsite" placeholder="https://...">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone</mat-label>
+            <input matInput formControlName="newCompanyPhone">
+          </mat-form-field>
+        </form>
+      }
+    }
+  </div>
+
+  <!-- Section 3: Deal (optional toggle) -->
+  <div class="convert-section">
+    <div class="section-header">
+      <mat-icon>handshake</mat-icon>
+      <h3>Deal</h3>
+      <mat-slide-toggle
+        [checked]="createDealEnabled()"
+        (change)="onDealToggle($event.checked)"
+        labelPosition="before">
+        Create a deal
+      </mat-slide-toggle>
+    </div>
+
+    @if (createDealEnabled()) {
+      <form [formGroup]="dealForm" class="form-grid">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Deal Title</mat-label>
+          <input matInput formControlName="dealTitle">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Value</mat-label>
+          <input matInput formControlName="dealValue" type="number" min="0">
+          <span matTextPrefix>$&nbsp;</span>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Pipeline</mat-label>
+          <mat-select formControlName="dealPipelineId">
+            @for (pipeline of pipelines(); track pipeline.id) {
+              <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </form>
+    }
+  </div>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary"
+          (click)="onConvert()"
+          [disabled]="isSaving() || contactForm.invalid"
+          class="convert-action-button">
+    @if (isSaving()) {
+      <mat-spinner diameter="20"></mat-spinner>
+    }
+    <mat-icon>swap_horiz</mat-icon>
+    Convert Lead
+  </button>
+</mat-dialog-actions>
