@@ -1,0 +1,417 @@
+@if (isLoading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (lead()) {
+  <div class="detail-page">
+
+    <!-- Converted Banner -->
+    @if (lead()!.isConverted) {
+      <div class="converted-banner">
+        <mat-icon>swap_horiz</mat-icon>
+        <div class="converted-banner-text">
+          <strong>This lead has been converted</strong>
+          <span>
+            on {{ lead()!.convertedAt | date:'mediumDate' }}
+            @if (lead()!.convertedByUserName) {
+              by {{ lead()!.convertedByUserName }}
+            }
+          </span>
+        </div>
+        <div class="converted-links">
+          @if (lead()!.convertedContactId) {
+            <a mat-stroked-button [routerLink]="['/contacts', lead()!.convertedContactId]">
+              <mat-icon>person</mat-icon> Contact
+            </a>
+          }
+          @if (lead()!.convertedCompanyId) {
+            <a mat-stroked-button [routerLink]="['/companies', lead()!.convertedCompanyId]">
+              <mat-icon>business</mat-icon> Company
+            </a>
+          }
+          @if (lead()!.convertedDealId) {
+            <a mat-stroked-button [routerLink]="['/deals', lead()!.convertedDealId]">
+              <mat-icon>handshake</mat-icon> Deal
+            </a>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Header -->
+    <div class="detail-header">
+      <div class="header-left">
+        <a mat-icon-button routerLink="/leads" aria-label="Back to leads">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <h1>{{ lead()!.fullName }}</h1>
+
+        <!-- Temperature badge -->
+        <span class="temperature-badge"
+              [style.background-color]="getTemperatureColor(lead()!.temperature)">
+          {{ lead()!.temperature }}
+        </span>
+
+        <!-- Source tag -->
+        @if (lead()!.sourceName) {
+          <mat-chip-set>
+            <mat-chip>{{ lead()!.sourceName }}</mat-chip>
+          </mat-chip-set>
+        }
+
+        <!-- Owner name -->
+        @if (lead()!.ownerName) {
+          <span class="owner-info">
+            <mat-icon>person</mat-icon>
+            {{ lead()!.ownerName }}
+          </span>
+        }
+      </div>
+
+      <div class="header-actions">
+        @if (!isTerminal()) {
+          <button mat-stroked-button
+                  *appHasPermission="'Lead:Edit'"
+                  [routerLink]="['/leads', lead()!.id, 'edit']">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+        }
+
+        @if (!lead()!.isConverted) {
+          <button mat-stroked-button color="warn"
+                  *appHasPermission="'Lead:Delete'"
+                  (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        }
+
+        @if (!isTerminal()) {
+          <button mat-raised-button color="primary"
+                  *appHasPermission="'Lead:Edit'"
+                  (click)="onConvert()"
+                  class="convert-button">
+            <mat-icon>swap_horiz</mat-icon> Convert Lead
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Stage Stepper -->
+    <div class="stage-stepper">
+      <div class="stepper-track">
+        @for (stage of activeStages(); track stage.id; let i = $index; let last = $last) {
+          <div class="stepper-step"
+               [class.past]="isStagePast(stage)"
+               [class.current]="isStageCurrent(stage)"
+               [class.future]="!isStagePast(stage) && !isStageCurrent(stage)"
+               [class.clickable]="isStageClickable(stage)"
+               (click)="onStageClick(stage)">
+            <div class="step-circle"
+                 [style.border-color]="stage.color"
+                 [style.background-color]="isStageCurrent(stage) ? stage.color : (isStagePast(stage) ? stage.color + '33' : 'transparent')">
+              @if (isStagePast(stage)) {
+                <mat-icon class="step-icon check">check</mat-icon>
+              } @else {
+                <span class="step-number">{{ i + 1 }}</span>
+              }
+            </div>
+            <span class="step-label">{{ stage.name }}</span>
+            @if (!last) {
+              <div class="step-connector"
+                   [class.completed]="isStagePast(stage)"></div>
+            }
+          </div>
+        }
+
+        <!-- Terminal stages -->
+        @for (stage of terminalStages(); track stage.id) {
+          <div class="stepper-step terminal"
+               [class.current]="isStageCurrent(stage)"
+               [class.converted]="stage.isConverted"
+               [class.lost]="stage.isLost">
+            <div class="step-circle terminal-circle"
+                 [style.border-color]="stage.isConverted ? '#4caf50' : '#f44336'"
+                 [style.background-color]="isStageCurrent(stage) ? (stage.isConverted ? '#4caf50' : '#f44336') : 'transparent'">
+              @if (stage.isConverted) {
+                <mat-icon class="step-icon">check_circle</mat-icon>
+              } @else {
+                <mat-icon class="step-icon">cancel</mat-icon>
+              }
+            </div>
+            <span class="step-label">{{ stage.name }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Reopen button for terminal stages -->
+      @if (isTerminal() && !lead()!.isConverted) {
+        <button mat-stroked-button
+                class="reopen-button"
+                *appHasPermission="'Lead:Edit'"
+                (click)="onReopen()">
+          <mat-icon>replay</mat-icon> Reopen Lead
+        </button>
+      }
+    </div>
+
+    <!-- Main content: Tabs -->
+    <div class="detail-content">
+      <div class="detail-main">
+        <app-related-entity-tabs [tabs]="tabs()" (tabChanged)="onTabChanged($event)">
+
+          <!-- Tab 0: Overview -->
+          <ng-template>
+            <div class="details-grid">
+              <div class="detail-field">
+                <span class="field-label">Email</span>
+                <span class="field-value">
+                  @if (lead()!.email) {
+                    <a href="mailto:{{ lead()!.email }}">{{ lead()!.email }}</a>
+                  } @else {
+                    -
+                  }
+                </span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Phone</span>
+                <span class="field-value">{{ lead()!.phone || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Mobile</span>
+                <span class="field-value">{{ lead()!.mobilePhone || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Job Title</span>
+                <span class="field-value">{{ lead()!.jobTitle || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Company</span>
+                <span class="field-value">{{ lead()!.companyName || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Stage</span>
+                <span class="field-value stage-value">
+                  <span class="stage-dot" [style.background-color]="lead()!.stageColor"></span>
+                  {{ lead()!.stageName }}
+                </span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Source</span>
+                <span class="field-value">{{ lead()!.sourceName || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Owner</span>
+                <span class="field-value">{{ lead()!.ownerName || '-' }}</span>
+              </div>
+              <div class="detail-field full-width">
+                <span class="field-label">Description</span>
+                <span class="field-value">{{ lead()!.description || '-' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Created</span>
+                <span class="field-value">{{ lead()!.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="detail-field">
+                <span class="field-label">Last Updated</span>
+                <span class="field-value">{{ lead()!.updatedAt | date:'medium' }}</span>
+              </div>
+            </div>
+
+            <!-- Custom fields in readonly mode -->
+            <h3 class="section-title">Custom Fields</h3>
+            <app-custom-field-form
+              [entityType]="'Lead'"
+              [customFieldValues]="lead()!.customFields"
+              [readonly]="true" />
+          </ng-template>
+
+          <!-- Tab 1: Activities -->
+          <ng-template>
+            @if (activitiesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (linkedActivities().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>task_alt</mat-icon>
+                <span>No activities linked to this lead.</span>
+                <a mat-stroked-button routerLink="/activities/new">Create Activity</a>
+              </div>
+            } @else {
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Subject</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Due Date</th>
+                    <th>Assigned To</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (activity of linkedActivities(); track activity.id) {
+                    <tr>
+                      <td><a [routerLink]="['/activities', activity.id]">{{ activity.subject }}</a></td>
+                      <td>{{ activity.type }}</td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getStatusColor(activity.status) + '22'"
+                                    [style.color]="getStatusColor(activity.status)">
+                            {{ activity.status }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>
+                        <mat-chip-set>
+                          <mat-chip [style.--mdc-chip-elevated-container-color]="getPriorityColor(activity.priority) + '22'"
+                                    [style.color]="getPriorityColor(activity.priority)">
+                            {{ activity.priority }}
+                          </mat-chip>
+                        </mat-chip-set>
+                      </td>
+                      <td>{{ activity.dueDate ? (activity.dueDate | date:'mediumDate') : '-' }}</td>
+                      <td>{{ activity.assignedToName || '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </ng-template>
+
+          <!-- Tab 2: Notes -->
+          <ng-template>
+            @if (notesLoading()) {
+              <div class="tab-loading">
+                <mat-spinner diameter="32"></mat-spinner>
+              </div>
+            } @else if (leadNotes().length === 0) {
+              <div class="tab-empty">
+                <mat-icon>note</mat-icon>
+                <span>No notes for this lead.</span>
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Lead', entityId: lead()?.id, entityName: lead()?.fullName }">
+                  Add Note
+                </a>
+              </div>
+            } @else {
+              <div style="margin-bottom: 12px; text-align: right;">
+                <a mat-stroked-button
+                   [routerLink]="['/notes/new']"
+                   [queryParams]="{ entityType: 'Lead', entityId: lead()?.id, entityName: lead()?.fullName }">
+                  <mat-icon>add</mat-icon> Add Note
+                </a>
+              </div>
+              <table class="activities-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Preview</th>
+                    <th>Author</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (note of leadNotes(); track note.id) {
+                    <tr>
+                      <td><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></td>
+                      <td style="color: var(--color-text-secondary); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
+                      <td>{{ note.authorName || '-' }}</td>
+                      <td style="white-space: nowrap;">{{ formatNoteDate(note.createdAt) }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          </ng-template>
+
+          <!-- Tab 3: Attachments -->
+          <ng-template>
+            <app-entity-attachments [entityType]="'lead'" [entityId]="lead()?.id ?? ''" />
+          </ng-template>
+
+          <!-- Tab 4: Timeline -->
+          <ng-template>
+            <app-entity-timeline
+              [entries]="timelineEntries()"
+              [isLoading]="timelineLoading()" />
+          </ng-template>
+
+          <!-- Tab 5: Conversion (only when converted) -->
+          @if (lead()!.isConverted) {
+            <ng-template>
+              <div class="conversion-details">
+                <h3>Conversion Details</h3>
+                <div class="details-grid">
+                  <div class="detail-field">
+                    <span class="field-label">Converted On</span>
+                    <span class="field-value">{{ lead()!.convertedAt | date:'medium' }}</span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Converted By</span>
+                    <span class="field-value">{{ lead()!.convertedByUserName || '-' }}</span>
+                  </div>
+                </div>
+
+                <h3 class="section-title">Created Records</h3>
+                <div class="conversion-links">
+                  @if (lead()!.conversionDetails?.contactId) {
+                    <a class="conversion-link-card" [routerLink]="['/contacts', lead()!.conversionDetails!.contactId]">
+                      <mat-icon>person</mat-icon>
+                      <div>
+                        <strong>Contact</strong>
+                        <span>{{ lead()!.conversionDetails!.contactName || 'View Contact' }}</span>
+                      </div>
+                      <mat-icon class="link-arrow">arrow_forward</mat-icon>
+                    </a>
+                  }
+                  @if (lead()!.conversionDetails?.companyId) {
+                    <a class="conversion-link-card" [routerLink]="['/companies', lead()!.conversionDetails!.companyId]">
+                      <mat-icon>business</mat-icon>
+                      <div>
+                        <strong>Company</strong>
+                        <span>{{ lead()!.conversionDetails!.companyName || 'View Company' }}</span>
+                      </div>
+                      <mat-icon class="link-arrow">arrow_forward</mat-icon>
+                    </a>
+                  }
+                  @if (lead()!.conversionDetails?.dealId) {
+                    <a class="conversion-link-card" [routerLink]="['/deals', lead()!.conversionDetails!.dealId]">
+                      <mat-icon>handshake</mat-icon>
+                      <div>
+                        <strong>Deal</strong>
+                        <span>{{ lead()!.conversionDetails!.dealTitle || 'View Deal' }}</span>
+                      </div>
+                      <mat-icon class="link-arrow">arrow_forward</mat-icon>
+                    </a>
+                  }
+                </div>
+
+                @if (lead()!.conversionDetails?.notes) {
+                  <h3 class="section-title">Conversion Notes</h3>
+                  <p class="conversion-notes">{{ lead()!.conversionDetails!.notes }}</p>
+                }
+              </div>
+            </ng-template>
+          }
+
+        </app-related-entity-tabs>
+      </div>
+
+      <!-- Timeline sidebar -->
+      <div class="detail-sidebar">
+        <h3 class="sidebar-title">Timeline</h3>
+        <app-entity-timeline
+          [entries]="timelineEntries()"
+          [isLoading]="timelineLoading()" />
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="detail-not-found">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Lead not found</h2>
+    <a mat-stroked-button routerLink="/leads">Back to Leads</a>
+  </div>
+}
