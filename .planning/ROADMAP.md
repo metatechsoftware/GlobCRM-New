@@ -30,7 +30,7 @@ Full archive: `.planning/milestones/v1.0-ROADMAP.md`
 ### Phase 12: v1.0 Bug Fixes & Integration Polish
 **Goal:** Close all audit gaps — fix 3 code bugs, add missing navigation, improve architectural consistency
 **Gap Closure:** Closes all gaps from v1.0-MILESTONE-AUDIT.md
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 12-01-PLAN.md — Bug fixes (Gmail connect, navbar import link) + permission guards on CRM routes
@@ -53,4 +53,4 @@ Plans:
 | 9. Dashboards & Reporting | v1.0 | 8/8 | Complete | 2026-02-17 |
 | 10. Data Operations | v1.0 | 6/6 | Complete | 2026-02-17 |
 | 11. Polish & Completeness | v1.0 | 7/7 | Complete | 2026-02-18 |
-| 12. Bug Fixes & Integration Polish | v1.0 | 0/2 | Planned | - |
+| 12. Bug Fixes & Integration Polish | v1.0 | Complete    | 2026-02-18 | - |
