@@ -17,6 +17,7 @@ import { CustomFieldService } from '../../../core/custom-fields/custom-field.ser
 import {
   CustomFieldDefinition,
   CustomFieldSection,
+  CUSTOM_FIELD_TYPE_LABELS,
 } from '../../../core/custom-fields/custom-field.models';
 import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
@@ -66,6 +67,7 @@ export class CustomFieldListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
 
   readonly entityTypes = ENTITY_TYPES;
+  readonly fieldTypeLabels: Record<string, string> = CUSTOM_FIELD_TYPE_LABELS;
   readonly displayedColumns = ['label', 'name', 'fieldType', 'required', 'sortOrder', 'actions'];
 
   readonly selectedEntityType = signal<string>('Contact');
@@ -251,15 +253,15 @@ export class CustomFieldListComponent implements OnInit {
 
   getFieldTypeColor(type: string): string {
     const colors: Record<string, string> = {
-      Text: 'primary',
-      Number: 'accent',
-      Date: 'primary',
-      Dropdown: 'accent',
-      Checkbox: 'primary',
-      MultiSelect: 'accent',
-      Currency: 'primary',
-      File: 'accent',
-      Relation: 'primary',
+      text: 'primary',
+      number: 'accent',
+      date: 'primary',
+      dropdown: 'accent',
+      checkbox: 'primary',
+      multiSelect: 'accent',
+      currency: 'primary',
+      file: 'accent',
+      relation: 'primary',
     };
     return colors[type] ?? 'primary';
   }

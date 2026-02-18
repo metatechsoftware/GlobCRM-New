@@ -25,6 +25,7 @@ import {
   CustomFieldDefinition,
   CustomFieldSection,
   CustomFieldType,
+  CUSTOM_FIELD_TYPE_LABELS,
   FieldOption,
   CreateCustomFieldRequest,
   UpdateCustomFieldRequest,
@@ -73,6 +74,7 @@ export class CustomFieldEditDialogComponent implements OnInit {
   private readonly fieldService = inject(CustomFieldService);
 
   readonly fieldTypes = Object.values(CustomFieldType);
+  readonly fieldTypeLabels = CUSTOM_FIELD_TYPE_LABELS;
   readonly entityTypes = ENTITY_TYPES;
   readonly saving = signal<boolean>(false);
 

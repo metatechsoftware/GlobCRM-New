@@ -95,12 +95,13 @@ public class CustomFieldsController : ControllerBase
             });
         }
 
-        var tenantId = _tenantProvider.GetTenantId()
-            ?? throw new InvalidOperationException("No tenant context.");
+        var tenantId = _tenantProvider.GetTenantId();
+        if (tenantId == null)
+            return BadRequest(new { message = "No tenant context. Please log in again." });
 
         var field = new CustomFieldDefinition
         {
-            TenantId = tenantId,
+            TenantId = tenantId.Value,
             EntityType = request.EntityType,
             Name = request.Name,
             Label = request.Label,
@@ -112,16 +113,34 @@ public class CustomFieldsController : ControllerBase
             RelationEntityType = request.RelationEntityType
         };
 
-        var created = await _repository.CreateAsync(field);
+        try
+        {
+            var created = await _repository.CreateAsync(field);
 
-        _logger.LogInformation(
-            "Custom field created: {FieldName} ({FieldType}) for {EntityType}",
-            created.Name, created.FieldType, created.EntityType);
+            _logger.LogInformation(
+                "Custom field created: {FieldName} ({FieldType}) for {EntityType}",
+                created.Name, created.FieldType, created.EntityType);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = created.Id },
-            CustomFieldDefinitionDto.FromEntity(created));
+            return CreatedAtAction(
+                nameof(GetById),
+                new { id = created.Id },
+                CustomFieldDefinitionDto.FromEntity(created));
+        }
+        catch (Microsoft.EntityFrameworkCore.DbUpdateException ex)
+            when (ex.InnerException is Npgsql.PostgresException pgEx && pgEx.SqlState == "23505")
+        {
+            _logger.LogWarning(
+                "Duplicate custom field: {FieldName} for {EntityType}",
+                request.Name, request.EntityType);
+            return Conflict(new { message = $"A field named '{request.Name}' already exists for {request.EntityType}." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to create custom field: {FieldName} for {EntityType}",
+                request.Name, request.EntityType);
+            return StatusCode(500, new { message = "Failed to create custom field. Please try again." });
+        }
     }
 
     /// <summary>

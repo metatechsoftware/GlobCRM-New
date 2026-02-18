@@ -26,7 +26,7 @@
         <mat-label>Field Type</mat-label>
         <mat-select formControlName="fieldType">
           @for (type of fieldTypes; track type) {
-            <mat-option [value]="type">{{ type }}</mat-option>
+            <mat-option [value]="type">{{ fieldTypeLabels[type] }}</mat-option>
           }
         </mat-select>
         @if (!isCreateMode()) {

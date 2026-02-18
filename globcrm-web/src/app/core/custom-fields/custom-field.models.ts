@@ -4,16 +4,29 @@
  */
 
 export enum CustomFieldType {
-  Text = 'Text',
-  Number = 'Number',
-  Date = 'Date',
-  Dropdown = 'Dropdown',
-  Checkbox = 'Checkbox',
-  MultiSelect = 'MultiSelect',
-  Currency = 'Currency',
-  File = 'File',
-  Relation = 'Relation',
+  Text = 'text',
+  Number = 'number',
+  Date = 'date',
+  Dropdown = 'dropdown',
+  Checkbox = 'checkbox',
+  MultiSelect = 'multiSelect',
+  Currency = 'currency',
+  File = 'file',
+  Relation = 'relation',
 }
+
+/** Human-readable labels for display in dropdowns and UI. */
+export const CUSTOM_FIELD_TYPE_LABELS: Record<CustomFieldType, string> = {
+  [CustomFieldType.Text]: 'Text',
+  [CustomFieldType.Number]: 'Number',
+  [CustomFieldType.Date]: 'Date',
+  [CustomFieldType.Dropdown]: 'Dropdown',
+  [CustomFieldType.Checkbox]: 'Checkbox',
+  [CustomFieldType.MultiSelect]: 'Multi-Select',
+  [CustomFieldType.Currency]: 'Currency',
+  [CustomFieldType.File]: 'File',
+  [CustomFieldType.Relation]: 'Relation',
+};
 
 export interface CustomFieldValidation {
   required: boolean;

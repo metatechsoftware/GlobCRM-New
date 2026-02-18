@@ -158,7 +158,7 @@ interface FieldGroup {
                 @if (getFieldAccess(field.id) !== 'hidden') {
                   <div class="field-item">
                     @switch (field.fieldType) {
-                      @case ('Text') {
+                      @case ('text') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <input matInput
@@ -169,7 +169,7 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('Number') {
+                      @case ('number') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <input matInput type="number"
@@ -180,7 +180,7 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('Date') {
+                      @case ('date') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <input matInput
@@ -194,7 +194,7 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('Dropdown') {
+                      @case ('dropdown') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <mat-select [formControlName]="field.id"
@@ -208,7 +208,7 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('Checkbox') {
+                      @case ('checkbox') {
                         <div class="checkbox-field">
                           <mat-checkbox [formControlName]="field.id"
                                         [disabled]="isFieldReadonly(field.id)">
@@ -216,7 +216,7 @@ interface FieldGroup {
                           </mat-checkbox>
                         </div>
                       }
-                      @case ('MultiSelect') {
+                      @case ('multiSelect') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <mat-select [formControlName]="field.id"
@@ -231,7 +231,7 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('Currency') {
+                      @case ('currency') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <span matPrefix class="currency-prefix">{{ getCurrencySymbol(field) }}&nbsp;</span>
@@ -243,13 +243,13 @@ interface FieldGroup {
                           }
                         </mat-form-field>
                       }
-                      @case ('File') {
+                      @case ('file') {
                         <div class="file-field">
                           <label>{{ field.label }}</label>
                           <span class="file-field-placeholder">File upload coming soon</span>
                         </div>
                       }
-                      @case ('Relation') {
+                      @case ('relation') {
                         <mat-form-field appearance="outline">
                           <mat-label>{{ field.label }}</mat-label>
                           <input matInput
