@@ -51,5 +51,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: v1.1 roadmap created with 8 phases (13-20), 57 requirements mapped
+Stopped at: Phase 13 context gathered
+Resume file: .planning/phases/13-leads/13-CONTEXT.md
 Next step: `/gsd:plan-phase 13` to plan the Leads phase
