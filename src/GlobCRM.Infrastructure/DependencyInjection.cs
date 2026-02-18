@@ -76,6 +76,8 @@ public static class DependencyInjection
         }
 
         // TenantProvider as ITenantProvider (scoped, resolves per-request)
+        // HttpContextAccessor is needed by TenantProvider for JWT claim fallback
+        services.AddHttpContextAccessor();
         services.AddScoped<ITenantProvider, TenantProvider>();
 
         // ---- ASP.NET Core Identity ----

@@ -36,7 +36,7 @@
         <!-- New Deal button -->
         <button mat-raised-button color="primary"
                 *appHasPermission="'Deal:Create'"
-                routerLink="new">
+                (click)="openCreateDialog()">
           <mat-icon>add</mat-icon> New Deal
         </button>
       </div>
@@ -63,6 +63,8 @@
       [loading]="dealStore.isLoading()"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
-      (rowEditClicked)="onRowEditClicked($event)" />
+      (rowEditClicked)="onRowEditClicked($event)"
+      (searchChanged)="onSearchChanged($event)"
+      (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>
 </div>

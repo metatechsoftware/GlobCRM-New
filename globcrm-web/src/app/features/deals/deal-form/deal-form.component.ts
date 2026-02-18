@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -76,6 +78,7 @@ import {
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dialog-mode]': 'dialogMode()' },
   styles: `
     :host {
       display: block;
@@ -160,6 +163,11 @@ import {
       border-top: 1px solid var(--color-border);
     }
 
+    :host.dialog-mode .entity-form-container {
+      padding: 0;
+      max-width: unset;
+    }
+
     @media (max-width: 768px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -168,12 +176,14 @@ import {
   `,
   template: `
     <div class="entity-form-container">
-      <div class="form-header">
-        <a mat-icon-button routerLink="/deals" aria-label="Back to deals">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode ? 'Edit Deal' : 'New Deal' }}</h1>
-      </div>
+      @if (!dialogMode()) {
+        <div class="form-header">
+          <a mat-icon-button routerLink="/deals" aria-label="Back to deals">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h1>{{ isEditMode ? 'Edit Deal' : 'New Deal' }}</h1>
+        </div>
+      }
 
       @if (isLoadingDetail()) {
         <div class="form-loading">
@@ -306,16 +316,18 @@ import {
           </div>
 
           <!-- Form actions -->
-          <div class="form-actions">
-            <button mat-button type="button" routerLink="/deals">Cancel</button>
-            <button mat-raised-button color="primary" type="submit"
-                    [disabled]="dealForm.invalid || isSaving()">
-              @if (isSaving()) {
-                <mat-spinner diameter="20"></mat-spinner>
-              }
-              {{ isEditMode ? 'Save Changes' : 'Create Deal' }}
-            </button>
-          </div>
+          @if (!dialogMode()) {
+            <div class="form-actions">
+              <button mat-button type="button" routerLink="/deals">Cancel</button>
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="dealForm.invalid || isSaving()">
+                @if (isSaving()) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                {{ isEditMode ? 'Save Changes' : 'Create Deal' }}
+              </button>
+            </div>
+          }
         </form>
       }
     </div>
@@ -330,6 +342,11 @@ export class DealFormComponent implements OnInit, OnDestroy {
   private readonly companyService = inject(CompanyService);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+
+  /** Dialog mode inputs/outputs. */
+  dialogMode = input(false);
+  entityCreated = output<any>();
+  entityCreateError = output<void>();
 
   /** Whether this is an edit (vs create) form. */
   isEditMode = false;
@@ -387,8 +404,10 @@ export class DealFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.dealId = this.route.snapshot.paramMap.get('id') ?? '';
-    this.isEditMode = !!this.dealId;
+    if (!this.dialogMode()) {
+      this.dealId = this.route.snapshot.paramMap.get('id') ?? '';
+      this.isEditMode = !!this.dealId;
+    }
 
     // Load pipelines
     this.pipelineService.getAll().subscribe({
@@ -620,18 +639,35 @@ export class DealFormComponent implements OnInit, OnDestroy {
       this.dealService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Deal created successfully', 'Close', {
-            duration: 3000,
-          });
-          this.router.navigate(['/deals', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.snackBar.open('Deal created successfully', 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['/deals', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create deal', 'Close', {
-            duration: 5000,
-          });
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          } else {
+            this.snackBar.open('Failed to create deal', 'Close', {
+              duration: 5000,
+            });
+          }
         },
       });
     }
+  }
+
+  /** Trigger form submission programmatically (used by dialog wrapper). */
+  triggerSubmit(): void {
+    if (this.dealForm.invalid) {
+      this.dealForm.markAllAsTouched();
+      return;
+    }
+    this.onSubmit();
   }
 }

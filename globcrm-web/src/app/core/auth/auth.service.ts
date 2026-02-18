@@ -19,6 +19,7 @@ import {
   SendInvitationsResponse,
   OrganizationSettings,
 } from './auth.models';
+import { decodeUserInfoFromJwt } from './auth.utils';
 
 const REFRESH_TOKEN_KEY = 'globcrm_refresh_token';
 const REMEMBER_ME_KEY = 'globcrm_remember_me';
@@ -216,7 +217,7 @@ export class AuthService implements OnDestroy {
     this.authStore.setLoading(false);
 
     // Decode JWT to extract user info (role, name, org) without a server round-trip
-    const userInfo = this.decodeUserInfoFromJwt(response.accessToken);
+    const userInfo = decodeUserInfoFromJwt(response.accessToken);
     if (userInfo) {
       this.authStore.setUser(userInfo);
     }
@@ -231,32 +232,6 @@ export class AuthService implements OnDestroy {
     // Load user permissions after successful authentication.
     // This ensures the PermissionStore is populated before any guards or directives check access.
     this.permissionStore.loadPermissions();
-  }
-
-  /**
-   * Decode the JWT payload to extract UserInfo including role.
-   * The Identity manage/info endpoint doesn't return role, but the JWT has it.
-   */
-  private decodeUserInfoFromJwt(token: string): UserInfo | null {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      // ClaimTypes.Role uses the full URI as the key
-      const role =
-        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'] ??
-        payload['role'] ??
-        '';
-      return {
-        id: payload['sub'] ?? '',
-        firstName: payload['firstName'] ?? '',
-        lastName: payload['lastName'] ?? '',
-        email: payload['email'] ?? '',
-        organizationId: payload['organizationId'] ?? '',
-        organizationName: payload['organizationName'] ?? '',
-        role: Array.isArray(role) ? role[0] : role,
-      };
-    } catch {
-      return null;
-    }
   }
 
   /**

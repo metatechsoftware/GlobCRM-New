@@ -37,6 +37,18 @@
       padding-top: 6px;
       padding-bottom: 6px;
     }
+
+    .search-clear-btn {
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
   }
 }
 
@@ -96,8 +108,11 @@ th.mat-mdc-header-cell {
   color: var(--color-text-secondary);
   letter-spacing: 0.3px;
   text-transform: uppercase;
-
   cursor: grab;
+
+  &.actions-column {
+    cursor: default;
+  }
 
   &.is-dragging {
     opacity: 0.4;
@@ -168,6 +183,20 @@ td.mat-mdc-cell {
   }
 }
 
+// ─── Add Column (Quick-Add Field) ─────────────────────────
+.add-column-header,
+.add-column-cell {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+th.add-column-header {
+  cursor: default;
+}
+
 // ─── Actions Column ───────────────────────────────────────
 .actions-column {
   width: 64px;
@@ -207,6 +236,10 @@ th.actions-column {
 // ─── Paginator ────────────────────────────────────────────
 mat-paginator {
   border-top: 1px solid var(--color-border-subtle);
+
+  ::ng-deep .mat-mdc-paginator-container {
+    justify-content: center;
+  }
 }
 
 // ─── Progress Bar ─────────────────────────────────────────

@@ -9,6 +9,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
 import { DynamicTableComponent } from '../../../shared/components/dynamic-table/dynamic-table.component';
 import { FilterPanelComponent } from '../../../shared/components/filter-panel/filter-panel.component';
 import { FilterChipsComponent } from '../../../shared/components/filter-chips/filter-chips.component';
@@ -26,6 +27,8 @@ import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
 import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
 import { ContactStore } from '../contact.store';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
 /**
  * Contact list page with dynamic table, saved views sidebar, and filter panel.
@@ -55,6 +58,7 @@ export class ContactListComponent implements OnInit {
   private readonly customFieldService = inject(CustomFieldService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
 
   /** All column definitions (core + custom fields). */
   columnDefs = signal<ColumnDefinition[]>([]);
@@ -158,6 +162,11 @@ export class ContactListComponent implements OnInit {
     }
   }
 
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.contactStore.setSearch(search);
+  }
+
   /** Handle sort change from dynamic table. */
   onSortChanged(sort: ViewSort): void {
     this.contactStore.setSort(sort.fieldId, sort.direction);
@@ -192,8 +201,43 @@ export class ContactListComponent implements OnInit {
     this.router.navigate(['/contacts', row.id, 'edit']);
   }
 
+  /** Handle custom field created from quick-add in table header. */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    // 1. Update custom field definitions and rebuild column defs
+    const updated = [...this.customFieldDefs(), field];
+    this.customFieldDefs.set(updated);
+    this.buildColumnDefinitions(updated);
+
+    // 2. Snapshot current view columns, filter out any default entry for this field
+    const currentViewCols = this.activeViewColumns().filter(c => c.fieldId !== field.id);
+    const maxOrder = currentViewCols.reduce((max, c) => Math.max(max, c.sortOrder), 0);
+
+    // 3. Append new column as visible
+    this.viewColumns.set([
+      ...currentViewCols,
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
+  }
+
   /** Handle row click -- navigate to detail page. */
   onRowClicked(row: any): void {
     this.router.navigate(['/contacts', row.id]);
+  }
+
+  /** Open create dialog instead of navigating to /contacts/new. */
+  openCreateDialog(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      data: { entityType: 'Contact' },
+      width: '800px',
+      maxHeight: '90vh',
+    });
+    dialogRef.afterClosed().subscribe((result?: EntityFormDialogResult) => {
+      if (!result) return;
+      if (result.action === 'view') {
+        this.router.navigate(['/contacts', result.entity.id]);
+      } else {
+        this.contactStore.loadPage();
+      }
+    });
   }
 }

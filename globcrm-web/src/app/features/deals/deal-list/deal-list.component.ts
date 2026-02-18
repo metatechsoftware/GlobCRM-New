@@ -34,6 +34,8 @@ import { PipelineService } from '../pipeline.service';
 import { DealStore } from '../deal.store';
 import { DealService } from '../deal.service';
 import { PipelineDto } from '../deal.models';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
 /**
  * Deal list page with dynamic table, pipeline filter, saved views sidebar,
@@ -193,6 +195,11 @@ export class DealListComponent implements OnInit {
     }
   }
 
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.dealStore.setSearch(search);
+  }
+
   /** Handle sort change from dynamic table. */
   onSortChanged(sort: ViewSort): void {
     this.dealStore.setSort(sort.fieldId, sort.direction);
@@ -227,9 +234,40 @@ export class DealListComponent implements OnInit {
     this.router.navigate(['/deals', row.id, 'edit']);
   }
 
+  /** Handle custom field created from quick-add in table header. */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    const updated = [...this.customFieldDefs(), field];
+    this.customFieldDefs.set(updated);
+    this.buildColumnDefinitions(updated);
+
+    const currentViewCols = this.activeViewColumns().filter(c => c.fieldId !== field.id);
+    const maxOrder = currentViewCols.reduce((max, c) => Math.max(max, c.sortOrder), 0);
+    this.viewColumns.set([
+      ...currentViewCols,
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
+  }
+
   /** Handle row click -- navigate to detail page. */
   onRowClicked(row: any): void {
     this.router.navigate(['/deals', row.id]);
+  }
+
+  /** Open create dialog instead of navigating to /deals/new. */
+  openCreateDialog(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      data: { entityType: 'Deal' },
+      width: '800px',
+      maxHeight: '90vh',
+    });
+    dialogRef.afterClosed().subscribe((result?: EntityFormDialogResult) => {
+      if (!result) return;
+      if (result.action === 'view') {
+        this.router.navigate(['/deals', result.entity.id]);
+      } else {
+        this.dealStore.loadPage();
+      }
+    });
   }
 
   /** Delete a deal with confirmation dialog. */

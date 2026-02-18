@@ -30,6 +30,8 @@ import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.
 import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
 import { ActivityStore } from '../activity.store';
 import { ActivityService } from '../activity.service';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
 /**
  * Activity list page with dynamic table, saved views sidebar,
@@ -168,6 +170,11 @@ export class ActivityListComponent implements OnInit {
     }
   }
 
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.activityStore.setSearch(search);
+  }
+
   /** Handle sort change from dynamic table. */
   onSortChanged(sort: ViewSort): void {
     this.activityStore.setSort(sort.fieldId, sort.direction);
@@ -197,6 +204,20 @@ export class ActivityListComponent implements OnInit {
     this.activityStore.setFilters([]);
   }
 
+  /** Handle custom field created from quick-add in table header. */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    const updated = [...this.customFieldDefs(), field];
+    this.customFieldDefs.set(updated);
+    this.buildColumnDefinitions(updated);
+
+    const currentViewCols = this.activeViewColumns().filter(c => c.fieldId !== field.id);
+    const maxOrder = currentViewCols.reduce((max, c) => Math.max(max, c.sortOrder), 0);
+    this.viewColumns.set([
+      ...currentViewCols,
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
+  }
+
   /** Handle row click -- navigate to detail page. */
   onRowClicked(row: any): void {
     this.router.navigate(['/activities', row.id]);
@@ -205,6 +226,23 @@ export class ActivityListComponent implements OnInit {
   /** Handle row edit click -- navigate to edit page. */
   onRowEditClicked(row: any): void {
     this.router.navigate(['/activities', row.id, 'edit']);
+  }
+
+  /** Open create dialog instead of navigating to /activities/new. */
+  openCreateDialog(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      data: { entityType: 'Activity' },
+      width: '800px',
+      maxHeight: '90vh',
+    });
+    dialogRef.afterClosed().subscribe((result?: EntityFormDialogResult) => {
+      if (!result) return;
+      if (result.action === 'view') {
+        this.router.navigate(['/activities', result.entity.id]);
+      } else {
+        this.activityStore.loadList();
+      }
+    });
   }
 
   /** Delete an activity with confirmation dialog. */

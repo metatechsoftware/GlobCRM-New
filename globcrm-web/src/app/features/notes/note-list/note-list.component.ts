@@ -92,7 +92,8 @@ import { NoteListDto } from '../note.models';
           [loading]="noteStore.isLoading()"
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
-          (rowEditClicked)="onRowClicked($event)" />
+          (rowEditClicked)="onRowClicked($event)"
+          (searchChanged)="onSearchChanged($event)" />
       </div>
     </div>
   `,
@@ -216,6 +217,11 @@ export class NoteListComponent implements OnInit {
       const primarySort = view.sorts[0];
       this.noteStore.setSort(primarySort.fieldId, primarySort.direction);
     }
+  }
+
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.noteStore.setSearch(search);
   }
 
   /** Handle sort change from dynamic table. */

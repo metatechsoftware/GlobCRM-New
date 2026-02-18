@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import {
@@ -52,10 +54,24 @@ import {
     CustomFieldFormComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dialog-mode]': 'dialogMode()' },
   styles: `
     :host {
       display: block;
       padding: 24px;
+    }
+
+    :host.dialog-mode {
+      padding: 0;
+    }
+
+    :host.dialog-mode .form-container {
+      max-width: unset;
+    }
+
+    :host.dialog-mode mat-card {
+      box-shadow: none;
+      border: none;
     }
 
     .form-header {
@@ -107,12 +123,14 @@ import {
   `,
   template: `
     <!-- Header -->
-    <div class="form-header">
-      <button mat-icon-button routerLink="/products" aria-label="Back to Products">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <h1>{{ isEditMode ? 'Edit Product' : 'New Product' }}</h1>
-    </div>
+    @if (!dialogMode()) {
+      <div class="form-header">
+        <button mat-icon-button routerLink="/products" aria-label="Back to Products">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>{{ isEditMode ? 'Edit Product' : 'New Product' }}</h1>
+      </div>
+    }
 
     @if (isLoadingProduct()) {
       <div class="loading-container">
@@ -185,13 +203,15 @@ import {
                 (valuesChanged)="onCustomFieldsChanged($event)" />
 
               <!-- Form actions -->
-              <div class="form-actions">
-                <button mat-button type="button" routerLink="/products">Cancel</button>
-                <button mat-raised-button color="primary" type="submit"
-                        [disabled]="productForm.invalid || isSaving()">
-                  {{ isEditMode ? 'Save Changes' : 'Create Product' }}
-                </button>
-              </div>
+              @if (!dialogMode()) {
+                <div class="form-actions">
+                  <button mat-button type="button" routerLink="/products">Cancel</button>
+                  <button mat-raised-button color="primary" type="submit"
+                          [disabled]="productForm.invalid || isSaving()">
+                    {{ isEditMode ? 'Save Changes' : 'Create Product' }}
+                  </button>
+                </div>
+              }
             </form>
           </mat-card-content>
         </mat-card>
@@ -204,6 +224,11 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly productService = inject(ProductService);
+
+  /** Dialog mode inputs/outputs. */
+  dialogMode = input(false);
+  entityCreated = output<any>();
+  entityCreateError = output<void>();
 
   isEditMode = false;
   productId: string | null = null;
@@ -224,8 +249,10 @@ export class ProductFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.productId = this.route.snapshot.paramMap.get('id');
-    this.isEditMode = !!this.productId;
+    if (!this.dialogMode()) {
+      this.productId = this.route.snapshot.paramMap.get('id');
+      this.isEditMode = !!this.productId;
+    }
 
     if (this.isEditMode && this.productId) {
       this.loadProduct(this.productId);
@@ -304,12 +331,28 @@ export class ProductFormComponent implements OnInit, OnDestroy {
       this.productService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.router.navigate(['/products', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.router.navigate(['/products', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          }
         },
       });
     }
+  }
+
+  /** Trigger form submission programmatically (used by dialog wrapper). */
+  triggerSubmit(): void {
+    if (this.productForm.invalid) {
+      this.productForm.markAllAsTouched();
+      return;
+    }
+    this.onSubmit();
   }
 }

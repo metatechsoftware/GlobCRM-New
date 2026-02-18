@@ -51,24 +51,12 @@ public class TenantResolutionMiddleware
 
         if (tenantInfo == null)
         {
-            // In development, allow requests without tenant context if X-Tenant-Id header is absent
-            // This enables testing non-tenant endpoints without subdomain setup
-            var env = context.RequestServices.GetRequiredService<IWebHostEnvironment>();
-            if (env.IsDevelopment())
-            {
-                // In development, only enforce tenant for paths that clearly need it
-                // Let it pass through and let the individual endpoint handle the null tenant
-                await _next(context);
-                return;
-            }
-
-            context.Response.StatusCode = StatusCodes.Status404NotFound;
-            context.Response.ContentType = "application/json";
-            await context.Response.WriteAsJsonAsync(new
-            {
-                error = "Organization not found",
-                message = "The requested organization could not be found. Please check the URL."
-            });
+            // Allow unauthenticated requests through — they'll either hit
+            // [Authorize] and get 401, or hit an [AllowAnonymous] endpoint
+            // that doesn't need tenant context. Authenticated requests
+            // will have their tenant resolved via JWT claim fallback
+            // in TenantProvider.
+            await _next(context);
             return;
         }
 

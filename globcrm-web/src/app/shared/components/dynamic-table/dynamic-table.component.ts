@@ -2,13 +2,17 @@ import {
   Component,
   ChangeDetectionStrategy,
   computed,
+  DestroyRef,
+  inject,
   input,
   output,
   signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import {
   MatPaginatorModule,
   MatPaginator,
@@ -21,6 +25,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
 import { ColumnPickerComponent } from './column-picker.component';
+import { QuickAddFieldComponent } from './quick-add-field.component';
+import { AuthStore } from '../../../core/auth/auth.store';
+import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
 import {
   ColumnDefinition,
   ViewColumn,
@@ -49,6 +56,7 @@ import {
     MatProgressBarModule,
     ColumnResizeDirective,
     ColumnPickerComponent,
+    QuickAddFieldComponent,
   ],
   templateUrl: './dynamic-table.component.html',
   styleUrl: './dynamic-table.component.scss',
@@ -73,25 +81,45 @@ export class DynamicTableComponent {
   sortChanged = output<ViewSort>();
   pageChanged = output<{ page: number; pageSize: number }>();
   rowEditClicked = output<any>();
+  searchChanged = output<string>();
+  customFieldCreated = output<CustomFieldDefinition>();
+
+  // Admin check for addColumn
+  private readonly authStore = inject(AuthStore);
+  isAdmin = computed(() => this.authStore.userRole() === 'Admin');
 
   // View children
   readonly sort = viewChild(MatSort);
   readonly paginator = viewChild(MatPaginator);
 
+  // Search state
+  searchValue = signal('');
+  private readonly searchSubject = new Subject<string>();
+  private readonly destroyRef = inject(DestroyRef);
+
   // Drag state
   draggedFieldId = signal<string | null>(null);
   private dragColumnOrder = signal<string[] | null>(null);
 
-  // Computed: visible columns sorted by sortOrder, plus actions column
+  constructor() {
+    this.searchSubject
+      .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
+      .subscribe((term) => this.searchChanged.emit(term));
+  }
+
+  // Computed: visible columns sorted by sortOrder, plus optional addColumn and actions
   displayedColumns = computed<string[]>(() => {
+    const admin = this.isAdmin();
     const dragOrder = this.dragColumnOrder();
-    if (dragOrder) return [...dragOrder, 'actions'];
+    if (dragOrder) {
+      return admin ? [...dragOrder, 'addColumn', 'actions'] : [...dragOrder, 'actions'];
+    }
 
     const visible = this.columns()
       .filter((c) => c.visible)
       .sort((a, b) => a.sortOrder - b.sortOrder)
       .map((c) => c.fieldId);
-    return [...visible, 'actions'];
+    return admin ? [...visible, 'addColumn', 'actions'] : [...visible, 'actions'];
   });
 
   // Computed: only visible ViewColumns, sorted
@@ -239,5 +267,29 @@ export class DynamicTableComponent {
       page: event.pageIndex + 1, // 1-based for API
       pageSize: event.pageSize,
     });
+  }
+
+  /**
+   * Handle search input — push to debounced subject.
+   */
+  onSearchInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchValue.set(value);
+    this.searchSubject.next(value);
+  }
+
+  /**
+   * Clear search — emit immediately (no debounce needed for clear).
+   */
+  onSearchClear(): void {
+    this.searchValue.set('');
+    this.searchChanged.emit('');
+  }
+
+  /**
+   * Handle custom field created from quick-add component.
+   */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    this.customFieldCreated.emit(field);
   }
 }

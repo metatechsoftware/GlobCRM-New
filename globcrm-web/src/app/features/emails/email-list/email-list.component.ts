@@ -176,7 +176,8 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
           [loading]="emailStore.isLoading()"
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
-          (rowEditClicked)="onRowClicked($event)" />
+          (rowEditClicked)="onRowClicked($event)"
+          (searchChanged)="onSearchChanged($event)" />
       </div>
     </div>
   `,
@@ -302,6 +303,11 @@ export class EmailListComponent implements OnInit {
       const primarySort = view.sorts[0];
       this.emailStore.setSort(primarySort.fieldId, primarySort.direction);
     }
+  }
+
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.emailStore.setSearch(search);
   }
 
   /** Handle sort change from dynamic table. */

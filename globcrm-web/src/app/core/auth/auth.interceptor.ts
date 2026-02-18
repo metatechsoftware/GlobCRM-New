@@ -24,12 +24,14 @@ function isAuthEndpoint(url: string): boolean {
   return AUTH_ENDPOINTS.some((endpoint) => url.includes(endpoint));
 }
 
-function addAuthHeader(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
-  return req.clone({
-    setHeaders: {
-      Authorization: `Bearer ${token}`,
-    },
-  });
+function addAuthHeaders(req: HttpRequest<unknown>, token: string, tenantId: string | null): HttpRequest<unknown> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${token}`,
+  };
+  if (tenantId) {
+    headers['X-Tenant-Id'] = tenantId;
+  }
+  return req.clone({ setHeaders: headers });
 }
 
 export const authInterceptor: HttpInterceptorFn = (
@@ -45,9 +47,10 @@ export const authInterceptor: HttpInterceptorFn = (
   }
 
   const accessToken = authStore.accessToken();
+  const tenantId = authStore.user()?.organizationId ?? null;
 
-  // Attach Bearer token if available
-  const authReq = accessToken ? addAuthHeader(req, accessToken) : req;
+  // Attach Bearer token and tenant ID if available
+  const authReq = accessToken ? addAuthHeaders(req, accessToken, tenantId) : req;
 
   return next(authReq).pipe(
     catchError((error: HttpErrorResponse) => {
@@ -65,7 +68,7 @@ export const authInterceptor: HttpInterceptorFn = (
             }
 
             // Retry the original request with the new access token
-            const retryReq = addAuthHeader(req, response.accessToken);
+            const retryReq = addAuthHeaders(req, response.accessToken, tenantId);
             return next(retryReq);
           }),
           catchError((refreshError) => {

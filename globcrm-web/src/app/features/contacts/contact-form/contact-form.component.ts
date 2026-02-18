@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -54,6 +56,7 @@ import {
     CustomFieldFormComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dialog-mode]': 'dialogMode()' },
   styles: `
     :host {
       display: block;
@@ -138,6 +141,11 @@ import {
       border-top: 1px solid var(--color-border);
     }
 
+    :host.dialog-mode .entity-form-container {
+      padding: 0;
+      max-width: unset;
+    }
+
     @media (max-width: 768px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -146,12 +154,14 @@ import {
   `,
   template: `
     <div class="entity-form-container">
-      <div class="form-header">
-        <a mat-icon-button routerLink="/contacts" aria-label="Back to contacts">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode ? 'Edit Contact' : 'New Contact' }}</h1>
-      </div>
+      @if (!dialogMode()) {
+        <div class="form-header">
+          <a mat-icon-button routerLink="/contacts" aria-label="Back to contacts">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h1>{{ isEditMode ? 'Edit Contact' : 'New Contact' }}</h1>
+        </div>
+      }
 
       @if (isLoadingDetail()) {
         <div class="form-loading">
@@ -278,16 +288,18 @@ import {
           </div>
 
           <!-- Form actions -->
-          <div class="form-actions">
-            <button mat-button type="button" routerLink="/contacts">Cancel</button>
-            <button mat-raised-button color="primary" type="submit"
-                    [disabled]="contactForm.invalid || isSaving()">
-              @if (isSaving()) {
-                <mat-spinner diameter="20"></mat-spinner>
-              }
-              {{ isEditMode ? 'Save Changes' : 'Create Contact' }}
-            </button>
-          </div>
+          @if (!dialogMode()) {
+            <div class="form-actions">
+              <button mat-button type="button" routerLink="/contacts">Cancel</button>
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="contactForm.invalid || isSaving()">
+                @if (isSaving()) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                {{ isEditMode ? 'Save Changes' : 'Create Contact' }}
+              </button>
+            </div>
+          }
         </form>
       }
     </div>
@@ -300,6 +312,11 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   private readonly contactService = inject(ContactService);
   private readonly companyService = inject(CompanyService);
   private readonly snackBar = inject(MatSnackBar);
+
+  /** Dialog mode inputs/outputs. */
+  dialogMode = input(false);
+  entityCreated = output<any>();
+  entityCreateError = output<void>();
 
   /** Whether this is an edit (vs create) form. */
   isEditMode = false;
@@ -350,8 +367,10 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    this.contactId = this.route.snapshot.paramMap.get('id') ?? '';
-    this.isEditMode = !!this.contactId;
+    if (!this.dialogMode()) {
+      this.contactId = this.route.snapshot.paramMap.get('id') ?? '';
+      this.isEditMode = !!this.contactId;
+    }
 
     // Set up company search typeahead (debounced 300ms)
     this.companySearch$
@@ -521,18 +540,35 @@ export class ContactFormComponent implements OnInit, OnDestroy {
       this.contactService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Contact created successfully', 'Close', {
-            duration: 3000,
-          });
-          this.router.navigate(['/contacts', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.snackBar.open('Contact created successfully', 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['/contacts', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create contact', 'Close', {
-            duration: 5000,
-          });
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          } else {
+            this.snackBar.open('Failed to create contact', 'Close', {
+              duration: 5000,
+            });
+          }
         },
       });
     }
+  }
+
+  /** Trigger form submission programmatically (used by dialog wrapper). */
+  triggerSubmit(): void {
+    if (this.contactForm.invalid) {
+      this.contactForm.markAllAsTouched();
+      return;
+    }
+    this.onSubmit();
   }
 }

@@ -10,6 +10,7 @@ import { Router } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatDialog } from '@angular/material/dialog';
 
 import { DynamicTableComponent } from '../../../shared/components/dynamic-table/dynamic-table.component';
 import { ViewSidebarComponent } from '../../../shared/components/saved-views/view-sidebar.component';
@@ -17,6 +18,7 @@ import { FilterChipsComponent } from '../../../shared/components/filter-chips/fi
 import { FilterPanelComponent } from '../../../shared/components/filter-panel/filter-panel.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
+import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
 import {
   ColumnDefinition,
   ViewColumn,
@@ -26,6 +28,8 @@ import {
 import { ViewStore } from '../../../shared/components/saved-views/view.store';
 import { ProductStore } from '../product.store';
 import { ProductDto } from '../product.models';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
 /**
  * Core product column definitions for the dynamic table.
@@ -77,6 +81,7 @@ const DEFAULT_PRODUCT_COLUMNS: ViewColumn[] = [
 })
 export class ProductListComponent implements OnInit {
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   readonly productStore = inject(ProductStore);
   readonly viewStore = inject(ViewStore);
   private readonly customFieldService = inject(CustomFieldService);
@@ -145,6 +150,10 @@ export class ProductListComponent implements OnInit {
     }
   }
 
+  onSearchChanged(search: string): void {
+    this.productStore.setSearch(search);
+  }
+
   onSortChanged(sort: { fieldId: string; direction: 'asc' | 'desc'; sortOrder: number }): void {
     this.productStore.setSort(sort.fieldId, sort.direction);
   }
@@ -189,12 +198,44 @@ export class ProductListComponent implements OnInit {
     this.columns.set(columns);
   }
 
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    // Append custom field to column definitions
+    const newColDef: ColumnDefinition = {
+      fieldId: field.id,
+      label: field.label,
+      isCustomField: true,
+      fieldType: field.fieldType.toLowerCase(),
+      sortable: false,
+      filterable: true,
+    };
+    this.columnDefinitions.set([...this.columnDefinitions(), newColDef]);
+
+    // Append visible ViewColumn
+    const maxOrder = this.columns().reduce((max, c) => Math.max(max, c.sortOrder), 0);
+    this.columns.set([
+      ...this.columns(),
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
+  }
+
   onRowEditClicked(row: any): void {
     this.router.navigate(['/products', row.id]);
   }
 
   navigateToNewProduct(): void {
-    this.router.navigate(['/products', 'new']);
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      data: { entityType: 'Product' },
+      width: '800px',
+      maxHeight: '90vh',
+    });
+    dialogRef.afterClosed().subscribe((result?: EntityFormDialogResult) => {
+      if (!result) return;
+      if (result.action === 'view') {
+        this.router.navigate(['/products', result.entity.id]);
+      } else {
+        this.productStore.loadPage();
+      }
+    });
   }
 
   private formatCurrency(value: number): string {

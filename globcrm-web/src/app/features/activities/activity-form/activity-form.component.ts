@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -64,6 +66,7 @@ import {
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dialog-mode]': 'dialogMode()' },
   styles: `
     :host {
       display: block;
@@ -134,6 +137,11 @@ import {
       border-top: 1px solid var(--color-border);
     }
 
+    :host.dialog-mode .entity-form-container {
+      padding: 0;
+      max-width: unset;
+    }
+
     @media (max-width: 768px) {
       .form-grid {
         grid-template-columns: 1fr;
@@ -142,12 +150,14 @@ import {
   `,
   template: `
     <div class="entity-form-container">
-      <div class="form-header">
-        <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode ? 'Edit Activity' : 'New Activity' }}</h1>
-      </div>
+      @if (!dialogMode()) {
+        <div class="form-header">
+          <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h1>{{ isEditMode ? 'Edit Activity' : 'New Activity' }}</h1>
+        </div>
+      }
 
       @if (isLoadingDetail()) {
         <div class="form-loading">
@@ -234,16 +244,18 @@ import {
           </div>
 
           <!-- Form actions -->
-          <div class="form-actions">
-            <button mat-button type="button" routerLink="/activities">Cancel</button>
-            <button mat-raised-button color="primary" type="submit"
-                    [disabled]="activityForm.invalid || isSaving()">
-              @if (isSaving()) {
-                <mat-spinner diameter="20"></mat-spinner>
-              }
-              {{ isEditMode ? 'Save Changes' : 'Create Activity' }}
-            </button>
-          </div>
+          @if (!dialogMode()) {
+            <div class="form-actions">
+              <button mat-button type="button" routerLink="/activities">Cancel</button>
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="activityForm.invalid || isSaving()">
+                @if (isSaving()) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                {{ isEditMode ? 'Save Changes' : 'Create Activity' }}
+              </button>
+            </div>
+          }
         </form>
       }
     </div>
@@ -256,6 +268,11 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
   private readonly activityService = inject(ActivityService);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+
+  /** Dialog mode inputs/outputs. */
+  dialogMode = input(false);
+  entityCreated = output<any>();
+  entityCreateError = output<void>();
 
   /** Expose constants for template. */
   readonly activityTypes = ACTIVITY_TYPES;
@@ -296,10 +313,12 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
   });
 
   ngOnInit(): void {
-    const idParam = this.route.snapshot.paramMap.get('id') ?? '';
-    this.isEditMode = !!idParam && idParam !== 'new';
-    if (this.isEditMode) {
-      this.activityId = idParam;
+    if (!this.dialogMode()) {
+      const idParam = this.route.snapshot.paramMap.get('id') ?? '';
+      this.isEditMode = !!idParam && idParam !== 'new';
+      if (this.isEditMode) {
+        this.activityId = idParam;
+      }
     }
 
     // Load team members for assignee dropdown
@@ -310,7 +329,7 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
 
     if (this.isEditMode) {
       this.loadActivityForEdit();
-    } else {
+    } else if (!this.dialogMode()) {
       // In create mode, pre-fill dueDate from queryParams (e.g., from calendar date click)
       const dueDateParam = this.route.snapshot.queryParamMap.get('dueDate');
       if (dueDateParam) {
@@ -407,18 +426,35 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
       this.activityService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Activity created successfully', 'Close', {
-            duration: 3000,
-          });
-          this.router.navigate(['/activities', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.snackBar.open('Activity created successfully', 'Close', {
+              duration: 3000,
+            });
+            this.router.navigate(['/activities', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create activity', 'Close', {
-            duration: 5000,
-          });
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          } else {
+            this.snackBar.open('Failed to create activity', 'Close', {
+              duration: 5000,
+            });
+          }
         },
       });
     }
+  }
+
+  /** Trigger form submission programmatically (used by dialog wrapper). */
+  triggerSubmit(): void {
+    if (this.activityForm.invalid) {
+      this.activityForm.markAllAsTouched();
+      return;
+    }
+    this.onSubmit();
   }
 }

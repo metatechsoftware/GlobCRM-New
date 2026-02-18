@@ -107,7 +107,9 @@ import { RequestService } from '../request.service';
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
           (rowClicked)="onRowClicked($event)"
-          (rowEditClicked)="onRowEditClicked($event)" />
+          (rowEditClicked)="onRowEditClicked($event)"
+          (searchChanged)="onSearchChanged($event)"
+          (customFieldCreated)="onCustomFieldCreated($event)" />
       </div>
     </div>
   `,
@@ -220,6 +222,11 @@ export class RequestListComponent implements OnInit {
     }
   }
 
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.requestStore.setSearch(search);
+  }
+
   /** Handle sort change from dynamic table. */
   onSortChanged(sort: ViewSort): void {
     this.requestStore.setSort(sort.fieldId, sort.direction);
@@ -247,6 +254,20 @@ export class RequestListComponent implements OnInit {
   /** Handle all filters cleared. */
   onFiltersCleared(): void {
     this.requestStore.setFilters([]);
+  }
+
+  /** Handle custom field created from quick-add in table header. */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    const updated = [...this.customFieldDefs(), field];
+    this.customFieldDefs.set(updated);
+    this.buildColumnDefinitions(updated);
+
+    const currentViewCols = this.activeViewColumns().filter(c => c.fieldId !== field.id);
+    const maxOrder = currentViewCols.reduce((max, c) => Math.max(max, c.sortOrder), 0);
+    this.viewColumns.set([
+      ...currentViewCols,
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
   }
 
   /** Handle row click -- navigate to detail page. */

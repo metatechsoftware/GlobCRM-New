@@ -23,7 +23,7 @@
         <!-- New Activity button -->
         <button mat-raised-button color="primary"
                 *appHasPermission="'Activity:Create'"
-                routerLink="new">
+                (click)="openCreateDialog()">
           <mat-icon>add</mat-icon> New Activity
         </button>
       </div>
@@ -50,6 +50,8 @@
       [loading]="activityStore.isLoading()"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
-      (rowEditClicked)="onRowEditClicked($event)" />
+      (rowEditClicked)="onRowEditClicked($event)"
+      (searchChanged)="onSearchChanged($event)"
+      (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>
 </div>

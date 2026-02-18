@@ -105,7 +105,9 @@ import { QuoteListDto, QUOTE_STATUSES } from '../quote.models';
           [loading]="quoteStore.isLoading()"
           (sortChanged)="onSortChanged($event)"
           (pageChanged)="onPageChanged($event)"
-          (rowEditClicked)="onRowClicked($event)" />
+          (rowEditClicked)="onRowClicked($event)"
+          (searchChanged)="onSearchChanged($event)"
+          (customFieldCreated)="onCustomFieldCreated($event)" />
       </div>
     </div>
   `,
@@ -247,6 +249,11 @@ export class QuoteListComponent implements OnInit {
     }
   }
 
+  /** Handle search change from dynamic table. */
+  onSearchChanged(search: string): void {
+    this.quoteStore.setSearch(search);
+  }
+
   /** Handle sort change from dynamic table. */
   onSortChanged(sort: ViewSort): void {
     this.quoteStore.setSort(sort.fieldId, sort.direction);
@@ -274,6 +281,20 @@ export class QuoteListComponent implements OnInit {
   /** Handle all filters cleared. */
   onFiltersCleared(): void {
     this.quoteStore.setFilters([]);
+  }
+
+  /** Handle custom field created from quick-add in table header. */
+  onCustomFieldCreated(field: CustomFieldDefinition): void {
+    const updated = [...this.customFieldDefs(), field];
+    this.customFieldDefs.set(updated);
+    this.buildColumnDefinitions(updated);
+
+    const currentViewCols = this.activeViewColumns().filter(c => c.fieldId !== field.id);
+    const maxOrder = currentViewCols.reduce((max, c) => Math.max(max, c.sortOrder), 0);
+    this.viewColumns.set([
+      ...currentViewCols,
+      { fieldId: field.id, isCustomField: true, width: 150, sortOrder: maxOrder + 1, visible: true },
+    ]);
   }
 
   /** Handle row click -- navigate to detail page. */

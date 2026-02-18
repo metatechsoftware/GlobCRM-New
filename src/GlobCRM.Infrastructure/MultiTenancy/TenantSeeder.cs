@@ -139,6 +139,16 @@ public class TenantSeeder : ITenantSeeder
             return;
         }
 
+        // Idempotency guard: skip if seed data already exists
+        var alreadySeeded = await _db.Companies
+            .AnyAsync(c => c.TenantId == organizationId && c.IsSeedData);
+        if (alreadySeeded)
+        {
+            _logger.LogInformation(
+                "Seed data already exists for organization {OrgId}, skipping", organizationId);
+            return;
+        }
+
         var seedManifest = CreateSeedManifest();
 
         _logger.LogInformation(

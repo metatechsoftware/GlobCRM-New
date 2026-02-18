@@ -167,21 +167,18 @@ public class CreateOrganizationCommandHandler
             "Created admin user {Email} for organization {OrgId}",
             user.Email, organization.Id);
 
-        // 6. Seed organization data (fire-and-forget with error handling)
-        _ = Task.Run(async () =>
+        // 6. Seed organization data
+        try
         {
-            try
-            {
-                await _tenantSeeder.SeedOrganizationDataAsync(organization.Id);
-                _logger.LogInformation(
-                    "Seeded organization data for {OrgId}", organization.Id);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Failed to seed organization data for {OrgId}", organization.Id);
-            }
-        }, cancellationToken);
+            await _tenantSeeder.SeedOrganizationDataAsync(organization.Id);
+            _logger.LogInformation(
+                "Seeded organization data for {OrgId}", organization.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex,
+                "Failed to seed organization data for {OrgId}", organization.Id);
+        }
 
         // 7. Generate email confirmation token and send verification email
         try

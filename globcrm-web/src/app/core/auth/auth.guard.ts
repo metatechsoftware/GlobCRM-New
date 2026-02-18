@@ -3,6 +3,7 @@ import { CanActivateFn, Router } from '@angular/router';
 import { map, catchError, of } from 'rxjs';
 import { AuthStore } from './auth.store';
 import { AuthService } from './auth.service';
+import { decodeUserInfoFromJwt } from './auth.utils';
 
 /**
  * Functional route guard that protects authenticated routes.
@@ -25,6 +26,12 @@ export const authGuard: CanActivateFn = (route, state) => {
   if (storedRefreshToken) {
     return authService.refreshToken(storedRefreshToken).pipe(
       map((response) => {
+        // Decode JWT and set user BEFORE setting tokens, so organizationId
+        // is available when isAuthenticated becomes true and effects fire
+        const userInfo = decodeUserInfoFromJwt(response.accessToken);
+        if (userInfo) {
+          authStore.setUser(userInfo);
+        }
         authStore.setTokens(response.accessToken, response.refreshToken);
         localStorage.setItem('globcrm_refresh_token', response.refreshToken);
         return true;

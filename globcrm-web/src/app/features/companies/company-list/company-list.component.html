@@ -7,7 +7,7 @@
       <h1>Companies</h1>
       <button mat-raised-button color="primary"
               *appHasPermission="'Company:Create'"
-              routerLink="new">
+              (click)="openCreateDialog()">
         <mat-icon>add</mat-icon> New Company
       </button>
     </div>
@@ -33,6 +33,8 @@
       [loading]="companyStore.isLoading()"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
-      (rowEditClicked)="onRowEditClicked($event)" />
+      (rowEditClicked)="onRowEditClicked($event)"
+      (searchChanged)="onSearchChanged($event)"
+      (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>
 </div>

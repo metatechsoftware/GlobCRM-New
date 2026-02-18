@@ -7,7 +7,7 @@
       <h1>Contacts</h1>
       <button mat-raised-button color="primary"
               *appHasPermission="'Contact:Create'"
-              routerLink="new">
+              (click)="openCreateDialog()">
         <mat-icon>add</mat-icon> New Contact
       </button>
     </div>
@@ -33,6 +33,8 @@
       [loading]="contactStore.isLoading()"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
-      (rowEditClicked)="onRowEditClicked($event)" />
+      (rowEditClicked)="onRowEditClicked($event)"
+      (searchChanged)="onSearchChanged($event)"
+      (customFieldCreated)="onCustomFieldCreated($event)" />
   </div>
 </div>
