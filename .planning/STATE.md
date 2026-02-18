@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-16)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** Phases 1-10 complete. Ready for Phase 11: Polish & Completeness.
+**Current focus:** Phase 11: Polish & Completeness — responsive design, calendar, notes, attachments.
 
 ## Current Position
 
 Phase: 11 of 11 (Polish & Completeness)
-Plan: 0 of TBD in current phase
-Status: Not started — needs `/gsd:plan-phase 11`
-Last activity: 2026-02-17 — Phases 8, 9, 10 marked complete
+Plan: 6 of 7 in current phase
+Status: In progress — executing Phase 11 plans
+Last activity: 2026-02-18 — Completed 11-06-PLAN.md (Responsive Design)
 
-Progress: Phases 1-10 complete (10/11 phases)
+Progress: Phases 1-10 complete + Phase 11 plan 06 done
 
 ## Performance Metrics
 
@@ -110,6 +110,7 @@ Progress: Phases 1-10 complete (10/11 phases)
 | Phase 10 P05 | 2min | 2 tasks | 6 files |
 | Phase 10 P04 | 6min | 2 tasks | 11 files |
 | Phase 10 P06 | 3min | 2 tasks | 5 files |
+| Phase 11 P06 | 3min | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -378,6 +379,10 @@ Recent decisions affecting current work:
 - [Phase 10-04]: ImportStore tracks entityType in state for mapping step context (not just upload response)
 - [Phase 10-04]: SignalR ImportProgress event added to SignalRService following existing Subject/Observable pattern
 - [Phase 10-04]: Custom fields use 'custom:' prefix in mapping dropdown value to distinguish from core fields; stripped before API call
+- [11-06] CSS-only slide-in drawer instead of MatSidenav to avoid restructuring app.component.html layout
+- [11-06] BreakpointObserver with toSignal for reactive isMobile detection (Angular CDK best practice, not window.resize)
+- [11-06] Scroll hint gradient on mobile tables for horizontal scroll affordance
+- [11-06] Column resize handles hidden on touch devices via pointer: coarse media query
 
 ### Pending Todos
 
@@ -389,6 +394,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-17
-Stopped at: Completed 10-06-PLAN.md (Import History and Settings Integration) -- Phase 10 complete
-Resume file: .planning/phases/10-data-operations/10-06-SUMMARY.md
+Last session: 2026-02-18
+Stopped at: Completed 11-06-PLAN.md (Responsive Design)
+Resume file: .planning/phases/11-polish-and-completeness/11-06-SUMMARY.md
