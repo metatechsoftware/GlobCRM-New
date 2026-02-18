@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/auth/auth.guard';
+import { permissionGuard } from './core/permissions/permission.guard';
 
 export const routes: Routes = [
   {
@@ -49,7 +50,7 @@ export const routes: Routes = [
   },
   {
     path: 'companies',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Company', 'View')],
     loadChildren: () =>
       import('./features/companies/companies.routes').then(
         (m) => m.COMPANY_ROUTES
@@ -57,7 +58,7 @@ export const routes: Routes = [
   },
   {
     path: 'contacts',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Contact', 'View')],
     loadChildren: () =>
       import('./features/contacts/contacts.routes').then(
         (m) => m.CONTACT_ROUTES
@@ -65,7 +66,7 @@ export const routes: Routes = [
   },
   {
     path: 'products',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Product', 'View')],
     loadChildren: () =>
       import('./features/products/products.routes').then(
         (m) => m.PRODUCT_ROUTES
@@ -73,7 +74,7 @@ export const routes: Routes = [
   },
   {
     path: 'deals',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Deal', 'View')],
     loadChildren: () =>
       import('./features/deals/deals.routes').then(
         (m) => m.DEAL_ROUTES
@@ -81,7 +82,7 @@ export const routes: Routes = [
   },
   {
     path: 'activities',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Activity', 'View')],
     loadChildren: () =>
       import('./features/activities/activities.routes').then(
         (m) => m.ACTIVITY_ROUTES
@@ -89,7 +90,7 @@ export const routes: Routes = [
   },
   {
     path: 'quotes',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Quote', 'View')],
     loadChildren: () =>
       import('./features/quotes/quotes.routes').then(
         (m) => m.QUOTE_ROUTES
@@ -97,7 +98,7 @@ export const routes: Routes = [
   },
   {
     path: 'requests',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Request', 'View')],
     loadChildren: () =>
       import('./features/requests/requests.routes').then(
         (m) => m.REQUEST_ROUTES
@@ -121,7 +122,7 @@ export const routes: Routes = [
   },
   {
     path: 'notes',
-    canActivate: [authGuard],
+    canActivate: [authGuard, permissionGuard('Note', 'View')],
     loadChildren: () =>
       import('./features/notes/notes.routes').then(
         (m) => m.NOTES_ROUTES
