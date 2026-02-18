@@ -82,7 +82,7 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 ### Leads
 
 - [x] **LEAD-01**: User can create, view, edit, and delete leads with standard CRM fields (name, email, phone, company, source, status)
-- [ ] **LEAD-02**: User can view leads in a dynamic table with configurable columns, sorting, filtering, and saved Views
+- [x] **LEAD-02**: User can view leads in a dynamic table with configurable columns, sorting, filtering, and saved Views
 - [x] **LEAD-03**: User can track lead source and status through configurable stages (New, Contacted, Qualified, Unqualified, Converted)
 - [x] **LEAD-04**: User can convert a qualified lead into a contact + company + deal in one action
 - [x] **LEAD-05**: Leads support custom fields (same JSONB system as other entities)
@@ -141,7 +141,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | LEAD-01 | Phase 13 | Complete |
-| LEAD-02 | Phase 13 | Pending |
+| LEAD-02 | Phase 13 | Complete |
 | LEAD-03 | Phase 13 | Complete |
 | LEAD-04 | Phase 13 | Complete |
 | LEAD-05 | Phase 13 | Complete |

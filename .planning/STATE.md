@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 13 of 20 (Leads)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: Executing
-Last activity: 2026-02-18 — Completed 13-02 (Lead API controllers)
+Last activity: 2026-02-18 — Completed 13-03 (Lead Angular frontend)
 
-Progress: [████████████████████████░░░░░░░░░░░░░░░░] 60% (v1.0: 96/96 plans, v1.1: 2 plans)
+Progress: [██████████████████████████░░░░░░░░░░░░░░] 65% (v1.0: 96/96 plans, v1.1: 3 plans)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 2
+- v1.1 plans completed: 3
 - v1.1 plans total: 4+ (Phase 13: 4 plans)
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
@@ -42,6 +42,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [13-02] Conversion uses direct DbContext operations for single-SaveChangesAsync atomicity across Contact/Company/Deal/LeadConversion
 - [13-02] LeadSource DELETE sets referencing leads' SourceId to null (matching FK SET NULL behavior)
 - [13-02] Reused NotificationType.DealStageChanged for lead stage notifications (avoids migration)
+- [13-03] Kanban groups leads client-side from flat API response via computed signal (stagesWithLeads)
+- [13-03] Forward-only drag enforcement done client-side by SortOrder comparison before API call
+- [13-03] Converted stage drop rejected entirely -- users must use Convert Lead action on detail page
 
 ### Pending Todos
 
@@ -57,6 +60,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-18
-Stopped at: Completed 13-02-PLAN.md (Lead API controllers)
-Resume file: .planning/phases/13-leads/13-02-SUMMARY.md
-Next step: Execute 13-03-PLAN.md (Lead Angular frontend)
+Stopped at: Completed 13-03-PLAN.md (Lead Angular frontend)
+Resume file: .planning/phases/13-leads/13-03-SUMMARY.md
+Next step: Execute 13-04-PLAN.md (Lead detail, form, conversion UI)
