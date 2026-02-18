@@ -17,7 +17,7 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
 import { AuthStore } from '../../../core/auth/auth.store';
 import { NoteService } from '../note.service';
 import { NoteDetailDto } from '../note.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 /**
  * Note detail page displaying full rich text content.

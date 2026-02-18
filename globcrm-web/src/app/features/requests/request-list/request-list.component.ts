@@ -27,7 +27,7 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
 import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { RequestStore } from '../request.store';
 import { RequestService } from '../request.service';
 

@@ -12,7 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatCardModule } from '@angular/material/card';
 import { PipelineService } from '../../deals/pipeline.service';
 import { PipelineDto } from '../../deals/deal.models';
-import { ConfirmDeleteDialogComponent } from '../roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
   selector: 'app-pipeline-list',

@@ -30,7 +30,7 @@ import {
   QUOTE_TRANSITIONS,
 } from '../quote.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 /**
  * Quote detail page with line items table, PDF download, versioning, and status management.

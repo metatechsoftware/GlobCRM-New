@@ -38,7 +38,7 @@ import {
   ALLOWED_TRANSITIONS,
 } from '../activity.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { CompanyService } from '../../companies/company.service';
 import { ContactService } from '../../contacts/contact.service';
 import { DealService } from '../../deals/deal.service';

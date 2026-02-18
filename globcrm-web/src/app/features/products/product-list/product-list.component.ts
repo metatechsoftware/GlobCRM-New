@@ -26,7 +26,7 @@ import {
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
 import { ViewStore } from '../../../shared/components/saved-views/view.store';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { ProductStore } from '../product.store';
 import { ProductService } from '../product.service';
 import { ProductDto } from '../product.models';

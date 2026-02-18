@@ -34,7 +34,7 @@ import { NoteService } from '../../notes/note.service';
 import { NoteListDto } from '../../notes/note.models';
 import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 /**
  * Contact detail page with tabs (Details, Company, and disabled future tabs)

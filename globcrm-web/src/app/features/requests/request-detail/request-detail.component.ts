@@ -30,7 +30,7 @@ import {
   ALLOWED_TRANSITIONS,
 } from '../request.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
-import { ConfirmDeleteDialogComponent } from '../../settings/roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 /**
  * Request detail page with status workflow, entity links, and timeline.

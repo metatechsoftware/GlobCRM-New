@@ -11,7 +11,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { PermissionService } from '../../../core/permissions/permission.service';
 import { TeamDto } from '../../../core/permissions/permission.models';
-import { ConfirmDeleteDialogComponent } from '../roles/role-list.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 @Component({
