@@ -1,0 +1,123 @@
+<div class="kanban-layout">
+  <!-- Header toolbar -->
+  <div class="kanban-header">
+    <h1>Leads Pipeline</h1>
+
+    <div class="header-actions">
+      <!-- Show Terminal Stages toggle -->
+      <mat-slide-toggle
+        [checked]="includeTerminal()"
+        (change)="onTerminalToggled($event.checked)"
+        class="terminal-toggle">
+        Show Lost/Converted
+      </mat-slide-toggle>
+
+      <!-- View mode switcher -->
+      <mat-button-toggle-group value="kanban" class="view-mode-toggle">
+        <mat-button-toggle value="list" routerLink="/leads">
+          <mat-icon>view_list</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="kanban">
+          <mat-icon>view_kanban</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+
+      <!-- New Lead button -->
+      <button mat-raised-button color="primary"
+              *appHasPermission="'Lead:Create'"
+              routerLink="/leads/new">
+        <mat-icon>add</mat-icon> New Lead
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading bar -->
+  @if (isLoading()) {
+    <mat-progress-bar mode="indeterminate" class="kanban-loading"></mat-progress-bar>
+  }
+
+  <!-- Kanban board -->
+  @if (stagesWithLeads().length > 0) {
+    <div class="kanban-board" cdkDropListGroup>
+      @for (stage of stagesWithLeads(); track stage.id) {
+        <div class="kanban-column" [class.terminal-column]="stage.isConverted || stage.isLost">
+          <div class="column-header" [style.border-top-color]="stage.color">
+            <div class="column-header-left">
+              <span class="column-title">{{ stage.name }}</span>
+              <span class="column-count">{{ stage.leads.length }}</span>
+            </div>
+          </div>
+          <div cdkDropList
+               [cdkDropListData]="stage.leads"
+               [cdkDropListDisabled]="stage.isConverted || stage.isLost"
+               [id]="'stage-' + stage.id"
+               (cdkDropListDropped)="onDrop($event, stage.id)"
+               class="column-body">
+            @for (lead of stage.leads; track lead.id) {
+              <div cdkDrag
+                   [cdkDragDisabled]="stage.isConverted || stage.isLost"
+                   class="lead-card"
+                   (click)="openLead(lead.id)">
+                <!-- Lead name -->
+                <div class="lead-name">{{ lead.fullName }}</div>
+
+                <!-- Company name -->
+                @if (lead.companyName) {
+                  <div class="lead-company">
+                    <mat-icon class="lead-meta-icon">business</mat-icon>
+                    {{ lead.companyName }}
+                  </div>
+                }
+
+                <!-- Source -->
+                @if (lead.sourceName) {
+                  <div class="lead-source">
+                    <mat-icon class="lead-meta-icon">campaign</mat-icon>
+                    {{ lead.sourceName }}
+                  </div>
+                }
+
+                <!-- Bottom row: temperature badge, owner initials, days in stage -->
+                <div class="lead-card-footer">
+                  <span class="temperature-badge"
+                        [style.background-color]="getTemperatureColor(lead.temperature)">
+                    {{ lead.temperature }}
+                  </span>
+
+                  @if (lead.ownerInitials) {
+                    <span class="owner-avatar" [title]="lead.ownerName ?? ''">
+                      {{ lead.ownerInitials }}
+                    </span>
+                  }
+
+                  <span class="days-in-stage">{{ lead.daysInStage }}d</span>
+                </div>
+
+                <!-- Drag preview -->
+                <div *cdkDragPreview class="lead-card-preview">
+                  <div class="lead-name">{{ lead.fullName }}</div>
+                  <span class="temperature-badge"
+                        [style.background-color]="getTemperatureColor(lead.temperature)">
+                    {{ lead.temperature }}
+                  </span>
+                </div>
+
+                <!-- Drag placeholder -->
+                <div *cdkDragPlaceholder class="lead-card-placeholder"></div>
+              </div>
+            }
+            @if (stage.leads.length === 0) {
+              <div class="column-empty">No leads in this stage</div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (!isLoading()) {
+    <div class="kanban-empty">
+      <mat-icon class="empty-icon">person_search</mat-icon>
+      <p>No leads found</p>
+      <p class="empty-subtext">Create your first lead to get started</p>
+    </div>
+  }
+</div>

@@ -1,0 +1,387 @@
+// ─── Lead Kanban Board ──────────────────────────────────────────────────────
+// Horizontal scrollable Kanban board with drag-drop lead cards.
+// Uses Angular CDK drag-drop with forward-only stage transitions.
+
+.kanban-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: var(--space-6) var(--space-6) var(--space-4);
+  background: var(--color-bg);
+}
+
+// ─── Header ──────────────────────────────────────────────────────────────────
+
+.kanban-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+  flex-shrink: 0;
+
+  h1 {
+    margin: 0;
+    font-size: var(--text-2xl);
+    font-weight: var(--font-bold);
+    color: var(--color-text);
+    letter-spacing: -0.3px;
+  }
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.terminal-toggle {
+  white-space: nowrap;
+}
+
+.view-mode-toggle {
+  ::ng-deep .mat-button-toggle-label-content {
+    padding: 0 var(--space-2);
+  }
+}
+
+// ─── Loading ─────────────────────────────────────────────────────────────────
+
+.kanban-loading {
+  flex-shrink: 0;
+  margin-bottom: var(--space-2);
+}
+
+// ─── Board ───────────────────────────────────────────────────────────────────
+
+.kanban-board {
+  display: flex;
+  gap: var(--space-4);
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-bottom: var(--space-2);
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+}
+
+// ─── Column ──────────────────────────────────────────────────────────────────
+
+.kanban-column {
+  min-width: 280px;
+  max-width: 320px;
+  width: 300px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.terminal-column {
+  opacity: 0.7;
+
+  .column-header {
+    background: var(--color-bg-secondary);
+  }
+}
+
+.column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  border-top: 4px solid transparent;
+  background: var(--color-surface-active);
+}
+
+.column-header-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.column-title {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  color: var(--color-text);
+}
+
+.column-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 var(--space-1-5);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  font-weight: var(--font-semibold);
+}
+
+.column-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-2);
+  min-height: 80px;
+  max-height: calc(100vh - 220px);
+  transition: background-color var(--duration-normal) var(--ease-default);
+  border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+
+  &.cdk-drop-list-dragging {
+    background: var(--color-primary-soft);
+  }
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 2px;
+  }
+}
+
+.column-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 60px;
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  opacity: 0.7;
+}
+
+// ─── Lead Card ───────────────────────────────────────────────────────────────
+
+.lead-card {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-2);
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--duration-normal) var(--ease-default), transform 150ms var(--ease-default);
+  border: 1px solid transparent;
+  user-select: none;
+
+  &:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
+    border-color: var(--color-border);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.lead-name {
+  font-weight: var(--font-medium);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  margin-bottom: var(--space-1);
+  line-height: 1.3;
+}
+
+.lead-company,
+.lead-source {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-secondary);
+  font-size: var(--text-xs);
+  margin-top: var(--space-1);
+  line-height: 1.4;
+}
+
+.lead-meta-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.lead-card-footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-2);
+}
+
+.temperature-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  color: #fff;
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  line-height: 1.4;
+}
+
+.owner-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-weight: var(--font-semibold);
+  margin-left: auto;
+}
+
+.days-in-stage {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+// ─── CDK Drag-Drop Animations ────────────────────────────────────────────────
+
+.lead-card-preview {
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  box-shadow: var(--shadow-xl);
+  transform: rotate(2deg);
+  opacity: 0.92;
+  max-width: 300px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+
+  .lead-name {
+    font-weight: var(--font-medium);
+    font-size: var(--text-base);
+    color: var(--color-text);
+    margin-bottom: 0;
+  }
+}
+
+.lead-card-placeholder {
+  background: var(--color-primary-soft);
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius-md);
+  min-height: 60px;
+  margin-bottom: var(--space-2);
+  opacity: 0.5;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .lead-card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.cdk-drop-list-dragging .cdk-drag {
+  opacity: 0;
+}
+
+// ─── Empty State ─────────────────────────────────────────────────────────────
+
+.kanban-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  color: var(--color-text-muted);
+  opacity: 0.6;
+
+  .empty-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-3);
+  }
+
+  p {
+    font-size: var(--text-base);
+    margin: 0;
+  }
+
+  .empty-subtext {
+    font-size: var(--text-sm);
+    margin-top: var(--space-1);
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .kanban-layout {
+    padding: var(--space-4);
+  }
+
+  .kanban-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .header-actions {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    width: 100%;
+  }
+
+  .kanban-column {
+    min-width: 260px;
+  }
+
+  .lead-card {
+    min-height: 80px;
+    padding: 14px;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@media (max-width: 480px) {
+  .kanban-column {
+    min-width: 240px;
+    max-width: 280px;
+  }
+
+  .column-header {
+    padding: 10px var(--space-3);
+  }
+
+  .lead-card {
+    padding: 10px;
+  }
+}
