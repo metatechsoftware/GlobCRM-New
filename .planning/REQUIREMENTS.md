@@ -140,13 +140,69 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated during roadmap creation) | | |
+| LEAD-01 | Phase 13 | Pending |
+| LEAD-02 | Phase 13 | Pending |
+| LEAD-03 | Phase 13 | Pending |
+| LEAD-04 | Phase 13 | Pending |
+| LEAD-05 | Phase 13 | Pending |
+| LEAD-06 | Phase 13 | Pending |
+| ETMPL-01 | Phase 14 | Pending |
+| ETMPL-02 | Phase 14 | Pending |
+| ETMPL-03 | Phase 14 | Pending |
+| ETMPL-04 | Phase 14 | Pending |
+| ETMPL-05 | Phase 14 | Pending |
+| FORM-01 | Phase 15 | Pending |
+| FORM-02 | Phase 15 | Pending |
+| FORM-03 | Phase 15 | Pending |
+| FORM-04 | Phase 15 | Pending |
+| FORM-05 | Phase 15 | Pending |
+| DUP-01 | Phase 16 | Pending |
+| DUP-02 | Phase 16 | Pending |
+| DUP-03 | Phase 16 | Pending |
+| DUP-04 | Phase 16 | Pending |
+| DUP-05 | Phase 16 | Pending |
+| DUP-06 | Phase 16 | Pending |
+| DUP-07 | Phase 16 | Pending |
+| WHOOK-01 | Phase 17 | Pending |
+| WHOOK-02 | Phase 17 | Pending |
+| WHOOK-03 | Phase 17 | Pending |
+| WHOOK-04 | Phase 17 | Pending |
+| WHOOK-05 | Phase 17 | Pending |
+| WHOOK-06 | Phase 17 | Pending |
+| ESEQ-01 | Phase 18 | Pending |
+| ESEQ-02 | Phase 18 | Pending |
+| ESEQ-03 | Phase 18 | Pending |
+| ESEQ-04 | Phase 18 | Pending |
+| ESEQ-05 | Phase 18 | Pending |
+| ESEQ-06 | Phase 18 | Pending |
+| ESEQ-07 | Phase 18 | Pending |
+| WFLOW-01 | Phase 19 | Pending |
+| WFLOW-02 | Phase 19 | Pending |
+| WFLOW-03 | Phase 19 | Pending |
+| WFLOW-04 | Phase 19 | Pending |
+| WFLOW-05 | Phase 19 | Pending |
+| WFLOW-06 | Phase 19 | Pending |
+| WFLOW-07 | Phase 19 | Pending |
+| WFLOW-08 | Phase 19 | Pending |
+| WFLOW-09 | Phase 19 | Pending |
+| WFLOW-10 | Phase 19 | Pending |
+| WFLOW-11 | Phase 19 | Pending |
+| WFLOW-12 | Phase 19 | Pending |
+| WFLOW-13 | Phase 19 | Pending |
+| RPT-01 | Phase 20 | Pending |
+| RPT-02 | Phase 20 | Pending |
+| RPT-03 | Phase 20 | Pending |
+| RPT-04 | Phase 20 | Pending |
+| RPT-05 | Phase 20 | Pending |
+| RPT-06 | Phase 20 | Pending |
+| RPT-07 | Phase 20 | Pending |
+| RPT-08 | Phase 20 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 47 total
-- Mapped to phases: 0
-- Unmapped: 47
+- v1.1 requirements: 57 total
+- Mapped to phases: 57
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-18*
-*Last updated: 2026-02-18 after initial definition*
+*Last updated: 2026-02-18 after roadmap creation*
