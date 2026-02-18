@@ -50,6 +50,10 @@
           <mat-icon class="navbar__link-icon">support_agent</mat-icon>
           Requests
         </a>
+        <a routerLink="/notes" routerLinkActive="navbar__link--active" class="navbar__link">
+          <mat-icon class="navbar__link-icon">note</mat-icon>
+          Notes
+        </a>
         <a routerLink="/emails" routerLinkActive="navbar__link--active" class="navbar__link">
           <mat-icon class="navbar__link-icon">email</mat-icon>
           Emails
@@ -61,10 +65,6 @@
         <a routerLink="/calendar" routerLinkActive="navbar__link--active" class="navbar__link">
           <mat-icon class="navbar__link-icon">calendar_month</mat-icon>
           Calendar
-        </a>
-        <a routerLink="/notes" routerLinkActive="navbar__link--active" class="navbar__link">
-          <mat-icon class="navbar__link-icon">note</mat-icon>
-          Notes
         </a>
         <a routerLink="/team-directory" routerLinkActive="navbar__link--active" class="navbar__link">
           <mat-icon class="navbar__link-icon">groups</mat-icon>
@@ -188,6 +188,11 @@
         <mat-icon>support_agent</mat-icon>
         <span>Requests</span>
       </a>
+      <a routerLink="/notes" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>note</mat-icon>
+        <span>Notes</span>
+      </a>
       <a routerLink="/emails" routerLinkActive="navbar__mobile-link--active"
          class="navbar__mobile-link" (click)="closeSidenav()">
         <mat-icon>email</mat-icon>
@@ -202,11 +207,6 @@
          class="navbar__mobile-link" (click)="closeSidenav()">
         <mat-icon>calendar_month</mat-icon>
         <span>Calendar</span>
-      </a>
-      <a routerLink="/notes" routerLinkActive="navbar__mobile-link--active"
-         class="navbar__mobile-link" (click)="closeSidenav()">
-        <mat-icon>note</mat-icon>
-        <span>Notes</span>
       </a>
       <a routerLink="/team-directory" routerLinkActive="navbar__mobile-link--active"
          class="navbar__mobile-link" (click)="closeSidenav()">
