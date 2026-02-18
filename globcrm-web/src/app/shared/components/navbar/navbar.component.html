@@ -203,6 +203,11 @@
         <mat-icon>calendar_month</mat-icon>
         <span>Calendar</span>
       </a>
+      <a routerLink="/notes" routerLinkActive="navbar__mobile-link--active"
+         class="navbar__mobile-link" (click)="closeSidenav()">
+        <mat-icon>note</mat-icon>
+        <span>Notes</span>
+      </a>
       <a routerLink="/team-directory" routerLinkActive="navbar__mobile-link--active"
          class="navbar__mobile-link" (click)="closeSidenav()">
         <mat-icon>groups</mat-icon>
