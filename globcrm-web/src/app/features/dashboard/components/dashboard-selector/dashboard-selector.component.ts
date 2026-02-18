@@ -37,7 +37,12 @@ import { AuthStore } from '../../../../core/auth/auth.store';
     }
 
     .dashboard-selector__select {
-      min-width: 240px;
+      min-width: 200px;
+      max-width: 220px;
+    }
+
+    :host ::ng-deep .dashboard-selector__select .mat-mdc-form-field-subscript-wrapper {
+      display: none;
     }
 
     .dashboard-selector__option {

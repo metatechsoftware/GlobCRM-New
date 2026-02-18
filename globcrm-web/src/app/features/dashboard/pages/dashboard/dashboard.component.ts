@@ -1,8 +1,8 @@
-import { Component, inject, computed, afterNextRender } from '@angular/core';
+import { Component, inject, computed, afterNextRender, OnDestroy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+
 import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -74,7 +74,6 @@ export class CreateDashboardDialogComponent {
     MatButtonModule,
     MatIconModule,
     MatDialogModule,
-    MatSnackBarModule,
     MatTabsModule,
     DashboardGridComponent,
     DashboardSelectorComponent,
@@ -85,10 +84,10 @@ export class CreateDashboardDialogComponent {
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
-export class DashboardComponent {
+export class DashboardComponent implements OnDestroy {
   readonly store = inject(DashboardStore);
   private readonly dialog = inject(MatDialog);
-  private readonly snackBar = inject(MatSnackBar);
+
   private readonly authStore = inject(AuthStore);
 
   readonly greeting = computed(() => {
@@ -109,7 +108,12 @@ export class DashboardComponent {
     afterNextRender(() => {
       this.store.loadDashboards();
       this.store.loadTargets();
+      this.store.startRealTimeRefresh();
     });
+  }
+
+  ngOnDestroy(): void {
+    this.store.stopRealTimeRefresh();
   }
 
   onDashboardSelected(id: string): void {
@@ -126,7 +130,6 @@ export class DashboardComponent {
 
   onLayoutChanged(widgets: WidgetDto[]): void {
     this.store.saveLayout(widgets);
-    this.snackBar.open('Layout saved', 'OK', { duration: 2000 });
   }
 
   onAddWidget(): void {

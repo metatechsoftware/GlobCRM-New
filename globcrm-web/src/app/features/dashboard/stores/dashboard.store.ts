@@ -7,7 +7,9 @@ import {
   withMethods,
   patchState,
 } from '@ngrx/signals';
+import { merge, Subscription, debounceTime } from 'rxjs';
 import { DashboardApiService } from '../services/dashboard-api.service';
+import { SignalRService } from '../../../core/signalr/signalr.service';
 import {
   DashboardDto,
   WidgetDto,
@@ -67,8 +69,26 @@ export const DashboardStore = signalStore(
   })),
   withMethods((store) => {
     const api = inject(DashboardApiService);
+    const signalR = inject(SignalRService);
+    let realTimeSub: Subscription | null = null;
 
     return {
+      /** Subscribe to SignalR events and auto-refresh widget data on CRM changes. */
+      startRealTimeRefresh(): void {
+        realTimeSub?.unsubscribe();
+        realTimeSub = merge(signalR.notification$, signalR.feedUpdate$)
+          .pipe(debounceTime(2000))
+          .subscribe(() => {
+            this.loadWidgetData();
+          });
+      },
+
+      /** Unsubscribe from SignalR events (call on component destroy). */
+      stopRealTimeRefresh(): void {
+        realTimeSub?.unsubscribe();
+        realTimeSub = null;
+      },
+
       /** Fetch all dashboards, set first/default as active. */
       loadDashboards(): void {
         patchState(store, { isLoading: true });
@@ -176,11 +196,17 @@ export const DashboardStore = signalStore(
         patchState(store, { isEditing: !store.isEditing() });
       },
 
-      /** Save widget positions after drag/resize. */
+      /** Save widget positions after drag/resize (optimistic update, no reload). */
       saveLayout(widgets: WidgetDto[]): void {
         const dashboard = store.activeDashboard();
         if (!dashboard) return;
 
+        // Optimistic local update -- no re-render flicker
+        patchState(store, {
+          activeDashboard: { ...dashboard, widgets },
+        });
+
+        // Background save (no reload on success since local state is already correct)
         const req: UpdateDashboardRequest = {
           name: dashboard.name,
           description: dashboard.description ?? undefined,
@@ -198,7 +224,8 @@ export const DashboardStore = signalStore(
         };
 
         api.updateDashboard(dashboard.id, req).subscribe({
-          next: () => {
+          error: () => {
+            // Revert to server state on failure
             this.loadDashboard(dashboard.id);
           },
         });

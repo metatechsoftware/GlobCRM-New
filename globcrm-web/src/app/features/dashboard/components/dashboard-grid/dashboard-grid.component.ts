@@ -5,10 +5,12 @@ import {
   output,
   computed,
   effect,
+  OnDestroy,
 } from '@angular/core';
 import { GridsterModule, GridsterConfig, GridsterItem } from 'angular-gridster2';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, Subscription, debounceTime } from 'rxjs';
 import { WidgetDto, MetricResultDto, TargetDto, DashboardGridItem } from '../../models/dashboard.models';
 import { WidgetWrapperComponent } from '../widget-wrapper/widget-wrapper.component';
 
@@ -64,7 +66,7 @@ import { WidgetWrapperComponent } from '../widget-wrapper/widget-wrapper.compone
     </gridster>
   `,
 })
-export class DashboardGridComponent {
+export class DashboardGridComponent implements OnDestroy {
   readonly widgets = input<WidgetDto[]>([]);
   readonly widgetData = input<Record<string, MetricResultDto>>({});
   readonly targets = input<TargetDto[]>([]);
@@ -73,6 +75,10 @@ export class DashboardGridComponent {
   readonly layoutChanged = output<WidgetDto[]>();
   readonly editWidget = output<WidgetDto>();
   readonly removeWidget = output<WidgetDto>();
+
+  /** Subject that debounces rapid layout change events during drag/resize. */
+  private readonly layoutChange$ = new Subject<void>();
+  private readonly layoutSub: Subscription;
 
   /** Gridster configuration with 12-column layout and verticalFixed grid type. */
   gridOptions: GridsterConfig = {
@@ -99,8 +105,8 @@ export class DashboardGridComponent {
     outerMarginLeft: 16,
     margin: 16,
     displayGrid: 'onDrag&Resize',
-    itemChangeCallback: (item: GridsterItem) => this.onItemChange(item),
-    itemResizeCallback: (item: GridsterItem) => this.onItemResize(item),
+    itemChangeCallback: () => this.layoutChange$.next(),
+    itemResizeCallback: () => this.layoutChange$.next(),
   };
 
   /** Map widgets to GridsterItem objects for gridster rendering. */
@@ -116,6 +122,11 @@ export class DashboardGridComponent {
   });
 
   constructor() {
+    // Debounce layout changes -- only emit once the user stops dragging/resizing for 500ms
+    this.layoutSub = this.layoutChange$.pipe(debounceTime(500)).subscribe(() => {
+      this.emitLayoutChanged();
+    });
+
     // Watch isEditing and toggle drag/resize options
     effect(() => {
       const editing = this.isEditing();
@@ -129,22 +140,17 @@ export class DashboardGridComponent {
     });
   }
 
+  ngOnDestroy(): void {
+    this.layoutSub.unsubscribe();
+    this.layoutChange$.complete();
+  }
+
   /** Find the matching target for a TargetProgress widget. */
   getTargetForWidget(widget: WidgetDto): TargetDto | null {
     if (widget.type !== 'TargetProgress') return null;
     const targetId = widget.config['targetId'];
     if (!targetId) return null;
     return this.targets().find((t) => t.id === targetId) ?? null;
-  }
-
-  /** Called when a widget is dragged to a new position. Emits updated layout. */
-  private onItemChange(item: GridsterItem): void {
-    this.emitLayoutChanged();
-  }
-
-  /** Called when a widget is resized. Emits updated layout. */
-  private onItemResize(item: GridsterItem): void {
-    this.emitLayoutChanged();
   }
 
   /** Map gridster items back to WidgetDto with updated positions and emit. */

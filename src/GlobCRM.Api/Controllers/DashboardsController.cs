@@ -236,6 +236,14 @@ public class DashboardsController : ControllerBase
         if (!CanAccessDashboard(dashboard, userId))
             return Forbid();
 
+        // Normalize dates: detect date-only input (midnight) BEFORE converting to UTC,
+        // then push end date to end-of-day so the full day is included.
+        // Npgsql requires offset 0 (UTC) for timestamptz columns.
+        var effectiveStart = request.StartDate.ToUniversalTime();
+        var effectiveEnd = request.EndDate.TimeOfDay == TimeSpan.Zero
+            ? new DateTimeOffset(request.EndDate.Date.AddDays(1).AddTicks(-1), request.EndDate.Offset).ToUniversalTime()
+            : request.EndDate.ToUniversalTime();
+
         var results = new Dictionary<string, MetricResultDto>();
 
         foreach (var widget in request.Widgets)
@@ -272,7 +280,7 @@ public class DashboardsController : ControllerBase
             try
             {
                 var metricResult = await _aggregationService.ComputeMetricAsync(
-                    metricType, request.StartDate, request.EndDate,
+                    metricType, effectiveStart, effectiveEnd,
                     userId, scope, teamMemberIds);
 
                 results[widget.WidgetId] = new MetricResultDto

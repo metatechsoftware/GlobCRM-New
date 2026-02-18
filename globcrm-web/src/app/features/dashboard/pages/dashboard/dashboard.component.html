@@ -1,16 +1,15 @@
 <div class="dashboard">
-  <!-- Header -->
+  <!-- Compact Header -->
   <header class="dashboard__header">
     <div class="dashboard__greeting">
       <h1 class="dashboard__title">{{ greeting() }}, {{ firstName() }}</h1>
-      <p class="dashboard__subtitle">
-        @if (store.activeDashboard(); as dashboard) {
-          {{ dashboard.name }}
-          @if (dashboard.isTeamWide) {
-            <span class="dashboard__badge">Team</span>
-          }
+      @if (store.activeDashboard(); as dashboard) {
+        <span class="dashboard__sep"></span>
+        <span class="dashboard__dash-name">{{ dashboard.name }}</span>
+        @if (dashboard.isTeamWide) {
+          <span class="dashboard__badge">Team</span>
         }
-      </p>
+      }
     </div>
     <div class="dashboard__actions">
       <app-date-range-filter
@@ -24,6 +23,12 @@
         (createDashboard)="onCreateDashboard()"
         (deleteDashboard)="onDeleteDashboard($event)"
       />
+      @if (store.isEditing()) {
+        <button mat-stroked-button class="dashboard__add-widget-btn" (click)="onAddWidget()">
+          <mat-icon>add</mat-icon>
+          Add Widget
+        </button>
+      }
       <button mat-flat-button (click)="onToggleEdit()">
         <mat-icon>{{ store.isEditing() ? 'check' : 'edit' }}</mat-icon>
         {{ store.isEditing() ? 'Done' : 'Edit' }}
@@ -34,15 +39,6 @@
   <!-- Tabs: Dashboard and Targets -->
   <mat-tab-group class="dashboard__tabs" animationDuration="200ms">
     <mat-tab label="Dashboard">
-      <!-- Add Widget button (edit mode only) -->
-      @if (store.isEditing()) {
-        <div class="dashboard__toolbar">
-          <button mat-stroked-button (click)="onAddWidget()">
-            <mat-icon>add</mat-icon>
-            Add Widget
-          </button>
-        </div>
-      }
 
       <!-- Dashboard Grid -->
       @if (store.activeDashboard(); as dashboard) {
