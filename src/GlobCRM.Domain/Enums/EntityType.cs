@@ -13,5 +13,6 @@ public enum EntityType
     Quote,
     Request,
     Product,
-    Note
+    Note,
+    Lead
 }
