@@ -78,7 +78,7 @@ export class EmailService {
   }
 
   connect(): Observable<ConnectResponse> {
-    return this.api.post<ConnectResponse>(`${this.accountBasePath}/connect`);
+    return this.api.get<ConnectResponse>(`${this.accountBasePath}/connect`);
   }
 
   disconnect(): Observable<void> {

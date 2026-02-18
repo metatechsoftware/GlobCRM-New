@@ -95,6 +95,7 @@ export class NavbarComponent {
     {
       label: 'Admin',
       items: [
+        { route: '/import', icon: 'upload_file', label: 'Import' },
         { route: '/team-directory', icon: 'groups', label: 'Team' },
         { route: '/settings', icon: 'settings', label: 'Settings' },
       ]
