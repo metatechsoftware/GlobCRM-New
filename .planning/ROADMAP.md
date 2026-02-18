@@ -52,7 +52,13 @@
   3. User can move leads through configurable pipeline stages (New, Contacted, Qualified, Unqualified, Converted) and track their source
   4. User can convert a qualified lead into a contact + company + deal in a single action, with all lead data carried over
   5. Leads support JSONB custom fields, activities, notes, and an entity timeline — consistent with the existing entity pattern
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Backend domain entities, EF configurations, repository, migration, RLS, and seed data
+- [ ] 13-02-PLAN.md — Backend API controllers (CRUD, stage transitions, conversion, Kanban, timeline, admin)
+- [ ] 13-03-PLAN.md — Frontend models, service, store, routes, list page, and Kanban board
+- [ ] 13-04-PLAN.md — Frontend detail page with stepper, create/edit form, and conversion dialog
 
 ### Phase 14: Foundation Infrastructure & Email Templates
 **Goal**: Shared background processing infrastructure is operational and tenant-safe, and users can create rich email templates with merge fields for use by downstream features (sequences, workflows)
@@ -155,7 +161,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 10. Data Operations | v1.0 | 6/6 | Complete | 2026-02-17 |
 | 11. Polish & Completeness | v1.0 | 7/7 | Complete | 2026-02-18 |
 | 12. Bug Fixes & Integration Polish | v1.0 | 2/2 | Complete | 2026-02-18 |
-| 13. Leads | v1.1 | 0/? | Not started | - |
+| 13. Leads | v1.1 | 0/4 | Planned | - |
 | 14. Foundation Infrastructure & Email Templates | v1.1 | 0/? | Not started | - |
 | 15. Formula / Computed Custom Fields | v1.1 | 0/? | Not started | - |
 | 16. Duplicate Detection & Merge | v1.1 | 0/? | Not started | - |
