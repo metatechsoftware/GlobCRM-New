@@ -4,6 +4,18 @@
 
 GlobCRM is a modern, multi-tenant SaaS CRM for mid-size organizations (10-50 users) spanning sales, support, and operations. Teams manage their entire customer lifecycle — companies, contacts, deals, quotes, activities, email, and KPIs — through fast, consistent pages with dynamic tables, global search, and clean relational navigation. Built with Angular 19 (web) and .NET 10 (backend) on PostgreSQL 17.
 
+## Current Milestone: v1.1 Automation & Intelligence
+
+**Goal:** Add workflow automation, email templates/sequences, computed custom fields, duplicate detection, webhooks, and an advanced reporting builder — all integrated as a connected system.
+
+**Target features:**
+- Email templates and sequences (triggered by workflows)
+- Formula/computed custom fields
+- Workflow automation (trigger-based actions that fire emails, webhooks, field updates)
+- Duplicate detection and merge for contacts and companies
+- Webhooks for external integrations (fired by entity events and workflows)
+- Advanced reporting builder (leveraging computed fields and all entity data)
+
 ## Core Value
 
 Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work without switching tools.
@@ -33,18 +45,21 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 - ✓ Multi-tenant SaaS with isolated data per organization (triple-layer defense) — v1.0
 - ✓ Responsive web app (Angular) for desktop, tablet, and mobile browsers — v1.0
 
-### Active
+### Active (v1.1)
 
-- [ ] Native mobile apps (iOS/Android) via .NET MAUI
-- [ ] Outlook/Microsoft 365 email integration (Microsoft Graph API)
 - [ ] Email templates and sequences
 - [ ] Formula/computed custom fields
 - [ ] Workflow automation (trigger-based actions)
 - [ ] Duplicate detection and merge for contacts and companies
-- [ ] SSO/SAML/OIDC integration
-- [ ] Bulk operations across list views
 - [ ] Webhooks for external integrations
 - [ ] Advanced reporting builder
+
+### Future
+
+- [ ] Native mobile apps (iOS/Android) via .NET MAUI
+- [ ] Outlook/Microsoft 365 email integration (Microsoft Graph API)
+- [ ] SSO/SAML/OIDC integration
+- [ ] Bulk operations across list views
 
 ### Out of Scope
 
@@ -96,4 +111,4 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 | CSS-only responsive (no MatSidenav) | Avoid layout restructuring of app.component | ✓ Good — slide-in drawer works on mobile/tablet |
 
 ---
-*Last updated: 2026-02-18 after v1.0 milestone*
+*Last updated: 2026-02-18 after v1.1 milestone start*
