@@ -104,6 +104,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 15-04-PLAN.md (Phase 15 complete)
-Resume file: .planning/phases/15-formula-computed-custom-fields/15-04-SUMMARY.md
+Stopped at: Phase 16 context gathered
+Resume file: .planning/phases/16-duplicate-detection-merge/16-CONTEXT.md
 Next step: Plan Phase 16 (Duplicate Detection & Merge)
