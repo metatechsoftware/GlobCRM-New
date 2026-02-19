@@ -43,11 +43,11 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 
 ### Formula / Computed Custom Fields
 
-- [ ] **FORM-01**: Admin can create formula custom fields with arithmetic expressions and field references
-- [ ] **FORM-02**: Formula fields support date difference calculations (days between dates)
-- [ ] **FORM-03**: Formula fields support string concatenation and conditional logic (IF)
+- [x] **FORM-01**: Admin can create formula custom fields with arithmetic expressions and field references
+- [x] **FORM-02**: Formula fields support date difference calculations (days between dates)
+- [x] **FORM-03**: Formula fields support string concatenation and conditional logic (IF)
 - [ ] **FORM-04**: Formula values are computed on-read and displayed as read-only in all views
-- [ ] **FORM-05**: Admin receives validation feedback when creating invalid formulas (syntax errors, circular references)
+- [x] **FORM-05**: Admin receives validation feedback when creating invalid formulas (syntax errors, circular references)
 
 ### Duplicate Detection & Merge
 
@@ -151,11 +151,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ETMPL-03 | Phase 14 | Complete |
 | ETMPL-04 | Phase 14 | Complete |
 | ETMPL-05 | Phase 14 | Complete |
-| FORM-01 | Phase 15 | Pending |
-| FORM-02 | Phase 15 | Pending |
-| FORM-03 | Phase 15 | Pending |
+| FORM-01 | Phase 15 | Complete |
+| FORM-02 | Phase 15 | Complete |
+| FORM-03 | Phase 15 | Complete |
 | FORM-04 | Phase 15 | Pending |
-| FORM-05 | Phase 15 | Pending |
+| FORM-05 | Phase 15 | Complete |
 | DUP-01 | Phase 16 | Pending |
 | DUP-02 | Phase 16 | Pending |
 | DUP-03 | Phase 16 | Pending |

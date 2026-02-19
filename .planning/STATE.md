@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 14 complete
+**Current focus:** v1.1 Automation & Intelligence — Phase 15 in progress
 
 ## Current Position
 
-Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- COMPLETE
-Plan: 4 of 4 complete
-Status: Phase Complete
-Last activity: 2026-02-19 — Completed 14-04 (Preview, Polish, Navigation)
+Phase: 15 of 20 (Formula / Computed Custom Fields)
+Plan: 1 of 4 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 15-01 (Backend Foundation)
 
-Progress: [██████████████████████████████████░░░░░░░░] 76% (v1.0: 96/96 plans, v1.1: 8/8+ Phase 13: 4/4, Phase 14: 4/4)
+Progress: [███████████████████████████████████░░░░░░░] 77% (v1.0: 96/96 plans, v1.1: 9/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 1/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 8
-- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 4/4)
+- v1.1 plans completed: 9
+- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 1/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -29,6 +29,7 @@ Progress: [███████████████████████
 | 14-02 | Email Template API + TenantSeeder | 6min | 2 | 8 |
 | 14-03 | Email Template Frontend (Unlayer + list) | 8min | 3 | 16 |
 | 14-04 | Preview, Polish, Navigation | 5min | 2 | 9 |
+| 15-01 | Backend Foundation (domain + NCalc engine + services) | 5min | 2 | 13 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -71,6 +72,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [14-04] Preview dialog uses iframe sandbox+srcdoc for safe rendered HTML display
 - [14-04] Entity search uses ApiService directly (not per-entity services) to avoid coupling
 - [14-04] Email Templates nav item in Connect group after Emails; route guards for access control
+- [15-01] NCalcSync v5.11.0 for formula evaluation -- EvaluateFunction event handler pattern for custom functions
+- [15-01] Field references: camelCase system fields, snake_case custom fields -- no GUID references in formulas
+- [15-01] FormulaResultType admin-selected (number/text/date) -- explicit display formatting control
+- [15-01] DependsOnFieldIds stores field names for dependency tracking and topological sort
+- [15-01] Formula services (evaluation, validation, registry) registered via AddFormulaFieldServices() from AddCustomFieldServices()
 
 ### Pending Todos
 
@@ -86,6 +92,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 15 context gathered
-Resume file: .planning/phases/15-formula-computed-custom-fields/15-CONTEXT.md
-Next step: Plan Phase 15 (Formula / Computed Custom Fields)
+Stopped at: Completed 15-01-PLAN.md
+Resume file: .planning/phases/15-formula-computed-custom-fields/15-01-SUMMARY.md
+Next step: Execute 15-02-PLAN.md (Formula API endpoints)
