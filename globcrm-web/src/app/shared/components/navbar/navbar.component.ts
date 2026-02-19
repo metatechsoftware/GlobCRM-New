@@ -89,6 +89,7 @@ export class NavbarComponent {
       label: 'Connect',
       items: [
         { route: '/emails', icon: 'email', label: 'Emails' },
+        { route: '/email-templates', icon: 'drafts', label: 'Templates' },
         { route: '/feed', icon: 'dynamic_feed', label: 'Feed' },
         { route: '/calendar', icon: 'calendar_month', label: 'Calendar' },
       ]

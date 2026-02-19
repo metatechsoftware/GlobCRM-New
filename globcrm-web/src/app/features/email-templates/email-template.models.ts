@@ -28,6 +28,7 @@ export interface EmailTemplateListItem {
   categoryId: string | null;
   categoryName: string | null;
   isShared: boolean;
+  isSeedData: boolean;
   ownerId: string | null;
   ownerName: string | null;
   htmlBody: string;

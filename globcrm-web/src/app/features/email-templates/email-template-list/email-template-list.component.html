@@ -84,6 +84,12 @@
                 <span class="share-badge" [class.shared]="template.isShared">
                   {{ template.isShared ? 'Shared' : 'Personal' }}
                 </span>
+                @if (template.isSeedData) {
+                  <span class="starter-badge">Starter</span>
+                }
+                @if (template.isShared && template.ownerName) {
+                  <span class="owner-label">by {{ template.ownerName }}</span>
+                }
               </div>
             </mat-card-content>
 
