@@ -156,7 +156,15 @@ Plans:
   3. User can view detailed workflow execution logs showing which trigger fired, which conditions were evaluated, and the result of each action
   4. User can enable/disable workflows without deleting them, and admin can select from prebuilt workflow templates as starting points
   5. Workflow engine enforces execution depth limits and loop prevention to avoid infinite cascading triggers
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+- [ ] 19-01-PLAN.md — Backend domain entities, enums, EF configurations, migration, RLS, repository, and seed data
+- [ ] 19-02-PLAN.md — Backend execution engine (domain event handler, condition evaluator, action executor, loop guard, 6 action types, date trigger scan)
+- [ ] 19-03-PLAN.md — Backend API controllers (workflow CRUD, enable/disable, execution logs, templates), Program.cs wiring
+- [ ] 19-04-PLAN.md — Frontend models, service, store, routes, card grid list page with flow diagram thumbnails, navigation
+- [ ] 19-05-PLAN.md — Frontend workflow builder (@foblex/flow canvas, node components, config panels, template gallery, toolbar)
+- [ ] 19-06-PLAN.md — Frontend workflow detail page, execution log list and detail components
 
 ### Phase 20: Advanced Reporting Builder
 **Goal**: Users can build custom reports by selecting entity sources, fields (including formula fields and related entity fields), filters, groupings, and visualizations — then save, share, and export them
