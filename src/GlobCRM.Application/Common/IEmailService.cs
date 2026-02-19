@@ -42,4 +42,13 @@ public interface IEmailService
     /// <param name="message">Notification message body with context.</param>
     /// <param name="entityUrl">Optional relative URL for "View in GlobCRM" deep link.</param>
     Task SendNotificationEmailAsync(string email, string userName, string title, string message, string? entityUrl);
+
+    /// <summary>
+    /// Sends a raw HTML email with the given subject and body.
+    /// Used for template test sends and custom email delivery.
+    /// </summary>
+    /// <param name="toEmail">Recipient email address.</param>
+    /// <param name="subject">Email subject line.</param>
+    /// <param name="htmlBody">Rendered HTML body content.</param>
+    Task SendRawEmailAsync(string toEmail, string subject, string htmlBody);
 }

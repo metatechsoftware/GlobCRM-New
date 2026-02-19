@@ -173,6 +173,14 @@ public class SendGridEmailSender : IEmailService
 </html>";
     }
 
+    /// <inheritdoc />
+    public async Task SendRawEmailAsync(string toEmail, string subject, string htmlBody)
+    {
+        _logger.LogInformation("=== RAW EMAIL ===\nTo: {Email}\nSubject: {Subject}\n=================", toEmail, subject);
+
+        await SendEmailAsync(toEmail, subject, htmlBody, "raw-template");
+    }
+
     /// <summary>
     /// Sends an email via SendGrid with structured logging for delivery tracking.
     /// </summary>
