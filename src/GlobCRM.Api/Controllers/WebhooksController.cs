@@ -283,6 +283,155 @@ public class WebhooksController : ControllerBase
         return Ok(WebhookSubscriptionDto.FromEntity(subscription));
     }
 
+    // ---- Delivery Log Endpoints ----
+
+    /// <summary>
+    /// Get delivery logs across all subscriptions with optional subscription filter.
+    /// Paginated with total count for UI pagination.
+    /// </summary>
+    [HttpGet("delivery-logs")]
+    [ProducesResponseType(typeof(PagedDeliveryLogResponse), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetDeliveryLogs(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 25,
+        [FromQuery] Guid? subscriptionId = null)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 25;
+        if (pageSize > 100) pageSize = 100;
+
+        var (items, totalCount) = await _webhookRepository.GetDeliveryLogsAsync(
+            subscriptionId, page, pageSize, CancellationToken.None);
+
+        return Ok(new PagedDeliveryLogResponse
+        {
+            Items = items.Select(WebhookDeliveryLogDto.FromEntity).ToList(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        });
+    }
+
+    /// <summary>
+    /// Get delivery logs for a specific subscription. Verifies subscription exists.
+    /// </summary>
+    [HttpGet("{id:guid}/delivery-logs")]
+    [ProducesResponseType(typeof(PagedDeliveryLogResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetSubscriptionDeliveryLogs(
+        Guid id,
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 25)
+    {
+        if (page < 1) page = 1;
+        if (pageSize < 1) pageSize = 25;
+        if (pageSize > 100) pageSize = 100;
+
+        var subscription = await _webhookRepository.GetSubscriptionByIdAsync(id, CancellationToken.None);
+        if (subscription is null)
+            return NotFound(new { error = "Webhook subscription not found." });
+
+        var (items, totalCount) = await _webhookRepository.GetDeliveryLogsAsync(
+            id, page, pageSize, CancellationToken.None);
+
+        return Ok(new PagedDeliveryLogResponse
+        {
+            Items = items.Select(WebhookDeliveryLogDto.FromEntity).ToList(),
+            TotalCount = totalCount,
+            Page = page,
+            PageSize = pageSize
+        });
+    }
+
+    // ---- Test & Retry Endpoints ----
+
+    /// <summary>
+    /// Test a webhook subscription. Two-step process:
+    /// - preview=true: Returns sample payload for inspection
+    /// - preview=false (or omitted): Enqueues a real delivery with sample data
+    /// </summary>
+    [HttpPost("{id:guid}/test")]
+    [ProducesResponseType(typeof(WebhookTestPreviewResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> TestWebhook(Guid id, [FromBody] WebhookTestRequest? request)
+    {
+        var subscription = await _webhookRepository.GetSubscriptionByIdAsync(id, CancellationToken.None);
+        if (subscription is null)
+            return NotFound(new { error = "Webhook subscription not found." });
+
+        // Determine which event type to use for the sample (first in the subscription's list)
+        var eventKey = subscription.EventSubscriptions.FirstOrDefault() ?? "Contact.Created";
+        var parts = eventKey.Split('.');
+        var entityType = parts.Length > 0 ? parts[0] : "Contact";
+        var eventType = parts.Length > 1 ? parts[1] : "Created";
+
+        // Build sample payload using the webhook envelope format
+        var samplePayload = BuildSamplePayload(entityType, eventType);
+
+        // Preview mode: return the payload for inspection
+        if (request?.Preview == true)
+        {
+            return Ok(new WebhookTestPreviewResponse { SamplePayload = samplePayload });
+        }
+
+        // Send mode: enqueue a real delivery
+        var tenantId = _tenantProvider.GetTenantId()
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        _jobClient.Enqueue<WebhookDeliveryService>(
+            WebhookDeliveryService.QueueName,
+            svc => svc.DeliverAsync(id, samplePayload, tenantId, 0));
+
+        _logger.LogInformation(
+            "Test webhook enqueued for subscription {SubscriptionId} ({SubscriptionName})",
+            id, subscription.Name);
+
+        return Ok(new { message = "Test webhook enqueued for delivery." });
+    }
+
+    /// <summary>
+    /// Retry a failed delivery by re-enqueuing the original payload.
+    /// Validates that the log entry is a failure and the subscription is still active.
+    /// </summary>
+    [HttpPost("delivery-logs/{logId:guid}/retry")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RetryDelivery(Guid logId)
+    {
+        var log = await _webhookRepository.GetDeliveryLogByIdAsync(logId, CancellationToken.None);
+        if (log is null)
+            return NotFound(new { error = "Delivery log entry not found." });
+
+        if (log.Success)
+            return BadRequest(new { error = "Cannot retry a successful delivery." });
+
+        // Verify the subscription still exists and is usable
+        var subscription = await _webhookRepository.GetSubscriptionByIdAsync(
+            log.SubscriptionId, CancellationToken.None);
+        if (subscription is null)
+            return BadRequest(new { error = "The subscription for this delivery no longer exists." });
+
+        if (!subscription.IsActive)
+            return BadRequest(new { error = "The subscription is currently inactive. Enable it before retrying." });
+
+        if (subscription.IsDisabled)
+            return BadRequest(new { error = "The subscription is auto-disabled. Re-enable it before retrying." });
+
+        var tenantId = _tenantProvider.GetTenantId()
+            ?? throw new InvalidOperationException("No tenant context.");
+
+        _jobClient.Enqueue<WebhookDeliveryService>(
+            WebhookDeliveryService.QueueName,
+            svc => svc.DeliverAsync(log.SubscriptionId, log.RequestPayload, tenantId, 0));
+
+        _logger.LogInformation(
+            "Delivery retry enqueued for log {LogId}, subscription {SubscriptionId}",
+            logId, log.SubscriptionId);
+
+        return Ok(new { message = "Delivery retry enqueued." });
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -290,6 +439,104 @@ public class WebhooksController : ControllerBase
         var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier)
             ?? throw new InvalidOperationException("User ID not found in claims.");
         return Guid.Parse(userIdClaim);
+    }
+
+    /// <summary>
+    /// Builds a sample webhook payload with realistic fake data for the specified entity type.
+    /// Uses the standard webhook envelope format for consistency with real deliveries.
+    /// </summary>
+    private static string BuildSamplePayload(string entityType, string eventType)
+    {
+        var sampleId = "00000000-0000-0000-0000-000000000001";
+        var timestamp = DateTimeOffset.UtcNow.ToString("o");
+
+        var data = entityType switch
+        {
+            "Contact" => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["firstName"] = "Jane",
+                ["lastName"] = "Doe",
+                ["email"] = "jane.doe@example.com",
+                ["phone"] = "+1 (555) 123-4567",
+                ["jobTitle"] = "Marketing Director",
+                ["department"] = "Marketing",
+                ["companyId"] = "00000000-0000-0000-0000-000000000002",
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            },
+            "Company" => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["name"] = "Acme Corp",
+                ["industry"] = "Technology",
+                ["website"] = "https://acme.com",
+                ["phone"] = "+1 (555) 987-6543",
+                ["email"] = "info@acme.com",
+                ["size"] = "51-200",
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            },
+            "Deal" => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["title"] = "Enterprise License",
+                ["value"] = 50000,
+                ["probability"] = 75,
+                ["expectedCloseDate"] = DateOnly.FromDateTime(DateTime.UtcNow.AddDays(30)).ToString("yyyy-MM-dd"),
+                ["pipelineId"] = "00000000-0000-0000-0000-000000000003",
+                ["pipelineStageId"] = "00000000-0000-0000-0000-000000000004",
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            },
+            "Lead" => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["firstName"] = "Test",
+                ["lastName"] = "Lead",
+                ["email"] = "lead@example.com",
+                ["phone"] = "+1 (555) 456-7890",
+                ["companyName"] = "Test Company Inc.",
+                ["temperature"] = "warm",
+                ["isConverted"] = false,
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            },
+            "Activity" => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["subject"] = "Follow-up Call",
+                ["type"] = "call",
+                ["status"] = "planned",
+                ["priority"] = "medium",
+                ["dueDate"] = DateTimeOffset.UtcNow.AddDays(1).ToString("o"),
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            },
+            _ => new Dictionary<string, object?>
+            {
+                ["id"] = sampleId,
+                ["createdAt"] = timestamp,
+                ["updatedAt"] = timestamp
+            }
+        };
+
+        var envelope = new Dictionary<string, object?>
+        {
+            ["id"] = Guid.NewGuid().ToString(),
+            ["timestamp"] = timestamp,
+            ["version"] = "1.0",
+            ["tenantId"] = "00000000-0000-0000-0000-000000000000",
+            ["event"] = $"{entityType.ToLowerInvariant()}.{eventType.ToLowerInvariant()}",
+            ["data"] = data
+        };
+
+        return System.Text.Json.JsonSerializer.Serialize(envelope, new System.Text.Json.JsonSerializerOptions
+        {
+            PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+            DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
+            WriteIndented = true
+        });
     }
 }
 
