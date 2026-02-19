@@ -134,6 +134,12 @@ public class ApplicationDbContext
     public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
     public DbSet<WebhookDeliveryLog> WebhookDeliveryLogs => Set<WebhookDeliveryLog>();
 
+    // Email Sequences DbSets
+    public DbSet<EmailSequence> EmailSequences => Set<EmailSequence>();
+    public DbSet<EmailSequenceStep> EmailSequenceSteps => Set<EmailSequenceStep>();
+    public DbSet<SequenceEnrollment> SequenceEnrollments => Set<SequenceEnrollment>();
+    public DbSet<SequenceTrackingEvent> SequenceTrackingEvents => Set<SequenceTrackingEvent>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -230,6 +236,12 @@ public class ApplicationDbContext
         // Webhooks entity configurations
         modelBuilder.ApplyConfiguration(new WebhookSubscriptionConfiguration());
         modelBuilder.ApplyConfiguration(new WebhookDeliveryLogConfiguration());
+
+        // Email Sequences entity configurations
+        modelBuilder.ApplyConfiguration(new EmailSequenceConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailSequenceStepConfiguration());
+        modelBuilder.ApplyConfiguration(new SequenceEnrollmentConfiguration());
+        modelBuilder.ApplyConfiguration(new SequenceTrackingEventConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -399,5 +411,20 @@ public class ApplicationDbContext
         // Global query filter: filter WebhookDeliveryLogs by TenantId (tenant-scoped)
         modelBuilder.Entity<WebhookDeliveryLog>().HasQueryFilter(
             wdl => _tenantProvider == null || _tenantProvider.GetTenantId() == null || wdl.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter EmailSequences by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailSequence>().HasQueryFilter(
+            es => _tenantProvider == null || _tenantProvider.GetTenantId() == null || es.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: EmailSequenceStep does NOT need its own query filter --
+        // it is filtered through its parent EmailSequence FK which is already tenant-filtered.
+
+        // Global query filter: filter SequenceEnrollments by TenantId (tenant-scoped)
+        modelBuilder.Entity<SequenceEnrollment>().HasQueryFilter(
+            se => _tenantProvider == null || _tenantProvider.GetTenantId() == null || se.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter SequenceTrackingEvents by TenantId (tenant-scoped)
+        modelBuilder.Entity<SequenceTrackingEvent>().HasQueryFilter(
+            ste => _tenantProvider == null || _tenantProvider.GetTenantId() == null || ste.TenantId == _tenantProvider.GetTenantId());
     }
 }

@@ -557,6 +557,54 @@ COMMENT ON POLICY tenant_isolation_webhook_delivery_logs ON webhook_delivery_log
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- email_sequences - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_sequences ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_sequences FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_sequences ON email_sequences
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_sequences ON email_sequences IS
+    'Ensures email sequence queries only return sequences for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: email_sequence_steps does NOT need an RLS policy. It is accessed through
+-- FK joins from its tenant-filtered parent (email_sequences).
+
+-- =====================================================================
+-- sequence_enrollments - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE sequence_enrollments ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE sequence_enrollments FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_sequence_enrollments ON sequence_enrollments
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_sequence_enrollments ON sequence_enrollments IS
+    'Ensures sequence enrollment queries only return enrollments for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- sequence_tracking_events - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE sequence_tracking_events ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE sequence_tracking_events FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_sequence_tracking_events ON sequence_tracking_events
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_sequence_tracking_events ON sequence_tracking_events IS
+    'Ensures sequence tracking event queries only return events for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

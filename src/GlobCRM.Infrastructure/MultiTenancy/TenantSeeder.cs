@@ -152,6 +152,34 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Email Sequence seed data ────────────────
+        // Tracking events and enrollments first (children), then steps (cascade), then sequences
+        var seedSequenceIds = await _db.EmailSequences
+            .Where(s => s.TenantId == organizationId && s.IsSeedData)
+            .Select(s => s.Id)
+            .ToListAsync();
+
+        if (seedSequenceIds.Count > 0)
+        {
+            var seedEnrollmentIds = await _db.SequenceEnrollments
+                .Where(e => seedSequenceIds.Contains(e.SequenceId))
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            if (seedEnrollmentIds.Count > 0)
+            {
+                await _db.SequenceTrackingEvents
+                    .Where(t => seedEnrollmentIds.Contains(t.EnrollmentId))
+                    .ExecuteDeleteAsync();
+            }
+
+            await _db.SequenceEnrollments
+                .Where(e => seedSequenceIds.Contains(e.SequenceId))
+                .ExecuteDeleteAsync();
+        }
+
+        await _db.EmailSequences.Where(s => s.TenantId == organizationId && s.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing Email Template seed data ────────────────
         await _db.EmailTemplates.Where(t => t.TenantId == organizationId && t.IsSeedData).ExecuteDeleteAsync();
         await _db.EmailTemplateCategories.Where(c => c.TenantId == organizationId && c.IsSeedData).ExecuteDeleteAsync();
@@ -1567,6 +1595,11 @@ public class TenantSeeder : ITenantSeeder
         // STEP 11: Email Template Categories + Starter Templates
         // ══════════════════════════════════════════════════════════
         await SeedEmailTemplatesAsync(organizationId);
+
+        // ══════════════════════════════════════════════════════════
+        // STEP 12: Email Sequences (depends on templates from Step 11)
+        // ══════════════════════════════════════════════════════════
+        await SeedEmailSequencesAsync(organizationId);
     }
 
     /// <summary>
@@ -1704,6 +1737,160 @@ public class TenantSeeder : ITenantSeeder
         _logger.LogInformation(
             "Email template seed data created for organization {OrgId}: 4 categories, 5 templates",
             organizationId);
+    }
+
+    /// <summary>
+    /// Seeds a sample email sequence with steps and enrollments for a new organization.
+    /// Creates 1 "New Customer Onboarding" sequence (Active, 3 steps) and 3 sample enrollments.
+    /// Must be called AFTER SeedEmailTemplatesAsync (steps reference templates).
+    /// </summary>
+    private async Task SeedEmailSequencesAsync(Guid organizationId)
+    {
+        // ── Get first seed user and first 3 seed templates ──────────
+        var seedUser = await _db.Users
+            .Where(u => u.OrganizationId == organizationId)
+            .OrderBy(u => u.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (seedUser == null)
+        {
+            _logger.LogWarning("No users found for organization {OrgId}, skipping sequence seeding", organizationId);
+            return;
+        }
+
+        var seedTemplates = await _db.EmailTemplates
+            .Where(t => t.TenantId == organizationId && t.IsSeedData)
+            .OrderBy(t => t.CreatedAt)
+            .Take(3)
+            .ToListAsync();
+
+        if (seedTemplates.Count < 3)
+        {
+            _logger.LogWarning("Not enough seed templates ({Count}) for organization {OrgId}, skipping sequence seeding",
+                seedTemplates.Count, organizationId);
+            return;
+        }
+
+        // ── Create Sequence ─────────────────────────────────────────
+        var sequence = new EmailSequence
+        {
+            TenantId = organizationId,
+            Name = "New Customer Onboarding",
+            Description = "A 3-step welcome sequence for newly onboarded customers. Sends a welcome email immediately, a follow-up after 2 days, and a meeting request after 5 days.",
+            Status = SequenceStatus.Active,
+            CreatedByUserId = seedUser.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _db.EmailSequences.Add(sequence);
+        await _db.SaveChangesAsync();
+
+        // ── Create Steps ─────────────────────────────────────────
+        var steps = new List<EmailSequenceStep>
+        {
+            new()
+            {
+                SequenceId = sequence.Id,
+                StepNumber = 1,
+                EmailTemplateId = seedTemplates[0].Id,
+                DelayDays = 0,
+                PreferredSendTime = new TimeOnly(9, 0),
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            new()
+            {
+                SequenceId = sequence.Id,
+                StepNumber = 2,
+                EmailTemplateId = seedTemplates[1].Id,
+                SubjectOverride = "Checking in - how's everything going?",
+                DelayDays = 2,
+                PreferredSendTime = new TimeOnly(9, 0),
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            new()
+            {
+                SequenceId = sequence.Id,
+                StepNumber = 3,
+                EmailTemplateId = seedTemplates[2].Id,
+                DelayDays = 5,
+                PreferredSendTime = new TimeOnly(9, 0),
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            }
+        };
+
+        _db.EmailSequenceSteps.AddRange(steps);
+        await _db.SaveChangesAsync();
+
+        // ── Create Sample Enrollments ──────────────────────────────
+        var seedContacts = await _db.Contacts
+            .Where(c => c.TenantId == organizationId && c.IsSeedData)
+            .OrderBy(c => c.CreatedAt)
+            .Take(3)
+            .ToListAsync();
+
+        if (seedContacts.Count >= 3)
+        {
+            var enrollments = new List<SequenceEnrollment>
+            {
+                // Active enrollment - currently on step 2
+                new()
+                {
+                    TenantId = organizationId,
+                    SequenceId = sequence.Id,
+                    ContactId = seedContacts[0].Id,
+                    Status = EnrollmentStatus.Active,
+                    CurrentStepNumber = 2,
+                    StepsSent = 2,
+                    LastStepSentAt = DateTimeOffset.UtcNow.AddDays(-1),
+                    CreatedByUserId = seedUser.Id,
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-3),
+                    UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1)
+                },
+                // Completed enrollment - all steps sent
+                new()
+                {
+                    TenantId = organizationId,
+                    SequenceId = sequence.Id,
+                    ContactId = seedContacts[1].Id,
+                    Status = EnrollmentStatus.Completed,
+                    CurrentStepNumber = 3,
+                    StepsSent = 3,
+                    LastStepSentAt = DateTimeOffset.UtcNow.AddDays(-2),
+                    CompletedAt = DateTimeOffset.UtcNow.AddDays(-2),
+                    CreatedByUserId = seedUser.Id,
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-10),
+                    UpdatedAt = DateTimeOffset.UtcNow.AddDays(-2)
+                },
+                // Replied enrollment - contact replied at step 1
+                new()
+                {
+                    TenantId = organizationId,
+                    SequenceId = sequence.Id,
+                    ContactId = seedContacts[2].Id,
+                    Status = EnrollmentStatus.Replied,
+                    CurrentStepNumber = 1,
+                    StepsSent = 1,
+                    LastStepSentAt = DateTimeOffset.UtcNow.AddDays(-5),
+                    RepliedAt = DateTimeOffset.UtcNow.AddDays(-4),
+                    ReplyStepNumber = 1,
+                    CreatedByUserId = seedUser.Id,
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-6),
+                    UpdatedAt = DateTimeOffset.UtcNow.AddDays(-4)
+                }
+            };
+
+            _db.SequenceEnrollments.AddRange(enrollments);
+            await _db.SaveChangesAsync();
+        }
+
+        _logger.LogInformation(
+            "Email sequence seed data created for organization {OrgId}: 1 sequence, 3 steps, {EnrollmentCount} enrollments",
+            organizationId, seedContacts.Count >= 3 ? 3 : 0);
     }
 
     // ── Starter Template HTML Builders ─────────────────────────

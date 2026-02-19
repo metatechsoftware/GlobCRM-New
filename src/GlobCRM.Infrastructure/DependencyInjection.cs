@@ -8,6 +8,7 @@ using GlobCRM.Infrastructure.Authorization;
 using GlobCRM.Infrastructure.DomainEvents;
 using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
+using GlobCRM.Infrastructure.Persistence.Repositories;
 using GlobCRM.Infrastructure.Webhooks;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
@@ -184,6 +185,10 @@ public static class DependencyInjection
 
         // ---- Webhook delivery pipeline (handler, delivery service, SSRF validator, payload builder) ----
         services.AddWebhookServices();
+
+        // ---- Email sequence repositories ----
+        services.AddScoped<IEmailSequenceRepository, EmailSequenceRepository>();
+        services.AddScoped<ISequenceEnrollmentRepository, SequenceEnrollmentRepository>();
 
         return services;
     }
