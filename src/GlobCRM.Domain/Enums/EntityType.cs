@@ -17,5 +17,6 @@ public enum EntityType
     Lead,
     EmailTemplate,
     EmailSequence,
-    Workflow
+    Workflow,
+    Report
 }
