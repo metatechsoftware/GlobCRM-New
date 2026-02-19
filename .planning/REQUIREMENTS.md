@@ -91,6 +91,7 @@ Deferred to future release. Tracked but not in current roadmap.
 | Admin-controlled My Day layouts | My Day is personal; admins control org dashboard only |
 | Real-time polling on all My Day widgets | Refresh on load + manual refresh; SignalR for specific events only |
 | External calendar embedding (Google/Outlook) | OAuth per provider adds complexity; show CRM activities only |
+| Configurable widget layout (gridster drag-and-drop) | Deferred to MYDAY-13; My Day uses fixed layout for v1.2 |
 
 ## Traceability
 
@@ -98,13 +99,49 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | — |
+| PREVIEW-01 | Phase 22 | Pending |
+| PREVIEW-02 | Phase 22 | Pending |
+| PREVIEW-03 | Phase 22 | Pending |
+| PREVIEW-04 | Phase 22 | Pending |
+| PREVIEW-05 | Phase 22 | Pending |
+| PREVIEW-06 | Phase 22 | Pending |
+| PREVIEW-07 | Phase 22 | Pending |
+| PREVIEW-08 | Phase 25 | Pending |
+| PREVIEW-09 | Phase 25 | Pending |
+| PREVIEW-10 | Phase 25 | Pending |
+| PREVIEW-11 | Phase 25 | Pending |
+| PREVIEW-12 | Phase 22 | Pending |
+| PREVIEW-13 | Phase 22 | Pending |
+| SUMMARY-01 | Phase 23 | Pending |
+| SUMMARY-02 | Phase 23 | Pending |
+| SUMMARY-03 | Phase 23 | Pending |
+| SUMMARY-04 | Phase 23 | Pending |
+| SUMMARY-05 | Phase 23 | Pending |
+| SUMMARY-06 | Phase 23 | Pending |
+| SUMMARY-07 | Phase 23 | Pending |
+| SUMMARY-08 | Phase 23 | Pending |
+| SUMMARY-09 | Phase 23 | Pending |
+| SUMMARY-10 | Phase 23 | Pending |
+| SUMMARY-11 | Phase 23 | Pending |
+| SUMMARY-12 | Phase 23 | Pending |
+| MYDAY-01 | Phase 24 | Pending |
+| MYDAY-02 | Phase 24 | Pending |
+| MYDAY-03 | Phase 24 | Pending |
+| MYDAY-04 | Phase 24 | Pending |
+| MYDAY-05 | Phase 24 | Pending |
+| MYDAY-06 | Phase 24 | Pending |
+| MYDAY-07 | Phase 24 | Pending |
+| MYDAY-08 | Phase 24 | Pending |
+| MYDAY-09 | Phase 24 | Pending |
+| MYDAY-10 | Phase 24 | Pending |
+| MYDAY-11 | Phase 24 | Pending |
+| MYDAY-12 | Phase 24 | Pending |
 
 **Coverage:**
 - v1 requirements: 37 total
-- Mapped to phases: 0
-- Unmapped: 37 (pending roadmap creation)
+- Mapped to phases: 37
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-20*
-*Last updated: 2026-02-20 after initial definition*
+*Last updated: 2026-02-20 after roadmap creation*
