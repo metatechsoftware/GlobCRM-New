@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar)
-Plan: 0 of 4 in current phase
-Status: Ready to plan
-Last activity: 2026-02-20 — Roadmap created for v1.2 Connected Experience
+Plan: 1 of 4 in current phase
+Status: Executing
+Last activity: 2026-02-20 — Completed 22-01 (Shared Foundation)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████░░░░░░░] 93% (139/153 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████░░░░░░░] 91% (140/153 plans)
 
 ## Milestones
 
@@ -41,6 +41,9 @@ Recent decisions for v1.2:
 - Summary tabs use single batched aggregation endpoints (not N+1 individual calls)
 - My Day has FIXED layout (user deferred configurable gridster drag-and-drop to v1.3+)
 - Zero new packages needed for v1.2
+- EntityTypeRegistry as pure constant map (not injectable service) for tree-shaking
+- EntityName backfill via raw SQL JOINs in migration Up method
+- ShowInPreview uses nullable bool on update requests for partial update semantics
 
 ### Pending Todos
 
@@ -49,10 +52,10 @@ None.
 ### Blockers/Concerns
 
 - Phase 24 needs schema design session during planning: DashboardScope enum, "create on first access" strategy for personal dashboards
-- entity_name migration on feed_items: nullable column first, backfill, then enforce not-null
+- entity_name migration on feed_items: DONE (nullable column with backfill, applied via 22-01)
 
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 22 context gathered
-Next step: /gsd:plan-phase 22
+Stopped at: Completed 22-01-PLAN.md
+Next step: Execute 22-02-PLAN.md
