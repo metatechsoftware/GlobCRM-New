@@ -196,13 +196,15 @@ export const ReportStore = signalStore(
       // ---- Field Metadata ----
 
       loadFieldMetadata(entityType: string): void {
+        patchState(store, { fieldMetadata: null, error: null });
         service.getFieldMetadata(entityType).subscribe({
           next: (metadata) => {
-            patchState(store, { fieldMetadata: metadata });
+            patchState(store, { fieldMetadata: metadata, error: null });
           },
           error: (err) => {
             patchState(store, {
-              error: err?.message ?? 'Failed to load field metadata',
+              fieldMetadata: null,
+              error: err?.error?.error ?? err?.message ?? `Failed to load fields for ${entityType}`,
             });
           },
         });

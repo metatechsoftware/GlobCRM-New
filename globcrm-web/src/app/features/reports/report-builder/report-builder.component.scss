@@ -95,6 +95,27 @@
     }
   }
 
+  // Sidebar Error
+  &__sidebar-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2, 8px);
+    padding: var(--space-3, 12px);
+    margin: 0 var(--space-2, 8px) var(--space-2, 8px);
+    border-radius: var(--radius-md, 8px);
+    background: var(--color-warning-soft, #FEF3C7);
+    color: var(--color-warning-text, #92400E);
+    font-size: var(--text-sm, 13px);
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+  }
+
   // Actions
   &__actions {
     display: flex;

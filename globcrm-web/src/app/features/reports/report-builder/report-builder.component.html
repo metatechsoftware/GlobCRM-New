@@ -57,6 +57,14 @@
         />
       </div>
 
+      <!-- Error feedback for sidebar operations -->
+      @if (store.error()) {
+        <div class="report-builder__sidebar-error">
+          <mat-icon>warning</mat-icon>
+          <span>{{ store.error() }}</span>
+        </div>
+      }
+
       <!-- Fixed Bottom Actions -->
       <div class="report-builder__actions">
         <button

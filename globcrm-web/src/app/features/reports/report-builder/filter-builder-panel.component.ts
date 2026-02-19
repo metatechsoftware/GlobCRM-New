@@ -211,6 +211,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
             [filterGroup]="childGroup"
             [isNested]="true"
             (filterGroupChange)="onChildGroupChange(childIdx, $event)"
+            (removeRequest)="onChildGroupRemove(childIdx)"
           ></app-filter-builder-panel>
         }
 
@@ -509,6 +510,12 @@ export class FilterBuilderPanelComponent {
     const groups = group.groups.map((g, i) =>
       i === index ? updatedChild : g
     );
+    this.emitUpdate({ ...group, groups });
+  }
+
+  onChildGroupRemove(index: number): void {
+    const group = this.currentGroup();
+    const groups = group.groups.filter((_, i) => i !== index);
     this.emitUpdate({ ...group, groups });
   }
 
