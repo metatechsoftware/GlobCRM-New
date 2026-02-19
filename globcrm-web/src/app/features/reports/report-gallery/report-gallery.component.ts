@@ -112,7 +112,7 @@ export class ReportGalleryComponent implements OnInit {
     this.router.navigate(['/reports', report.id]);
   }
 
-  private loadReports(): void {
+  loadReports(): void {
     this.store.loadReports({
       categoryId: this.categoryFilter() || undefined,
       entityType: this.entityTypeFilter() || undefined,

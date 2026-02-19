@@ -73,8 +73,21 @@
     </div>
   }
 
+  <!-- Error State -->
+  @if (!store.loading() && store.error()) {
+    <div class="report-gallery__error">
+      <mat-icon>error_outline</mat-icon>
+      <h3>Unable to load reports</h3>
+      <p>{{ store.error() }}</p>
+      <button mat-raised-button color="primary" (click)="loadReports()">
+        <mat-icon>refresh</mat-icon>
+        Retry
+      </button>
+    </div>
+  }
+
   <!-- Empty State -->
-  @if (!store.loading() && store.reports().length === 0) {
+  @if (!store.loading() && !store.error() && store.reports().length === 0) {
     <div class="report-gallery__empty">
       <mat-icon>bar_chart</mat-icon>
       <h3>No reports found</h3>
@@ -89,7 +102,7 @@
   }
 
   <!-- Card Grid -->
-  @if (!store.loading() && store.reports().length > 0) {
+  @if (!store.loading() && !store.error() && store.reports().length > 0) {
     <div class="report-gallery__grid">
       @for (report of store.reports(); track report.id) {
         <app-report-card

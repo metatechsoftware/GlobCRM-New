@@ -97,6 +97,37 @@
   }
 }
 
+// ---- Error State ----
+.report-gallery__error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  padding: var(--space-12, 48px) var(--space-4, 16px);
+  text-align: center;
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    color: var(--color-error, #DC2626);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: var(--text-lg, 18px);
+    font-weight: var(--font-semibold, 600);
+    color: var(--color-text, #1A1A1A);
+  }
+
+  p {
+    margin: 0;
+    font-size: var(--text-sm, 14px);
+    color: var(--color-text-secondary, #6B7280);
+    max-width: 400px;
+  }
+}
+
 // ---- Skeleton Loading ----
 .report-gallery__skeleton-card {
   background: var(--color-surface, #fff);

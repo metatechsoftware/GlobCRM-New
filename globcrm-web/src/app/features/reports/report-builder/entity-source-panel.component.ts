@@ -5,6 +5,7 @@ import {
   output,
   signal,
   effect,
+  computed,
 } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -74,6 +75,9 @@ const ENTITY_OPTIONS: EntityOption[] = [
             [ngModel]="entityTypeValue()"
             (ngModelChange)="onEntityTypeChange($event)"
           >
+            <mat-select-trigger>
+              {{ selectedEntityLabel() }}
+            </mat-select-trigger>
             @for (entity of entityOptions; track entity.value) {
               <mat-option [value]="entity.value">
                 <div class="entity-option">
@@ -151,6 +155,13 @@ export class EntitySourcePanelComponent {
   readonly categoryIdChange = output<string | null>();
 
   readonly entityOptions = ENTITY_OPTIONS;
+
+  readonly selectedEntityLabel = computed(() => {
+    const value = this.entityTypeValue();
+    if (!value) return '';
+    const option = this.entityOptions.find(e => e.value === value);
+    return option?.label ?? value;
+  });
 
   // Local signals for two-way binding
   readonly entityTypeValue = signal('');
