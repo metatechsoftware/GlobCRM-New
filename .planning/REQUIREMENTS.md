@@ -1,0 +1,110 @@
+# Requirements: GlobCRM v1.2 Connected Experience
+
+**Defined:** 2026-02-20
+**Core Value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
+
+## v1 Requirements
+
+Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
+
+### Entity Preview Sidebar
+
+- [ ] **PREVIEW-01**: User can click entity names in feed items to open a preview sidebar instead of navigating away
+- [ ] **PREVIEW-02**: Preview sidebar slides in from the right (~400px) as an overlay without displacing page content
+- [ ] **PREVIEW-03**: User sees key properties (name, status/stage, owner, primary info) for each entity type in preview
+- [ ] **PREVIEW-04**: User can click "Open full record" to navigate to the entity detail page from preview
+- [ ] **PREVIEW-05**: User can close the preview sidebar by clicking outside or pressing Escape
+- [ ] **PREVIEW-06**: User sees a loading skeleton while preview data is being fetched
+- [ ] **PREVIEW-07**: Feed scroll position is preserved when opening and closing the preview sidebar
+- [ ] **PREVIEW-08**: Preview sidebar displays full-width on mobile screens (< 768px)
+- [ ] **PREVIEW-09**: User can open entity preview from global search results
+- [ ] **PREVIEW-10**: User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) from the preview sidebar
+- [ ] **PREVIEW-11**: User can click author names in feed to preview user profiles (name, role, email, avatar)
+- [ ] **PREVIEW-12**: Preview sidebar displays association chips (related records) linking to their detail pages
+- [ ] **PREVIEW-13**: Preview sidebar shows last 3 recent activities in condensed timeline
+
+### Summary Tabs on Detail Pages
+
+- [ ] **SUMMARY-01**: Summary tab appears as the first (default) tab on Company, Contact, Deal, Lead, Quote, and Request detail pages
+- [ ] **SUMMARY-02**: Summary tab displays a key properties card with 4-8 highlighted fields per entity type (read-only)
+- [ ] **SUMMARY-03**: Summary tab shows association counts (e.g., "5 Contacts, 3 Deals") that link to respective tabs
+- [ ] **SUMMARY-04**: Summary tab displays last 3-5 recent activities in condensed format
+- [ ] **SUMMARY-05**: Summary tab displays upcoming activities (not done, due today or later) in condensed format
+- [ ] **SUMMARY-06**: Summary tab shows stage/status indicator: pipeline stepper for Deals, stage+temperature for Leads, status badges for Quotes/Requests
+- [ ] **SUMMARY-07**: Summary tab includes a quick action bar (Add Note, Log Activity, Send Email) with entity-type-specific actions
+- [ ] **SUMMARY-08**: Company and Contact summary tabs show mini deal/pipeline summary (total value, deals by stage chart, win rate)
+- [ ] **SUMMARY-09**: Contact summary tab shows email engagement summary (last sent/received, total exchanged)
+- [ ] **SUMMARY-10**: Summary tab shows last 2-3 notes preview (truncated to ~100 chars)
+- [ ] **SUMMARY-11**: Summary tab displays "Last contacted" timestamp prominently
+- [ ] **SUMMARY-12**: Summary tab shows attachments count badge
+
+### My Day Personal Dashboard
+
+- [ ] **MYDAY-01**: User sees "My Day" as the default landing page after login
+- [ ] **MYDAY-02**: My Day displays a personalized greeting with date/time context
+- [ ] **MYDAY-03**: My Day shows today's tasks/activities widget (assigned to user, due today, not done)
+- [ ] **MYDAY-04**: My Day highlights overdue tasks with urgency indicators
+- [ ] **MYDAY-05**: My Day shows an upcoming events/calendar widget (today + next 2 days, compact agenda)
+- [ ] **MYDAY-06**: My Day shows a personal pipeline summary widget (user's deals grouped by stage with values)
+- [ ] **MYDAY-07**: My Day includes a quick actions row (New Contact, New Deal, Log Activity, New Note, Send Email)
+- [ ] **MYDAY-08**: My Day shows a recent records widget (last 5-8 recently viewed entities)
+- [ ] **MYDAY-09**: Org dashboard relocated to its own menu item, accessible via sidebar navigation
+- [ ] **MYDAY-10**: My Day includes an email summary widget (unread count, recent emails)
+- [ ] **MYDAY-11**: My Day includes a feed preview widget (last 5 feed items, compact format)
+- [ ] **MYDAY-12**: My Day includes a notification digest widget (today's notifications grouped by type)
+
+## Future Requirements
+
+Deferred to future release. Tracked but not in current roadmap.
+
+### Entity Preview Enhancements
+
+- **PREVIEW-14**: Inline entity references in feed content (entity names clickable within post text)
+- **PREVIEW-15**: Cross-entity relationship map visualization
+
+### Summary Tab Enhancements
+
+- **SUMMARY-13**: Admin-customizable Summary tab layout per entity type
+- **SUMMARY-14**: AI-generated record summaries with sentiment analysis
+- **SUMMARY-15**: Sparkline trend charts (deal values, activity volume over 30/60/90 days)
+
+### My Day Enhancements
+
+- **MYDAY-13**: Configurable drag-and-drop widget layout (user-customizable My Day arrangement)
+- **MYDAY-14**: Smart nudges / guided actions (rule-based: "3 deals closing this week", "5 overdue activities")
+
+## Out of Scope
+
+| Feature | Reason |
+|---------|--------|
+| Full entity editing in preview sidebar | Preview is read-only context; narrow panel creates poor editing UX |
+| Nested preview-within-preview | One level of preview only; associations navigate to full detail |
+| Custom fields in preview | Variable-length content makes preview unpredictable; core fields only |
+| Preview panel resizing/docking | Fixed ~400px width; "Open full record" for more detail |
+| Real-time updates while preview open | Refresh on re-open; stale-on-close pattern sufficient |
+| Replacing existing left sidebar with MatSidenav | Current CSS sidebar works well; preview uses MatDrawer (right side only) |
+| Editable fields on Summary tab | Summary is read-oriented; edit via Details tab |
+| Full timeline on Summary tab | Summary shows 3-5 recent items; full timeline is its own tab |
+| AI-generated summaries | Requires AI infrastructure; deferred to v2+ |
+| Summary tab on Products | Insufficient connected data; add when Products have richer connections |
+| Full FullCalendar embed on My Day | Heavyweight, redundant with Calendar page; use compact agenda instead |
+| Admin-controlled My Day layouts | My Day is personal; admins control org dashboard only |
+| Real-time polling on all My Day widgets | Refresh on load + manual refresh; SignalR for specific events only |
+| External calendar embedding (Google/Outlook) | OAuth per provider adds complexity; show CRM activities only |
+
+## Traceability
+
+Which phases cover which requirements. Updated during roadmap creation.
+
+| Requirement | Phase | Status |
+|-------------|-------|--------|
+| — | — | — |
+
+**Coverage:**
+- v1 requirements: 37 total
+- Mapped to phases: 0
+- Unmapped: 37 (pending roadmap creation)
+
+---
+*Requirements defined: 2026-02-20*
+*Last updated: 2026-02-20 after initial definition*
