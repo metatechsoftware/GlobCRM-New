@@ -292,7 +292,7 @@ export class TemplateGalleryComponent implements OnInit {
 
   private loadTemplates(): void {
     this.loading.set(true);
-    this.service.getTemplates(undefined, this.entityType() || undefined).subscribe({
+    this.service.getTemplates().subscribe({
       next: (templates) => {
         this.templates.set(templates);
         this.filterTemplates();
@@ -307,14 +307,26 @@ export class TemplateGalleryComponent implements OnInit {
   private filterTemplates(): void {
     const cat = this.selectedCategory();
     const all = this.templates();
+    const currentEntityType = this.entityType();
+
+    let filtered: WorkflowTemplateListItem[];
     if (!cat) {
-      this.filteredTemplates.set(all);
+      filtered = all;
     } else if (cat === 'Custom') {
-      this.filteredTemplates.set(all.filter((t) => !t.isSystem));
+      filtered = all.filter((t) => !t.isSystem);
     } else {
-      this.filteredTemplates.set(
-        all.filter((t) => t.category.toLowerCase() === cat.toLowerCase()),
-      );
+      filtered = all.filter((t) => t.category.toLowerCase() === cat.toLowerCase());
     }
+
+    // Sort templates matching current entity type first for relevance
+    if (currentEntityType) {
+      filtered = [...filtered].sort((a, b) => {
+        const aMatch = a.entityType?.toLowerCase() === currentEntityType.toLowerCase() ? 0 : 1;
+        const bMatch = b.entityType?.toLowerCase() === currentEntityType.toLowerCase() ? 0 : 1;
+        return aMatch - bMatch;
+      });
+    }
+
+    this.filteredTemplates.set(filtered);
   }
 }
