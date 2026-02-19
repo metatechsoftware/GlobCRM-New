@@ -12,6 +12,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
@@ -54,6 +55,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatListModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatSnackBarModule,
     HasPermissionDirective,
     RelatedEntityTabsComponent,
     EntityTimelineComponent,
@@ -289,6 +291,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly emailService = inject(EmailService);
   private readonly noteService = inject(NoteService);
   private readonly permissionStore = inject(PermissionStore);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
 
   /** Company detail data. */
@@ -345,12 +348,24 @@ export class CompanyDetailComponent implements OnInit {
     this.loadTimeline();
   }
 
-  /** Load company detail data. */
+  /** Load company detail data. Handles merged-record redirects. */
   private loadCompany(): void {
     this.isLoading.set(true);
     this.companyService.getById(this.companyId).subscribe({
-      next: (company) => {
-        this.company.set(company);
+      next: (response: any) => {
+        // Check if the response is a merged-record redirect
+        if (response?.isMerged && response?.mergedIntoId) {
+          this.snackBar.open(
+            'This company was merged into another record. Redirecting...',
+            'Close',
+            { duration: 3000 }
+          );
+          this.router.navigate(['/companies', response.mergedIntoId], {
+            replaceUrl: true,
+          });
+          return;
+        }
+        this.company.set(response);
         this.isLoading.set(false);
       },
       error: () => {

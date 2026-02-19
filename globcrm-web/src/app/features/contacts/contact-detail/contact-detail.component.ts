@@ -11,6 +11,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
@@ -51,6 +52,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatIconModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    MatSnackBarModule,
     HasPermissionDirective,
     RelatedEntityTabsComponent,
     EntityTimelineComponent,
@@ -326,6 +328,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly emailService = inject(EmailService);
   private readonly noteService = inject(NoteService);
   private readonly permissionStore = inject(PermissionStore);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
 
   /** Contact detail data. */
@@ -378,12 +381,24 @@ export class ContactDetailComponent implements OnInit {
     this.loadTimeline();
   }
 
-  /** Load contact detail data. */
+  /** Load contact detail data. Handles merged-record redirects. */
   private loadContact(): void {
     this.isLoading.set(true);
     this.contactService.getById(this.contactId).subscribe({
-      next: (contact) => {
-        this.contact.set(contact);
+      next: (response: any) => {
+        // Check if the response is a merged-record redirect
+        if (response?.isMerged && response?.mergedIntoId) {
+          this.snackBar.open(
+            'This contact was merged into another record. Redirecting...',
+            'Close',
+            { duration: 3000 }
+          );
+          this.router.navigate(['/contacts', response.mergedIntoId], {
+            replaceUrl: true,
+          });
+          return;
+        }
+        this.contact.set(response);
         this.isLoading.set(false);
       },
       error: () => {

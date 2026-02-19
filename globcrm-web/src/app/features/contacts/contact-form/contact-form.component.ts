@@ -33,12 +33,15 @@ import {
   CreateContactRequest,
   UpdateContactRequest,
 } from '../contact.models';
+import { DuplicateService } from '../../duplicates/duplicate.service';
+import { ContactDuplicateMatch } from '../../duplicates/duplicate.models';
 
 /**
  * Contact create/edit form component.
  * Renders core contact fields in a 2-column grid with company autocomplete
  * selector and custom field integration.
  * Determines create vs edit mode from the presence of :id route param.
+ * Shows duplicate warning banner on create mode when potential duplicates are detected.
  */
 @Component({
   selector: 'app-contact-form',
@@ -141,6 +144,57 @@ import {
       border-top: 1px solid var(--color-border);
     }
 
+    .duplicate-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      border-radius: 4px;
+    }
+
+    .duplicate-warning mat-icon {
+      color: #ff9800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .duplicate-warning__content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .duplicate-warning__content strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .duplicate-warning__match {
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .duplicate-warning__match a {
+      color: var(--color-primary, #e65100);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .duplicate-warning__match a:hover {
+      text-decoration: none;
+    }
+
+    .duplicate-warning__details {
+      color: var(--color-text-secondary, #64748b);
+    }
+
+    .duplicate-warning__dismiss {
+      flex-shrink: 0;
+    }
+
     :host.dialog-mode .entity-form-container {
       padding: 0;
       max-width: unset;
@@ -168,11 +222,36 @@ import {
           <mat-spinner diameter="48"></mat-spinner>
         </div>
       } @else {
+        <!-- Duplicate warning banner (create mode only) -->
+        @if (potentialDuplicates().length > 0 && !duplicateWarningDismissed()) {
+          <div class="duplicate-warning">
+            <mat-icon>warning</mat-icon>
+            <div class="duplicate-warning__content">
+              <strong>Potential duplicates found:</strong>
+              @for (match of potentialDuplicates(); track match.id) {
+                <div class="duplicate-warning__match">
+                  <a [routerLink]="['/contacts', match.id]" target="_blank">
+                    {{ match.fullName }}
+                  </a>
+                  <span class="duplicate-warning__details">
+                    {{ match.email ? '(' + match.email + ')' : '' }} -- {{ match.score }}% match
+                  </span>
+                </div>
+              }
+            </div>
+            <button mat-icon-button class="duplicate-warning__dismiss"
+                    (click)="dismissDuplicateWarning()" aria-label="Dismiss warning">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+
         <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
             <mat-form-field appearance="outline">
               <mat-label>First Name</mat-label>
-              <input matInput formControlName="firstName" required>
+              <input matInput formControlName="firstName" required
+                     (blur)="onNameOrEmailBlur()">
               @if (contactForm.controls['firstName'].hasError('required')) {
                 <mat-error>First name is required</mat-error>
               }
@@ -183,7 +262,8 @@ import {
 
             <mat-form-field appearance="outline">
               <mat-label>Last Name</mat-label>
-              <input matInput formControlName="lastName" required>
+              <input matInput formControlName="lastName" required
+                     (blur)="onNameOrEmailBlur()">
               @if (contactForm.controls['lastName'].hasError('required')) {
                 <mat-error>Last name is required</mat-error>
               }
@@ -194,7 +274,8 @@ import {
 
             <mat-form-field appearance="outline">
               <mat-label>Email</mat-label>
-              <input matInput formControlName="email" type="email">
+              <input matInput formControlName="email" type="email"
+                     (blur)="onNameOrEmailBlur()">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -311,6 +392,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly contactService = inject(ContactService);
   private readonly companyService = inject(CompanyService);
+  private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
 
   /** Dialog mode inputs/outputs. */
@@ -348,6 +430,13 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   /** Subject for company search typeahead. */
   private readonly companySearch$ = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
+
+  /** Duplicate detection signals (create mode only). */
+  potentialDuplicates = signal<ContactDuplicateMatch[]>([]);
+  duplicateWarningDismissed = signal(false);
+
+  /** Track last checked values to avoid redundant API calls. */
+  private lastCheckedValues = '';
 
   /** Reactive form with all core contact fields. */
   contactForm: FormGroup = this.fb.group({
@@ -475,6 +564,46 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   /** Capture custom field value changes. */
   onCustomFieldsChanged(values: Record<string, any>): void {
     this.customFieldValues = values;
+  }
+
+  /**
+   * On blur of firstName, lastName, or email fields in CREATE mode,
+   * check for potential duplicates via the API.
+   */
+  onNameOrEmailBlur(): void {
+    // Only check duplicates in create mode (not edit mode)
+    if (this.isEditMode) return;
+
+    const firstName = (this.contactForm.get('firstName')?.value || '').trim();
+    const lastName = (this.contactForm.get('lastName')?.value || '').trim();
+    const email = (this.contactForm.get('email')?.value || '').trim();
+
+    // Need at least a first or last name to check
+    if (!firstName && !lastName) return;
+
+    // Avoid redundant API calls if values haven't changed
+    const currentValues = `${firstName}|${lastName}|${email}`;
+    if (currentValues === this.lastCheckedValues) return;
+    this.lastCheckedValues = currentValues;
+
+    // Reset dismissed state so new results can appear
+    this.duplicateWarningDismissed.set(false);
+
+    this.duplicateService
+      .checkContactDuplicates({ firstName, lastName, email: email || undefined })
+      .subscribe({
+        next: (matches) => {
+          this.potentialDuplicates.set(matches);
+        },
+        error: () => {
+          // Silently fail -- duplicate check is non-critical
+        },
+      });
+  }
+
+  /** Dismiss the duplicate warning banner. */
+  dismissDuplicateWarning(): void {
+    this.duplicateWarningDismissed.set(true);
   }
 
   /** Submit the form -- create or update. */

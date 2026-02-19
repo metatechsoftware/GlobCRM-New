@@ -27,11 +27,14 @@ import {
   CreateCompanyRequest,
   UpdateCompanyRequest,
 } from '../company.models';
+import { DuplicateService } from '../../duplicates/duplicate.service';
+import { CompanyDuplicateMatch } from '../../duplicates/duplicate.models';
 
 /**
  * Company create/edit form component.
  * Renders core company fields in a 2-column grid with custom field integration.
  * Determines create vs edit mode from the presence of :id route param.
+ * Shows duplicate warning banner on create mode when potential duplicates are detected.
  */
 @Component({
   selector: 'app-company-form',
@@ -108,6 +111,57 @@ import {
       border-top: 1px solid var(--color-border);
     }
 
+    .duplicate-warning {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 16px;
+      margin-bottom: 16px;
+      background: #fff3e0;
+      border-left: 4px solid #ff9800;
+      border-radius: 4px;
+    }
+
+    .duplicate-warning mat-icon {
+      color: #ff9800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .duplicate-warning__content {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .duplicate-warning__content strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    .duplicate-warning__match {
+      font-size: 13px;
+      margin-bottom: 2px;
+    }
+
+    .duplicate-warning__match a {
+      color: var(--color-primary, #e65100);
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .duplicate-warning__match a:hover {
+      text-decoration: none;
+    }
+
+    .duplicate-warning__details {
+      color: var(--color-text-secondary, #64748b);
+    }
+
+    .duplicate-warning__dismiss {
+      flex-shrink: 0;
+    }
+
     :host.dialog-mode .entity-form-container {
       padding: 0;
       max-width: unset;
@@ -135,11 +189,36 @@ import {
           <mat-spinner diameter="48"></mat-spinner>
         </div>
       } @else {
+        <!-- Duplicate warning banner (create mode only) -->
+        @if (potentialDuplicates().length > 0 && !duplicateWarningDismissed()) {
+          <div class="duplicate-warning">
+            <mat-icon>warning</mat-icon>
+            <div class="duplicate-warning__content">
+              <strong>Potential duplicates found:</strong>
+              @for (match of potentialDuplicates(); track match.id) {
+                <div class="duplicate-warning__match">
+                  <a [routerLink]="['/companies', match.id]" target="_blank">
+                    {{ match.name }}
+                  </a>
+                  <span class="duplicate-warning__details">
+                    {{ match.website ? '(' + match.website + ')' : '' }} -- {{ match.score }}% match
+                  </span>
+                </div>
+              }
+            </div>
+            <button mat-icon-button class="duplicate-warning__dismiss"
+                    (click)="dismissDuplicateWarning()" aria-label="Dismiss warning">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        }
+
         <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
           <div class="form-grid">
             <mat-form-field appearance="outline">
               <mat-label>Company Name</mat-label>
-              <input matInput formControlName="name" required>
+              <input matInput formControlName="name" required
+                     (blur)="onNameOrWebsiteBlur()">
               @if (companyForm.controls['name'].hasError('required')) {
                 <mat-error>Company name is required</mat-error>
               }
@@ -155,7 +234,8 @@ import {
 
             <mat-form-field appearance="outline">
               <mat-label>Website</mat-label>
-              <input matInput formControlName="website">
+              <input matInput formControlName="website"
+                     (blur)="onNameOrWebsiteBlur()">
             </mat-form-field>
 
             <mat-form-field appearance="outline">
@@ -236,6 +316,7 @@ export class CompanyFormComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly fb = inject(FormBuilder);
   private readonly companyService = inject(CompanyService);
+  private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
 
   /** Dialog mode inputs/outputs. */
@@ -260,6 +341,13 @@ export class CompanyFormComponent implements OnInit {
 
   /** Custom field values captured from CustomFieldFormComponent. */
   private customFieldValues: Record<string, any> = {};
+
+  /** Duplicate detection signals (create mode only). */
+  potentialDuplicates = signal<CompanyDuplicateMatch[]>([]);
+  duplicateWarningDismissed = signal(false);
+
+  /** Track last checked values to avoid redundant API calls. */
+  private lastCheckedValues = '';
 
   /** Reactive form with all core company fields. */
   companyForm: FormGroup = this.fb.group({
@@ -322,6 +410,45 @@ export class CompanyFormComponent implements OnInit {
   /** Capture custom field value changes. */
   onCustomFieldsChanged(values: Record<string, any>): void {
     this.customFieldValues = values;
+  }
+
+  /**
+   * On blur of name or website fields in CREATE mode,
+   * check for potential duplicates via the API.
+   */
+  onNameOrWebsiteBlur(): void {
+    // Only check duplicates in create mode (not edit mode)
+    if (this.isEditMode) return;
+
+    const name = (this.companyForm.get('name')?.value || '').trim();
+    const website = (this.companyForm.get('website')?.value || '').trim();
+
+    // Need at least a name to check
+    if (!name) return;
+
+    // Avoid redundant API calls if values haven't changed
+    const currentValues = `${name}|${website}`;
+    if (currentValues === this.lastCheckedValues) return;
+    this.lastCheckedValues = currentValues;
+
+    // Reset dismissed state so new results can appear
+    this.duplicateWarningDismissed.set(false);
+
+    this.duplicateService
+      .checkCompanyDuplicates({ name, website: website || undefined })
+      .subscribe({
+        next: (matches) => {
+          this.potentialDuplicates.set(matches);
+        },
+        error: () => {
+          // Silently fail -- duplicate check is non-critical
+        },
+      });
+  }
+
+  /** Dismiss the duplicate warning banner. */
+  dismissDuplicateWarning(): void {
+    this.duplicateWarningDismissed.set(true);
   }
 
   /** Submit the form -- create or update. */
