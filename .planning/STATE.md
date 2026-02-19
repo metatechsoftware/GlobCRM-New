@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 2 of 6 complete
+Plan: 3 of 6 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 20-02 (Report Engine Core)
+Last activity: 2026-02-19 — Completed 20-03 (Report API + CSV Export + Seed Reports)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 35/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 2/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 36/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 3/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 35
+- v1.1 plans completed: 36
 - v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 2/6)
 
 | Phase | Plan | Duration | Tasks | Files |
@@ -56,6 +56,7 @@ Progress: [███████████████████████
 | 19-08 | Permission Reload After Token Refresh (auth interceptor gap closure) | 2min | 1 | 1 |
 | 20-01 | Report Domain Foundation (entities + migration + RLS + repository) | 5min | 2 | 17 |
 | 20-02 | Report Engine Core (field metadata + query engine + DI) | 4min | 2 | 4 |
+| 20-03 | Report API + CSV Export + Seed Reports | 6min | 2 | 3 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -198,6 +199,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-02] Conditional .Include() based on report field references -- prevents N+1 without loading unnecessary navigation properties
 - [20-02] Formula fields display-only in reports -- computed via FormulaEvaluationService on result rows, not in SQL
 - [20-02] IsCustomOrFormulaField heuristic: snake_case = custom field, camelCase = system field
+- [20-03] ReportCsvExportJob uses PermissionScope.All for export (already authorized at controller level)
+- [20-03] Category request records prefixed with Report (CreateReportCategoryRequest) to avoid name collision with EmailTemplateCategoriesController
+- [20-03] ReportCsvExportJob created in Task 1 alongside controller (build dependency -- controller references job type for Hangfire Enqueue)
 
 ### Pending Todos
 
@@ -213,6 +217,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-02-PLAN.md
-Resume file: .planning/phases/20-advanced-reporting-builder/20-02-SUMMARY.md
-Next step: Execute Phase 20 Plan 03 (/gsd:execute-phase 20)
+Stopped at: Completed 20-03-PLAN.md
+Resume file: .planning/phases/20-advanced-reporting-builder/20-03-SUMMARY.md
+Next step: Execute Phase 20 Plan 04 (/gsd:execute-phase 20)
