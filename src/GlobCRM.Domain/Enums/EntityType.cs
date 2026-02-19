@@ -16,5 +16,6 @@ public enum EntityType
     Note,
     Lead,
     EmailTemplate,
-    EmailSequence
+    EmailSequence,
+    Workflow
 }
