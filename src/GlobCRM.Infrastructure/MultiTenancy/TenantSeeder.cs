@@ -152,6 +152,10 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Email Template seed data ────────────────
+        await _db.EmailTemplates.Where(t => t.TenantId == organizationId && t.IsSeedData).ExecuteDeleteAsync();
+        await _db.EmailTemplateCategories.Where(c => c.TenantId == organizationId && c.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing Lead seed data ──────────────────────────
         // Lead children first
         var seedLeadIds = await _db.Leads
@@ -1056,40 +1060,130 @@ public class TenantSeeder : ITenantSeeder
         }
 
         // ── Leads ─────────────────────────────────────────────────
-        var leadList = new (string First, string Last, string Email, string? Phone, string? Company, string? JobTitle, string Stage, string Source, LeadTemperature Temp, Guid OwnerId, int DaysAgo)[]
+        var leadList = new (string First, string Last, string Email, string? Phone, string? Mobile, string? Company, string? JobTitle, string Stage, string Source, LeadTemperature Temp, string? Desc, Guid OwnerId, int DaysAgo)[]
         {
-            ("Alex", "Turner", "alex.turner@example.com", "+1-555-3001", "Horizon Tech", "VP Engineering", "New", "Website", LeadTemperature.Hot, jake.Id, -2),
-            ("Maria", "Gonzalez", "maria.gonzalez@example.com", "+1-555-3002", "Bright Solutions", "Head of Sales", "New", "LinkedIn", LeadTemperature.Warm, priya.Id, -1),
-            ("Wei", "Zhang", "wei.zhang@example.com", "+86-10-55503003", "Eastwind Manufacturing", "Procurement Director", "Contacted", "Trade Show", LeadTemperature.Hot, jake.Id, -5),
-            ("Fatima", "Al-Hassan", "fatima.alhassan@example.com", "+971-4-5503004", "Gulf Commerce Ltd", "CEO", "Contacted", "Referral", LeadTemperature.Warm, emily.Id, -4),
-            ("James", "O'Brien", "james.obrien@example.com", "+353-1-5503005", "Celtic Analytics", "Data Science Lead", "Qualified", "Email Campaign", LeadTemperature.Hot, priya.Id, -7),
-            ("Sophia", "Petrova", "sophia.petrova@example.com", "+7-495-5503006", "NexGen Software", "COO", "Qualified", "Cold Call", LeadTemperature.Warm, olivia.Id, -6),
-            ("Rafael", "Santos", "rafael.santos@example.com", "+55-11-55503007", "SunPeak Ventures", "Investment Director", "New", "Referral", LeadTemperature.Cold, emily.Id, -3),
-            ("Hannah", "Mueller", "hannah.mueller@example.com", "+49-30-5503008", "Eurotech GmbH", "IT Manager", "Contacted", "Website", LeadTemperature.Warm, jake.Id, -8),
-            ("Raj", "Patel", "raj.patel@example.com", "+91-22-55503009", "Indus Systems", "CTO", "New", "LinkedIn", LeadTemperature.Hot, priya.Id, 0),
-            ("Emma", "Wilson", "emma.wilson@example.com", "+44-20-5503010", "Sterling Partners", "Managing Partner", "Qualified", "Trade Show", LeadTemperature.Cold, olivia.Id, -10),
+            // New leads (fresh inbound)
+            ("Alex", "Turner", "alex.turner@horizontech.com", "+1-555-3001", null, "Horizon Tech", "VP Engineering", "New", "Website", LeadTemperature.Hot, "Filled out pricing form for 50-seat deployment. Mentioned current tool is Salesforce but looking to switch.", jake.Id, -2),
+            ("Maria", "Gonzalez", "maria.gonzalez@brightsolutions.com", "+1-555-3002", "+1-555-3012", "Bright Solutions", "Head of Sales", "New", "LinkedIn", LeadTemperature.Warm, "Connected via LinkedIn post about CRM automation. Interested in workflow features for 15-person sales team.", priya.Id, -1),
+            ("Rafael", "Santos", "rafael.santos@sunpeak.vc", "+55-11-5503007", null, "SunPeak Ventures", "Investment Director", "New", "Referral", LeadTemperature.Cold, "Referred by existing customer at Alpine Digital. Exploring CRM options for portfolio company.", emily.Id, -3),
+            ("Raj", "Patel", "raj.patel@indussys.com", "+91-22-5503009", "+91-98-55503019", "Indus Systems", "CTO", "New", "LinkedIn", LeadTemperature.Hot, "Downloaded whitepaper on API integrations. Company has 200+ employees and growing fast.", priya.Id, 0),
+            ("Lena", "Kowalski", "lena.k@novadesign.io", "+48-22-5503011", null, "Nova Design Studio", "Creative Director", "New", "Website", LeadTemperature.Warm, "Signed up for free trial. Small agency (8 people) looking for project + client management.", olivia.Id, -1),
+
+            // Contacted leads (initial outreach done)
+            ("Wei", "Zhang", "wei.zhang@eastwind-mfg.com", "+86-10-5503003", null, "Eastwind Manufacturing", "Procurement Director", "Contacted", "Trade Show", LeadTemperature.Hot, "Met at SaaS Connect 2026. Manages procurement for 3 factories. Budget approved for Q2. Follow-up call scheduled for next week.", jake.Id, -5),
+            ("Fatima", "Al-Hassan", "fatima.alhassan@gulfcommerce.ae", "+971-4-5503004", "+971-50-5503014", "Gulf Commerce Ltd", "CEO", "Contacted", "Referral", LeadTemperature.Warm, "Referred by Wei Zhang. Running legacy CRM, wants modern cloud solution. Had intro call — interested in demo.", emily.Id, -4),
+            ("Hannah", "Mueller", "hannah.mueller@eurotech.de", "+49-30-5503008", null, "Eurotech GmbH", "IT Manager", "Contacted", "Website", LeadTemperature.Warm, "Requested demo via contact form. Company uses SAP for ERP, needs standalone CRM. Sent product overview deck.", jake.Id, -8),
+            ("Yuki", "Tanaka", "yuki.tanaka@sakurafinance.jp", "+81-3-5503012", null, "Sakura Finance", "Operations Manager", "Contacted", "Email Campaign", LeadTemperature.Cold, "Opened 3 emails in nurture sequence. Replied asking about data residency options.", priya.Id, -6),
+            ("Carlos", "Mendez", "carlos.m@latamlogistics.com", "+52-55-5503013", "+52-55-5503023", "LatAm Logistics", "Regional Sales Manager", "Contacted", "Cold Call", LeadTemperature.Warm, "Cold call went well — has 25 sales reps using spreadsheets. Wants to see Kanban pipeline features.", olivia.Id, -7),
+
+            // Qualified leads (budget, authority, need confirmed)
+            ("James", "O'Brien", "james.obrien@celticanalytics.ie", "+353-1-5503005", null, "Celtic Analytics", "Data Science Lead", "Qualified", "Email Campaign", LeadTemperature.Hot, "Completed demo. Budget: $40K/yr. Decision timeline: 30 days. Needs API access for data warehouse integration. Sending proposal this week.", priya.Id, -7),
+            ("Sophia", "Petrova", "sophia.petrova@nexgensoftware.ru", "+7-495-5503006", null, "NexGen Software", "COO", "Qualified", "Cold Call", LeadTemperature.Warm, "Two demos completed with technical team. 80 users. Main concern is migration from HubSpot. Proposal under review.", olivia.Id, -6),
+            ("Emma", "Wilson", "emma.wilson@sterlingpartners.co.uk", "+44-20-5503010", "+44-77-5503020", "Sterling Partners", "Managing Partner", "Qualified", "Trade Show", LeadTemperature.Hot, "Met at London SaaS Summit. Partnership firm with 12 partners and 40 staff. Needs deal tracking + reporting. Final approval from board next Tuesday.", olivia.Id, -10),
+            ("David", "Kim", "david.kim@pacificretail.com", "+1-415-5503014", null, "Pacific Retail Group", "VP Sales Operations", "Qualified", "Referral", LeadTemperature.Hot, "Referred by James O'Brien. 150 sales reps across 5 regions. Currently evaluating us vs Pipedrive. Budget allocated.", jake.Id, -12),
+            ("Amara", "Okafor", "amara.okafor@savannatech.ng", "+234-1-5503015", null, "Savanna Technologies", "Head of Business Development", "Qualified", "Website", LeadTemperature.Warm, "Applied for enterprise pilot program. 60-person BizDev team. Needs multi-currency support and custom reporting.", emily.Id, -9),
+
+            // Lost leads
+            ("Tom", "Baker", "tom.baker@oldguardconsulting.com", "+1-212-5503016", null, "Old Guard Consulting", "Senior Partner", "Lost", "Cold Call", LeadTemperature.Cold, "Decided to stay with existing Dynamics 365 setup. Budget was reallocated to internal IT projects. May revisit in 6 months.", jake.Id, -20),
+            ("Nina", "Bergstrom", "nina.b@nordicshipping.se", "+46-8-5503017", null, "Nordic Shipping AB", "Digital Transformation Lead", "Lost", "Trade Show", LeadTemperature.Cold, "Went with competitor (Freshsales) due to built-in phone dialer. Price was not the issue — feature gap on telephony.", emily.Id, -18),
+
+            // Converted leads
+            ("Priya", "Sharma", "priya.sharma@zenithcloud.in", "+91-80-5503018", "+91-98-5503028", "Zenith Cloud Services", "Founder & CEO", "Converted", "Referral", LeadTemperature.Hot, "Converted to contact + company + deal. Signed 25-seat annual contract. Onboarding in progress.", priya.Id, -25),
+            ("Lucas", "Dubois", "lucas.dubois@parismedia.fr", "+33-1-5503019", null, "Paris Media Group", "Marketing Director", "Converted", "LinkedIn", LeadTemperature.Warm, "Converted to contact + company. Started with 10 seats. Interested in email sequences once available.", olivia.Id, -22),
         };
 
-        foreach (var (first, last, email, phone, company, jobTitle, stage, source, temp, ownerId, daysAgo) in leadList)
+        var leadMap = new Dictionary<string, Lead>();
+        foreach (var (first, last, email, phone, mobile, company, jobTitle, stage, source, temp, desc, ownerId, daysAgo) in leadList)
         {
-            _db.Leads.Add(new Lead
+            var lead = new Lead
             {
                 TenantId = organizationId,
                 FirstName = first,
                 LastName = last,
                 Email = email,
                 Phone = phone,
+                MobilePhone = mobile,
                 CompanyName = company,
                 JobTitle = jobTitle,
                 LeadStageId = leadStageMap[stage].Id,
                 LeadSourceId = leadSourceMap[source].Id,
                 Temperature = temp,
+                Description = desc,
                 OwnerId = ownerId,
                 IsSeedData = true,
                 CreatedAt = DateTimeOffset.UtcNow.AddDays(daysAgo),
-                UpdatedAt = DateTimeOffset.UtcNow
-            });
+                UpdatedAt = DateTimeOffset.UtcNow.AddDays(daysAgo + 1 > 0 ? 0 : daysAgo + 1)
+            };
+            _db.Leads.Add(lead);
+            leadMap[$"{first} {last}"] = lead;
         }
+
+        // ── Lead Stage History ────────────────────────────────────
+        void AddLeadStageHistory(string leadRef, string? fromStage, string toStage, Guid changedByUserId, int daysAgo)
+        {
+            if (leadMap.TryGetValue(leadRef, out var lead) &&
+                leadStageMap.TryGetValue(toStage, out var to))
+            {
+                Guid? fromId = fromStage != null && leadStageMap.TryGetValue(fromStage, out var from) ? from.Id : null;
+                _db.LeadStageHistories.Add(new LeadStageHistory
+                {
+                    LeadId = lead.Id,
+                    FromStageId = fromId,
+                    ToStageId = to.Id,
+                    ChangedByUserId = changedByUserId,
+                    ChangedAt = DateTimeOffset.UtcNow.AddDays(-daysAgo)
+                });
+            }
+        }
+
+        // Contacted leads: New -> Contacted
+        AddLeadStageHistory("Wei Zhang", null, "New", jake.Id, 5);
+        AddLeadStageHistory("Wei Zhang", "New", "Contacted", jake.Id, 3);
+        AddLeadStageHistory("Fatima Al-Hassan", null, "New", emily.Id, 4);
+        AddLeadStageHistory("Fatima Al-Hassan", "New", "Contacted", emily.Id, 2);
+        AddLeadStageHistory("Hannah Mueller", null, "New", jake.Id, 8);
+        AddLeadStageHistory("Hannah Mueller", "New", "Contacted", jake.Id, 5);
+        AddLeadStageHistory("Yuki Tanaka", null, "New", priya.Id, 6);
+        AddLeadStageHistory("Yuki Tanaka", "New", "Contacted", priya.Id, 3);
+        AddLeadStageHistory("Carlos Mendez", null, "New", olivia.Id, 7);
+        AddLeadStageHistory("Carlos Mendez", "New", "Contacted", olivia.Id, 4);
+
+        // Qualified leads: New -> Contacted -> Qualified
+        AddLeadStageHistory("James O'Brien", null, "New", priya.Id, 7);
+        AddLeadStageHistory("James O'Brien", "New", "Contacted", priya.Id, 5);
+        AddLeadStageHistory("James O'Brien", "Contacted", "Qualified", priya.Id, 3);
+        AddLeadStageHistory("Sophia Petrova", null, "New", olivia.Id, 6);
+        AddLeadStageHistory("Sophia Petrova", "New", "Contacted", olivia.Id, 4);
+        AddLeadStageHistory("Sophia Petrova", "Contacted", "Qualified", olivia.Id, 2);
+        AddLeadStageHistory("Emma Wilson", null, "New", olivia.Id, 10);
+        AddLeadStageHistory("Emma Wilson", "New", "Contacted", olivia.Id, 7);
+        AddLeadStageHistory("Emma Wilson", "Contacted", "Qualified", olivia.Id, 4);
+        AddLeadStageHistory("David Kim", null, "New", jake.Id, 12);
+        AddLeadStageHistory("David Kim", "New", "Contacted", jake.Id, 9);
+        AddLeadStageHistory("David Kim", "Contacted", "Qualified", jake.Id, 5);
+        AddLeadStageHistory("Amara Okafor", null, "New", emily.Id, 9);
+        AddLeadStageHistory("Amara Okafor", "New", "Contacted", emily.Id, 6);
+        AddLeadStageHistory("Amara Okafor", "Contacted", "Qualified", emily.Id, 3);
+
+        // Lost leads: New -> Contacted -> Qualified -> Lost
+        AddLeadStageHistory("Tom Baker", null, "New", jake.Id, 20);
+        AddLeadStageHistory("Tom Baker", "New", "Contacted", jake.Id, 16);
+        AddLeadStageHistory("Tom Baker", "Contacted", "Qualified", jake.Id, 12);
+        AddLeadStageHistory("Tom Baker", "Qualified", "Lost", jake.Id, 8);
+        AddLeadStageHistory("Nina Bergstrom", null, "New", emily.Id, 18);
+        AddLeadStageHistory("Nina Bergstrom", "New", "Contacted", emily.Id, 14);
+        AddLeadStageHistory("Nina Bergstrom", "Contacted", "Qualified", emily.Id, 10);
+        AddLeadStageHistory("Nina Bergstrom", "Qualified", "Lost", emily.Id, 6);
+
+        // Converted leads: New -> Contacted -> Qualified -> Converted
+        AddLeadStageHistory("Priya Sharma", null, "New", priya.Id, 25);
+        AddLeadStageHistory("Priya Sharma", "New", "Contacted", priya.Id, 20);
+        AddLeadStageHistory("Priya Sharma", "Contacted", "Qualified", priya.Id, 15);
+        AddLeadStageHistory("Priya Sharma", "Qualified", "Converted", priya.Id, 10);
+        AddLeadStageHistory("Lucas Dubois", null, "New", olivia.Id, 22);
+        AddLeadStageHistory("Lucas Dubois", "New", "Contacted", olivia.Id, 17);
+        AddLeadStageHistory("Lucas Dubois", "Contacted", "Qualified", olivia.Id, 12);
+        AddLeadStageHistory("Lucas Dubois", "Qualified", "Converted", olivia.Id, 7);
 
         await _db.SaveChangesAsync();
 
@@ -1468,6 +1562,357 @@ public class TenantSeeder : ITenantSeeder
                 "Default dashboard seeded for organization {OrgId}: 'Sales Overview' with {WidgetCount} widgets",
                 organizationId, widgets.Count);
         }
+
+        // ══════════════════════════════════════════════════════════
+        // STEP 11: Email Template Categories + Starter Templates
+        // ══════════════════════════════════════════════════════════
+        await SeedEmailTemplatesAsync(organizationId);
+    }
+
+    /// <summary>
+    /// Seeds starter email template categories and templates for a new organization.
+    /// Creates 4 system categories and 5 shared starter templates.
+    /// </summary>
+    private async Task SeedEmailTemplatesAsync(Guid organizationId)
+    {
+        // ── Categories ──────────────────────────────────────────
+        var salesCategory = new EmailTemplateCategory
+        {
+            TenantId = organizationId,
+            Name = "Sales",
+            SortOrder = 1,
+            IsSystem = true,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var marketingCategory = new EmailTemplateCategory
+        {
+            TenantId = organizationId,
+            Name = "Marketing",
+            SortOrder = 2,
+            IsSystem = true,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var supportCategory = new EmailTemplateCategory
+        {
+            TenantId = organizationId,
+            Name = "Support",
+            SortOrder = 3,
+            IsSystem = true,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var generalCategory = new EmailTemplateCategory
+        {
+            TenantId = organizationId,
+            Name = "General",
+            SortOrder = 4,
+            IsSystem = true,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _db.EmailTemplateCategories.AddRange(salesCategory, marketingCategory, supportCategory, generalCategory);
+        await _db.SaveChangesAsync();
+
+        // ── Starter Templates ────────────────────────────────────
+        var templates = new EmailTemplate[]
+        {
+            // 1. Welcome Email (General)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Welcome Email",
+                Subject = "Welcome to {{ company.name }}!",
+                HtmlBody = BuildWelcomeEmailHtml(),
+                DesignJson = "{}",
+                CategoryId = generalCategory.Id,
+                IsShared = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            // 2. Follow-up (Sales)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Follow-up",
+                Subject = "Following up on our conversation",
+                HtmlBody = BuildFollowUpEmailHtml(),
+                DesignJson = "{}",
+                CategoryId = salesCategory.Id,
+                IsShared = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            // 3. Meeting Request (Sales)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Meeting Request",
+                Subject = "Let's schedule a meeting",
+                HtmlBody = BuildMeetingRequestEmailHtml(),
+                DesignJson = "{}",
+                CategoryId = salesCategory.Id,
+                IsShared = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            // 4. Deal Won (Sales)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Deal Won",
+                Subject = "Congratulations on {{ deal.title }}!",
+                HtmlBody = BuildDealWonEmailHtml(),
+                DesignJson = "{}",
+                CategoryId = salesCategory.Id,
+                IsShared = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+            // 5. Support Follow-up (Support)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Support Follow-up",
+                Subject = "How was your experience?",
+                HtmlBody = BuildSupportFollowUpEmailHtml(),
+                DesignJson = "{}",
+                CategoryId = supportCategory.Id,
+                IsShared = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+        };
+
+        _db.EmailTemplates.AddRange(templates);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Email template seed data created for organization {OrgId}: 4 categories, 5 templates",
+            organizationId);
+    }
+
+    // ── Starter Template HTML Builders ─────────────────────────
+
+    private static string BuildEmailWrapper(string bodyContent)
+    {
+        return $@"<!DOCTYPE html>
+<html>
+<head><meta charset=""utf-8""><meta name=""viewport"" content=""width=device-width, initial-scale=1.0""></head>
+<body style=""margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f5;"">
+<table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"" style=""background-color: #f4f4f5;"">
+<tr>
+<td style=""padding: 40px 20px;"">
+<table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""560"" style=""margin: 0 auto; background-color: #ffffff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"">
+    <tr>
+        <td style=""padding: 32px 40px 24px; border-bottom: 1px solid #e4e4e7;"">
+            <span style=""font-size: 20px; font-weight: 700; color: #ea580c;"">{{{{ company.name | default: 'Your Company' }}}}</span>
+        </td>
+    </tr>
+    <tr>
+        <td style=""padding: 32px 40px;"">
+            <table role=""presentation"" cellspacing=""0"" cellpadding=""0"" border=""0"" width=""100%"">
+{bodyContent}
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td style=""padding: 24px 40px; border-top: 1px solid #e4e4e7; font-size: 12px; color: #a1a1aa; text-align: center;"">
+            Sent via GlobCRM
+        </td>
+    </tr>
+</table>
+</td>
+</tr>
+</table>
+</body>
+</html>";
+    }
+
+    private static string BuildWelcomeEmailHtml()
+    {
+        return BuildEmailWrapper(@"
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 16px;"">
+                        Welcome!
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Hi {{ contact.first_name | default: 'there' }},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Thank you for connecting with us! We're excited to have you on board and look forward to working together.
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 24px;"">
+                        If you have any questions or need assistance getting started, don't hesitate to reach out. Our team is here to help you every step of the way.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href=""#"" style=""display: inline-block; background-color: #ea580c; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;"">
+                            Get Started
+                        </a>
+                    </td>
+                </tr>");
+    }
+
+    private static string BuildFollowUpEmailHtml()
+    {
+        return BuildEmailWrapper(@"
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 16px;"">
+                        Following Up
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Hi {{ contact.first_name | default: 'there' }},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        I wanted to follow up on our recent conversation. It was great learning about your needs and I believe we can provide significant value to your team.
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        <strong>Next steps:</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.8; padding-bottom: 24px;"">
+                        1. Review the proposal we discussed<br>
+                        2. Schedule a follow-up call to address any questions<br>
+                        3. Finalize the timeline for implementation
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6;"">
+                        Looking forward to hearing from you!
+                    </td>
+                </tr>");
+    }
+
+    private static string BuildMeetingRequestEmailHtml()
+    {
+        return BuildEmailWrapper(@"
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 16px;"">
+                        Let's Connect
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Hi {{ contact.first_name | default: 'there' }},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        I'd love to schedule a meeting to discuss {{ deal.title | default: 'our upcoming project' }} in more detail. I have some ideas that I think could be really valuable for your team.
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 24px;"">
+                        Would any of these times work for you this week? I'm flexible and happy to work around your schedule.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href=""#"" style=""display: inline-block; background-color: #ea580c; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;"">
+                            Schedule Meeting
+                        </a>
+                    </td>
+                </tr>");
+    }
+
+    private static string BuildDealWonEmailHtml()
+    {
+        return BuildEmailWrapper(@"
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 16px;"">
+                        Congratulations!
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Hi {{ contact.first_name | default: 'there' }},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        We're thrilled to officially welcome you as a partner! The {{ deal.title | default: 'deal' }} is now finalized and we're ready to get started.
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        <strong>Deal summary:</strong><br>
+                        Deal: {{ deal.title | default: 'N/A' }}<br>
+                        Value: ${{ deal.value | default: '0' }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 24px;"">
+                        Our onboarding team will reach out shortly to schedule the kickoff and ensure a smooth transition. We're committed to making this a success!
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href=""#"" style=""display: inline-block; background-color: #16a34a; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;"">
+                            View Onboarding Guide
+                        </a>
+                    </td>
+                </tr>");
+    }
+
+    private static string BuildSupportFollowUpEmailHtml()
+    {
+        return BuildEmailWrapper(@"
+                <tr>
+                    <td style=""font-size: 18px; font-weight: 600; color: #18181b; padding-bottom: 16px;"">
+                        How Was Your Experience?
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        Hi {{ contact.first_name | default: 'there' }},
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 16px;"">
+                        We recently assisted you with a support request and wanted to check in. Your satisfaction is important to us and we'd love to hear your feedback.
+                    </td>
+                </tr>
+                <tr>
+                    <td style=""font-size: 14px; color: #3f3f46; line-height: 1.6; padding-bottom: 24px;"">
+                        If there's anything else we can help with, please don't hesitate to reach out. Our support team is always here for you.
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <a href=""#"" style=""display: inline-block; background-color: #ea580c; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 14px;"">
+                            Share Feedback
+                        </a>
+                    </td>
+                </tr>");
     }
 
     /// <summary>

@@ -19,6 +19,10 @@ using GlobCRM.Infrastructure.Feed;
 using GlobCRM.Infrastructure.Import;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Search;
+using GlobCRM.Infrastructure.BackgroundJobs;
+using GlobCRM.Infrastructure.DomainEvents;
+using GlobCRM.Infrastructure.EmailTemplates;
+using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -79,6 +83,15 @@ builder.Services.AddSearchServices();
 // Import subsystem services
 builder.Services.AddImportServices();
 
+// Hangfire background job infrastructure
+builder.Services.AddHangfireServices(builder.Configuration);
+
+// Domain event infrastructure (interceptor + dispatcher)
+builder.Services.AddDomainEventServices();
+
+// Email template services (repository, render, merge fields)
+builder.Services.AddEmailTemplateServices();
+
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();
 
@@ -125,6 +138,12 @@ app.UseTenantResolution();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Hangfire dashboard -- after UseAuthorization, before MapControllers
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
+});
 
 // SignalR hub endpoint -- must be after UseAuthorization, before MapControllers
 app.MapHub<CrmHub>("/hubs/crm");
