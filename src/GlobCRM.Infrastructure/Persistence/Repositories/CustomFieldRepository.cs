@@ -136,6 +136,18 @@ public class CustomFieldRepository : ICustomFieldRepository
     }
 
     /// <summary>
+    /// Gets custom field definitions marked as ShowInPreview for an entity type.
+    /// Excludes soft-deleted fields. Ordered by SortOrder for consistent display.
+    /// </summary>
+    public async Task<List<CustomFieldDefinition>> GetPinnedForPreviewAsync(string entityType)
+    {
+        return await _context.CustomFieldDefinitions
+            .Where(c => c.EntityType == entityType && c.ShowInPreview && !c.IsDeleted)
+            .OrderBy(c => c.SortOrder)
+            .ToListAsync();
+    }
+
+    /// <summary>
     /// Hard-deletes a section. Fields referencing this section get their SectionId
     /// set to null so they appear in the default (ungrouped) area.
     /// </summary>

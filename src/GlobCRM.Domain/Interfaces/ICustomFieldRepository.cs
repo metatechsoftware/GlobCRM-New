@@ -68,4 +68,10 @@ public interface ICustomFieldRepository
     /// Hard-deletes a section. Fields in the deleted section get their SectionId set to null.
     /// </summary>
     Task DeleteSectionAsync(Guid sectionId);
+
+    /// <summary>
+    /// Gets custom field definitions marked as ShowInPreview for an entity type.
+    /// Used by the preview sidebar to display pinned custom fields.
+    /// </summary>
+    Task<List<CustomFieldDefinition>> GetPinnedForPreviewAsync(string entityType);
 }
