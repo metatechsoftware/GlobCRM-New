@@ -8,6 +8,7 @@ using GlobCRM.Infrastructure.Authorization;
 using GlobCRM.Infrastructure.DomainEvents;
 using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
+using GlobCRM.Infrastructure.Webhooks;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
 using GlobCRM.Infrastructure.MultiTenancy;
@@ -180,6 +181,9 @@ public static class DependencyInjection
 
         // ---- Duplicate detection and merge services ----
         services.AddDuplicateServices();
+
+        // ---- Webhook delivery pipeline (handler, delivery service, SSRF validator, payload builder) ----
+        services.AddWebhookServices();
 
         return services;
     }
