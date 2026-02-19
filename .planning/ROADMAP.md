@@ -122,7 +122,11 @@ Plans:
   3. Failed webhook deliveries are automatically retried with exponential backoff (up to 7 attempts), and subscriptions auto-disable after 50 consecutive failures
   4. Admin can view a delivery log showing each attempt's status, HTTP response code, and timing, and can test a subscription with a sample payload
   5. Webhook URLs are validated against SSRF attacks (HTTPS-only, RFC1918 rejection, DNS re-resolution on each delivery)
-**Plans**: TBD
+**Plans:** 4 plans
+- [ ] 17-01-PLAN.md — Backend foundation: domain entities, EF configs, migration, RLS, DomainEvent OldValues enhancement, repository
+- [ ] 17-02-PLAN.md — Backend delivery pipeline: domain event handler, delivery service with HMAC signing and retry, SSRF validator, payload builder
+- [ ] 17-03-PLAN.md — Backend API: WebhooksController with subscription CRUD, delivery logs, test webhook, manual retry
+- [ ] 17-04-PLAN.md — Frontend: subscription list/edit/detail, global delivery log, test dialog, settings routes
 
 ### Phase 18: Email Sequences
 **Goal**: Users can create automated multi-step email drip campaigns that send templated emails on a schedule, with enrollment management and performance tracking
