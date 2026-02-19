@@ -5,6 +5,7 @@ using Finbuckle.MultiTenant.Extensions;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Authorization;
+using GlobCRM.Infrastructure.DomainEvents;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
 using GlobCRM.Infrastructure.MultiTenancy;
@@ -48,6 +49,9 @@ public static class DependencyInjection
         services.AddScoped<TenantDbConnectionInterceptor>();
         services.AddScoped<AuditableEntityInterceptor>();
 
+        // ---- Domain event infrastructure ----
+        services.AddDomainEventServices();
+
         // ---- Database contexts ----
 
         // TenantDbContext (tenant catalog -- not tenant-scoped)
@@ -55,12 +59,15 @@ public static class DependencyInjection
             options.UseNpgsql(dataSource));
 
         // ApplicationDbContext (tenant-scoped) with interceptors
+        // Interceptor order matters: TenantDbConnection sets RLS context,
+        // AuditableEntity sets timestamps, DomainEvent captures final entity state
         services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
         {
             options.UseNpgsql(dataSource);
             options.AddInterceptors(
                 serviceProvider.GetRequiredService<TenantDbConnectionInterceptor>(),
-                serviceProvider.GetRequiredService<AuditableEntityInterceptor>());
+                serviceProvider.GetRequiredService<AuditableEntityInterceptor>(),
+                serviceProvider.GetRequiredService<DomainEventInterceptor>());
         });
 
         // ---- Finbuckle multi-tenancy ----

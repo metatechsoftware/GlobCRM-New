@@ -1,6 +1,7 @@
 using Finbuckle.MultiTenant.Abstractions;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.BackgroundJobs;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -11,6 +12,7 @@ namespace GlobCRM.Infrastructure.MultiTenancy;
 /// ITenantProvider implementation using Finbuckle's multi-tenant context.
 /// Registered as scoped so it resolves per-request tenant context.
 /// Falls back to JWT organizationId claim when Finbuckle can't resolve a tenant.
+/// Falls back to TenantScope.CurrentTenantId (AsyncLocal) for background job execution.
 /// </summary>
 public class TenantProvider : ITenantProvider
 {
@@ -32,6 +34,7 @@ public class TenantProvider : ITenantProvider
     /// Gets the current tenant (organization) ID from the resolved Finbuckle context.
     /// Falls back to the organizationId JWT claim for authenticated requests where
     /// Finbuckle couldn't resolve the tenant (e.g., localhost without subdomain).
+    /// Falls back to TenantScope.CurrentTenantId for background job execution (AsyncLocal).
     /// Returns null if no tenant context is established (e.g., during org creation, CLI, or health checks).
     /// </summary>
     public Guid? GetTenantId()
@@ -47,11 +50,15 @@ public class TenantProvider : ITenantProvider
                 return parsedId;
         }
 
-        // Fallback: extract organizationId from JWT claims
+        // Fallback 1: extract organizationId from JWT claims
         var orgClaim = _httpContextAccessor.HttpContext?.User
             ?.FindFirst("organizationId")?.Value;
         if (orgClaim != null && Guid.TryParse(orgClaim, out var orgId))
             return orgId;
+
+        // Fallback 2: AsyncLocal tenant scope (set by Hangfire TenantJobFilter for background jobs)
+        if (TenantScope.CurrentTenantId.HasValue)
+            return TenantScope.CurrentTenantId.Value;
 
         return null;  // Legitimate for unauthenticated endpoints (register, login, health) and CLI
     }
