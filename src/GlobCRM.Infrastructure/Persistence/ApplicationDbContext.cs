@@ -146,6 +146,10 @@ public class ApplicationDbContext
     public DbSet<WorkflowActionLog> WorkflowActionLogs => Set<WorkflowActionLog>();
     public DbSet<WorkflowTemplate> WorkflowTemplates => Set<WorkflowTemplate>();
 
+    // Reporting DbSets
+    public DbSet<Report> Reports => Set<Report>();
+    public DbSet<ReportCategory> ReportCategories => Set<ReportCategory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -254,6 +258,10 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new WorkflowExecutionLogConfiguration());
         modelBuilder.ApplyConfiguration(new WorkflowActionLogConfiguration());
         modelBuilder.ApplyConfiguration(new WorkflowTemplateConfiguration());
+
+        // Reporting entity configurations
+        modelBuilder.ApplyConfiguration(new ReportConfiguration());
+        modelBuilder.ApplyConfiguration(new ReportCategoryConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -453,5 +461,13 @@ public class ApplicationDbContext
         // Global query filter: filter WorkflowTemplates by TenantId (tenant-scoped)
         modelBuilder.Entity<WorkflowTemplate>().HasQueryFilter(
             wt => _tenantProvider == null || _tenantProvider.GetTenantId() == null || wt.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Reports by TenantId (tenant-scoped)
+        modelBuilder.Entity<Report>().HasQueryFilter(
+            r => _tenantProvider == null || _tenantProvider.GetTenantId() == null || r.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter ReportCategories by TenantId (tenant-scoped)
+        modelBuilder.Entity<ReportCategory>().HasQueryFilter(
+            rc => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rc.TenantId == _tenantProvider.GetTenantId());
     }
 }

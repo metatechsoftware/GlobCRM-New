@@ -9,6 +9,7 @@ using GlobCRM.Infrastructure.DomainEvents;
 using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Persistence.Repositories;
+using GlobCRM.Infrastructure.Reporting;
 using GlobCRM.Infrastructure.Webhooks;
 using GlobCRM.Infrastructure.Workflows;
 using GlobCRM.Infrastructure.Sequences;
@@ -197,6 +198,9 @@ public static class DependencyInjection
 
         // ---- Workflow automation services (handler, execution engine, actions, repository) ----
         services.AddWorkflowServices();
+
+        // ---- Reporting repository ----
+        services.AddScoped<IReportRepository, ReportRepository>();
 
         return services;
     }

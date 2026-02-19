@@ -653,6 +653,36 @@ COMMENT ON POLICY tenant_isolation_workflow_templates ON workflow_templates IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- reports - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE reports ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE reports FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_reports ON reports
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_reports ON reports IS
+    'Ensures report queries only return reports for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- report_categories - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE report_categories ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE report_categories FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_report_categories ON report_categories
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_report_categories ON report_categories IS
+    'Ensures report category queries only return categories for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter
