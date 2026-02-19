@@ -199,8 +199,9 @@ public static class DependencyInjection
         // ---- Workflow automation services (handler, execution engine, actions, repository) ----
         services.AddWorkflowServices();
 
-        // ---- Reporting repository ----
+        // ---- Reporting services (repository, field metadata, query engine) ----
         services.AddScoped<IReportRepository, ReportRepository>();
+        services.AddReportingServices();
 
         return services;
     }
