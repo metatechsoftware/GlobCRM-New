@@ -130,6 +130,10 @@ public class ApplicationDbContext
     public DbSet<DuplicateMatchingConfig> DuplicateMatchingConfigs => Set<DuplicateMatchingConfig>();
     public DbSet<MergeAuditLog> MergeAuditLogs => Set<MergeAuditLog>();
 
+    // Webhooks DbSets
+    public DbSet<WebhookSubscription> WebhookSubscriptions => Set<WebhookSubscription>();
+    public DbSet<WebhookDeliveryLog> WebhookDeliveryLogs => Set<WebhookDeliveryLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -222,6 +226,10 @@ public class ApplicationDbContext
         // Duplicate Detection & Merge entity configurations
         modelBuilder.ApplyConfiguration(new DuplicateMatchingConfigConfiguration());
         modelBuilder.ApplyConfiguration(new MergeAuditLogConfiguration());
+
+        // Webhooks entity configurations
+        modelBuilder.ApplyConfiguration(new WebhookSubscriptionConfiguration());
+        modelBuilder.ApplyConfiguration(new WebhookDeliveryLogConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -383,5 +391,13 @@ public class ApplicationDbContext
         // Global query filter: filter MergeAuditLogs by TenantId (tenant-scoped)
         modelBuilder.Entity<MergeAuditLog>().HasQueryFilter(
             m => _tenantProvider == null || _tenantProvider.GetTenantId() == null || m.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter WebhookSubscriptions by TenantId (tenant-scoped)
+        modelBuilder.Entity<WebhookSubscription>().HasQueryFilter(
+            ws => _tenantProvider == null || _tenantProvider.GetTenantId() == null || ws.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter WebhookDeliveryLogs by TenantId (tenant-scoped)
+        modelBuilder.Entity<WebhookDeliveryLog>().HasQueryFilter(
+            wdl => _tenantProvider == null || _tenantProvider.GetTenantId() == null || wdl.TenantId == _tenantProvider.GetTenantId());
     }
 }

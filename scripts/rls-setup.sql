@@ -527,6 +527,36 @@ COMMENT ON POLICY tenant_isolation_merge_audit_logs ON merge_audit_logs IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- webhook_subscriptions - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE webhook_subscriptions ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE webhook_subscriptions FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_webhook_subscriptions ON webhook_subscriptions
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_webhook_subscriptions ON webhook_subscriptions IS
+    'Ensures webhook subscription queries only return subscriptions for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- webhook_delivery_logs - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE webhook_delivery_logs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE webhook_delivery_logs FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_webhook_delivery_logs ON webhook_delivery_logs
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_webhook_delivery_logs ON webhook_delivery_logs IS
+    'Ensures webhook delivery log queries only return logs for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter
