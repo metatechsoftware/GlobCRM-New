@@ -20,8 +20,6 @@ using GlobCRM.Infrastructure.Import;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Search;
 using GlobCRM.Infrastructure.BackgroundJobs;
-using GlobCRM.Infrastructure.DomainEvents;
-using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Workflows;
 using Hangfire;
 using Microsoft.AspNetCore.Identity;
@@ -86,12 +84,6 @@ builder.Services.AddImportServices();
 
 // Hangfire background job infrastructure
 builder.Services.AddHangfireServices(builder.Configuration);
-
-// Domain event infrastructure (interceptor + dispatcher)
-builder.Services.AddDomainEventServices();
-
-// Email template services (repository, render, merge fields)
-builder.Services.AddEmailTemplateServices();
 
 // Register profile validators
 builder.Services.AddScoped<IValidator<UpdateProfileRequest>, UpdateProfileRequestValidator>();

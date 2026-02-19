@@ -12,6 +12,7 @@ public static class ReportingServiceExtensions
     {
         services.AddScoped<ReportFieldMetadataService>();
         services.AddScoped<ReportQueryEngine>();
+        services.AddScoped<ReportCsvExportJob>();
         return services;
     }
 }
