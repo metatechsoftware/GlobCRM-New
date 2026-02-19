@@ -93,6 +93,7 @@ export class NavbarComponent {
         { route: '/emails', icon: 'email', label: 'Emails' },
         { route: '/email-templates', icon: 'drafts', label: 'Templates' },
         { route: '/sequences', icon: 'schedule_send', label: 'Sequences' },
+        { route: '/workflows', icon: 'account_tree', label: 'Workflows' },
         { route: '/feed', icon: 'dynamic_feed', label: 'Feed' },
         { route: '/calendar', icon: 'calendar_month', label: 'Calendar' },
       ]

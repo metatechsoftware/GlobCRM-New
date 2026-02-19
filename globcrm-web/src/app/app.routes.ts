@@ -169,6 +169,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'workflows',
+    canActivate: [authGuard, permissionGuard('Workflow', 'View')],
+    loadChildren: () =>
+      import('./features/workflows/workflows.routes').then(
+        (m) => m.WORKFLOW_ROUTES
+      ),
+  },
+  {
     path: 'duplicates',
     canActivate: [authGuard],
     loadChildren: () =>
