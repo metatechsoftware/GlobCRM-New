@@ -177,7 +177,15 @@ Plans:
   2. User can group report results and apply aggregations (count, sum, average, min, max) to numeric and formula fields
   3. User can visualize report results as charts (bar, line, pie) or as a data table, and drill down from a chart data point to view the underlying records
   4. User can save reports, share them with team members, and export results to CSV
-**Plans**: TBD
+**Plans**: 6 plans
+
+Plans:
+- [ ] 20-01-PLAN.md — Backend domain entities, EF configs, migration, RLS, repository, RBAC, NuGet packages
+- [ ] 20-02-PLAN.md — Backend ReportFieldMetadataService and ReportQueryEngine (core engine)
+- [ ] 20-03-PLAN.md — Backend ReportsController, ReportCsvExportJob, seed starter reports
+- [ ] 20-04-PLAN.md — Frontend models, service, store, routes, gallery page, builder shell, navigation
+- [ ] 20-05-PLAN.md — Frontend builder sidebar panels (entity source, field selector, filter builder, grouping, chart config)
+- [ ] 20-06-PLAN.md — Frontend viewer (chart rendering, data table, drill-down, aggregation cards, CSV export)
 
 ## Progress
 
@@ -207,4 +215,4 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 17. Webhooks | 4/4 | Complete    | 2026-02-19 | - |
 | 18. Email Sequences | 5/5 | Complete    | 2026-02-19 | - |
 | 19. Workflow Automation | 8/8 | Complete   | 2026-02-19 | - |
-| 20. Advanced Reporting Builder | v1.1 | 0/? | Not started | - |
+| 20. Advanced Reporting Builder | v1.1 | 0/6 | Not started | - |
