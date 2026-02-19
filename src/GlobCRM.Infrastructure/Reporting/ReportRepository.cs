@@ -34,9 +34,7 @@ public class ReportRepository : IReportRepository
         string? categoryId, string? entityType, string? search,
         bool includeShared, Guid userId, int page, int pageSize)
     {
-        var query = _context.Reports
-            .Include(r => r.Category)
-            .AsQueryable();
+        var query = _context.Reports.AsQueryable();
 
         // Access control: user's own reports + shared reports + seed data
         query = query.Where(r =>
@@ -65,11 +63,48 @@ public class ReportRepository : IReportRepository
 
         var totalCount = await query.CountAsync();
 
-        var items = await query
+        // Project into anonymous type to exclude Definition JSONB column.
+        // Definition is a complex owned type (recursive ReportFilterGroup, ReportChartConfig)
+        // that can cause 500 errors during deserialization. List views don't need it.
+        var projected = await query
             .OrderByDescending(r => r.UpdatedAt)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .AsNoTracking()
+            .Select(r => new
+            {
+                r.Id, r.TenantId, r.Name, r.Description, r.EntityType,
+                r.ChartType, r.CategoryId,
+                CategoryName = r.Category != null ? r.Category.Name : null,
+                r.OwnerId,
+                OwnerFirstName = r.Owner != null ? r.Owner.FirstName : null,
+                OwnerLastName = r.Owner != null ? r.Owner.LastName : null,
+                r.IsShared, r.IsSeedData, r.LastRunAt, r.LastRunRowCount,
+                r.CreatedAt, r.UpdatedAt
+            })
             .ToListAsync();
+
+        var items = projected.Select(r => new Report
+        {
+            Id = r.Id,
+            TenantId = r.TenantId,
+            Name = r.Name,
+            Description = r.Description,
+            EntityType = r.EntityType,
+            ChartType = r.ChartType,
+            CategoryId = r.CategoryId,
+            Category = r.CategoryName != null ? new ReportCategory { Name = r.CategoryName } : null,
+            OwnerId = r.OwnerId,
+            Owner = r.OwnerFirstName != null ? new ApplicationUser { FirstName = r.OwnerFirstName, LastName = r.OwnerLastName ?? "" } : null,
+            IsShared = r.IsShared,
+            IsSeedData = r.IsSeedData,
+            LastRunAt = r.LastRunAt,
+            LastRunRowCount = r.LastRunRowCount,
+            CreatedAt = r.CreatedAt,
+            UpdatedAt = r.UpdatedAt,
+            // Definition intentionally excluded — not needed for list view
+            // and avoids JSONB deserialization issues
+        }).ToList();
 
         return (items, totalCount);
     }
