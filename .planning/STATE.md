@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 17 of 20 (Webhooks)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 17-01 (Webhook Domain Foundation)
+Last activity: 2026-02-19 — Completed 17-02 (Webhook Delivery Pipeline)
 
-Progress: [██████████████████████████████████████████░░] 87% (v1.0: 96/96 plans, v1.1: 17/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 1/4)
+Progress: [██████████████████████████████████████████░░] 88% (v1.0: 96/96 plans, v1.1: 18/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 2/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 17
+- v1.1 plans completed: 18
 - v1.1 plans total: 20+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 1/4)
 
 | Phase | Plan | Duration | Tasks | Files |
@@ -38,6 +38,7 @@ Progress: [███████████████████████
 | 16-03 | Frontend Scan & Merge UI (scan page + comparison page + confirmation dialog) | 10min | 2 | 7 |
 | 16-04 | Frontend Settings & Warnings (admin rules page + form banners + merged redirects) | 8min | 2 | 7 |
 | 17-01 | Webhook Domain Foundation (entities + migration + RLS + repository + DomainEvent enhancement) | 4min | 2 | 14 |
+| 17-02 | Webhook Delivery Pipeline (handler + delivery service + HMAC + SSRF + retry + DI) | 4min | 2 | 7 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -116,6 +117,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [17-01] RequestPayload stored as text (not JSONB) to preserve exact serialization for HMAC signature fidelity
 - [17-01] GetSubscriptionsForEventAsync loads active subscriptions then filters in-memory for JSONB contains
 - [17-01] Composite index on (tenant_id, is_active, is_disabled) for subscription matching query optimization
+- [17-02] Payload builder uses explicit per-entity property mapping (not DTOs) for stable webhook API contracts
+- [17-02] SSRF validator uses System.Net.IPNetwork for CIDR matching with fresh DNS resolution per delivery
+- [17-02] 429 Too Many Requests treated as retryable; other 4xx are permanent errors (no retry)
+- [17-02] Subscription cache: IMemoryCache with 60-second TTL keyed by tenant ID, InvalidateCache for CRUD
 
 ### Pending Todos
 
@@ -131,6 +136,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 17-01-PLAN.md
-Resume file: .planning/phases/17-webhooks/17-01-SUMMARY.md
-Next step: Execute 17-02-PLAN.md
+Stopped at: Completed 17-02-PLAN.md
+Resume file: .planning/phases/17-webhooks/17-02-SUMMARY.md
+Next step: Execute 17-03-PLAN.md
