@@ -1,0 +1,113 @@
+<div class="report-gallery">
+  <!-- Header -->
+  <div class="report-gallery__header">
+    <div>
+      <h1>Reports</h1>
+      <p class="report-gallery__subtitle">
+        Build and explore data reports across your CRM
+      </p>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/reports/new">
+      <mat-icon>add</mat-icon>
+      New Report
+    </a>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="report-gallery__filters">
+    <mat-form-field appearance="outline" class="report-gallery__filter-field">
+      <mat-label>Category</mat-label>
+      <mat-select
+        [value]="categoryFilter()"
+        (selectionChange)="onCategoryChange($event.value)"
+      >
+        @for (cat of categoryOptions(); track cat.value) {
+          <mat-option [value]="cat.value">{{ cat.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="report-gallery__filter-field">
+      <mat-label>Entity Type</mat-label>
+      <mat-select
+        [value]="entityTypeFilter()"
+        (selectionChange)="onEntityTypeChange($event.value)"
+      >
+        @for (type of entityTypes; track type.value) {
+          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="report-gallery__search-field">
+      <mat-label>Search reports</mat-label>
+      <mat-icon matPrefix>search</mat-icon>
+      <input
+        matInput
+        [value]="searchFilter()"
+        (input)="onSearchChange($any($event.target).value)"
+        placeholder="Search by name..."
+      />
+    </mat-form-field>
+  </div>
+
+  <!-- Loading State -->
+  @if (store.loading()) {
+    <div class="report-gallery__grid">
+      @for (item of skeletonItems; track item) {
+        <div class="report-gallery__skeleton-card">
+          <div class="skeleton-thumbnail"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--desc"></div>
+            <div class="skeleton-badges">
+              <div class="skeleton-badge"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+          </div>
+          <div class="skeleton-footer">
+            <div class="skeleton-line skeleton-line--stat"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!store.loading() && store.reports().length === 0) {
+    <div class="report-gallery__empty">
+      <mat-icon>bar_chart</mat-icon>
+      <h3>No reports found</h3>
+      <p>
+        Reports let you visualize and analyze your CRM data with charts, tables,
+        and filters. Create your first report to get started.
+      </p>
+      <a mat-raised-button color="primary" routerLink="/reports/new">
+        Create your first report
+      </a>
+    </div>
+  }
+
+  <!-- Card Grid -->
+  @if (!store.loading() && store.reports().length > 0) {
+    <div class="report-gallery__grid">
+      @for (report of store.reports(); track report.id) {
+        <app-report-card
+          [report]="report"
+          (viewReport)="onCardClick(report)"
+        />
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (store.totalCount() > 20) {
+      <mat-paginator
+        [length]="store.totalCount()"
+        [pageSize]="20"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="onPageChange($event)"
+        class="report-gallery__paginator"
+      />
+    }
+  }
+</div>
