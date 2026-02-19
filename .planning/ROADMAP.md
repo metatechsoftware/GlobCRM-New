@@ -3,7 +3,7 @@
 ## Milestones
 
 - ✅ **v1.0 MVP** — Phases 1-12 (shipped 2026-02-18)
-- **v1.1 Automation & Intelligence** — Phases 13-20 (in progress)
+- **v1.1 Automation & Intelligence** — Phases 13-21 (in progress)
 
 ## Phases
 
@@ -39,6 +39,7 @@
 - [x] **Phase 18: Email Sequences** - Multi-step drip sequences with delays, enrollment management, reply-based auto-unenroll, and per-step open/click tracking (completed 2026-02-19)
 - [x] **Phase 19: Workflow Automation** - Trigger-based automation engine with event/field-change/date triggers, multi-action execution (field update, notify, task, email, webhook, sequence), execution logs, and prebuilt templates (completed 2026-02-19)
 - [x] **Phase 20: Advanced Reporting Builder** - Dynamic report builder with entity/field selection, filter conditions, grouping/aggregation, chart visualization, related entity fields, save/share, CSV export, and drill-down (UAT gap closure in progress) (completed 2026-02-19)
+- [ ] **Phase 21: Integration Polish & Tech Debt Closure** - Audit gap closure: ReportCsvExportJob DI fix, workflow action config dropdown pickers, duplicate DI cleanup, DTO field naming fix
 
 ## Phase Details
 
@@ -189,10 +190,26 @@ Plans:
 - [ ] 20-07-PLAN.md — Gap closure: backend GetAllAsync projection + ChartType lowercase normalization
 - [ ] 20-08-PLAN.md — Gap closure: gallery error display, mat-select-trigger, sidebar error visibility, filter group delete
 
+### Phase 21: Integration Polish & Tech Debt Closure
+**Goal**: Close all integration gaps and tech debt identified by v1.1 milestone audit — ensure CSV export DI is reliable, workflow builder has proper UX pickers, and duplicate registrations are cleaned up
+**Depends on**: Phase 20 (audit performed after Phase 20 completion)
+**Requirements**: RPT-06, WFLOW-07, WFLOW-09 (integration hardening, not new implementation)
+**Gap Closure**: Closes INT-01, INT-02, INT-03 from v1.1 audit + TD-01
+**Success Criteria** (what must be TRUE):
+  1. ReportCsvExportJob is explicitly registered in DI and CSV export Hangfire flow completes without activation errors
+  2. Workflow builder "Send Email" and "Enroll in Sequence" action panels use mat-select dropdowns populated from API (not free-text UUID inputs)
+  3. No duplicate DI registrations exist between Program.cs and DependencyInjection.cs
+  4. DuplicatesController uses correct field naming (Website for companies, Email for contacts)
+**Plans**: TBD
+
+Plans:
+- [ ] 21-01-PLAN.md — Backend DI fixes (ReportCsvExportJob registration, duplicate DI cleanup, DTO field rename)
+- [ ] 21-02-PLAN.md — Frontend workflow action config dropdown pickers (email template + sequence selectors)
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
+Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20 -> 21
 
 **Dependency Note:** Phases 13, 14, 15 have no inter-dependencies and could execute in parallel. Phases 16, 17, 18 all depend on Phase 14 but are independent of each other. Phase 19 depends on 14 + 17 + 18. Phase 20 depends on 15.
 
@@ -218,3 +235,4 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 18. Email Sequences | 5/5 | Complete    | 2026-02-19 | - |
 | 19. Workflow Automation | 8/8 | Complete   | 2026-02-19 | - |
 | 20. Advanced Reporting Builder | 8/8 | Complete    | 2026-02-19 | - |
+| 21. Integration Polish & Tech Debt Closure | 0/2 | Pending | - | - |
