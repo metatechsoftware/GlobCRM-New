@@ -1,0 +1,114 @@
+<div class="report-builder">
+  <!-- Header -->
+  <div class="report-builder__header">
+    <div class="report-builder__header-left">
+      <a mat-icon-button routerLink="/reports" class="report-builder__back">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <h1>{{ id() ? 'Edit Report' : 'New Report' }}</h1>
+    </div>
+  </div>
+
+  <!-- Two-Panel Layout -->
+  <div class="report-builder__content">
+    <!-- Left Sidebar -->
+    <div class="report-builder__sidebar">
+      <div class="report-builder__panels">
+        <!-- 1. Entity Source Panel -->
+        <app-entity-source-panel
+          [entityType]="entityType()"
+          [name]="reportName()"
+          [description]="reportDescription()"
+          [categoryId]="categoryId()"
+          [categories]="store.categories()"
+          (entityTypeChange)="onEntityTypeChange($event)"
+          (nameChange)="onNameChange($event)"
+          (descriptionChange)="onDescriptionChange($event)"
+          (categoryIdChange)="onCategoryIdChange($event)"
+        />
+
+        <!-- 2. Field Selector Panel -->
+        <app-field-selector-panel
+          [fieldMetadata]="store.fieldMetadata()"
+          [selectedFields]="selectedFields()"
+          (fieldsChange)="onFieldsChange($event)"
+        />
+
+        <!-- 3. Filter Builder Panel -->
+        <app-filter-builder-panel
+          [fieldMetadata]="store.fieldMetadata()"
+          [filterGroup]="filterGroup()"
+          (filterGroupChange)="onFilterGroupChange($event)"
+        />
+
+        <!-- 4. Grouping Panel -->
+        <app-grouping-panel
+          [selectedFields]="selectedFields()"
+          [fieldMetadata]="store.fieldMetadata()"
+          [groupings]="groupings()"
+          (groupingsChange)="onGroupingsChange($event)"
+          (aggregationsChange)="onAggregationsChange($event)"
+        />
+
+        <!-- 5. Chart Config Panel -->
+        <app-chart-config-panel
+          [chartConfig]="chartConfig()"
+          (chartConfigChange)="onChartConfigChange($event)"
+        />
+      </div>
+
+      <!-- Fixed Bottom Actions -->
+      <div class="report-builder__actions">
+        <button
+          mat-flat-button
+          color="primary"
+          (click)="runReport()"
+          [disabled]="!canRun() || store.executing()"
+          class="report-builder__run-btn"
+        >
+          <mat-icon>play_arrow</mat-icon>
+          Run Report
+        </button>
+        <button
+          mat-stroked-button
+          (click)="saveReport()"
+          [disabled]="!canSave() || store.loading()"
+        >
+          <mat-icon>save</mat-icon>
+          Save
+        </button>
+      </div>
+    </div>
+
+    <!-- Right Preview Area -->
+    <div class="report-builder__preview">
+      @if (store.executing()) {
+        <div class="report-builder__loading">
+          <mat-spinner diameter="48"></mat-spinner>
+          <p>Running report...</p>
+        </div>
+      } @else if (store.executionResult()) {
+        <div class="report-builder__result">
+          <div class="report-builder__result-header">
+            <mat-icon>check_circle</mat-icon>
+            <span>Report executed: {{ store.executionResult()?.totalCount }} rows</span>
+          </div>
+          <!-- Plan 06 will replace this with chart + table viewer components -->
+        </div>
+      } @else {
+        <div class="report-builder__empty-preview">
+          <mat-icon>bar_chart</mat-icon>
+          <h3>Report Preview</h3>
+          <p>Configure your report and click "Run Report" to see results</p>
+        </div>
+      }
+
+      @if (store.error()) {
+        <div class="report-builder__error">
+          <mat-icon>error_outline</mat-icon>
+          <span>{{ store.error() }}</span>
+        </div>
+      }
+    </div>
+  </div>
+</div>
