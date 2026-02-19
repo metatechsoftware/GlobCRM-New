@@ -10,22 +10,23 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- IN PROGRESS
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: Executing
-Last activity: 2026-02-19 — Completed 14-01 (Hangfire, DomainEvents, EmailTemplate data layer)
+Last activity: 2026-02-19 — Completed 14-02 (Email Template API + TenantSeeder)
 
-Progress: [█████████████████████████████░░░░░░░░░░░░] 69% (v1.0: 96/96 plans, v1.1: 5/8+ Phase 13: 4/4, Phase 14: 1/4)
+Progress: [██████████████████████████████░░░░░░░░░░░] 72% (v1.0: 96/96 plans, v1.1: 6/8+ Phase 13: 4/4, Phase 14: 2/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 5
-- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 1/4)
+- v1.1 plans completed: 6
+- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 2/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 14-01 | Foundation infra + EmailTemplate data layer | 9min | 2 | 27 |
+| 14-02 | Email Template API + TenantSeeder | 6min | 2 | 8 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -58,6 +59,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [14-01] TenantProvider 3-level fallback: Finbuckle -> JWT claim -> TenantScope AsyncLocal
 - [14-01] TemplateRenderService singleton (FluidParser thread-safe), EmailTemplateRepository scoped
 - [14-01] EmailTemplate.DesignJson as JSONB, HtmlBody as text column
+- [14-02] SendRawEmailAsync added to IEmailService for generic HTML delivery (test sends, future sequences)
+- [14-02] Preview endpoint uses sample placeholder data when no entity specified, real entity data with EntityType+EntityId
+- [14-02] Hangfire dashboard: open in dev, Admin role required in prod
 
 ### Pending Todos
 
@@ -73,6 +77,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 14-01-PLAN.md
-Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-01-SUMMARY.md
-Next step: Execute 14-02-PLAN.md (Email Template API + TenantSeeder)
+Stopped at: Completed 14-02-PLAN.md
+Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-02-SUMMARY.md
+Next step: Execute 14-03-PLAN.md (Email Template Frontend)
