@@ -206,13 +206,11 @@ export class LeadDetailComponent implements OnInit {
   }
 
   /** Handle tab change -- lazy load data for certain tabs. */
-  onTabChanged(index: number): void {
-    // Activities tab = index 1
-    if (index === 1) {
+  onTabChanged(label: string): void {
+    if (label === 'Activities') {
       this.loadLinkedActivities();
     }
-    // Notes tab = index 2
-    if (index === 2) {
+    if (label === 'Notes') {
       this.loadLeadNotes();
     }
   }

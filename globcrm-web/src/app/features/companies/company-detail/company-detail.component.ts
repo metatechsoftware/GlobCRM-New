@@ -190,23 +190,23 @@ export class CompanyDetailComponent implements OnInit {
   }
 
   /** Handle tab change -- lazy load contacts/activities/quotes/requests/emails when tab is selected. */
-  onTabChanged(index: number): void {
-    if (index === 1) {
+  onTabChanged(label: string): void {
+    if (label === 'Contacts') {
       this.loadContacts();
     }
-    if (index === 3) {
+    if (label === 'Activities') {
       this.loadLinkedActivities();
     }
-    if (index === 4) {
+    if (label === 'Quotes') {
       this.loadLinkedQuotes();
     }
-    if (index === 5) {
+    if (label === 'Requests') {
       this.loadLinkedRequests();
     }
-    if (index === 6) {
+    if (label === 'Emails') {
       this.loadCompanyEmails();
     }
-    if (index === 7) {
+    if (label === 'Notes') {
       this.loadCompanyNotes();
     }
   }

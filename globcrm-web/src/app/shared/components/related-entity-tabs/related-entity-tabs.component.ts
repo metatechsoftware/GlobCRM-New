@@ -182,8 +182,8 @@ export class RelatedEntityTabsComponent {
   /** The initially active tab index. Defaults to 0 (Details). */
   activeTabIndex = input<number>(0);
 
-  /** Emits the new tab index when the user switches tabs. */
-  tabChanged = output<number>();
+  /** Emits the label of the newly selected tab when the user switches tabs. */
+  tabChanged = output<string>();
 
   /**
    * Content templates projected by the parent component.
@@ -192,9 +192,13 @@ export class RelatedEntityTabsComponent {
   tabTemplates = contentChildren(TemplateRef);
 
   /**
-   * Handle tab selection change.
+   * Handle tab selection change. Resolves the tab label from the index
+   * and emits it, so consumers match on label strings instead of indices.
    */
   onTabChange(index: number): void {
-    this.tabChanged.emit(index);
+    const tab = this.tabs()[index];
+    if (tab) {
+      this.tabChanged.emit(tab.label);
+    }
   }
 }

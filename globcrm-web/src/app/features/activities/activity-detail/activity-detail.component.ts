@@ -321,9 +321,13 @@ export class ActivityDetailComponent implements OnInit {
       });
   }
 
-  /** Handle tab change for lazy loading notes (index 6 = Notes). */
+  /** Tab labels matching the mat-tab-group order in the template. */
+  private readonly TAB_LABELS = ['Details', 'Comments', 'Attachments', 'Time Log', 'Links', 'Timeline', 'Notes'];
+
+  /** Handle tab change for lazy loading. Resolves label from index for consistency with label-based matching. */
   onTabChange(index: number): void {
-    if (index === 6) {
+    const label = this.TAB_LABELS[index];
+    if (label === 'Notes') {
       this.loadActivityNotes();
     }
   }

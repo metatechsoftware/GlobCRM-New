@@ -176,14 +176,14 @@ export class DealDetailComponent implements OnInit {
   }
 
   /** Handle tab change -- lazy load activities/quotes/notes when tab is selected. */
-  onTabChanged(index: number): void {
-    if (index === 3) {
+  onTabChanged(label: string): void {
+    if (label === 'Activities') {
       this.loadLinkedActivities();
     }
-    if (index === 4) {
+    if (label === 'Quotes') {
       this.loadLinkedQuotes();
     }
-    if (index === 6) {
+    if (label === 'Notes') {
       this.loadDealNotes();
     }
   }

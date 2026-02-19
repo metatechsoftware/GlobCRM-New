@@ -15,6 +15,7 @@ export interface FeedItemDto {
   content: string;
   entityType: string | null;
   entityId: string | null;
+  entityName: string | null;
   authorId: string;
   authorName: string;
   authorAvatarUrl: string | null;

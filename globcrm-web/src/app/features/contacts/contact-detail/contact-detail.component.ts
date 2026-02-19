@@ -172,21 +172,21 @@ export class ContactDetailComponent implements OnInit {
   }
 
   /** Handle tab change -- lazy load activities/quotes/requests/emails when tab is selected. */
-  onTabChanged(index: number): void {
+  onTabChanged(label: string): void {
     // Company tab data comes from the contact detail DTO itself.
-    if (index === 3) {
+    if (label === 'Activities') {
       this.loadLinkedActivities();
     }
-    if (index === 4) {
+    if (label === 'Quotes') {
       this.loadLinkedQuotes();
     }
-    if (index === 5) {
+    if (label === 'Requests') {
       this.loadLinkedRequests();
     }
-    if (index === 6) {
+    if (label === 'Emails') {
       this.loadContactEmails();
     }
-    if (index === 7) {
+    if (label === 'Notes') {
       this.loadContactNotes();
     }
   }
