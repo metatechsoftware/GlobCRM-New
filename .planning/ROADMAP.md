@@ -137,7 +137,14 @@ Plans:
   2. User can manually enroll individual contacts or bulk-enroll contacts from a list view multi-select into a sequence
   3. Contacts are automatically unenrolled when they reply to a sequence email, and users can manually pause/resume individual enrollments
   4. User can view per-step tracking metrics (open rate, click rate) and sequence-level analytics (enrolled, completed, replied, bounced)
-**Plans**: TBD
+**Plans**: 5 plans
+
+Plans:
+- [ ] 18-01-PLAN.md — Backend domain entities, EF configurations, migration, RLS, repositories, and seed data
+- [ ] 18-02-PLAN.md — Backend execution engine (Hangfire jobs), email sender with tracking, reply detector
+- [ ] 18-03-PLAN.md — Backend API controller (CRUD, enrollment, analytics endpoints) and RBAC permissions
+- [ ] 18-04-PLAN.md — Frontend sequence builder (CDK drag-drop), list, detail page with enrollment management
+- [ ] 18-05-PLAN.md — Frontend DynamicTable row selection, bulk enrollment, analytics (funnel chart + metrics), contact detail action
 
 ### Phase 19: Workflow Automation
 **Goal**: Users can automate CRM operations by creating trigger-based workflows that execute actions (field updates, notifications, tasks, emails, webhooks, sequence enrollment) when entity events or conditions are met
@@ -188,6 +195,6 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Formula / Computed Custom Fields | 4/4 | Complete    | 2026-02-19 | - |
 | 16. Duplicate Detection & Merge | 4/4 | Complete    | 2026-02-19 | - |
 | 17. Webhooks | 4/4 | Complete    | 2026-02-19 | - |
-| 18. Email Sequences | v1.1 | 0/? | Not started | - |
+| 18. Email Sequences | v1.1 | 0/5 | Planned | - |
 | 19. Workflow Automation | v1.1 | 0/? | Not started | - |
 | 20. Advanced Reporting Builder | v1.1 | 0/? | Not started | - |
