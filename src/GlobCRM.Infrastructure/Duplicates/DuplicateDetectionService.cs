@@ -78,6 +78,7 @@ public class DuplicateDetectionService : IDuplicateDetectionService
                     c.Id,
                     candidateName,
                     c.Email,
+                    null,
                     score,
                     c.UpdatedAt));
             }
@@ -142,6 +143,7 @@ public class DuplicateDetectionService : IDuplicateDetectionService
                 scored.Add(new DuplicateMatch(
                     c.Id,
                     c.Name,
+                    null,
                     c.Website,
                     score,
                     c.UpdatedAt));
@@ -189,8 +191,8 @@ public class DuplicateDetectionService : IDuplicateDetectionService
                 if (score >= threshold)
                 {
                     pairs.Add(new DuplicatePair(
-                        new DuplicateMatch(a.Id, aName, a.Email, score, a.UpdatedAt),
-                        new DuplicateMatch(b.Id, bName, b.Email, score, b.UpdatedAt),
+                        new DuplicateMatch(a.Id, aName, a.Email, null, score, a.UpdatedAt),
+                        new DuplicateMatch(b.Id, bName, b.Email, null, score, b.UpdatedAt),
                         score));
                 }
             }
@@ -233,8 +235,8 @@ public class DuplicateDetectionService : IDuplicateDetectionService
                 if (score >= threshold)
                 {
                     pairs.Add(new DuplicatePair(
-                        new DuplicateMatch(a.Id, a.Name, a.Website, score, a.UpdatedAt),
-                        new DuplicateMatch(b.Id, b.Name, b.Website, score, b.UpdatedAt),
+                        new DuplicateMatch(a.Id, a.Name, null, a.Website, score, a.UpdatedAt),
+                        new DuplicateMatch(b.Id, b.Name, null, b.Website, score, b.UpdatedAt),
                         score));
                 }
             }

@@ -40,10 +40,12 @@ public interface IDuplicateDetectionService
 /// <summary>
 /// Represents a single potential duplicate match found for a given record.
 /// </summary>
+/// <param name="SecondaryField">Entity-type-specific secondary data: Website for companies, null for contacts.</param>
 public record DuplicateMatch(
     Guid EntityId,
     string FullName,
     string? Email,
+    string? SecondaryField,
     int Score,
     DateTimeOffset UpdatedAt);
 

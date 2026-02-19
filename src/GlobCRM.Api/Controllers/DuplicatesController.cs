@@ -127,7 +127,7 @@ public class DuplicatesController : ControllerBase
             {
                 Id = m.EntityId,
                 Name = m.FullName,
-                Website = m.Email, // DuplicateMatch.Email stores website for companies
+                Website = m.SecondaryField,
                 Email = details?.Email,
                 Phone = details?.Phone,
                 Score = m.Score,
@@ -232,7 +232,7 @@ public class DuplicatesController : ControllerBase
             return new CompanyDuplicateMatchDto
             {
                 Id = m.EntityId, Name = m.FullName,
-                Website = m.Email, // DuplicateMatch.Email stores website for companies
+                Website = m.SecondaryField,
                 Email = d?.Email, Phone = d?.Phone,
                 Score = m.Score, UpdatedAt = m.UpdatedAt
             };
