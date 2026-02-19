@@ -140,6 +140,12 @@ public class ApplicationDbContext
     public DbSet<SequenceEnrollment> SequenceEnrollments => Set<SequenceEnrollment>();
     public DbSet<SequenceTrackingEvent> SequenceTrackingEvents => Set<SequenceTrackingEvent>();
 
+    // Workflow Automation DbSets
+    public DbSet<Workflow> Workflows => Set<Workflow>();
+    public DbSet<WorkflowExecutionLog> WorkflowExecutionLogs => Set<WorkflowExecutionLog>();
+    public DbSet<WorkflowActionLog> WorkflowActionLogs => Set<WorkflowActionLog>();
+    public DbSet<WorkflowTemplate> WorkflowTemplates => Set<WorkflowTemplate>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -242,6 +248,12 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new EmailSequenceStepConfiguration());
         modelBuilder.ApplyConfiguration(new SequenceEnrollmentConfiguration());
         modelBuilder.ApplyConfiguration(new SequenceTrackingEventConfiguration());
+
+        // Workflow Automation entity configurations
+        modelBuilder.ApplyConfiguration(new WorkflowConfiguration());
+        modelBuilder.ApplyConfiguration(new WorkflowExecutionLogConfiguration());
+        modelBuilder.ApplyConfiguration(new WorkflowActionLogConfiguration());
+        modelBuilder.ApplyConfiguration(new WorkflowTemplateConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -426,5 +438,20 @@ public class ApplicationDbContext
         // Global query filter: filter SequenceTrackingEvents by TenantId (tenant-scoped)
         modelBuilder.Entity<SequenceTrackingEvent>().HasQueryFilter(
             ste => _tenantProvider == null || _tenantProvider.GetTenantId() == null || ste.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Workflows by TenantId (tenant-scoped)
+        modelBuilder.Entity<Workflow>().HasQueryFilter(
+            w => _tenantProvider == null || _tenantProvider.GetTenantId() == null || w.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter WorkflowExecutionLogs by TenantId (tenant-scoped)
+        modelBuilder.Entity<WorkflowExecutionLog>().HasQueryFilter(
+            wel => _tenantProvider == null || _tenantProvider.GetTenantId() == null || wel.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: WorkflowActionLog does NOT need its own query filter --
+        // it is filtered through its parent WorkflowExecutionLog FK which is already tenant-filtered.
+
+        // Global query filter: filter WorkflowTemplates by TenantId (tenant-scoped)
+        modelBuilder.Entity<WorkflowTemplate>().HasQueryFilter(
+            wt => _tenantProvider == null || _tenantProvider.GetTenantId() == null || wt.TenantId == _tenantProvider.GetTenantId());
     }
 }

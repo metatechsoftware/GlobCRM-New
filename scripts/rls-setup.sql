@@ -605,6 +605,54 @@ COMMENT ON POLICY tenant_isolation_sequence_tracking_events ON sequence_tracking
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- workflows - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE workflows ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE workflows FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_workflows ON workflows
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_workflows ON workflows IS
+    'Ensures workflow queries only return workflows for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- workflow_execution_logs - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE workflow_execution_logs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE workflow_execution_logs FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_workflow_execution_logs ON workflow_execution_logs
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_workflow_execution_logs ON workflow_execution_logs IS
+    'Ensures workflow execution log queries only return logs for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- Note: workflow_action_logs does NOT need an RLS policy. It is accessed through
+-- FK joins from its tenant-filtered parent (workflow_execution_logs).
+
+-- =====================================================================
+-- workflow_templates - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE workflow_templates ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE workflow_templates FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_workflow_templates ON workflow_templates
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_workflow_templates ON workflow_templates IS
+    'Ensures workflow template queries only return templates for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

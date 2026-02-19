@@ -152,6 +152,38 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Workflow seed data ────────────────────
+        // Execution logs and action logs cascade-delete with workflow, but templates are separate
+        await _db.WorkflowTemplates.Where(t => t.TenantId == organizationId && t.IsSeedData).ExecuteDeleteAsync();
+
+        var seedWorkflowIds = await _db.Workflows
+            .Where(w => w.TenantId == organizationId && w.IsSeedData)
+            .Select(w => w.Id)
+            .ToListAsync();
+
+        if (seedWorkflowIds.Count > 0)
+        {
+            // Action logs cascade from execution logs, execution logs cascade from workflows
+            // but ExecuteDeleteAsync doesn't cascade, so delete explicitly
+            var seedExecLogIds = await _db.WorkflowExecutionLogs
+                .Where(l => seedWorkflowIds.Contains(l.WorkflowId))
+                .Select(l => l.Id)
+                .ToListAsync();
+
+            if (seedExecLogIds.Count > 0)
+            {
+                await _db.WorkflowActionLogs
+                    .Where(a => seedExecLogIds.Contains(a.ExecutionLogId))
+                    .ExecuteDeleteAsync();
+            }
+
+            await _db.WorkflowExecutionLogs
+                .Where(l => seedWorkflowIds.Contains(l.WorkflowId))
+                .ExecuteDeleteAsync();
+        }
+
+        await _db.Workflows.Where(w => w.TenantId == organizationId && w.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing Email Sequence seed data ────────────────
         // Tracking events and enrollments first (children), then steps (cascade), then sequences
         var seedSequenceIds = await _db.EmailSequences
@@ -1600,6 +1632,11 @@ public class TenantSeeder : ITenantSeeder
         // STEP 12: Email Sequences (depends on templates from Step 11)
         // ══════════════════════════════════════════════════════════
         await SeedEmailSequencesAsync(organizationId);
+
+        // ══════════════════════════════════════════════════════════
+        // STEP 13: Workflow Automations + System Templates
+        // ══════════════════════════════════════════════════════════
+        await SeedWorkflowsAsync(organizationId);
     }
 
     /// <summary>
@@ -1891,6 +1928,279 @@ public class TenantSeeder : ITenantSeeder
         _logger.LogInformation(
             "Email sequence seed data created for organization {OrgId}: 1 sequence, 3 steps, {EnrollmentCount} enrollments",
             organizationId, seedContacts.Count >= 3 ? 3 : 0);
+    }
+
+    /// <summary>
+    /// Seeds demo workflow automations and system workflow templates.
+    /// Creates 2 active demo workflows and 3 system templates for the template gallery.
+    /// </summary>
+    private async Task SeedWorkflowsAsync(Guid organizationId)
+    {
+        // ── Get first seed user ──────────────────────────────────────
+        var seedUser = await _db.Users
+            .Where(u => u.OrganizationId == organizationId)
+            .OrderBy(u => u.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        if (seedUser == null)
+        {
+            _logger.LogWarning("No users found for organization {OrgId}, skipping workflow seeding", organizationId);
+            return;
+        }
+
+        // ── Demo Workflow 1: New Deal Notification ────────────────────
+        var dealNotificationWorkflow = new Workflow
+        {
+            TenantId = organizationId,
+            Name = "New Deal Notification",
+            Description = "Automatically sends a notification to the deal owner when a new deal is created.",
+            EntityType = "Deal",
+            Definition = new WorkflowDefinition
+            {
+                Nodes =
+                [
+                    new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Deal Created", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                    new WorkflowNode { Id = "action-1", Type = "action", Label = "Notify Deal Owner", Position = new WorkflowNodePosition { X = 250, Y = 200 } }
+                ],
+                Connections =
+                [
+                    new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "action-1" }
+                ],
+                Triggers =
+                [
+                    new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.RecordCreated, EventType = "Created" }
+                ],
+                Conditions = [],
+                Actions =
+                [
+                    new WorkflowActionConfig
+                    {
+                        Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.SendNotification, Order = 1,
+                        Config = "{\"Title\":\"New Deal Created\",\"Message\":\"A new deal has been created and assigned to you.\",\"RecipientType\":\"deal_owner\"}"
+                    }
+                ]
+            },
+            TriggerSummary = ["RecordCreated"],
+            Status = WorkflowStatus.Active,
+            IsActive = true,
+            CreatedByUserId = seedUser.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        // ── Demo Workflow 2: Lead Follow-Up Task ──────────────────────
+        var leadFollowUpWorkflow = new Workflow
+        {
+            TenantId = organizationId,
+            Name = "Lead Follow-Up Task",
+            Description = "Creates a follow-up activity when a lead status changes to Qualified.",
+            EntityType = "Lead",
+            Definition = new WorkflowDefinition
+            {
+                Nodes =
+                [
+                    new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Lead Updated", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                    new WorkflowNode { Id = "condition-1", Type = "condition", Label = "Status = Qualified", Position = new WorkflowNodePosition { X = 250, Y = 180 } },
+                    new WorkflowNode { Id = "action-1", Type = "action", Label = "Create Follow-Up Task", Position = new WorkflowNodePosition { X = 250, Y = 330 } }
+                ],
+                Connections =
+                [
+                    new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "condition-1" },
+                    new WorkflowConnection { Id = "conn-2", SourceNodeId = "condition-1", TargetNodeId = "action-1" }
+                ],
+                Triggers =
+                [
+                    new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.FieldChanged, EventType = "Updated", FieldName = "Status" }
+                ],
+                Conditions =
+                [
+                    new WorkflowConditionGroup
+                    {
+                        Id = "cg-1", NodeId = "condition-1",
+                        Conditions = [new WorkflowCondition { Field = "Status", Operator = "changed_to", Value = "Qualified" }]
+                    }
+                ],
+                Actions =
+                [
+                    new WorkflowActionConfig
+                    {
+                        Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.CreateActivity, Order = 1,
+                        Config = "{\"Subject\":\"Follow up with qualified lead\",\"Type\":\"Task\",\"Priority\":\"High\",\"DueDateOffsetDays\":1,\"AssigneeType\":\"record_owner\"}"
+                    }
+                ]
+            },
+            TriggerSummary = ["FieldChanged:Status"],
+            Status = WorkflowStatus.Active,
+            IsActive = true,
+            CreatedByUserId = seedUser.Id,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1)
+        };
+
+        _db.Workflows.AddRange(dealNotificationWorkflow, leadFollowUpWorkflow);
+        await _db.SaveChangesAsync();
+
+        // ── System Workflow Templates ──────────────────────────────────
+        var templates = new WorkflowTemplate[]
+        {
+            // 1. Deal Won Celebration (sales)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Deal Won Celebration",
+                Description = "Notify the team and send a congratulatory email when a deal stage changes to Won.",
+                Category = "sales",
+                EntityType = "Deal",
+                Definition = new WorkflowDefinition
+                {
+                    Nodes =
+                    [
+                        new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Deal Updated", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                        new WorkflowNode { Id = "condition-1", Type = "condition", Label = "Stage = Won", Position = new WorkflowNodePosition { X = 250, Y = 180 } },
+                        new WorkflowNode { Id = "action-1", Type = "action", Label = "Notify Team", Position = new WorkflowNodePosition { X = 100, Y = 330 } },
+                        new WorkflowNode { Id = "action-2", Type = "action", Label = "Send Email", Position = new WorkflowNodePosition { X = 400, Y = 330 } }
+                    ],
+                    Connections =
+                    [
+                        new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "condition-1" },
+                        new WorkflowConnection { Id = "conn-2", SourceNodeId = "condition-1", TargetNodeId = "action-1" },
+                        new WorkflowConnection { Id = "conn-3", SourceNodeId = "condition-1", TargetNodeId = "action-2" }
+                    ],
+                    Triggers =
+                    [
+                        new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.FieldChanged, EventType = "Updated", FieldName = "Stage" }
+                    ],
+                    Conditions =
+                    [
+                        new WorkflowConditionGroup
+                        {
+                            Id = "cg-1", NodeId = "condition-1",
+                            Conditions = [new WorkflowCondition { Field = "Stage", Operator = "changed_to", Value = "Won" }]
+                        }
+                    ],
+                    Actions =
+                    [
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.SendNotification, Order = 1,
+                            Config = "{\"Title\":\"Deal Won!\",\"Message\":\"A deal has been marked as Won. Congratulations!\",\"RecipientType\":\"team\"}"
+                        },
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-2", NodeId = "action-2", ActionType = WorkflowActionType.SendEmail, Order = 2, ContinueOnError = true,
+                            Config = "{\"RecipientField\":\"PrimaryContact.Email\"}"
+                        }
+                    ]
+                },
+                IsSystem = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+
+            // 2. Welcome New Contact (engagement)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Welcome New Contact",
+                Description = "Send a welcome email and create an introduction call activity when a new contact is added.",
+                Category = "engagement",
+                EntityType = "Contact",
+                Definition = new WorkflowDefinition
+                {
+                    Nodes =
+                    [
+                        new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Contact Created", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                        new WorkflowNode { Id = "action-1", Type = "action", Label = "Send Welcome Email", Position = new WorkflowNodePosition { X = 100, Y = 200 } },
+                        new WorkflowNode { Id = "action-2", Type = "action", Label = "Create Intro Call", Position = new WorkflowNodePosition { X = 400, Y = 200 } }
+                    ],
+                    Connections =
+                    [
+                        new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "action-1" },
+                        new WorkflowConnection { Id = "conn-2", SourceNodeId = "trigger-1", TargetNodeId = "action-2" }
+                    ],
+                    Triggers =
+                    [
+                        new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.RecordCreated, EventType = "Created" }
+                    ],
+                    Conditions = [],
+                    Actions =
+                    [
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.SendEmail, Order = 1, ContinueOnError = true,
+                            Config = "{\"RecipientField\":\"Email\"}"
+                        },
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-2", NodeId = "action-2", ActionType = WorkflowActionType.CreateActivity, Order = 2,
+                            Config = "{\"Subject\":\"Introduction call with new contact\",\"Type\":\"Call\",\"Priority\":\"Medium\",\"DueDateOffsetDays\":2,\"AssigneeType\":\"record_owner\"}"
+                        }
+                    ]
+                },
+                IsSystem = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+
+            // 3. High-Value Deal Alert (operational)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "High-Value Deal Alert",
+                Description = "Alert the team when a deal with value over $10,000 is created.",
+                Category = "operational",
+                EntityType = "Deal",
+                Definition = new WorkflowDefinition
+                {
+                    Nodes =
+                    [
+                        new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Deal Created", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                        new WorkflowNode { Id = "condition-1", Type = "condition", Label = "Value > $10,000", Position = new WorkflowNodePosition { X = 250, Y = 180 } },
+                        new WorkflowNode { Id = "action-1", Type = "action", Label = "Notify Team", Position = new WorkflowNodePosition { X = 250, Y = 330 } }
+                    ],
+                    Connections =
+                    [
+                        new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "condition-1" },
+                        new WorkflowConnection { Id = "conn-2", SourceNodeId = "condition-1", TargetNodeId = "action-1" }
+                    ],
+                    Triggers =
+                    [
+                        new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.RecordCreated, EventType = "Created" }
+                    ],
+                    Conditions =
+                    [
+                        new WorkflowConditionGroup
+                        {
+                            Id = "cg-1", NodeId = "condition-1",
+                            Conditions = [new WorkflowCondition { Field = "Value", Operator = "gt", Value = "10000" }]
+                        }
+                    ],
+                    Actions =
+                    [
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.SendNotification, Order = 1,
+                            Config = "{\"Title\":\"High-Value Deal Alert\",\"Message\":\"A new deal worth over $10,000 has been created.\",\"RecipientType\":\"team\"}"
+                        }
+                    ]
+                },
+                IsSystem = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            }
+        };
+
+        _db.WorkflowTemplates.AddRange(templates);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Workflow seed data created for organization {OrgId}: 2 demo workflows, 3 system templates",
+            organizationId);
     }
 
     // ── Starter Template HTML Builders ─────────────────────────

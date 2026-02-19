@@ -10,6 +10,7 @@ using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Persistence.Repositories;
 using GlobCRM.Infrastructure.Webhooks;
+using GlobCRM.Infrastructure.Workflows;
 using GlobCRM.Infrastructure.Sequences;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
@@ -193,6 +194,9 @@ public static class DependencyInjection
         // ---- Email sequence repositories ----
         services.AddScoped<IEmailSequenceRepository, EmailSequenceRepository>();
         services.AddScoped<ISequenceEnrollmentRepository, SequenceEnrollmentRepository>();
+
+        // ---- Workflow automation repository ----
+        services.AddScoped<IWorkflowRepository, WorkflowRepository>();
 
         return services;
     }

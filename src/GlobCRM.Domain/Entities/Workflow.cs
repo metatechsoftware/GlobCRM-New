@@ -145,9 +145,9 @@ public class WorkflowNode
     public WorkflowNodePosition Position { get; set; } = new();
 
     /// <summary>
-    /// Optional type-specific configuration data.
+    /// Optional type-specific configuration data stored as serialized JSON string.
     /// </summary>
-    public Dictionary<string, object?>? Config { get; set; }
+    public string? Config { get; set; }
 }
 
 /// <summary>
@@ -289,7 +289,7 @@ public class WorkflowActionConfig
     public int Order { get; set; }
 
     /// <summary>
-    /// Type-specific configuration. Key/value structure depends on ActionType:
+    /// Type-specific configuration stored as serialized JSON string. Structure depends on ActionType:
     /// - UpdateField: { FieldName, Value, IsDynamic, DynamicSourceField }
     /// - SendNotification: { Title, Message, RecipientType, RecipientId }
     /// - CreateActivity: { Subject, Type, Priority, DueDateOffsetDays, AssigneeType, AssigneeId }
@@ -299,5 +299,5 @@ public class WorkflowActionConfig
     /// - Branch: { ConditionGroups }
     /// - Wait: { DelayMinutes, DelayHours, DelayDays }
     /// </summary>
-    public Dictionary<string, object?> Config { get; set; } = new();
+    public string Config { get; set; } = "{}";
 }
