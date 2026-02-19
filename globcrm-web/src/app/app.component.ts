@@ -12,11 +12,12 @@ import { NotificationStore } from './features/notifications/notification.store';
 import { SidebarStateService } from './shared/services/sidebar-state.service';
 import { ThemeService } from './core/theme/theme.service';
 import { PreviewSidebarStore } from './shared/stores/preview-sidebar.store';
+import { EntityPreviewSidebarComponent } from './shared/components/entity-preview-sidebar/entity-preview-sidebar.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent, MatSidenavModule],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, MatSidenavModule, EntityPreviewSidebarComponent],
   template: `
     @if (showNavbar()) {
       <app-navbar />
@@ -37,7 +38,7 @@ import { PreviewSidebarStore } from './shared/stores/preview-sidebar.store';
                      [opened]="previewStore.isOpen()"
                      disableClose
                      class="preview-drawer">
-          <!-- EntityPreviewSidebarComponent will be added by Task 2 -->
+          <app-entity-preview-sidebar />
         </mat-sidenav>
       }
     </mat-sidenav-container>

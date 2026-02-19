@@ -1,0 +1,90 @@
+<div class="preview-sidebar">
+  <!-- Header -->
+  <div class="preview-header">
+    <div class="preview-header-left">
+      @if (store.canGoBack()) {
+        <button mat-icon-button (click)="store.goBack()" matTooltip="Back">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      }
+      @if (entityConfig(); as config) {
+        <span class="entity-type-badge" [style.background-color]="config.color">
+          <mat-icon>{{ config.icon }}</mat-icon>
+          {{ config.label }}
+        </span>
+      }
+    </div>
+    <div class="preview-header-right">
+      <button mat-button color="primary" (click)="store.openFullRecord()">
+        <mat-icon>open_in_new</mat-icon>
+        Open full record
+      </button>
+      <button mat-icon-button (click)="store.close()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Entity name -->
+  @if (store.currentData(); as data) {
+    <div class="preview-entity-name">{{ data.name }}</div>
+    @if (data.ownerName) {
+      <div class="preview-owner">
+        <img [src]="data.ownerAvatarUrl || '/assets/default-avatar.svg'"
+             class="owner-avatar" alt="Owner" />
+        <span>{{ data.ownerName }}</span>
+      </div>
+    }
+  }
+
+  <!-- Content -->
+  <div class="preview-body">
+    @if (store.isLoading()) {
+      <app-preview-skeleton />
+    } @else if (store.error()) {
+      <div class="preview-error">
+        <mat-icon>error_outline</mat-icon>
+        <p>{{ store.error() }}</p>
+        <button mat-stroked-button (click)="store.close()">Close</button>
+      </div>
+    } @else if (store.currentData()) {
+      @switch (store.currentData()!.entityType) {
+        @case ('Contact') { <app-contact-preview [data]="store.currentData()!" /> }
+        @case ('Company') { <app-company-preview [data]="store.currentData()!" /> }
+        @case ('Deal') { <app-deal-preview [data]="store.currentData()!" /> }
+        @case ('Lead') { <app-lead-preview [data]="store.currentData()!" /> }
+        @case ('Activity') { <app-activity-preview [data]="store.currentData()!" /> }
+        @case ('Product') { <app-product-preview [data]="store.currentData()!" /> }
+      }
+
+      <!-- Associations section -->
+      @if (store.currentData()!.associations.length > 0) {
+        <app-association-chips
+          [associations]="store.currentData()!.associations"
+          (chipClick)="onAssociationClick($event)" />
+      }
+
+      <!-- Recent Activities section -->
+      @if (store.currentData()!.recentActivities.length > 0) {
+        <app-mini-timeline
+          [activities]="store.currentData()!.recentActivities"
+          [entityType]="store.currentData()!.entityType"
+          [entityId]="store.currentData()!.id"
+          (viewAllClick)="onViewAllActivities()" />
+      }
+
+      <!-- Pinned Custom Fields -->
+      @if (store.currentData()!.pinnedCustomFields.length > 0) {
+        <div class="preview-section">
+          <div class="section-title">Custom Fields</div>
+          @for (field of store.currentData()!.pinnedCustomFields; track field.label) {
+            <div class="field-row">
+              <span class="field-label">{{ field.label }}</span>
+              <span class="field-value">{{ field.value ?? '-' }}</span>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+</div>
