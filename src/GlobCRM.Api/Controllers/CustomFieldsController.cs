@@ -2,6 +2,7 @@ using FluentValidation;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.FormulaFields;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,7 +12,7 @@ namespace GlobCRM.Api.Controllers;
 /// REST endpoints for custom field definition and section management.
 /// Admin-only: all endpoints require the "Admin" role.
 /// Supports CRUD for field definitions with soft-delete/restore,
-/// and CRUD for field sections with hard-delete.
+/// CRUD for field sections with hard-delete, and formula validation/preview/field registry.
 /// </summary>
 [ApiController]
 [Route("api/custom-fields")]
@@ -20,15 +21,21 @@ public class CustomFieldsController : ControllerBase
 {
     private readonly ICustomFieldRepository _repository;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaValidationService _formulaValidation;
+    private readonly FieldRegistryService _fieldRegistry;
     private readonly ILogger<CustomFieldsController> _logger;
 
     public CustomFieldsController(
         ICustomFieldRepository repository,
         ITenantProvider tenantProvider,
+        FormulaValidationService formulaValidation,
+        FieldRegistryService fieldRegistry,
         ILogger<CustomFieldsController> logger)
     {
         _repository = repository;
         _tenantProvider = tenantProvider;
+        _formulaValidation = formulaValidation;
+        _fieldRegistry = fieldRegistry;
         _logger = logger;
     }
 
@@ -118,6 +125,32 @@ public class CustomFieldsController : ControllerBase
         {
             field.FormulaExpression = request.FormulaExpression;
             field.FormulaResultType = request.FormulaResultType;
+
+            // Validate formula expression server-side
+            if (!string.IsNullOrWhiteSpace(request.FormulaExpression))
+            {
+                var formulaErrors = await _formulaValidation.ValidateAsync(
+                    request.EntityType, request.FormulaExpression, null, request.Name);
+                if (formulaErrors.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        errors = formulaErrors.Select(e => new { field = "FormulaExpression", message = e })
+                    });
+                }
+
+                // Extract parameter names for dependency tracking
+                try
+                {
+                    var expr = new NCalc.Expression(request.FormulaExpression);
+                    field.DependsOnFieldIds = expr.GetParameterNames().ToList();
+                }
+                catch
+                {
+                    // Syntax was already validated above; if this fails, store empty
+                    field.DependsOnFieldIds = new List<string>();
+                }
+            }
         }
 
         try
@@ -184,7 +217,31 @@ public class CustomFieldsController : ControllerBase
         if (field.FieldType == CustomFieldType.Formula)
         {
             if (request.FormulaExpression is not null)
+            {
+                // Re-validate the new formula expression
+                var formulaErrors = await _formulaValidation.ValidateAsync(
+                    field.EntityType, request.FormulaExpression, field.Id, field.Name);
+                if (formulaErrors.Count > 0)
+                {
+                    return BadRequest(new
+                    {
+                        errors = formulaErrors.Select(e => new { field = "FormulaExpression", message = e })
+                    });
+                }
+
                 field.FormulaExpression = request.FormulaExpression;
+
+                // Update dependency tracking
+                try
+                {
+                    var expr = new NCalc.Expression(request.FormulaExpression);
+                    field.DependsOnFieldIds = expr.GetParameterNames().ToList();
+                }
+                catch
+                {
+                    field.DependsOnFieldIds = new List<string>();
+                }
+            }
 
             if (request.FormulaResultType is not null)
                 field.FormulaResultType = request.FormulaResultType;
@@ -234,6 +291,58 @@ public class CustomFieldsController : ControllerBase
             return NotFound(new { error = "Custom field not found after restore." });
 
         return Ok(CustomFieldDefinitionDto.FromEntity(field));
+    }
+
+    // ---- Formula Endpoints ----
+
+    /// <summary>
+    /// Validates a formula expression for syntax, field references, and circular dependencies.
+    /// </summary>
+    [HttpPost("validate-formula")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> ValidateFormula([FromBody] ValidateFormulaRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Expression))
+            return Ok(new { valid = false, errors = new[] { "Expression is required." } });
+
+        var errors = await _formulaValidation.ValidateAsync(
+            request.EntityType,
+            request.Expression,
+            request.ExcludeFieldId,
+            request.FieldName);
+
+        return Ok(new { valid = errors.Count == 0, errors });
+    }
+
+    /// <summary>
+    /// Previews a formula result using sample or real entity data.
+    /// </summary>
+    [HttpPost("preview-formula")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> PreviewFormula([FromBody] PreviewFormulaRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.Expression))
+            return Ok(new { value = (object?)null, error = "Expression is required." });
+
+        var (value, error) = await _formulaValidation.PreviewAsync(
+            request.EntityType,
+            request.Expression,
+            request.SampleEntityId);
+
+        return Ok(new { value, error });
+    }
+
+    /// <summary>
+    /// Returns available fields (system + custom + formula) for an entity type,
+    /// grouped by category. Used for formula editor autocomplete.
+    /// </summary>
+    [HttpGet("field-registry/{entityType}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetFieldRegistry(string entityType)
+    {
+        var customFields = await _repository.GetFieldsByEntityTypeAsync(entityType);
+        var fields = _fieldRegistry.GetAvailableFields(entityType, customFields);
+        return Ok(fields);
     }
 
     // ---- Section Endpoints ----
@@ -462,6 +571,29 @@ public record UpdateSectionRequest
     public string? Name { get; init; }
     public int? SortOrder { get; init; }
     public bool? IsCollapsedByDefault { get; init; }
+}
+
+// ---- Formula Request DTOs ----
+
+/// <summary>
+/// Request body for validating a formula expression.
+/// </summary>
+public record ValidateFormulaRequest
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Expression { get; init; } = string.Empty;
+    public Guid? ExcludeFieldId { get; init; }
+    public string? FieldName { get; init; }
+}
+
+/// <summary>
+/// Request body for previewing a formula result.
+/// </summary>
+public record PreviewFormulaRequest
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Expression { get; init; } = string.Empty;
+    public Guid? SampleEntityId { get; init; }
 }
 
 // ---- FluentValidation Validator ----
