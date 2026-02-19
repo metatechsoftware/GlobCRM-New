@@ -104,7 +104,13 @@ Plans:
   3. User can view a side-by-side comparison of duplicate records showing all fields, with clear indication of differences
   4. User can merge duplicate contacts or companies, with all relationships (deals, activities, notes, emails, attachments, feed items, notifications, sequence enrollments) transferred to the surviving record
   5. Merged records are soft-deleted with a MergedIntoId redirect, and a full merge audit trail is preserved
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 16-01-PLAN.md — Backend foundation: domain entities, pg_trgm extension, DuplicateDetectionService, ContactMergeService, CompanyMergeService
+- [ ] 16-02-PLAN.md — Backend API: DuplicatesController (check, scan, merge-preview, merge), DuplicateSettingsController, merged-record redirect
+- [ ] 16-03-PLAN.md — Frontend scan page and merge comparison page with side-by-side field selection
+- [ ] 16-04-PLAN.md — Frontend create form duplicate warnings, admin settings page, merged-record redirect handling
 
 ### Phase 17: Webhooks
 **Goal**: Admins can subscribe external systems to CRM entity events via secure, reliable webhook delivery with full observability
