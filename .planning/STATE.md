@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 16 in progress
+**Current focus:** v1.1 Automation & Intelligence — Phase 17 in progress
 
 ## Current Position
 
-Phase: 16 of 20 (Duplicate Detection & Merge)
-Plan: 4 of 4 complete
-Status: Phase Complete
-Last activity: 2026-02-19 — Completed 16-03 (Frontend Scan & Merge UI)
+Phase: 17 of 20 (Webhooks)
+Plan: 1 of 4 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 17-01 (Webhook Domain Foundation)
 
-Progress: [██████████████████████████████████████████░░] 86% (v1.0: 96/96 plans, v1.1: 16/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4)
+Progress: [██████████████████████████████████████████░░] 87% (v1.0: 96/96 plans, v1.1: 17/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 1/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 16
-- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4)
+- v1.1 plans completed: 17
+- v1.1 plans total: 20+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 1/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -37,6 +37,7 @@ Progress: [███████████████████████
 | 16-02 | API Endpoints (DuplicatesController + DuplicateSettingsController + merged redirect) | 5min | 2 | 4 |
 | 16-03 | Frontend Scan & Merge UI (scan page + comparison page + confirmation dialog) | 10min | 2 | 7 |
 | 16-04 | Frontend Settings & Warnings (admin rules page + form banners + merged redirects) | 8min | 2 | 7 |
+| 17-01 | Webhook Domain Foundation (entities + migration + RLS + repository + DomainEvent enhancement) | 4min | 2 | 14 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -110,6 +111,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [16-04] Warning banners positioned above form grid, amber styling, dismissible, reset dismissed state on new field values
 - [16-04] Merged-record redirect checks response shape (isMerged + mergedIntoId) with any type cast for simplicity
 - [16-04] DuplicateRulesComponent uses mutable EntityRuleConfig objects with signal update spread for OnPush change detection
+- [17-01] DomainEvent OldPropertyValues nullable with default null -- backward compatible for existing Created/Deleted consumers
+- [17-01] EventSubscriptions stored as JSONB List<string> with "Entity.EventType" format (e.g., "Contact.Created")
+- [17-01] RequestPayload stored as text (not JSONB) to preserve exact serialization for HMAC signature fidelity
+- [17-01] GetSubscriptionsForEventAsync loads active subscriptions then filters in-memory for JSONB contains
+- [17-01] Composite index on (tenant_id, is_active, is_disabled) for subscription matching query optimization
 
 ### Pending Todos
 
@@ -125,6 +131,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 16-03-PLAN.md (Phase 16 now fully complete: 4/4 plans)
-Resume file: .planning/phases/16-duplicate-detection-merge/16-03-SUMMARY.md
-Next step: Plan Phase 17
+Stopped at: Completed 17-01-PLAN.md
+Resume file: .planning/phases/17-webhooks/17-01-SUMMARY.md
+Next step: Execute 17-02-PLAN.md
