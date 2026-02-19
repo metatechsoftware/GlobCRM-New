@@ -239,6 +239,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-08-PLAN.md (UAT gap closure complete, Phase 20 fully done)
-Resume file: .planning/phases/20-advanced-reporting-builder/20-08-SUMMARY.md
-Next step: All Phase 20 plans complete (8/8). UAT gap closure done. v1.1 milestone fully delivered.
+Stopped at: Phase 21 context gathered
+Resume file: .planning/phases/21-integration-polish-tech-debt/21-CONTEXT.md
+Next step: Plan Phase 21 — /gsd:plan-phase 21
