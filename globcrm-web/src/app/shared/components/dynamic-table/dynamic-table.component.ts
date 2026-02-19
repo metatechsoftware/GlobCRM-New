@@ -3,6 +3,7 @@ import {
   ChangeDetectionStrategy,
   computed,
   DestroyRef,
+  effect,
   inject,
   input,
   output,
@@ -10,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
@@ -22,6 +24,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
@@ -54,6 +57,7 @@ import {
     MatInputModule,
     MatIconModule,
     MatButtonModule,
+    MatCheckboxModule,
     MatProgressBarModule,
     MatTooltipModule,
     ColumnResizeDirective,
@@ -75,8 +79,10 @@ export class DynamicTableComponent {
   // Optional inputs
   pageSize = input<number>(25);
   loading = input<boolean>(false);
+  enableSelection = input<boolean>(false);
 
   // Outputs
+  selectionChanged = output<any[]>();
   columnOrderChanged = output<ViewColumn[]>();
   columnResized = output<{ fieldId: string; width: number }>();
   columnsVisibilityChanged = output<ViewColumn[]>();
@@ -105,25 +111,47 @@ export class DynamicTableComponent {
   draggedFieldId = signal<string | null>(null);
   private dragColumnOrder = signal<string[] | null>(null);
 
+  // Selection state (generic row selection via CDK SelectionModel)
+  readonly selection = new SelectionModel<any>(true, []);
+  readonly selectedCount = signal(0);
+  readonly hasSelection = computed(() => this.selectedCount() > 0);
+
   constructor() {
     this.searchSubject
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntilDestroyed(this.destroyRef))
       .subscribe((term) => this.searchChanged.emit(term));
+
+    // Clear selection when data changes (new page, new filters)
+    effect(() => {
+      // Read data signal to track changes
+      this.data();
+      this.clearSelection();
+    });
   }
 
-  // Computed: visible columns sorted by sortOrder, plus optional addColumn and actions
+  // Computed: visible columns sorted by sortOrder, plus optional select, addColumn and actions
   displayedColumns = computed<string[]>(() => {
     const admin = this.isAdmin();
+    const selectionEnabled = this.enableSelection();
     const dragOrder = this.dragColumnOrder();
+
+    let cols: string[];
     if (dragOrder) {
-      return admin ? [...dragOrder, 'addColumn', 'actions'] : [...dragOrder, 'actions'];
+      cols = admin ? [...dragOrder, 'addColumn', 'actions'] : [...dragOrder, 'actions'];
+    } else {
+      const visible = this.columns()
+        .filter((c) => c.visible)
+        .sort((a, b) => a.sortOrder - b.sortOrder)
+        .map((c) => c.fieldId);
+      cols = admin ? [...visible, 'addColumn', 'actions'] : [...visible, 'actions'];
     }
 
-    const visible = this.columns()
-      .filter((c) => c.visible)
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map((c) => c.fieldId);
-    return admin ? [...visible, 'addColumn', 'actions'] : [...visible, 'actions'];
+    // Prepend select column when selection is enabled
+    if (selectionEnabled) {
+      cols = ['select', ...cols];
+    }
+
+    return cols;
   });
 
   // Computed: only visible ViewColumns, sorted
@@ -309,5 +337,58 @@ export class DynamicTableComponent {
    */
   onCustomFieldCreated(field: CustomFieldDefinition): void {
     this.customFieldCreated.emit(field);
+  }
+
+  // ---- Selection Methods ----
+
+  /**
+   * Check if all rows on the current page are selected.
+   */
+  isAllSelected(): boolean {
+    const data = this.data();
+    return data.length > 0 && this.selection.selected.length === data.length;
+  }
+
+  /**
+   * Check if some (but not all) rows are selected.
+   */
+  isIndeterminate(): boolean {
+    return this.selection.selected.length > 0 && !this.isAllSelected();
+  }
+
+  /**
+   * Toggle selection for all rows on the current page.
+   */
+  toggleAllRows(): void {
+    if (this.isAllSelected()) {
+      this.selection.clear();
+    } else {
+      this.selection.select(...this.data());
+    }
+    this.emitSelection();
+  }
+
+  /**
+   * Toggle selection for a single row.
+   */
+  toggleRow(row: any): void {
+    this.selection.toggle(row);
+    this.emitSelection();
+  }
+
+  /**
+   * Clear all selections.
+   */
+  clearSelection(): void {
+    this.selection.clear();
+    this.selectedCount.set(0);
+  }
+
+  /**
+   * Emit the current selection state.
+   */
+  private emitSelection(): void {
+    this.selectedCount.set(this.selection.selected.length);
+    this.selectionChanged.emit(this.selection.selected);
   }
 }

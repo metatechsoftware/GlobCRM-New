@@ -192,6 +192,19 @@ td.mat-mdc-cell {
   letter-spacing: 0.5px;
 }
 
+// ─── Select Column (Row Selection) ───────────────────────
+.select-column {
+  width: 48px;
+  min-width: 48px;
+  max-width: 48px;
+  text-align: center;
+  padding: 0 4px;
+}
+
+th.select-column {
+  cursor: default;
+}
+
 // ─── Add Column (Quick-Add Field) ─────────────────────────
 .add-column-header,
 .add-column-cell {

@@ -38,6 +38,26 @@
   letter-spacing: -0.3px;
 }
 
+// ─── Bulk Action Bar ──────────────────────────────────────
+.bulk-action-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface);
+  border: 1px solid var(--color-primary, #f97316);
+  border-radius: var(--radius-lg);
+  margin-top: var(--space-3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.bulk-action-bar__count {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-right: auto;
+}
+
 // ─── Responsive ───────────────────────────────────────────
 @media (max-width: 768px) {
   .entity-list-content {

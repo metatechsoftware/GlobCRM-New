@@ -9,6 +9,7 @@ import {
 import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { DynamicTableComponent } from '../../../shared/components/dynamic-table/dynamic-table.component';
 import { FilterPanelComponent } from '../../../shared/components/filter-panel/filter-panel.component';
@@ -31,6 +32,8 @@ import { ContactStore } from '../contact.store';
 import { ContactService } from '../contact.service';
 import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
 import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SequenceService } from '../../sequences/sequence.service';
+import { SequenceListItem } from '../../sequences/sequence.models';
 
 /**
  * Contact list page with dynamic table, saved views sidebar, and filter panel.
@@ -43,6 +46,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
     RouterLink,
     MatButtonModule,
     MatIconModule,
+    MatSnackBarModule,
     DynamicTableComponent,
     FilterPanelComponent,
     FilterChipsComponent,
@@ -59,9 +63,14 @@ export class ContactListComponent implements OnInit {
   private readonly viewStore = inject(ViewStore);
   private readonly contactService = inject(ContactService);
   private readonly customFieldService = inject(CustomFieldService);
+  private readonly sequenceService = inject(SequenceService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+
+  /** Selected contacts for bulk actions. */
+  selectedContacts = signal<any[]>([]);
 
   /** All column definitions (core + custom fields). */
   columnDefs = signal<ColumnDefinition[]>([]);
@@ -263,5 +272,56 @@ export class ContactListComponent implements OnInit {
         this.contactStore.loadPage();
       }
     });
+  }
+
+  /** Handle selection changes from dynamic table. */
+  onSelectionChanged(selected: any[]): void {
+    this.selectedContacts.set(selected);
+  }
+
+  /** Clear current selection (called from bulk action bar). */
+  clearSelection(): void {
+    this.selectedContacts.set([]);
+  }
+
+  /** Open sequence picker then bulk enroll selected contacts. */
+  bulkEnrollInSequence(): void {
+    const contacts = this.selectedContacts();
+    if (contacts.length === 0) return;
+
+    // Lazy import sequence picker dialog to avoid eagerly loading the sequence module
+    import('../../sequences/sequence-picker-dialog/sequence-picker-dialog.component').then(
+      ({ SequencePickerDialogComponent }) => {
+        const dialogRef = this.dialog.open(SequencePickerDialogComponent, {
+          width: '500px',
+          maxHeight: '80vh',
+        });
+
+        dialogRef.afterClosed().subscribe((selectedSequence: SequenceListItem | undefined) => {
+          if (!selectedSequence) return;
+
+          const contactIds = contacts.map((c: any) => c.id);
+          this.sequenceService
+            .bulkEnroll(selectedSequence.id, { contactIds })
+            .subscribe({
+              next: (result) => {
+                const msg =
+                  result.skipped > 0
+                    ? `Enrolled ${result.enrolled} contacts in ${selectedSequence.name}, ${result.skipped} skipped (already enrolled).`
+                    : `Enrolled ${result.enrolled} contacts in ${selectedSequence.name}.`;
+                this.snackBar.open(msg, 'Close', { duration: 5000 });
+                this.selectedContacts.set([]);
+              },
+              error: (err) => {
+                this.snackBar.open(
+                  err?.message ?? 'Failed to enroll contacts.',
+                  'Close',
+                  { duration: 5000 },
+                );
+              },
+            });
+        });
+      },
+    );
   }
 }

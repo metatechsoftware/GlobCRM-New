@@ -31,6 +31,8 @@
       [totalCount]="contactStore.totalCount()"
       [pageSize]="contactStore.pageSize()"
       [loading]="contactStore.isLoading()"
+      [enableSelection]="true"
+      (selectionChanged)="onSelectionChanged($event)"
       (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
       (sortChanged)="onSortChanged($event)"
       (pageChanged)="onPageChanged($event)"
@@ -39,5 +41,19 @@
       (rowDeleteClicked)="onRowDeleteClicked($event)"
       (searchChanged)="onSearchChanged($event)"
       (customFieldCreated)="onCustomFieldCreated($event)" />
+
+    <!-- Bulk Action Bar -->
+    @if (selectedContacts().length > 0) {
+      <div class="bulk-action-bar">
+        <span class="bulk-action-bar__count">{{ selectedContacts().length }} contact{{ selectedContacts().length !== 1 ? 's' : '' }} selected</span>
+        <button mat-flat-button color="primary" (click)="bulkEnrollInSequence()">
+          <mat-icon>schedule_send</mat-icon>
+          Enroll in Sequence
+        </button>
+        <button mat-stroked-button (click)="clearSelection()">
+          Clear Selection
+        </button>
+      </div>
+    }
   </div>
 </div>
