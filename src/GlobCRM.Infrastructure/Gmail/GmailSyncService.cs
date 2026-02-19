@@ -5,6 +5,7 @@ using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
+using GlobCRM.Infrastructure.Sequences;
 using Google.Apis.Gmail.v1;
 using Google.Apis.Gmail.v1.Data;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,7 @@ public class GmailSyncService
     private readonly IEmailAccountRepository _accountRepository;
     private readonly NotificationDispatcher _dispatcher;
     private readonly IFeedRepository _feedRepository;
+    private readonly SequenceReplyDetector _replyDetector;
     private readonly ApplicationDbContext _db;
     private readonly IConfiguration _configuration;
     private readonly ILogger<GmailSyncService> _logger;
@@ -35,6 +37,7 @@ public class GmailSyncService
         IEmailAccountRepository accountRepository,
         NotificationDispatcher dispatcher,
         IFeedRepository feedRepository,
+        SequenceReplyDetector replyDetector,
         ApplicationDbContext db,
         IConfiguration configuration,
         ILogger<GmailSyncService> logger)
@@ -44,6 +47,7 @@ public class GmailSyncService
         _accountRepository = accountRepository;
         _dispatcher = dispatcher;
         _feedRepository = feedRepository;
+        _replyDetector = replyDetector;
         _db = db;
         _configuration = configuration;
         _logger = logger;
@@ -354,6 +358,22 @@ public class GmailSyncService
 
         // Save message
         await _messageRepository.CreateAsync(emailMessage);
+
+        // Check for sequence replies on inbound messages (auto-unenroll on reply)
+        if (isInbound)
+        {
+            try
+            {
+                await _replyDetector.CheckForSequenceReplyAsync(emailMessage);
+            }
+            catch (Exception ex)
+            {
+                // Reply detection failure must not break email sync
+                _logger.LogError(ex,
+                    "Failed to check for sequence reply on message {MessageId}",
+                    emailMessage.GmailMessageId);
+            }
+        }
 
         // Dispatch notification and feed event for new inbound emails only
         if (isInbound && account != null)

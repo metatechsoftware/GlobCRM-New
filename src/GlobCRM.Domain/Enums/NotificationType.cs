@@ -11,5 +11,6 @@ public enum NotificationType
     Mention,
     DueDateApproaching,
     EmailReceived,
-    WebhookAutoDisabled
+    WebhookAutoDisabled,
+    SequenceReply
 }
