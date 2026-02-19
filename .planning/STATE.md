@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 18 complete (Email Sequences)
+**Current focus:** v1.1 Automation & Intelligence — Phase 19 in progress (Workflow Automation)
 
 ## Current Position
 
-Phase: 18 of 20 (Email Sequences)
-Plan: 5 of 5 complete
-Status: Complete
-Last activity: 2026-02-19 — Completed 18-05 (Tracking & Analytics Dashboard)
+Phase: 19 of 20 (Workflow Automation)
+Plan: 1 of 6 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 19-01 (Workflow Domain Foundation)
 
-Progress: [██████████████████████████████████████████████░] 95% (v1.0: 96/96 plans, v1.1: 25/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5)
+Progress: [██████████████████████████████████████████████░] 96% (v1.0: 96/96 plans, v1.1: 26/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 1/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 25
-- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5)
+- v1.1 plans completed: 26
+- v1.1 plans total: 31+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 1/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -46,6 +46,7 @@ Progress: [███████████████████████
 | 18-03 | Sequence API Endpoints (SequencesController + 20 endpoints + DTOs + validators) | 5min | 2 | 2 |
 | 18-04 | Sequence Frontend (builder + list + detail + enrollment dialog + nav) | 8min | 2 | 15 |
 | 18-05 | Tracking & Analytics Dashboard (DynamicTable selection + analytics + funnel chart + enrollment) | 6min | 2 | 12 |
+| 19-01 | Workflow Domain Foundation (entities + migration + RLS + repository + seeds) | 8min | 2 | 23 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -155,6 +156,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [18-05] DynamicTable selection is fully generic -- no sequence-specific code; usable by any entity list page via enableSelection input
 - [18-05] SequencePickerDialog lazy-imported via dynamic import() from contacts list and contact detail to avoid eagerly loading sequence module
 - [18-05] Contact detail uses mat-menu more_vert trigger for "Enroll in Sequence" action -- keeps header clean, extensible for future actions
+- [19-01] WorkflowDefinition stored as JSONB owned entity via ToJson() with nested OwnsMany for nodes/connections/triggers/conditions/actions
+- [19-01] WorkflowActionConfig.Config and WorkflowNode.Config stored as string (serialized JSON) instead of Dictionary -- EF Core ToJson() doesn't support nested dictionaries in owned types
+- [19-01] TriggerSummary denormalized List<string> on Workflow entity for fast event matching without full definition deserialization
 
 ### Pending Todos
 
@@ -170,6 +174,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 18-05-PLAN.md (Phase 18 complete)
-Resume file: .planning/phases/18-email-sequences/18-05-SUMMARY.md
-Next step: Plan Phase 19 (Workflows)
+Stopped at: Completed 19-01-PLAN.md
+Resume file: .planning/phases/19-workflow-automation/19-01-SUMMARY.md
+Next step: Execute 19-02-PLAN.md (Workflow Execution Engine)
