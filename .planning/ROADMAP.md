@@ -38,7 +38,7 @@
 - [x] **Phase 17: Webhooks** - HMAC-signed webhook delivery with exponential retry, subscription management, delivery logs, SSRF prevention (completed 2026-02-19)
 - [x] **Phase 18: Email Sequences** - Multi-step drip sequences with delays, enrollment management, reply-based auto-unenroll, and per-step open/click tracking (completed 2026-02-19)
 - [x] **Phase 19: Workflow Automation** - Trigger-based automation engine with event/field-change/date triggers, multi-action execution (field update, notify, task, email, webhook, sequence), execution logs, and prebuilt templates (completed 2026-02-19)
-- [x] **Phase 20: Advanced Reporting Builder** - Dynamic report builder with entity/field selection, filter conditions, grouping/aggregation, chart visualization, related entity fields, save/share, CSV export, and drill-down (completed 2026-02-19)
+- [ ] **Phase 20: Advanced Reporting Builder** - Dynamic report builder with entity/field selection, filter conditions, grouping/aggregation, chart visualization, related entity fields, save/share, CSV export, and drill-down (UAT gap closure in progress)
 
 ## Phase Details
 
@@ -177,15 +177,17 @@ Plans:
   2. User can group report results and apply aggregations (count, sum, average, min, max) to numeric and formula fields
   3. User can visualize report results as charts (bar, line, pie) or as a data table, and drill down from a chart data point to view the underlying records
   4. User can save reports, share them with team members, and export results to CSV
-**Plans**: 6 plans
+**Plans**: 8 plans
 
 Plans:
-- [ ] 20-01-PLAN.md — Backend domain entities, EF configs, migration, RLS, repository, RBAC, NuGet packages
-- [ ] 20-02-PLAN.md — Backend ReportFieldMetadataService and ReportQueryEngine (core engine)
-- [ ] 20-03-PLAN.md — Backend ReportsController, ReportCsvExportJob, seed starter reports
-- [ ] 20-04-PLAN.md — Frontend models, service, store, routes, gallery page, builder shell, navigation
-- [ ] 20-05-PLAN.md — Frontend builder sidebar panels (entity source, field selector, filter builder, grouping, chart config)
-- [ ] 20-06-PLAN.md — Frontend viewer (chart rendering, data table, drill-down, aggregation cards, CSV export)
+- [x] 20-01-PLAN.md — Backend domain entities, EF configs, migration, RLS, repository, RBAC, NuGet packages
+- [x] 20-02-PLAN.md — Backend ReportFieldMetadataService and ReportQueryEngine (core engine)
+- [x] 20-03-PLAN.md — Backend ReportsController, ReportCsvExportJob, seed starter reports
+- [x] 20-04-PLAN.md — Frontend models, service, store, routes, gallery page, builder shell, navigation
+- [x] 20-05-PLAN.md — Frontend builder sidebar panels (entity source, field selector, filter builder, grouping, chart config)
+- [x] 20-06-PLAN.md — Frontend viewer (chart rendering, data table, drill-down, aggregation cards, CSV export)
+- [ ] 20-07-PLAN.md — Gap closure: backend GetAllAsync projection + ChartType lowercase normalization
+- [ ] 20-08-PLAN.md — Gap closure: gallery error display, mat-select-trigger, sidebar error visibility, filter group delete
 
 ## Progress
 
@@ -215,4 +217,4 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 17. Webhooks | 4/4 | Complete    | 2026-02-19 | - |
 | 18. Email Sequences | 5/5 | Complete    | 2026-02-19 | - |
 | 19. Workflow Automation | 8/8 | Complete   | 2026-02-19 | - |
-| 20. Advanced Reporting Builder | 6/6 | Complete    | 2026-02-19 | - |
+| 20. Advanced Reporting Builder | 6/8 | Gap Closure | 2026-02-19 | - |
