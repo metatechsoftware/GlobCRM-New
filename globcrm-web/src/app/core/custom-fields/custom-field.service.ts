@@ -6,6 +6,11 @@ import {
   CustomFieldSection,
   CreateCustomFieldRequest,
   UpdateCustomFieldRequest,
+  FieldInfo,
+  ValidateFormulaRequest,
+  ValidateFormulaResponse,
+  PreviewFormulaRequest,
+  PreviewFormulaResponse,
 } from './custom-field.models';
 
 /**
@@ -69,6 +74,39 @@ export class CustomFieldService {
   getSections(entityType: string): Observable<CustomFieldSection[]> {
     return this.api.get<CustomFieldSection[]>(
       `/api/custom-fields/sections/${entityType}`,
+    );
+  }
+
+  /**
+   * Validate a formula expression against an entity type's available fields.
+   */
+  validateFormula(
+    request: ValidateFormulaRequest,
+  ): Observable<ValidateFormulaResponse> {
+    return this.api.post<ValidateFormulaResponse>(
+      '/api/custom-fields/validate-formula',
+      request,
+    );
+  }
+
+  /**
+   * Preview a formula result using sample or real entity data.
+   */
+  previewFormula(
+    request: PreviewFormulaRequest,
+  ): Observable<PreviewFormulaResponse> {
+    return this.api.post<PreviewFormulaResponse>(
+      '/api/custom-fields/preview-formula',
+      request,
+    );
+  }
+
+  /**
+   * Get available fields for formula autocomplete, grouped by category.
+   */
+  getFieldRegistry(entityType: string): Observable<FieldInfo[]> {
+    return this.api.get<FieldInfo[]>(
+      `/api/custom-fields/field-registry/${entityType}`,
     );
   }
 }
