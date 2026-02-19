@@ -86,7 +86,13 @@ Plans:
   2. Formula fields support date difference calculations, string concatenation, and conditional logic (IF/THEN/ELSE)
   3. Formula values are computed on-read (server-side) and displayed as read-only columns in dynamic tables, detail pages, and all other views
   4. Admin receives immediate, clear validation feedback when creating formulas with syntax errors, invalid field references, or circular dependencies (detected via topological sort)
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 15-01-PLAN.md — Backend domain model extension, NCalc engine, formula evaluation/validation/registry services
+- [ ] 15-02-PLAN.md — Backend API endpoints (validate, preview, field-registry) and formula evaluation in all entity DTO mappings
+- [ ] 15-03-PLAN.md — Frontend formula editor with autocomplete, live preview, and custom-field-edit-dialog integration
+- [ ] 15-04-PLAN.md — Frontend formula display in dynamic tables (#ERR with tooltip) and detail page custom field forms
 
 ### Phase 16: Duplicate Detection & Merge
 **Goal**: Users can detect and merge duplicate contacts and companies with confidence, preserving all relationships and history on the surviving record
