@@ -10,17 +10,17 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 19 of 20 (Workflow Automation)
-Plan: 3 of 6 complete
+Plan: 4 of 6 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 19-03 (Workflow REST API)
+Last activity: 2026-02-19 — Completed 19-04 (Workflow Frontend Service Layer & List Page)
 
-Progress: [██████████████████████████████████████████████░] 97% (v1.0: 96/96 plans, v1.1: 28/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 3/6)
+Progress: [██████████████████████████████████████████████░] 97% (v1.0: 96/96 plans, v1.1: 29/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 4/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 28
+- v1.1 plans completed: 29
 - v1.1 plans total: 31+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 3/6)
 
 | Phase | Plan | Duration | Tasks | Files |
@@ -49,6 +49,7 @@ Progress: [███████████████████████
 | 19-01 | Workflow Domain Foundation (entities + migration + RLS + repository + seeds) | 8min | 2 | 23 |
 | 19-02 | Workflow Execution Engine (handler + condition eval + actions + loop guard) | 11min | 2 | 15 |
 | 19-03 | Workflow REST API (17 endpoints + DTOs + validators + date trigger scanner) | 9min | 2 | 12 |
+| 19-04 | Workflow Frontend (models + service + store + card grid list + SVG thumbnails) | 6min | 2 | 14 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -171,6 +172,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [19-03] Stub action classes created for parallel 19-02 build compatibility -- 19-02 replaces with real implementations
 - [19-03] DateTriggerScanService supports Deal.ExpectedCloseDate and Activity.DueDate; custom field date querying deferred
 - [19-03] NotificationType.WorkflowAction added proactively for 19-02 SendNotificationAction compatibility
+- [19-04] SVG schematic thumbnail approach 2 -- renders from triggerSummary.length and nodeCount without full definition (no backend change)
+- [19-04] Placeholder components for builder/detail/logs routes -- Angular compiler resolves lazy-loaded paths at compile time
+- [19-04] WorkflowStore component-provided (not root) following WebhookStore/SequenceStore pattern -- each page gets fresh instance
+- [19-04] Optimistic status toggle with revert-on-error pattern for responsive UX
 
 ### Pending Todos
 
@@ -186,6 +191,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 19-02-PLAN.md (parallel with 19-03)
-Resume file: .planning/phases/19-workflow-automation/19-02-SUMMARY.md
-Next step: Execute 19-04-PLAN.md (Workflow Frontend)
+Stopped at: Completed 19-04-PLAN.md
+Resume file: .planning/phases/19-workflow-automation/19-04-SUMMARY.md
+Next step: Execute 19-05-PLAN.md (Workflow Visual Builder)
