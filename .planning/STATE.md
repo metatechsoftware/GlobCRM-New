@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 20 (Advanced Reporting Builder) -- COMPLETE (UAT gap closure done)
+**Current focus:** Gap Closure — Phase 21 (Integration Polish & Tech Debt Closure)
 
 ## Current Position
 
-Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 8 of 8 complete
-Status: Complete
-Last activity: 2026-02-19 — Completed 20-08 (UAT Gap Closure - error display, mat-select trigger, filter group delete)
+Phase: 21 of 21 (Integration Polish & Tech Debt Closure)
+Plan: 1 of 2 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 21-01 (Backend Integration Gap Closure - DI fix, duplicate removal, DuplicateMatch refactor)
 
-Progress: [████████████████████████████████████████████████] 100% (v1.0: 96/96 plans, v1.1: 41/41 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8)
+Progress: [████████████████████████████████████████████████] ~98% (v1.0: 96/96 plans, v1.1: 42/43 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 1/2)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 41
-- v1.1 plans total: 41 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8)
+- v1.1 plans completed: 42
+- v1.1 plans total: 43 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 1/2)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -62,6 +62,7 @@ Progress: [███████████████████████
 | 20-06 | Report Viewer (chart + data table + aggregation cards + builder wiring) | 5min | 2 | 8 |
 | 20-07 | Gallery API Fix (JSONB projection + ChartType casing) | 2min | 1 | 2 |
 | 20-08 | UAT Gap Closure (error display + mat-select trigger + filter delete) | 3min | 2 | 8 |
+| 21-01 | Backend Integration Gap Closure (DI fix + duplicate removal + DuplicateMatch refactor) | 2min | 2 | 5 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -224,6 +225,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-08] mat-select-trigger with computed signal for entity label -- avoids mat-icon CSS ligature text leak in selected display
 - [20-08] loadFieldMetadata clears fieldMetadata and error at start -- prevents stale data from prior entity type selection
 - [20-08] Recursive filter (removeRequest) binding on child instance -- parent onChildGroupRemove splices child from groups array
+- [21-01] Removed unused DomainEvents and EmailTemplates using directives from Program.cs after removing duplicate registration calls
+- [21-01] Company DuplicateMatch passes null for Email and Website as SecondaryField -- companies have no per-match email, it comes from enrichment query
 
 ### Pending Todos
 
@@ -239,6 +242,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 21 context gathered
-Resume file: .planning/phases/21-integration-polish-tech-debt/21-CONTEXT.md
-Next step: Plan Phase 21 — /gsd:plan-phase 21
+Stopped at: Completed 21-01-PLAN.md
+Resume file: .planning/phases/21-integration-polish-tech-debt/21-01-SUMMARY.md
+Next step: Execute Plan 02 — /gsd:execute-phase 21
