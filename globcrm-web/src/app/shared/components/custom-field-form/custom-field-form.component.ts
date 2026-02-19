@@ -19,6 +19,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { Subscription } from 'rxjs';
 
@@ -27,6 +28,7 @@ import {
   CustomFieldDefinition,
   CustomFieldSection,
   CustomFieldType,
+  isFormulaError,
 } from '../../../core/custom-fields/custom-field.models';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 
@@ -70,6 +72,7 @@ interface FieldGroup {
     MatExpansionModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
   ],
   providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -137,6 +140,39 @@ interface FieldGroup {
       color: var(--color-text-secondary);
       font-size: 13px;
       font-style: italic;
+    }
+
+    .formula-field-display {
+      padding: 8px 0;
+    }
+
+    .formula-label {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 12px;
+      color: var(--color-text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .formula-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--color-text-muted);
+    }
+
+    .formula-value {
+      font-size: 14px;
+      color: var(--color-text);
+      padding: 4px 0;
+    }
+
+    .formula-error {
+      color: var(--color-danger, #ef4444);
+      font-weight: 600;
+      cursor: help;
+      font-size: 13px;
     }
   `,
   template: `
@@ -260,6 +296,24 @@ interface FieldGroup {
                             <mat-error>{{ field.label }} is required</mat-error>
                           }
                         </mat-form-field>
+                      }
+                      @case ('formula') {
+                        <div class="formula-field-display">
+                          <label class="formula-label">
+                            <mat-icon class="formula-icon">functions</mat-icon>
+                            {{ field.label }}
+                          </label>
+                          @if (isFormulaErrorForField(field)) {
+                            <span class="formula-error"
+                                  [matTooltip]="getFormulaTooltip(field)">
+                              #ERR
+                            </span>
+                          } @else {
+                            <span class="formula-value">
+                              {{ getFormulaDisplayValue(field) }}
+                            </span>
+                          }
+                        </div>
                       }
                     }
                   </div>
@@ -394,6 +448,9 @@ export class CustomFieldFormComponent implements OnInit, OnDestroy {
       // Skip hidden fields
       if (this.getFieldAccess(field.id) === 'hidden') continue;
 
+      // Skip formula fields -- they are computed read-only, not form controls
+      if (field.fieldType === CustomFieldType.Formula) continue;
+
       const initialValue = currentValues?.[field.id] ?? this.getDefaultValue(field);
       const validators = [];
 
@@ -458,5 +515,36 @@ export class CustomFieldFormComponent implements OnInit, OnDestroy {
     // The validation model doesn't have currencyCode currently,
     // so we default to '$'. Can be extended when currency codes are added.
     return '$';
+  }
+
+  /**
+   * Get the display value for a formula field.
+   * Returns the computed value or a dash if null/undefined.
+   */
+  getFormulaDisplayValue(field: CustomFieldDefinition): string {
+    const values = this.customFieldValues();
+    const value = values?.[field.name] ?? values?.[field.id];
+    if (value === null || value === undefined) return '\u2014';
+    if (isFormulaError(value)) return '#ERR';
+    return String(value);
+  }
+
+  /**
+   * Get the error tooltip for a formula field value.
+   */
+  getFormulaTooltip(field: CustomFieldDefinition): string {
+    const values = this.customFieldValues();
+    const value = values?.[field.name] ?? values?.[field.id];
+    if (isFormulaError(value)) return value.message;
+    return '';
+  }
+
+  /**
+   * Check if a formula field's value is a formula error.
+   */
+  isFormulaErrorForField(field: CustomFieldDefinition): boolean {
+    const values = this.customFieldValues();
+    const value = values?.[field.name] ?? values?.[field.id];
+    return isFormulaError(value);
   }
 }
