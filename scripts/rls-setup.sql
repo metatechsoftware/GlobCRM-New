@@ -497,6 +497,36 @@ COMMENT ON POLICY tenant_isolation_email_templates ON email_templates IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- duplicate_matching_configs - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE duplicate_matching_configs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE duplicate_matching_configs FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_duplicate_matching_configs ON duplicate_matching_configs
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_duplicate_matching_configs ON duplicate_matching_configs IS
+    'Ensures duplicate matching config queries only return configs for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- merge_audit_logs - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE merge_audit_logs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE merge_audit_logs FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_merge_audit_logs ON merge_audit_logs
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_merge_audit_logs ON merge_audit_logs IS
+    'Ensures merge audit log queries only return logs for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

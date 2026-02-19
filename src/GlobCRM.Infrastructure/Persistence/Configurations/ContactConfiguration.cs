@@ -100,6 +100,16 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
             .HasColumnName("updated_at")
             .IsRequired();
 
+        // Merge tracking fields
+        builder.Property(c => c.MergedIntoId)
+            .HasColumnName("merged_into_id");
+
+        builder.Property(c => c.MergedAt)
+            .HasColumnName("merged_at");
+
+        builder.Property(c => c.MergedByUserId)
+            .HasColumnName("merged_by_user_id");
+
         // Ignore computed property (not stored in database)
         builder.Ignore(c => c.FullName);
 
@@ -126,6 +136,9 @@ public class ContactConfiguration : IEntityTypeConfiguration<Contact>
 
         builder.HasIndex(c => c.OwnerId)
             .HasDatabaseName("idx_contacts_owner");
+
+        builder.HasIndex(c => c.MergedIntoId)
+            .HasDatabaseName("idx_contacts_merged_into");
 
         builder.HasIndex(c => c.CustomFields)
             .HasMethod("gin")

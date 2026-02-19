@@ -72,4 +72,22 @@ public class Contact
 
     // Navigation: Contact has many EmailMessages (one-to-many via EmailMessage.LinkedContactId)
     public ICollection<EmailMessage> EmailMessages { get; set; } = new List<EmailMessage>();
+
+    // Merge tracking fields (Phase 16: Duplicate Detection & Merge)
+
+    /// <summary>
+    /// If this contact was merged into another, points to the surviving contact.
+    /// Null for active (non-merged) contacts. Global query filter excludes merged records.
+    /// </summary>
+    public Guid? MergedIntoId { get; set; }
+
+    /// <summary>
+    /// When this contact was merged into another record.
+    /// </summary>
+    public DateTimeOffset? MergedAt { get; set; }
+
+    /// <summary>
+    /// User who performed the merge operation.
+    /// </summary>
+    public Guid? MergedByUserId { get; set; }
 }

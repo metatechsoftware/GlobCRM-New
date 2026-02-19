@@ -92,6 +92,16 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
             .HasColumnName("updated_at")
             .IsRequired();
 
+        // Merge tracking fields
+        builder.Property(c => c.MergedIntoId)
+            .HasColumnName("merged_into_id");
+
+        builder.Property(c => c.MergedAt)
+            .HasColumnName("merged_at");
+
+        builder.Property(c => c.MergedByUserId)
+            .HasColumnName("merged_by_user_id");
+
         // Relationships
         builder.HasOne(c => c.Owner)
             .WithMany()
@@ -109,6 +119,9 @@ public class CompanyConfiguration : IEntityTypeConfiguration<Company>
 
         builder.HasIndex(c => new { c.TenantId, c.Name })
             .HasDatabaseName("idx_companies_tenant_name");
+
+        builder.HasIndex(c => c.MergedIntoId)
+            .HasDatabaseName("idx_companies_merged_into");
 
         builder.HasIndex(c => c.CustomFields)
             .HasMethod("gin")

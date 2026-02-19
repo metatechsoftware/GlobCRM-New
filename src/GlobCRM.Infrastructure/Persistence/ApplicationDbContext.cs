@@ -126,9 +126,16 @@ public class ApplicationDbContext
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
     public DbSet<EmailTemplateCategory> EmailTemplateCategories => Set<EmailTemplateCategory>();
 
+    // Duplicate Detection & Merge DbSets
+    public DbSet<DuplicateMatchingConfig> DuplicateMatchingConfigs => Set<DuplicateMatchingConfig>();
+    public DbSet<MergeAuditLog> MergeAuditLogs => Set<MergeAuditLog>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+
+        // Enable pg_trgm extension for fuzzy string matching (duplicate detection)
+        modelBuilder.HasPostgresExtension("pg_trgm");
 
         // Apply entity type configurations
         // Organization table is owned by TenantDbContext - apply config for mapping but exclude from migrations
@@ -212,6 +219,10 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new EmailTemplateCategoryConfiguration());
         modelBuilder.ApplyConfiguration(new EmailTemplateConfiguration());
 
+        // Duplicate Detection & Merge entity configurations
+        modelBuilder.ApplyConfiguration(new DuplicateMatchingConfigConfiguration());
+        modelBuilder.ApplyConfiguration(new MergeAuditLogConfiguration());
+
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
         modelBuilder.Entity<Invitation>().HasQueryFilter(
@@ -246,13 +257,13 @@ public class ApplicationDbContext
         // do NOT need their own query filters -- they are filtered through their
         // parent's FK relationship (Role or Team) which is already tenant-filtered.
 
-        // Global query filter: filter Companies by TenantId (tenant-scoped)
+        // Global query filter: filter Companies by TenantId AND exclude merged records
         modelBuilder.Entity<Company>().HasQueryFilter(
-            c => _tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId());
+            c => (_tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId()) && c.MergedIntoId == null);
 
-        // Global query filter: filter Contacts by TenantId (tenant-scoped)
+        // Global query filter: filter Contacts by TenantId AND exclude merged records
         modelBuilder.Entity<Contact>().HasQueryFilter(
-            c => _tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId());
+            c => (_tenantProvider == null || _tenantProvider.GetTenantId() == null || c.TenantId == _tenantProvider.GetTenantId()) && c.MergedIntoId == null);
 
         // Global query filter: filter Products by TenantId (tenant-scoped)
         modelBuilder.Entity<Product>().HasQueryFilter(
@@ -364,5 +375,13 @@ public class ApplicationDbContext
         // Global query filter: filter EmailTemplateCategories by TenantId (tenant-scoped)
         modelBuilder.Entity<EmailTemplateCategory>().HasQueryFilter(
             etc => _tenantProvider == null || _tenantProvider.GetTenantId() == null || etc.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter DuplicateMatchingConfigs by TenantId (tenant-scoped)
+        modelBuilder.Entity<DuplicateMatchingConfig>().HasQueryFilter(
+            d => _tenantProvider == null || _tenantProvider.GetTenantId() == null || d.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter MergeAuditLogs by TenantId (tenant-scoped)
+        modelBuilder.Entity<MergeAuditLog>().HasQueryFilter(
+            m => _tenantProvider == null || _tenantProvider.GetTenantId() == null || m.TenantId == _tenantProvider.GetTenantId());
     }
 }
