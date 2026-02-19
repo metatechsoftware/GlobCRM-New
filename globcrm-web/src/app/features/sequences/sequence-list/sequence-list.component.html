@@ -1,0 +1,115 @@
+<div class="sequence-list">
+  <!-- Header -->
+  <div class="sequence-list__header">
+    <div>
+      <h1>Sequences</h1>
+      <p class="sequence-list__subtitle">Automate multi-step email outreach to contacts</p>
+    </div>
+    <a mat-flat-button color="primary" routerLink="/sequences/new">
+      <mat-icon>add</mat-icon>
+      Create Sequence
+    </a>
+  </div>
+
+  <!-- Loading -->
+  @if (store.loading()) {
+    <div class="sequence-list__loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else if (store.sequences().length === 0) {
+    <!-- Empty State -->
+    <div class="sequence-list__empty">
+      <mat-icon>campaign</mat-icon>
+      <h3>No sequences yet</h3>
+      <p>Create your first email sequence to automate outreach</p>
+      <a mat-flat-button color="primary" routerLink="/sequences/new" style="margin-top: 16px">
+        <mat-icon>add</mat-icon>
+        Create Sequence
+      </a>
+    </div>
+  } @else {
+    <!-- Sequence Table -->
+    <div class="sequence-list__table-wrap">
+      <table mat-table [dataSource]="store.sequences()">
+        <!-- Name Column -->
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <td mat-cell *matCellDef="let seq">
+            <a class="sequence-list__name-link" [routerLink]="['/sequences', seq.id]">
+              {{ seq.name }}
+            </a>
+            @if (seq.description) {
+              <div class="sequence-list__desc">{{ seq.description }}</div>
+            }
+          </td>
+        </ng-container>
+
+        <!-- Status Column -->
+        <ng-container matColumnDef="status">
+          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <td mat-cell *matCellDef="let seq">
+            <span class="sequence-list__status"
+                  [class.status--draft]="seq.status === 'draft'"
+                  [class.status--active]="seq.status === 'active'"
+                  [class.status--paused]="seq.status === 'paused'"
+                  [class.status--archived]="seq.status === 'archived'">
+              {{ seq.status | titlecase }}
+            </span>
+          </td>
+        </ng-container>
+
+        <!-- Steps Column -->
+        <ng-container matColumnDef="steps">
+          <th mat-header-cell *matHeaderCellDef>Steps</th>
+          <td mat-cell *matCellDef="let seq">{{ seq.stepCount }}</td>
+        </ng-container>
+
+        <!-- Enrolled Column -->
+        <ng-container matColumnDef="enrolled">
+          <th mat-header-cell *matHeaderCellDef>Enrolled</th>
+          <td mat-cell *matCellDef="let seq">{{ seq.totalEnrolled }}</td>
+        </ng-container>
+
+        <!-- Active Column -->
+        <ng-container matColumnDef="active">
+          <th mat-header-cell *matHeaderCellDef>Active</th>
+          <td mat-cell *matCellDef="let seq">{{ seq.activeEnrollments }}</td>
+        </ng-container>
+
+        <!-- Completed Column -->
+        <ng-container matColumnDef="completed">
+          <th mat-header-cell *matHeaderCellDef>Completed</th>
+          <td mat-cell *matCellDef="let seq">{{ seq.completedEnrollments }}</td>
+        </ng-container>
+
+        <!-- Reply Rate Column -->
+        <ng-container matColumnDef="replyRate">
+          <th mat-header-cell *matHeaderCellDef>Reply Rate</th>
+          <td mat-cell *matCellDef="let seq">{{ seq.replyRate }}%</td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let seq">
+            <div class="sequence-list__actions" (click)="$event.stopPropagation()">
+              <button mat-icon-button matTooltip="Edit"
+                      [routerLink]="['/sequences', seq.id, 'edit']">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button matTooltip="Delete" color="warn"
+                      (click)="onDelete(seq)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            class="sequence-list__row"
+            [routerLink]="['/sequences', row.id]"></tr>
+      </table>
+    </div>
+  }
+</div>

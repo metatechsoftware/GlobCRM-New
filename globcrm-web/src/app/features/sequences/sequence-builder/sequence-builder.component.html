@@ -1,0 +1,93 @@
+<div class="builder">
+  <!-- Header -->
+  <div class="builder__header">
+    <button mat-icon-button (click)="goBack()" aria-label="Back">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>{{ isEditMode() ? 'Edit Sequence' : 'Create Sequence' }}</h1>
+  </div>
+
+  @if (store.loading() && isEditMode()) {
+    <div class="builder__loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <!-- Sequence Info -->
+    <div class="builder__section">
+      <mat-form-field class="builder__field" appearance="outline">
+        <mat-label>Sequence Name</mat-label>
+        <input matInput
+               [(ngModel)]="name"
+               placeholder="e.g., New Customer Onboarding"
+               required />
+      </mat-form-field>
+
+      <mat-form-field class="builder__field" appearance="outline">
+        <mat-label>Description (optional)</mat-label>
+        <textarea matInput
+                  [(ngModel)]="description"
+                  rows="2"
+                  placeholder="Brief description of this sequence"></textarea>
+      </mat-form-field>
+
+      @if (isEditMode() && store.selectedSequence()) {
+        <div class="builder__status-row">
+          <span class="builder__status-label">Status:</span>
+          <span class="builder__status-badge"
+                [class.status--draft]="store.selectedSequence()!.status === 'draft'"
+                [class.status--active]="store.selectedSequence()!.status === 'active'"
+                [class.status--paused]="store.selectedSequence()!.status === 'paused'"
+                [class.status--archived]="store.selectedSequence()!.status === 'archived'">
+            {{ store.selectedSequence()!.status | titlecase }}
+          </span>
+        </div>
+      }
+    </div>
+
+    <!-- Steps Section -->
+    <div class="builder__section">
+      <div class="builder__section-header">
+        <h2>Steps</h2>
+        <span class="builder__step-count">{{ steps().length }} step{{ steps().length !== 1 ? 's' : '' }}</span>
+      </div>
+
+      @if (steps().length === 0) {
+        <div class="builder__empty-steps">
+          <mat-icon>mail_outline</mat-icon>
+          <p>No steps yet. Add your first email step below.</p>
+        </div>
+      } @else {
+        <div cdkDropList
+             class="builder__step-list"
+             (cdkDropListDropped)="onStepDrop($event)">
+          @for (step of steps(); track step.id) {
+            <div cdkDrag class="builder__step-drag-item">
+              <app-step-item
+                [step]="step"
+                (stepChanged)="onStepChanged(step, $event)"
+                (stepDeleted)="onStepDeleted(step)" />
+            </div>
+          }
+        </div>
+      }
+
+      <button mat-stroked-button
+              class="builder__add-step"
+              (click)="addStep()">
+        <mat-icon>add</mat-icon>
+        Add Step
+      </button>
+    </div>
+
+    <!-- Actions -->
+    <div class="builder__actions">
+      <button mat-button (click)="goBack()">Cancel</button>
+      <button mat-flat-button
+              color="primary"
+              [disabled]="!name || store.loading()"
+              (click)="save()">
+        {{ isEditMode() ? 'Save Changes' : 'Create Sequence' }}
+      </button>
+    </div>
+  }
+</div>
