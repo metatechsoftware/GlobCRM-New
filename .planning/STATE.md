@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 15 of 20 (Formula / Computed Custom Fields)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 15-01 (Backend Foundation)
+Last activity: 2026-02-19 — Completed 15-02 (Formula API Endpoints)
 
-Progress: [███████████████████████████████████░░░░░░░] 77% (v1.0: 96/96 plans, v1.1: 9/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 1/4)
+Progress: [████████████████████████████████████░░░░░░] 80% (v1.0: 96/96 plans, v1.1: 10/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 2/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 9
-- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 1/4)
+- v1.1 plans completed: 10
+- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 2/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -30,6 +30,7 @@ Progress: [███████████████████████
 | 14-03 | Email Template Frontend (Unlayer + list) | 8min | 3 | 16 |
 | 14-04 | Preview, Polish, Navigation | 5min | 2 | 9 |
 | 15-01 | Backend Foundation (domain + NCalc engine + services) | 5min | 2 | 13 |
+| 15-02 | Formula API endpoints + entity controller DTO enrichment | 8min | 2 | 9 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -77,6 +78,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [15-01] FormulaResultType admin-selected (number/text/date) -- explicit display formatting control
 - [15-01] DependsOnFieldIds stores field names for dependency tracking and topological sort
 - [15-01] Formula services (evaluation, validation, registry) registered via AddFormulaFieldServices() from AddCustomFieldServices()
+- [15-02] Optional parameter pattern on FromEntity for backward compat -- enrichedCustomFields ?? entity.CustomFields
+- [15-02] Only Deals/Activities list DTOs enriched (they expose CustomFields); other entities detail-only
+- [15-02] DependsOnFieldIds extracted via NCalc GetParameterNames() during Create/Update
 
 ### Pending Todos
 
@@ -92,6 +96,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 15-01-PLAN.md
-Resume file: .planning/phases/15-formula-computed-custom-fields/15-01-SUMMARY.md
-Next step: Execute 15-02-PLAN.md (Formula API endpoints)
+Stopped at: Completed 15-02-PLAN.md
+Resume file: .planning/phases/15-formula-computed-custom-fields/15-02-SUMMARY.md
+Next step: Execute 15-03-PLAN.md (Angular frontend formula components)
