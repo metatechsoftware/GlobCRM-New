@@ -174,6 +174,14 @@ export class SequenceService {
     );
   }
 
+  // ---- Usage ----
+
+  getSequenceUsage(id: string): Observable<{ usedByCount: number; workflows: { id: string; name: string }[] }> {
+    return this.api.get<{ usedByCount: number; workflows: { id: string; name: string }[] }>(
+      `${this.basePath}/${id}/usage`
+    );
+  }
+
   // ---- Analytics ----
 
   getAnalytics(sequenceId: string): Observable<SequenceAnalytics> {

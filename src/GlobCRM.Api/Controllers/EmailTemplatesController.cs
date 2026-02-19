@@ -2,8 +2,10 @@ using GlobCRM.Application.Common;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.EmailTemplates;
+using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace GlobCRM.Api.Controllers;
@@ -22,6 +24,7 @@ public class EmailTemplatesController : ControllerBase
     private readonly MergeFieldService _mergeFieldService;
     private readonly IEmailService _emailService;
     private readonly ITenantProvider _tenantProvider;
+    private readonly ApplicationDbContext _db;
     private readonly ILogger<EmailTemplatesController> _logger;
 
     public EmailTemplatesController(
@@ -30,6 +33,7 @@ public class EmailTemplatesController : ControllerBase
         MergeFieldService mergeFieldService,
         IEmailService emailService,
         ITenantProvider tenantProvider,
+        ApplicationDbContext db,
         ILogger<EmailTemplatesController> logger)
     {
         _templateRepository = templateRepository;
@@ -37,6 +41,7 @@ public class EmailTemplatesController : ControllerBase
         _mergeFieldService = mergeFieldService;
         _emailService = emailService;
         _tenantProvider = tenantProvider;
+        _db = db;
         _logger = logger;
     }
 
@@ -257,6 +262,26 @@ public class EmailTemplatesController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Returns the count and list of workflows that reference this email template in their definition.
+    /// Used to warn users before deleting a template that is used by active workflows.
+    /// </summary>
+    [HttpGet("{id:guid}/usage")]
+    [Authorize(Policy = "Permission:EmailTemplate:View")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetTemplateUsage(Guid id)
+    {
+        var templateIdStr = id.ToString();
+        // Search workflows whose JSONB definition column contains this template ID as text
+        var workflows = await _db.Database
+            .SqlQueryRaw<WorkflowUsageResult>(
+                "SELECT id AS \"Id\", name AS \"Name\" FROM workflows WHERE CAST(definition AS text) ILIKE {0}",
+                $"%{templateIdStr}%")
+            .ToListAsync();
+
+        return Ok(new { usedByCount = workflows.Count, workflows });
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -452,3 +477,8 @@ public record TestSendRequest(
 public record EmailTemplatePreviewResponse(
     string RenderedHtml,
     string RenderedSubject);
+
+/// <summary>
+/// Result type for raw SQL workflow usage queries.
+/// </summary>
+public record WorkflowUsageResult(Guid Id, string Name);

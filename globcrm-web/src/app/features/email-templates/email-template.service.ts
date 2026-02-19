@@ -120,6 +120,14 @@ export class EmailTemplateService {
     return this.api.delete<void>(`${this.categoriesPath}/${id}`);
   }
 
+  // ─── Usage ─────────────────────────────────────────────────────────────
+
+  getTemplateUsage(id: string): Observable<{ usedByCount: number; workflows: { id: string; name: string }[] }> {
+    return this.api.get<{ usedByCount: number; workflows: { id: string; name: string }[] }>(
+      `${this.basePath}/${id}/usage`
+    );
+  }
+
   // ─── Merge Fields ───────────────────────────────────────────────────────
 
   getMergeFields(): Observable<MergeFieldGroup> {

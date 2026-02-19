@@ -15,6 +15,18 @@
 
 <!-- Main Content Area -->
 <div class="builder-content">
+  <!-- Stale Reference Warning Banner -->
+  @if (staleWarnings().length > 0) {
+    <div class="stale-warning-banner">
+      <mat-icon>warning</mat-icon>
+      <div class="stale-warning-messages">
+        @for (warning of staleWarnings(); track warning) {
+          <span>{{ warning }}</span>
+        }
+      </div>
+    </div>
+  }
+
   <!-- Canvas -->
   <div class="builder-canvas">
     <app-workflow-canvas
@@ -112,6 +124,8 @@
                   [node]="node"
                   [entityType]="entityType()"
                   [entityFields]="entityFields()"
+                  [templates]="templates()"
+                  [sequences]="sequences()"
                   (configChanged)="onConfigChanged(node.id, $event)" />
               }
               @case ('branch') {
@@ -126,6 +140,8 @@
                   [node]="node"
                   [entityType]="entityType()"
                   [entityFields]="entityFields()"
+                  [templates]="templates()"
+                  [sequences]="sequences()"
                   (configChanged)="onConfigChanged(node.id, $event)" />
               }
             }

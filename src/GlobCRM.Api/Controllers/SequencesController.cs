@@ -881,6 +881,26 @@ public class SequencesController : ControllerBase
         return Ok(funnelData);
     }
 
+    /// <summary>
+    /// Returns the count and list of workflows that reference this sequence in their definition.
+    /// Used to warn users before deleting a sequence that is used by active workflows.
+    /// </summary>
+    [HttpGet("{id:guid}/usage")]
+    [Authorize(Policy = "Permission:EmailSequence:View")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetSequenceUsage(Guid id)
+    {
+        var sequenceIdStr = id.ToString();
+        // Search workflows whose JSONB definition column contains this sequence ID as text
+        var workflows = await _db.Database
+            .SqlQueryRaw<SequenceUsageResult>(
+                "SELECT id AS \"Id\", name AS \"Name\" FROM workflows WHERE CAST(definition AS text) ILIKE {0}",
+                $"%{sequenceIdStr}%")
+            .ToListAsync();
+
+        return Ok(new { usedByCount = workflows.Count, workflows });
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -1188,3 +1208,8 @@ public class BulkEnrollRequestValidator : AbstractValidator<BulkEnrollRequest>
         RuleFor(x => x.ContactIds.Count).LessThanOrEqualTo(1000).WithMessage("Maximum 1000 contacts per bulk enrollment.");
     }
 }
+
+/// <summary>
+/// Result type for raw SQL workflow usage queries.
+/// </summary>
+public record SequenceUsageResult(Guid Id, string Name);

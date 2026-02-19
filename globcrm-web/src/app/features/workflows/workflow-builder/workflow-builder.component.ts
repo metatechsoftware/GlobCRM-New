@@ -8,6 +8,7 @@ import {
   OnInit,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { forkJoin } from 'rxjs';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -21,6 +22,10 @@ import {
 } from '../workflow.models';
 import { WorkflowService } from '../workflow.service';
 import { WorkflowStore } from '../workflow.store';
+import { EmailTemplateService } from '../../email-templates/email-template.service';
+import { EmailTemplateListItem } from '../../email-templates/email-template.models';
+import { SequenceService } from '../../sequences/sequence.service';
+import { SequenceListItem } from '../../sequences/sequence.models';
 import { WorkflowCanvasComponent } from './workflow-canvas.component';
 import { WorkflowToolbarComponent } from './workflow-toolbar.component';
 import { TriggerConfigComponent } from './panels/trigger-config.component';
@@ -57,6 +62,13 @@ export class WorkflowBuilderComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly service = inject(WorkflowService);
   private readonly store = inject(WorkflowStore);
+  private readonly emailTemplateService = inject(EmailTemplateService);
+  private readonly sequenceService = inject(SequenceService);
+
+  // -- Picker data for action config --
+  readonly templates = signal<EmailTemplateListItem[]>([]);
+  readonly sequences = signal<SequenceListItem[]>([]);
+  readonly staleWarnings = signal<string[]>([]);
 
   // -- Workflow metadata --
   readonly workflowName = signal('Untitled Workflow');
@@ -94,6 +106,7 @@ export class WorkflowBuilderComponent implements OnInit {
       this.loadWorkflow(workflowId);
     }
     this.loadEntityFields();
+    this.loadPickerData();
   }
 
   // -- Load existing workflow --
@@ -110,6 +123,9 @@ export class WorkflowBuilderComponent implements OnInit {
           this.nodes.set(workflow.definition.nodes ?? []);
           this.connections.set(workflow.definition.connections ?? []);
         }
+
+        // Detect stale references after workflow loads (picker data may already be loaded)
+        this.detectStaleReferences();
       },
       error: () => {
         this.snackBar.open('Failed to load workflow', 'Dismiss', {
@@ -127,6 +143,47 @@ export class WorkflowBuilderComponent implements OnInit {
         error: () => this.entityFields.set([]),
       });
     }
+  }
+
+  private loadPickerData(): void {
+    forkJoin({
+      templates: this.emailTemplateService.getTemplates(),
+      sequences: this.sequenceService.getSequences(),
+    }).subscribe({
+      next: ({ templates, sequences }) => {
+        this.templates.set(templates);
+        this.sequences.set(sequences);
+        // Re-run stale detection now that picker data is available
+        this.detectStaleReferences();
+      },
+      error: () => {
+        this.templates.set([]);
+        this.sequences.set([]);
+      },
+    });
+  }
+
+  private detectStaleReferences(): void {
+    const warnings: string[] = [];
+    const templateIds = new Set(this.templates().map(t => t.id));
+    const sequenceIds = new Set(this.sequences().map(s => s.id));
+
+    // Only check if picker data is loaded
+    if (templateIds.size === 0 && sequenceIds.size === 0) return;
+
+    for (const node of this.nodes()) {
+      if (node.config?.['actionType'] === 'sendEmail' && node.config?.['emailTemplateId']) {
+        if (!templateIds.has(node.config['emailTemplateId'])) {
+          warnings.push(`Action "${node.label}" references a deleted email template`);
+        }
+      }
+      if (node.config?.['actionType'] === 'enrollInSequence' && node.config?.['sequenceId']) {
+        if (!sequenceIds.has(node.config['sequenceId'])) {
+          warnings.push(`Action "${node.label}" references a deleted sequence`);
+        }
+      }
+    }
+    this.staleWarnings.set(warnings);
   }
 
   // -- Node management --
@@ -264,6 +321,17 @@ export class WorkflowBuilderComponent implements OnInit {
   // -- Save --
 
   onSave(): void {
+    // Re-run stale detection before save
+    this.detectStaleReferences();
+    if (this.staleWarnings().length > 0) {
+      this.snackBar.open(
+        'Cannot save: ' + this.staleWarnings()[0] + (this.staleWarnings().length > 1 ? ` (+${this.staleWarnings().length - 1} more)` : ''),
+        'Dismiss',
+        { duration: 5000 },
+      );
+      return;
+    }
+
     this.isSaving.set(true);
     const definition = this.buildDefinition();
     const request = {
