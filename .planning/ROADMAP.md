@@ -195,6 +195,6 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Formula / Computed Custom Fields | 4/4 | Complete    | 2026-02-19 | - |
 | 16. Duplicate Detection & Merge | 4/4 | Complete    | 2026-02-19 | - |
 | 17. Webhooks | 4/4 | Complete    | 2026-02-19 | - |
-| 18. Email Sequences | 1/5 | In Progress|  | - |
+| 18. Email Sequences | 2/5 | In Progress|  | - |
 | 19. Workflow Automation | v1.1 | 0/? | Not started | - |
 | 20. Advanced Reporting Builder | v1.1 | 0/? | Not started | - |

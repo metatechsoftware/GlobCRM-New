@@ -36,8 +36,8 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 - [x] **ESEQ-01**: User can create a multi-step email sequence with configurable delays between steps
 - [ ] **ESEQ-02**: User can manually enroll contacts into a sequence
 - [ ] **ESEQ-03**: User can bulk-enroll contacts from a list view multi-select
-- [ ] **ESEQ-04**: Contacts are automatically unenrolled when they reply to a sequence email
-- [ ] **ESEQ-05**: User can view per-step tracking (open rate, click rate) for each sequence
+- [x] **ESEQ-04**: Contacts are automatically unenrolled when they reply to a sequence email
+- [x] **ESEQ-05**: User can view per-step tracking (open rate, click rate) for each sequence
 - [ ] **ESEQ-06**: User can view sequence-level analytics (enrolled, completed, replied, bounced)
 - [ ] **ESEQ-07**: User can pause/resume individual enrollments
 
@@ -172,8 +172,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ESEQ-01 | Phase 18 | Complete |
 | ESEQ-02 | Phase 18 | Pending |
 | ESEQ-03 | Phase 18 | Pending |
-| ESEQ-04 | Phase 18 | Pending |
-| ESEQ-05 | Phase 18 | Pending |
+| ESEQ-04 | Phase 18 | Complete |
+| ESEQ-05 | Phase 18 | Complete |
 | ESEQ-06 | Phase 18 | Pending |
 | ESEQ-07 | Phase 18 | Pending |
 | WFLOW-01 | Phase 19 | Pending |
