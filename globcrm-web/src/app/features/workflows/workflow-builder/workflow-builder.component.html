@@ -1,0 +1,143 @@
+<!-- Toolbar -->
+<app-workflow-toolbar
+  [workflowName]="workflowName()"
+  [entityType]="entityType()"
+  [isActive]="isActive()"
+  [isDirty]="isDirty()"
+  [isSaving]="isSaving()"
+  [isNew]="isNew()"
+  (nameChanged)="workflowName.set($event); markDirty()"
+  (entityTypeChanged)="entityType.set($event); loadEntityFields(); markDirty()"
+  (save)="onSave()"
+  (toggleActive)="onToggleActive()"
+  (openTemplates)="sidebarMode.set('templates')"
+  (back)="onBack()" />
+
+<!-- Main Content Area -->
+<div class="builder-content">
+  <!-- Canvas -->
+  <div class="builder-canvas">
+    <app-workflow-canvas
+      [nodes]="nodes()"
+      [connections]="connections()"
+      [selectedNodeId]="selectedNodeId()"
+      (nodeSelected)="onNodeSelected($event)"
+      (nodeAdded)="onNodeAdded($event)"
+      (connectionCreated)="onConnectionCreated($event)"
+      (connectionRemoved)="onConnectionRemoved($event)"
+      (nodePositionChanged)="onNodePositionChanged($event)"
+      (nodeDblClicked)="onNodeDblClicked($event)" />
+
+    <!-- Add Node Floating Button -->
+    @if (nodes().length > 0) {
+      <button mat-fab
+              extended
+              class="add-node-fab"
+              [matMenuTriggerFor]="addNodeMenu">
+        <mat-icon>add</mat-icon>
+        Add Node
+      </button>
+
+      <mat-menu #addNodeMenu="matMenu">
+        <button mat-menu-item (click)="addNode('trigger')">
+          <mat-icon class="menu-icon trigger-color">bolt</mat-icon>
+          <span>Trigger</span>
+        </button>
+        <button mat-menu-item (click)="addNode('condition')">
+          <mat-icon class="menu-icon condition-color">filter_list</mat-icon>
+          <span>Condition</span>
+        </button>
+        <button mat-menu-item (click)="addNode('action')">
+          <mat-icon class="menu-icon action-color">play_arrow</mat-icon>
+          <span>Action</span>
+        </button>
+        <button mat-menu-item (click)="addNode('branch')">
+          <mat-icon class="menu-icon branch-color">call_split</mat-icon>
+          <span>Branch</span>
+        </button>
+        <button mat-menu-item (click)="addNode('wait')">
+          <mat-icon class="menu-icon wait-color">hourglass_empty</mat-icon>
+          <span>Wait</span>
+        </button>
+      </mat-menu>
+    }
+
+    <!-- Selected Node Actions -->
+    @if (selectedNodeId()) {
+      <div class="node-actions">
+        <button mat-icon-button
+                (click)="onNodeDblClicked(selectedNodeId()!)"
+                matTooltip="Configure">
+          <mat-icon>settings</mat-icon>
+        </button>
+        <button mat-icon-button
+                (click)="removeNode(selectedNodeId()!)"
+                matTooltip="Delete"
+                class="delete-btn">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- Sidebar -->
+  @if (sidebarMode()) {
+    <div class="builder-sidebar" [@slideIn]>
+      @switch (sidebarMode()) {
+        @case ('config') {
+          <div class="sidebar-header">
+            <h3>Configure Node</h3>
+            <button mat-icon-button (click)="closeSidebar()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+
+          @if (selectedNode(); as node) {
+            @switch (node.type) {
+              @case ('trigger') {
+                <app-trigger-config
+                  [node]="node"
+                  [entityType]="entityType()"
+                  [entityFields]="entityFields()"
+                  (configChanged)="onConfigChanged(node.id, $event)" />
+              }
+              @case ('condition') {
+                <app-condition-config
+                  [node]="node"
+                  [entityFields]="entityFields()"
+                  (configChanged)="onConfigChanged(node.id, $event)" />
+              }
+              @case ('action') {
+                <app-action-config
+                  [node]="node"
+                  [entityType]="entityType()"
+                  [entityFields]="entityFields()"
+                  (configChanged)="onConfigChanged(node.id, $event)" />
+              }
+              @case ('branch') {
+                <app-condition-config
+                  [node]="node"
+                  [entityFields]="entityFields()"
+                  [headerTitle]="'Branch Condition'"
+                  (configChanged)="onConfigChanged(node.id, $event)" />
+              }
+              @case ('wait') {
+                <app-action-config
+                  [node]="node"
+                  [entityType]="entityType()"
+                  [entityFields]="entityFields()"
+                  (configChanged)="onConfigChanged(node.id, $event)" />
+              }
+            }
+          }
+        }
+        @case ('templates') {
+          <app-template-gallery
+            [entityType]="entityType()"
+            (templateApplied)="onTemplateApplied($event)"
+            (close)="closeSidebar()" />
+        }
+      }
+    </div>
+  }
+</div>
