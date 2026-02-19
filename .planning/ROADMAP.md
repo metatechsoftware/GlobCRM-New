@@ -200,11 +200,11 @@ Plans:
   2. Workflow builder "Send Email" and "Enroll in Sequence" action panels use mat-select dropdowns populated from API (not free-text UUID inputs)
   3. No duplicate DI registrations exist between Program.cs and DependencyInjection.cs
   4. DuplicatesController uses correct field naming (Website for companies, Email for contacts)
-**Plans**: TBD
+**Plans**: 2 plans
 
 Plans:
-- [ ] 21-01-PLAN.md — Backend DI fixes (ReportCsvExportJob registration, duplicate DI cleanup, DTO field rename)
-- [ ] 21-02-PLAN.md — Frontend workflow action config dropdown pickers (email template + sequence selectors)
+- [ ] 21-01-PLAN.md — Backend DI fixes: ReportCsvExportJob registration, duplicate DI cleanup, DuplicateMatch field rename
+- [ ] 21-02-PLAN.md — Frontend workflow action config pickers (searchable mat-select dropdowns) + stale reference handling + usage endpoints
 
 ## Progress
 
