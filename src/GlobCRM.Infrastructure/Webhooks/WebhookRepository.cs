@@ -28,6 +28,14 @@ public class WebhookRepository : IWebhookRepository
     }
 
     /// <inheritdoc />
+    public async Task<List<WebhookSubscription>> GetAllSubscriptionsAsync(CancellationToken ct)
+    {
+        return await _context.WebhookSubscriptions
+            .OrderBy(s => s.Name)
+            .ToListAsync(ct);
+    }
+
+    /// <inheritdoc />
     public async Task<WebhookSubscription?> GetSubscriptionByIdAsync(Guid id, CancellationToken ct)
     {
         return await _context.WebhookSubscriptions
@@ -92,6 +100,14 @@ public class WebhookRepository : IWebhookRepository
     {
         _context.WebhookDeliveryLogs.Add(log);
         await _context.SaveChangesAsync(ct);
+    }
+
+    /// <inheritdoc />
+    public async Task<WebhookDeliveryLog?> GetDeliveryLogByIdAsync(Guid id, CancellationToken ct)
+    {
+        return await _context.WebhookDeliveryLogs
+            .Include(l => l.Subscription)
+            .FirstOrDefaultAsync(l => l.Id == id, ct);
     }
 
     /// <inheritdoc />
