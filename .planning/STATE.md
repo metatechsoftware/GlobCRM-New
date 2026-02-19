@@ -5,23 +5,27 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 13 complete, ready for Phase 14
+**Current focus:** v1.1 Automation & Intelligence — Phase 14 in progress
 
 ## Current Position
 
-Phase: 13 of 20 (Leads) -- COMPLETE
-Plan: 4 of 4 complete
-Status: Phase Complete
-Last activity: 2026-02-18 — Completed 13-04 (Lead detail, form, conversion UI)
+Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- IN PROGRESS
+Plan: 1 of 4 complete
+Status: Executing
+Last activity: 2026-02-19 — Completed 14-01 (Hangfire, DomainEvents, EmailTemplate data layer)
 
-Progress: [████████████████████████████░░░░░░░░░░░░] 67% (v1.0: 96/96 plans, v1.1: 4/4 Phase 13 plans)
+Progress: [█████████████████████████████░░░░░░░░░░░░] 69% (v1.0: 96/96 plans, v1.1: 5/8+ Phase 13: 4/4, Phase 14: 1/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 4
-- v1.1 plans total: 4+ (Phase 13: 4 plans complete)
+- v1.1 plans completed: 5
+- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 1/4)
+
+| Phase | Plan | Duration | Tasks | Files |
+|-------|------|----------|-------|-------|
+| 14-01 | Foundation infra + EmailTemplate data layer | 9min | 2 | 27 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -49,6 +53,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [13-04] Conversion dialog uses sectioned form (not multi-step wizard) -- simpler UX with Contact/Company/Deal sections in single view
 - [13-04] Duplicate check on dialog open shows informational warnings only -- actual dedup merge deferred to Phase 16
 - [13-04] Company section in conversion dialog offers both link-existing (autocomplete) and create-new options
+- [14-01] DomainEventInterceptor uses AsyncLocal for pending events, dispatches after SaveChanges with fire-and-forget
+- [14-01] Interceptor chain: TenantDbConnection -> Auditable -> DomainEvent (order matters for final state capture)
+- [14-01] TenantProvider 3-level fallback: Finbuckle -> JWT claim -> TenantScope AsyncLocal
+- [14-01] TemplateRenderService singleton (FluidParser thread-safe), EmailTemplateRepository scoped
+- [14-01] EmailTemplate.DesignJson as JSONB, HtmlBody as text column
 
 ### Pending Todos
 
@@ -57,13 +66,13 @@ None.
 ### Blockers/Concerns
 
 - @foblex/flow Angular 19.2.x compatibility unverified — fallback is linear form builder (decision needed before Phase 19 planning)
-- DomainEventInterceptor ordering with existing AuditableEntityInterceptor needs integration testing in Phase 14
+- DomainEventInterceptor ordering resolved in 14-01: Auditable first (sets timestamps), DomainEvent second (captures final state)
 - Gmail reply detection accuracy for sequence auto-unenroll (Phase 18) — false positive/negative handling needs explicit design
 - Complete FK reference map needed before Phase 16 (Duplicate Merge) implementation to avoid data loss
 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 14 context gathered
-Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-CONTEXT.md
-Next step: Plan Phase 14 (Foundation Infrastructure & Email Templates)
+Stopped at: Completed 14-01-PLAN.md
+Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-01-SUMMARY.md
+Next step: Execute 14-02-PLAN.md (Email Template API + TenantSeeder)

@@ -26,8 +26,8 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 ### Email Templates
 
 - [ ] **ETMPL-01**: User can create rich text email templates with a WYSIWYG editor
-- [ ] **ETMPL-02**: User can insert merge fields (contact, deal, company fields) into templates
-- [ ] **ETMPL-03**: User can organize templates into categories (Sales, Support, Follow-up, etc.)
+- [x] **ETMPL-02**: User can insert merge fields (contact, deal, company fields) into templates
+- [x] **ETMPL-03**: User can organize templates into categories (Sales, Support, Follow-up, etc.)
 - [ ] **ETMPL-04**: User can preview a template with real entity data before sending
 - [ ] **ETMPL-05**: User can clone/duplicate an existing template
 
@@ -147,8 +147,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LEAD-05 | Phase 13 | Complete |
 | LEAD-06 | Phase 13 | Complete |
 | ETMPL-01 | Phase 14 | Pending |
-| ETMPL-02 | Phase 14 | Pending |
-| ETMPL-03 | Phase 14 | Pending |
+| ETMPL-02 | Phase 14 | Complete |
+| ETMPL-03 | Phase 14 | Complete |
 | ETMPL-04 | Phase 14 | Pending |
 | ETMPL-05 | Phase 14 | Pending |
 | FORM-01 | Phase 15 | Pending |
