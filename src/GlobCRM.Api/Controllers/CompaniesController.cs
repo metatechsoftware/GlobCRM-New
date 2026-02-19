@@ -97,7 +97,19 @@ public class CompaniesController : ControllerBase
     {
         var company = await _companyRepository.GetByIdAsync(id);
         if (company is null)
+        {
+            // Check if this company was merged into another record
+            var mergedCompany = await _db.Companies
+                .IgnoreQueryFilters()
+                .Where(c => c.Id == id && c.MergedIntoId != null)
+                .Select(c => new { c.MergedIntoId })
+                .FirstOrDefaultAsync();
+
+            if (mergedCompany is not null)
+                return Ok(new MergedRedirectDto { MergedIntoId = mergedCompany.MergedIntoId!.Value, IsMerged = true });
+
             return NotFound(new { error = "Company not found." });
+        }
 
         var userId = GetCurrentUserId();
         var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Company", "View");

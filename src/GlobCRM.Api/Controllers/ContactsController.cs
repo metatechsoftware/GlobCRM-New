@@ -98,7 +98,19 @@ public class ContactsController : ControllerBase
     {
         var contact = await _contactRepository.GetByIdAsync(id);
         if (contact is null)
+        {
+            // Check if this contact was merged into another record
+            var mergedContact = await _db.Contacts
+                .IgnoreQueryFilters()
+                .Where(c => c.Id == id && c.MergedIntoId != null)
+                .Select(c => new { c.MergedIntoId })
+                .FirstOrDefaultAsync();
+
+            if (mergedContact is not null)
+                return Ok(new MergedRedirectDto { MergedIntoId = mergedContact.MergedIntoId!.Value, IsMerged = true });
+
             return NotFound(new { error = "Contact not found." });
+        }
 
         var userId = GetCurrentUserId();
         var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Contact", "View");
@@ -574,6 +586,16 @@ public record UpdateContactRequest
     public string? Description { get; init; }
     public Guid? CompanyId { get; init; }
     public Dictionary<string, object?>? CustomFields { get; init; }
+}
+
+/// <summary>
+/// DTO returned when requesting a merged record. Contains the surviving record's ID
+/// so the frontend can redirect.
+/// </summary>
+public record MergedRedirectDto
+{
+    public Guid MergedIntoId { get; init; }
+    public bool IsMerged { get; init; } = true;
 }
 
 // ---- FluentValidation ----
