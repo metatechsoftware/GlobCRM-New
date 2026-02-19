@@ -153,6 +153,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'email-templates',
+    canActivate: [authGuard, permissionGuard('EmailTemplate', 'View')],
+    loadChildren: () =>
+      import('./features/email-templates/email-templates.routes').then(
+        (m) => m.EMAIL_TEMPLATE_ROUTES
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
