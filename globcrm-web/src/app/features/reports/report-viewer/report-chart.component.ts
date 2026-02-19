@@ -225,7 +225,7 @@ export class ReportChartComponent implements OnDestroy {
             ...sharedTooltip,
             callbacks: {
               label: (ctx: TooltipItem<'bar'>) => {
-                const val = ctx.parsed.y;
+                const val = ctx.parsed.y ?? 0;
                 const pct = totalSum > 0 ? ((val / totalSum) * 100).toFixed(1) : '0';
                 return `${ctx.label}: ${val.toLocaleString()} (${pct}%)`;
               },
@@ -269,7 +269,7 @@ export class ReportChartComponent implements OnDestroy {
             intersect: false,
             callbacks: {
               label: (ctx: TooltipItem<'line'>) => {
-                const val = ctx.parsed.y;
+                const val = ctx.parsed.y ?? 0;
                 return `${ctx.dataset.label ?? 'Value'}: ${val.toLocaleString()}`;
               },
             },

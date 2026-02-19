@@ -88,12 +88,52 @@
           <p>Running report...</p>
         </div>
       } @else if (store.executionResult()) {
-        <div class="report-builder__result">
-          <div class="report-builder__result-header">
-            <mat-icon>check_circle</mat-icon>
-            <span>Report executed: {{ store.executionResult()?.totalCount }} rows</span>
+        <!-- Chart (visible when chartType is not 'table') -->
+        @if (chartConfig().chartType !== 'table') {
+          <div class="report-builder__chart-area">
+            <app-report-chart
+              [executionResult]="store.executionResult()"
+              [chartType]="chartConfig().chartType"
+              [groupingField]="groupings().length > 0 ? groupings()[0].fieldId : ''"
+              (drillDown)="onDrillDown($event)">
+            </app-report-chart>
           </div>
-          <!-- Plan 06 will replace this with chart + table viewer components -->
+        }
+
+        <!-- Aggregation summary cards -->
+        @if (store.executionResult()?.aggregates?.length) {
+          <app-report-aggregation-cards
+            [aggregates]="store.executionResult()!.aggregates!">
+          </app-report-aggregation-cards>
+        }
+
+        <!-- Data table (always visible) -->
+        <app-report-data-table
+          [executionResult]="store.executionResult()"
+          [entityType]="entityType()"
+          [currentPage]="store.currentPage()"
+          [drillDownFilter]="drillDownFilter()"
+          (pageChange)="onPageChange($event)"
+          (rowClick)="onRowClick($event)"
+          (clearDrillDown)="onClearDrillDown()">
+        </app-report-data-table>
+
+        <!-- Export and share actions -->
+        <div class="report-builder__result-actions">
+          <button mat-stroked-button (click)="exportCsv()" [disabled]="store.exporting()">
+            <mat-icon>download</mat-icon>
+            Export CSV
+          </button>
+          @if (store.selectedReport()) {
+            <button mat-stroked-button (click)="toggleShare()">
+              <mat-icon>{{ store.selectedReport()?.isShared ? 'lock' : 'share' }}</mat-icon>
+              {{ store.selectedReport()?.isShared ? 'Make Private' : 'Share' }}
+            </button>
+            <button mat-stroked-button (click)="cloneReport()">
+              <mat-icon>content_copy</mat-icon>
+              Clone
+            </button>
+          }
         </div>
       } @else {
         <div class="report-builder__empty-preview">

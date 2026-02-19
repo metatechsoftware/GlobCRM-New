@@ -13,6 +13,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ReportStore } from '../report.store';
 import {
   ReportField,
@@ -21,6 +22,7 @@ import {
   ReportChartConfig,
   ReportDefinition,
   ReportChartType,
+  ReportFilterCondition,
   CreateReportRequest,
   UpdateReportRequest,
 } from '../report.models';
@@ -29,6 +31,9 @@ import { FieldSelectorPanelComponent } from './field-selector-panel.component';
 import { FilterBuilderPanelComponent } from './filter-builder-panel.component';
 import { GroupingPanelComponent } from './grouping-panel.component';
 import { ChartConfigPanelComponent } from './chart-config-panel.component';
+import { ReportChartComponent } from '../report-viewer/report-chart.component';
+import { ReportDataTableComponent } from '../report-viewer/report-data-table.component';
+import { ReportAggregationCardsComponent } from '../report-viewer/report-aggregation-cards.component';
 
 /**
  * Report builder with left sidebar configuration panels and right preview area.
@@ -44,11 +49,15 @@ import { ChartConfigPanelComponent } from './chart-config-panel.component';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    MatSnackBarModule,
     EntitySourcePanelComponent,
     FieldSelectorPanelComponent,
     FilterBuilderPanelComponent,
     GroupingPanelComponent,
     ChartConfigPanelComponent,
+    ReportChartComponent,
+    ReportDataTableComponent,
+    ReportAggregationCardsComponent,
   ],
   providers: [ReportStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -59,6 +68,10 @@ export class ReportBuilderComponent implements OnInit {
   readonly id = input<string>();
   readonly store = inject(ReportStore);
   private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
+
+  // Drill-down filter state (set when user clicks a chart element)
+  readonly drillDownFilter = signal<ReportFilterCondition | null>(null);
 
   // Local state signals for building the report definition
   readonly entityType = signal<string>('');
@@ -214,6 +227,73 @@ export class ReportBuilderComponent implements OnInit {
         this.router.navigate(['/reports', created.id, 'edit']);
       });
     }
+  }
+
+  // ---- Drill-down interaction ----
+
+  onDrillDown(filter: ReportFilterCondition): void {
+    this.drillDownFilter.set(filter);
+    const reportId = this.id();
+    if (reportId) {
+      this.store.executeReport(reportId, {
+        drillDownFilter: filter,
+      });
+    }
+  }
+
+  onClearDrillDown(): void {
+    this.drillDownFilter.set(null);
+    const reportId = this.id();
+    if (reportId) {
+      this.store.executeReport(reportId);
+    }
+  }
+
+  onPageChange(page: number): void {
+    const reportId = this.id();
+    if (reportId) {
+      const filter = this.drillDownFilter();
+      this.store.executeReport(reportId, {
+        page,
+        pageSize: 50,
+        drillDownFilter: filter ?? undefined,
+      });
+    }
+  }
+
+  onRowClick(row: Record<string, any>): void {
+    // Navigation handled inside ReportDataTableComponent via Router
+  }
+
+  // ---- CSV Export ----
+
+  exportCsv(): void {
+    const reportId = this.id() ?? this.store.selectedReport()?.id;
+    if (!reportId) return;
+
+    this.store.exportCsv(reportId, () => {
+      this.snackBar.open(
+        'Export started. You\'ll be notified when it\'s ready.',
+        'OK',
+        { duration: 5000 },
+      );
+    });
+  }
+
+  // ---- Share / Clone ----
+
+  toggleShare(): void {
+    const report = this.store.selectedReport();
+    if (!report) return;
+    this.store.toggleShare(report.id, !report.isShared);
+  }
+
+  cloneReport(): void {
+    const report = this.store.selectedReport();
+    if (!report) return;
+    this.store.cloneReport(report.id, `${report.name} (Copy)`, (cloned) => {
+      this.router.navigate(['/reports', cloned.id, 'edit']);
+    });
   }
 
   private buildDefinition(): ReportDefinition {
