@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 4 of 6 complete
+Plan: 5 of 6 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 20-04 (Report Frontend Foundation)
+Last activity: 2026-02-19 — Completed 20-05 (Report Builder Sidebar)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 37/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 4/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 38/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 5/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 37
-- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 4/6)
+- v1.1 plans completed: 38
+- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 5/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -58,6 +58,7 @@ Progress: [███████████████████████
 | 20-02 | Report Engine Core (field metadata + query engine + DI) | 4min | 2 | 4 |
 | 20-03 | Report API + CSV Export + Seed Reports | 6min | 2 | 3 |
 | 20-04 | Report Frontend Foundation (gallery + service + store + routes) | 5min | 2 | 11 |
+| 20-05 | Report Builder Sidebar (5 config panels + builder layout wiring) | 6min | 2 | 8 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -208,6 +209,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-04] Reports nav link in Analytics group next to Dashboard -- reports span all entities, not specific to Connect group
 - [20-04] Builder shell two-panel layout with 320px sidebar -- ready for Plan 05/06 expansion
 - [20-04] Gallery search uses server-side API search parameter -- leverages backend full-text search
+- [20-05] Checkbox list with search for field selection (not drag-drop) -- simpler UX for report column selection
+- [20-05] Recursive FilterBuilderPanelComponent with isNested input for wrapper toggle -- supports unlimited AND/OR nesting depth
+- [20-05] Local signals in builder component for panel state (not direct store) -- enables canSave/canRun computed guards
 
 ### Pending Todos
 
@@ -223,6 +227,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-04-PLAN.md
-Resume file: .planning/phases/20-advanced-reporting-builder/20-04-SUMMARY.md
-Next step: Execute Phase 20 Plan 05 (/gsd:execute-phase 20)
+Stopped at: Completed 20-05-PLAN.md
+Resume file: .planning/phases/20-advanced-reporting-builder/20-05-SUMMARY.md
+Next step: Execute Phase 20 Plan 06 (/gsd:execute-phase 20)
