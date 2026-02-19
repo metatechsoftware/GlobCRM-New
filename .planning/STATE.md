@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 17 complete, Phase 18 next
+**Current focus:** v1.1 Automation & Intelligence — Phase 18 in progress (Email Sequences)
 
 ## Current Position
 
-Phase: 17 of 20 (Webhooks)
-Plan: 4 of 4 complete
-Status: Phase Complete
-Last activity: 2026-02-19 — Completed 17-04 (Webhook Frontend Management)
+Phase: 18 of 20 (Email Sequences)
+Plan: 1 of 5 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 18-01 (Email Sequence Data Layer)
 
-Progress: [████████████████████████████████████████████░] 91% (v1.0: 96/96 plans, v1.1: 20/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4)
+Progress: [████████████████████████████████████████████░] 92% (v1.0: 96/96 plans, v1.1: 21/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 1/5)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 20
-- v1.1 plans total: 20+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4)
+- v1.1 plans completed: 21
+- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 1/5)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -41,6 +41,7 @@ Progress: [███████████████████████
 | 17-02 | Webhook Delivery Pipeline (handler + delivery service + HMAC + SSRF + retry + DI) | 4min | 2 | 7 |
 | 17-03 | Webhook API Controller (11 endpoints + DTOs + validators) | 3min | 2 | 3 |
 | 17-04 | Webhook Frontend Management (5 components + service + store + routes) | 7min | 2 | 10 |
+| 18-01 | Email Sequence Data Layer (entities + migration + RLS + repos + seeds) | 6min | 2 | 22 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -132,6 +133,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [17-04] Secret dialog shared between create and regenerate flows -- same WebhookSecretDialogComponent
 - [17-04] Delivery log expandable rows use signal-based Set<string> for OnPush-compatible expanded row tracking
 - [17-04] Global delivery log subscription filter uses direct service call (not store) to avoid coupling filter with log state
+- [18-01] EmailSequenceStep FK to EmailTemplate uses Restrict delete -- prevents template deletion while used by active sequences
+- [18-01] SequenceEnrollment uses timestamp fields (RepliedAt, PausedAt, BouncedAt, CompletedAt) as audit trail rather than separate history table
+- [18-01] StepMetrics record type in ISequenceEnrollmentRepository for per-step analytics aggregation
+- [18-01] Composite unique index on (sequence_id, step_number) for step ordering integrity
 
 ### Pending Todos
 
@@ -147,6 +152,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 17-04-PLAN.md (Phase 17 complete)
-Resume file: .planning/phases/17-webhooks/17-04-SUMMARY.md
-Next step: Plan Phase 18 (Sequences)
+Stopped at: Completed 18-01-PLAN.md
+Resume file: .planning/phases/18-email-sequences/18-01-SUMMARY.md
+Next step: Execute 18-02-PLAN.md (Sequence Execution Engine)

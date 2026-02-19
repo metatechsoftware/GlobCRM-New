@@ -33,7 +33,7 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 
 ### Email Sequences
 
-- [ ] **ESEQ-01**: User can create a multi-step email sequence with configurable delays between steps
+- [x] **ESEQ-01**: User can create a multi-step email sequence with configurable delays between steps
 - [ ] **ESEQ-02**: User can manually enroll contacts into a sequence
 - [ ] **ESEQ-03**: User can bulk-enroll contacts from a list view multi-select
 - [ ] **ESEQ-04**: Contacts are automatically unenrolled when they reply to a sequence email
@@ -169,7 +169,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WHOOK-04 | Phase 17 | Complete |
 | WHOOK-05 | Phase 17 | Complete |
 | WHOOK-06 | Phase 17 | Complete |
-| ESEQ-01 | Phase 18 | Pending |
+| ESEQ-01 | Phase 18 | Complete |
 | ESEQ-02 | Phase 18 | Pending |
 | ESEQ-03 | Phase 18 | Pending |
 | ESEQ-04 | Phase 18 | Pending |
