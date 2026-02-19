@@ -86,23 +86,41 @@ export class ChartWidgetComponent implements OnDestroy {
         position: 'bottom',
         labels: {
           usePointStyle: true,
-          padding: 12,
-          font: { size: 11 },
+          padding: 16,
+          font: { size: 11, family: 'Inter, sans-serif' },
+          color: '#9CA3AF',
         },
       },
       title: {
         display: false,
       },
+      tooltip: {
+        backgroundColor: '#1A1A1A',
+        titleFont: { size: 12, family: 'Inter, sans-serif', weight: '600' as any },
+        bodyFont: { size: 11, family: 'Inter, sans-serif' },
+        padding: 10,
+        cornerRadius: 8,
+        displayColors: true,
+        boxPadding: 4,
+      },
     },
     scales: {
       x: {
         grid: { display: false },
-        ticks: { font: { size: 11 } },
+        ticks: {
+          font: { size: 11, family: 'Inter, sans-serif' },
+          color: '#9CA3AF',
+        },
+        border: { display: false },
       },
       y: {
         beginAtZero: true,
-        grid: { color: 'rgba(0,0,0,0.05)' },
-        ticks: { font: { size: 11 } },
+        grid: { color: 'rgba(249, 115, 22, 0.04)' },
+        ticks: {
+          font: { size: 11, family: 'Inter, sans-serif' },
+          color: '#9CA3AF',
+        },
+        border: { display: false },
       },
     },
   };
@@ -124,7 +142,9 @@ export class ChartWidgetComponent implements OnDestroy {
             data: values,
             backgroundColor: CHART_COLORS.slice(0, values.length),
             borderWidth: 2,
-            borderColor: 'var(--color-surface, #fff)',
+            borderColor: '#FFFFFF',
+            hoverBorderWidth: 3,
+            hoverOffset: 4,
           },
         ],
       };
@@ -138,14 +158,22 @@ export class ChartWidgetComponent implements OnDestroy {
           label: metric?.label ?? this.title(),
           data: values,
           backgroundColor: isLine
-            ? CHART_COLORS_ALPHA[0]
-            : CHART_COLORS.slice(0, values.length),
-          borderColor: isLine ? CHART_COLORS[0] : undefined,
-          borderWidth: isLine ? 2 : 0,
+            ? 'rgba(249, 115, 22, 0.08)'
+            : values.map((_, i) => {
+                const baseColor = CHART_COLORS[i % CHART_COLORS.length];
+                return baseColor + 'CC'; // 80% opacity for bar depth
+              }),
+          borderColor: isLine ? CHART_COLORS[0] : values.map((_, i) => CHART_COLORS[i % CHART_COLORS.length]),
+          borderWidth: isLine ? 2.5 : 1,
           fill: isLine,
-          tension: isLine ? 0.3 : 0,
-          pointBackgroundColor: isLine ? CHART_COLORS[0] : undefined,
-          pointRadius: isLine ? 3 : undefined,
+          tension: isLine ? 0.4 : 0,
+          pointBackgroundColor: isLine ? '#FFFFFF' : undefined,
+          pointBorderColor: isLine ? CHART_COLORS[0] : undefined,
+          pointBorderWidth: isLine ? 2 : undefined,
+          pointRadius: isLine ? 4 : undefined,
+          pointHoverRadius: isLine ? 6 : undefined,
+          borderRadius: isLine ? undefined : 6,
+          borderSkipped: false as any,
         },
       ],
     };

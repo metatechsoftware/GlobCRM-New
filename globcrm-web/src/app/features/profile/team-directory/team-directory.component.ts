@@ -32,6 +32,7 @@ import {
     AvatarComponent,
   ],
   templateUrl: './team-directory.component.html',
+  styleUrl: './team-directory.component.scss',
 })
 export class TeamDirectoryComponent implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);

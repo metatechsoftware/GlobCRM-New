@@ -4,61 +4,94 @@
   </div>
 } @else if (contact()) {
   <div class="detail-page">
-    <!-- Header -->
-    <div class="detail-header">
-      <div class="header-left">
+    <!-- Hero Card -->
+    <div class="contact-hero">
+      <div class="hero-accent"></div>
+
+      <!-- Navigation bar -->
+      <div class="hero-nav">
         <a mat-icon-button routerLink="/contacts" aria-label="Back to contacts">
           <mat-icon>arrow_back</mat-icon>
         </a>
-        <h1>{{ contact()!.fullName }}</h1>
-      </div>
-      <div class="header-actions">
-        <button mat-stroked-button
-                *appHasPermission="'Contact:Edit'"
-                routerLink="edit">
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button mat-stroked-button color="warn"
-                *appHasPermission="'Contact:Delete'"
-                (click)="onDelete()">
-          <mat-icon>delete</mat-icon> Delete
-        </button>
-        <button mat-icon-button [matMenuTriggerFor]="actionsMenu" aria-label="More actions">
-          <mat-icon>more_vert</mat-icon>
-        </button>
-        <mat-menu #actionsMenu="matMenu">
-          <button mat-menu-item (click)="enrollInSequence()">
-            <mat-icon>schedule_send</mat-icon>
-            <span>Enroll in Sequence</span>
+        <div class="hero-actions">
+          <button mat-stroked-button
+                  *appHasPermission="'Contact:Edit'"
+                  routerLink="edit">
+            <mat-icon>edit</mat-icon> Edit
           </button>
-        </mat-menu>
+          <button mat-stroked-button color="warn"
+                  *appHasPermission="'Contact:Delete'"
+                  (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+          <button mat-icon-button [matMenuTriggerFor]="actionsMenu" aria-label="More actions">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #actionsMenu="matMenu">
+            <button mat-menu-item (click)="enrollInSequence()">
+              <mat-icon>schedule_send</mat-icon>
+              <span>Enroll in Sequence</span>
+            </button>
+          </mat-menu>
+        </div>
       </div>
-    </div>
 
-    <!-- Subheader: Key fields -->
-    <div class="detail-subheader">
-      @if (contact()!.email) {
-        <div class="subheader-item">
-          <mat-icon>email</mat-icon>
-          <span>{{ contact()!.email }}</span>
+      <!-- Profile section -->
+      <div class="hero-profile">
+        <div class="hero-avatar">{{ getInitials() }}</div>
+        <div class="hero-info">
+          <h1 class="hero-name">{{ contact()!.fullName }}</h1>
+          <div class="hero-badges">
+            @if (contact()!.jobTitle) {
+              <span class="badge badge--primary">{{ contact()!.jobTitle }}</span>
+            }
+            @if (contact()!.companyName) {
+              <span class="badge badge--accent">{{ contact()!.companyName }}</span>
+            }
+            @if (contact()!.department) {
+              <span class="badge badge--secondary">{{ contact()!.department }}</span>
+            }
+          </div>
         </div>
-      }
-      @if (contact()!.phone) {
-        <div class="subheader-item">
-          <mat-icon>phone</mat-icon>
-          <span>{{ contact()!.phone }}</span>
-        </div>
-      }
-      @if (contact()!.jobTitle) {
-        <div class="subheader-item">
-          <mat-icon>work</mat-icon>
-          <span>{{ contact()!.jobTitle }}</span>
-        </div>
-      }
-      @if (contact()!.companyName) {
-        <div class="subheader-item">
-          <mat-icon>business</mat-icon>
-          <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+      </div>
+
+      <!-- Meta info pills -->
+      @if (contact()!.email || contact()!.phone || contact()!.companyName || contact()!.ownerName) {
+        <hr class="hero-divider">
+        <div class="hero-meta">
+          @if (contact()!.email) {
+            <span class="meta-item">
+              <mat-icon>email</mat-icon>
+              <a [href]="'mailto:' + contact()!.email">{{ contact()!.email }}</a>
+            </span>
+          }
+          @if (contact()!.email && contact()!.phone) {
+            <span class="meta-separator"></span>
+          }
+          @if (contact()!.phone) {
+            <span class="meta-item">
+              <mat-icon>phone</mat-icon>
+              {{ contact()!.phone }}
+            </span>
+          }
+          @if ((contact()!.email || contact()!.phone) && contact()!.companyName) {
+            <span class="meta-separator"></span>
+          }
+          @if (contact()!.companyName) {
+            <span class="meta-item">
+              <mat-icon>business</mat-icon>
+              <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+            </span>
+          }
+          @if ((contact()!.email || contact()!.phone || contact()!.companyName) && contact()!.ownerName) {
+            <span class="meta-separator"></span>
+          }
+          @if (contact()!.ownerName) {
+            <span class="meta-item">
+              <mat-icon>person</mat-icon>
+              {{ contact()!.ownerName }}
+            </span>
+          }
         </div>
       }
     </div>
@@ -69,77 +102,126 @@
         <app-related-entity-tabs [tabs]="tabs" (tabChanged)="onTabChanged($event)">
           <!-- Details tab content (index 0) -->
           <ng-template>
-            <div class="details-grid">
-              <div class="detail-field">
-                <span class="field-label">First Name</span>
-                <span class="field-value">{{ contact()!.firstName }}</span>
+            <!-- Contact Info section -->
+            <div class="detail-section">
+              <div class="detail-section__header">
+                <mat-icon>person</mat-icon>
+                <h3>Contact Info</h3>
               </div>
-              <div class="detail-field">
-                <span class="field-label">Last Name</span>
-                <span class="field-value">{{ contact()!.lastName }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Email</span>
-                <span class="field-value">{{ contact()!.email || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Phone</span>
-                <span class="field-value">{{ contact()!.phone || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Mobile Phone</span>
-                <span class="field-value">{{ contact()!.mobilePhone || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Job Title</span>
-                <span class="field-value">{{ contact()!.jobTitle || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Department</span>
-                <span class="field-value">{{ contact()!.department || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Company</span>
-                <span class="field-value">
-                  @if (contact()!.companyId) {
-                    <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+              <div class="details-grid">
+                <div class="detail-field">
+                  <span class="field-label">First Name</span>
+                  <span class="field-value">{{ contact()!.firstName }}</span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Last Name</span>
+                  <span class="field-value">{{ contact()!.lastName }}</span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Email</span>
+                  @if (contact()!.email) {
+                    <a class="field-value field-value--link"
+                       [href]="'mailto:' + contact()!.email">
+                      {{ contact()!.email }}
+                    </a>
                   } @else {
-                    -
+                    <span class="field-value field-value--empty">Not specified</span>
                   }
-                </span>
-              </div>
-              <div class="detail-field full-width">
-                <span class="field-label">Address</span>
-                <span class="field-value">{{ contact()!.address || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">City</span>
-                <span class="field-value">{{ contact()!.city || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">State / Region</span>
-                <span class="field-value">{{ contact()!.state || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Country</span>
-                <span class="field-value">{{ contact()!.country || '-' }}</span>
-              </div>
-              <div class="detail-field">
-                <span class="field-label">Postal Code</span>
-                <span class="field-value">{{ contact()!.postalCode || '-' }}</span>
-              </div>
-              <div class="detail-field full-width">
-                <span class="field-label">Description</span>
-                <span class="field-value">{{ contact()!.description || '-' }}</span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Phone</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.phone">
+                    {{ contact()!.phone || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Mobile Phone</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.mobilePhone">
+                    {{ contact()!.mobilePhone || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Job Title</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.jobTitle">
+                    {{ contact()!.jobTitle || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Department</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.department">
+                    {{ contact()!.department || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Company</span>
+                  <span class="field-value">
+                    @if (contact()!.companyId) {
+                      <a class="field-value--link" [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+                    } @else {
+                      <span class="field-value--empty">Not specified</span>
+                    }
+                  </span>
+                </div>
+                <div class="detail-field full-width">
+                  <span class="field-label">Description</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.description">
+                    {{ contact()!.description || 'No description' }}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <!-- Custom fields in readonly mode -->
-            <h3 class="section-title">Custom Fields</h3>
-            <app-custom-field-form
-              [entityType]="'Contact'"
-              [customFieldValues]="contact()!.customFields"
-              [readonly]="true" />
+            <!-- Address section -->
+            <div class="detail-section">
+              <div class="detail-section__header">
+                <mat-icon>location_on</mat-icon>
+                <h3>Address</h3>
+              </div>
+              <div class="details-grid">
+                <div class="detail-field full-width">
+                  <span class="field-label">Street Address</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.address">
+                    {{ contact()!.address || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">City</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.city">
+                    {{ contact()!.city || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">State / Region</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.state">
+                    {{ contact()!.state || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Country</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.country">
+                    {{ contact()!.country || 'Not specified' }}
+                  </span>
+                </div>
+                <div class="detail-field">
+                  <span class="field-label">Postal Code</span>
+                  <span class="field-value" [class.field-value--empty]="!contact()!.postalCode">
+                    {{ contact()!.postalCode || 'Not specified' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Custom fields -->
+            <div class="detail-section">
+              <div class="detail-section__header">
+                <mat-icon>tune</mat-icon>
+                <h3>Custom Fields</h3>
+              </div>
+              <app-custom-field-form
+                [entityType]="'Contact'"
+                [customFieldValues]="contact()!.customFields"
+                [readonly]="true" />
+            </div>
           </ng-template>
 
           <!-- Company tab content (index 1) -->
@@ -150,7 +232,7 @@
                   <div class="detail-field">
                     <span class="field-label">Company Name</span>
                     <span class="field-value">
-                      <a [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
+                      <a class="field-value--link" [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
                     </span>
                   </div>
                 </div>
@@ -192,7 +274,7 @@
                 <a mat-stroked-button routerLink="/activities/new">Create Activity</a>
               </div>
             } @else {
-              <table class="activities-table">
+              <table class="entity-table">
                 <thead>
                   <tr>
                     <th>Subject</th>
@@ -224,7 +306,7 @@
                           </mat-chip>
                         </mat-chip-set>
                       </td>
-                      <td>{{ activity.dueDate ? (activity.dueDate | date:'mediumDate') : '-' }}</td>
+                      <td class="text-nowrap">{{ activity.dueDate ? (activity.dueDate | date:'mediumDate') : '-' }}</td>
                       <td>{{ activity.assignedToName || '-' }}</td>
                     </tr>
                   }
@@ -245,7 +327,7 @@
                 <span>No quotes linked to this contact.</span>
               </div>
             } @else {
-              <table class="activities-table">
+              <table class="entity-table">
                 <thead>
                   <tr>
                     <th>Quote #</th>
@@ -272,7 +354,7 @@
                   }
                 </tbody>
               </table>
-              <div style="text-align: right; margin-top: 8px;">
+              <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/quotes']" [queryParams]="{ contactId: contact()?.id }">
                   View All Quotes
                 </a>
@@ -292,7 +374,7 @@
                 <span>No requests linked to this contact.</span>
               </div>
             } @else {
-              <table class="activities-table">
+              <table class="entity-table">
                 <thead>
                   <tr>
                     <th>Subject</th>
@@ -324,7 +406,7 @@
                   }
                 </tbody>
               </table>
-              <div style="text-align: right; margin-top: 8px;">
+              <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/requests']" [queryParams]="{ contactId: contact()?.id }">
                   View All Requests
                 </a>
@@ -344,7 +426,7 @@
                 <span>No emails linked to this contact.</span>
               </div>
             } @else {
-              <table class="activities-table">
+              <table class="entity-table">
                 <thead>
                   <tr>
                     <th></th>
@@ -357,19 +439,20 @@
                   @for (email of contactEmails(); track email.id) {
                     <tr [style.font-weight]="email.isRead ? 'normal' : '600'">
                       <td>
-                        <mat-icon style="font-size: 16px; width: 16px; height: 16px;"
-                                  [style.color]="email.isInbound ? 'var(--color-info)' : 'var(--color-success)'">
+                        <mat-icon class="direction-icon"
+                                  [class.direction-icon--inbound]="email.isInbound"
+                                  [class.direction-icon--outbound]="!email.isInbound">
                           {{ email.isInbound ? 'arrow_downward' : 'arrow_upward' }}
                         </mat-icon>
                       </td>
                       <td><a [routerLink]="['/emails', email.id]">{{ email.subject }}</a></td>
-                      <td style="color: var(--color-text-secondary); font-size: 13px;">{{ email.bodyPreview }}</td>
-                      <td style="white-space: nowrap;">{{ formatEmailDate(email.sentAt) }}</td>
+                      <td class="text-preview">{{ email.bodyPreview }}</td>
+                      <td class="text-nowrap">{{ formatEmailDate(email.sentAt) }}</td>
                     </tr>
                   }
                 </tbody>
               </table>
-              <div style="text-align: right; margin-top: 8px;">
+              <div class="table-footer-link">
                 <a mat-button color="primary" routerLink="/emails">
                   View All Emails
                 </a>
@@ -394,14 +477,14 @@
                 </a>
               </div>
             } @else {
-              <div style="margin-bottom: 12px; text-align: right;">
+              <div class="tab-actions">
                 <a mat-stroked-button
                    [routerLink]="['/notes/new']"
                    [queryParams]="{ entityType: 'Contact', entityId: contact()?.id, entityName: contact()?.fullName }">
                   <mat-icon>add</mat-icon> Add Note
                 </a>
               </div>
-              <table class="activities-table">
+              <table class="entity-table">
                 <thead>
                   <tr>
                     <th>Title</th>
@@ -414,9 +497,9 @@
                   @for (note of contactNotes(); track note.id) {
                     <tr>
                       <td><a [routerLink]="['/notes', note.id]">{{ note.title }}</a></td>
-                      <td style="color: var(--color-text-secondary); font-size: 13px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</td>
+                      <td class="text-preview">{{ note.plainTextBody }}</td>
                       <td>{{ note.authorName || '-' }}</td>
-                      <td style="white-space: nowrap;">{{ formatNoteDate(note.createdAt) }}</td>
+                      <td class="text-nowrap">{{ formatNoteDate(note.createdAt) }}</td>
                     </tr>
                   }
                 </tbody>
@@ -433,10 +516,17 @@
 
       <!-- Timeline sidebar -->
       <div class="detail-sidebar">
-        <h3 class="sidebar-title">Timeline</h3>
-        <app-entity-timeline
-          [entries]="timelineEntries()"
-          [isLoading]="timelineLoading()" />
+        <div class="sidebar-card">
+          <div class="sidebar-card__header">
+            <mat-icon>timeline</mat-icon>
+            <h3>Timeline</h3>
+          </div>
+          <div class="sidebar-card__body">
+            <app-entity-timeline
+              [entries]="timelineEntries()"
+              [isLoading]="timelineLoading()" />
+          </div>
+        </div>
       </div>
     </div>
   </div>

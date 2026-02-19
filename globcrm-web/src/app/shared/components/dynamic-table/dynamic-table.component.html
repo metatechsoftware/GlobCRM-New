@@ -1,24 +1,31 @@
 <div class="dynamic-table-wrapper">
-  <!-- Toolbar: search + column picker -->
+  <!-- Toolbar: search + record count | column picker -->
   <div class="table-toolbar">
-    <mat-form-field appearance="outline" class="quick-search">
-      <mat-icon matPrefix>search</mat-icon>
-      <input matInput placeholder="Quick search..."
-             [value]="searchValue()"
-             (input)="onSearchInput($event)">
-      @if (searchValue()) {
-        <button mat-icon-button matSuffix
-                (click)="onSearchClear()"
-                aria-label="Clear search"
-                class="search-clear-btn">
-          <mat-icon>close</mat-icon>
-        </button>
+    <div class="toolbar-left">
+      <mat-form-field appearance="outline" class="quick-search">
+        <mat-icon matPrefix>search</mat-icon>
+        <input matInput placeholder="Quick search..."
+               [value]="searchValue()"
+               (input)="onSearchInput($event)">
+        @if (searchValue()) {
+          <button mat-icon-button matSuffix
+                  (click)="onSearchClear()"
+                  aria-label="Clear search"
+                  class="search-clear-btn">
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+      @if (totalCount() > 0) {
+        <span class="record-count-pill">{{ totalCount() }} records</span>
       }
-    </mat-form-field>
-    <app-column-picker
-      [allColumns]="columnDefinitions()"
-      [visibleColumns]="columns()"
-      (columnsChanged)="columnsVisibilityChanged.emit($event)" />
+    </div>
+    <div class="toolbar-right">
+      <app-column-picker
+        [allColumns]="columnDefinitions()"
+        [visibleColumns]="columns()"
+        (columnsChanged)="columnsVisibilityChanged.emit($event)" />
+    </div>
   </div>
 
   <!-- Progress bar -->
@@ -80,7 +87,26 @@
                 #ERR
               </span>
             } @else {
-              {{ getCellValue(row, col.fieldId) }}
+              @switch (getColumnRenderAs(col.fieldId)) {
+                @case ('badge') {
+                  @if (getCellValue(row, col.fieldId)) {
+                    <span class="badge" [ngClass]="getBadgeClass(getCellValue(row, col.fieldId))">
+                      {{ getBadgeLabel(getCellValue(row, col.fieldId)) }}
+                    </span>
+                  }
+                }
+                @case ('email') {
+                  @if (getCellValue(row, col.fieldId)) {
+                    <a class="cell-email-link"
+                       [href]="'mailto:' + getCellValue(row, col.fieldId)">
+                      {{ getCellValue(row, col.fieldId) }}
+                    </a>
+                  }
+                }
+                @default {
+                  {{ getCellValue(row, col.fieldId) }}
+                }
+              }
             }
           </td>
         </ng-container>
@@ -144,12 +170,15 @@
     </table>
   </div>
 
-  <!-- Paginator -->
-  <mat-paginator
-    [pageSizeOptions]="[10, 25, 50, 100]"
-    [pageSize]="pageSize()"
-    [length]="totalCount()"
-    (page)="onPageChange($event)"
-    showFirstLastButtons>
-  </mat-paginator>
+  <!-- Footer: range summary + paginator -->
+  <div class="table-footer">
+    <span class="page-range-summary">{{ getPageRangeSummary() }}</span>
+    <mat-paginator
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      [pageSize]="pageSize()"
+      [length]="totalCount()"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
 </div>

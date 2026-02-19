@@ -52,7 +52,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
   providers: [ViewStore, CompanyStore],
   templateUrl: './company-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: '../../../../styles/_entity-list.scss',
+  styleUrls: ['../../../../styles/_entity-list.scss', './company-list.component.scss'],
 })
 export class CompanyListComponent implements OnInit {
   readonly companyStore = inject(CompanyStore);

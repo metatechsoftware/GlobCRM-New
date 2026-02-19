@@ -58,6 +58,7 @@ export interface ColumnDefinition {
   fieldType: string;
   sortable: boolean;
   filterable: boolean;
+  renderAs?: 'text' | 'badge' | 'email';
 }
 
 export interface CreateViewRequest {

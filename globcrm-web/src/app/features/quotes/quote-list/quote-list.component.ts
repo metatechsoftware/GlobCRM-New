@@ -159,7 +159,7 @@ export class QuoteListComponent implements OnInit {
   private readonly coreColumnDefs: ColumnDefinition[] = [
     { fieldId: 'quoteNumber', label: 'Quote #', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'title', label: 'Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'status', label: 'Status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'status', label: 'Status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
     { fieldId: 'grandTotal', label: 'Total', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
     { fieldId: 'contactName', label: 'Contact', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },

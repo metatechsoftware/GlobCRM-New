@@ -399,6 +399,16 @@ export class LeadDetailComponent implements OnInit {
     });
   }
 
+  /** Get initials from lead full name for hero avatar. */
+  getInitials(): string {
+    const name = this.lead()?.fullName ?? '';
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+
   /** Format note date for display. */
   formatNoteDate(dateStr: string): string {
     if (!dateStr) return '';

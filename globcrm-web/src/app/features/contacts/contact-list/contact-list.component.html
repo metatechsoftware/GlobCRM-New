@@ -4,7 +4,15 @@
     (viewSelected)="onViewSelected($event)" />
   <div class="entity-list-content">
     <div class="list-header">
-      <h1>Contacts</h1>
+      <div class="list-header__title-group">
+        <div class="list-header__icon">
+          <mat-icon>people</mat-icon>
+        </div>
+        <div class="list-header__text">
+          <h1>Contacts</h1>
+          <p class="list-header__subtitle">Manage people, relationships, and communication history</p>
+        </div>
+      </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Contact:Create'"
               (click)="openCreateDialog()">

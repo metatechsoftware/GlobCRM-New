@@ -97,6 +97,14 @@ export class DashboardComponent implements OnDestroy {
     return 'Good evening';
   });
 
+  readonly timeIcon = computed(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) return 'wb_sunny';
+    if (hour >= 12 && hour < 17) return 'wb_cloudy';
+    if (hour >= 17 && hour < 21) return 'wb_twilight';
+    return 'dark_mode';
+  });
+
   readonly firstName = computed(() => {
     const name = this.authStore.userName();
     return name?.split(' ')[0] ?? '';

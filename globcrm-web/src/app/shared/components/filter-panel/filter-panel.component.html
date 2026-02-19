@@ -1,71 +1,108 @@
-<mat-expansion-panel class="filter-panel" [expanded]="isPanelOpen">
-  <mat-expansion-panel-header>
-    <mat-panel-title>
-      <mat-icon>filter_list</mat-icon>
-      Advanced Filters
-      @if (activeFilters().length > 0) {
-        <span class="filter-count">({{ activeFilters().length }})</span>
-      }
-    </mat-panel-title>
-  </mat-expansion-panel-header>
+<div class="filter-panel" [class.filter-panel--open]="isPanelOpen()">
+  <!-- Header toggle -->
+  <div class="filter-panel__header"
+       (click)="togglePanel()"
+       role="button"
+       [attr.aria-expanded]="isPanelOpen()"
+       aria-controls="filter-panel-body">
+    <mat-icon class="header-icon">filter_list</mat-icon>
+    <span class="header-title">Advanced Filters</span>
+    @if (activeFilters().length > 0) {
+      <span class="badge badge--primary">{{ activeFilters().length }}</span>
+    }
+    <mat-icon class="header-chevron" [class.header-chevron--open]="isPanelOpen()">expand_more</mat-icon>
+  </div>
 
-  <div class="filter-rows">
-    @for (filter of filterRows; track $index) {
-      <div class="filter-row">
-        <!-- Field selector -->
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Field</mat-label>
-          <mat-select
-            [value]="filter.fieldId"
-            (selectionChange)="onFieldChange($index, $event.value)">
-            @for (col of filterableColumns(); track col.fieldId) {
-              <mat-option [value]="col.fieldId">{{ col.label }}</mat-option>
+  <!-- Collapsible body -->
+  <div class="filter-panel__body"
+       [class.filter-panel__body--open]="isPanelOpen()"
+       id="filter-panel-body">
+    <div class="filter-panel__body-inner">
+      <div class="filter-panel__content">
+        @if (filterRows.length === 0) {
+          <!-- Empty state -->
+          <div class="filter-empty">
+            <mat-icon class="filter-empty__icon">tune</mat-icon>
+            <span class="filter-empty__title">No filters applied</span>
+            <span class="filter-empty__subtitle">Add filters to narrow down your results</span>
+          </div>
+        } @else {
+          <!-- Filter rows -->
+          <div class="filter-rows">
+            @for (filter of filterRows; track $index) {
+              <div class="filter-row">
+                <span class="filter-row__index">{{ $index + 1 }}</span>
+
+                <div class="filter-row__fields">
+                  <!-- Field selector -->
+                  <mat-form-field appearance="outline" class="filter-field">
+                    <mat-label>Field</mat-label>
+                    <mat-select
+                      [value]="filter.fieldId"
+                      (selectionChange)="onFieldChange($index, $event.value)">
+                      @for (col of filterableColumns(); track col.fieldId) {
+                        <mat-option [value]="col.fieldId">{{ col.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <!-- Operator selector -->
+                  <mat-form-field appearance="outline" class="filter-operator">
+                    <mat-label>Operator</mat-label>
+                    <mat-select
+                      [value]="filter.operator"
+                      (selectionChange)="onOperatorChange($index, $event.value)">
+                      @for (op of getOperatorsForField(filter.fieldId); track op.value) {
+                        <mat-option [value]="op.value">{{ op.label }}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+
+                  <!-- Value input -->
+                  @if (!isNullOperator(filter.operator)) {
+                    <mat-form-field appearance="outline" class="filter-value">
+                      <mat-label>Value</mat-label>
+                      <input matInput
+                             [value]="filter.value ?? ''"
+                             (input)="onValueChange($index, $any($event.target).value)">
+                    </mat-form-field>
+                  }
+                </div>
+
+                <!-- Remove button -->
+                <button mat-icon-button
+                        class="filter-row__remove"
+                        (click)="removeFilter($index)"
+                        aria-label="Remove filter">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
             }
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Operator selector -->
-        <mat-form-field appearance="outline" class="filter-operator">
-          <mat-label>Operator</mat-label>
-          <mat-select
-            [value]="filter.operator"
-            (selectionChange)="onOperatorChange($index, $event.value)">
-            @for (op of getOperatorsForField(filter.fieldId); track op.value) {
-              <mat-option [value]="op.value">{{ op.label }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-
-        <!-- Value input -->
-        @if (!isNullOperator(filter.operator)) {
-          <mat-form-field appearance="outline" class="filter-value">
-            <mat-label>Value</mat-label>
-            <input matInput
-                   [value]="filter.value ?? ''"
-                   (input)="onValueChange($index, $any($event.target).value)">
-          </mat-form-field>
+          </div>
         }
+      </div>
 
-        <!-- Remove button -->
-        <button mat-icon-button
-                color="warn"
-                (click)="removeFilter($index)"
-                aria-label="Remove filter">
-          <mat-icon>close</mat-icon>
+      <!-- Action bar -->
+      <div class="filter-actions">
+        <button mat-stroked-button (click)="addFilter()" class="filter-actions__add">
+          <mat-icon>add</mat-icon>
+          Add Filter
+        </button>
+        <span class="filter-actions__spacer"></span>
+        <button mat-button
+                (click)="clearFilters()"
+                [disabled]="filterRows.length === 0"
+                class="filter-actions__clear">
+          Clear All
+        </button>
+        <button mat-flat-button
+                color="primary"
+                (click)="applyFilters()"
+                [disabled]="filterRows.length === 0"
+                class="filter-actions__apply">
+          Apply Filters
         </button>
       </div>
-    }
+    </div>
   </div>
-
-  <div class="filter-actions">
-    <button mat-stroked-button (click)="addFilter()">
-      <mat-icon>add</mat-icon>
-      Add Filter
-    </button>
-    <span class="spacer"></span>
-    <button mat-button (click)="clearFilters()">Clear All</button>
-    <button mat-flat-button color="primary" (click)="applyFilters()">
-      Apply Filters
-    </button>
-  </div>
-</mat-expansion-panel>
+</div>

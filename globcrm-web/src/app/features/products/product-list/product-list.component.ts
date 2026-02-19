@@ -41,7 +41,7 @@ const PRODUCT_CORE_COLUMNS: ColumnDefinition[] = [
   { fieldId: 'sku', label: 'SKU', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
   { fieldId: 'category', label: 'Category', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
   { fieldId: 'unitPrice', label: 'Unit Price', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
-  { fieldId: 'isActive', label: 'Active', isCustomField: false, fieldType: 'checkbox', sortable: true, filterable: true },
+  { fieldId: 'isActive', label: 'Active', isCustomField: false, fieldType: 'checkbox', sortable: true, filterable: true, renderAs: 'badge' },
   { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
 ];
 
@@ -78,7 +78,7 @@ const DEFAULT_PRODUCT_COLUMNS: ViewColumn[] = [
   ],
   providers: [ViewStore, ProductStore],
   templateUrl: './product-list.component.html',
-  styleUrl: './product-list.component.scss',
+  styleUrls: ['../../../../styles/_entity-list.scss', './product-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProductListComponent implements OnInit {

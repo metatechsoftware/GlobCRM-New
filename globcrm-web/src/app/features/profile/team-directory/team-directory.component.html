@@ -1,9 +1,10 @@
-<div class="team-directory">
-  <div class="page-header">
+<div class="team-directory-page">
+  <div class="directory-header">
     <h1>Team Directory</h1>
+    <p>Find and connect with your team members</p>
   </div>
 
-  <div class="filters">
+  <div class="directory-filters">
     <mat-form-field appearance="outline" class="search-field">
       <mat-label>Search members</mat-label>
       <mat-icon matPrefix>search</mat-icon>
@@ -30,19 +31,21 @@
       <p>Loading team members...</p>
     </div>
   } @else if (members().length === 0) {
-    <div class="empty-state">
+    <div class="directory-empty">
       <mat-icon class="empty-icon">people</mat-icon>
       <h3>No team members found</h3>
       @if (searchQuery() || selectedDepartment()) {
         <p>Try adjusting your search or filter criteria.</p>
+      } @else {
+        <p>Team members will appear here once they join.</p>
       }
     </div>
   } @else {
     <div class="members-grid">
       @for (member of members(); track member.id) {
-        <mat-card class="member-card" (click)="viewProfile(member)">
-          <mat-card-content>
-            <div class="card-top">
+        <div class="member-card" (click)="viewProfile(member)">
+          <div class="card-content">
+            <div class="card-avatar">
               <app-avatar
                 [avatarUrl]="member.avatarUrl"
                 [firstName]="member.firstName"
@@ -50,29 +53,31 @@
                 [avatarColor]="member.avatarColor"
                 size="lg" />
             </div>
-            <div class="card-info">
+            <div class="card-identity">
               <h3 class="member-name">{{ member.firstName }} {{ member.lastName }}</h3>
               @if (member.jobTitle) {
                 <p class="member-title">{{ member.jobTitle }}</p>
               }
-              @if (member.department) {
-                <p class="member-dept">{{ member.department }}</p>
-              }
-              <div class="member-contact">
-                <div class="contact-row">
-                  <mat-icon>email</mat-icon>
-                  <span>{{ member.email }}</span>
-                </div>
-                @if (member.phone) {
-                  <div class="contact-row">
-                    <mat-icon>phone</mat-icon>
-                    <span>{{ member.phone }}</span>
-                  </div>
-                }
-              </div>
             </div>
-          </mat-card-content>
-        </mat-card>
+            @if (member.department) {
+              <div class="card-department">
+                <span class="dept-badge">{{ member.department }}</span>
+              </div>
+            }
+            <div class="card-contacts">
+              <div class="contact-row">
+                <mat-icon>email</mat-icon>
+                <span>{{ member.email }}</span>
+              </div>
+              @if (member.phone) {
+                <div class="contact-row">
+                  <mat-icon>phone</mat-icon>
+                  <span>{{ member.phone }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
       }
     </div>
 

@@ -1,13 +1,21 @@
-<div class="product-list-page">
+<div class="entity-list-layout">
   <!-- View Tabs -->
   <app-view-sidebar
     entityType="Product"
     (viewSelected)="onViewSelected($event)" />
   <!-- Main Content -->
-  <div class="product-list-content">
+  <div class="entity-list-content">
     <!-- Header -->
-    <div class="page-header">
-      <h1>Products</h1>
+    <div class="list-header">
+      <div class="list-header__title-group">
+        <div class="list-header__icon">
+          <mat-icon>inventory_2</mat-icon>
+        </div>
+        <div class="list-header__text">
+          <h1>Products</h1>
+          <p class="list-header__subtitle">Manage your product catalog, pricing, and inventory</p>
+        </div>
+      </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Product:Create'"
               (click)="navigateToNewProduct()">

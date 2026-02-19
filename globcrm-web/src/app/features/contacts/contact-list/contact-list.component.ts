@@ -56,7 +56,7 @@ import { SequenceListItem } from '../../sequences/sequence.models';
   providers: [ViewStore, ContactStore],
   templateUrl: './contact-list.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styleUrl: '../../../../styles/_entity-list.scss',
+  styleUrls: ['../../../../styles/_entity-list.scss', './contact-list.component.scss'],
 })
 export class ContactListComponent implements OnInit {
   readonly contactStore = inject(ContactStore);
@@ -96,7 +96,7 @@ export class ContactListComponent implements OnInit {
     { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'firstName', label: 'First Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'lastName', label: 'Last Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
     { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
     { fieldId: 'jobTitle', label: 'Job Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },

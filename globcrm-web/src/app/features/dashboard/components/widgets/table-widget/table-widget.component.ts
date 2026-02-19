@@ -36,13 +36,13 @@ interface TableColumn {
 
     .widget-table th {
       text-align: left;
-      padding: var(--space-2, 8px) var(--space-3, 12px);
+      padding: var(--space-2, 8px) var(--space-4, 16px);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text-secondary, #6B7280);
-      font-size: var(--text-xs, 0.75rem);
+      color: var(--color-text-muted, #9CA3AF);
+      font-size: 10px;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
-      border-bottom: 2px solid var(--color-border-subtle, #F3F4F6);
+      letter-spacing: 0.08em;
+      border-bottom: 2px solid var(--color-primary-soft, #FFF7ED);
       white-space: nowrap;
     }
 
@@ -51,19 +51,32 @@ interface TableColumn {
     }
 
     .widget-table td {
-      padding: var(--space-2, 8px) var(--space-3, 12px);
+      padding: var(--space-2, 8px) var(--space-4, 16px);
       color: var(--color-text, #111827);
       border-bottom: 1px solid var(--color-border-subtle, #F3F4F6);
     }
 
+    .widget-table td:first-child {
+      font-weight: var(--font-medium, 500);
+    }
+
     .widget-table td:last-child {
       text-align: right;
-      font-weight: var(--font-medium, 500);
+      font-weight: var(--font-semibold, 600);
       font-variant-numeric: tabular-nums;
+      color: var(--color-text, #111827);
+    }
+
+    .widget-table tbody tr {
+      transition: background var(--duration-fast, 100ms);
+    }
+
+    .widget-table tbody tr:nth-child(even) {
+      background: rgba(249, 115, 22, 0.02);
     }
 
     .widget-table tbody tr:hover {
-      background: var(--color-highlight, rgba(249, 115, 22, 0.08));
+      background: var(--color-highlight, rgba(249, 115, 22, 0.06));
     }
 
     .widget-table tbody tr:last-child td {

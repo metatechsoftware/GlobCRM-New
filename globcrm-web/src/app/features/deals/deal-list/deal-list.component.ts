@@ -60,7 +60,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
   ],
   providers: [ViewStore, DealStore],
   templateUrl: './deal-list.component.html',
-  styleUrl: './deal-list.component.scss',
+  styleUrls: ['../../../../styles/_entity-list.scss', './deal-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DealListComponent implements OnInit {
@@ -105,7 +105,7 @@ export class DealListComponent implements OnInit {
     { fieldId: 'value', label: 'Value', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
     { fieldId: 'probability', label: 'Probability', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
     { fieldId: 'expectedCloseDate', label: 'Close Date', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
     { fieldId: 'pipelineName', label: 'Pipeline', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
     { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },

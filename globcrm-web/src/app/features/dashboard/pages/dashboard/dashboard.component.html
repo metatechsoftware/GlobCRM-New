@@ -1,40 +1,50 @@
 <div class="dashboard">
-  <!-- Compact Header -->
-  <header class="dashboard__header">
-    <div class="dashboard__greeting">
-      <h1 class="dashboard__title">{{ greeting() }}, {{ firstName() }}</h1>
-      @if (store.activeDashboard(); as dashboard) {
-        <span class="dashboard__sep"></span>
-        <span class="dashboard__dash-name">{{ dashboard.name }}</span>
-        @if (dashboard.isTeamWide) {
-          <span class="dashboard__badge">Team</span>
+  <!-- Hero Header Area -->
+  <div class="dashboard__hero">
+    <header class="dashboard__header">
+      <div class="dashboard__greeting">
+        <div class="dashboard__time-icon">
+          <mat-icon>{{ timeIcon() }}</mat-icon>
+        </div>
+        <div>
+          <h1 class="dashboard__title">{{ greeting() }}, {{ firstName() }}</h1>
+          @if (store.activeDashboard(); as dashboard) {
+            <div class="dashboard__subtitle-row">
+              <span class="dashboard__dash-name">{{ dashboard.name }}</span>
+              @if (dashboard.isTeamWide) {
+                <span class="dashboard__badge">Team</span>
+              }
+              <span class="dashboard__dot"></span>
+              <span class="dashboard__updated">Live</span>
+            </div>
+          }
+        </div>
+      </div>
+      <div class="dashboard__actions">
+        <app-date-range-filter
+          [dateRange]="store.dateRange()"
+          (dateRangeChanged)="onDateRangeChanged($event)"
+        />
+        <app-dashboard-selector
+          [dashboards]="store.dashboards()"
+          [activeDashboardId]="store.activeDashboard()?.id ?? null"
+          (dashboardSelected)="onDashboardSelected($event)"
+          (createDashboard)="onCreateDashboard()"
+          (deleteDashboard)="onDeleteDashboard($event)"
+        />
+        @if (store.isEditing()) {
+          <button mat-stroked-button class="dashboard__add-widget-btn" (click)="onAddWidget()">
+            <mat-icon>add</mat-icon>
+            Add Widget
+          </button>
         }
-      }
-    </div>
-    <div class="dashboard__actions">
-      <app-date-range-filter
-        [dateRange]="store.dateRange()"
-        (dateRangeChanged)="onDateRangeChanged($event)"
-      />
-      <app-dashboard-selector
-        [dashboards]="store.dashboards()"
-        [activeDashboardId]="store.activeDashboard()?.id ?? null"
-        (dashboardSelected)="onDashboardSelected($event)"
-        (createDashboard)="onCreateDashboard()"
-        (deleteDashboard)="onDeleteDashboard($event)"
-      />
-      @if (store.isEditing()) {
-        <button mat-stroked-button class="dashboard__add-widget-btn" (click)="onAddWidget()">
-          <mat-icon>add</mat-icon>
-          Add Widget
+        <button mat-flat-button class="dashboard__edit-btn" (click)="onToggleEdit()">
+          <mat-icon>{{ store.isEditing() ? 'check' : 'edit' }}</mat-icon>
+          {{ store.isEditing() ? 'Done' : 'Edit' }}
         </button>
-      }
-      <button mat-flat-button (click)="onToggleEdit()">
-        <mat-icon>{{ store.isEditing() ? 'check' : 'edit' }}</mat-icon>
-        {{ store.isEditing() ? 'Done' : 'Edit' }}
-      </button>
-    </div>
-  </header>
+      </div>
+    </header>
+  </div>
 
   <!-- Tabs: Dashboard and Targets -->
   <mat-tab-group class="dashboard__tabs" animationDuration="200ms">
@@ -44,8 +54,12 @@
       @if (store.activeDashboard(); as dashboard) {
         @if (store.isLoading()) {
           <div class="dashboard__loading">
-            <mat-icon>hourglass_empty</mat-icon>
-            Loading dashboard...
+            <div class="dashboard__loading-skeleton">
+              <div class="dashboard__skeleton-card"></div>
+              <div class="dashboard__skeleton-card"></div>
+              <div class="dashboard__skeleton-card"></div>
+            </div>
+            <span class="dashboard__loading-text">Loading your dashboard...</span>
           </div>
         } @else {
           <app-dashboard-grid
@@ -61,10 +75,12 @@
       } @else if (!store.isLoading()) {
         <!-- No dashboards exist yet -->
         <div class="dashboard__empty">
-          <mat-icon>dashboard_customize</mat-icon>
+          <div class="dashboard__empty-decoration">
+            <mat-icon>dashboard_customize</mat-icon>
+          </div>
           <h2>No dashboards yet</h2>
           <p>Create your first dashboard to start tracking KPIs and metrics.</p>
-          <button mat-flat-button color="primary" (click)="onCreateDashboard()">
+          <button mat-flat-button color="primary" class="dashboard__empty-cta" (click)="onCreateDashboard()">
             <mat-icon>add</mat-icon>
             Create Dashboard
           </button>

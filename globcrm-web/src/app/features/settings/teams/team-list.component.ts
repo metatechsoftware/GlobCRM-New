@@ -1,10 +1,8 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -20,10 +18,8 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
   imports: [
     CommonModule,
     RouterLink,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
@@ -43,12 +39,13 @@ export class TeamListComponent implements OnInit {
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
 
-  displayedColumns = [
-    'name',
-    'description',
-    'defaultRoleName',
-    'memberCount',
-    'actions',
+  private readonly teamColors: [string, string][] = [
+    ['var(--color-primary)', 'var(--color-primary-soft)'],
+    ['var(--color-secondary)', 'var(--color-secondary-soft)'],
+    ['var(--color-accent)', 'var(--color-accent-soft)'],
+    ['var(--color-info)', 'var(--color-info-soft)'],
+    ['var(--color-success)', 'var(--color-success-soft)'],
+    ['var(--color-warning)', 'var(--color-warning-soft)'],
   ];
 
   ngOnInit(): void {
@@ -102,5 +99,19 @@ export class TeamListComponent implements OnInit {
         },
       });
     });
+  }
+
+  getTeamColor(team: TeamDto): string {
+    const hash = team.name
+      .split('')
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return this.teamColors[hash % this.teamColors.length][0];
+  }
+
+  getTeamColorSoft(team: TeamDto): string {
+    const hash = team.name
+      .split('')
+      .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    return this.teamColors[hash % this.teamColors.length][1];
   }
 }

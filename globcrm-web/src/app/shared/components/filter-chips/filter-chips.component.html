@@ -1,0 +1,20 @@
+@if (filters().length > 0) {
+  <div class="filter-chips" role="list" aria-label="Active filters">
+    @for (filter of filters(); track $index) {
+      <span class="filter-chip badge" [ngClass]="getChipBadgeClass(filter)" role="listitem">
+        <span class="filter-chip__label">{{ getChipLabel(filter) }}</span>
+        <button class="filter-chip__remove"
+                (click)="filterRemoved.emit(filter)"
+                [attr.aria-label]="'Remove filter: ' + getChipLabel(filter)">
+          <mat-icon>close</mat-icon>
+        </button>
+      </span>
+    }
+    <button class="filter-chips__clear"
+            (click)="filtersCleared.emit()"
+            aria-label="Clear all filters">
+      <mat-icon>clear_all</mat-icon>
+      Clear all
+    </button>
+  </div>
+}

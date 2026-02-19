@@ -1,0 +1,129 @@
+@if (loading()) {
+  <div class="loading-state">
+    <mat-icon>person</mat-icon>
+    <p>Loading profile...</p>
+  </div>
+} @else {
+  @if (profile(); as p) {
+    <div class="profile-view-page">
+      <!-- Hero Card -->
+      <div class="profile-hero">
+        <div class="hero-accent"></div>
+        <div class="hero-nav">
+          <button mat-icon-button (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+          </button>
+        </div>
+        <div class="hero-profile">
+          <app-avatar
+            [avatarUrl]="p.avatarUrl"
+            [firstName]="p.firstName"
+            [lastName]="p.lastName"
+            [avatarColor]="p.avatarColor"
+            size="lg" />
+          <div class="hero-info">
+            <h1 class="hero-name">{{ p.firstName }} {{ p.lastName }}</h1>
+            @if (p.jobTitle) {
+              <p class="hero-title">{{ p.jobTitle }}</p>
+            }
+            @if (p.department) {
+              <span class="department-badge">{{ p.department }}</span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Content -->
+      <div class="view-content">
+        <!-- Contact Info -->
+        <div class="info-section">
+          <div class="info-section__header">
+            <mat-icon>mail</mat-icon>
+            <h3>Contact</h3>
+          </div>
+          <div class="info-rows">
+            <div class="info-row">
+              <mat-icon>email</mat-icon>
+              <span>{{ p.email }}</span>
+            </div>
+            @if (p.phone) {
+              <div class="info-row">
+                <mat-icon>phone</mat-icon>
+                <span>{{ p.phone }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <!-- Bio -->
+        @if (p.bio) {
+          <div class="info-section">
+            <div class="info-section__header">
+              <mat-icon>info</mat-icon>
+              <h3>About</h3>
+            </div>
+            <p class="bio-text">{{ p.bio }}</p>
+          </div>
+        }
+
+        <!-- Skills -->
+        @if (p.skills && p.skills.length > 0) {
+          <div class="info-section">
+            <div class="info-section__header">
+              <mat-icon>star</mat-icon>
+              <h3>Skills</h3>
+            </div>
+            <mat-chip-set>
+              @for (skill of p.skills; track skill; let i = $index) {
+                <mat-chip [class]="'skill-chip skill-chip--' + (i % 3)">{{ skill }}</mat-chip>
+              }
+            </mat-chip-set>
+          </div>
+        }
+
+        <!-- Social Links -->
+        @if (p.socialLinks && hasSocialLinks(p.socialLinks)) {
+          <div class="info-section">
+            <div class="info-section__header">
+              <mat-icon>language</mat-icon>
+              <h3>Social</h3>
+            </div>
+            <div class="social-links">
+              @if (p.socialLinks['linkedin']) {
+                <a class="social-link-card" [href]="p.socialLinks['linkedin']" target="_blank" rel="noopener">
+                  <mat-icon>link</mat-icon>
+                  <span class="social-label">LinkedIn</span>
+                  <mat-icon class="social-arrow">open_in_new</mat-icon>
+                </a>
+              }
+              @if (p.socialLinks['twitter']) {
+                <a class="social-link-card" [href]="p.socialLinks['twitter']" target="_blank" rel="noopener">
+                  <mat-icon>link</mat-icon>
+                  <span class="social-label">Twitter / X</span>
+                  <mat-icon class="social-arrow">open_in_new</mat-icon>
+                </a>
+              }
+              @if (p.socialLinks['github']) {
+                <a class="social-link-card" [href]="p.socialLinks['github']" target="_blank" rel="noopener">
+                  <mat-icon>link</mat-icon>
+                  <span class="social-label">GitHub</span>
+                  <mat-icon class="social-arrow">open_in_new</mat-icon>
+                </a>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  } @else {
+    <div class="empty-state">
+      <mat-icon>person_off</mat-icon>
+      <h3>Profile not found</h3>
+      <p>The user profile you're looking for doesn't exist.</p>
+      <button mat-stroked-button (click)="goBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Go Back
+      </button>
+    </div>
+  }
+}

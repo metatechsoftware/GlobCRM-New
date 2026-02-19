@@ -1,50 +1,19 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
-import { MatChipsModule } from '@angular/material/chips';
+import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { ColumnDefinition, ViewFilter } from '../saved-views/view.models';
 
 /**
- * Displays active filters as removable chips.
- * Shows "{fieldLabel} {operator} {value}" with a remove (x) button per chip,
- * and a "Clear all" chip when filters are active.
+ * Displays active filters as removable badge chips.
+ * Chips are color-coded by field type using the global .badge utility.
  */
 @Component({
   selector: 'app-filter-chips',
   standalone: true,
-  imports: [MatChipsModule, MatIconModule],
+  imports: [MatIconModule, NgClass],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    @if (filters().length > 0) {
-      <mat-chip-set class="filter-chips" aria-label="Active filters">
-        @for (filter of filters(); track $index) {
-          <mat-chip (removed)="filterRemoved.emit(filter)" highlighted>
-            {{ getChipLabel(filter) }}
-            <button matChipRemove aria-label="Remove filter">
-              <mat-icon>cancel</mat-icon>
-            </button>
-          </mat-chip>
-        }
-        <mat-chip
-          class="clear-all-chip"
-          (click)="filtersCleared.emit()">
-          <mat-icon>clear_all</mat-icon>
-          Clear all
-        </mat-chip>
-      </mat-chip-set>
-    }
-  `,
-  styles: `
-    .filter-chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      padding: 8px 16px;
-    }
-
-    .clear-all-chip {
-      cursor: pointer;
-    }
-  `,
+  templateUrl: './filter-chips.component.html',
+  styleUrl: './filter-chips.component.scss',
 })
 export class FilterChipsComponent {
   filters = input.required<ViewFilter[]>();
@@ -52,6 +21,24 @@ export class FilterChipsComponent {
 
   filterRemoved = output<ViewFilter>();
   filtersCleared = output<void>();
+
+  /**
+   * Get the badge color class based on the field type.
+   */
+  getChipBadgeClass(filter: ViewFilter): string {
+    const col = this.columnDefinitions().find(
+      (c) => c.fieldId === filter.fieldId,
+    );
+    if (!col) return 'badge--primary';
+
+    const type = col.fieldType.toLowerCase();
+    if (type === 'number' || type === 'currency') return 'badge--accent';
+    if (type === 'date' || type === 'datetime') return 'badge--warning';
+    if (type === 'dropdown' || type === 'multiselect' || type === 'checkbox')
+      return 'badge--secondary';
+    if (type === 'text') return 'badge--info';
+    return 'badge--primary';
+  }
 
   /**
    * Build a human-readable chip label from a ViewFilter.

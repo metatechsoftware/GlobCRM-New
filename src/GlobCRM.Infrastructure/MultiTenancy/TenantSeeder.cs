@@ -487,6 +487,7 @@ public class TenantSeeder : ITenantSeeder
         // STEP 3: Assign RBAC template roles
         // ══════════════════════════════════════════════════════════
         await RoleTemplateSeeder.SeedTemplateRolesAsync(_db, organizationId);
+        await RoleTemplateSeeder.EnsurePermissionsForAllEntityTypesAsync(_db, organizationId);
 
         var rbacRoles = await _db.Roles
             .IgnoreQueryFilters()

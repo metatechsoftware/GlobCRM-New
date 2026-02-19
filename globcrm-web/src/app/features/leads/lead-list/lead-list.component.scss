@@ -1,20 +1,53 @@
-@use '../../../../styles/entity-list';
+// ─── Lead List: Enhanced Header + Token-Based Styles ────────
 
+// ─── Enhanced Header ────────────────────────────────────────
+.list-header__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    color: var(--color-primary);
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.list-header__text {
+  display: flex;
+  flex-direction: column;
+}
+
+.list-header__subtitle {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-normal);
+  line-height: 1.3;
+}
+
+// ─── Header Actions ─────────────────────────────────────────
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .view-mode-toggle {
   ::ng-deep .mat-button-toggle-label-content {
-    padding: 0 8px;
+    padding: 0 var(--space-2);
   }
 }
 
+// ─── Responsive ─────────────────────────────────────────────
 @media (max-width: 768px) {
   .header-actions {
     flex-wrap: wrap;
-    gap: 8px;
+    gap: var(--space-2);
   }
 }

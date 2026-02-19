@@ -211,6 +211,7 @@ small {
   &--warning   { background: var(--color-warning-soft); color: var(--color-warning-text); }
   &--danger    { background: var(--color-danger-soft); color: var(--color-danger-text); }
   &--info      { background: var(--color-info-soft); color: var(--color-info-text); }
+  &--accent    { background: var(--color-accent-soft, var(--color-info-soft)); color: var(--color-accent-text, var(--color-info-text)); }
 }
 
 // ─── Divider utility ──────────────────────────────────────

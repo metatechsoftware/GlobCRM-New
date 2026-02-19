@@ -18,6 +18,10 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
   imports: [MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes ringFill {
+      from { stroke-dashoffset: 314; }
+    }
+
     :host {
       display: block;
       height: 100%;
@@ -35,28 +39,61 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 
     .target-card__ring {
       position: relative;
-      width: 100px;
-      height: 100px;
-      border-radius: var(--radius-full, 9999px);
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      width: 110px;
+      height: 110px;
       flex-shrink: 0;
     }
 
-    .target-card__ring-inner {
+    .target-card__ring svg {
+      width: 110px;
+      height: 110px;
+      transform: rotate(-90deg);
+    }
+
+    .target-card__ring-track {
+      fill: none;
+      stroke: var(--color-border-subtle, #F3F4F6);
+      stroke-width: 8;
+    }
+
+    .target-card__ring-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dashoffset 800ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1));
+      animation: ringFill 800ms var(--ease-out, cubic-bezier(0, 0, 0.2, 1)) both;
+      filter: drop-shadow(0 0 4px currentColor);
+    }
+
+    .target-card__ring-fill--green {
+      stroke: var(--color-success, #22C55E);
+      color: rgba(34, 197, 94, 0.3);
+    }
+
+    .target-card__ring-fill--yellow {
+      stroke: var(--color-warning, #F59E0B);
+      color: rgba(245, 158, 11, 0.3);
+    }
+
+    .target-card__ring-fill--red {
+      stroke: var(--color-danger, #EF4444);
+      color: rgba(239, 68, 68, 0.3);
+    }
+
+    .target-card__ring-text {
       position: absolute;
-      inset: 8px;
-      border-radius: var(--radius-full, 9999px);
-      background: var(--color-surface, #FFFFFF);
+      inset: 0;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
     }
 
     .target-card__ring-percent {
-      font-size: var(--text-lg, 1.125rem);
+      font-size: var(--text-xl, 1.25rem);
       font-weight: var(--font-bold, 700);
+      font-variant-numeric: tabular-nums;
+      line-height: 1;
     }
 
     .target-card__ring-percent--green {
@@ -69,6 +106,15 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 
     .target-card__ring-percent--red {
       color: var(--color-danger-text, #993D3D);
+    }
+
+    .target-card__ring-sublabel {
+      font-size: 9px;
+      font-weight: var(--font-semibold, 600);
+      color: var(--color-text-muted, #9CA3AF);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-top: 2px;
     }
 
     .target-card__name {
@@ -90,6 +136,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
     .target-card__current {
       font-weight: var(--font-bold, 700);
       color: var(--color-text, #111827);
+      font-variant-numeric: tabular-nums;
     }
 
     .target-card__separator {
@@ -98,12 +145,14 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 
     .target-card__target-val {
       color: var(--color-text-secondary, #6B7280);
+      font-variant-numeric: tabular-nums;
     }
 
     .target-card__period {
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted, #9CA3AF);
       text-transform: capitalize;
+      font-weight: var(--font-medium, 500);
     }
 
     .target-card__empty {
@@ -126,14 +175,22 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
   template: `
     @if (target()) {
       <div class="target-card">
-        <div
-          class="target-card__ring"
-          [style.background]="ringGradient()"
-        >
-          <div class="target-card__ring-inner">
+        <div class="target-card__ring">
+          <svg viewBox="0 0 110 110">
+            <circle class="target-card__ring-track" cx="55" cy="55" r="50" />
+            <circle
+              class="target-card__ring-fill"
+              [class]="ringFillClass()"
+              cx="55" cy="55" r="50"
+              [attr.stroke-dasharray]="314"
+              [attr.stroke-dashoffset]="ringDashOffset()"
+            />
+          </svg>
+          <div class="target-card__ring-text">
             <span class="target-card__ring-percent" [class]="percentColorClass()">
               {{ progressPercent() }}%
             </span>
+            <span class="target-card__ring-sublabel">complete</span>
           </div>
         </div>
 
@@ -172,17 +229,14 @@ export class TargetProgressComponent {
     return 'red';
   });
 
-  readonly ringGradient = computed(() => {
+  readonly ringDashOffset = computed(() => {
     const pct = Math.min(this.progressPercent(), 100);
-    const color = this.statusColor();
-    const fillColor =
-      color === 'green'
-        ? 'var(--color-success, #22C55E)'
-        : color === 'yellow'
-          ? 'var(--color-warning, #F59E0B)'
-          : 'var(--color-danger, #EF4444)';
-    const trackColor = 'var(--color-border-subtle, #F3F4F6)';
-    return `conic-gradient(${fillColor} ${pct * 3.6}deg, ${trackColor} ${pct * 3.6}deg)`;
+    const circumference = 314; // 2 * PI * 50
+    return circumference - (circumference * pct) / 100;
+  });
+
+  readonly ringFillClass = computed(() => {
+    return `target-card__ring-fill target-card__ring-fill--${this.statusColor()}`;
   });
 
   readonly percentColorClass = computed(() => {

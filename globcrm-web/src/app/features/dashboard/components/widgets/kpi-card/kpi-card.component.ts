@@ -17,6 +17,10 @@ import { MatIconModule } from '@angular/material/icon';
   imports: [MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes progressFill {
+      from { width: 0; }
+    }
+
     :host {
       display: block;
       height: 100%;
@@ -41,11 +45,12 @@ import { MatIconModule } from '@angular/material/icon';
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
+      width: 42px;
+      height: 42px;
+      min-width: 42px;
       border-radius: var(--radius-md, 8px);
       font-size: 20px;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
     .kpi-card__icon[data-color="primary"] {
@@ -84,19 +89,23 @@ import { MatIconModule } from '@angular/material/icon';
     }
 
     .kpi-card__title {
-      font-size: var(--text-sm, 0.8125rem);
-      font-weight: var(--font-medium, 500);
-      color: var(--color-text-secondary, #6B7280);
+      font-size: var(--text-xs, 0.75rem);
+      font-weight: var(--font-semibold, 600);
+      color: var(--color-text-muted, #9CA3AF);
       margin: 0;
       line-height: var(--leading-tight, 1.25);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
     .kpi-card__value {
-      font-size: var(--text-2xl, 1.5rem);
+      font-size: var(--text-3xl, 1.875rem);
       font-weight: var(--font-bold, 700);
       color: var(--color-text, #111827);
       margin: 0;
       line-height: var(--leading-tight, 1.25);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
 
     .kpi-card__progress {
@@ -113,15 +122,30 @@ import { MatIconModule } from '@angular/material/icon';
 
     .kpi-card__progress-fill {
       height: 100%;
-      background: var(--color-primary, #F97316);
+      background: linear-gradient(90deg, var(--color-primary, #F97316), var(--color-primary-hover, #EA580C));
       border-radius: var(--radius-full, 9999px);
-      transition: width var(--duration-normal, 200ms) var(--ease-default);
+      transition: width var(--duration-slower, 500ms) var(--ease-out);
+      animation: progressFill 800ms var(--ease-out) both;
+      box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+    }
+
+    .kpi-card__progress-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: var(--space-1, 4px);
     }
 
     .kpi-card__progress-text {
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted, #9CA3AF);
-      margin-top: var(--space-1, 4px);
+    }
+
+    .kpi-card__progress-pct {
+      font-size: var(--text-xs, 0.75rem);
+      font-weight: var(--font-semibold, 600);
+      color: var(--color-primary-text, #C2410C);
+      font-variant-numeric: tabular-nums;
     }
   `,
   template: `
@@ -143,9 +167,10 @@ import { MatIconModule } from '@angular/material/icon';
               [style.width.%]="progressPercent()"
             ></div>
           </div>
-          <p class="kpi-card__progress-text">
-            {{ progressPercent() }}% of target
-          </p>
+          <div class="kpi-card__progress-meta">
+            <span class="kpi-card__progress-text">of target</span>
+            <span class="kpi-card__progress-pct">{{ progressPercent() }}%</span>
+          </div>
         </div>
       }
     </div>

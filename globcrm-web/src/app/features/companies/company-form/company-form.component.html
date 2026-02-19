@@ -1,0 +1,135 @@
+<div class="entity-form-container">
+  @if (!dialogMode()) {
+    <div class="form-header">
+      <a mat-icon-button routerLink="/companies" aria-label="Back to companies">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <h1>{{ isEditMode ? 'Edit Company' : 'New Company' }}</h1>
+    </div>
+  }
+
+  @if (isLoadingDetail()) {
+    <div class="form-loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <!-- Duplicate warning banner (create mode only) -->
+    @if (potentialDuplicates().length > 0 && !duplicateWarningDismissed()) {
+      <div class="duplicate-warning">
+        <mat-icon>warning</mat-icon>
+        <div class="duplicate-warning__content">
+          <strong>Potential duplicates found:</strong>
+          @for (match of potentialDuplicates(); track match.id) {
+            <div class="duplicate-warning__match">
+              <a [routerLink]="['/companies', match.id]" target="_blank">
+                {{ match.name }}
+              </a>
+              <span class="duplicate-warning__details">
+                {{ match.website ? '(' + match.website + ')' : '' }} -- {{ match.score }}% match
+              </span>
+            </div>
+          }
+        </div>
+        <button mat-icon-button class="duplicate-warning__dismiss"
+                (click)="dismissDuplicateWarning()" aria-label="Dismiss warning">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    }
+
+    <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Company Name</mat-label>
+          <input matInput formControlName="name" required
+                 (blur)="onNameOrWebsiteBlur()">
+          @if (companyForm.controls['name'].hasError('required')) {
+            <mat-error>Company name is required</mat-error>
+          }
+          @if (companyForm.controls['name'].hasError('maxlength')) {
+            <mat-error>Company name cannot exceed 200 characters</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Industry</mat-label>
+          <input matInput formControlName="industry">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Website</mat-label>
+          <input matInput formControlName="website"
+                 (blur)="onNameOrWebsiteBlur()">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Phone</mat-label>
+          <input matInput formControlName="phone">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" type="email">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Company Size</mat-label>
+          <input matInput formControlName="size">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Address</mat-label>
+          <input matInput formControlName="address">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>City</mat-label>
+          <input matInput formControlName="city">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>State / Region</mat-label>
+          <input matInput formControlName="state">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Country</mat-label>
+          <input matInput formControlName="country">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Postal Code</mat-label>
+          <input matInput formControlName="postalCode">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+
+      <!-- Custom fields -->
+      <div class="custom-fields-section">
+        <h3>Custom Fields</h3>
+        <app-custom-field-form
+          [entityType]="'Company'"
+          [customFieldValues]="existingCustomFields"
+          (valuesChanged)="onCustomFieldsChanged($event)" />
+      </div>
+
+      <!-- Form actions -->
+      @if (!dialogMode()) {
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/companies">Cancel</button>
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="companyForm.invalid || isSaving()">
+            @if (isSaving()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            }
+            {{ isEditMode ? 'Save Changes' : 'Create Company' }}
+          </button>
+        </div>
+      }
+    </form>
+  }
+</div>

@@ -1,0 +1,168 @@
+<div class="entity-form-container">
+  @if (!dialogMode()) {
+    <div class="form-header">
+      <a mat-icon-button routerLink="/leads" aria-label="Back to leads">
+        <mat-icon>arrow_back</mat-icon>
+      </a>
+      <h1>{{ isEditMode ? 'Edit Lead' : 'New Lead' }}</h1>
+    </div>
+  }
+
+  @if (isLoadingDetail()) {
+    <div class="form-loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  } @else {
+    <form [formGroup]="leadForm" (ngSubmit)="onSubmit()">
+      <!-- Contact Information Section -->
+      <div class="form-section">
+        <h3>Contact Information</h3>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>First Name</mat-label>
+            <input matInput formControlName="firstName" required>
+            @if (leadForm.controls['firstName'].hasError('required')) {
+              <mat-error>First name is required</mat-error>
+            }
+            @if (leadForm.controls['firstName'].hasError('maxlength')) {
+              <mat-error>Max 100 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Last Name</mat-label>
+            <input matInput formControlName="lastName" required>
+            @if (leadForm.controls['lastName'].hasError('required')) {
+              <mat-error>Last name is required</mat-error>
+            }
+            @if (leadForm.controls['lastName'].hasError('maxlength')) {
+              <mat-error>Max 100 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Email</mat-label>
+            <input matInput formControlName="email" type="email">
+            @if (leadForm.controls['email'].hasError('email')) {
+              <mat-error>Invalid email format</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Phone</mat-label>
+            <input matInput formControlName="phone">
+            @if (leadForm.controls['phone'].hasError('maxlength')) {
+              <mat-error>Max 50 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Mobile Phone</mat-label>
+            <input matInput formControlName="mobilePhone">
+            @if (leadForm.controls['mobilePhone'].hasError('maxlength')) {
+              <mat-error>Max 50 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Job Title</mat-label>
+            <input matInput formControlName="jobTitle">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Company Section -->
+      <div class="form-section">
+        <h3>Company</h3>
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Company Name</mat-label>
+            <input matInput formControlName="companyName">
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Lead Details Section -->
+      <div class="form-section">
+        <h3>Lead Details</h3>
+        <div class="form-grid">
+          <mat-form-field appearance="outline">
+            <mat-label>Stage</mat-label>
+            <mat-select formControlName="leadStageId" required>
+              @for (stage of stages(); track stage.id) {
+                <mat-option [value]="stage.id">{{ stage.name }}</mat-option>
+              }
+            </mat-select>
+            @if (leadForm.controls['leadStageId'].hasError('required')) {
+              <mat-error>Stage is required</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Source</mat-label>
+            <mat-select formControlName="leadSourceId">
+              <mat-option [value]="null">None</mat-option>
+              @for (source of sources(); track source.id) {
+                <mat-option [value]="source.id">{{ source.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Temperature toggle -->
+          <div class="temperature-toggle-group">
+            <span class="temperature-label">Temperature</span>
+            <mat-button-toggle-group formControlName="temperature" aria-label="Lead Temperature">
+              <mat-button-toggle value="hot" class="temp-hot">
+                Hot
+              </mat-button-toggle>
+              <mat-button-toggle value="warm" class="temp-warm">
+                Warm
+              </mat-button-toggle>
+              <mat-button-toggle value="cold" class="temp-cold">
+                Cold
+              </mat-button-toggle>
+            </mat-button-toggle-group>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Owner</mat-label>
+            <mat-select formControlName="ownerId">
+              <mat-option [value]="null">Unassigned</mat-option>
+              @for (member of teamMembers(); track member.id) {
+                <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Description</mat-label>
+            <textarea matInput formControlName="description" rows="3"></textarea>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Custom Fields -->
+      <div class="custom-fields-section">
+        <h3>Custom Fields</h3>
+        <app-custom-field-form
+          [entityType]="'Lead'"
+          [customFieldValues]="existingCustomFields"
+          (valuesChanged)="onCustomFieldsChanged($event)" />
+      </div>
+
+      @if (!dialogMode()) {
+        <!-- Form Actions -->
+        <div class="form-actions">
+          <button mat-button type="button" routerLink="/leads">Cancel</button>
+          <button mat-raised-button color="primary" type="submit"
+                  [disabled]="leadForm.invalid || isSaving()">
+            @if (isSaving()) {
+              <mat-spinner diameter="20"></mat-spinner>
+            }
+            {{ isEditMode ? 'Save Changes' : 'Create Lead' }}
+          </button>
+        </div>
+      }
+    </form>
+  }
+</div>

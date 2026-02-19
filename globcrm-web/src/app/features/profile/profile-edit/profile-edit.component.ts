@@ -87,6 +87,7 @@ const DATE_FORMATS = [
     AvatarUploadComponent,
   ],
   templateUrl: './profile-edit.component.html',
+  styleUrl: './profile-edit.component.scss',
 })
 export class ProfileEditComponent implements OnInit {
   private readonly fb = inject(FormBuilder);

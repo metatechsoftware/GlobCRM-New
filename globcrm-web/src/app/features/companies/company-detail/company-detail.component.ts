@@ -63,223 +63,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     EntityAttachmentsComponent,
   ],
   templateUrl: './company-detail.component.html',
+  styleUrl: './company-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    :host {
-      display: block;
-    }
-
-    .detail-loading {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 64px;
-    }
-
-    .detail-page {
-      padding: 16px 24px;
-    }
-
-    .detail-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .header-left {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .header-left h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    .header-actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .detail-subheader {
-      display: flex;
-      gap: 16px;
-      flex-wrap: wrap;
-      margin-bottom: 24px;
-      padding-left: 48px;
-    }
-
-    .subheader-item {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-
-    .subheader-item mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .detail-content {
-      display: flex;
-      gap: 24px;
-    }
-
-    .detail-main {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .detail-sidebar {
-      width: 320px;
-      flex-shrink: 0;
-    }
-
-    .sidebar-title {
-      margin: 0 0 16px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .details-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-
-    .detail-field {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .detail-field.full-width {
-      grid-column: 1 / -1;
-    }
-
-    .field-label {
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--color-text-secondary);
-    }
-
-    .field-value {
-      font-size: 14px;
-      color: var(--color-text);
-    }
-
-    .section-title {
-      margin: 24px 0 12px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .contacts-tab {
-      min-height: 100px;
-    }
-
-    .tab-loading, .tab-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      padding: 32px;
-      color: var(--color-text-secondary);
-    }
-
-    .tab-empty mat-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
-      opacity: 0.5;
-    }
-
-    .tab-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 48px 24px;
-      color: var(--color-text-secondary);
-      text-align: center;
-    }
-
-    .tab-placeholder mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      opacity: 0.4;
-    }
-
-    .activities-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .activities-table th {
-      text-align: left;
-      font-size: 12px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--color-text-secondary);
-      padding: 8px 12px;
-      border-bottom: 2px solid var(--color-border);
-    }
-
-    .activities-table td {
-      padding: 10px 12px;
-      font-size: 14px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      vertical-align: middle;
-    }
-
-    .activities-table a {
-      color: var(--color-primary);
-      text-decoration: none;
-    }
-
-    .activities-table a:hover {
-      text-decoration: underline;
-    }
-
-    .detail-not-found {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 64px;
-      color: var(--color-text-secondary);
-    }
-
-    .detail-not-found mat-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-    }
-
-    @media (max-width: 1024px) {
-      .detail-content {
-        flex-direction: column;
-      }
-
-      .detail-sidebar {
-        width: 100%;
-      }
-
-      .details-grid {
-        grid-template-columns: 1fr;
-      }
-    }
-  `,
 })
 export class CompanyDetailComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);
@@ -576,6 +361,16 @@ export class CompanyDetailComponent implements OnInit {
       hour: 'numeric',
       minute: '2-digit',
     }).format(new Date(dateStr));
+  }
+
+  /** Get 2-letter initials from company name. */
+  getInitials(): string {
+    const name = this.company()?.name ?? '';
+    const words = name.trim().split(/\s+/);
+    if (words.length >= 2) {
+      return (words[0][0] + words[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
   }
 
   /** Handle delete with confirmation dialog. */

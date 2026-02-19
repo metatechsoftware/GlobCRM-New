@@ -39,9 +39,22 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes widgetEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     :host {
       display: block;
       height: 100%;
+      animation: widgetEntrance var(--duration-slower, 500ms) var(--ease-out) both;
+      animation-delay: var(--widget-delay, 0ms);
     }
 
     .widget-wrapper {
@@ -52,6 +65,17 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       border: 1px solid var(--color-border-subtle, #F3F4F6);
       border-radius: var(--radius-lg, 12px);
       overflow: hidden;
+      box-shadow: var(--shadow-sm);
+      transition:
+        box-shadow var(--duration-slow, 300ms) var(--ease-default),
+        transform var(--duration-slow, 300ms) var(--ease-default),
+        border-color var(--duration-slow, 300ms) var(--ease-default);
+    }
+
+    .widget-wrapper:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-2px);
+      border-color: var(--color-border);
     }
 
     .widget-wrapper__header {
@@ -64,11 +88,25 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       flex-shrink: 0;
     }
 
+    .widget-wrapper__dot {
+      width: 6px;
+      height: 6px;
+      min-width: 6px;
+      border-radius: var(--radius-full, 9999px);
+      background: var(--color-primary, #F97316);
+      opacity: 0.7;
+    }
+
     .widget-drag-handle {
       cursor: grab;
       display: flex;
       align-items: center;
       color: var(--color-text-muted, #9CA3AF);
+      transition: color var(--duration-fast, 100ms);
+    }
+
+    .widget-drag-handle:hover {
+      color: var(--color-primary, #F97316);
     }
 
     .widget-drag-handle:active {
@@ -90,6 +128,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      letter-spacing: -0.01em;
     }
 
     .widget-wrapper__menu-btn {
@@ -100,10 +139,11 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
       height: 28px;
       border: none;
       background: transparent;
-      border-radius: var(--radius-sm, 4px);
+      border-radius: var(--radius-full, 9999px);
       color: var(--color-text-muted, #9CA3AF);
       cursor: pointer;
       padding: 0;
+      transition: all var(--duration-fast, 100ms);
     }
 
     .widget-wrapper__menu-btn:hover {
@@ -138,6 +178,8 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
           <span class="widget-drag-handle">
             <mat-icon>drag_indicator</mat-icon>
           </span>
+        } @else {
+          <span class="widget-wrapper__dot"></span>
         }
         <h3 class="widget-wrapper__title">{{ widget().title }}</h3>
         @if (isEditing()) {

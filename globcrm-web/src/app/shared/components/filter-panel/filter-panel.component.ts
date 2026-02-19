@@ -4,8 +4,8 @@ import {
   computed,
   input,
   output,
+  signal,
 } from '@angular/core';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
@@ -79,7 +79,6 @@ const SELECT_OPERATORS: OperatorOption[] = [
   selector: 'app-filter-panel',
   standalone: true,
   imports: [
-    MatExpansionModule,
     MatFormFieldModule,
     MatSelectModule,
     MatInputModule,
@@ -87,70 +86,24 @@ const SELECT_OPERATORS: OperatorOption[] = [
     MatIconModule,
   ],
   templateUrl: './filter-panel.component.html',
+  styleUrl: './filter-panel.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .filter-panel {
-      margin: 0;
-    }
-
-    .filter-rows {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
-    }
-
-    .filter-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-    }
-
-    .filter-field {
-      flex: 2;
-      min-width: 160px;
-    }
-
-    .filter-operator {
-      flex: 1.5;
-      min-width: 140px;
-    }
-
-    .filter-value {
-      flex: 2;
-      min-width: 160px;
-    }
-
-    .filter-actions {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      padding-top: 8px;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .spacer {
-      flex: 1;
-    }
-
-    .filter-count {
-      margin-left: 4px;
-      font-weight: normal;
-      color: var(--color-primary);
-    }
-  `,
 })
 export class FilterPanelComponent {
   columnDefinitions = input.required<ColumnDefinition[]>();
   activeFilters = input.required<ViewFilter[]>();
   filtersChanged = output<ViewFilter[]>();
 
-  isPanelOpen = false;
+  isPanelOpen = signal(false);
   filterRows: FilterRow[] = [];
 
   filterableColumns = computed(() =>
     this.columnDefinitions().filter((c) => c.filterable),
   );
+
+  togglePanel(): void {
+    this.isPanelOpen.update((v) => !v);
+  }
 
   /**
    * Get available operators based on the field type.

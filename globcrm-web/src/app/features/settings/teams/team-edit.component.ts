@@ -13,7 +13,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
@@ -62,10 +62,9 @@ interface DirectoryResponse {
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule,
+    MatTooltipModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatListModule,
     MatDialogModule,
   ],
   templateUrl: './team-edit.component.html',
@@ -333,7 +332,7 @@ export class TeamEditComponent implements OnInit {
       }
       .user-email {
         font-size: 12px;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
       }
     `,
   ],

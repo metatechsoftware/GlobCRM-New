@@ -11,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NgClass } from '@angular/common';
 import { SelectionModel } from '@angular/cdk/collections';
 import { MatTableModule } from '@angular/material/table';
 import { MatSortModule, MatSort, Sort } from '@angular/material/sort';
@@ -50,6 +51,7 @@ import {
   selector: 'app-dynamic-table',
   standalone: true,
   imports: [
+    NgClass,
     MatTableModule,
     MatSortModule,
     MatPaginatorModule,
@@ -106,6 +108,9 @@ export class DynamicTableComponent {
   searchValue = signal('');
   private readonly searchSubject = new Subject<string>();
   private readonly destroyRef = inject(DestroyRef);
+
+  // Page tracking for footer summary
+  currentPageIndex = signal(0);
 
   // Drag state
   draggedFieldId = signal<string | null>(null);
@@ -309,6 +314,7 @@ export class DynamicTableComponent {
    * Handle page change from mat-paginator.
    */
   onPageChange(event: PageEvent): void {
+    this.currentPageIndex.set(event.pageIndex);
     this.pageChanged.emit({
       page: event.pageIndex + 1, // 1-based for API
       pageSize: event.pageSize,
@@ -390,5 +396,104 @@ export class DynamicTableComponent {
   private emitSelection(): void {
     this.selectedCount.set(this.selection.selected.length);
     this.selectionChanged.emit(this.selection.selected);
+  }
+
+  // ---- Badge / Cell Rendering ----
+
+  private static readonly STATUS_BADGE_MAP: Record<string, string> = {
+    // Success tier
+    won: 'badge--success',
+    completed: 'badge--success',
+    done: 'badge--success',
+    active: 'badge--success',
+    closed: 'badge--success',
+    converted: 'badge--success',
+    qualified: 'badge--success',
+    // Warning tier
+    pending: 'badge--warning',
+    warm: 'badge--warning',
+    'in progress': 'badge--warning',
+    'follow up': 'badge--warning',
+    expired: 'badge--warning',
+    // Danger tier
+    lost: 'badge--danger',
+    cancelled: 'badge--danger',
+    cold: 'badge--danger',
+    urgent: 'badge--danger',
+    overdue: 'badge--danger',
+    hot: 'badge--danger',
+    rejected: 'badge--danger',
+    // Info tier
+    new: 'badge--info',
+    open: 'badge--info',
+    assigned: 'badge--info',
+    sent: 'badge--info',
+    medium: 'badge--info',
+    // Primary tier
+    accepted: 'badge--primary',
+    call: 'badge--primary',
+    // Secondary tier
+    draft: 'badge--secondary',
+    inactive: 'badge--secondary',
+    review: 'badge--secondary',
+  };
+
+  private static readonly BADGE_VARIANTS = [
+    'badge--primary',
+    'badge--secondary',
+    'badge--success',
+    'badge--warning',
+    'badge--info',
+    'badge--accent',
+  ];
+
+  /**
+   * Get CSS class for a badge value — semantic map first, hash fallback.
+   */
+  getBadgeClass(value: any): string {
+    if (value == null || value === '') return 'badge--secondary';
+    const normalized = String(value).toLowerCase().trim();
+    const mapped = DynamicTableComponent.STATUS_BADGE_MAP[normalized];
+    if (mapped) return mapped;
+
+    // Deterministic hash fallback for unknown values
+    let hash = 0;
+    for (let i = 0; i < normalized.length; i++) {
+      hash = ((hash << 5) - hash + normalized.charCodeAt(i)) | 0;
+    }
+    return DynamicTableComponent.BADGE_VARIANTS[
+      Math.abs(hash) % DynamicTableComponent.BADGE_VARIANTS.length
+    ];
+  }
+
+  /**
+   * Convert camelCase or PascalCase to spaced label.
+   */
+  getBadgeLabel(value: any): string {
+    if (value == null || value === '') return '';
+    return String(value)
+      .replace(/([a-z])([A-Z])/g, '$1 $2')
+      .replace(/_/g, ' ');
+  }
+
+  /**
+   * Get the renderAs type for a column, defaulting to 'text'.
+   */
+  getColumnRenderAs(fieldId: string): 'text' | 'badge' | 'email' {
+    const def = this.columnDefinitions().find((d) => d.fieldId === fieldId);
+    return def?.renderAs ?? 'text';
+  }
+
+  /**
+   * Compute "Showing X-Y of Z" summary for the footer.
+   */
+  getPageRangeSummary(): string {
+    const total = this.totalCount();
+    if (total === 0) return 'No records';
+    const size = this.pageSize();
+    const pageIdx = this.currentPageIndex();
+    const start = pageIdx * size + 1;
+    const end = Math.min(start + size - 1, total);
+    return `Showing ${start}\u2013${end} of ${total}`;
   }
 }

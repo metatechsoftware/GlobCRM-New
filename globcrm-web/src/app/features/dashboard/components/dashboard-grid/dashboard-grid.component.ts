@@ -39,14 +39,38 @@ import { WidgetWrapperComponent } from '../widget-wrapper/widget-wrapper.compone
     }
 
     .dashboard-grid {
-      height: calc(100vh - 180px);
+      height: calc(100vh - 200px);
       overflow-y: auto;
       background: transparent;
     }
 
-    /* Override gridster background */
+    /* Override gridster background and grid styling */
     :host ::ng-deep gridster {
       background: transparent !important;
+    }
+
+    :host ::ng-deep .gridster-column,
+    :host ::ng-deep .gridster-row {
+      border-color: rgba(249, 115, 22, 0.06) !important;
+    }
+
+    :host ::ng-deep gridster-item {
+      border-radius: var(--radius-lg, 12px);
+    }
+
+    :host ::ng-deep .gridster-item-resizable-handler {
+      opacity: 0.3;
+    }
+
+    :host ::ng-deep .gridster-item-resizable-handler:hover {
+      opacity: 0.6;
+    }
+
+    /* Edit-mode drag preview */
+    :host ::ng-deep .gridster-preview-holder {
+      background: rgba(249, 115, 22, 0.08) !important;
+      border: 2px dashed rgba(249, 115, 22, 0.3) !important;
+      border-radius: var(--radius-lg, 12px) !important;
     }
   `,
   template: `

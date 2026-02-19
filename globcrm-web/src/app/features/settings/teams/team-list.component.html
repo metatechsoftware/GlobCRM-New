@@ -1,97 +1,124 @@
-<div class="team-list-container">
-  <div class="page-header">
-    <h1>Team Management</h1>
-    <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" routerLink="/settings/teams/new">
+<div class="teams-page">
+  <!-- Header -->
+  <div class="teams-header">
+    <div class="header-text">
+      <h1>Teams</h1>
+      <p class="header-subtitle">Organize your people into collaborative groups</p>
+    </div>
+    <button
+      *appHasPermission="'Contact:Create'"
+      mat-flat-button
+      color="primary"
+      routerLink="/settings/teams/new"
+      class="create-btn"
+    >
       <mat-icon>add</mat-icon>
-      Create Team
+      New Team
     </button>
   </div>
 
   @if (isLoading()) {
-    <div class="loading-container">
-      <mat-spinner diameter="48"></mat-spinner>
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
       <p>Loading teams...</p>
     </div>
   } @else if (errorMessage()) {
-    <div class="error-container">
-      <mat-icon class="error-icon">error_outline</mat-icon>
+    <div class="error-state">
+      <div class="error-icon-wrap">
+        <mat-icon>wifi_off</mat-icon>
+      </div>
+      <h3>Something went wrong</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" (click)="loadTeams()">
         <mat-icon>refresh</mat-icon>
-        Retry
+        Try Again
+      </button>
+    </div>
+  } @else if (teams().length === 0) {
+    <div class="empty-state">
+      <div class="empty-visual">
+        <div class="empty-circles">
+          <div class="circle c1"></div>
+          <div class="circle c2"></div>
+          <div class="circle c3"></div>
+        </div>
+        <mat-icon class="empty-icon">groups</mat-icon>
+      </div>
+      <h3>No teams yet</h3>
+      <p>Create your first team to start organizing your people into collaborative groups.</p>
+      <button
+        *appHasPermission="'Contact:Create'"
+        mat-flat-button
+        color="primary"
+        routerLink="/settings/teams/new"
+      >
+        <mat-icon>add</mat-icon>
+        Create First Team
       </button>
     </div>
   } @else {
-    <table mat-table [dataSource]="teams()" class="teams-table">
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let team">{{ team.name }}</td>
-      </ng-container>
+    <div class="teams-grid">
+      @for (team of teams(); track team.id; let i = $index) {
+        <div
+          class="team-card"
+          [style.animation-delay]="(i * 60) + 'ms'"
+          tabindex="0"
+          (click)="onEdit(team)"
+          (keydown.enter)="onEdit(team)"
+        >
+          <div class="card-accent" [style.background]="getTeamColor(team)"></div>
 
-      <!-- Description Column -->
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef>Description</th>
-        <td mat-cell *matCellDef="let team" class="description-cell">
-          {{ team.description || '-' }}
-        </td>
-      </ng-container>
+          <div class="card-body">
+            <div class="card-top">
+              <div
+                class="team-icon"
+                [style.background]="getTeamColorSoft(team)"
+                [style.color]="getTeamColor(team)"
+              >
+                {{ team.name.charAt(0).toUpperCase() }}
+              </div>
+              <div class="card-actions" (click)="$event.stopPropagation()">
+                <button
+                  *appHasPermission="'Contact:Edit'"
+                  mat-icon-button
+                  (click)="onEdit(team)"
+                  matTooltip="Edit team"
+                  class="action-btn"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  *appHasPermission="'Contact:Delete'"
+                  mat-icon-button
+                  (click)="onDelete(team)"
+                  matTooltip="Delete team"
+                  class="action-btn action-btn--danger"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
 
-      <!-- Default Role Column -->
-      <ng-container matColumnDef="defaultRoleName">
-        <th mat-header-cell *matHeaderCellDef>Default Role</th>
-        <td mat-cell *matCellDef="let team">
-          @if (team.defaultRoleName) {
-            <mat-chip-set>
-              <mat-chip>{{ team.defaultRoleName }}</mat-chip>
-            </mat-chip-set>
-          } @else {
-            <span class="no-role">None</span>
-          }
-        </td>
-      </ng-container>
+            <div class="card-content">
+              <h3 class="team-name">{{ team.name }}</h3>
+              <p class="team-desc">{{ team.description || 'No description' }}</p>
+            </div>
 
-      <!-- Member Count Column -->
-      <ng-container matColumnDef="memberCount">
-        <th mat-header-cell *matHeaderCellDef>Members</th>
-        <td mat-cell *matCellDef="let team">{{ team.memberCount }}</td>
-      </ng-container>
-
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let team">
-          <div class="action-buttons">
-            <button
-              *appHasPermission="'Contact:Edit'"
-              mat-icon-button
-              (click)="onEdit(team)"
-              matTooltip="Edit team"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            <button
-              *appHasPermission="'Contact:Delete'"
-              mat-icon-button
-              color="warn"
-              (click)="onDelete(team)"
-              matTooltip="Delete team"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+            <div class="card-footer">
+              <div class="metric">
+                <mat-icon class="metric-icon">people</mat-icon>
+                <span class="metric-value">{{ team.memberCount }}</span>
+                <span class="metric-label">{{ team.memberCount === 1 ? 'member' : 'members' }}</span>
+              </div>
+              @if (team.defaultRoleName) {
+                <div class="role-badge">
+                  {{ team.defaultRoleName }}
+                </div>
+              }
+            </div>
           </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-      <!-- No data row -->
-      <tr class="mat-mdc-no-data-row" *matNoDataRow>
-        <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
-          No teams found. Create your first team to get started.
-        </td>
-      </tr>
-    </table>
+        </div>
+      }
+    </div>
   }
 </div>

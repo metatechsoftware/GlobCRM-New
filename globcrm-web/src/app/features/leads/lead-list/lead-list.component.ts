@@ -54,7 +54,7 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
   ],
   providers: [ViewStore, LeadStore],
   templateUrl: './lead-list.component.html',
-  styleUrl: './lead-list.component.scss',
+  styleUrls: ['../../../../styles/_entity-list.scss', './lead-list.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class LeadListComponent implements OnInit {
@@ -90,12 +90,12 @@ export class LeadListComponent implements OnInit {
   /** Core column definitions for Lead entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
     { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
     { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
     { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
     { fieldId: 'sourceName', label: 'Source', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'temperature', label: 'Temperature', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'temperature', label: 'Temperature', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
     { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
     { fieldId: 'isConverted', label: 'Converted', isCustomField: false, fieldType: 'boolean', sortable: true, filterable: true },
     { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
