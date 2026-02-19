@@ -49,7 +49,7 @@
 
 **Milestone Goal:** Make GlobCRM feel connected — entity links in feeds open preview sidebars, every detail page starts with a Summary tab, and a personal "My Day" dashboard replaces the home page.
 
-- [ ] **Phase 22: Shared Foundation + Entity Preview Sidebar** - Cross-cutting infrastructure (EntityTypeRegistry, tab index refactor, entity_name denormalization) and full entity preview sidebar with feed integration
+- [x] **Phase 22: Shared Foundation + Entity Preview Sidebar** - Cross-cutting infrastructure (EntityTypeRegistry, tab index refactor, entity_name denormalization) and full entity preview sidebar with feed integration (completed 2026-02-19)
 - [ ] **Phase 23: Summary Tabs on Detail Pages** - Aggregated summary tab as default first tab on all 6 major entity detail pages with batched backend endpoints
 - [ ] **Phase 24: My Day Personal Dashboard** - Personal daily workspace replacing home page with fixed-layout widgets, plus org dashboard relocation
 - [ ] **Phase 25: Preview Sidebar Polish + Cross-Feature Integration** - Quick actions in preview, global search preview, user profile preview, responsive mobile behavior, and performance indexes
@@ -152,7 +152,7 @@ Phases execute in numeric order: 22 → 23 → 24 → 25
 | 19. Workflow Automation | v1.1 | 8/8 | Complete | 2026-02-19 |
 | 20. Advanced Reporting Builder | v1.1 | 8/8 | Complete | 2026-02-19 |
 | 21. Integration Polish & Tech Debt | v1.1 | 2/2 | Complete | 2026-02-19 |
-| 22. Shared Foundation + Entity Preview Sidebar | 3/4 | In Progress|  | - |
+| 22. Shared Foundation + Entity Preview Sidebar | 4/4 | Complete   | 2026-02-19 | - |
 | 23. Summary Tabs on Detail Pages | v1.2 | 0/4 | Not started | - |
 | 24. My Day Personal Dashboard | v1.2 | 0/4 | Not started | - |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 0/2 | Not started | - |

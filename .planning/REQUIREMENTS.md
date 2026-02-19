@@ -9,13 +9,13 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 
 ### Entity Preview Sidebar
 
-- [ ] **PREVIEW-01**: User can click entity names in feed items to open a preview sidebar instead of navigating away
+- [x] **PREVIEW-01**: User can click entity names in feed items to open a preview sidebar instead of navigating away
 - [x] **PREVIEW-02**: Preview sidebar slides in from the right (~400px) as an overlay without displacing page content
 - [x] **PREVIEW-03**: User sees key properties (name, status/stage, owner, primary info) for each entity type in preview
 - [x] **PREVIEW-04**: User can click "Open full record" to navigate to the entity detail page from preview
 - [x] **PREVIEW-05**: User can close the preview sidebar by clicking outside or pressing Escape
 - [x] **PREVIEW-06**: User sees a loading skeleton while preview data is being fetched
-- [ ] **PREVIEW-07**: Feed scroll position is preserved when opening and closing the preview sidebar
+- [x] **PREVIEW-07**: Feed scroll position is preserved when opening and closing the preview sidebar
 - [ ] **PREVIEW-08**: Preview sidebar displays full-width on mobile screens (< 768px)
 - [ ] **PREVIEW-09**: User can open entity preview from global search results
 - [ ] **PREVIEW-10**: User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) from the preview sidebar
@@ -99,13 +99,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| PREVIEW-01 | Phase 22 | Pending |
+| PREVIEW-01 | Phase 22 | Complete |
 | PREVIEW-02 | Phase 22 | Complete |
 | PREVIEW-03 | Phase 22 | Complete |
 | PREVIEW-04 | Phase 22 | Complete |
 | PREVIEW-05 | Phase 22 | Complete |
 | PREVIEW-06 | Phase 22 | Complete |
-| PREVIEW-07 | Phase 22 | Pending |
+| PREVIEW-07 | Phase 22 | Complete |
 | PREVIEW-08 | Phase 25 | Pending |
 | PREVIEW-09 | Phase 25 | Pending |
 | PREVIEW-10 | Phase 25 | Pending |

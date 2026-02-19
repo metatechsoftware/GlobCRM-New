@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 22 (Shared Foundation + Entity Preview Sidebar)
+**Current focus:** v1.2 Connected Experience — Phase 23 (next phase)
 
 ## Current Position
 
-Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar)
-Plan: 3 of 4 in current phase
-Status: Executing
-Last activity: 2026-02-20 — Completed 22-03 (Frontend Preview Sidebar)
+Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase Complete
+Last activity: 2026-02-20 — Completed 22-04 (Feed Entity Link Preview Integration)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████░░░░] 93% (142/153 plans)
+Progress: [███████████████████████████████████████████████████████████████████████████████████████████████████░░░░] 93% (143/153 plans)
 
 ## Milestones
 
@@ -25,9 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 142
+- Total plans completed: 143
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
+- v1.2 (in progress): 4 plans in phase 22
 
 ## Accumulated Context
 
@@ -48,6 +49,8 @@ Recent decisions for v1.2:
 - Activity preview checks both OwnerId and AssignedToId; Product preview skips scope check
 - AppComponent uses mat-sidenav-container with mode=side for push-content preview sidebar at 480px
 - Preview sidebar store uses navigation stack with max depth 10 and cap-and-trim strategy
+- Feed entity links: normal click opens preview sidebar, Ctrl/Cmd+click navigates to detail page
+- Feed tooltips use denormalized entityName (no API call on hover)
 
 ### Pending Todos
 
@@ -61,5 +64,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 22-03-PLAN.md
-Next step: Execute 22-04-PLAN.md
+Stopped at: Completed 22-04-PLAN.md (Phase 22 complete)
+Next step: Plan or execute Phase 23
