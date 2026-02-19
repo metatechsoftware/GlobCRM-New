@@ -32,7 +32,7 @@
 **Milestone Goal:** Add workflow automation, email templates/sequences, computed fields, duplicate detection, webhooks, advanced reporting, and a Leads entity — all integrated as a connected system where workflows orchestrate emails, webhooks, and sequences, and reports leverage computed fields.
 
 - [x] **Phase 13: Leads** - Full lead management with CRUD, dynamic table, pipeline stages, and lead-to-contact conversion
-- [ ] **Phase 14: Foundation Infrastructure & Email Templates** - Hangfire background jobs, TenantScope wrapper, DomainEventInterceptor, Fluid template engine, and rich email templates with merge fields
+- [x] **Phase 14: Foundation Infrastructure & Email Templates** - Hangfire background jobs, TenantScope wrapper, DomainEventInterceptor, Fluid template engine, and rich email templates with merge fields (completed 2026-02-19)
 - [ ] **Phase 15: Formula / Computed Custom Fields** - NCalc expression evaluator, formula field type with arithmetic/date/string/conditional support, on-read evaluation, and circular dependency detection
 - [ ] **Phase 16: Duplicate Detection & Merge** - Two-tier fuzzy matching (pg_trgm + FuzzySharp), configurable rules, side-by-side merge UI, and full relationship transfer
 - [ ] **Phase 17: Webhooks** - HMAC-signed webhook delivery with exponential retry, subscription management, delivery logs, SSRF prevention
@@ -168,7 +168,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 11. Polish & Completeness | v1.0 | 7/7 | Complete | 2026-02-18 |
 | 12. Bug Fixes & Integration Polish | v1.0 | 2/2 | Complete | 2026-02-18 |
 | 13. Leads | v1.1 | Complete    | 2026-02-18 | 2026-02-18 |
-| 14. Foundation Infrastructure & Email Templates | 3/4 | In Progress|  | - |
+| 14. Foundation Infrastructure & Email Templates | 4/4 | Complete   | 2026-02-19 | - |
 | 15. Formula / Computed Custom Fields | v1.1 | 0/? | Not started | - |
 | 16. Duplicate Detection & Merge | v1.1 | 0/? | Not started | - |
 | 17. Webhooks | v1.1 | 0/? | Not started | - |

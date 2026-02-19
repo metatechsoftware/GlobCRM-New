@@ -5,29 +5,30 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 14 in progress
+**Current focus:** v1.1 Automation & Intelligence — Phase 14 complete
 
 ## Current Position
 
-Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- IN PROGRESS
-Plan: 3 of 4 complete
-Status: Executing
-Last activity: 2026-02-19 — Completed 14-03 (Email Template Frontend)
+Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- COMPLETE
+Plan: 4 of 4 complete
+Status: Phase Complete
+Last activity: 2026-02-19 — Completed 14-04 (Preview, Polish, Navigation)
 
-Progress: [████████████████████████████████░░░░░░░░░░] 74% (v1.0: 96/96 plans, v1.1: 7/8+ Phase 13: 4/4, Phase 14: 3/4)
+Progress: [██████████████████████████████████░░░░░░░░] 76% (v1.0: 96/96 plans, v1.1: 8/8+ Phase 13: 4/4, Phase 14: 4/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 7
-- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 3/4)
+- v1.1 plans completed: 8
+- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 4/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 14-01 | Foundation infra + EmailTemplate data layer | 9min | 2 | 27 |
 | 14-02 | Email Template API + TenantSeeder | 6min | 2 | 8 |
 | 14-03 | Email Template Frontend (Unlayer + list) | 8min | 3 | 16 |
+| 14-04 | Preview, Polish, Navigation | 5min | 2 | 9 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -67,6 +68,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [14-03] Template list uses card grid with iframe srcdoc thumbnails (not DynamicTable)
 - [14-03] Merge field panel is supplementary browser with copy-to-clipboard; primary insertion via Unlayer toolbar
 - [14-03] Editor stores both design JSON (for re-editing) and compiled HTML (for rendering)
+- [14-04] Preview dialog uses iframe sandbox+srcdoc for safe rendered HTML display
+- [14-04] Entity search uses ApiService directly (not per-entity services) to avoid coupling
+- [14-04] Email Templates nav item in Connect group after Emails; route guards for access control
 
 ### Pending Todos
 
@@ -82,6 +86,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 14-03-PLAN.md
-Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-03-SUMMARY.md
-Next step: Execute 14-04-PLAN.md (Navigation, Polish, Testing)
+Stopped at: Completed 14-04-PLAN.md (Phase 14 complete)
+Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-04-SUMMARY.md
+Next step: Plan Phase 15 (Webhooks)
