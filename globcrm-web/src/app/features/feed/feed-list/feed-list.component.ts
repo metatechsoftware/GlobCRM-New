@@ -15,12 +15,15 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
 import { FeedStore } from '../feed.store';
 import { FeedItemDto, FeedItemType } from '../feed.models';
 import { FeedPostFormComponent } from '../feed-post-form/feed-post-form.component';
 import { SignalRService } from '../../../core/signalr/signalr.service';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { PreviewSidebarStore } from '../../../shared/stores/preview-sidebar.store';
+import { getEntityConfig, getEntityRoute } from '../../../shared/services/entity-type-registry';
 
 /**
  * Feed list page combining activity stream and social posts.
@@ -39,6 +42,7 @@ import { AuthStore } from '../../../core/auth/auth.store';
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    MatTooltipModule,
     FeedPostFormComponent,
   ],
   providers: [FeedStore],
@@ -151,17 +155,21 @@ import { AuthStore } from '../../../core/auth/auth.store';
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      font-size: 13px;
       color: var(--color-primary, #d97b3a);
-      cursor: pointer;
       text-decoration: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 2px 0;
       margin-bottom: 8px;
+      transition: color 0.15s ease;
 
       &:hover {
         text-decoration: underline;
+        color: var(--color-primary-dark, var(--color-primary, #d97b3a));
       }
 
-      mat-icon {
+      .entity-link-icon {
         font-size: 16px;
         width: 16px;
         height: 16px;
@@ -329,9 +337,13 @@ import { AuthStore } from '../../../core/auth/auth.store';
             <div class="feed-item-content">{{ item.content }}</div>
 
             @if (item.entityType && item.entityId) {
-              <a class="feed-entity-link" (click)="navigateToEntity(item)">
-                <mat-icon>open_in_new</mat-icon>
-                View {{ item.entityType }}
+              <a class="feed-entity-link"
+                 [matTooltip]="getEntityTooltip(item)"
+                 matTooltipShowDelay="300"
+                 (click)="onEntityClick($event, item)"
+                 (auxclick)="onEntityMiddleClick($event, item)">
+                <mat-icon class="entity-link-icon">{{ getEntityIcon(item.entityType) }}</mat-icon>
+                {{ item.entityName || ('View ' + item.entityType) }}
               </a>
             }
 
@@ -403,6 +415,7 @@ import { AuthStore } from '../../../core/auth/auth.store';
 })
 export class FeedListComponent implements OnInit, OnDestroy {
   readonly store = inject(FeedStore);
+  readonly previewStore = inject(PreviewSidebarStore);
   private readonly signalRService = inject(SignalRService);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
@@ -491,11 +504,45 @@ export class FeedListComponent implements OnInit, OnDestroy {
     this.setCommentText(itemId, '');
   }
 
-  /** Navigate to the entity referenced by a feed item. */
-  navigateToEntity(item: FeedItemDto): void {
+  /** Handle entity link click -- normal click opens preview, Ctrl/Cmd+click navigates to detail. */
+  onEntityClick(event: MouseEvent, item: FeedItemDto): void {
     if (!item.entityType || !item.entityId) return;
-    const entityPath = item.entityType.toLowerCase() + 's';
-    this.router.navigate(['/', entityPath, item.entityId]);
+
+    // Ctrl/Cmd+click: navigate to full detail page
+    if (event.ctrlKey || event.metaKey) {
+      event.preventDefault();
+      const route = getEntityRoute(item.entityType, item.entityId);
+      this.router.navigateByUrl(route);
+      return;
+    }
+
+    // Normal click: open preview sidebar
+    this.previewStore.open({
+      entityType: item.entityType,
+      entityId: item.entityId,
+      entityName: item.entityName ?? undefined,
+    });
+  }
+
+  /** Handle middle-click to open in new tab (standard browser behavior). */
+  onEntityMiddleClick(event: MouseEvent, item: FeedItemDto): void {
+    if (event.button === 1 && item.entityType && item.entityId) {
+      const route = getEntityRoute(item.entityType, item.entityId);
+      window.open(route, '_blank');
+    }
+  }
+
+  /** Get tooltip text for entity link hover (no API call -- uses data from feed item). */
+  getEntityTooltip(item: FeedItemDto): string {
+    const config = getEntityConfig(item.entityType ?? '');
+    const name = item.entityName || item.entityType || '';
+    return config ? `${config.label}: ${name}` : name;
+  }
+
+  /** Get Material icon for entity type from registry. */
+  getEntityIcon(entityType: string | null): string {
+    if (!entityType) return 'open_in_new';
+    return getEntityConfig(entityType)?.icon ?? 'open_in_new';
   }
 
   /** Check if the current user can delete this item. */
