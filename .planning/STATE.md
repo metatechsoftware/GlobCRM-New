@@ -86,6 +86,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 14-04-PLAN.md (Phase 14 complete)
-Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-04-SUMMARY.md
-Next step: Plan Phase 15 (Webhooks)
+Stopped at: Phase 15 context gathered
+Resume file: .planning/phases/15-formula-computed-custom-fields/15-CONTEXT.md
+Next step: Plan Phase 15 (Formula / Computed Custom Fields)
