@@ -47,25 +47,33 @@
   --color-info-text:         #1D4ED8;
 
   /* --- Color: Surfaces --- */
-  --color-bg:                #FFFFFF;
-  --color-bg-secondary:      #F9FAFB;
+  --color-bg:                #F7F7F5;
+  --color-bg-secondary:      #F0F0EE;
   --color-surface:           #FFFFFF;
-  --color-surface-hover:     #F9FAFB;
-  --color-surface-active:    #F3F4F6;
+  --color-surface-hover:     #F7F7F5;
+  --color-surface-active:    #F0F0EE;
   --color-surface-raised:    #FFFFFF;
 
+  /* --- Color: Sidebar --- */
+  --color-sidebar-bg:            #FFFFFF;
+  --color-sidebar-active-bg:     #FFF7ED;
+  --color-sidebar-active-text:   #C2410C;
+  --color-sidebar-hover-bg:      rgba(249, 115, 22, 0.06);
+  --color-sidebar-active-border: #F97316;
+  --color-sidebar-group-label:   #EA580C;
+
   /* --- Color: Text --- */
-  --color-text:              #111827;
+  --color-text:              #1A1A1A;
   --color-text-secondary:    #6B7280;
   --color-text-muted:        #9CA3AF;
   --color-text-on-primary:   #FFFFFF;
-  --color-text-link:         #F97316;
-  --color-text-link-hover:   #EA580C;
+  --color-text-link:         #1A1A1A;
+  --color-text-link-hover:   #F97316;
 
   /* --- Color: Borders --- */
-  --color-border:            #E5E7EB;
+  --color-border:            #E8E8E6;
   --color-border-strong:     #D1D5DB;
-  --color-border-subtle:     #F3F4F6;
+  --color-border-subtle:     #F0F0EE;
   --color-border-focus:      #F97316;
 
   /* --- Color: Overlays --- */
@@ -203,6 +211,14 @@
   --color-surface-active:    #35353C;
   --color-surface-raised:    #2B2B31;
 
+  /* --- Sidebar --- */
+  --color-sidebar-bg:            #19191D;
+  --color-sidebar-active-bg:     #2A1A0A;
+  --color-sidebar-active-text:   #FB923C;
+  --color-sidebar-hover-bg:      rgba(251, 146, 60, 0.08);
+  --color-sidebar-active-border: #FB923C;
+  --color-sidebar-group-label:   #FB923C;
+
   /* --- Text --- */
   --color-text:              #F3F4F6;
   --color-text-secondary:    #A1A1AA;
@@ -277,6 +293,13 @@
     --color-surface-hover:     #2B2B31;
     --color-surface-active:    #35353C;
     --color-surface-raised:    #2B2B31;
+
+    --color-sidebar-bg:            #19191D;
+    --color-sidebar-active-bg:     #2A1A0A;
+    --color-sidebar-active-text:   #FB923C;
+    --color-sidebar-hover-bg:      rgba(251, 146, 60, 0.08);
+    --color-sidebar-active-border: #FB923C;
+    --color-sidebar-group-label:   #FB923C;
 
     --color-text:              #F3F4F6;
     --color-text-secondary:    #A1A1AA;

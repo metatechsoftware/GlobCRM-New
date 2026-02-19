@@ -38,8 +38,9 @@ import { WebhookService } from './webhook.service';
     .test-dialog__payload {
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 12px;
-      background-color: #1e293b;
-      color: #e2e8f0;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
       padding: 16px;
       border-radius: 8px;
       white-space: pre-wrap;
@@ -54,21 +55,21 @@ import { WebhookService } from './webhook.service';
       align-items: center;
       gap: 12px;
       padding: 16px;
-      background-color: #dcfce7;
-      border: 1px solid #86efac;
+      background-color: var(--color-success-soft);
+      border: 1px solid var(--color-success);
       border-radius: 8px;
       margin: 16px 0;
     }
 
     .test-dialog__success mat-icon {
-      color: #16a34a;
+      color: var(--color-success);
       flex-shrink: 0;
     }
 
     .test-dialog__success p {
       margin: 0;
       font-size: 14px;
-      color: #166534;
+      color: var(--color-success-text);
     }
 
     .test-dialog__error {
@@ -76,21 +77,21 @@ import { WebhookService } from './webhook.service';
       align-items: center;
       gap: 12px;
       padding: 16px;
-      background-color: #fef2f2;
-      border: 1px solid #fecaca;
+      background-color: var(--color-danger-soft);
+      border: 1px solid var(--color-danger);
       border-radius: 8px;
       margin: 16px 0;
     }
 
     .test-dialog__error mat-icon {
-      color: #dc2626;
+      color: var(--color-danger);
       flex-shrink: 0;
     }
 
     .test-dialog__error p {
       margin: 0;
       font-size: 14px;
-      color: #991b1b;
+      color: var(--color-danger-text);
     }
   `,
   template: `
@@ -111,7 +112,7 @@ import { WebhookService } from './webhook.service';
           <p>Test webhook sent! Check delivery logs for results.</p>
         </div>
       } @else if (previewPayload()) {
-        <p style="font-size: 14px; color: var(--text-secondary, #64748b)">
+        <p style="font-size: 14px; color: var(--color-text-secondary)">
           Preview the sample payload that will be sent to your webhook endpoint:
         </p>
         <pre class="test-dialog__payload">{{ previewPayload() }}</pre>

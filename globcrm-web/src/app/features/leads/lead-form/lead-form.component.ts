@@ -5,6 +5,8 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
 import {
   ReactiveFormsModule,
@@ -61,6 +63,7 @@ import {
     CustomFieldFormComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.dialog-mode]': 'dialogMode()' },
   styles: `
     :host {
       display: block;
@@ -167,12 +170,14 @@ import {
   `,
   template: `
     <div class="entity-form-container">
-      <div class="form-header">
-        <a mat-icon-button routerLink="/leads" aria-label="Back to leads">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode ? 'Edit Lead' : 'New Lead' }}</h1>
-      </div>
+      @if (!dialogMode()) {
+        <div class="form-header">
+          <a mat-icon-button routerLink="/leads" aria-label="Back to leads">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h1>{{ isEditMode ? 'Edit Lead' : 'New Lead' }}</h1>
+        </div>
+      }
 
       @if (isLoadingDetail()) {
         <div class="form-loading">
@@ -316,17 +321,19 @@ import {
               (valuesChanged)="onCustomFieldsChanged($event)" />
           </div>
 
-          <!-- Form Actions -->
-          <div class="form-actions">
-            <button mat-button type="button" routerLink="/leads">Cancel</button>
-            <button mat-raised-button color="primary" type="submit"
-                    [disabled]="leadForm.invalid || isSaving()">
-              @if (isSaving()) {
-                <mat-spinner diameter="20"></mat-spinner>
-              }
-              {{ isEditMode ? 'Save Changes' : 'Create Lead' }}
-            </button>
-          </div>
+          @if (!dialogMode()) {
+            <!-- Form Actions -->
+            <div class="form-actions">
+              <button mat-button type="button" routerLink="/leads">Cancel</button>
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="leadForm.invalid || isSaving()">
+                @if (isSaving()) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                {{ isEditMode ? 'Save Changes' : 'Create Lead' }}
+              </button>
+            </div>
+          }
         </form>
       }
     </div>
@@ -340,6 +347,11 @@ export class LeadFormComponent implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);
   private readonly authStore = inject(AuthStore);
   private readonly snackBar = inject(MatSnackBar);
+
+  /** Dialog mode inputs/outputs. */
+  dialogMode = input(false);
+  entityCreated = output<any>();
+  entityCreateError = output<void>();
 
   /** Whether this is an edit (vs create) form. */
   isEditMode = false;
@@ -535,14 +547,31 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       this.leadService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Lead created successfully', 'Close', { duration: 3000 });
-          this.router.navigate(['/leads', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.snackBar.open('Lead created successfully', 'Close', { duration: 3000 });
+            this.router.navigate(['/leads', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create lead', 'Close', { duration: 5000 });
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          } else {
+            this.snackBar.open('Failed to create lead', 'Close', { duration: 5000 });
+          }
         },
       });
     }
+  }
+
+  /** Trigger form submission programmatically (used by dialog wrapper). */
+  triggerSubmit(): void {
+    if (this.leadForm.invalid) {
+      this.leadForm.markAllAsTouched();
+      return;
+    }
+    this.onSubmit();
   }
 }

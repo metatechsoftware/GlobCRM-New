@@ -169,7 +169,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
 
       p {
         margin-top: 16px;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
       }
     }
 
@@ -184,19 +184,19 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: #f44336;
+        color: var(--color-danger);
       }
 
       p {
         margin: 16px 0;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
       }
     }
 
     .pipelines-table {
       width: 100%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      border-radius: 4px;
+      box-shadow: var(--shadow-sm);
+      border-radius: var(--radius-sm);
     }
 
     .description-cell {
@@ -214,7 +214,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .no-data-cell {
       text-align: center;
       padding: 32px !important;
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--color-text-secondary);
     }
   `],
 })

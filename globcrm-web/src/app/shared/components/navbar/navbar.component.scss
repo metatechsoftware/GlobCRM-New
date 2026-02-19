@@ -16,13 +16,14 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   left: 0;
   bottom: 0;
   width: $sidebar-width;
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border-subtle);
+  background: var(--color-sidebar-bg);
+  border-right: 1px solid var(--color-border);
   display: flex;
   flex-direction: column;
   z-index: var(--z-fixed);
   transition: width $transition-speed $transition-ease;
   overflow: hidden;
+  border-top: 2px solid var(--color-sidebar-active-border);
 
   &--collapsed {
     width: $sidebar-collapsed-width;
@@ -58,6 +59,12 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
       pointer-events: none;
     }
 
+    .sidebar__link--active {
+      border-left: 3px solid var(--color-sidebar-active-border);
+      padding-left: calc(var(--space-2) - 3px);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+    }
+
     .sidebar__nav {
       padding: var(--space-2) var(--space-1);
     }
@@ -73,7 +80,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   padding: 0 var(--space-4);
   text-decoration: none;
   flex-shrink: 0;
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border);
   transition: padding $transition-speed $transition-ease,
               justify-content $transition-speed $transition-ease;
 }
@@ -85,12 +92,11 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   width: 32px;
   height: 32px;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-hover) 100%);
-  color: var(--color-primary-fg);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF;
   font-size: var(--text-md);
   font-weight: var(--font-bold);
   letter-spacing: -0.5px;
-  box-shadow: 0 2px 8px rgba(249, 115, 22, 0.25);
   flex-shrink: 0;
 
   &--sm {
@@ -122,7 +128,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   font-size: var(--text-xs);
   font-weight: var(--font-medium);
   color: var(--color-text-secondary);
-  border-bottom: 1px solid var(--color-border-subtle);
+  border-bottom: 1px solid var(--color-border);
   transition: opacity $transition-speed $transition-ease,
               width $transition-speed $transition-ease;
 
@@ -130,7 +136,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
     font-size: 14px;
     width: 14px;
     height: 14px;
-    color: var(--color-primary);
+    color: var(--color-text-muted);
     flex-shrink: 0;
   }
 
@@ -175,7 +181,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
 .sidebar__group-label {
   font-size: 11px;
   font-weight: var(--font-semibold);
-  color: var(--color-text-muted);
+  color: var(--color-sidebar-group-label);
   text-transform: uppercase;
   letter-spacing: 0.8px;
   padding: var(--space-4) var(--space-3) var(--space-1);
@@ -208,32 +214,24 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
               padding $transition-speed $transition-ease;
 
   &:hover {
-    background: var(--color-highlight);
+    background: var(--color-sidebar-hover-bg);
     color: var(--color-text);
 
     .sidebar__link-icon {
-      color: var(--color-text);
+      color: var(--color-primary-text);
     }
   }
 
   &--active {
-    background: var(--color-primary-soft);
-    color: var(--color-primary-text);
-
-    // Orange accent bar on left edge
-    &::before {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 8px;
-      bottom: 8px;
-      width: 3px;
-      background: var(--color-primary);
-      border-radius: 0 2px 2px 0;
-    }
+    background: var(--color-sidebar-active-bg);
+    color: var(--color-sidebar-active-text);
+    font-weight: var(--font-semibold);
+    border-left: 3px solid var(--color-sidebar-active-border);
+    padding-left: calc(var(--space-3) - 3px);
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
 
     .sidebar__link-icon {
-      color: var(--color-primary);
+      color: var(--color-sidebar-active-text);
     }
   }
 }
@@ -257,7 +255,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
 // ─── Sidebar Footer ─────────────────────────────────────
 .sidebar__footer {
   flex-shrink: 0;
-  border-top: 1px solid var(--color-border-subtle);
+  border-top: 1px solid var(--color-border);
   padding: var(--space-2);
 }
 
@@ -276,8 +274,8 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
               color 0.15s ease;
 
   &:hover {
-    background: var(--color-highlight);
-    color: var(--color-text);
+    background: var(--color-sidebar-hover-bg);
+    color: var(--color-primary-text);
   }
 
   &:focus-visible {
@@ -335,14 +333,25 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   left: $sidebar-width;
   right: 0;
   height: $header-height;
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border-subtle);
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
   display: flex;
   align-items: center;
   padding: 0 var(--space-6);
   gap: var(--space-3);
   z-index: calc(var(--z-fixed) - 1);
   transition: left $transition-speed $transition-ease;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #F97316 0%, #FB923C 50%, #FDBA74 100%);
+    pointer-events: none;
+  }
 
   &--collapsed {
     left: $sidebar-collapsed-width;
@@ -383,8 +392,8 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-secondary-soft) 100%);
-  color: var(--color-primary-text);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF;
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   letter-spacing: 0.5px;
@@ -434,6 +443,17 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
     0 1px 3px rgba(0, 0, 0, 0.04),
     0 4px 12px rgba(0, 0, 0, 0.02);
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #F97316 0%, #FB923C 50%, #FDBA74 100%);
+    pointer-events: none;
+  }
 }
 
 .topbar__hamburger {
@@ -450,7 +470,7 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   transition: background-color 0.15s ease;
 
   &:hover {
-    background: var(--color-highlight);
+    background: var(--color-sidebar-hover-bg);
   }
 
   &:focus-visible {
@@ -483,8 +503,8 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   width: 32px;
   height: 32px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-secondary-soft) 100%);
-  color: var(--color-primary-text);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF;
   font-size: var(--text-xs);
   font-weight: var(--font-semibold);
   letter-spacing: 0.5px;
@@ -517,8 +537,8 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
   width: 40px;
   height: 40px;
   border-radius: var(--radius-full);
-  background: linear-gradient(135deg, var(--color-primary-soft) 0%, var(--color-secondary-soft) 100%);
-  color: var(--color-primary-text);
+  background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+  color: #FFFFFF;
   font-size: var(--text-sm);
   font-weight: var(--font-semibold);
   letter-spacing: 0.5px;
@@ -539,4 +559,38 @@ $transition-ease: cubic-bezier(0.4, 0, 0.2, 1);
 
 .sidebar-user-menu__logout {
   color: var(--color-danger-text);
+}
+
+// ─── Theme Toggle ────────────────────────────────────────
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease,
+              color 0.15s ease,
+              border-color 0.15s ease;
+
+  &:hover {
+    background: var(--color-primary-soft);
+    color: var(--color-primary-text);
+    border-color: var(--color-primary);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
 }

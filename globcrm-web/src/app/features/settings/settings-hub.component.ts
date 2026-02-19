@@ -65,12 +65,12 @@ interface SettingsItem {
       font-size: 24px;
       font-weight: 600;
       margin: 0 0 4px 0;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .settings-hub__subtitle {
       font-size: 14px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       margin: 0;
     }
 
@@ -83,10 +83,10 @@ interface SettingsItem {
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-primary-text);
       margin: 0 0 12px 0;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
+      border-bottom: 2px solid var(--color-primary);
     }
 
     .settings-hub__cards {
@@ -100,24 +100,25 @@ interface SettingsItem {
       align-items: center;
       gap: 16px;
       padding: 16px 20px;
-      border: 1px solid var(--border-color, #e2e8f0);
+      border: 1px solid var(--color-border);
       border-radius: 8px;
       text-decoration: none;
       color: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
       cursor: pointer;
     }
 
     .settings-hub__card:hover {
-      border-color: var(--primary, #4f46e5);
-      box-shadow: 0 1px 3px rgba(79, 70, 229, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: 0 1px 6px rgba(249, 115, 22, 0.15);
+      background-color: var(--color-primary-soft);
     }
 
     .settings-hub__card-icon {
       font-size: 24px;
       width: 24px;
       height: 24px;
-      color: var(--primary, #4f46e5);
+      color: var(--color-primary);
       flex-shrink: 0;
     }
 
@@ -130,12 +131,12 @@ interface SettingsItem {
       font-size: 15px;
       font-weight: 600;
       margin: 0 0 2px 0;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .settings-hub__card-desc {
       font-size: 13px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       margin: 0;
       white-space: nowrap;
       overflow: hidden;
@@ -146,8 +147,13 @@ interface SettingsItem {
       font-size: 20px;
       width: 20px;
       height: 20px;
-      color: var(--text-secondary, #94a3b8);
+      color: var(--color-text-muted);
       flex-shrink: 0;
+      transition: color 0.15s;
+    }
+
+    .settings-hub__card:hover .settings-hub__card-arrow {
+      color: var(--color-primary);
     }
   `],
 })

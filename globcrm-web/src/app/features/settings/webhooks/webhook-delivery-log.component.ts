@@ -68,7 +68,7 @@ import { WebhookService } from './webhook.service';
     }
 
     .delivery-log__subtitle {
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       font-size: 14px;
       margin: 0 0 24px 0;
       padding-left: 48px;
@@ -90,7 +90,7 @@ import { WebhookService } from './webhook.service';
     .delivery-log__empty {
       text-align: center;
       padding: 64px 24px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .delivery-log__empty mat-icon {
@@ -98,13 +98,14 @@ import { WebhookService } from './webhook.service';
       width: 48px;
       height: 48px;
       margin-bottom: 16px;
-      opacity: 0.5;
+      color: var(--color-primary);
+      opacity: 0.6;
     }
 
     .delivery-log__empty h3 {
       margin: 0 0 8px 0;
       font-weight: 500;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .delivery-table {
@@ -118,16 +119,16 @@ import { WebhookService } from './webhook.service';
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       padding: 8px 12px;
-      border-bottom: 2px solid var(--border-color, #e2e8f0);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .delivery-table td {
       font-size: 13px;
       padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
-      color: var(--text-primary, #1e293b);
+      border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-text);
     }
 
     .delivery-row {
@@ -136,7 +137,7 @@ import { WebhookService } from './webhook.service';
     }
 
     .delivery-row:hover {
-      background-color: #f8fafc;
+      background-color: var(--color-surface-hover);
     }
 
     .delivery-badge {
@@ -148,22 +149,22 @@ import { WebhookService } from './webhook.service';
     }
 
     .delivery-badge--success {
-      background-color: #dcfce7;
-      color: #166534;
+      background-color: var(--color-success-soft);
+      color: var(--color-success-text);
     }
 
     .delivery-badge--failed {
-      background-color: #fecaca;
-      color: #991b1b;
+      background-color: var(--color-danger-soft);
+      color: var(--color-danger-text);
     }
 
     .delivery-badge--retrying {
-      background-color: #fed7aa;
-      color: #9a3412;
+      background-color: var(--color-warning-soft);
+      color: var(--color-warning-text);
     }
 
     .delivery-expanded {
-      background-color: #f8fafc;
+      background-color: var(--color-surface-hover);
     }
 
     .delivery-expanded td {
@@ -186,14 +187,15 @@ import { WebhookService } from './webhook.service';
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .delivery-detail__value {
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 12px;
-      background-color: #1e293b;
-      color: #e2e8f0;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
       padding: 12px;
       border-radius: 6px;
       white-space: pre-wrap;
@@ -203,7 +205,7 @@ import { WebhookService } from './webhook.service';
     }
 
     .subscription-link {
-      color: var(--primary, #4f46e5);
+      color: var(--color-primary);
       text-decoration: none;
       cursor: pointer;
     }
@@ -314,7 +316,7 @@ import { WebhookService } from './webhook.service';
                         }
                         <div class="delivery-detail__section">
                           <span class="delivery-detail__label">Attempt Number</span>
-                          <span style="font-size: 14px; color: var(--text-primary, #1e293b)">{{ log.attemptNumber }}</span>
+                          <span style="font-size: 14px; color: var(--color-text)">{{ log.attemptNumber }}</span>
                         </div>
                       </div>
                     </td>

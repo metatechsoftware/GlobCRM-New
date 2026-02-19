@@ -108,12 +108,12 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .info-value {
       font-size: 14px;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .info-value--mono {
@@ -130,18 +130,18 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .status-badge--active {
-      background-color: #dcfce7;
-      color: #166534;
+      background-color: var(--color-success-soft);
+      color: var(--color-success-text);
     }
 
     .status-badge--disabled {
-      background-color: #fecaca;
-      color: #991b1b;
+      background-color: var(--color-danger-soft);
+      color: var(--color-danger-text);
     }
 
     .status-badge--paused {
-      background-color: #e2e8f0;
-      color: #475569;
+      background-color: var(--color-surface-active);
+      color: var(--color-text-secondary);
     }
 
     .event-chips {
@@ -155,8 +155,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       font-size: 12px;
       padding: 2px 8px;
       border-radius: 4px;
-      background-color: #eff6ff;
-      color: #1e40af;
+      background-color: var(--color-primary-soft);
+      color: var(--color-primary-text);
       font-weight: 500;
     }
 
@@ -165,14 +165,14 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       align-items: center;
       gap: 12px;
       padding: 12px 16px;
-      background-color: #fef2f2;
-      border: 1px solid #fecaca;
+      background-color: var(--color-danger-soft);
+      border: 1px solid var(--color-danger);
       border-radius: 8px;
       margin-bottom: 24px;
     }
 
     .disabled-banner mat-icon {
-      color: #dc2626;
+      color: var(--color-danger);
       flex-shrink: 0;
     }
 
@@ -183,7 +183,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .disabled-banner__content p {
       margin: 0;
       font-size: 14px;
-      color: #991b1b;
+      color: var(--color-danger-text);
     }
 
     .disabled-banner__content p:first-child {
@@ -216,16 +216,16 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       padding: 8px 12px;
-      border-bottom: 2px solid var(--border-color, #e2e8f0);
+      border-bottom: 2px solid var(--color-border);
     }
 
     .delivery-table td {
       font-size: 13px;
       padding: 10px 12px;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
-      color: var(--text-primary, #1e293b);
+      border-bottom: 1px solid var(--color-border-subtle);
+      color: var(--color-text);
     }
 
     .delivery-row {
@@ -234,7 +234,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .delivery-row:hover {
-      background-color: #f8fafc;
+      background-color: var(--color-surface-hover);
     }
 
     .delivery-badge {
@@ -246,22 +246,22 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .delivery-badge--success {
-      background-color: #dcfce7;
-      color: #166534;
+      background-color: var(--color-success-soft);
+      color: var(--color-success-text);
     }
 
     .delivery-badge--failed {
-      background-color: #fecaca;
-      color: #991b1b;
+      background-color: var(--color-danger-soft);
+      color: var(--color-danger-text);
     }
 
     .delivery-badge--retrying {
-      background-color: #fed7aa;
-      color: #9a3412;
+      background-color: var(--color-warning-soft);
+      color: var(--color-warning-text);
     }
 
     .delivery-expanded {
-      background-color: #f8fafc;
+      background-color: var(--color-surface-hover);
     }
 
     .delivery-expanded td {
@@ -284,14 +284,15 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .delivery-detail__value {
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 12px;
-      background-color: #1e293b;
-      color: #e2e8f0;
+      background-color: var(--color-bg);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
       padding: 12px;
       border-radius: 6px;
       white-space: pre-wrap;
@@ -303,7 +304,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .delivery-empty {
       text-align: center;
       padding: 48px 24px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
   `,

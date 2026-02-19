@@ -20,6 +20,7 @@ import { CompanyFormComponent } from '../../../features/companies/company-form/c
 import { DealFormComponent } from '../../../features/deals/deal-form/deal-form.component';
 import { ActivityFormComponent } from '../../../features/activities/activity-form/activity-form.component';
 import { ProductFormComponent } from '../../../features/products/product-form/product-form.component';
+import { LeadFormComponent } from '../../../features/leads/lead-form/lead-form.component';
 import {
   EntityFormDialogData,
   EntityFormDialogResult,
@@ -40,6 +41,7 @@ import {
     DealFormComponent,
     ActivityFormComponent,
     ProductFormComponent,
+    LeadFormComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -90,6 +92,12 @@ import {
             (entityCreated)="onEntityCreated($event)"
             (entityCreateError)="onCreateError()" />
         }
+        @case ('Lead') {
+          <app-lead-form
+            [dialogMode]="true"
+            (entityCreated)="onEntityCreated($event)"
+            (entityCreateError)="onCreateError()" />
+        }
       }
     </mat-dialog-content>
 
@@ -125,6 +133,7 @@ export class EntityFormDialogComponent {
   private readonly dealForm = viewChild(DealFormComponent);
   private readonly activityForm = viewChild(ActivityFormComponent);
   private readonly productForm = viewChild(ProductFormComponent);
+  private readonly leadForm = viewChild(LeadFormComponent);
 
   /** Track saving state and which action button was clicked. */
   isSaving = signal(false);
@@ -141,6 +150,7 @@ export class EntityFormDialogComponent {
       case 'Deal': return this.dealForm();
       case 'Activity': return this.activityForm();
       case 'Product': return this.productForm();
+      case 'Lead': return this.leadForm();
     }
   }
 

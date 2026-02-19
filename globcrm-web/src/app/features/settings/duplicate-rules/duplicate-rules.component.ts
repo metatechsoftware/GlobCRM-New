@@ -73,7 +73,7 @@ interface EntityRuleConfig {
     }
 
     .rules-subtitle {
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       font-size: 14px;
       margin: 0 0 24px 0;
       padding-left: 48px;
@@ -106,12 +106,12 @@ interface EntityRuleConfig {
       font-size: 14px;
       font-weight: 500;
       margin-bottom: 4px;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .rule-section-helper {
       font-size: 13px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       margin: 4px 0 0 0;
     }
 
@@ -149,15 +149,15 @@ interface EntityRuleConfig {
     }
 
     .threshold-indicator--strict {
-      background-color: #4caf50;
+      background-color: var(--color-success);
     }
 
     .threshold-indicator--moderate {
-      background-color: #ff9800;
+      background-color: var(--color-warning);
     }
 
     .threshold-indicator--permissive {
-      background-color: #f44336;
+      background-color: var(--color-danger);
     }
 
     .threshold-slider {
@@ -177,7 +177,7 @@ interface EntityRuleConfig {
       display: flex;
       justify-content: flex-end;
       padding-top: 16px;
-      border-top: 1px solid var(--border-color, #e2e8f0);
+      border-top: 1px solid var(--color-border);
     }
   `,
   template: `

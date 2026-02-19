@@ -9,6 +9,7 @@ import { AuthStore } from './core/auth/auth.store';
 import { SignalRService } from './core/signalr/signalr.service';
 import { NotificationStore } from './features/notifications/notification.store';
 import { SidebarStateService } from './shared/services/sidebar-state.service';
+import { ThemeService } from './core/theme/theme.service';
 
 @Component({
   selector: 'app-root',
@@ -63,6 +64,7 @@ export class AppComponent {
   private readonly notificationStore = inject(NotificationStore);
   readonly sidebarState = inject(SidebarStateService);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly themeService = inject(ThemeService);
 
   /** Start/stop SignalR and load unread count based on auth state. */
   private readonly authEffect = effect(() => {

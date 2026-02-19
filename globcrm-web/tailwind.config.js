@@ -56,6 +56,14 @@ module.exports = {
           active:   'var(--color-surface-active)',
           raised:   'var(--color-surface-raised)',
         },
+        sidebar: {
+          DEFAULT:        'var(--color-sidebar-bg)',
+          'active-bg':    'var(--color-sidebar-active-bg)',
+          'active-text':  'var(--color-sidebar-active-text)',
+          'hover-bg':     'var(--color-sidebar-hover-bg)',
+          'active-border':'var(--color-sidebar-active-border)',
+          'group-label':  'var(--color-sidebar-group-label)',
+        },
         bg: {
           DEFAULT:    'var(--color-bg)',
           secondary:  'var(--color-bg-secondary)',

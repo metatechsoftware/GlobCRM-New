@@ -129,8 +129,8 @@ import { SearchHit, SearchResponse } from './search.models';
 
       &.active {
         background: var(--color-surface);
-        border-color: var(--color-primary);
-        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.1);
+        border-color: var(--color-border-strong);
+        box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
         width: 360px;
       }
     }

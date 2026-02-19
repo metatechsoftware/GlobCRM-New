@@ -117,7 +117,7 @@ const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
 
     .preferences-description {
       margin: 0;
-      color: #666;
+      color: var(--color-text-secondary);
       font-size: 14px;
     }
 

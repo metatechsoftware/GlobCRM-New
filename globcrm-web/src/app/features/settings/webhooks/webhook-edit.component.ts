@@ -85,7 +85,7 @@ import {
     }
 
     .webhook-edit__subtitle {
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       font-size: 14px;
       margin: 0 0 24px 0;
       padding-left: 48px;
@@ -114,7 +114,7 @@ import {
 
     .toggle-label {
       font-size: 14px;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .event-matrix {
@@ -127,13 +127,13 @@ import {
       gap: 8px;
       margin-bottom: 8px;
       padding-bottom: 8px;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
+      border-bottom: 1px solid var(--color-border);
     }
 
     .event-matrix__header span {
       font-size: 13px;
       font-weight: 600;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       text-align: center;
     }
 
@@ -152,7 +152,7 @@ import {
     .event-matrix__entity {
       font-size: 14px;
       font-weight: 500;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .event-matrix__cell {
@@ -230,7 +230,7 @@ import {
               <mat-card-title>Event Subscriptions</mat-card-title>
             </mat-card-header>
             <mat-card-content>
-              <p style="font-size: 13px; color: var(--text-secondary, #64748b); margin: 0 0 16px 0">
+              <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 16px 0">
                 Select which entity events trigger this webhook
               </p>
 
@@ -487,8 +487,8 @@ export class WebhookEditComponent implements OnInit {
       align-items: center;
       gap: 8px;
       padding: 12px 16px;
-      background-color: #f1f5f9;
-      border: 1px solid var(--border-color, #e2e8f0);
+      background-color: var(--color-bg-secondary);
+      border: 1px solid var(--color-border);
       border-radius: 8px;
     }
 
@@ -497,7 +497,7 @@ export class WebhookEditComponent implements OnInit {
       font-family: 'SF Mono', 'Fira Code', monospace;
       font-size: 13px;
       word-break: break-all;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
   `,
 })

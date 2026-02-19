@@ -269,7 +269,7 @@ import {
 
       p {
         margin-top: 16px;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
       }
     }
 
@@ -284,12 +284,12 @@ import {
         font-size: 48px;
         width: 48px;
         height: 48px;
-        color: #f44336;
+        color: var(--color-danger);
       }
 
       p {
         margin: 16px 0;
-        color: rgba(0, 0, 0, 0.6);
+        color: var(--color-text-secondary);
       }
     }
 
@@ -317,7 +317,7 @@ import {
     .stages-section {
       margin-top: 24px;
       padding-top: 24px;
-      border-top: 1px solid rgba(0, 0, 0, 0.12);
+      border-top: 1px solid var(--color-border);
     }
 
     .stages-header {
@@ -333,7 +333,7 @@ import {
       gap: 8px;
       margin-bottom: 16px;
       padding: 12px;
-      background: rgba(0, 0, 0, 0.04);
+      background: var(--color-primary-soft);
       border-radius: 8px;
     }
 
@@ -363,19 +363,20 @@ import {
       align-items: flex-start;
       gap: 8px;
       padding: 16px;
-      background: white;
-      border: 1px solid rgba(0, 0, 0, 0.12);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
       border-radius: 8px;
-      transition: box-shadow 200ms;
+      transition: box-shadow 200ms, border-color 200ms;
 
       &:hover {
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
+        border-color: var(--color-primary);
       }
     }
 
     .stage-drag-handle {
       cursor: grab;
-      color: rgba(0, 0, 0, 0.38);
+      color: var(--color-text-muted);
       padding-top: 12px;
 
       &:active {
@@ -429,7 +430,7 @@ import {
     .required-count {
       margin-left: 8px;
       font-size: 12px;
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--color-text-secondary);
     }
 
     .no-stages {
@@ -437,13 +438,15 @@ import {
       flex-direction: column;
       align-items: center;
       padding: 32px;
-      color: rgba(0, 0, 0, 0.6);
+      color: var(--color-text-secondary);
 
       mat-icon {
         font-size: 48px;
         width: 48px;
         height: 48px;
         margin-bottom: 8px;
+        color: var(--color-primary);
+        opacity: 0.6;
       }
     }
 
@@ -453,9 +456,9 @@ import {
       gap: 8px;
       margin-top: 16px;
       padding: 12px;
-      background-color: #fce4ec;
-      border-radius: 4px;
-      color: #c62828;
+      background-color: var(--color-danger-soft);
+      border-radius: var(--radius-sm);
+      color: var(--color-danger-text);
 
       mat-icon {
         font-size: 20px;

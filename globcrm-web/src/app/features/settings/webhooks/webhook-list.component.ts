@@ -62,7 +62,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .webhook-list__subtitle {
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       font-size: 14px;
       margin: 0 0 24px 0;
       padding-left: 48px;
@@ -82,7 +82,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .webhook-list__empty {
       text-align: center;
       padding: 64px 24px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .webhook-list__empty mat-icon {
@@ -90,13 +90,14 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       width: 48px;
       height: 48px;
       margin-bottom: 16px;
-      opacity: 0.5;
+      color: var(--color-primary);
+      opacity: 0.6;
     }
 
     .webhook-list__empty h3 {
       margin: 0 0 8px 0;
       font-weight: 500;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .webhook-card {
@@ -106,8 +107,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .webhook-card:hover {
-      border-color: var(--primary, #4f46e5);
-      box-shadow: 0 1px 3px rgba(79, 70, 229, 0.1);
+      border-color: var(--color-primary);
+      box-shadow: 0 1px 6px rgba(249, 115, 22, 0.15);
     }
 
     .webhook-card__content {
@@ -126,12 +127,12 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       font-size: 15px;
       font-weight: 600;
       margin: 0 0 4px 0;
-      color: var(--text-primary, #1e293b);
+      color: var(--color-text);
     }
 
     .webhook-card__url {
       font-size: 13px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
       margin: 0 0 8px 0;
       white-space: nowrap;
       overflow: hidden;
@@ -155,34 +156,34 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     }
 
     .badge--active {
-      background-color: #dcfce7;
-      color: #166534;
+      background-color: var(--color-success-soft);
+      color: var(--color-success-text);
     }
 
     .badge--disabled {
-      background-color: #fecaca;
-      color: #991b1b;
+      background-color: var(--color-danger-soft);
+      color: var(--color-danger-text);
     }
 
     .badge--paused {
-      background-color: #e2e8f0;
-      color: #475569;
+      background-color: var(--color-surface-active);
+      color: var(--color-text-secondary);
     }
 
     .webhook-card__events {
       font-size: 12px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .webhook-card__failures {
       font-size: 12px;
-      color: #dc2626;
+      color: var(--color-danger-text);
       font-weight: 500;
     }
 
     .webhook-card__last-delivery {
       font-size: 12px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-text-secondary);
     }
 
     .webhook-card__actions {

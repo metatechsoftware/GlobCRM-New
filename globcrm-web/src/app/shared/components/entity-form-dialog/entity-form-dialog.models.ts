@@ -1,4 +1,4 @@
-export type CreateDialogEntityType = 'Contact' | 'Company' | 'Deal' | 'Activity' | 'Product';
+export type CreateDialogEntityType = 'Contact' | 'Company' | 'Deal' | 'Activity' | 'Product' | 'Lead';
 
 export interface EntityFormDialogData {
   entityType: CreateDialogEntityType;

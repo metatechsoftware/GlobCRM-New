@@ -51,6 +51,10 @@
   <header class="content-header" [class.content-header--collapsed]="sidebarState.isCollapsed()">
     <app-global-search />
     <span class="content-header__spacer"></span>
+    <button class="theme-toggle" (click)="themeService.toggle()"
+            [attr.aria-label]="themeService.theme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'">
+      <mat-icon>{{ themeService.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</mat-icon>
+    </button>
     <app-notification-center />
 
     <!-- User Trigger -->
@@ -81,6 +85,10 @@
     </a>
     <span class="topbar__spacer"></span>
     <app-global-search />
+    <button class="theme-toggle" (click)="themeService.toggle()"
+            [attr.aria-label]="themeService.theme() === 'light' ? 'Switch to dark mode' : 'Switch to light mode'">
+      <mat-icon>{{ themeService.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</mat-icon>
+    </button>
     <app-notification-center />
     <button class="topbar__avatar" [matMenuTriggerFor]="userMenu" aria-label="User menu">
       {{ userInitials }}

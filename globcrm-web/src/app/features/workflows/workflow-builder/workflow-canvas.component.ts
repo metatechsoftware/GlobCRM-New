@@ -41,196 +41,91 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
             class="flow-container"
             [class.hidden]="nodes().length === 0">
       <f-canvas>
+        <!-- IMPORTANT: div[fNode] must be a DIRECT child of @for (no @switch wrapper).
+             Angular's ng-content select="[fNode]" in f-canvas does not match elements
+             nested inside @switch/@case embedded views (Angular issue #55462). -->
         @for (node of nodes(); track node.id) {
-          @switch (node.type) {
-            @case ('trigger') {
-              <div fNode
-                   [fNodeId]="node.id"
-                   [fNodePosition]="node.position"
-                   class="workflow-node trigger-node"
-                   [class.selected]="selectedNodeId() === node.id"
-                   (click)="nodeSelected.emit(node.id)"
-                   (dblclick)="nodeDblClicked.emit(node.id)">
+          <div fNode
+               [fNodeId]="node.id"
+               [fNodePosition]="node.position"
+               class="workflow-node"
+               [class.trigger-node]="node.type === 'trigger'"
+               [class.condition-node]="node.type === 'condition'"
+               [class.action-node]="node.type === 'action'"
+               [class.branch-node]="node.type === 'branch'"
+               [class.wait-node]="node.type === 'wait'"
+               [class.selected]="selectedNodeId() === node.id"
+               (click)="nodeSelected.emit(node.id)"
+               (dblclick)="nodeDblClicked.emit(node.id)">
 
-                <div class="node-content">
-                  <div class="node-header">
-                    <div class="node-icon trigger-icon">
-                      <mat-icon>bolt</mat-icon>
-                    </div>
-                    <div class="node-info">
-                      <span class="node-label">{{ node.label || 'Trigger' }}</span>
-                      @if (getTriggerBadge(node)) {
-                        <span class="node-badge">{{ getTriggerBadge(node) }}</span>
-                      }
-                    </div>
-                  </div>
+            <!-- Input connector (all types except trigger) -->
+            @if (node.type !== 'trigger') {
+              <div fNodeInput
+                   [fInputId]="node.id + '_input'"
+                   fInputConnectableSide="top"
+                   class="connector connector-input"
+                   [class.condition-connector]="node.type === 'condition'"
+                   [class.action-connector]="node.type === 'action'"
+                   [class.branch-connector]="node.type === 'branch'"
+                   [class.wait-connector]="node.type === 'wait'">
+              </div>
+            }
+
+            <!-- Node content -->
+            <div class="node-content">
+              <div class="node-header">
+                <div class="node-icon"
+                     [class.trigger-icon]="node.type === 'trigger'"
+                     [class.condition-icon]="node.type === 'condition'"
+                     [class.action-icon]="node.type === 'action'"
+                     [class.branch-icon]="node.type === 'branch'"
+                     [class.wait-icon]="node.type === 'wait'">
+                  <mat-icon>{{ getNodeIcon(node) }}</mat-icon>
                 </div>
+                <div class="node-info">
+                  <span class="node-label">{{ node.label || getDefaultLabel(node.type) }}</span>
+                  @if (getNodeBadge(node)) {
+                    <span class="node-badge">{{ getNodeBadge(node) }}</span>
+                  }
+                </div>
+              </div>
+            </div>
 
-                <div fNodeOutput
-                     [fOutputId]="node.id + '_output'"
-                     fOutputConnectableSide="bottom"
-                     class="connector connector-output trigger-connector">
+            <!-- Branch outputs (yes/no) -->
+            @if (node.type === 'branch') {
+              <div class="branch-outputs">
+                <div class="branch-output-wrapper">
+                  <div fNodeOutput
+                       [fOutputId]="node.id + '_output_yes'"
+                       fOutputConnectableSide="bottom"
+                       class="connector connector-output-yes">
+                  </div>
+                  <span class="branch-label yes-label">Yes</span>
+                </div>
+                <div class="branch-output-wrapper">
+                  <div fNodeOutput
+                       [fOutputId]="node.id + '_output_no'"
+                       fOutputConnectableSide="bottom"
+                       class="connector connector-output-no">
+                  </div>
+                  <span class="branch-label no-label">No</span>
                 </div>
               </div>
             }
-            @case ('condition') {
-              <div fNode
-                   [fNodeId]="node.id"
-                   [fNodePosition]="node.position"
-                   class="workflow-node condition-node"
-                   [class.selected]="selectedNodeId() === node.id"
-                   (click)="nodeSelected.emit(node.id)"
-                   (dblclick)="nodeDblClicked.emit(node.id)">
 
-                <div fNodeInput
-                     [fInputId]="node.id + '_input'"
-                     fInputConnectableSide="top"
-                     class="connector connector-input condition-connector">
-                </div>
-
-                <div class="node-content">
-                  <div class="node-header">
-                    <div class="node-icon condition-icon">
-                      <mat-icon>filter_list</mat-icon>
-                    </div>
-                    <div class="node-info">
-                      <span class="node-label">{{ node.label || 'Condition' }}</span>
-                      @if (getConditionSummary(node)) {
-                        <span class="node-badge">{{ getConditionSummary(node) }}</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div fNodeOutput
-                     [fOutputId]="node.id + '_output'"
-                     fOutputConnectableSide="bottom"
-                     class="connector connector-output condition-connector">
-                </div>
+            <!-- Standard output connector (all types except branch) -->
+            @if (node.type !== 'branch') {
+              <div fNodeOutput
+                   [fOutputId]="node.id + '_output'"
+                   fOutputConnectableSide="bottom"
+                   class="connector connector-output"
+                   [class.trigger-connector]="node.type === 'trigger'"
+                   [class.condition-connector]="node.type === 'condition'"
+                   [class.action-connector]="node.type === 'action'"
+                   [class.wait-connector]="node.type === 'wait'">
               </div>
             }
-            @case ('action') {
-              <div fNode
-                   [fNodeId]="node.id"
-                   [fNodePosition]="node.position"
-                   class="workflow-node action-node"
-                   [class.selected]="selectedNodeId() === node.id"
-                   (click)="nodeSelected.emit(node.id)"
-                   (dblclick)="nodeDblClicked.emit(node.id)">
-
-                <div fNodeInput
-                     [fInputId]="node.id + '_input'"
-                     fInputConnectableSide="top"
-                     class="connector connector-input action-connector">
-                </div>
-
-                <div class="node-content">
-                  <div class="node-header">
-                    <div class="node-icon action-icon">
-                      <mat-icon>{{ getActionIcon(node) }}</mat-icon>
-                    </div>
-                    <div class="node-info">
-                      <span class="node-label">{{ node.label || 'Action' }}</span>
-                      @if (getActionBadge(node)) {
-                        <span class="node-badge">{{ getActionBadge(node) }}</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div fNodeOutput
-                     [fOutputId]="node.id + '_output'"
-                     fOutputConnectableSide="bottom"
-                     class="connector connector-output action-connector">
-                </div>
-              </div>
-            }
-            @case ('branch') {
-              <div fNode
-                   [fNodeId]="node.id"
-                   [fNodePosition]="node.position"
-                   class="workflow-node branch-node"
-                   [class.selected]="selectedNodeId() === node.id"
-                   (click)="nodeSelected.emit(node.id)"
-                   (dblclick)="nodeDblClicked.emit(node.id)">
-
-                <div fNodeInput
-                     [fInputId]="node.id + '_input'"
-                     fInputConnectableSide="top"
-                     class="connector connector-input branch-connector">
-                </div>
-
-                <div class="node-content">
-                  <div class="node-header">
-                    <div class="node-icon branch-icon">
-                      <mat-icon>call_split</mat-icon>
-                    </div>
-                    <div class="node-info">
-                      <span class="node-label">{{ node.label || 'Branch' }}</span>
-                      @if (getConditionSummary(node)) {
-                        <span class="node-badge">{{ getConditionSummary(node) }}</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div class="branch-outputs">
-                  <div class="branch-output-wrapper">
-                    <div fNodeOutput
-                         [fOutputId]="node.id + '_output_yes'"
-                         fOutputConnectableSide="bottom"
-                         class="connector connector-output-yes">
-                    </div>
-                    <span class="branch-label yes-label">Yes</span>
-                  </div>
-                  <div class="branch-output-wrapper">
-                    <div fNodeOutput
-                         [fOutputId]="node.id + '_output_no'"
-                         fOutputConnectableSide="bottom"
-                         class="connector connector-output-no">
-                    </div>
-                    <span class="branch-label no-label">No</span>
-                  </div>
-                </div>
-              </div>
-            }
-            @case ('wait') {
-              <div fNode
-                   [fNodeId]="node.id"
-                   [fNodePosition]="node.position"
-                   class="workflow-node wait-node"
-                   [class.selected]="selectedNodeId() === node.id"
-                   (click)="nodeSelected.emit(node.id)"
-                   (dblclick)="nodeDblClicked.emit(node.id)">
-
-                <div fNodeInput
-                     [fInputId]="node.id + '_input'"
-                     fInputConnectableSide="top"
-                     class="connector connector-input wait-connector">
-                </div>
-
-                <div class="node-content">
-                  <div class="node-header">
-                    <div class="node-icon wait-icon">
-                      <mat-icon>hourglass_empty</mat-icon>
-                    </div>
-                    <div class="node-info">
-                      <span class="node-label">{{ node.label || 'Wait' }}</span>
-                      @if (getWaitSummary(node)) {
-                        <span class="node-badge">{{ getWaitSummary(node) }}</span>
-                      }
-                    </div>
-                  </div>
-                </div>
-
-                <div fNodeOutput
-                     [fOutputId]="node.id + '_output'"
-                     fOutputConnectableSide="bottom"
-                     class="connector connector-output wait-connector">
-                </div>
-              </div>
-            }
-          }
+          </div>
         }
 
         @for (conn of connections(); track conn.id) {
@@ -646,9 +541,42 @@ export class WorkflowCanvasComponent {
     }
   }
 
-  // Helper methods for node badge/icon computation
+  // Helper methods for unified node template
 
-  getTriggerBadge(node: WorkflowNode): string {
+  getNodeIcon(node: WorkflowNode): string {
+    switch (node.type) {
+      case 'trigger': return 'bolt';
+      case 'condition': return 'filter_list';
+      case 'action': return this.getActionIcon(node);
+      case 'branch': return 'call_split';
+      case 'wait': return 'hourglass_empty';
+      default: return 'circle';
+    }
+  }
+
+  getDefaultLabel(type: string): string {
+    switch (type) {
+      case 'trigger': return 'Trigger';
+      case 'condition': return 'Condition';
+      case 'action': return 'Action';
+      case 'branch': return 'Branch';
+      case 'wait': return 'Wait';
+      default: return type;
+    }
+  }
+
+  getNodeBadge(node: WorkflowNode): string {
+    switch (node.type) {
+      case 'trigger': return this.getTriggerBadge(node);
+      case 'condition':
+      case 'branch': return this.getConditionSummary(node);
+      case 'action': return this.getActionBadge(node);
+      case 'wait': return this.getWaitSummary(node);
+      default: return '';
+    }
+  }
+
+  private getTriggerBadge(node: WorkflowNode): string {
     const config = node.config;
     if (!config) return '';
     switch (config['triggerType']) {
@@ -661,7 +589,7 @@ export class WorkflowCanvasComponent {
     }
   }
 
-  getActionIcon(node: WorkflowNode): string {
+  private getActionIcon(node: WorkflowNode): string {
     const actionType = node.config?.['actionType'];
     switch (actionType) {
       case 'updateField': return 'edit';
@@ -674,7 +602,7 @@ export class WorkflowCanvasComponent {
     }
   }
 
-  getActionBadge(node: WorkflowNode): string {
+  private getActionBadge(node: WorkflowNode): string {
     const actionType = node.config?.['actionType'];
     switch (actionType) {
       case 'updateField': return 'Update Field';
@@ -687,7 +615,7 @@ export class WorkflowCanvasComponent {
     }
   }
 
-  getConditionSummary(node: WorkflowNode): string {
+  private getConditionSummary(node: WorkflowNode): string {
     const config = node.config;
     if (!config?.['conditions']?.length) return '';
     const first = config['conditions'][0];
@@ -698,7 +626,7 @@ export class WorkflowCanvasComponent {
     return '';
   }
 
-  getWaitSummary(node: WorkflowNode): string {
+  private getWaitSummary(node: WorkflowNode): string {
     const config = node.config;
     if (!config?.['duration'] || !config?.['unit']) return '';
     const duration = config['duration'];
