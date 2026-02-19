@@ -1,4 +1,5 @@
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Persistence.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -24,6 +25,9 @@ public static class CustomFieldServiceExtensions
 
         // Validator
         services.AddScoped<CustomFieldValidator>();
+
+        // Formula field services (evaluation, validation, field registry)
+        services.AddFormulaFieldServices();
 
         return services;
     }
