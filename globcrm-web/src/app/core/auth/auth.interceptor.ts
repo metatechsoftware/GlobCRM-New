@@ -3,6 +3,7 @@ import { inject } from '@angular/core';
 import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthStore } from './auth.store';
 import { AuthService } from './auth.service';
+import { PermissionStore } from '../permissions/permission.store';
 
 /**
  * Auth endpoints that should NOT receive a Bearer token.
@@ -44,6 +45,7 @@ export const authInterceptor: HttpInterceptorFn = (
 ) => {
   const authStore = inject(AuthStore);
   const authService = inject(AuthService);
+  const permissionStore = inject(PermissionStore);
 
   // Do not attach token to auth-related endpoints
   if (isAuthEndpoint(req.url)) {
@@ -72,6 +74,11 @@ export const authInterceptor: HttpInterceptorFn = (
             } else {
               sessionStorage.setItem('globcrm_refresh_token', response.refreshToken);
             }
+
+            // Reload permissions in the background (fire-and-forget) so that
+            // any new entity types / permission changes are picked up without
+            // requiring a full re-login.
+            permissionStore.loadPermissions();
 
             // Retry the original request with the new access token
             const retryReq = addAuthHeaders(req, response.accessToken, tenantId);
