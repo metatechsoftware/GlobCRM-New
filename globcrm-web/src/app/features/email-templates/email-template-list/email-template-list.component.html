@@ -1,0 +1,139 @@
+<div class="template-list-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>Email Templates</h1>
+    </div>
+    <div class="header-right">
+      <mat-form-field appearance="outline" class="search-field">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          placeholder="Search templates..."
+          [value]="searchValue()"
+          (input)="onSearchChange($any($event.target).value)"
+        />
+      </mat-form-field>
+      <button
+        mat-raised-button
+        color="primary"
+        *appHasPermission="'EmailTemplate:Create'"
+        (click)="createTemplate()"
+      >
+        <mat-icon>add</mat-icon>
+        Create Template
+      </button>
+    </div>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="category-filter">
+    <mat-chip-set>
+      <mat-chip
+        [highlighted]="selectedCategoryId() === null"
+        (click)="onCategorySelect(null)"
+      >
+        All
+      </mat-chip>
+      @for (category of store.categories(); track category.id) {
+        <mat-chip
+          [highlighted]="selectedCategoryId() === category.id"
+          (click)="onCategorySelect(category.id)"
+        >
+          {{ category.name }}
+        </mat-chip>
+      }
+    </mat-chip-set>
+  </div>
+
+  <!-- Loading State -->
+  @if (store.loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Loading templates...</p>
+    </div>
+  }
+
+  <!-- Template Grid -->
+  @if (!store.loading()) {
+    @if (store.filteredTemplates().length > 0) {
+      <div class="template-grid">
+        @for (template of store.filteredTemplates(); track template.id) {
+          <mat-card class="template-card">
+            <!-- Thumbnail -->
+            <div class="thumbnail-container" (click)="editTemplate(template)">
+              <iframe
+                class="thumbnail-iframe"
+                [srcdoc]="template.htmlBody || '<div style=&quot;display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-family:sans-serif;&quot;><p>No preview available</p></div>'"
+                sandbox
+                scrolling="no"
+                tabindex="-1"
+              ></iframe>
+            </div>
+
+            <!-- Info Section -->
+            <mat-card-content class="template-info">
+              <h3 class="template-name">{{ template.name }}</h3>
+              @if (template.subject) {
+                <p class="template-subject">{{ template.subject }}</p>
+              }
+              <div class="template-meta">
+                @if (template.categoryName) {
+                  <span class="category-chip">{{ template.categoryName }}</span>
+                }
+                <span class="share-badge" [class.shared]="template.isShared">
+                  {{ template.isShared ? 'Shared' : 'Personal' }}
+                </span>
+              </div>
+            </mat-card-content>
+
+            <!-- Actions -->
+            <mat-card-actions class="template-actions">
+              <button
+                mat-icon-button
+                *appHasPermission="'EmailTemplate:Edit'"
+                matTooltip="Edit"
+                (click)="editTemplate(template)"
+              >
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                *appHasPermission="'EmailTemplate:Create'"
+                matTooltip="Clone"
+                (click)="cloneTemplate(template)"
+              >
+                <mat-icon>content_copy</mat-icon>
+              </button>
+              <button
+                mat-icon-button
+                *appHasPermission="'EmailTemplate:Delete'"
+                matTooltip="Delete"
+                color="warn"
+                (click)="deleteTemplate(template)"
+              >
+                <mat-icon>delete</mat-icon>
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <mat-icon class="empty-icon">mail_outline</mat-icon>
+        <h2>No email templates yet</h2>
+        <p>Create your first email template to start sending personalized emails.</p>
+        <button
+          mat-raised-button
+          color="primary"
+          *appHasPermission="'EmailTemplate:Create'"
+          (click)="createTemplate()"
+        >
+          <mat-icon>add</mat-icon>
+          Create your first template
+        </button>
+      </div>
+    }
+  }
+</div>
