@@ -108,16 +108,19 @@ public class DomainEventInterceptor : SaveChangesInterceptor
                 entityId = guidId;
             }
 
-            // For Modified entities, capture changed properties
+            // For Modified entities, capture changed properties and their original values
             Dictionary<string, object?>? changedProperties = null;
+            Dictionary<string, object?>? oldPropertyValues = null;
             if (entry.State == EntityState.Modified)
             {
                 changedProperties = new Dictionary<string, object?>();
+                oldPropertyValues = new Dictionary<string, object?>();
                 foreach (var prop in entry.Properties)
                 {
                     if (prop.IsModified)
                     {
                         changedProperties[prop.Metadata.Name] = prop.CurrentValue;
+                        oldPropertyValues[prop.Metadata.Name] = prop.OriginalValue;
                     }
                 }
             }
@@ -127,7 +130,8 @@ public class DomainEventInterceptor : SaveChangesInterceptor
                 EventType: eventType,
                 Entity: entry.Entity,
                 EntityId: entityId,
-                ChangedProperties: changedProperties));
+                ChangedProperties: changedProperties,
+                OldPropertyValues: oldPropertyValues));
         }
 
         _pendingEvents.Value = events;

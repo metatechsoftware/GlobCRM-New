@@ -9,12 +9,14 @@ namespace GlobCRM.Domain.Interfaces;
 /// <param name="Entity">Reference to the entity instance.</param>
 /// <param name="EntityId">The entity's Id property value, if available.</param>
 /// <param name="ChangedProperties">For Updated events: dictionary of property name to new value. Null for Created/Deleted.</param>
+/// <param name="OldPropertyValues">For Updated events: dictionary of property name to original value before the change. Null for Created/Deleted. Used by webhooks to include old/new value pairs in payloads.</param>
 public record DomainEvent(
     string EntityName,
     string EventType,
     object Entity,
     Guid? EntityId,
-    Dictionary<string, object?>? ChangedProperties);
+    Dictionary<string, object?>? ChangedProperties,
+    Dictionary<string, object?>? OldPropertyValues = null);
 
 /// <summary>
 /// Handler for domain events. Implementations are resolved from DI and invoked
