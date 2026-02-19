@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 21 of 21 (Integration Polish & Tech Debt Closure)
-Plan: 1 of 2 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 21-01 (Backend Integration Gap Closure - DI fix, duplicate removal, DuplicateMatch refactor)
+Plan: 2 of 2 complete
+Status: Complete
+Last activity: 2026-02-19 — Completed 21-02 (Workflow Action Picker Dropdowns - mat-select pickers, stale reference detection, usage endpoints)
 
-Progress: [████████████████████████████████████████████████] ~98% (v1.0: 96/96 plans, v1.1: 42/43 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 1/2)
+Progress: [████████████████████████████████████████████████] 100% (v1.0: 96/96 plans, v1.1: 43/43 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 2/2)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 42
-- v1.1 plans total: 43 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 1/2)
+- v1.1 plans completed: 43
+- v1.1 plans total: 43 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 8/8, Phase 21: 2/2)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -63,6 +63,7 @@ Progress: [███████████████████████
 | 20-07 | Gallery API Fix (JSONB projection + ChartType casing) | 2min | 1 | 2 |
 | 20-08 | UAT Gap Closure (error display + mat-select trigger + filter delete) | 3min | 2 | 8 |
 | 21-01 | Backend Integration Gap Closure (DI fix + duplicate removal + DuplicateMatch refactor) | 2min | 2 | 5 |
+| 21-02 | Workflow Action Picker Dropdowns (mat-select pickers + stale ref detection + usage endpoints) | 6min | 2 | 8 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -227,6 +228,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-08] Recursive filter (removeRequest) binding on child instance -- parent onChildGroupRemove splices child from groups array
 - [21-01] Removed unused DomainEvents and EmailTemplates using directives from Program.cs after removing duplicate registration calls
 - [21-01] Company DuplicateMatch passes null for Email and Website as SecondaryField -- companies have no per-match email, it comes from enrichment query
+- [21-02] Raw SQL CAST(definition AS text) ILIKE for JSONB text search in usage endpoints -- EF Core owned ToJson() types don't support LINQ text search
+- [21-02] forkJoin for parallel template/sequence list loading with stale detection on completion
+- [21-02] Styled spans (not MatChip) for sequence status badges -- simpler, no extra module import
+- [21-02] Template entity type highlighting skipped -- EmailTemplateListItem has no entityType field (documented gap)
 
 ### Pending Todos
 
@@ -242,6 +247,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 21-01-PLAN.md
-Resume file: .planning/phases/21-integration-polish-tech-debt/21-01-SUMMARY.md
-Next step: Execute Plan 02 — /gsd:execute-phase 21
+Stopped at: Completed 21-02-PLAN.md (Phase 21 complete)
+Resume file: .planning/phases/21-integration-polish-tech-debt/21-02-SUMMARY.md
+Next step: All v1.1 phases complete. Project milestone v1.1 Automation & Intelligence delivered.
