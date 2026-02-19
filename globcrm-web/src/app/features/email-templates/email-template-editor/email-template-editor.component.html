@@ -1,0 +1,103 @@
+<div class="editor-page">
+  <!-- Top Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-left">
+      <button mat-icon-button (click)="goBack()" matTooltip="Back to templates">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2 class="page-title">{{ pageTitle() }}</h2>
+    </div>
+
+    <div class="toolbar-center">
+      <mat-form-field appearance="outline" class="name-field">
+        <mat-label>Template Name</mat-label>
+        <input
+          matInput
+          [value]="templateName()"
+          (input)="templateName.set($any($event.target).value)"
+          placeholder="Enter template name"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="subject-field">
+        <mat-label>Subject Line</mat-label>
+        <input
+          matInput
+          [value]="templateSubject()"
+          (input)="templateSubject.set($any($event.target).value)"
+          placeholder="Email subject (supports merge fields)"
+        />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="category-field">
+        <mat-label>Category</mat-label>
+        <mat-select
+          [value]="selectedCategoryId()"
+          (selectionChange)="selectedCategoryId.set($event.value)"
+        >
+          <mat-option [value]="null">None</mat-option>
+          @for (category of store.categories(); track category.id) {
+            <mat-option [value]="category.id">{{ category.name }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="toolbar-right">
+      <mat-slide-toggle
+        [checked]="isShared()"
+        (change)="isShared.set($event.checked)"
+        matTooltip="Share with team"
+      >
+        Shared
+      </mat-slide-toggle>
+
+      <button
+        mat-stroked-button
+        (click)="toggleMergePanel()"
+        matTooltip="Browse merge fields"
+      >
+        <mat-icon>data_object</mat-icon>
+        Merge Fields
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        [disabled]="saving() || !templateName()"
+        (click)="save()"
+      >
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        Save
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="editor-content">
+    <!-- Unlayer Editor -->
+    <div class="editor-container" [class.panel-open]="showMergePanel()">
+      <email-editor
+        #emailEditor
+        [options]="editorOptions()"
+        (loaded)="onEditorLoaded()"
+        (ready)="onEditorReady()"
+        minHeight="calc(100vh - 140px)"
+      ></email-editor>
+    </div>
+
+    <!-- Merge Field Side Panel -->
+    @if (showMergePanel()) {
+      <div class="merge-panel-container">
+        <app-merge-field-panel
+          [mergeFields]="store.mergeFields()"
+          (closePanel)="showMergePanel.set(false)"
+        />
+      </div>
+    }
+  </div>
+</div>

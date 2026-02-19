@@ -1,0 +1,63 @@
+<div class="merge-panel">
+  <!-- Panel Header -->
+  <div class="panel-header">
+    <h3>Merge Fields</h3>
+    <button mat-icon-button (click)="closePanel.emit()" matTooltip="Close panel">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Info Hint -->
+  <div class="panel-hint">
+    <mat-icon class="hint-icon">info_outline</mat-icon>
+    <span>
+      Click a field to copy. You can also use Unlayer's toolbar dropdown or type
+      <code>{{ '{{' }}</code> in the editor for autocomplete.
+    </span>
+  </div>
+
+  <!-- Entity Groups -->
+  <mat-accordion multi>
+    @for (group of entityGroups; track group) {
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <span
+              class="entity-dot"
+              [style.background-color]="getEntityConfig(group).text"
+            ></span>
+            {{ getEntityConfig(group).label }}
+            <span class="field-count">{{ getFields(group).length }}</span>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <div class="field-list">
+          @for (field of getFields(group); track field.key) {
+            <button
+              class="field-chip"
+              [style.background-color]="getEntityConfig(group).bg"
+              [style.color]="getEntityConfig(group).text"
+              [style.border-color]="getEntityConfig(group).text + '33'"
+              (click)="copyMergeTag(field)"
+              [matTooltip]="'{{' + field.key + '}}'"
+            >
+              <span class="field-label">{{ field.label }}</span>
+              @if (field.isCustomField) {
+                <span class="custom-badge">Custom</span>
+              }
+              <mat-icon class="copy-icon">content_copy</mat-icon>
+            </button>
+          }
+        </div>
+      </mat-expansion-panel>
+    }
+  </mat-accordion>
+
+  <!-- Fallback Hint -->
+  <div class="fallback-hint">
+    <mat-icon class="hint-icon">lightbulb_outline</mat-icon>
+    <span>
+      Set fallback values using: <code>{{ '{{' }} field | default: 'fallback' {{ '}}' }}</code>
+    </span>
+  </div>
+</div>

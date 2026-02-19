@@ -1,0 +1,142 @@
+.editor-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+// ─── Toolbar ──────────────────────────────────────────────────────────────
+
+.editor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  flex-wrap: wrap;
+  min-height: 56px;
+  z-index: 10;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-shrink: 0;
+}
+
+.page-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.toolbar-center {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.name-field {
+  width: 200px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.subject-field {
+  width: 240px;
+  flex-shrink: 1;
+  min-width: 120px;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.category-field {
+  width: 160px;
+  flex-shrink: 0;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-shrink: 0;
+}
+
+// ─── Editor Content ───────────────────────────────────────────────────────
+
+.editor-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.editor-container {
+  flex: 1;
+  overflow: hidden;
+  transition: flex var(--duration-normal) var(--ease-default);
+
+  &.panel-open {
+    flex: 1;
+  }
+}
+
+// ─── Merge Field Panel ────────────────────────────────────────────────────
+
+.merge-panel-container {
+  width: 320px;
+  flex-shrink: 0;
+  border-left: 1px solid var(--color-border);
+  background-color: var(--color-surface);
+  overflow-y: auto;
+}
+
+// ─── Responsive ───────────────────────────────────────────────────────────
+
+@media (max-width: 1024px) {
+  .editor-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .toolbar-center {
+    order: 3;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .name-field,
+  .subject-field,
+  .category-field {
+    width: 100%;
+    min-width: unset;
+  }
+
+  .merge-panel-container {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .merge-panel-container {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: var(--z-overlay);
+    box-shadow: var(--shadow-xl);
+  }
+}
