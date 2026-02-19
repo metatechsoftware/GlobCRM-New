@@ -15,11 +15,6 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { WorkflowNode, WorkflowConnection } from '../workflow.models';
-import { TriggerNodeComponent } from './nodes/trigger-node.component';
-import { ConditionNodeComponent } from './nodes/condition-node.component';
-import { ActionNodeComponent } from './nodes/action-node.component';
-import { BranchNodeComponent } from './nodes/branch-node.component';
-import { WaitNodeComponent } from './nodes/wait-node.component';
 
 @Component({
   selector: 'app-workflow-canvas',
@@ -28,11 +23,6 @@ import { WaitNodeComponent } from './nodes/wait-node.component';
     FFlowModule,
     MatIconModule,
     MatButtonModule,
-    TriggerNodeComponent,
-    ConditionNodeComponent,
-    ActionNodeComponent,
-    BranchNodeComponent,
-    WaitNodeComponent,
   ],
   template: `
     @if (nodes().length === 0) {
@@ -54,39 +44,191 @@ import { WaitNodeComponent } from './nodes/wait-node.component';
         @for (node of nodes(); track node.id) {
           @switch (node.type) {
             @case ('trigger') {
-              <app-trigger-node
-                [node]="node"
-                [isSelected]="selectedNodeId() === node.id"
-                (selected)="nodeSelected.emit($event)"
-                (dblclick)="nodeDblClicked.emit(node.id)" />
+              <div fNode
+                   [fNodeId]="node.id"
+                   [fNodePosition]="node.position"
+                   class="workflow-node trigger-node"
+                   [class.selected]="selectedNodeId() === node.id"
+                   (click)="nodeSelected.emit(node.id)"
+                   (dblclick)="nodeDblClicked.emit(node.id)">
+
+                <div class="node-content">
+                  <div class="node-header">
+                    <div class="node-icon trigger-icon">
+                      <mat-icon>bolt</mat-icon>
+                    </div>
+                    <div class="node-info">
+                      <span class="node-label">{{ node.label || 'Trigger' }}</span>
+                      @if (getTriggerBadge(node)) {
+                        <span class="node-badge">{{ getTriggerBadge(node) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div fNodeOutput
+                     [fOutputId]="node.id + '_output'"
+                     fOutputConnectableSide="bottom"
+                     class="connector connector-output trigger-connector">
+                </div>
+              </div>
             }
             @case ('condition') {
-              <app-condition-node
-                [node]="node"
-                [isSelected]="selectedNodeId() === node.id"
-                (selected)="nodeSelected.emit($event)"
-                (dblclick)="nodeDblClicked.emit(node.id)" />
+              <div fNode
+                   [fNodeId]="node.id"
+                   [fNodePosition]="node.position"
+                   class="workflow-node condition-node"
+                   [class.selected]="selectedNodeId() === node.id"
+                   (click)="nodeSelected.emit(node.id)"
+                   (dblclick)="nodeDblClicked.emit(node.id)">
+
+                <div fNodeInput
+                     [fInputId]="node.id + '_input'"
+                     fInputConnectableSide="top"
+                     class="connector connector-input condition-connector">
+                </div>
+
+                <div class="node-content">
+                  <div class="node-header">
+                    <div class="node-icon condition-icon">
+                      <mat-icon>filter_list</mat-icon>
+                    </div>
+                    <div class="node-info">
+                      <span class="node-label">{{ node.label || 'Condition' }}</span>
+                      @if (getConditionSummary(node)) {
+                        <span class="node-badge">{{ getConditionSummary(node) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div fNodeOutput
+                     [fOutputId]="node.id + '_output'"
+                     fOutputConnectableSide="bottom"
+                     class="connector connector-output condition-connector">
+                </div>
+              </div>
             }
             @case ('action') {
-              <app-action-node
-                [node]="node"
-                [isSelected]="selectedNodeId() === node.id"
-                (selected)="nodeSelected.emit($event)"
-                (dblclick)="nodeDblClicked.emit(node.id)" />
+              <div fNode
+                   [fNodeId]="node.id"
+                   [fNodePosition]="node.position"
+                   class="workflow-node action-node"
+                   [class.selected]="selectedNodeId() === node.id"
+                   (click)="nodeSelected.emit(node.id)"
+                   (dblclick)="nodeDblClicked.emit(node.id)">
+
+                <div fNodeInput
+                     [fInputId]="node.id + '_input'"
+                     fInputConnectableSide="top"
+                     class="connector connector-input action-connector">
+                </div>
+
+                <div class="node-content">
+                  <div class="node-header">
+                    <div class="node-icon action-icon">
+                      <mat-icon>{{ getActionIcon(node) }}</mat-icon>
+                    </div>
+                    <div class="node-info">
+                      <span class="node-label">{{ node.label || 'Action' }}</span>
+                      @if (getActionBadge(node)) {
+                        <span class="node-badge">{{ getActionBadge(node) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div fNodeOutput
+                     [fOutputId]="node.id + '_output'"
+                     fOutputConnectableSide="bottom"
+                     class="connector connector-output action-connector">
+                </div>
+              </div>
             }
             @case ('branch') {
-              <app-branch-node
-                [node]="node"
-                [isSelected]="selectedNodeId() === node.id"
-                (selected)="nodeSelected.emit($event)"
-                (dblclick)="nodeDblClicked.emit(node.id)" />
+              <div fNode
+                   [fNodeId]="node.id"
+                   [fNodePosition]="node.position"
+                   class="workflow-node branch-node"
+                   [class.selected]="selectedNodeId() === node.id"
+                   (click)="nodeSelected.emit(node.id)"
+                   (dblclick)="nodeDblClicked.emit(node.id)">
+
+                <div fNodeInput
+                     [fInputId]="node.id + '_input'"
+                     fInputConnectableSide="top"
+                     class="connector connector-input branch-connector">
+                </div>
+
+                <div class="node-content">
+                  <div class="node-header">
+                    <div class="node-icon branch-icon">
+                      <mat-icon>call_split</mat-icon>
+                    </div>
+                    <div class="node-info">
+                      <span class="node-label">{{ node.label || 'Branch' }}</span>
+                      @if (getConditionSummary(node)) {
+                        <span class="node-badge">{{ getConditionSummary(node) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div class="branch-outputs">
+                  <div class="branch-output-wrapper">
+                    <div fNodeOutput
+                         [fOutputId]="node.id + '_output_yes'"
+                         fOutputConnectableSide="bottom"
+                         class="connector connector-output-yes">
+                    </div>
+                    <span class="branch-label yes-label">Yes</span>
+                  </div>
+                  <div class="branch-output-wrapper">
+                    <div fNodeOutput
+                         [fOutputId]="node.id + '_output_no'"
+                         fOutputConnectableSide="bottom"
+                         class="connector connector-output-no">
+                    </div>
+                    <span class="branch-label no-label">No</span>
+                  </div>
+                </div>
+              </div>
             }
             @case ('wait') {
-              <app-wait-node
-                [node]="node"
-                [isSelected]="selectedNodeId() === node.id"
-                (selected)="nodeSelected.emit($event)"
-                (dblclick)="nodeDblClicked.emit(node.id)" />
+              <div fNode
+                   [fNodeId]="node.id"
+                   [fNodePosition]="node.position"
+                   class="workflow-node wait-node"
+                   [class.selected]="selectedNodeId() === node.id"
+                   (click)="nodeSelected.emit(node.id)"
+                   (dblclick)="nodeDblClicked.emit(node.id)">
+
+                <div fNodeInput
+                     [fInputId]="node.id + '_input'"
+                     fInputConnectableSide="top"
+                     class="connector connector-input wait-connector">
+                </div>
+
+                <div class="node-content">
+                  <div class="node-header">
+                    <div class="node-icon wait-icon">
+                      <mat-icon>hourglass_empty</mat-icon>
+                    </div>
+                    <div class="node-info">
+                      <span class="node-label">{{ node.label || 'Wait' }}</span>
+                      @if (getWaitSummary(node)) {
+                        <span class="node-badge">{{ getWaitSummary(node) }}</span>
+                      }
+                    </div>
+                  </div>
+                </div>
+
+                <div fNodeOutput
+                     [fOutputId]="node.id + '_output'"
+                     fOutputConnectableSide="bottom"
+                     class="connector connector-output wait-connector">
+                </div>
+              </div>
             }
           }
         }
@@ -204,6 +346,224 @@ import { WaitNodeComponent } from './nodes/wait-node.component';
         height: 20px;
       }
     }
+
+    /* Shared node styles */
+    .workflow-node {
+      min-width: 220px;
+      padding: 12px;
+      border-radius: 8px;
+      background: var(--color-surface);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: border-color var(--duration-fast) var(--ease-default),
+                  box-shadow var(--duration-fast) var(--ease-default);
+      position: relative;
+
+      &:hover {
+        box-shadow: var(--shadow-md);
+      }
+
+      &.selected {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+      }
+    }
+
+    .node-content {
+      pointer-events: none;
+    }
+
+    .node-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .node-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 6px;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+    }
+
+    .node-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .node-label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .node-badge {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .connector {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--color-surface);
+      position: absolute;
+      z-index: 1;
+    }
+
+    .connector-input {
+      top: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .connector-output {
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Trigger node - Blue */
+    .trigger-node {
+      border-left: 4px solid #3B82F6;
+    }
+
+    .trigger-icon {
+      background: #EFF6FF;
+      color: #3B82F6;
+    }
+
+    .trigger-connector {
+      background: #3B82F6;
+    }
+
+    /* Condition node - Amber */
+    .condition-node {
+      border-left: 4px solid #F59E0B;
+    }
+
+    .condition-icon {
+      background: #FFFBEB;
+      color: #F59E0B;
+    }
+
+    .condition-connector {
+      background: #F59E0B;
+    }
+
+    /* Action node - Green */
+    .action-node {
+      border-left: 4px solid #10B981;
+    }
+
+    .action-icon {
+      background: #ECFDF5;
+      color: #10B981;
+    }
+
+    .action-connector {
+      background: #10B981;
+    }
+
+    /* Branch node - Purple */
+    .branch-node {
+      border-left: 4px solid #8B5CF6;
+    }
+
+    .branch-icon {
+      background: #F5F3FF;
+      color: #8B5CF6;
+    }
+
+    .branch-connector {
+      background: #8B5CF6;
+    }
+
+    .branch-outputs {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      padding: 0 12px;
+    }
+
+    .branch-output-wrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .branch-label {
+      font-size: 10px;
+      font-weight: var(--font-medium);
+      margin-top: 2px;
+    }
+
+    .yes-label {
+      color: var(--color-success-text);
+    }
+
+    .no-label {
+      color: var(--color-danger-text);
+    }
+
+    .connector-output-yes {
+      background: var(--color-success);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--color-surface);
+      z-index: 1;
+    }
+
+    .connector-output-no {
+      background: var(--color-danger);
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--color-surface);
+      z-index: 1;
+    }
+
+    /* Wait node - Gray */
+    .wait-node {
+      border-left: 4px solid #6B7280;
+    }
+
+    .wait-icon {
+      background: #F3F4F6;
+      color: #6B7280;
+    }
+
+    .wait-connector {
+      background: #6B7280;
+    }
+
+    /* Dark mode overrides */
+    :host-context([data-theme="dark"]),
+    :host-context(.dark) {
+      .trigger-icon { background: rgba(59, 130, 246, 0.15); }
+      .condition-icon { background: rgba(245, 158, 11, 0.15); }
+      .action-icon { background: rgba(16, 185, 129, 0.15); }
+      .branch-icon { background: rgba(139, 92, 246, 0.15); }
+      .wait-icon { background: rgba(107, 114, 128, 0.15); }
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -284,5 +644,65 @@ export class WorkflowCanvasComponent {
     if (canvas) {
       canvas.fitToScreen({ x: 40, y: 40 }, true);
     }
+  }
+
+  // Helper methods for node badge/icon computation
+
+  getTriggerBadge(node: WorkflowNode): string {
+    const config = node.config;
+    if (!config) return '';
+    switch (config['triggerType']) {
+      case 'recordCreated': return 'Record Created';
+      case 'recordUpdated': return 'Record Updated';
+      case 'recordDeleted': return 'Record Deleted';
+      case 'fieldChanged': return 'Field Changed';
+      case 'dateBased': return 'Date Based';
+      default: return '';
+    }
+  }
+
+  getActionIcon(node: WorkflowNode): string {
+    const actionType = node.config?.['actionType'];
+    switch (actionType) {
+      case 'updateField': return 'edit';
+      case 'sendNotification': return 'notifications';
+      case 'createActivity': return 'task_alt';
+      case 'sendEmail': return 'email';
+      case 'fireWebhook': return 'webhook';
+      case 'enrollInSequence': return 'schedule_send';
+      default: return 'play_arrow';
+    }
+  }
+
+  getActionBadge(node: WorkflowNode): string {
+    const actionType = node.config?.['actionType'];
+    switch (actionType) {
+      case 'updateField': return 'Update Field';
+      case 'sendNotification': return 'Send Notification';
+      case 'createActivity': return 'Create Activity';
+      case 'sendEmail': return 'Send Email';
+      case 'fireWebhook': return 'Fire Webhook';
+      case 'enrollInSequence': return 'Enroll in Sequence';
+      default: return '';
+    }
+  }
+
+  getConditionSummary(node: WorkflowNode): string {
+    const config = node.config;
+    if (!config?.['conditions']?.length) return '';
+    const first = config['conditions'][0];
+    if (first?.field && first?.operator) {
+      const val = first.value ? ` ${first.value}` : '';
+      return `${first.field} ${first.operator}${val}`;
+    }
+    return '';
+  }
+
+  getWaitSummary(node: WorkflowNode): string {
+    const config = node.config;
+    if (!config?.['duration'] || !config?.['unit']) return '';
+    const duration = config['duration'];
+    const unit = config['unit'];
+    return `Wait ${duration} ${unit}`;
   }
 }
