@@ -10,23 +10,24 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 14 of 20 (Foundation Infrastructure & Email Templates) -- IN PROGRESS
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: Executing
-Last activity: 2026-02-19 — Completed 14-02 (Email Template API + TenantSeeder)
+Last activity: 2026-02-19 — Completed 14-03 (Email Template Frontend)
 
-Progress: [██████████████████████████████░░░░░░░░░░░] 72% (v1.0: 96/96 plans, v1.1: 6/8+ Phase 13: 4/4, Phase 14: 2/4)
+Progress: [████████████████████████████████░░░░░░░░░░] 74% (v1.0: 96/96 plans, v1.1: 7/8+ Phase 13: 4/4, Phase 14: 3/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 6
-- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 2/4)
+- v1.1 plans completed: 7
+- v1.1 plans total: 8+ (Phase 13: 4/4, Phase 14: 3/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
 | 14-01 | Foundation infra + EmailTemplate data layer | 9min | 2 | 27 |
 | 14-02 | Email Template API + TenantSeeder | 6min | 2 | 8 |
+| 14-03 | Email Template Frontend (Unlayer + list) | 8min | 3 | 16 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -62,6 +63,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [14-02] SendRawEmailAsync added to IEmailService for generic HTML delivery (test sends, future sequences)
 - [14-02] Preview endpoint uses sample placeholder data when no entity specified, real entity data with EntityType+EntityId
 - [14-02] Hangfire dashboard: open in dev, Admin role required in prod
+- [14-03] Unlayer merge tags use color property per entity group for color-coded pill rendering
+- [14-03] Template list uses card grid with iframe srcdoc thumbnails (not DynamicTable)
+- [14-03] Merge field panel is supplementary browser with copy-to-clipboard; primary insertion via Unlayer toolbar
+- [14-03] Editor stores both design JSON (for re-editing) and compiled HTML (for rendering)
 
 ### Pending Todos
 
@@ -77,6 +82,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 14-02-PLAN.md
-Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-02-SUMMARY.md
-Next step: Execute 14-03-PLAN.md (Email Template Frontend)
+Stopped at: Completed 14-03-PLAN.md
+Resume file: .planning/phases/14-foundation-infrastructure-email-templates/14-03-SUMMARY.md
+Next step: Execute 14-04-PLAN.md (Navigation, Polish, Testing)
