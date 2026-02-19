@@ -83,6 +83,14 @@ export const SETTINGS_ROUTES: Routes = [
       ),
   },
   {
+    path: 'duplicate-rules',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./duplicate-rules/duplicate-rules.component').then(
+        (m) => m.DuplicateRulesComponent
+      ),
+  },
+  {
     path: 'email-accounts',
     loadComponent: () =>
       import('./email-accounts/email-account-settings.component').then(

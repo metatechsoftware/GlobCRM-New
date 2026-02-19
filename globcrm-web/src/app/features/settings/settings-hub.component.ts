@@ -186,6 +186,13 @@ export class SettingsHubComponent {
           route: '/settings/pipelines',
           adminOnly: true,
         },
+        {
+          icon: 'compare_arrows',
+          label: 'Duplicate Detection Rules',
+          description: 'Configure matching rules and thresholds',
+          route: '/settings/duplicate-rules',
+          adminOnly: true,
+        },
       ],
     },
     {
