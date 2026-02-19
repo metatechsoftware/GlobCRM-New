@@ -1,586 +1,390 @@
 # Domain Pitfalls
 
-**Domain:** v1.1 Automation & Intelligence features for multi-tenant SaaS CRM
-**Researched:** 2026-02-18
-**Scope:** Workflow automation, email templates/sequences, formula fields, duplicate detection & merge, webhooks, advanced reporting builder -- all integrated with existing triple-layer multi-tenancy (Finbuckle + EF Core filters + PostgreSQL RLS) and RBAC permission system.
+**Domain:** v1.2 Connected Experience -- Entity preview sidebars, summary tabs, personal "My Day" dashboard, feed deep linking
+**Researched:** 2026-02-20
+**Scope:** Adding entity-linked feed with preview sidebars, summary/overview tabs on all major detail pages, personal configurable "My Day" dashboard replacing home page, and org dashboard relocation -- all integrated with existing triple-layer multi-tenancy and granular RBAC permission system.
 
 ---
 
 ## Critical Pitfalls
 
-Mistakes that cause data loss, security breaches, system outages, or architectural rewrites.
+Mistakes that cause security breaches, data leaks, severe performance degradation, or architectural rewrites.
 
 ---
 
-### Pitfall 1: Workflow Automation Infinite Loops
+### Pitfall 1: Preview Sidebar Bypasses RBAC Permission Checks
 
-**What goes wrong:** A workflow triggers an entity update (e.g., "when deal stage changes, update custom field"), which itself triggers another workflow (e.g., "when custom field changes, update deal stage"), creating an infinite recursive loop. The system burns CPU, fills the database with audit records, floods SignalR with notifications, and may crash the process or exhaust database connections. In a multi-tenant system, one tenant's runaway workflow takes down the entire system for all tenants.
+**What goes wrong:** The entity preview sidebar loads a summary of any entity type (Company, Contact, Deal, Lead, Quote, Request) when a user clicks a feed entity link or an entity reference elsewhere. The sidebar calls a generic "preview" endpoint or reuses existing detail endpoints without checking whether the current user has View permission for that entity type with appropriate scope (Own/Team/All). A user with `Contact:View:Own` scope sees a feed item about a Contact they do not own, clicks the link, and the sidebar displays the full Contact preview -- leaking data they should not access.
 
-**Why it happens:** Workflow engines that fire entity-change events without tracking execution context. The system cannot distinguish between a "user-initiated change" and a "workflow-initiated change" because both go through the same save path.
+**Why it happens:** The feed system stores `EntityType` + `EntityId` on FeedItem entities. Feed items are visible to all users in the tenant (no per-item RBAC). The existing `navigateToEntity()` in `feed-list.component.ts` does a simple `router.navigate(['/', entityPath, entityId])`, and the target route has `permissionGuard('Contact', 'View')` which only checks if the user has ANY View scope (not None). But scope-level filtering (Own vs Team vs All) happens inside the controller's query, not at the route level. A preview sidebar that loads entity data via a direct GET-by-ID call would bypass scope filtering because GET-by-ID endpoints typically return the entity if it exists in the tenant, without checking if the requester "owns" it.
 
 **Consequences:**
-- CPU exhaustion and process crash (noisy neighbor for all tenants)
-- Database connection pool exhaustion from rapid-fire queries
-- SignalR broadcast storm: thousands of notifications per second to connected clients
-- Audit log / feed_items table explosion (millions of rows in seconds)
-- `AuditableEntityInterceptor` fires on every save, creating cascading timestamp updates
+- Data leakage within tenant: users see entities outside their permission scope
+- Field-level permissions bypassed: sidebar shows fields that should be Hidden for the user's role
+- Violates the RBAC contract established in v1.0
 
 **Prevention:**
-1. **Execution context tracking:** Every workflow execution must carry a `WorkflowExecutionContext` with a unique `executionId`, `depth` counter, and `triggeredByWorkflowId`. Pass this context through all entity-update code paths.
-2. **Hard depth limit:** Enforce a maximum recursion depth of 5 (configurable per tenant). When depth exceeds the limit, halt execution, log a warning, and mark the workflow as "circuit-broken."
-3. **Per-execution visited set:** Track which (entityId, workflowId) pairs have already been processed in the current execution chain. Skip duplicates.
-4. **Per-tenant execution rate limit:** Cap the number of workflow executions per tenant per minute (e.g., 100/min for standard tier). Use .NET 10's partitioned rate limiting with `PartitionedRateLimiter<string>` keyed by tenant ID.
-5. **Background execution with queue:** Never execute workflows synchronously in the HTTP request pipeline. Use a queue (in-process `Channel<T>` or Hangfire) so the original API call returns immediately and workflow processing happens asynchronously.
-6. **Separate "workflow-initiated" save path:** Create a distinct method like `UpdateEntityFromWorkflow(entity, context)` that explicitly skips workflow trigger evaluation when depth > 0, or that only allows re-triggering with incremented depth.
+1. **Backend scope check on every preview endpoint:** Create a dedicated `GET /api/{entity}/{id}/preview` endpoint (or reuse existing GET-by-ID) that explicitly calls `_permissionService.GetEffectivePermissionAsync(userId, entityType, "View")` and then validates scope: if scope is "Own", verify `CreatedById == userId` or `AssignedToId == userId`; if scope is "Team", verify the owner is in the user's team. Return 403 if scope check fails, not 404 (do not hide the existence of the entity -- the feed already revealed it -- but do deny the data).
+2. **Frontend pre-check before opening sidebar:** Before calling the preview API, check `permissionStore.hasPermission(entityType, 'View')`. If false, show a "You don't have access to this [Entity]" message inline instead of opening the sidebar. This avoids a wasted API call and a jarring 403 error.
+3. **Field-level filtering in preview DTO:** The preview endpoint must consult field permissions and omit or redact fields where `accessLevel === 'hidden'`. Use the same `FieldPermission` system that detail pages use. Do not create a separate field-visibility path for previews.
+4. **Integration test:** For each entity type, test that a user with `View:Own` scope cannot preview an entity owned by another user.
 
 **Detection:**
-- Monitor `workflow_executions` table for chains with depth > 3
-- Alert on workflow execution rate exceeding 50/min for any single tenant
-- Log workflow execution chain as structured data: `{executionId, depth, parentWorkflowId, triggeredBy}`
-- Dashboard widget showing "workflow executions per hour by tenant"
+- Audit log showing 403 responses on preview endpoints (indicates users are attempting to preview entities outside their scope -- expected behavior, but monitor for patterns)
+- Automated test suite covering all entity type + scope combinations
 
-**Feature:** Workflow Automation
-**Phase to address:** First -- must be designed into the workflow engine from the start, not bolted on later.
+**Phase to address:** Entity Preview Sidebar phase -- must be designed into the preview endpoint from the start.
+**Confidence:** HIGH -- direct examination of existing code shows GET-by-ID endpoints do not enforce scope-level checks, and feed items are visible to all tenant users.
 
 ---
 
-### Pitfall 2: Tenant Context Loss in Background Jobs
+### Pitfall 2: N+1 Queries in Summary Tab Aggregation
 
-**What goes wrong:** Workflows, email sequences, webhook deliveries, and report generation all run as background jobs. These jobs execute outside an HTTP request, so Finbuckle's middleware (Layer 1 of triple-layer defense) never runs. The `TenantDbConnectionInterceptor` requires `ITenantProvider.GetTenantId()` to set `app.current_tenant` on the PostgreSQL session, but `ITenantProvider` resolves from HttpContext. Background jobs have no HttpContext, so:
-- EF Core global query filters use a null tenant ID, potentially returning all tenants' data or no data
-- PostgreSQL RLS policies receive a null `app.current_tenant`, blocking all queries (rows invisible)
-- Worse: if a previous request's connection is reused from the pool, the *wrong* tenant's session variable may still be set
+**What goes wrong:** The Summary tab on each detail page (Company, Contact, Deal, etc.) aggregates data from multiple related entities: counts of linked Deals, Activities, Quotes, Requests; recent activity timeline; revenue totals; last interaction date. A naive implementation makes one query per aggregation: `SELECT COUNT(*) FROM deals WHERE company_id = @id`, then `SELECT COUNT(*) FROM activities WHERE linked_entity_id = @id`, then `SELECT SUM(value) FROM deals WHERE company_id = @id AND stage = 'Won'`, and so on. For a Company Summary with 8 metrics, that is 8+ round-trips to the database.
 
-**Why it happens:** The v1.0 architecture correctly resolves tenant from HTTP requests via `TenantProvider` which reads from Finbuckle. Background jobs bypass this entirely. The existing `NotificationDispatcher.DispatchAsync(request, tenantId)` overload shows awareness of this problem for notifications, but a systematic solution is needed for all v1.1 background processing.
+**Why it happens:** Developers naturally build summary sections by calling existing service methods: `dealService.getCountByCompany()`, `activityService.getCountByEntity()`, etc. Each method does its own query. The existing detail page pattern (visible in `company-detail.component.ts`) already lazy-loads tabs independently, so each tab triggers its own API call. A Summary tab that calls 5-8 separate endpoints multiplies this pattern.
 
 **Consequences:**
-- Workflow actions execute against wrong tenant's data (catastrophic data leak)
-- Email sequences send emails to wrong tenant's contacts
-- Webhook payloads contain cross-tenant data
-- Report queries return data from other tenants
-- RLS may silently return zero rows, causing workflows to fail silently with no error
+- 8-12 database round-trips per Summary tab load (vs. 1-2 with a batched approach)
+- Latency spike: sequential round-trips at ~5ms each = 40-60ms just for the queries, plus HTTP overhead if multiple API calls from the frontend
+- Under load, connection pool contention as each summary load holds multiple connections
+- The problem is multiplicative: if 50 users load Company details simultaneously, that is 400-600 concurrent queries just for summary tabs
 
 **Prevention:**
-1. **Explicit tenant context wrapper for all background jobs:** Create a `TenantScope` class that, given a tenant ID:
-   - Creates a new DI scope via `IServiceScopeFactory`
-   - Resolves a `TenantProvider` and sets the tenant ID explicitly
-   - Ensures the `ApplicationDbContext` in that scope gets the correct tenant
-   - The `TenantDbConnectionInterceptor` then sets `app.current_tenant` correctly
-2. **Store tenant ID in every job payload:** All background job records (workflow executions, email sequence steps, webhook deliveries) must persist `TenantId` as a non-nullable column. Never rely on ambient context.
-3. **Validate tenant context before processing:** At the start of every background job handler, assert that `ITenantProvider.GetTenantId()` returns the expected value. Fail loudly if it does not match.
-4. **Connection pool isolation:** Ensure background job connections do not reuse pooled connections from a different tenant without re-setting `app.current_tenant`. The `TenantDbConnectionInterceptor` already handles this on `ConnectionOpened`, but verify with integration tests.
-5. **Integration test:** Write a test that enqueues a background job for Tenant A, then immediately processes a job for Tenant B, and verifies no data leakage occurs.
+1. **Single batched summary endpoint:** Create `GET /api/{entity}/{id}/summary` that runs all aggregation queries in a single database round-trip using a multi-result query or parallel `Task.WhenAll()`. Example: fire all COUNT/SUM queries concurrently with `Task.WhenAll(dealCountTask, activityCountTask, revenueTask, ...)`, each using its own `AsNoTracking()` query. EF Core will multiplex these on the same connection if using the same DbContext instance.
+2. **Projection queries, not full entity loads:** Use `.Select()` projections to compute aggregates directly in SQL: `_db.Deals.Where(d => d.CompanyId == id).CountAsync()`, `_db.Deals.Where(d => d.CompanyId == id && d.Stage == "Won").SumAsync(d => d.Value)`. Never load full entity collections and count in memory.
+3. **Frontend: single API call per summary:** The Angular component should call one `GET /api/companies/{id}/summary` endpoint, not 8 separate endpoints. Display a single loading spinner for the whole Summary tab, not individual loading states per metric.
+4. **Cache consideration:** Summary data changes infrequently relative to reads. Consider short TTL caching (30-60 seconds) at the API level using `IMemoryCache` with cache keys including tenant ID + entity ID. Invalidate on write operations via DomainEventInterceptor.
+5. **RBAC scope filtering in aggregates:** The summary counts must respect the user's View scope for each related entity type. A user with `Deal:View:Own` should see "3 Deals" (their own), not "15 Deals" (all company deals). This is the most commonly missed aspect -- aggregate queries bypass scope if not explicitly filtered.
 
 **Detection:**
-- Audit log entries where `TenantId` on the action result differs from the `TenantId` on the triggering record
-- Background job failures with "No rows returned" when rows definitely exist (RLS blocking due to wrong tenant)
-- Structured logging: every background job log line must include `TenantId`
+- Monitor query count per request using EF Core logging (`EnableSensitiveDataLogging` in dev)
+- If a single GET request generates >5 queries, flag for batching review
+- Application Insights / Serilog structured logging showing request duration >100ms for summary endpoints
 
-**Feature:** All features (workflow, email sequences, webhooks, reports)
-**Phase to address:** First -- build the `TenantScope` infrastructure before implementing any background processing features.
+**Phase to address:** Summary Tabs phase -- the endpoint design must be batched from the start. Retrofitting batching onto individual endpoints is significantly harder.
+**Confidence:** HIGH -- existing `company-detail.component.ts` pattern of separate lazy-loaded API calls per tab confirms this is the natural path developers will take.
 
 ---
 
-### Pitfall 3: Report Query Builder Tenant Data Leakage
+### Pitfall 3: Feed Entity Links to Deleted Entities Cause Cascading Errors
 
-**What goes wrong:** The advanced reporting builder lets users construct custom queries (choose entity, filters, groupings, aggregations). If the query builder generates raw SQL or uses `FromSqlRaw`/`FromSqlInterpolated`, EF Core global query filters are bypassed. Even if LINQ is used, a bug in the dynamic query construction could accidentally call `IgnoreQueryFilters()` or construct a query that joins to an unfiltered table. One tenant's admin could craft a report that returns another tenant's data.
+**What goes wrong:** A FeedItem has `EntityType = "Deal"` and `EntityId = "abc-123"`. The deal is later deleted. When a user clicks the entity link in the feed, three things can go wrong: (a) the preview sidebar calls `GET /api/deals/abc-123` and gets a 404, showing an ugly error; (b) the `navigateToEntity()` routes to `/deals/abc-123` which loads a blank/error detail page; (c) system events referencing the deleted entity accumulate as orphaned records, cluttering the feed. Worse: if the entity was *merged* (the existing `isMerged` + `mergedIntoId` redirect pattern in `company-detail.component.ts`), the feed link should redirect to the merged record but does not.
 
-**Why it happens:** Dynamic query construction is inherently risky because the query shape is user-controlled. Unlike normal CRUD endpoints where the code path is fixed and reviewed, the report builder constructs queries programmatically based on user input. The combinatorial explosion of possible query shapes makes it nearly impossible to review every path.
+**Why it happens:** The FeedItem entity uses a logical reference (`EntityType` + `EntityId`) with no FK constraint to target entities (same pattern as Notes and Attachments -- documented in the domain entities). This is by design to avoid cascade-delete complexity, but it means FeedItems naturally accumulate dangling references as entities are deleted or merged.
 
 **Consequences:**
-- Cross-tenant data exposure (security breach, regulatory violation)
-- SQL injection if user input is interpolated into raw SQL
-- N+1 queries from naive query construction (e.g., loading related entities in a loop)
-- Query timeout from unoptimized joins across large tables
+- Broken user experience: clicking feed links shows errors or blank pages
+- User confusion: "I can see this deal was created in the feed, but clicking it goes nowhere"
+- Over time, a significant percentage of feed entity links become dead links
+- Merged entity links never redirect (the merge redirect logic is in `company-detail.component.ts` only, not in a preview sidebar)
 
 **Prevention:**
-1. **Never use raw SQL in the report builder.** Build all report queries using LINQ and the EF Core query pipeline so global query filters always apply. If raw SQL is absolutely needed, manually add `WHERE tenant_id = @tenantId` to every table reference -- but prefer LINQ.
-2. **Whitelist-based query construction:** The report builder should only allow selecting from a predefined set of entity types and fields. Map user selections to strongly-typed LINQ expressions, never to string-based SQL fragments. Example: user selects "Contact.Email" --> map to `query.Select(c => c.Email)`, not `$"SELECT {userInput} FROM contacts"`.
-3. **Rely on PostgreSQL RLS as the safety net:** Since `TenantDbConnectionInterceptor` sets `app.current_tenant` on every connection, RLS will catch any query filter bypass. But do not rely on this as the primary defense -- it is the last line.
-4. **Query complexity limits:** Cap the number of joins (max 5), result rows (max 10,000 with pagination), and execution time (30-second timeout). Use `SET statement_timeout = '30s'` for report queries.
-5. **Never expose `IgnoreQueryFilters()` in any code path reachable from the report builder.** Grep the codebase for `IgnoreQueryFilters` and ensure none of those paths are accessible from dynamic query construction.
-6. **Parameterize all user inputs:** Even in LINQ, ensure filter values are parameterized (EF Core does this by default, but verify when building dynamic `Expression<Func<T, bool>>`).
+1. **Graceful 404 handling in preview sidebar:** When the preview API returns 404, display a styled "This [Entity] has been deleted" message with a dismiss button, not a raw error. This is the most important fix -- it handles the common case cleanly.
+2. **Merged entity resolution:** When the preview API returns a 301/redirect response (or a `{ isMerged: true, mergedIntoId: "..." }` payload), the sidebar should automatically load the merged target entity instead. Generalize the existing merge-redirect pattern from `company-detail.component.ts` to a shared utility.
+3. **Soft-delete awareness in feed rendering:** When rendering feed items, optionally mark items whose linked entity no longer exists. This can be done lazily (on first access) or via a background job that periodically scans for orphaned references and sets a `isEntityDeleted` flag on the FeedItem.
+4. **Do NOT cascade-delete feed items when entities are deleted.** Feed items have historical value ("Deal X was created on Jan 5"). Deleting the feed item loses the audit trail. Instead, render the feed item with the entity link disabled and a "[deleted]" badge.
+5. **Entity name denormalization:** Store `entityName` (e.g., "Acme Corp Deal #42") on the FeedItem at creation time. When the entity is deleted, the feed item still shows a meaningful name instead of just "View Deal" with a dead link.
 
 **Detection:**
-- Integration tests that create data for two tenants, run every report type, and verify zero cross-tenant rows
-- Query logging: log the generated SQL for every report execution, with structured fields for tenant ID and user ID
-- Periodic audit: automated scan for `IgnoreQueryFilters` calls in the codebase
+- Monitor 404 rates on preview/detail endpoints when accessed from feed context (add a `?source=feed` query param for tracking)
+- Periodic background scan: count FeedItems where EntityId references a non-existent entity
+- User feedback: "link doesn't work" reports
 
-**Feature:** Advanced Reporting Builder
-**Phase to address:** Reporting Builder phase -- but design the query builder architecture with these constraints from the start.
+**Phase to address:** Feed Deep Linking phase -- must be handled when implementing the preview sidebar click handler. The entity name denormalization should be added as a migration in the same phase.
+**Confidence:** HIGH -- direct inspection of FeedItem entity shows no FK constraint and no `entityName` field. Current `navigateToEntity()` has zero error handling.
 
 ---
 
-### Pitfall 4: Duplicate Merge Data Loss and Broken References
+### Pitfall 4: Personal Dashboard Migration Breaks Existing Org Dashboard Users
 
-**What goes wrong:** When merging two duplicate contacts (or companies), the "losing" record is deleted after its data is transferred to the "winner." But the system has many FK relationships: `DealContact.ContactId`, `Activity.ContactId`, `EmailMessage` linked to contacts, `Note` linked to contacts, `QuoteLineItem` linked via deals, custom field `Relation` type fields pointing to the merged entity, feed items referencing the entity, notifications, webhook subscription filters, workflow trigger conditions, and potentially the new email sequence enrollments. Missing even one FK update means:
-- Orphaned records with dangling FK references (if FK constraints are nullable)
-- Constraint violation errors (if FK constraints are NOT NULL)
-- Activities, emails, and notes disappear from the merged entity's timeline
-- Workflows that reference the deleted entity's ID break silently
-- Reports show incorrect counts (entity referenced in old records but deleted)
+**What goes wrong:** The v1.2 plan relocates the current org dashboard from the home page (`/dashboard` -> redirected from `/`) to its own menu item, and replaces the home page with a personal "My Day" dashboard. This route change breaks: (a) bookmarks and shared links to `/dashboard`; (b) the `{ path: '', redirectTo: 'dashboard' }` and `{ path: '**', redirectTo: 'dashboard' }` routes in `app.routes.ts`; (c) any external integrations that link to the dashboard URL. Additionally, if the personal dashboard uses the same `DashboardStore` and `angular-gridster2` grid infrastructure as the org dashboard, state confusion can occur where editing widgets on the personal dashboard accidentally saves to the org dashboard or vice versa.
 
-**Why it happens:** The CRM entity graph is deeply interconnected. v1.0 has 50+ entity types with numerous relationships. Developers enumerate the "obvious" FKs (deals, activities, notes) but miss less obvious ones (feed_items.EntityId, notifications.EntityId, saved_view filters referencing specific entity IDs, custom field Relation values stored in JSONB).
+**Why it happens:** Route restructuring in a live application always has ripple effects. The current `app.routes.ts` shows `/dashboard` as the default route and the catch-all redirect. The `DashboardStore` is component-provided (not root), but the `DashboardApiService` and the backend endpoints are shared. If both personal and org dashboards use `POST /api/dashboards/{id}/widget-data`, the dashboard ID is the only discriminator -- but the frontend must know which dashboard to load.
 
 **Consequences:**
-- Permanent data loss (activities, emails, notes disconnected from the contact)
-- Broken timelines (the timeline endpoint assembles events from multiple sources; missing links = missing events)
-- Workflow/email sequence failures when they reference the deleted entity
-- Incorrect reporting data (merged entity's history is incomplete)
-- User frustration: "Where did my emails go after the merge?"
+- All existing users' bookmarks and shared links break (or redirect to the wrong page)
+- Real-time SignalR refresh (in `DashboardStore.startRealTimeRefresh()`) could refresh the wrong dashboard if both are open
+- The "default dashboard" concept (`isDefault: true`) becomes ambiguous: default personal dashboard vs. default org dashboard
+- Org dashboard widgets created pre-migration must not appear on personal dashboards and vice versa
 
 **Prevention:**
-1. **Build a comprehensive FK reference map:** Before implementing merge, enumerate every table/column that can reference a Contact or Company ID. Include:
-   - Direct FKs: `deal_contacts`, `activities`, `notes`, `attachments`, `quotes`, `email_messages`
-   - Polymorphic references: `feed_items.entity_id`, `notifications.entity_id` (where `entity_type = 'Contact'`)
-   - JSONB references: Custom field values of type `Relation` that point to the entity
-   - New v1.1 tables: `workflow_trigger_conditions`, `email_sequence_enrollments`, `webhook_subscriptions`
-2. **Merge operation as a transaction:** Wrap the entire merge in a single database transaction. Update all FKs, then soft-delete the losing record (do not hard-delete). Keep the losing record marked as `MergedIntoId = winnerId` for audit trail and potential undo.
-3. **Soft-delete with redirect:** When any code path resolves an entity by ID and gets a soft-deleted merged record, follow the `MergedIntoId` redirect to the winner. This prevents broken links from code that cached the old ID.
-4. **Merge preview endpoint:** Before executing, return a summary: "This will reassign 12 deals, 45 activities, 23 emails, 8 notes to the surviving record." Let the user confirm.
-5. **Conflict resolution UI:** When both records have different values for the same field (e.g., different phone numbers), let the user choose which value to keep per field, not just "keep winner's values."
-6. **Custom field JSONB merge:** For Relation-type custom fields pointing to the losing entity, update the JSONB value. Use PostgreSQL's `jsonb_set` function in a single UPDATE to avoid loading all entities into memory.
+1. **Route structure plan:** Define the new routes before writing any code:
+   - `/` -> redirect to `/my-day` (new personal dashboard)
+   - `/my-day` -> Personal "My Day" dashboard component
+   - `/analytics` or `/org-dashboard` -> Org dashboard (relocated, NOT deleted)
+   - `/dashboard` -> redirect to `/my-day` for backward compatibility
+2. **Separate ownership semantics in the backend:** The existing `DashboardDto` already has `OwnerId` (personal) vs. null `OwnerId` (team-wide). Use this cleanly: personal "My Day" dashboards always have `OwnerId = currentUserId`. Org dashboards have `OwnerId = null`. The API endpoint `GET /api/dashboards` already filters by userId. Add a query param like `?scope=personal` or `?scope=org` to make intent explicit.
+3. **Separate "default" flags:** Add a `DashboardScope` enum (`Personal`, `Organization`) so `isDefault` is scoped: "default personal dashboard" vs. "default org dashboard." Without this, setting a personal dashboard as default could unset the org dashboard's default.
+4. **Widget type expansion:** Personal "My Day" dashboard will have new widget types (upcoming activities, recent entities, personal feed, etc.) that do not make sense on org dashboards. The widget type enum needs expansion, and the widget renderer must handle unknown types gracefully (show "Widget type not supported" instead of crashing).
+5. **Migration path:** Existing users should see a populated "My Day" dashboard on first load, not a blank page. Either auto-create a default personal dashboard with sensible defaults during the migration, or create on first access via `GET /api/dashboards?scope=personal` returning a 200 with a newly created default if none exists.
 
 **Detection:**
-- After merge, query all FK reference points and verify zero references to the deleted entity ID remain
-- Integration test: create two contacts with full relationship graph, merge them, verify all relationships point to the winner
-- Monitor for 404 errors on entity detail pages (user bookmarked the old URL)
+- 404 monitoring on old `/dashboard` route after migration
+- User reports of "blank dashboard" after update
+- Analytics showing if personal vs. org dashboards are being confused
 
-**Feature:** Duplicate Detection & Merge
-**Phase to address:** Duplicate Detection & Merge phase -- but the soft-delete/redirect pattern should be designed early since it affects entity resolution across the entire system.
-
----
-
-### Pitfall 5: Webhook SSRF (Server-Side Request Forgery)
-
-**What goes wrong:** The webhook feature allows tenant admins to register arbitrary URLs that the system will call (POST with event payload) when entity events occur. An attacker registers a webhook URL pointing to `http://169.254.169.254/latest/meta-data/` (AWS metadata endpoint), `http://localhost:5233/api/admin/...` (internal API), or `http://10.0.0.1/internal-service`. The server dutifully makes the HTTP request from its own network, bypassing firewalls and accessing internal resources the attacker should not reach.
-
-**Why it happens:** Webhook implementations accept user-provided URLs and make server-side HTTP requests to them. Without URL validation, the server becomes a proxy for the attacker.
-
-**Consequences:**
-- Exposure of cloud provider credentials (AWS/Azure metadata endpoints)
-- Access to internal services not exposed to the internet
-- Port scanning of internal networks
-- Potential for further exploitation via SSRF chains
-
-**Prevention:**
-1. **URL validation on registration:**
-   - Allow only `https://` scheme (block `http://`, `file://`, `ftp://`, `gopher://`)
-   - Resolve the hostname to an IP address and reject RFC1918 private ranges (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`), loopback (`127.0.0.0/8`), link-local (`169.254.0.0/16`), and multicast ranges
-   - Re-resolve DNS on every webhook delivery (not just registration) to prevent DNS rebinding attacks
-   - Reject URLs with IP addresses (require hostnames)
-2. **Network isolation:** Run webhook delivery workers in a separate network segment / container with no access to internal services. Egress-only to the public internet.
-3. **Response handling:** Do not return the response body from webhook calls to the user (prevent data exfiltration). Only return status code, latency, and success/failure.
-4. **Redirect limits:** Follow a maximum of 3 redirects. On each redirect, re-validate the target URL against the same rules. Block redirects to private IPs.
-5. **Timeout:** Set a short HTTP timeout (10 seconds) to prevent connection to slow/hanging internal services.
-
-**Detection:**
-- Log all webhook delivery URLs with resolved IP addresses
-- Alert on webhook registrations to private IP ranges (should be blocked, but alert if validation is bypassed)
-- Monitor webhook delivery latency spikes (may indicate slow internal service scanning)
-
-**Feature:** Webhooks
-**Phase to address:** Webhooks phase -- URL validation must be in the first implementation, not added later.
-
----
-
-### Pitfall 6: Formula Field Circular Dependencies and Evaluation Storms
-
-**What goes wrong:** Formula/computed custom fields reference other fields, including other formula fields. Field A's formula references Field B, and Field B's formula references Field A (direct cycle). Or: Field A -> Field B -> Field C -> Field A (indirect cycle). When the system attempts to evaluate any field in the cycle, it enters infinite recursion. Even without cycles, deeply nested formula chains (A -> B -> C -> D -> E -> F) create evaluation storms when the root field changes, requiring re-computation of the entire chain for every record.
-
-**Why it happens:** Users define formula fields one at a time and do not visualize the dependency graph. The system does not validate the graph at definition time, only discovering cycles at evaluation time (or worse, hitting a stack overflow).
-
-**Consequences:**
-- Stack overflow / infinite recursion during field evaluation
-- CPU exhaustion when a bulk update touches a field referenced by deep formula chains
-- Stale computed values if evaluation errors are silently swallowed
-- Incorrect reports and dashboards showing stale or partially-evaluated formula values
-
-**Prevention:**
-1. **Build a dependency graph at definition time:** When a formula field is created or updated, parse the formula to extract all field references. Build a directed graph of field dependencies. Use topological sort to detect cycles. Reject formulas that create cycles with a clear error message: "This formula creates a circular dependency: Field A -> Field B -> Field A."
-2. **Maximum dependency depth:** Limit formula chains to 5 levels deep. A formula field cannot reference another formula field that is already at depth 4.
-3. **Topological evaluation order:** When a field value changes, use the dependency graph to determine which formula fields need re-evaluation and in what order. Evaluate in topological order (leaf dependencies first, then fields that depend on them).
-4. **Lazy evaluation with caching:** Store computed values in the entity's `CustomFields` JSONB alongside raw values, marked with a `_computed` suffix or in a separate JSONB column. Re-evaluate only when a dependency changes, not on every read.
-5. **Evaluation timeout:** Cap formula evaluation at 100ms per field per record. If evaluation exceeds this, mark the field as "error" and log the issue.
-6. **Restrict formula language:** Use a safe expression evaluator (not `eval()` or Roslyn compilation). Allow only arithmetic, string operations, field references, and simple conditionals. No loops, no function definitions, no external calls. Consider `NCalc` or a custom parser.
-7. **Bulk update performance:** When a bulk import updates 10,000 records, do not evaluate formula fields row-by-row. Batch the evaluation: collect all changed fields, determine affected formula fields, then evaluate in bulk using set-based operations where possible.
-
-**Detection:**
-- Validate dependency graph on every formula field save (reject cycles immediately)
-- Monitor formula evaluation time per tenant
-- Alert on formula evaluation errors (stale values are worse than errors)
-
-**Feature:** Formula/Computed Custom Fields
-**Phase to address:** Formula Fields phase -- dependency graph validation must be the first thing built, before the evaluation engine.
+**Phase to address:** Personal Dashboard phase -- route restructuring must be planned first, before building any new components.
+**Confidence:** HIGH -- direct inspection of `app.routes.ts` shows the current route structure and catch-all redirect.
 
 ---
 
 ## Moderate Pitfalls
 
-Mistakes that cause significant bugs, performance issues, or difficult debugging, but are recoverable without rewrites.
+Mistakes that cause significant bugs, poor performance, or user confusion, but are recoverable without rewrite.
 
 ---
 
-### Pitfall 7: Email Sequence Timing and Deliverability
+### Pitfall 5: Summary Tab Stale Data After Entity Mutations on Other Tabs
 
-**What goes wrong:** Email sequences send automated follow-up emails on a schedule (e.g., Day 1: Welcome, Day 3: Follow-up, Day 7: Check-in). Multiple issues arise:
-- **Timing drift:** If the sequence scheduler runs every 5 minutes, emails may send up to 5 minutes late. Over a 7-day sequence, this is acceptable. But if sequences are per-minute, the scheduler's polling interval matters.
-- **Deliverability collapse:** All tenants' sequences fire at the same time (e.g., all "Day 3" emails at midnight UTC). The shared SendGrid account gets rate-limited or flagged for bulk sending, causing all emails to bounce or be delayed.
-- **Contact unsubscribe ignored:** A contact unsubscribes (or is merged/deleted) while an email sequence is in progress. The next scheduled email still sends.
-- **Duplicate enrollment:** A contact is enrolled in the same sequence twice (e.g., workflow fires twice due to a bug), receiving duplicate emails.
+**What goes wrong:** User opens Company detail page. Summary tab shows "5 Deals, $120K pipeline value." User switches to Deals tab, creates a new Deal, then switches back to Summary tab. Summary still shows "5 Deals, $120K" because the summary data was fetched on first load and never refreshed. The existing lazy-load pattern (visible in `company-detail.component.ts`) uses `if (this.activitiesLoaded() || this.activitiesLoading()) return;` guards that prevent re-fetching once data is loaded.
 
-**Prevention:**
-1. **Jittered send times:** When enrolling a contact in a sequence, add a random jitter of +/- 30 minutes to each step's scheduled time. This spreads load across time and avoids bulk-sending spikes.
-2. **Per-tenant sending rate limits:** Cap each tenant's email sends to a reasonable rate (e.g., 100/hour). Queue excess emails and drain gradually.
-3. **Pre-send validation:** Before sending each sequence step, verify:
-   - Contact still exists and is not soft-deleted or merged
-   - Contact has not unsubscribed
-   - Contact's email is still valid (not bounced in a previous send)
-   - The sequence enrollment is still active (not paused or cancelled)
-4. **Idempotent enrollment:** Use a unique constraint on `(sequence_id, contact_id)` to prevent duplicate enrollments. If a workflow tries to enroll an already-active contact, skip or update the existing enrollment.
-5. **Sequence step deduplication:** Each step execution should have an idempotency key. If the scheduler processes the same step twice (due to retry), the second execution is a no-op.
-6. **SendGrid/email provider integration:** Use the existing `IEmailService` abstraction, but add rate-limiting middleware. Track bounce rates per tenant and auto-pause sequences if bounce rate exceeds 5%.
-
-**Detection:**
-- Monitor email send rate per tenant per hour
-- Alert on bounce rate exceeding 3% for any tenant
-- Dashboard showing sequence completion rates (enrollments vs. completions vs. drops)
-- Log every sequence step execution with contact ID, sequence ID, step number, and result
-
-**Feature:** Email Templates & Sequences
-**Phase to address:** Email Templates & Sequences phase.
-
----
-
-### Pitfall 8: Workflow Actions Bypassing RBAC Permission Checks
-
-**What goes wrong:** A workflow executes an action (e.g., "update deal stage to Won" or "create a follow-up activity") using the system's service account, not the user who triggered the workflow. The action succeeds even though the user who triggered it does not have permission to update deals or create activities. This violates the RBAC model and allows privilege escalation.
-
-**Why it happens:** Workflow actions are executed by a background service that has full system access. The `PermissionAuthorizationHandler` checks permissions based on `ClaimsPrincipal` from the HTTP context, but background jobs have no HTTP context and no user claims.
+**Why it happens:** The existing pattern of `loaded` boolean signals prevents redundant loads, which is correct for tabs that show a static list. But the Summary tab aggregates counts and totals that change when users mutate data on other tabs. The `loaded` guard means switching back to Summary never re-fetches.
 
 **Consequences:**
-- Users can create workflows that perform actions they are not authorized to do directly
-- Audit trails show "system" as the actor instead of the triggering user
-- Tenant admins cannot control what workflows are allowed to do through the existing permission model
+- Summary metrics are stale until full page reload
+- Users lose trust in summary accuracy ("I just created a deal, why doesn't the count update?")
+- If the Summary tab is the first (index 0) tab, users see stale data on every return to the "home" tab
 
 **Prevention:**
-1. **Workflow permission model:** Define which actions a workflow can perform as part of its configuration. Only Admin users should be able to create/edit workflows (controlled by a new `Workflow:Manage` permission).
-2. **Option: Execute as triggering user vs. execute as system:**
-   - "Execute as triggering user": Evaluate the triggering user's permissions before each action. If the user lacks `Deal:Edit` permission, the "update deal" action fails and is logged.
-   - "Execute as system": The workflow runs with full tenant-scoped access (still isolated by tenant, but no RBAC check). This is simpler but requires that only admins can create workflows.
-   - **Recommendation:** Start with "execute as system" + admin-only workflow management. It is simpler and matches what most CRM platforms do (Salesforce, HubSpot). Document the security model clearly.
-3. **Audit trail:** Every workflow-initiated action must record both the `triggeredByUserId` (the user whose action fired the trigger) and the `executedBySystem: true` flag. The existing `AuditableEntityInterceptor` sets `CreatedAt`/`UpdatedAt` but not `CreatedBy`/`UpdatedBy` -- ensure workflow actions also set these to the triggering user for traceability.
-4. **Scope restriction:** Even "execute as system" must respect tenant isolation. The background job must use the `TenantScope` wrapper (see Pitfall 2) so all actions are scoped to the correct tenant.
+1. **Invalidation signal pattern:** When any tab performs a mutation (create, update, delete), emit an event or set a signal that marks the summary as "dirty." On tab switch back to Summary, check the dirty flag and re-fetch if needed. Example: a shared `summaryDirty = signal(false)` that each tab's mutation handler sets to `true`.
+2. **Lightweight re-fetch:** The summary endpoint should be fast (<50ms) thanks to the batched query pattern from Pitfall 2. Re-fetching on every tab switch to Summary is acceptable if the endpoint is performant. Remove the `loaded` guard for the Summary tab specifically.
+3. **Optimistic count updates:** When a Deal is created on the Deals tab, optimistically increment `summary.dealCount` without a server round-trip. This provides instant feedback while a background re-fetch gets the authoritative numbers.
+4. **SignalR integration:** The existing `DashboardStore.startRealTimeRefresh()` pattern (listening to SignalR events and debouncing refreshes) can be applied to summary tabs. When any CRM mutation occurs for the current entity, debounce-refresh the summary.
 
 **Detection:**
-- Audit log review: filter for actions where `executedBy = system` and verify the triggering workflow is authorized
-- Permission change alerts: when a user's permissions are downgraded, check if they have active workflows performing actions they can no longer do
+- Manual QA: create entity on related tab, switch to Summary, verify count updated
+- E2E test: create a Deal linked to a Company, verify Summary tab count increments
 
-**Feature:** Workflow Automation
-**Phase to address:** Workflow Automation phase -- must be decided during workflow engine design.
+**Phase to address:** Summary Tabs phase -- build the invalidation mechanism into the summary tab component from the start.
+**Confidence:** HIGH -- direct inspection of existing lazy-load guards in `company-detail.component.ts`.
 
 ---
 
-### Pitfall 9: Webhook Delivery Retry Storms
+### Pitfall 6: Preview Sidebar Z-Index and Scroll Context Conflicts
 
-**What goes wrong:** A tenant registers a webhook endpoint that is temporarily down (returns 500 or times out). The system retries with exponential backoff: 1s, 2s, 4s, 8s, 16s, 32s... But if the endpoint is down for hours, and the tenant has many active entities generating events, the retry queue grows unboundedly. When the endpoint comes back up, the system fires all queued deliveries at once, overwhelming the endpoint (and the system's outbound HTTP connection pool). Meanwhile, if 100 tenants have webhooks and 5 are down, the retry queue consumes memory/storage and the delivery worker spends most of its time on failing requests.
+**What goes wrong:** The entity preview sidebar opens as an overlay panel (likely using Angular CDK Overlay or a custom side-sheet). On pages with existing overlays (Material dialogs, mat-menus, mat-datepickers, autocomplete dropdowns), the sidebar's z-index conflicts cause: (a) the sidebar appears behind an open dialog; (b) opening a dialog from within the sidebar renders the dialog behind the sidebar; (c) scrolling the sidebar content scrolls the underlying page instead. The existing notification panel (from v1.0) may already occupy a similar overlay slot.
+
+**Why it happens:** Angular CDK manages overlay z-index via a stacking order tied to creation order. The sidebar is a persistent panel (not ephemeral like a dialog), so it breaks the assumption that overlays are short-lived. The existing layout uses `margin-left: 240px` for the nav sidebar (visible in `app.component.ts`), but an entity preview sidebar on the right side would need different positioning strategy.
+
+**Consequences:**
+- Sidebar hidden behind dialogs or vice versa
+- Body scroll leaks when sidebar is open
+- On mobile, the sidebar may completely obscure the page with no way to dismiss
+- Notification panel and preview sidebar may fight for the same screen real estate
 
 **Prevention:**
-1. **Exponential backoff with jitter:** Use `delay = min(base * 2^attempt + random_jitter, max_delay)` where max_delay = 1 hour. Jitter prevents synchronized retries.
-2. **Maximum retry count:** Stop retrying after 5 attempts (spans approximately 1 hour total). Move the delivery to a dead-letter queue (DLQ). Provide a UI for tenants to view failed deliveries and manually retry.
-3. **Circuit breaker per endpoint:** After 3 consecutive failures to the same endpoint URL, mark it as "circuit-broken." Stop sending new events to that endpoint. Periodically (every 15 minutes) send a health-check probe. When the probe succeeds, resume delivery. Notify the tenant via in-app notification that their webhook endpoint is failing.
-4. **Outbound connection pool limits:** Use a named `HttpClient` via `IHttpClientFactory` with connection pooling. Set `MaxConnectionsPerServer = 5` to prevent overwhelming any single endpoint.
-5. **Queue depth limits:** Cap the delivery queue at 1,000 pending deliveries per endpoint. If the queue is full, drop new events for that endpoint (with logging) rather than growing the queue indefinitely.
-6. **Delivery status tracking:** Persist every delivery attempt with timestamp, HTTP status code, response time, and any error message. Expose this in the UI so tenants can debug their webhook endpoints.
+1. **Use CDK Overlay with explicit z-index stacking:** Do not use a fixed-position CSS sidebar. Use Angular CDK `Overlay` with `positionStrategy: GlobalPositionStrategy` anchored to the right edge. Set the overlay's `panelClass` to control z-index in a known layer (e.g., `z-index: 1000` for sidebar, `z-index: 1100` for dialogs opened from sidebar).
+2. **Block scroll on body when sidebar is open:** Use CDK `BlockScrollStrategy` on the overlay, or scope the sidebar's scroll container to prevent event propagation to the body.
+3. **Singleton service for sidebar state:** Create a `PreviewSidebarService` (root-provided) with a signal for the currently previewed entity. This ensures only one preview is open at a time, and any page component can open/close it. Mimic the existing `SidebarStateService` pattern.
+4. **Close sidebar on route navigation:** Listen to Router events and close the preview sidebar on `NavigationStart`. This prevents the sidebar from showing stale entity data after navigating to a different page.
+5. **Responsive behavior:** On mobile (< 768px, matching the existing `isMobile` breakpoint in `app.component.ts`), the preview sidebar should be a full-screen sheet (bottom sheet or full overlay), not a side panel. On tablet (768-1024px), it should push content or overlay at 50% width.
+6. **Dismiss on click outside:** Implement backdrop click handling so clicking outside the sidebar dismisses it.
 
 **Detection:**
-- Monitor retry queue depth per endpoint and per tenant
-- Alert on endpoints in circuit-broken state for more than 1 hour
-- Dashboard showing webhook delivery success rate, p95 latency, and retry rate
+- Visual QA: open sidebar, then open a dialog from the sidebar, verify dialog is on top
+- Test on mobile viewport: sidebar should be fullscreen
+- Test scroll: sidebar content scrolls independently from page
 
-**Feature:** Webhooks
-**Phase to address:** Webhooks phase.
+**Phase to address:** Entity Preview Sidebar phase -- the overlay architecture must be decided before building the sidebar component.
+**Confidence:** MEDIUM -- based on general Angular CDK overlay behavior and the specific layout in `app.component.ts`. Angular 21 CDK overlay changes (Popover API) may introduce additional z-index quirks.
 
 ---
 
-### Pitfall 10: SignalR Broadcast Storm from Workflow/Automation Events
+### Pitfall 7: "My Day" Widget Data Loading Creates Performance Waterfall
 
-**What goes wrong:** v1.0 sends SignalR events for entity changes (`FeedUpdate`, `ReceiveNotification`). When workflows execute, a single user action can cascade into dozens of entity updates (workflow updates 5 deals, creates 3 activities, sends 2 emails). Each update triggers a SignalR broadcast to the tenant group. The connected Angular clients receive 10+ events in rapid succession, each triggering a store update and UI re-render. The UI flickers, the browser becomes sluggish, and the SignalR connection may back up.
+**What goes wrong:** The personal "My Day" dashboard loads on every app launch (it is the new home page). It contains multiple widget types: upcoming activities, recent deals, personal feed, target progress, overdue tasks. Each widget makes its own API call. If there are 6-8 widgets, the page fires 6-8 parallel HTTP requests on initial load. This creates a performance waterfall: the browser's HTTP/2 connection limit may serialize some requests, and the backend processes them concurrently, creating a load spike on every user login.
+
+**Why it happens:** The existing `DashboardStore.loadWidgetData()` already uses a batched approach (single `POST /api/dashboards/{id}/widget-data` call for all metric widgets). But "My Day" introduces new widget types (upcoming activities, recent entities, personal feed) that are not metric-based and cannot use the existing `DashboardAggregationService.ComputeMetricAsync()` pattern. Each new widget type needs its own data source, and the natural implementation is separate API calls per widget.
+
+**Consequences:**
+- 6-8 concurrent API calls on every app load
+- Backend processes parallel requests, potentially hitting connection pool limits during login surge (9 AM spike)
+- Time-to-interactive delayed: widgets load one by one, causing layout shift as each widget populates
+- Worse if user has slow connection: serialized requests take 3-5 seconds for the page to fully load
 
 **Prevention:**
-1. **Batch/debounce workflow events:** When a workflow execution produces multiple entity changes, collect all changes into a single batched event. Send one SignalR message with the list of changes, rather than one message per change.
-2. **Throttle per tenant:** Rate-limit SignalR messages to a maximum of 10 per second per tenant group. Buffer excess messages and flush at the next interval.
-3. **Payload minimization:** Workflow-generated events should send minimal payloads (`{entityType, entityId, action}`) rather than full entity DTOs. Let the client fetch updated data if it is currently viewing that entity.
-4. **Client-side debounce:** In the Angular `SignalRService`, debounce incoming events by entity type. If 5 `FeedUpdate` events arrive within 500ms, process only the last one (or a merged set).
-5. **Suppress non-visible updates:** If a workflow updates an entity that no connected user is currently viewing, the client can skip the re-fetch. Use the Angular store's knowledge of "currently viewed entity" to decide whether to act on an event.
+1. **Extend the batched widget data pattern:** The existing `POST /api/dashboards/{id}/widget-data` endpoint should be extended to support new widget types alongside metrics. Add a `widgetType` discriminator to `WidgetMetricRequest` so the backend can route to the appropriate data source (metric computation vs. activity query vs. feed query) while still returning all results in a single response.
+2. **Two-tier loading:** Split widgets into "fast" (counts, KPIs -- cached, <50ms) and "slow" (recent entities with includes, feed items). Load fast widgets in the initial batch, then load slow widgets in a second batch. Show skeleton loaders for slow widgets.
+3. **Server-side cache for "My Day" data:** Personal dashboard data is highly cacheable. Activities due today, recent deals, and target progress change infrequently. Use `IMemoryCache` with a 60-second TTL keyed by `userId + widgetType`. Invalidate on write operations.
+4. **Stagger widget rendering:** Use `@defer` blocks in the Angular template to defer rendering of below-the-fold widgets until the viewport scrolls to them, or until the above-the-fold widgets finish loading.
+5. **Prefetch on auth:** After successful login, before navigating to `/my-day`, prefetch the dashboard configuration so the widget layout is immediately available and data loading can start.
 
 **Detection:**
-- Monitor SignalR message rate per tenant group
-- Client-side logging: count SignalR events received per second and warn if > 20
-- Server-side: log workflow execution event counts per batch
+- Network waterfall in browser DevTools: count the number of simultaneous API calls on home page load
+- Backend request logging: monitor concurrent request count per user at login time
+- Time-to-interactive metric: measure time from navigation to all widgets rendered
 
-**Feature:** Workflow Automation (with SignalR integration)
-**Phase to address:** Workflow Automation phase -- design the event batching from the start.
+**Phase to address:** Personal Dashboard phase -- the batched loading pattern must be designed before building widget components.
+**Confidence:** HIGH -- direct inspection of existing batched `loadWidgetData()` shows the pattern, but new widget types will not fit the existing metric-only schema.
 
 ---
 
-### Pitfall 11: Report Builder N+1 Queries and Performance
+### Pitfall 8: Tab Index Shift When Adding Summary Tab at Index 0
 
-**What goes wrong:** The report builder constructs LINQ queries dynamically. A user builds a report: "All deals with their primary contact email and company name." The naive implementation loads deals, then for each deal loads the contact (N+1), then for each contact loads the company (N+1 again). For 1,000 deals, this generates 2,001 database queries. With PostgreSQL RLS adding overhead to every query, this becomes extremely slow.
+**What goes wrong:** All existing detail pages use `RelatedEntityTabsComponent` with tab constants like `COMPANY_TABS`, `DEAL_TABS`, etc. The `onTabChanged(index: number)` handler uses hardcoded index numbers to trigger lazy loading: `if (index === 1) { this.loadContacts(); }`. Adding a "Summary" tab at index 0 shifts all existing tab indexes by one. The "Details" tab moves from index 0 to index 1, "Contacts" from index 1 to index 2, and so on. If the `onTabChanged` handler is not updated, clicking "Contacts" (now index 2) triggers `loadContacts()` at old index 1, which no longer maps to Contacts.
+
+**Why it happens:** Tab index coupling. The existing pattern in `company-detail.component.ts` uses numeric literals (`index === 1`, `index === 3`, etc.) rather than named constants or label-based matching. This is brittle to any tab reordering or insertion.
+
+**Consequences:**
+- Wrong tab content loads when switching tabs (e.g., clicking "Contacts" loads "Details" instead)
+- Lazy loading triggers fire for the wrong tabs, loading unnecessary data
+- Some tabs never load their data because the index mapping is broken
+- Every detail page across 6+ entity types must be updated, making this a wide-impact change
 
 **Prevention:**
-1. **Eager loading by default:** All report queries must use `.Include()` for related entities referenced in the report columns. Build the include chain dynamically based on which columns the user selected.
-2. **Projection-only queries:** Reports should never load full entity graphs. Use `.Select()` to project only the columns needed for the report. This generates a single SQL query with joins, not multiple queries.
-3. **Query plan analysis:** Log the generated SQL for every report execution. Periodically review with `EXPLAIN ANALYZE`. Set up automated detection for queries with > 10 joins or execution time > 5 seconds.
-4. **Materialized aggregations:** For aggregate reports (sum of deal values by stage, count of contacts by company), pre-compute aggregations in a background job and store in a `report_cache` table. Serve from cache if the data is less than 15 minutes old.
-5. **Result set limits:** Cap report results at 10,000 rows with mandatory pagination. For export (CSV), stream results using EF Core's `AsAsyncEnumerable()` to avoid loading everything into memory.
-6. **Timeout enforcement:** Set `CommandTimeout = 30` on the `DbCommand` for report queries. If a report query takes more than 30 seconds, cancel it and return an error to the user.
-7. **Custom fields in reports:** JSONB field access (`custom_fields->>'field_name'`) does not benefit from standard B-tree indexes unless a specific expression index exists. For frequently-reported custom fields, consider creating expression indexes. For ad-hoc custom field queries, accept the performance trade-off and document it.
+1. **Refactor to label-based tab matching BEFORE adding Summary tab:** Change `onTabChanged(index: number)` to resolve the tab label from the tabs array: `const tabLabel = this.tabs[index]?.label; if (tabLabel === 'Contacts') { this.loadContacts(); }`. This is resilient to index shifts.
+2. **Use tab constants as the source of truth:** Define tab labels as string constants (e.g., `TAB_SUMMARY = 'Summary'`, `TAB_DETAILS = 'Details'`) and use them in both the tab configuration and the handler. Never use numeric indexes for business logic.
+3. **Update all 6+ detail components consistently:** Company, Contact, Deal, Lead, Quote, Request detail pages all use the same pattern. Create a shared utility or base class method like `getTabLabel(index: number): string` to avoid duplicating the fix.
+4. **Add the Summary tab to all `*_TABS` constants at once:** Do not add Summary to `COMPANY_TABS` first and other entities later. Adding incrementally means some detail pages have shifted indexes and some do not, creating inconsistent behavior during development.
+5. **Automated test:** For each detail page, verify that clicking each tab loads the correct content. This catches index mismatches immediately.
 
 **Detection:**
-- EF Core query logging: flag any query batch with > 5 queries (indicates N+1)
-- Slow query log: PostgreSQL's `log_min_duration_statement = 5000` to catch queries over 5 seconds
-- Per-report execution timing in structured logs
+- QA: click through every tab on every detail page after adding Summary
+- Verify that lazy loading triggers fire for the correct tab (check network requests in DevTools)
+- If a tab shows "no data" when it should have data, the index mapping is likely broken
 
-**Feature:** Advanced Reporting Builder
-**Phase to address:** Reporting Builder phase.
+**Phase to address:** Summary Tabs phase -- the refactor from index-based to label-based tab matching should be done as the first task, before adding the Summary tab to any entity.
+**Confidence:** HIGH -- direct inspection of `company-detail.component.ts` shows hardcoded `index === 1`, `index === 3`, `index === 4`, `index === 5`, `index === 6`, `index === 7` in `onTabChanged()`.
 
 ---
 
-### Pitfall 12: Duplicate Detection False Positives Blocking Legitimate Records
+### Pitfall 9: Entity Preview Sidebar Creates Duplicate API/Service Instances
 
-**What goes wrong:** Overly aggressive duplicate detection rules (e.g., "same first name and last name = duplicate") flag too many false positives. When duplicate detection runs on record creation, it blocks users from creating legitimate contacts ("John Smith at Company A" is flagged as duplicate of "John Smith at Company B"). Users get frustrated and either stop using the CRM or find workarounds (misspelling names to avoid detection). Alternatively, overly relaxed rules miss real duplicates, defeating the feature's purpose.
+**What goes wrong:** The preview sidebar needs to load data for any entity type (Company, Contact, Deal, Lead, Quote, Request). Each entity type has its own service (`CompanyService`, `ContactService`, etc.) and some have component-provided stores (`CompanyStore`, etc.). If the sidebar component imports and injects all 6+ entity services, it creates tight coupling and increases the sidebar's bundle size. If the sidebar uses component-provided stores, it creates duplicate store instances that conflict with stores on the underlying detail page.
+
+**Why it happens:** The existing architecture uses per-feature services and component-provided stores. The `CompanyDetailComponent` provides its own `CompanyStore`. If the preview sidebar also provides a `CompanyStore` for its preview, and the user is already on the Company detail page, there are now two `CompanyStore` instances with potentially conflicting state.
+
+**Consequences:**
+- Bundle size bloat: sidebar imports all 6+ entity feature services
+- State confusion: duplicate stores cause stale or conflicting data
+- Memory leaks: sidebar creates store instances that are not properly destroyed
+- Tight coupling: every new entity type requires changes to the sidebar component
 
 **Prevention:**
-1. **Confidence scoring, not binary matching:** Instead of "duplicate: yes/no," return a confidence score (0-100%). Use weighted criteria:
-   - Email match: +40 points (emails are near-unique)
-   - Phone match: +25 points
-   - Name + company match: +20 points
-   - Name only match: +10 points (high false positive rate)
-   - Address match: +15 points
-2. **Threshold-based actions:**
-   - Score >= 90%: Auto-flag as likely duplicate, suggest merge in UI
-   - Score 60-89%: Show warning on create/edit, let user proceed
-   - Score < 60%: No action (save normally)
-3. **Never auto-merge without confirmation:** Always present duplicates to the user with a comparison view. Auto-merge is too risky for data loss.
-4. **Configurable rules per tenant:** Let admins customize which fields participate in duplicate detection and their weights. Different industries have different duplicate patterns.
-5. **Performance:** Duplicate detection queries against the entire contact/company table. For large tenants (100k+ contacts), use PostgreSQL trigram indexes (`pg_trgm` extension) for fuzzy matching, or pre-compute phonetic codes (Soundex/Metaphone) in a separate column for name matching.
-6. **Exclude from detection:** Allow users to explicitly mark two records as "not duplicates" so they are not re-flagged.
+1. **Dedicated lightweight preview service:** Create a single `EntityPreviewService` that has one method: `getPreview(entityType: string, entityId: string): Observable<EntityPreviewDto>`. This service calls a single backend endpoint `GET /api/entity-preview/{entityType}/{entityId}` that returns a standardized preview DTO (common fields: name, type, status, owner, key metrics, creation date). Do NOT reuse the existing per-entity detail services.
+2. **Generic preview DTO:** Define a single `EntityPreviewDto` interface with: `id, entityType, name, subtitle, status, statusColor, ownerName, createdAt, keyMetrics: { label: string, value: string }[], quickActions: string[]`. The backend maps each entity type to this common shape.
+3. **No component-provided stores in sidebar:** The preview sidebar should be stateless -- it loads data on open, displays it, and discards on close. Use a simple signal in the service (`previewData = signal<EntityPreviewDto | null>(null)`) rather than a full signal store.
+4. **Lazy-load entity-specific actions:** If the sidebar needs entity-specific actions (e.g., "Change Deal Stage"), load these as dynamic action definitions from the backend rather than importing entity-specific components.
+5. **Single backend endpoint:** `GET /api/entity-preview/{entityType}/{entityId}` with a switch on entityType that loads the appropriate entity, runs RBAC checks, and maps to the generic preview DTO. This keeps the backend change contained to one controller.
 
 **Detection:**
-- Track false positive rate: how often users dismiss duplicate warnings
-- Monitor duplicate detection query performance per tenant
-- A/B test detection rules: compare detection rates with different weight configurations
+- Bundle analysis: if the sidebar chunk exceeds 50KB, it is importing too many entity-specific modules
+- Memory profiler: check for leaked store instances when sidebar is opened/closed repeatedly
+- If changing entity service code breaks the sidebar, coupling is too tight
 
-**Feature:** Duplicate Detection & Merge
-**Phase to address:** Duplicate Detection & Merge phase.
+**Phase to address:** Entity Preview Sidebar phase -- the generic preview service pattern must be established before building the sidebar UI.
+**Confidence:** HIGH -- direct inspection shows component-provided stores and per-entity services as the current pattern.
 
 ---
 
 ## Minor Pitfalls
 
-Issues that cause friction, minor bugs, or suboptimal UX but are straightforward to fix.
+Mistakes that cause annoyance, polish issues, or minor bugs, but are easily fixable.
 
 ---
 
-### Pitfall 13: Email Template Variable Injection / XSS
+### Pitfall 10: Entity Type String Mapping Inconsistencies
 
-**What goes wrong:** Email templates use variable placeholders like `{{contact.firstName}}`, `{{deal.name}}`. When the template is rendered, the placeholder is replaced with the actual value. If a contact's name contains `<script>alert('XSS')</script>` or the template is rendered as HTML in the CRM's preview UI without escaping, it creates an XSS vulnerability. Additionally, if a user crafts a template with `{{contact.email}}` and sends it in a sequence, the recipient sees the raw email address (a privacy concern if the template is forwarded).
+**What goes wrong:** The entity type routing in the feed uses `item.entityType.toLowerCase() + 's'` to construct route paths (e.g., `"Deal"` -> `"/deals"`). The notification center uses a hardcoded `typeMap` object. The activity detail uses a switch statement. These three separate entity-type-to-route mapping implementations will diverge when new entity types are added (Lead, Quote, Request for the preview sidebar). One location gets updated, the others do not.
+
+**Why it happens:** No centralized entity type registry. Each feature implemented its own mapping independently during v1.0 development.
 
 **Prevention:**
-1. **HTML-escape all variable values** when rendering templates for email send and UI preview. Use a template engine that escapes by default (e.g., Handlebars with HTML escaping enabled, Scriban with HTML encoding).
-2. **Restrict available variables:** Only expose a whitelisted set of variables per entity type. Do not expose internal fields (IDs, tenant IDs, system fields).
-3. **Sanitize template HTML:** When admins save an email template, sanitize the HTML to remove `<script>`, `onclick`, and other dangerous attributes. Use a library like HtmlSanitizer for .NET.
-4. **Preview rendering:** When showing a template preview in the Angular app, render using `[innerHTML]` with Angular's built-in sanitization, or better, render server-side and return safe HTML.
+1. **Create a shared `EntityTypeRegistry` utility** with a single mapping: `{ entityType: string } -> { routePath: string, icon: string, label: string, previewSupported: boolean }`. Use this in the feed, notification center, activity detail, and preview sidebar.
+2. **Include all entity types from the start:** Company, Contact, Deal, Lead, Quote, Request, Activity, Email, Note, FeedItem. Future-proof by making the registry the single source of truth.
+3. **Fail gracefully for unknown types:** If an entity type is not in the registry, show a generic fallback (e.g., disabled link with "Unknown entity") instead of crashing or navigating to a 404 page.
 
-**Feature:** Email Templates & Sequences
-**Phase to address:** Email Templates & Sequences phase.
+**Phase to address:** Feed Deep Linking phase -- create the registry as a shared utility before building entity links.
+**Confidence:** HIGH -- three separate mapping implementations visible in the codebase.
 
 ---
 
-### Pitfall 14: Webhook Payload Leaking Sensitive Data
+### Pitfall 11: angular-gridster2 Layout Serialization Drift Between Org and Personal Dashboards
 
-**What goes wrong:** When a webhook fires for a "contact created" event, the payload includes the full entity DTO, which may contain sensitive fields that the webhook consumer should not see (e.g., internal notes, custom fields with financial data, field-level permission-restricted fields). The webhook consumer is an external system with no concept of the CRM's RBAC field-level permissions.
+**What goes wrong:** The existing org dashboard uses `angular-gridster2` with a 12-column layout and `fixedRowHeight: 200`. The personal "My Day" dashboard may need different grid settings (e.g., different row height for activity list widgets, or a different number of columns for a more compact layout). If both dashboards share the same `DashboardGridComponent` with the same gridster config, the personal dashboard looks wrong (too much whitespace or too cramped). If they have different configs, saved widget positions from one layout do not render correctly in the other.
+
+**Why it happens:** `angular-gridster2` positions are absolute grid coordinates (x, y, cols, rows). These coordinates are only meaningful within a specific grid configuration. A widget at position (x:6, y:0, cols:6, rows:2) in a 12-column grid occupies the right half. In an 8-column grid, the same coordinates would overflow.
 
 **Prevention:**
-1. **Webhook payload schema configuration:** When registering a webhook, let the admin choose which fields to include in the payload (whitelist approach), or at minimum, respect field-level permissions of the "Webhook" role.
-2. **Default to minimal payload:** By default, send only `{entityType, entityId, action, timestamp}`. Let the consumer call back to the API with an API key to fetch full details (with proper auth).
-3. **Never include:** tenant IDs, internal user IDs, RBAC role information, or audit metadata in webhook payloads.
-4. **HMAC signing:** Sign every webhook payload with a per-subscription secret so the consumer can verify authenticity. Include a timestamp to prevent replay attacks.
+1. **Use the same gridster configuration for both dashboards.** The existing 12-column / 200px row height config is flexible enough for both org and personal dashboards. Do not create a second grid config.
+2. **Differentiate at the widget level, not the grid level.** Personal widgets (activity list, recent items) should use different `rows` values (e.g., `rows: 3` for a tall activity list) rather than changing the grid's `fixedRowHeight`.
+3. **Widget type determines default size:** Define default `cols`/`rows` per widget type in a constant map. When a user adds a "My Upcoming Activities" widget, it defaults to `cols: 6, rows: 3`. When they add a KPI card, it defaults to `cols: 3, rows: 1`.
 
-**Feature:** Webhooks
-**Phase to address:** Webhooks phase.
+**Phase to address:** Personal Dashboard phase -- ensure grid config compatibility before adding new widget types.
+**Confidence:** MEDIUM -- depends on the specific layout requirements for "My Day" widgets.
 
 ---
 
-### Pitfall 15: Formula Fields Referencing Deleted Custom Field Definitions
+### Pitfall 12: Preview Sidebar Opens on Every Feed Scroll Interaction
 
-**What goes wrong:** A formula field references custom field `X` in its formula expression. An admin later deletes custom field `X`. The formula field's evaluation fails at runtime because the referenced field no longer exists. If the error is silently swallowed, the computed value becomes stale or null without explanation.
+**What goes wrong:** The feed list uses infinite scroll (Load More button) and renders entity links as clickable elements. If the sidebar opens on click, and the user is quickly scrolling and accidentally taps an entity link, the sidebar opens unexpectedly. On mobile, this is especially problematic because the sidebar is full-screen, interrupting the scroll flow.
+
+**Why it happens:** Click events on touch devices can fire on scroll if the touch handler is not properly configured with debouncing or drag detection.
 
 **Prevention:**
-1. **Reference validation on field deletion:** When deleting a custom field definition, check if any formula fields reference it. If so, block deletion with an error: "Cannot delete field 'X' because it is referenced by formula field 'Y'." Or force the admin to update the formula first.
-2. **On-save validation:** When saving a formula, validate that all referenced fields exist and are of compatible types.
-3. **Graceful degradation:** If a referenced field is somehow deleted (e.g., database manipulation), the formula evaluator should return `#REF!` error value (similar to Excel) rather than crashing or returning null silently.
-4. **Cascade warnings:** When deleting a field, show the admin a list of all dependent formula fields that will break.
+1. **Require deliberate click:** Use a small delay (100ms) or check that the click position did not change (no drag/scroll occurred) before opening the sidebar.
+2. **Hover preview on desktop:** On desktop, show a tooltip or mini-card on hover over the entity link. Only open the full sidebar on click. This gives users a preview without a commitment.
+3. **Mobile: navigate instead of sidebar:** On mobile viewports, clicking a feed entity link should navigate to the entity detail page rather than opening a sidebar overlay. The sidebar pattern works on desktop (where there is room for both content and sidebar) but not on mobile.
 
-**Feature:** Formula/Computed Custom Fields
-**Phase to address:** Formula Fields phase.
+**Phase to address:** Entity Preview Sidebar phase -- include mobile-specific behavior in the component design.
+**Confidence:** MEDIUM -- general UX concern, not specific to any bug found in the codebase.
 
 ---
 
-### Pitfall 16: Report Builder Allowing Unbounded Cross-Entity Joins
+### Pitfall 13: SignalR Real-Time Updates Cause Summary Tab Counter Flicker
 
-**What goes wrong:** A user builds a report joining Contacts -> Deals -> Activities -> Notes -> Attachments (5-level deep join). For a tenant with 50k contacts, 100k deals, 500k activities, this generates a query with millions of intermediate rows. PostgreSQL spends minutes on the join, consuming CPU and I/O. Other tenants' queries are delayed (noisy neighbor). The query may also exceed PostgreSQL's `work_mem` and spill to disk.
+**What goes wrong:** The "My Day" dashboard and summary tabs subscribe to SignalR events for real-time updates (following the existing `DashboardStore.startRealTimeRefresh()` pattern). Every CRM mutation in the tenant triggers a SignalR event. On a busy tenant, this causes rapid counter updates: "5 Deals" -> "6 Deals" -> "5 Deals" (if the 6th deal was quickly deleted) flickering on screen. The existing debounce of 2 seconds (`debounceTime(2000)` in `DashboardStore`) helps but is crude.
 
-**Prevention:**
-1. **Limit join depth:** Maximum 3 levels of entity joins in a single report (e.g., Contact -> Deal -> Activity is OK, but Contact -> Deal -> Activity -> Note is the limit).
-2. **Cardinality warnings:** When a user adds a join, estimate the result set size and warn if it exceeds 100k rows: "This report may be slow due to large data volume. Consider adding filters."
-3. **Statement timeout:** Set `SET statement_timeout = '30s'` on report query connections. Cancel queries that exceed the limit.
-4. **Per-tenant query concurrency:** Allow only 2 concurrent report queries per tenant. Queue additional requests.
-5. **Explain-before-execute:** For reports with > 2 joins, run `EXPLAIN` first, check the estimated row count, and reject if > 500k estimated rows.
-
-**Feature:** Advanced Reporting Builder
-**Phase to address:** Reporting Builder phase.
-
----
-
-### Pitfall 17: Workflow Trigger Conditions on JSONB Custom Fields -- Performance
-
-**What goes wrong:** A workflow trigger condition says "when custom field 'Priority Score' > 80, send email." This translates to a query like `WHERE (custom_fields->>'priority_score')::numeric > 80` on every entity update. If the table has 100k rows and the JSONB path is not indexed, this full-table scan runs on every single entity update to evaluate whether the trigger condition is met.
+**Why it happens:** The existing pattern refreshes ALL widget data on ANY SignalR event. For summary tabs, this means a Contact creation event triggers a re-fetch of the Company summary, even though the contact may not be linked to the currently viewed company.
 
 **Prevention:**
-1. **Event-driven evaluation, not poll-driven:** Do not query the database to find matching entities. Instead, evaluate trigger conditions against the specific entity that was just updated. The workflow engine receives the changed entity and evaluates conditions in memory.
-2. **Pre-compiled condition evaluators:** Parse trigger conditions at workflow save time into compiled expressions (`Expression<Func<Entity, bool>>`). At runtime, invoke the compiled delegate against the entity DTO, not the database.
-3. **Indexing for batch operations:** If batch evaluation is needed (e.g., "find all contacts where custom field X changed today"), create expression indexes on frequently-used JSONB paths: `CREATE INDEX idx_contacts_priority ON contacts ((custom_fields->>'priority_score'))`.
-4. **Limit trigger conditions per workflow:** Maximum 5 conditions per trigger. Complex conditions increase evaluation time and make debugging difficult.
+1. **Event-scoped refresh:** SignalR events should include the entity type and ID. Summary tabs should only refresh when the event is relevant (e.g., a Deal event for a Company summary only refreshes if the deal's `CompanyId` matches the current company). This requires enriching SignalR payloads.
+2. **Debounce + batch:** Use `debounceTime(3000)` for summary refreshes (longer than the current 2000ms for dashboards). Collect multiple events during the debounce window and make a single refresh call.
+3. **Optimistic updates where possible:** For simple operations (deal created, activity completed), apply the count change optimistically instead of re-fetching from the server.
 
-**Feature:** Workflow Automation
-**Phase to address:** Workflow Automation phase.
-
----
-
-### Pitfall 18: New Entity Tables Missing RLS Policies
-
-**What goes wrong:** v1.1 introduces new database tables: `workflow_definitions`, `workflow_executions`, `workflow_actions`, `email_templates`, `email_sequences`, `email_sequence_enrollments`, `email_sequence_steps`, `formula_field_definitions`, `duplicate_detection_rules`, `merge_audit_logs`, `webhook_subscriptions`, `webhook_deliveries`, `report_definitions`, `report_executions`. Each of these is tenant-scoped and needs:
-1. EF Core global query filter (`HasQueryFilter(e => e.TenantId == tenantId)`)
-2. PostgreSQL RLS policy in `scripts/rls-setup.sql`
-
-If any table is missed, that table has no tenant isolation at the database level. The EF Core filter provides Layer 2 protection, but a raw SQL query or a bug bypassing the filter would expose all tenants' data.
-
-**Prevention:**
-1. **Checklist for every new entity:**
-   - [ ] Entity has `TenantId` property (Guid, non-nullable)
-   - [ ] `ApplicationDbContext.OnModelCreating` adds `HasQueryFilter(e => e.TenantId == _tenantId)`
-   - [ ] `scripts/rls-setup.sql` has `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` + `CREATE POLICY`
-   - [ ] Migration sets `tenant_id` column as NOT NULL with no default
-   - [ ] Integration test verifies tenant isolation
-2. **Automated verification:** Add a startup check or integration test that queries `pg_catalog.pg_policies` and verifies every tenant-scoped table has an RLS policy. Fail the test if any table is missing.
-3. **Child table analysis:** Determine which new tables are "child tables" (accessed only via FK join from a tenant-filtered parent) and which are "root tables" (queried directly). Root tables need RLS; child tables may not if they are always accessed through a filtered parent. Document the decision for each table.
-
-**Detection:**
-- CI/CD check: compare the list of tables with `tenant_id` column against the list of tables with RLS policies. Any mismatch fails the build.
-- Code review checklist: every PR adding a new entity must include both the EF Core filter and the RLS policy update.
-
-**Feature:** All features
-**Phase to address:** Every phase that introduces new entities -- verify as part of each phase's implementation.
-
----
-
-### Pitfall 19: Workflow and Email Sequence State Management Across Deployments
-
-**What goes wrong:** A deployment restarts the application while:
-- A workflow execution chain is mid-flight (3 of 5 actions completed)
-- An email sequence has 500 contacts waiting for their "Day 3" email to send
-- A webhook delivery retry is queued for the 3rd attempt
-
-If these are stored only in memory (in-process queues, `Channel<T>`, or in-memory state), they are lost on deployment. If they are in a database but without proper status tracking, they may be replayed from the beginning (sending duplicate emails, executing duplicate workflow actions).
-
-**Prevention:**
-1. **Persist all execution state to the database:**
-   - Workflow executions: each action has a `status` (pending, running, completed, failed) persisted to the database. On restart, resume from the last incomplete action.
-   - Email sequence enrollments: each step has a `scheduledAt`, `sentAt`, `status`. On restart, the scheduler picks up steps where `status = 'pending' AND scheduledAt <= now`.
-   - Webhook deliveries: each delivery attempt is persisted with `attemptNumber`, `status`, `nextRetryAt`. On restart, retry failed deliveries where `nextRetryAt <= now`.
-2. **Idempotent execution:** Every action must be safe to execute twice (in case the process crashes after executing but before marking as "completed"). Use idempotency keys (e.g., `{workflowExecutionId}_{actionIndex}`) to deduplicate.
-3. **Graceful shutdown:** On `IHostApplicationLifetime.ApplicationStopping`, drain the in-process queue. Wait up to 30 seconds for running jobs to complete. Mark incomplete jobs as "interrupted" for restart pickup.
-4. **Do not use in-memory-only queues for critical work:** Use a persistent queue (database table, Redis, or Hangfire storage). `Channel<T>` is acceptable only for non-critical, fire-and-forget work (like SignalR event buffering).
-
-**Feature:** Workflow Automation, Email Sequences, Webhooks
-**Phase to address:** Each feature's phase -- but design the persistence pattern once and reuse it.
-
----
-
-### Pitfall 20: Angular Frontend Performance with Complex Workflow/Report Builders
-
-**What goes wrong:** The workflow builder UI (drag-and-drop trigger/action configuration) and the report builder UI (entity picker, field selector, filter builder, preview) are complex interactive components. Common Angular-specific issues:
-- **Change detection storms:** The workflow builder renders a visual graph with many nodes. Each node is a component. A single workflow change triggers change detection on every node component, causing jank.
-- **Memory leaks:** The report preview subscribes to data streams. If the user navigates away without the subscription being cleaned up, the subscription continues running, accumulating memory.
-- **Signal Store bloat:** Putting the entire workflow definition (with potentially 50+ actions) into a Signal Store causes excessive signal emissions on any change, since Angular signals emit on every mutation.
-
-**Prevention:**
-1. **OnPush everywhere** (already the convention -- maintain it for all new components).
-2. **Isolate builder state:** Use local component state for the builder's transient UI state (drag positions, hover states). Use the Signal Store only for the persisted workflow/report definition.
-3. **Immutable updates:** When updating a workflow action, create a new array reference (not mutate in place) so Angular's change detection can quickly determine what changed.
-4. **Debounce auto-save:** If the builder auto-saves on change, debounce by 2 seconds to avoid rapid API calls during drag-and-drop.
-5. **Virtual scrolling for report results:** Use `CdkVirtualScrollViewport` for report result tables with 10,000+ rows. Do not render all rows to the DOM.
-6. **Cleanup:** Use `DestroyRef` and `takeUntilDestroyed()` for all subscriptions in builder components. For `effect()`, Angular handles cleanup automatically, but verify with the component's `OnDestroy`.
-
-**Feature:** Workflow Automation, Advanced Reporting Builder
-**Phase to address:** Each feature's frontend implementation phase.
+**Phase to address:** Summary Tabs and Personal Dashboard phases -- consider this during SignalR integration for both features.
+**Confidence:** MEDIUM -- based on the existing SignalR refresh pattern and its known limitations.
 
 ---
 
 ## Phase-Specific Warnings
 
-| Phase Topic | Likely Pitfall | Mitigation |
-|-------------|---------------|------------|
-| Email Templates & Sequences | Timing drift, deliverability collapse from bulk sends, sending to deleted/merged contacts | Jittered send times, per-tenant rate limits, pre-send validation checks (Pitfalls 7, 13) |
-| Formula/Computed Fields | Circular dependencies crash the system, stale values in reports, deletion of referenced fields | Dependency graph with cycle detection at save time, topological evaluation order (Pitfalls 6, 15) |
-| Workflow Automation | Infinite loops exhaust system resources, bypass RBAC, SignalR broadcast storm | Execution context tracking with depth limits, admin-only management, event batching (Pitfalls 1, 8, 10, 17) |
-| Duplicate Detection & Merge | Data loss from broken FK references, false positives frustrate users | Comprehensive FK map, soft-delete with redirect, confidence scoring (Pitfalls 4, 12) |
-| Webhooks | SSRF attacks, retry storms overwhelm system, sensitive data leakage | URL validation with IP filtering, circuit breakers, minimal payload defaults (Pitfalls 5, 9, 14) |
-| Advanced Reporting Builder | Tenant data leakage through query filter bypass, N+1 queries, unbounded joins | LINQ-only construction, query complexity limits, statement timeouts (Pitfalls 3, 11, 16) |
-| All Features (cross-cutting) | Tenant context loss in background jobs, missing RLS on new tables, state loss on deployment | TenantScope wrapper, RLS checklist, persistent execution state (Pitfalls 2, 18, 19) |
+| Phase Topic | Likely Pitfall | Severity | Mitigation |
+|-------------|---------------|----------|------------|
+| Feed Deep Linking | Deleted/merged entity links (P3) | Critical | Graceful 404 handling + entity name denormalization |
+| Feed Deep Linking | Entity type string mapping inconsistency (P10) | Minor | Create shared EntityTypeRegistry utility |
+| Entity Preview Sidebar | RBAC bypass in preview (P1) | Critical | Scope-checked preview endpoint |
+| Entity Preview Sidebar | Z-index and scroll conflicts (P6) | Moderate | CDK Overlay with explicit stacking |
+| Entity Preview Sidebar | Duplicate service/store instances (P9) | Moderate | Generic EntityPreviewService |
+| Entity Preview Sidebar | Accidental open on scroll (P12) | Minor | Debounced click, mobile nav fallback |
+| Summary Tabs | N+1 aggregation queries (P2) | Critical | Single batched summary endpoint |
+| Summary Tabs | Stale data after mutations (P5) | Moderate | Dirty-flag invalidation + lightweight re-fetch |
+| Summary Tabs | Tab index shift (P8) | Moderate | Refactor to label-based tab matching first |
+| Summary Tabs | Counter flicker from SignalR (P13) | Minor | Event-scoped refresh + debounce |
+| Personal Dashboard | Route migration breaking existing links (P4) | Critical | Route redirects + backward compat |
+| Personal Dashboard | Widget data loading waterfall (P7) | Moderate | Extend batched widget data pattern |
+| Personal Dashboard | Gridster layout serialization (P11) | Minor | Same grid config, widget-level sizing |
 
 ---
 
-## Integration Pitfalls with Existing Architecture
+## Recommended Pitfall Resolution Order
 
-### Integration 1: New Features Must Integrate with Existing NotificationDispatcher
-
-All v1.1 features should dispatch notifications through the existing `NotificationDispatcher` (DB + SignalR + optional email). But workflow actions that create many entities in a loop will call `DispatchAsync` many times, hitting the database on each call. Batch notification creation or defer notifications to after the workflow execution completes.
-
-### Integration 2: New Features Must Set Correct Feed Items
-
-v1.0 creates `FeedItem` records for entity changes. Workflow-initiated changes should create feed items attributed to the workflow (not the system), with a note like "Updated by workflow 'Deal Close Automation'." Without this, the news feed becomes confusing ("System updated 50 records" with no context).
-
-### Integration 3: Custom Field Validator Must Handle Formula Fields
-
-The existing `CustomFieldValidator` validates user-provided custom field values against definitions. Formula/computed fields should be excluded from input validation (users do not provide values for them) but included in output serialization. The validator needs a new `IsComputed` check to skip validation for formula fields.
-
-### Integration 4: Saved Views Must Support New Entity Types
-
-If workflows, email templates, or reports become listable entities with their own list pages (likely for admin management), the `SavedView` system needs to support these new entity types for column configuration, filtering, and sorting.
-
-### Integration 5: EF Core Migration Ordering
-
-v1.1 will add many new tables. Migrations must be ordered carefully to avoid FK reference errors. Create base tables (workflow_definitions) before dependent tables (workflow_executions, workflow_actions). Run migrations against both `ApplicationDbContext` and potentially `TenantDbContext` if any new tables are organization-level (like webhook rate limit configurations).
+1. **Before any coding:** Create shared `EntityTypeRegistry` (P10), refactor tab handlers from index to label-based (P8)
+2. **Feed Deep Linking phase:** Address P3 (deleted entity handling) and P10 (entity type registry)
+3. **Entity Preview Sidebar phase:** Address P1 (RBAC), P6 (overlay architecture), P9 (generic preview service), P12 (mobile behavior)
+4. **Summary Tabs phase:** Address P2 (batched endpoint), P5 (invalidation), P8 (index shift), P13 (SignalR scoping)
+5. **Personal Dashboard phase:** Address P4 (route migration), P7 (loading waterfall), P11 (grid config)
 
 ---
 
 ## Sources
 
-- [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
-- [Hookdeck: Webhooks at Scale](https://hookdeck.com/blog/webhooks-at-scale)
-- [Insycle: Data Retention When Merging Duplicates](https://blog.insycle.com/data-retention-merging-duplicates)
-- [Inngest: Fixing Multi-Tenant Queueing Problems](https://www.inngest.com/blog/fixing-multi-tenant-queueing-concurrency-problems)
-- [Microsoft: EF Core Multi-tenancy](https://learn.microsoft.com/en-us/ef/core/miscellaneous/multitenancy)
-- [Microsoft: EF Core Global Query Filters](https://learn.microsoft.com/en-us/ef/core/querying/filters)
-- [Microsoft: SignalR Performance](https://learn.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance)
-- [Microsoft: DbContext Lifetime and Configuration](https://learn.microsoft.com/en-us/ef/core/dbcontext-configuration/)
-- [elmah.io: .NET 10 Multi-Tenant Rate Limiting](https://blog.elmah.io/new-in-net-10-and-c-14-multi-tenant-rate-limiting/)
-- [Dynamics 365: Calculated Fields and Circular Dependencies](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/define-calculated-fields)
-- [RT Dynamic: CRM Deduplication Guide 2025](https://www.rtdynamic.com/blog/crm-deduplication-guide-2025/)
-- [Inogic: Duplicate Detection and Merge in Dynamics 365](https://www.inogic.com/blog/2025/10/step-by-step-guide-to-duplicate-detection-and-merge-rules-in-dynamics-365-crm/)
-- [Hangfire Discussion: Multi-Tenant Architecture](https://discuss.hangfire.io/t/hangfire-multi-tenant-architecture-per-tenant-recurring-jobs-vs-dynamic-enqueueing-at-scale/11400)
-- [Code Maze: Prevent SQL Injection with EF Core](https://code-maze.com/prevent-sql-injection-with-ef-core-dapper-and-ado-net/)
-- Existing GlobCRM v1.0 codebase: `TenantDbConnectionInterceptor.cs`, `PermissionService.cs`, `CrmHub.cs`, `NotificationDispatcher.cs`, `CustomFieldValidator.cs`, `rls-setup.sql`
+- Direct codebase inspection: `feed-list.component.ts`, `FeedController.cs`, `DashboardsController.cs`, `company-detail.component.ts`, `related-entity-tabs.component.ts`, `permission.store.ts`, `app.routes.ts`, `app.component.ts`, `FeedItem.cs`, `dashboard.store.ts`
+- [EF Core Efficient Querying](https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying) -- Microsoft Learn
+- [Angular CDK Overlay Basics](https://briantree.se/angular-cdk-overlay-tutorial-learn-the-basics/) -- Brian Treese
+- [Angular OnPush Change Detection Pitfalls](https://blog.angular-university.io/onpush-change-detection-how-it-works/) -- Angular University
+- [N+1 Problem in EF Core](https://www.jocheojeda.com/2025/06/26/understanding-the-n1-database-problem-using-entity-framework-core/) -- Joche Ojeda
+- [EF Core Split Queries](https://bytecrate.dev/find-fix-ef-core-n-1-queries/) -- ByteCrate
+- [Parallel API Calls in Angular](https://tacettinsertkaya.medium.com/parallel-api-calls-in-angular-applications-4afa9f03c94d) -- Medium
+- [Angular 21 CDK Overlay Issues](https://medium.com/@Angular_With_Awais/how-to-fix-angular-21-cdk-overlay-issues-without-css-hacks-fcfa8ff349cf) -- Medium

@@ -1,277 +1,273 @@
 # Project Research Summary
 
-**Project:** GlobCRM v1.1 — Automation, Intelligence, and Extensibility
-**Domain:** Multi-Tenant SaaS CRM Automation (Workflow Engine, Email Sequences, Formula Fields, Duplicate Detection, Webhooks, Advanced Reporting)
-**Researched:** 2026-02-18
+**Project:** GlobCRM v1.2 — Connected Experience
+**Domain:** CRM entity connectivity, preview panels, summary dashboards, personal workspace
+**Researched:** 2026-02-20
 **Confidence:** HIGH
 
 ## Executive Summary
 
-GlobCRM v1.1 transforms the shipped v1.0 CRUD-focused CRM into an automation-first platform. The core architectural shift is from request/response data management to event-driven processing: entity changes become the universal trigger for workflows, webhooks, formula recalculation, and duplicate detection. All six v1.1 feature areas are interconnected through a shared infrastructure — a domain event interceptor hooked into EF Core's `SaveChangesAsync` pipeline, and Hangfire for durable background processing. The existing Clean Architecture (Angular 19 / .NET 10 / PostgreSQL 17) remains unchanged; v1.1 plugs into existing layers rather than replacing them.
+GlobCRM v1.2 is a frontend-dominant UX milestone that transforms the product from a collection of isolated record screens into an interconnected information network. Three features accomplish this: an entity preview sidebar (peek at any entity from the feed or search without leaving context), summary tabs on all major detail pages (aggregated KPIs and recent activity as the first tab on each record), and a personal "My Day" dashboard that replaces the current home page with a user-scoped daily workspace. The defining characteristic of this milestone is that it requires **zero new library installations** — every feature maps directly to Angular Material (`MatDrawer`), `angular-gridster2`, Chart.js, and NgRx Signals already installed in the stack. The primary engineering challenge is architectural design, not technology acquisition.
 
-The recommended approach is to build foundational infrastructure first (Hangfire job server + email template renderer + formula evaluator), then layer higher-order features on top. Email Templates and Formula Fields are independent leaf nodes that everything else depends on. Workflow Automation is the orchestration hub that connects templates, sequences, webhooks, and notifications. This dependency order dictates a natural phase structure: foundation first, then the automation engine, then sequences/webhooks in parallel, then duplicate detection (most complex data mutation), and finally the reporting builder (benefits from all preceding data). The stack additions are minimal: 5 NuGet packages and 1 npm package on top of the existing 17 NuGet packages.
+The recommended implementation approach follows the pattern established by HubSpot, Salesforce, and Pipedrive — all of which ship these exact three capabilities as the core of their "modern CRM" experience. The preview sidebar must be a global overlay component hosted at the `AppComponent` level, not inside any feature module, managed by a root-provided `PreviewSidebarStore` that any component in the app can call with `open(entityType, entityId)`. Summary tabs require a single batched backend aggregation endpoint per entity type rather than multiple individual API calls. "My Day" reuses the full existing gridster widget infrastructure with new per-user scoping semantics and new widget types — no new layout library, no new charting library.
 
-The primary risks are cross-cutting and architectural. Tenant context must be explicitly propagated into all background jobs or catastrophic cross-tenant data leakage occurs. Workflow engines that do not track execution depth create infinite loops that exhaust system resources across all tenants. Merge operations that miss FK references permanently destroy contact history. None of these risks are recoverable without data loss — they must be designed in from the start, not bolted on later. The research is unanimous: implement the `TenantScope` job wrapper and the workflow depth limiter before writing any feature-specific code.
+The top risks are security (preview sidebar must enforce RBAC scope checks — not just "can view" but "can view this specific record"), performance (summary tabs must use a single aggregated query endpoint, not N+1 calls per metric), and data integrity (feed links to deleted/merged entities must fail gracefully with denormalized names). All four critical pitfalls have clear, well-defined prevention strategies that must be designed in from the start, not retrofitted. Tab index shifting when inserting the Summary tab at position 0 across 6+ entity detail pages is the most widespread mechanical change and must be addressed by refactoring to label-based tab matching before any new tabs are added.
 
 ## Key Findings
 
 ### Recommended Stack
 
-The existing .NET 10 / Angular 19 / PostgreSQL 17 stack handles all v1.1 needs with only targeted additions. No architectural changes are required. The five NuGet additions are: **Hangfire** (PostgreSQL-backed durable job processing for delayed scheduling, retry, and monitoring), **Fluid.Core** (sandboxed Liquid template engine for user-editable email templates — RazorLight stays for system emails only), **NCalcSync** (expression evaluator for formula fields and workflow conditions), **FuzzySharp** (in-memory fuzzy string scoring for duplicate detection candidates), and **Microsoft.Extensions.Http.Resilience** (Polly-based resilient HTTP for webhook delivery). On the frontend, **@foblex/flow** provides the Angular-native visual workflow builder canvas.
+v1.2 needs no new npm packages. The entire feature set is buildable with the existing installed stack. See [STACK.md](.planning/research/STACK.md) for the full analysis.
 
-**Core technology additions:**
-- **Hangfire 1.8.23 (PostgreSQL storage)**: Durable background jobs — the backbone of all async processing. Required for delayed email sequence steps, webhook retry with backoff, workflow action execution, and nightly duplicate scans. Uses existing PostgreSQL database, no new infrastructure.
-- **Fluid.Core 2.31.0**: Liquid template engine for user-authored email templates. Sandboxed by design (no C# injection). 8x faster than DotLiquid. Coexists with RazorLight (system emails unchanged).
-- **NCalcSync 5.11.0**: Expression evaluator for formula fields (`[deal_value] * [probability]`) and workflow conditions (`[stage] == 'Won' && [value] > 10000`). Pure computation, no external dependencies. Placed in Application layer.
-- **FuzzySharp 2.0.2 + pg_trgm (built-in)**: Two-tier duplicate detection: PostgreSQL `pg_trgm` GIN indexes pre-filter candidates at database level; FuzzySharp computes weighted composite scores (name: 40%, email: 30%, phone: 20%, company: 10%) in memory.
-- **Microsoft.Extensions.Http.Resilience 10.3.0**: Webhook delivery resilience — retry with exponential backoff + jitter, circuit breaker, timeout. Official Microsoft replacement for deprecated `Http.Polly`.
-- **@foblex/flow 18.1.2**: Angular-native flow editor for visual workflow builder. MIT licensed, supports Angular Signals. Medium confidence — verify Angular 19.2.x compatibility before committing; fallback is a linear trigger → conditions → actions form layout.
+**Core technologies (existing, repurposed for v1.2):**
+- `@angular/material` MatDrawer: entity preview sidebar — purpose-built Angular component for right-side overlay panels; provides slide animation, backdrop, Esc handling, and focus trapping out of the box; no CDK Overlay custom implementation needed
+- `angular-gridster2` v19: "My Day" personal dashboard layout — already powering the org dashboard with full drag/resize/persist widget infrastructure; "My Day" reuses `DashboardGridComponent` entirely with new widget types
+- `Chart.js 4.5.1` + `ng2-charts 8.0.0`: mini sparkline charts on summary tabs — same library with minimal config (hidden axes, no legend, no tooltips, fill area only); no separate sparkline library needed
+- `@ngrx/signals`: new root-level `PreviewSidebarStore`, `MyDayStore`, and per-component summary stores — same signal store patterns as all existing stores
+- `MatTabsModule`: summary tabs slot into existing `RelatedEntityTabsComponent` tab arrays (`COMPANY_TABS`, `CONTACT_TABS`, etc.) — no new tab infrastructure needed
+- `@microsoft/signalr`: existing real-time feed updates work unchanged; summary tab counts can debounce-refresh on `FeedUpdate` events
 
-Explicitly rejected: MediatR (hand-rolled command/handler pattern is already established), Redis (Hangfire uses PostgreSQL storage; add only when scaling to multiple servers), Elasticsearch (pg_trgm handles fuzzy matching at CRM scale), Monaco Editor (formula editor is a simple mat-autocomplete overlay, not a code editor), raw Polly (use `Microsoft.Extensions.Http.Resilience` which wraps it).
+The one optional addition: `@fullcalendar/list` plugin for a native agenda view. Research recommends against it — a custom `TodayAgendaWidgetComponent` calling `ActivityService` with `dueDate=today` filter is simpler, more CRM-specific, and avoids FullCalendar's opinionated styling in a widget context.
 
 ### Expected Features
 
-Research across HubSpot, Pipedrive, Zoho, Salesforce Dynamics 365, and Freshsales with HIGH confidence established the following feature set:
+See [FEATURES.md](.planning/research/FEATURES.md) for full feature tables with CRM benchmark comparisons.
 
-**Must have (table stakes for v1.1):**
-- **Workflow Automation** — event-based triggers (record created/updated, field changed), date-based triggers, field update / notify / create task / send email / fire webhook / enroll in sequence actions, execution log, enable/disable toggle
-- **Email Templates** — rich text editor with Liquid merge fields, template categories, preview with sample data, clone
-- **Email Sequences** — multi-step builder with delays, manual + workflow enrollment, auto-unenroll on reply, open/click tracking, sequence analytics
-- **Formula / Computed Custom Fields** — arithmetic, date difference, string concatenation, IF/THEN, real-time recalculation on save, circular dependency detection
-- **Duplicate Detection & Merge** — on-demand scan, real-time warning on create, configurable match rules, fuzzy matching, side-by-side merge UI, relationship transfer, merge audit trail
-- **Webhooks** — subscription management, HMAC-SHA256 signing, retry with exponential backoff, delivery log, manual retry, test endpoint
-- **Advanced Reporting Builder** — entity + field selection, filter builder, grouping/aggregation, related entity fields (1 level), chart + table view, save/share/export
+**Must have (table stakes — users expect these from a modern CRM):**
+- Clickable entity names in feed that open a slide-in preview panel (not navigate away)
+- Preview panel: key fields, status, owner, "Open full record" link, close on Esc/backdrop click, loading skeleton
+- Scroll-position preservation when closing preview (feed stays in place)
+- Summary tab as the first/default tab on Companies, Contacts, Deals, Leads, Quotes, Requests
+- Summary tab contents: key properties card, association counts with tab-jump links, recent activities (3-5 items), stage/status indicator, quick action bar (Add Note, Log Activity, Send Email)
+- "My Day" as new home page: today's tasks/activities, overdue items, my pipeline widget, greeting with time-of-day context
+- Org dashboard relocated to its own navbar item (not deleted — it serves a different audience: team-level KPIs vs. personal daily view)
+- Responsive behavior: preview sidebar full-width on mobile (<768px), side panel on desktop
 
-**Should have (competitive differentiators):**
-- Workflow-triggered email sequence enrollment (connects automation and sequences — most mid-tier CRMs treat these separately)
-- Computed fields usable in report builder filters and aggregations (Pipedrive limits these to display-only)
-- Webhook action in workflows (single trigger drives both internal logic and external integration)
-- Upgrade existing CSV import duplicate detection to use new fuzzy matching engine
-- Prebuilt workflow templates (5-10 common patterns: "New lead follow-up", "Deal won", "Stale deal reminder")
-- Report drill-down: click chart bar to see filtered underlying records via existing dynamic table
+**Should have (differentiators):**
+- Quick actions in preview sidebar (Add Note, Log Call, Send Email) — reuses the same `QuickActionBarComponent` as summary tabs
+- Association chips in preview (linked company on a contact, contacts on a deal)
+- Mini deal/pipeline summary on Company and Contact summary tabs (Chart.js bar chart, aggregated deal stats endpoint)
+- "My Day" configurable widget layout via gridster — genuine differentiator; HubSpot Sales Workspace is not user-configurable in layout
+- User preference persistence for widget layout (user-scoped dashboard entity)
+- Entity preview from global search results (secondary action alongside navigate)
 
-**Defer to v1.2:**
-- Scheduled report delivery (email on schedule)
-- Sequence A/B testing
-- Cross-entity workflow triggers ("when a deal's company gets updated")
-- Cross-entity formula fields (formula on Contact referencing related Deal fields)
-- Bulk merge with batch processing
-- Per-contact timezone for sequence send windows
+**Defer to v1.3+:**
+- Inline entity @mention system in feed content (requires structured mention parsing backend)
+- AI-generated record summaries (requires AI infrastructure and token budget)
+- Admin-customizable Summary tab layout per entity type
+- Smart nudges / guided actions (rule engine is standalone work)
+- Sparkline trend charts on summary tabs (needs time-series aggregation endpoints)
+- Cross-entity relationship map visualization
+
+**Entity coverage in v1.2:**
+
+| Entity | Preview Sidebar | Summary Tab |
+|--------|----------------|-------------|
+| Company | Yes | Yes — rich (contacts, deals, activities, emails, quotes, requests) |
+| Contact | Yes | Yes — rich (company link, deals, activities, emails) |
+| Deal | Yes | Yes — rich (pipeline progress, contacts, products, activities, quotes) |
+| Lead | Yes | Yes — moderate (stage progress, temperature, source, activities) |
+| Quote | Yes | Yes — moderate (status badge, line item summary, linked deal/company/contact) |
+| Request | Yes | Yes — moderate (status + priority badges, linked contact/company) |
+| Product | Yes (basic) | No — insufficient connected data |
+| User/Team Member | Yes (feed only) | No |
 
 ### Architecture Approach
 
-v1.1 introduces three new cross-cutting concerns layered on the existing Clean Architecture: (1) a domain event system wired into `SaveChangesAsync` via `DomainEventInterceptor`; (2) Hangfire as the durable background processing backbone shared by all async features; (3) a dynamic expression evaluation layer via NCalc for formula fields, workflow conditions, and report query filters. All six features share these three infrastructure elements, which is why they must be built first.
+v1.2 is a **frontend UX milestone with targeted backend aggregation endpoints**. The existing architecture handles 90% of requirements. The critical architectural decision is placing the entity preview sidebar as a global overlay at `AppComponent` level, managed by a root-provided store, triggerable from anywhere in the app. See [ARCHITECTURE.md](.planning/research/ARCHITECTURE.md) for full component specs, data flow diagrams, code patterns, and the A/B/C/D build order.
 
-**Major components:**
-1. **DomainEventInterceptor** (Infrastructure) — captures entity changes before save, dispatches domain events after successful save. Triggers workflows, webhooks, duplicate checks, and formula recalculation from a single integration point. Critical: events captured in `SavingChangesAsync` (OriginalValues available) but dispatched in `SavedChangesAsync` (entity persisted).
-2. **WorkflowEngine** (Infrastructure) — evaluates NCalc conditions against domain events, dispatches quick actions synchronously and slow actions (email, webhook, sequence enrollment) as Hangfire jobs. Must track execution depth to prevent infinite loops.
-3. **Hangfire Job Server** (Infrastructure) — PostgreSQL-backed, 4 named queues (default, webhooks, emails, workflows), `TenantJobFilter` sets tenant context before every job execution. Used by: WorkflowActionJob, WebhookDeliveryJob, SequenceStepJob, DuplicateScanJob.
-4. **FormulaEvaluator** (Application) — NCalc-based expression evaluator with CRM-specific functions (IF, CONCAT, DATEDIFF, TODAY, ROUND). Evaluate on-read, never store computed values in JSONB.
-5. **FluidEmailTemplateRenderer** (Infrastructure) — renders Liquid templates with entity context. Coexists with existing RazorEmailRenderer for system emails.
-6. **DuplicateDetectionService** (Infrastructure) — pg_trgm SQL pre-filter + FuzzySharp weighted composite scoring. Two-tier design avoids loading all records into memory.
-7. **WebhookDeliveryService** (Infrastructure) — HMAC-SHA256 signed HTTP delivery via resilient HttpClient pipeline. Circuit breaker per endpoint after 3 consecutive failures.
-8. **ReportQueryBuilder** (Infrastructure) — translates JSON report definitions to EF Core IQueryable chains (never raw SQL). Tenant isolation automatic via global query filters.
-9. **12 new domain entities** — WorkflowDefinition, WorkflowExecutionLog, EmailTemplate, EmailSequence, EmailSequenceStep, SequenceEnrollment, SequenceStepLog, DuplicateCandidate, DuplicateRule, WebhookSubscription, WebhookDeliveryLog, ReportDefinition. All tenant-scoped with triple-layer isolation (TenantId + EF Core filter + PostgreSQL RLS).
+**Major new components:**
+
+1. `EntityPreviewSidebarComponent` (shared) — global overlay hosted in `AppComponent` template; managed by root `PreviewSidebarStore`; `@switch(entityType)` for type-specific field templates; CSS fixed position, ~400px wide, slides from right with MatDrawer animation
+2. `EntityPreviewService` (root) — single generic service calling `GET /api/entities/{type}/{id}/preview`; no per-entity services in sidebar (prevents coupling and bundle bloat)
+3. `EntitySummaryTabComponent` (shared) — slots into `RelatedEntityTabsComponent` as index 0 on all entity detail pages; calls single `GET /api/{entityType}/{id}/summary` aggregation endpoint
+4. `EntityFeedTabComponent` (shared) — entity-scoped feed reusing a new `FeedCardComponent` extracted from `FeedListComponent`; added as the last tab on all detail pages
+5. `MyDayComponent` + `MyDayStore` (feature) — personal dashboard reusing existing gridster widget infrastructure; new widget types: `TodayAgendaWidget`, `MyDealsWidget`, `RecentFeedWidget`, `QuickActionsWidget`
+6. Backend: `EntityPreviewController`, `EntitySummaryController`, `MyDayController` — three new controllers; no new NuGet packages
+
+**New backend endpoints:**
+
+| Endpoint | Purpose | Key Design Requirement |
+|----------|---------|----------------------|
+| `GET /api/entities/{type}/{id}/preview` | Generic slim DTO for preview sidebar | RBAC scope-checked (Own/Team/All); generic field-list DTO shape |
+| `GET /api/{entityType}/{id}/summary` | Aggregated counts + recent activity | Single DB round-trip via `Task.WhenAll()`; scope-filtered counts |
+| `GET /api/feed?entityType=X&entityId=Y` | Entity-scoped feed (extension) | Optional params added to existing endpoint; same paged response shape |
+| `GET /api/my-day` | Personal daily snapshot | User-scoped only; activities, deals, stats, recent feed in one response |
+
+**Build order (A → B → C → D):** Backend endpoints and services first (parallelizable by feature), component shells second, integration into existing pages third (highest risk — tab index shifts), polish and animations last.
 
 ### Critical Pitfalls
 
-1. **Tenant context loss in background jobs** (Pitfall 2) — Hangfire jobs run outside HTTP request scope, so Finbuckle middleware never runs. Without explicit `TenantScope` wrapper that sets `ITenantProvider` from the job's `tenantId` parameter, EF Core global filters and PostgreSQL RLS receive null tenant context, causing cross-tenant data leakage or silent empty result sets. Build `TenantScope` infrastructure before any background processing feature.
+See [PITFALLS.md](.planning/research/PITFALLS.md) for all 13 pitfalls with full prevention strategies and detection methods.
 
-2. **Workflow infinite loops** (Pitfall 1) — Workflows that update entities trigger further workflow evaluations. Without depth tracking, a two-workflow cycle burns CPU, exhausts database connections, floods SignalR, and fills audit tables within seconds — for all tenants simultaneously. Enforce execution depth limit (max 5), per-execution visited-set tracking, and per-tenant rate limiting (100 executions/min) from day one of workflow engine implementation.
+**Critical (must be designed in from the start — not retroactively fixable):**
 
-3. **Duplicate merge broken FK references** (Pitfall 4) — Merging contacts requires updating every table that references the losing entity by ID, including polymorphic references (`feed_items.entity_id`, `notifications.entity_id`), JSONB Relation-type custom field values, and new v1.1 tables (sequence enrollments, workflow conditions). Missing any FK permanently destroys the merged entity's history. Use soft-delete with `MergedIntoId` redirect + full transaction + pre-merge FK enumeration + user confirmation with impact preview.
+1. **Preview sidebar bypasses RBAC scope checks** (P1) — Feed shows entity links visible to all tenant users. A user with `Contact:View:Own` scope should not see another user's contact in the preview. Prevention: the preview endpoint must call `_permissionService.GetEffectivePermissionAsync()` and validate Own/Team/All scope before returning data. Return 403 on scope violation. Frontend pre-checks `permissionStore.hasPermission()` before opening the sidebar to avoid a wasted API call.
 
-4. **Report builder tenant data leakage** (Pitfall 3) — Dynamic query construction risks bypassing EF Core global query filters via `FromSqlRaw`, raw SQL fragments, or accidental `IgnoreQueryFilters()`. Use LINQ-only report queries with whitelist field mapping; never expose raw SQL construction. PostgreSQL RLS is the safety net, not the primary defense.
+2. **N+1 queries in summary tab aggregation** (P2) — Calling separate list endpoints for 8 different counts means 8 database round-trips per summary load. Under 50 concurrent users, that is 400+ queries per page-load cycle. Prevention: single `GET /api/{entityType}/{id}/summary` endpoint using EF Core `Task.WhenAll()` with `AsNoTracking()` `COUNT(*)` and `SUM()` queries. Never load collections to count in memory. Summary counts must also respect the user's View scope per entity type.
 
-5. **Webhook SSRF** (Pitfall 5) — Tenants can register webhook URLs pointing to cloud metadata endpoints (`169.254.169.254`), loopback, or internal services. Validate on registration AND re-resolve DNS on each delivery (DNS rebinding). Allow `https://` only, reject RFC1918 private ranges, limit redirects. Must be in first webhook implementation.
+3. **Feed links to deleted/merged entities cause broken UX** (P3) — FeedItems use logical references (`EntityType` + `EntityId`) with no FK constraint by design. Deleting a Deal leaves a dead link in the feed. Prevention: (a) add `EntityName` column to `FeedItem` at creation time (denormalization migration) so feed cards still show a meaningful name after deletion; (b) graceful 404 handling in preview sidebar ("This Deal has been deleted" message, not an error); (c) merge-redirect resolution generalized from the existing `company-detail.component.ts` pattern.
 
-6. **Formula circular dependencies** (Pitfall 6) — Formula field A references field B which references field A causes infinite recursion on evaluation. Validate dependency graph on every formula save using topological sort; reject cycles immediately with clear error. Maximum dependency chain depth of 5.
+4. **Route migration breaks existing org dashboard bookmarks** (P4) — Moving `/dashboard` to make way for "My Day" breaks existing bookmarks and the catch-all redirect in `app.routes.ts`. Prevention: define the complete new route map before writing any code — `/` and `/dashboard` both redirect to `/my-day`; org dashboard moves to `/analytics` with backward-compat redirect from old path. The route restructuring must be the very first task in the personal dashboard phase.
+
+**Moderate (significant bugs but recoverable):**
+
+5. **Summary tab stale data after mutations on sibling tabs** (P5) — Existing `loaded` boolean guards prevent re-fetch. Creating a Deal on the Deals tab does not update the Summary tab's deal count. Prevention: dirty-flag signal pattern — each tab's mutation handler sets `summaryDirty = signal(true)`; Summary re-fetches on tab-switch when dirty. The batched endpoint is fast enough for this pattern.
+
+6. **Preview sidebar z-index and scroll conflicts** (P6) — Conflicts with existing Material dialogs, menus, and datepickers. Prevention: CDK Overlay with explicit z-index stacking layer constants; `BlockScrollStrategy` to prevent body scroll when sidebar is open; close sidebar on `NavigationStart` router events to prevent stale previews across routes.
+
+7. **Tab index shift when inserting Summary at position 0** (P8) — All existing `onTabChanged(index)` handlers use hardcoded numeric indices (`if (index === 3)`). Inserting Summary at index 0 silently breaks all lazy loading across every detail page. Prevention: **refactor to label-based tab matching before adding any new tabs** — replace `if (index === 3)` with `if (tabLabel === 'Contacts')` in all 6+ detail components. This is the first task of the Summary Tabs phase.
+
+8. **"My Day" widget loading waterfall** (P7) — 6-8 concurrent HTTP requests on every app load (the new home page). Prevention: extend the existing batched `POST /api/dashboards/{id}/widget-data` endpoint to support new "My Day" widget types; use two-tier loading (fast KPIs first, slow entity lists second with skeleton loaders).
 
 ## Implications for Roadmap
 
-Based on the feature dependency graph from FEATURES.md and the build order analysis from ARCHITECTURE.md, the research recommends a 6-phase structure:
+Based on the combined research, the feature dependency graph and pitfall resolution order dictate a 4-phase structure within the v1.2 milestone. Phase ordering follows architectural dependencies (global components before per-page integrations) and pitfall mitigation requirements (refactoring before inserting new tabs; route planning before component building).
 
-### Phase 1: Foundation — Hangfire + Email Templates + Formula Fields
+### Phase 1: Foundation — Shared Infrastructure + Entity Preview Sidebar
 
-**Rationale:** Email Templates and Formula Fields have no dependencies on other v1.1 features and are required by every subsequent phase. Hangfire is the async processing backbone required by all subsequent features. This is the mandatory starting point. The `TenantScope` background job wrapper and the Hangfire `TenantJobFilter` must be implemented here — before any feature adds background processing.
+**Rationale:** All three v1.2 features depend on shared infrastructure: the `EntityTypeRegistry` utility, the tab index refactor, the generic `EntityPreviewService`, and the preview sidebar overlay itself. Building these first means Phases 2 and 3 are integration work against a stable foundation, not architecture decisions under time pressure. The preview sidebar is also the most novel UX paradigm — shipping it first gives the team time to iterate before users see it on summary tabs and search.
 
-**Delivers:** Tenant-safe background job infrastructure with TenantJobFilter; user-editable email templates with Liquid merge fields, rich text editing, preview, and template categories; formula/computed custom fields with NCalc evaluation, circular dependency detection via topological sort, on-read evaluation strategy, and formula validation on save.
+**Delivers:**
+- Shared `EntityTypeRegistry` utility (maps entity type strings to routes, icons, labels) — eliminates 3+ divergent mapping implementations across feed, notifications, and activities
+- Tab handler refactor across all 6 entity detail components: index-based to label-based `onTabChanged` — unblocks safe tab insertion in Phase 2 without silent regressions
+- `EntityName` denormalization: migration adding `entity_name` column to `feed_items` — prevents dead-link UX from Phase 2 onward
+- `EntityPreviewController` backend endpoint (`GET /api/entities/{type}/{id}/preview`) with RBAC scope checking built in
+- `EntityPreviewService` (Angular, root) + `PreviewSidebarStore` (root signal store)
+- `EntityPreviewSidebarComponent` hosted in `AppComponent` + feed entity link integration (replace `navigateToEntity()` with `previewSidebarStore.open()`)
+- Graceful 404/deleted-entity handling in preview sidebar
 
-**Addresses:** Email Templates (all table stakes), Formula Fields (all table stakes), Hangfire integration (shared infrastructure)
+**Addresses features from FEATURES.md:** All preview sidebar table stakes (clickable entity names, slide-in panel, key properties, close behavior, loading skeleton, deleted entity graceful handling, scroll-position preservation)
 
-**Avoids:** Pitfall 2 (TenantScope wrapper complete before downstream features add background jobs). Pitfall 6 (formula dependency graph + cycle detection from day one). Pitfall 15 (block deletion of custom fields referenced by formulas).
+**Avoids pitfalls:** P1 (RBAC bypass — scope-checked endpoint), P3 (deleted entities — denormalization + graceful 404), P9 (duplicate service instances — generic service), P10 (entity type mapping inconsistency — registry utility)
 
-**Research flag:** Standard patterns — well-documented libraries (Hangfire, Fluid, NCalc). Skip research-phase; proceed directly to planning.
+**Research flag:** Standard patterns — skip research-phase. MatDrawer implementation is official Angular Material. RBAC pattern matches existing `_permissionService` usage in other controllers.
 
----
+### Phase 2: Summary Tabs on All Detail Pages
 
-### Phase 2: Workflow Automation Engine
+**Rationale:** Summary tabs add high value to the most-visited pages in the app with low new-paradigm risk — they build on the tab infrastructure stabilized in Phase 1 (label-based handlers, Summary safely insertable at index 0). The aggregation endpoint pattern established here (single batched query, RBAC-scope-filtered counts) becomes the template for the My Day endpoint in Phase 3. The `QuickActionBarComponent` built here is reused in the Phase 4 preview sidebar polish.
 
-**Rationale:** The largest and most complex phase. Depends on Phase 1 (Hangfire for action dispatch, Email Templates for "send email" action). The DomainEventInterceptor is the integration point for workflows AND webhooks AND duplicate detection — it must be designed here to serve all downstream consumers. This is the architectural cornerstone of v1.1.
+**Delivers:**
+- `EntitySummaryController` with per-entity `GET /api/{entityType}/{id}/summary` endpoints (Companies, Contacts, Deals, Leads, Quotes, Requests) using `Task.WhenAll()` batching — no N+1 queries
+- `EntitySummaryService` (Angular root) + `EntitySummaryTabComponent` (shared): KPI cards, association count chips with tab-jump links, recent activity mini-timeline, stage/status indicator
+- `QuickActionBarComponent` (shared) — Add Note, Log Activity, Send Email; reused across summary tabs and (in Phase 4) preview sidebar
+- `FeedCardComponent` extracted from `FeedListComponent` (reduces duplication, enables entity feed tab)
+- `EntityFeedTabComponent` (shared) — entity-scoped feed using `FeedCardComponent`
+- `FeedController` extended with optional `?entityType=X&entityId=Y` filter params (additive change, backward compatible)
+- Summary tab added at index 0 on all 6 entity detail pages; Feed tab added as last tab
+- Dirty-flag invalidation: summary re-fetches when sibling tabs perform mutations
 
-**Delivers:** DomainEventInterceptor wired to `SaveChangesAsync`; WorkflowEngine with NCalc condition evaluation; WorkflowActionJob covering field update, create activity, send notification, send email, fire webhook, and start sequence actions; workflow builder UI with trigger/condition/action form (using @foblex/flow or linear fallback); execution log with full audit trail; enable/disable toggle; prebuilt workflow templates (5-10 patterns).
+**Addresses features from FEATURES.md:** All summary tab table stakes; entity-scoped feed tab; association count chips (also feeds preview sidebar in Phase 4)
 
-**Addresses:** Workflow Automation (all table stakes sub-features), workflow-triggered sequence enrollment (differentiator), webhook action in workflows (differentiator)
+**Avoids pitfalls:** P2 (N+1 queries — batched endpoint design), P5 (stale summary data — dirty-flag invalidation), P8 (tab index shift — resolved in Phase 1 refactor)
 
-**Avoids:** Pitfall 1 (execution depth limit, per-execution visited-set, per-tenant rate limiting designed in from the start). Pitfall 8 (admin-only workflow management, "execute as system with tenant isolation" model). Pitfall 10 (SignalR event batching for workflow-generated entity changes). Pitfall 17 (event-driven condition evaluation, not database polling).
+**Research flag:** Standard patterns — skip research-phase. EF Core aggregate queries are well-documented. Chart.js sparkline config is established. Tab integration is mechanical after Phase 1 refactor.
 
-**Research flag:** Needs deeper research during planning — DomainEventInterceptor interaction with existing AuditableEntityInterceptor, @foblex/flow Angular 19.2.x compatibility verification, workflow execution state machine completeness.
+### Phase 3: Personal "My Day" Dashboard + Org Dashboard Relocation
 
----
+**Rationale:** "My Day" is the highest-complexity feature — new page, new widget types, route restructuring, navbar changes, user preference persistence, and coordination with the existing org dashboard. It ships after Phases 1-2 because it reuses the aggregation endpoint pattern (Phase 2) and the `QuickActionBarComponent` (Phase 2). The route restructuring must be the very first task within this phase, executed atomically, to avoid breaking existing users mid-phase.
 
-### Phase 3: Email Sequences
+**Delivers:**
+- Route restructuring (first task, atomic): `/` → `/my-day`, `/dashboard` → `/my-day` (redirect), org dashboard moves to `/analytics` — with backward-compat redirects for existing bookmarks
+- Navbar update: "My Day" entry (home icon, default landing) + renamed "Analytics" entry (grid_view icon)
+- Auto-creation of default personal dashboard on first login (lazy creation: `GET /api/dashboards?scope=personal` creates default if none exists)
+- `MyDayController` (`GET /api/my-day`) — user-scoped activities, deals, stats, recent feed in one batched response
+- `MyDayComponent` + `MyDayStore` (per-page signal store, follows existing `DashboardStore` pattern)
+- New widget types: `TodayAgendaWidget` (custom component, not FullCalendar), `MyDealsWidget`, `RecentFeedWidget`, `QuickActionsWidget`
+- Widget layout persistence with user scope (`OwnerId = currentUserId`, separate `isDefault` semantics from org dashboard)
+- `DashboardScope` enum added to schema (Personal / Organization) with migration
 
-**Rationale:** Depends on Phase 1 (email templates for step content, Hangfire for delayed scheduling). Benefits from Phase 2 (workflows can trigger sequence enrollment). Relatively self-contained after foundation is in place — primarily adding enrollment management and step scheduling on top of existing email infrastructure.
+**Addresses features from FEATURES.md:** All "My Day" table stakes; org dashboard relocation; user-configurable layout (genuine differentiator); greeting/date context reuse from existing `DashboardComponent`
 
-**Delivers:** Multi-step sequence builder with delays; manual enrollment and workflow-triggered enrollment with idempotency constraint on `(sequence_id, contact_id)`; auto-unenroll on reply via Gmail sync integration; open/click tracking via pixel and link wrapping; sequence analytics (enrolled → opened → clicked → replied funnel); pause/resume individual enrollments; business hours send window; jittered send times.
+**Avoids pitfalls:** P4 (route migration — backward-compat redirects, route plan first), P7 (widget loading waterfall — extend batched endpoint), P11 (gridster layout config — same 12-column config, widget-level sizing differences only)
 
-**Addresses:** Email Sequences (all table stakes sub-features)
+**Research flag:** Needs schema design session during planning. The `DashboardScope` enum addition and the "create on first access" strategy for default personal dashboards need explicit decisions before any code is written. Also confirm the migration strategy for existing users (all existing users get a default "My Day" created).
 
-**Avoids:** Pitfall 7 (jittered send times, pre-send contact validation for deleted/merged/unsubscribed contacts, per-tenant sending rate limits). Pitfall 13 (HTML escaping of Liquid template output, HtmlSanitizer for template HTML).
+### Phase 4: Preview Sidebar Polish + Quick Actions Integration
 
-**Research flag:** Auto-unenroll on reply requires careful integration with existing Gmail sync service — needs planning-phase review of email address matching logic and false positive handling.
+**Rationale:** Cross-feature integration and polish ship last because they depend on all three features being functional and user-tested. Quick actions in the preview sidebar reuse the `QuickActionBarComponent` built in Phase 2 — the integration (opening dialogs from within the sidebar context, ensuring z-index is correct) needs all the pieces in place first. Responsive behavior, animations, and global search preview are refinement, not core functionality.
 
----
+**Delivers:**
+- `QuickActionBarComponent` wired into preview sidebar (reuse from Phase 2)
+- Preview sidebar responsive behavior: full-screen sheet on mobile (<768px), side panel on desktop
+- Global search preview integration: secondary "preview" action on search hits alongside existing "navigate" action
+- Animation polish: slide-in/out timing calibrated to existing CSS motion tokens (`--duration-normal`, `--ease-default`)
+- Preview sidebar closes on `NavigationStart` router events (prevents stale entity data across routes)
+- User preview for feed author names (lightweight `GET /api/users/{id}/preview` endpoint)
+- Database indexes verified/added: `ix_feed_items_entity`, `ix_activities_user_due`, `ix_deal_contacts_contact`
+- Association chips in preview sidebar (linked company on a contact, contacts on a deal)
 
-### Phase 4: Webhooks
+**Addresses features from FEATURES.md:** Preview sidebar differentiators (quick actions, user preview, associations, global search integration); responsive/mobile behavior; animation polish
 
-**Rationale:** Depends on Phase 1 (Hangfire for delivery jobs). Benefits from Phase 2 (DomainEventInterceptor publishes events that WebhookPublisher subscribes to). Relatively self-contained delivery pipeline. Simpler backend than workflows; simpler frontend (subscription CRUD + delivery log viewer) than most other phases.
+**Avoids pitfalls:** P6 (z-index conflicts — explicit stacking layers, `BlockScrollStrategy`), P12 (accidental sidebar open on mobile scroll — fallback to `router.navigate` on mobile viewports), P13 (SignalR counter flicker — event-scoped refresh with `debounceTime(3000)`)
 
-**Delivers:** WebhookSubscription CRUD (admin-only); event type selection per subscription; HMAC-SHA256 payload signing with replay-attack timestamp; WebhookDeliveryService with Polly resilience pipeline; delivery log with per-attempt tracking (status, HTTP code, response time, payload); manual retry UI; test webhook endpoint (ping); SSRF URL validation on registration and each delivery.
-
-**Addresses:** Webhooks (all table stakes sub-features)
-
-**Avoids:** Pitfall 5 (SSRF prevention — `https://` only, RFC1918 rejection, DNS re-resolution on each delivery, 3-redirect limit). Pitfall 9 (circuit breaker per endpoint after 3 consecutive failures, max 5 retry attempts over ~1 hour, 1,000-delivery queue cap per endpoint). Pitfall 14 (minimal payload by default, admin-configurable field inclusion).
-
-**Research flag:** Standard patterns — well-documented webhook delivery architecture. Skip research-phase.
-
----
-
-### Phase 5: Duplicate Detection & Merge
-
-**Rationale:** Depends on Phase 2 (DomainEventInterceptor fires on entity creation for real-time duplicate checks). Most complex data mutation phase — merge touches every FK relationship in the system, including new v1.1 tables created in Phases 1-4. Building this after other phases are complete means the full FK surface is known when writing the merge relationship transfer logic.
-
-**Delivers:** `CREATE EXTENSION pg_trgm` migration + GIN trigram indexes on contacts (email, name) and companies (name, domain); DuplicateDetectionService (two-tier: pg_trgm pre-filter + FuzzySharp weighted scoring); on-demand bulk duplicate scan as Hangfire recurring job (daily 2 AM); real-time duplicate warning on contact/company create; configurable match rules per tenant (admin); side-by-side merge UI with field-level conflict resolution; relationship transfer covering all FKs including feed_items, notifications, sequence enrollments; soft-delete with `MergedIntoId` redirect; merge audit trail; enhanced CSV import duplicate detection; "not a duplicate" explicit dismissal.
-
-**Addresses:** Duplicate Detection & Merge (all table stakes sub-features), enhanced import duplicate detection (differentiator), bulk duplicate review (table stakes)
-
-**Avoids:** Pitfall 4 (comprehensive FK reference map documented before implementation; soft-delete with `MergedIntoId` redirect; full transaction; merge preview with impact counts; JSONB Relation-type value update via `jsonb_set`). Pitfall 12 (confidence scoring 0-100% not binary, threshold-based UX: >=90% auto-flag, 60-89% warning, <60% silent, never auto-merge).
-
-**Research flag:** Needs planning-phase review — the complete FK reference map across all entities (v1.0 + v1.1) should be documented as a dedicated planning artifact before implementation begins. This is the most likely place for data loss to occur if a FK is missed.
-
----
-
-### Phase 6: Advanced Reporting Builder
-
-**Rationale:** Last phase because it benefits from all preceding data being operational (formula fields from Phase 1, workflow execution data from Phase 2, sequence analytics from Phase 3, webhook delivery stats from Phase 4). Reporting is also the feature with the highest tenant data leakage risk from dynamic query construction; building it last means tenant isolation patterns are proven and stable across the codebase.
-
-**Delivers:** ReportDefinition entity + CRUD; ReportQueryBuilder (LINQ-only, whitelist field mapping); entity source + field + filter + grouping + aggregation configuration UI; related entity fields (1 level, e.g., Contact → Company.Name); Chart.js visualization reusing existing dashboard charts; table view with CSV export via existing CsvHelper; save + share reports (owner, name, config JSON, IsShared flag); date range parameter with preset ranges; report drill-down to filtered dynamic table; CdkVirtualScrollViewport for large result sets.
-
-**Addresses:** Advanced Reporting Builder (all table stakes sub-features), report drill-down differentiator, computed fields in reports differentiator
-
-**Avoids:** Pitfall 3 (LINQ-only construction, never `FromSqlRaw`, whitelist field mapping). Pitfall 11 (eager loading via dynamic `.Include()` chains, `.Select()` projections, 10,000-row cap with pagination, 30-second statement timeout, `AsAsyncEnumerable()` for CSV streaming). Pitfall 16 (maximum 3-level join depth, cardinality warnings at 100k estimated rows, 2 concurrent queries per tenant).
-
-**Research flag:** Dynamic LINQ expression tree building for complex aggregations with JSONB custom fields needs validation during planning — EF Core translation edge cases with `GroupBy` over JSONB paths may require fallback to raw parameterized SQL with manual tenant filter.
-
----
+**Research flag:** Standard patterns — skip research-phase. CDK overlay z-index stacking is well-documented. Mobile breakpoint handling reuses existing `BreakpointObserver` pattern from `app.component.ts` and `navbar.component.ts`.
 
 ### Phase Ordering Rationale
 
-The dependency chain from FEATURES.md maps directly to this phase order:
-- Phase 1 installs the three shared libraries (Hangfire, NCalc, Fluid) plus the two leaf-node features (Email Templates, Formula Fields) that every subsequent phase depends on
-- Phase 2 (Workflow Engine) is the hub that references Phase 1 outputs; it also installs DomainEventInterceptor which Phases 4 and 5 consume
-- Phase 3 (Sequences) and Phase 4 (Webhooks) are independent of each other — Sequences is placed before Webhooks because the reply-detection Gmail integration is more complex and benefits from earlier delivery
-- Phase 5 (Duplicate Detection) is placed after Phases 1-4 so the full FK surface area from all v1.1 tables is known when building the merge relationship transfer logic
-- Phase 6 (Reporting) comes last; it is the only phase that explicitly benefits from data produced by all other phases being operational, and it has the highest inherent security risk from dynamic query construction
-
-Cross-cutting implementation priorities spanning all phases:
-- **TenantScope wrapper**: Implement in Phase 1, required by every subsequent phase
-- **RLS checklist per entity**: Apply to every new entity in every phase (Pitfall 18)
-- **Idempotent job design**: Apply from Phase 1 forward to survive deployments (Pitfall 19)
-- **OnPush change detection**: Maintain for all new Angular components (Pitfall 20)
+- **Foundation infrastructure before features:** `EntityTypeRegistry` and the tab index refactor are cross-cutting changes that will cause merge conflicts and silent bugs if done mid-development alongside feature work. They block safe tab insertion and safe entity link changes everywhere.
+- **Summary tabs before "My Day":** The `GET /api/{entityType}/{id}/summary` aggregation endpoint pattern and `QuickActionBarComponent` built in Phase 2 are directly reused in Phase 3. Building them first avoids duplication and ensures the pattern is proven before scaling it.
+- **Route restructuring as the first commit within Phase 3:** Route changes have the widest blast radius (bookmarks, catch-all redirects, navbar). Doing this before building widget components means the new routing is validated before new UI is added on top of it.
+- **Polish last:** Responsive behavior, animations, and global search integration have zero architectural dependencies — they ship last to avoid blocking core feature delivery while remaining valuable additions.
 
 ### Research Flags
 
-**Needs research-phase during planning:**
-- **Phase 2 (Workflow Automation):** DomainEventInterceptor interaction with existing AuditableEntityInterceptor (both are SaveChangesInterceptors — verify ordering); @foblex/flow Angular 19.2.x runtime compatibility verification; workflow execution state machine edge cases (partial failure, compensation)
-- **Phase 3 (Email Sequences):** Gmail sync service integration for reply detection — email address matching against active enrollments, false positive/negative handling
-- **Phase 5 (Duplicate Detection):** Complete FK reference map across all v1.0 + v1.1 entities — document as explicit planning artifact before implementation begins
-- **Phase 6 (Reporting):** Dynamic LINQ expression tree building with JSONB custom field aggregations — validate EF Core translation limits before committing to approach
+Phases needing deeper research or design decisions during planning:
+- **Phase 3 (Personal Dashboard):** `DashboardScope` enum migration design, "create on first access" strategy for existing users, and widget persistence scope semantics. Need a schema design session before planning begins.
 
-**Standard patterns, skip research-phase:**
-- **Phase 1 (Foundation):** Hangfire, Fluid, and NCalc are all well-documented with official guides and verified NuGet versions. Patterns are established.
-- **Phase 4 (Webhooks):** Webhook delivery architecture is well-established industry pattern. HMAC signing, exponential retry, and circuit breakers are standard.
+Phases with well-established patterns (skip research-phase):
+- **Phase 1 (Foundation):** MatDrawer is official Angular Material; RBAC pattern matches existing codebase implementation; tab refactor is mechanical.
+- **Phase 2 (Summary Tabs):** EF Core aggregate queries are standard; Chart.js sparklines are documented; tab integration is mechanical after Phase 1 refactor.
+- **Phase 4 (Polish):** CDK overlay, `BreakpointObserver`, and router events are all standard Angular patterns with existing usage in the codebase.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All NuGet package versions verified on NuGet.org with release dates. pg_trgm is a core PostgreSQL 17 extension. Single medium-confidence item: @foblex/flow Angular 19.2.x compatibility needs runtime verification. Fallback path (linear form builder) is well-defined. |
-| Features | HIGH | Multi-source verification across 5+ major CRM platforms (HubSpot, Pipedrive, Zoho, Salesforce Dynamics 365, Freshsales). Table stakes vs. differentiators vs. anti-features are clearly established with citation to each platform. |
-| Architecture | HIGH | Based on direct analysis of existing GlobCRM v1.0 codebase patterns (AuditableEntityInterceptor, TenantDbConnectionInterceptor, NotificationDispatcher, CrmHub) plus verified patterns for Hangfire multi-tenancy, EF Core interceptors, NCalc, and Fluid. All component boundaries are consistent with existing layer conventions. |
-| Pitfalls | HIGH | Sourced from OWASP (SSRF), official Microsoft documentation (EF Core multi-tenancy, SignalR performance), vendor-specific CRM guides (Dynamics 365 calculated fields), and direct GlobCRM v1.0 codebase analysis. Critical pitfalls include specific prevention code patterns, not just general advice. |
+| Stack | HIGH | All technologies confirmed installed in `package.json`. No new packages needed — verified by direct codebase analysis. Gridster, Chart.js, MatDrawer, NgRx Signals all proven working in existing production features. |
+| Features | MEDIUM-HIGH | CRM benchmark patterns validated against HubSpot, Salesforce, Pipedrive, Dynamics 365 documentation. Existing codebase confirmed all required data models exist. Some source confidence is MEDIUM (third-party HubSpot blog posts, not official APIs). Feature scope is well-defined with clear must-have/should-have/defer distinctions. |
+| Architecture | HIGH | Based on exhaustive direct codebase analysis of existing patterns (`feed-list.component.ts`, `company-detail.component.ts`, `dashboard.store.ts`, `related-entity-tabs.component.ts`, `app.component.ts`, etc.). Pattern recommendations are extensions of established existing patterns, not new paradigms. |
+| Pitfalls | HIGH | All critical pitfalls identified through direct code inspection with specific file and line references. RBAC scope gap, N+1 query risk, FeedItem no-FK design, hardcoded tab indices, and route catch-all all confirmed by reading actual source files. Confidence is HIGH because the pitfalls are code-evidence-based, not speculative. |
 
-**Overall confidence: HIGH**
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **@foblex/flow Angular 19.2.x compatibility:** Verify in Phase 2 planning before committing to the visual workflow builder. Fallback (linear form-based builder using existing Angular Material + CDK) is well-defined and lower-risk. Decision should be made before Phase 2 planning begins.
-- **DomainEventInterceptor ordering with AuditableEntityInterceptor:** Both intercept `SaveChangesAsync`. EF Core processes SaveChangesInterceptors in registration order. Verify that audit timestamps are set before domain events are captured (so event payloads include correct `UpdatedAt` values). Test with integration tests.
-- **Workflow execution state machine for partial failures:** If a workflow executes 3 of 5 actions and the 4th fails (e.g., SendGrid returns 500), the state machine needs explicit handling: retry the failed action only, mark remaining actions as skipped, or roll back all. Decide during Phase 2 planning.
-- **Gmail reply detection accuracy for sequence auto-unenroll:** Matching inbound email addresses against active enrollments has false negative risk (contact replies from different address) and false positive risk (different contact with similar email). Thresholds and fallback behavior need explicit design in Phase 3 planning.
-- **ReportQueryBuilder EF Core translation limits:** Dynamic `.GroupBy()` + `.Select()` with JSONB field access through expression trees may hit EF Core 10 translation limitations. Fallback to raw parameterized SQL with manual `WHERE tenant_id = @tenantId` remains available and is documented in ARCHITECTURE.md.
-- **Hangfire dashboard access control:** The Hangfire dashboard at `/hangfire` must be restricted to system administrators (not tenant admins). The `HangfireAdminAuthFilter` integration with the existing identity system needs explicit design in Phase 1.
+- **`DashboardScope` schema design:** The existing `Dashboard` entity has `OwnerId` (personal vs. null for team) but no `DashboardScope` enum and no separate `isDefault` per scope. Decide whether to add a `DashboardScope` enum column (with migration) or handle in application logic. Resolve during Phase 3 planning before any schema work begins.
+- **`entity_name` migration on `feed_items`:** Adding a new column to a potentially large table. Verify the migration strategy — nullable column first, then backfill via background job, then enforce not-null — against existing seed data patterns. Address in Phase 1 planning.
+- **Summary tab coverage for Leads, Quotes, Requests:** These were built in v1.1. Confirm their tab constant patterns (`LEAD_TABS`, `QUOTE_TABS`, `REQUEST_TABS`) match the `COMPANY_TABS`/`CONTACT_TABS` pattern before assuming the Phase 1 tab refactor applies uniformly.
+- **"My Day" default widget set:** Research provides the full widget type catalog. The specific default layout (which widgets, what positions, what sizes) is a UX design decision. Requires a design decision before Phase 3 planning.
+- **`@fullcalendar/list` final decision:** If the Phase 3 widget design review prefers native FullCalendar list rendering over a custom component, this is the only potential new dependency. Make the call explicitly during Phase 3 planning (recommendation: skip, build custom `TodayAgendaWidget`).
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-**Stack Research:**
-- [Hangfire.AspNetCore 1.8.23 on NuGet.org](https://www.nuget.org/packages/hangfire.aspnetcore/) — verified released 2026-02-05
-- [Hangfire.PostgreSql 1.21.1 on NuGet.org](https://www.nuget.org/packages/Hangfire.PostgreSql/) — verified
-- [Fluid.Core 2.31.0 on NuGet.org](https://www.nuget.org/packages/Fluid.Core/) — verified released 2025-11-07
-- [NCalcSync 5.11.0 on NuGet.org](https://www.nuget.org/packages/NCalcSync) — verified
-- [FuzzySharp 2.0.2 on NuGet.org](https://www.nuget.org/packages/FuzzySharp) — verified
-- [Microsoft.Extensions.Http.Resilience 10.3.0 on NuGet.org](https://www.nuget.org/packages/Microsoft.Extensions.Http.Resilience/) — verified
-- [PostgreSQL pg_trgm Documentation](https://www.postgresql.org/docs/current/pgtrgm.html) — core extension, PostgreSQL 17
-
-**Feature Research:**
-- [HubSpot Workflows Guide](https://knowledge.hubspot.com/workflows/create-workflows) — trigger types, action catalog
-- [HubSpot Sequences](https://knowledge.hubspot.com/sequences/create-and-edit-sequences) — sequence creation, enrollment, tracking
-- [Pipedrive Formula Fields Documentation](https://support.pipedrive.com/en/article/custom-fields-formula-fields) — formula syntax, limitations
-- [Dynamics 365 Duplicate Detection](https://www.inogic.com/blog/2025/10/step-by-step-guide-to-duplicate-detection-and-merge-rules-in-dynamics-365-crm/) — merge flow
-- [Zoho CRM Workflow Rules](https://help.zoho.com/portal/en/kb/crm/automate-business-processes/workflow-management/articles/configuring-workflow-rules) — trigger types
-- [Webhook Architecture Design](https://beeceptor.com/docs/webhook-feature-design/) — subscription, delivery, retry patterns
-
-**Architecture Research:**
-- [Hangfire Documentation](https://docs.hangfire.io/en/latest/) — PostgreSQL storage, multi-tenant patterns
-- [Fluid Template Engine (GitHub)](https://github.com/sebastienros/fluid) — rendering, context, filters
-- [NCalc Documentation](https://ncalc.github.io/ncalc/) — expression parsing, custom functions
-- [Microsoft Resilient HTTP Apps (.NET)](https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience) — Polly pipeline configuration
-- Existing GlobCRM v1.0 codebase — AuditableEntityInterceptor, TenantDbConnectionInterceptor, NotificationDispatcher, CrmHub patterns
-
-**Pitfalls Research:**
-- [OWASP SSRF Prevention Cheat Sheet](https://cheatsheetseries.owasp.org/cheatsheets/Server_Side_Request_Forgery_Prevention_Cheat_Sheet.html)
-- [Microsoft: EF Core Multi-tenancy](https://learn.microsoft.com/en-us/ef/core/miscellaneous/multitenancy)
-- [Microsoft: EF Core Global Query Filters](https://learn.microsoft.com/en-us/ef/core/querying/filters)
-- [Microsoft: SignalR Performance](https://learn.microsoft.com/en-us/aspnet/signalr/overview/performance/signalr-performance)
-- [Dynamics 365: Calculated Fields and Circular Dependencies](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/define-calculated-fields)
-- [Hangfire Discussion: Multi-Tenant Architecture](https://discuss.hangfire.io/t/hangfire-multi-tenant-architecture-per-tenant-recurring-jobs-vs-dynamic-enqueueing-at-scale/11400)
-- [Hookdeck: Webhooks at Scale](https://hookdeck.com/blog/webhooks-at-scale)
+- Angular Material Sidenav/Drawer API — https://material.angular.dev/components/sidenav/api
+- Angular CDK Overlay documentation — https://material.angular.dev/cdk/overlay/overview
+- FullCalendar Angular documentation — https://fullcalendar.io/docs/angular
+- EF Core Efficient Querying — https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying
+- Existing codebase: `package.json`, `feed-list.component.ts`, `FeedController.cs`, `company-detail.component.ts`, `related-entity-tabs.component.ts`, `dashboard.component.ts`, `dashboard.store.ts`, `app.component.ts`, `app.routes.ts`, `FeedItem.cs`, `permission.store.ts`, `signalr.service.ts`, `sidebar-state.service.ts`, `global-search.component.ts`, `entity-timeline.component.ts`
 
 ### Secondary (MEDIUM confidence)
+- HubSpot: Preview a record — https://knowledge.hubspot.com/records/preview-a-record
+- HubSpot: View and customize record overviews — https://knowledge.hubspot.com/crm-setup/view-and-customize-record-overviews
+- HubSpot: Sales Workspace activities — https://knowledge.hubspot.com/prospecting/review-sales-activity-in-the-sales-workspace
+- HubSpot: Customize preview sidebar in workspace — https://knowledge.hubspot.com/customize-the-record-preview-sidebar-in-the-customer-success-workspace
+- HubSpot Spring 2025 Spotlight: Workspaces — https://www.hubspot.com/company-news/spring-2025-spotlight-workspaces
+- Salesforce: Custom Lightning Home Page — Trailhead module
+- Salesforce: Compact Layouts — Trailhead module
+- Salesforce: Today's Tasks in Lightning — https://help.salesforce.com/s/articleView?id=000382898
+- Pipedrive: Detail view sidebar — https://support.pipedrive.com/en/article/detail-view-sidebar
+- Dynamics 365: Quick view forms — https://learn.microsoft.com/en-us/dynamics365/customerengagement
+- Chart.js sparkline pattern — https://www.ethangunderson.com/sparklines-in-chartjs/
+- angular-gridster2 — https://github.com/tiberiuzuld/angular-gridster2
+- Angular CDK Overlay tutorial — https://briantree.se/angular-cdk-overlay-tutorial-learn-the-basics/
+- N+1 Problem in EF Core — https://www.jocheojeda.com/2025/06/26/understanding-the-n1-database-problem-using-entity-framework-core/
 
-- [@foblex/flow npm registry](https://www.npmjs.com/package/@foblex/flow) — Angular-native flow editor; Angular 19 compatibility stated but not integration-tested against 19.2.x
-- [Webhook Best Practices (Svix)](https://www.svix.com/resources/webhook-best-practices/retries/) — retry schedule recommendations
-- [FuzzySharp GitHub](https://github.com/JakeBayer/FuzzySharp) — .NET port of Python FuzzyWuzzy, field weighting approach
-- [CRM Deduplication Guide 2025](https://www.rtdynamic.com/blog/crm-deduplication-guide-2025/) — algorithm selection and thresholds
-- [Inngest: Fixing Multi-Tenant Queueing Problems](https://www.inngest.com/blog/fixing-multi-tenant-queueing-concurrency-problems) — per-tenant rate limiting patterns
-
-### Tertiary (LOW confidence — validate during planning)
-
-- Dynamic LINQ expression tree approach for report queries with JSONB fields — pattern established but EF Core translation edge cases unknown until integration-tested
-- Gmail reply detection matching logic for sequence auto-unenroll — integration with existing Gmail sync service needs explicit design review during Phase 3 planning
+### Tertiary (LOW confidence)
+- Everything About CRM Record Overview Tab in HubSpot — third-party blog post (https://www.mergeyourdata.com/blog/everything-about-the-crm-record-overview-tab-in-hubspot)
+- Angular 21 CDK Overlay Issues — third-party Medium article (behavior may differ in Angular 19)
 
 ---
-*Research completed: 2026-02-18*
+*Research completed: 2026-02-20*
 *Ready for roadmap: yes*

@@ -1,1144 +1,686 @@
-# Architecture Patterns: v1.1 Automation & Intelligence
+# Architecture Patterns: v1.2 Connected Experience
 
-**Domain:** CRM Workflow Automation, Email Sequences, Computed Fields, Duplicate Detection, Webhooks, Advanced Reporting
-**Researched:** 2026-02-18
-**Confidence:** HIGH (based on existing codebase analysis + verified technology patterns)
+**Domain:** Entity-linked feed, entity preview sidebars, summary tabs on detail pages, personal "My Day" dashboard
+**Researched:** 2026-02-20
+**Confidence:** HIGH (based on exhaustive codebase analysis of existing patterns)
 
 ## Executive Summary
 
-The v1.1 features represent a shift from CRUD operations to **event-driven automation** and **dynamic computation**. The existing Clean Architecture layers remain intact, but v1.1 introduces three new cross-cutting concerns: (1) an event bus that reacts to entity changes, (2) a background processing pipeline for async work (workflows, webhooks, email sequences), and (3) a dynamic expression evaluation layer for formula fields and report queries.
+The v1.2 "Connected Experience" milestone weaves together three features that transform GlobCRM from a record-keeping system into a navigable information network. Unlike v1.1's event-driven automation, v1.2 is primarily a **frontend UX milestone** with targeted backend data aggregation endpoints. The existing architecture handles 90% of the requirements -- the key challenge is designing new **shared components** and **lightweight backend summaries** that integrate cleanly with the established patterns without duplicating existing functionality.
 
-The key architectural insight: **all six features share a common trigger mechanism** -- CRM entity changes (create/update/delete/stage-change) are the events that start workflows, fire webhooks, trigger duplicate checks, and recalculate formula fields. This means the core investment is a lightweight domain event system wired into the existing `SaveChangesAsync` pipeline, with each feature subscribing to relevant events.
+The three features share a common architectural thread: **contextual data surfacing**. Entity preview sidebars show entity snapshots without navigation. Summary tabs aggregate relationship counts and recent activity. "My Day" personalizes the existing dashboard with user-scoped daily views. All three consume existing entity data through new aggregation endpoints, and all three are rendered by new shared Angular components that slot into the established component hierarchy.
 
-**Background processing model:** v1.1 adopts Hangfire (PostgreSQL-backed) for all async job processing -- workflow action execution, webhook delivery with retry, email sequence step scheduling, and batch duplicate scanning. This replaces the need for hand-rolled `BackgroundService` polling loops (though existing ones like `DueDateNotificationService` and `EmailSyncBackgroundService` remain unchanged). Hangfire provides delayed job scheduling, automatic retry with backoff, job persistence across app restarts, and a monitoring dashboard -- capabilities that CRM automation specifically requires.
+**Critical architectural decision:** The entity preview sidebar must be a **global overlay component** hosted at the `AppComponent` level (alongside the navbar), managed by a root-level `PreviewSidebarStore`, and triggered from anywhere in the app. It cannot live inside individual feature modules because feed items, search results, and related entity links all need to open previews from different contexts.
 
 ## Recommended Architecture
 
-### System-Level View: v1.1 Components
+### System-Level View: v1.2 Components
 
 ```
-EXISTING (unchanged)                    NEW (v1.1)
+EXISTING (unchanged)                    NEW (v1.2)
 ============================           ============================
 
-Angular 19 Frontend                    + Workflow Builder UI
-  - Feature modules                    + Email Template Editor
-  - Signal Stores                      + Report Builder UI
-  - Shared components                  + Duplicate Review UI
-       |                                      |
-       v                                      v
-.NET 10 API Layer                      + WorkflowsController
-  - Controllers                        + EmailTemplatesController
-  - DTOs, Validators                   + EmailSequencesController
-  - Middleware                         + ReportBuilderController
-       |                              + DuplicatesController
-       v                              + WebhooksController
-Application Layer                            |
-  - Command/Handlers                         v
-  - Abstractions                       + Domain Event Dispatcher
-       |                              + IWorkflowEngine
-       v                              + IFormulaEvaluator
-Domain Layer                           + IDuplicateDetector
-  - Entities                           + IWebhookPublisher
-  - Interfaces                               |
-  - Enums                                    v
-       |                               Infrastructure Layer
-       v                              + WorkflowEngine (NCalc conditions)
-Infrastructure Layer                   + FormulaEvaluator (NCalc)
-  - EF Core / Repositories            + DuplicateDetectionService (pg_trgm + FuzzySharp)
-  - Email / Gmail                      + WebhookDeliveryService (Polly + HttpClient)
-  - Notifications                      + EmailTemplateRenderer (Fluid/Liquid)
-  - SignalR                            + ReportQueryBuilder
-  - Background Services               + Hangfire Job Server (PostgreSQL storage)
-                                         - WorkflowActionJob
-                                         - WebhookDeliveryJob
-                                         - SequenceStepJob
-                                         - DuplicateScanJob
+AppComponent                            + EntityPreviewSidebarComponent
+  - NavbarComponent                       (global overlay, lives here)
+  - <router-outlet>                     + PreviewSidebarService (root)
+                                        + PreviewSidebarStore (root)
+Feature Detail Pages                        |
+  - RelatedEntityTabsComponent          + EntitySummaryTabComponent (new tab)
+  - EntityTimelineComponent               (added as Summary tab to tab consts)
+  - tab content templates                   |
+                                        + EntitySummaryService (new)
+Feed Feature                            + Entity-linked feed filtering
+  - FeedListComponent                     (add entityType/entityId params)
+  - FeedStore                           + EntityFeedTabComponent (new)
+  - FeedService                             |
+                                        + "My Day" dashboard tab
+Dashboard Feature                         (new tab in DashboardComponent)
+  - DashboardComponent                  + MyDayStore (new per-page store)
+  - DashboardStore                      + MyDayApiService (new)
+  - angular-gridster2                   + MyDayComponent (new)
+                                            |
+.NET 10 Backend                         + EntityPreviewController (new)
+  - Entity Controllers                  + EntitySummaryController (new)
+  - FeedController                      + FeedController: add entity filter
+  - DashboardsController                + MyDayController (new)
 ```
 
 ### Component Boundaries
 
-| Component | Layer | Responsibility | Communicates With |
-|-----------|-------|---------------|-------------------|
-| **DomainEventInterceptor** | Infrastructure | Intercepts SaveChanges, publishes entity change events | WorkflowEngine, WebhookPublisher, DuplicateDetector |
-| **WorkflowEngine** | Infrastructure | Evaluates workflow conditions (NCalc), enqueues action jobs via Hangfire | Hangfire, NotificationDispatcher, EmailService, WebhookPublisher, FeedRepository |
-| **FormulaEvaluator** | Application | Evaluates NCalc expressions against entity + custom field data | CustomFieldRepository (for field definitions) |
-| **FluidEmailTemplateRenderer** | Infrastructure | Renders Liquid/Fluid templates with entity context | Existing RazorEmailRenderer (coexists for system emails) |
-| **EmailSequenceService** | Infrastructure | Manages enrollments, schedules steps as delayed Hangfire jobs | FluidEmailTemplateRenderer, EmailService, Hangfire |
-| **DuplicateDetectionService** | Infrastructure | Fuzzy matching via pg_trgm + FuzzySharp scoring | ApplicationDbContext (raw SQL for similarity) |
-| **WebhookDeliveryService** | Infrastructure | HTTP delivery with HMAC signing, Polly retry pipeline | IHttpClientFactory, Polly |
-| **WebhookPublisher** | Infrastructure | Enqueues webhook delivery as Hangfire fire-and-forget jobs | Hangfire, WebhookDeliveryService |
-| **ReportQueryBuilder** | Infrastructure | Translates report definitions into EF Core/SQL queries | ApplicationDbContext, FormulaEvaluator |
-| **Hangfire Job Server** | Infrastructure | Persists and executes background jobs with retry, scheduling, monitoring | PostgreSQL (dedicated schema), all job classes |
+| Component | Responsibility | Communicates With |
+|-----------|---------------|-------------------|
+| **EntityPreviewSidebarComponent** | Renders a slide-over panel showing entity snapshot data. Hosts entity-type-specific preview templates. | PreviewSidebarStore (state), EntityPreviewService (data fetch) |
+| **PreviewSidebarStore** | Root signal store managing sidebar open/close state, current entity type + ID, loaded preview data. | EntityPreviewService for API calls |
+| **EntityPreviewService** | Calls `GET /api/entities/{type}/{id}/preview` to fetch lightweight entity preview data. | ApiService (HTTP layer) |
+| **EntitySummaryTabComponent** | Shared component that renders aggregated counts + recent items for an entity's relationships. Designed to slot into RelatedEntityTabsComponent as a new tab. | EntitySummaryService for data |
+| **EntitySummaryService** | Calls `GET /api/{entityType}/{id}/summary` for aggregated relationship data. | ApiService |
+| **EntityFeedTabComponent** | Renders entity-scoped feed items inside a detail page tab. Reuses feed card markup from FeedListComponent. | FeedService (extended with entity filter params) |
+| **MyDayComponent** | Personal daily dashboard showing today's activities, recent deals, pending items. Lives as a new tab in DashboardComponent. | MyDayStore, MyDayApiService |
+| **MyDayStore** | Per-page signal store for My Day data (today's activities, overdue items, recent feed). | MyDayApiService |
+| **MyDayApiService** | Calls `GET /api/my-day` for aggregated personal daily snapshot. | ApiService |
 
 ### Data Flow
 
-#### Flow 1: Entity Change Triggers Everything
+#### 1. Entity Preview Sidebar
 
 ```
-User updates Deal stage via API
-       |
-       v
-DealsController.UpdateStage()
-       |
-       v
-_db.SaveChangesAsync()  <--- DomainEventInterceptor fires
-       |                      |
-       v                      +---> DomainEvent: DealUpdated { DealId, Changes, OldStage, NewStage }
-  Response 200 OK                    |
-                                     +---> WorkflowEngine.EvaluateAsync(event)
-                                     |       -> Matches "When deal moves to Won" rule
-                                     |       -> Quick actions inline (update field)
-                                     |       -> Slow actions enqueued via Hangfire:
-                                     |            BackgroundJob.Enqueue(() => SendWorkflowEmail(...))
-                                     |            BackgroundJob.Enqueue(() => DeliverWebhook(...))
-                                     |            BackgroundJob.Enqueue(() => CreateActivity(...))
-                                     |
-                                     +---> WebhookPublisher.EnqueueAsync(event)
-                                     |       -> For each matching subscription:
-                                     |            BackgroundJob.Enqueue(() => DeliverWebhook(...))
-                                     |
-                                     +---> DuplicateDetectionService (on Create only)
-                                             -> Inline pg_trgm check for real-time feedback
-                                             -> If found, create DuplicateCandidate records
+User clicks entity link/name anywhere in app
+  |
+  v
+Component calls PreviewSidebarStore.open(entityType, entityId)
+  |
+  v
+PreviewSidebarStore patches state: { isOpen: true, entityType, entityId, isLoading: true }
+  |
+  v
+EntityPreviewService.getPreview(entityType, entityId)
+  --> GET /api/entities/{type}/{id}/preview
+  |
+  v
+Backend: EntityPreviewController
+  - Resolves entity type to repository
+  - Loads entity with minimal includes (no deep graph)
+  - Returns EntityPreviewDto (type-specific fields)
+  |
+  v
+PreviewSidebarStore patches: { data: EntityPreviewDto, isLoading: false }
+  |
+  v
+EntityPreviewSidebarComponent renders overlay panel
+  - CSS: fixed position, right: 0, z-index above content but below dialogs
+  - Width: 400px, slide-in animation
+  - Content: type-specific template using @switch(entityType)
+  - Actions: "View Full Record" button navigates to detail page
+  - Close: click outside, Escape key, X button
 ```
 
-#### Flow 2: Email Sequence Execution
+#### 2. Summary Tab on Detail Pages
 
 ```
-Workflow Action: "Start sequence 'Welcome Onboarding'"
-       |
-       v
-EmailSequenceService.EnrollAsync(contactId, sequenceId)
-  -> Create SequenceEnrollment (status=Active, currentStep=0)
-  -> Schedule first step as delayed Hangfire job:
-       BackgroundJob.Schedule(() => ExecuteSequenceStep(enrollmentId, stepNumber: 0),
-                             delay: step.DelayDays days + step.DelayHours hours)
-       |
-       v
-[After delay elapses, Hangfire executes:]
-SequenceStepJob.ExecuteSequenceStep(enrollmentId, stepNumber)
-  1. Load enrollment + step template
-  2. Check step condition (NCalc, optional)
-  3. Render template with Fluid (contact/company/deal context)
-  4. Send via existing EmailService (SendGrid)
-  5. Log to SequenceStepLog
-  6. If more steps remain:
-       BackgroundJob.Schedule(() => ExecuteSequenceStep(enrollmentId, stepNumber + 1),
-                             delay: nextStep.Delay)
-  7. If last step: mark enrollment as Completed
+Detail page loads entity (existing flow, unchanged)
+  |
+  v
+RelatedEntityTabsComponent renders tabs from ENTITY_TABS constant
+  (NEW: "Summary" tab added at index 0, before "Details")
+  |
+  v
+User clicks "Summary" tab (or it's the default landing tab)
+  |
+  v
+EntitySummaryTabComponent receives entityType + entityId as inputs
+  |
+  v
+EntitySummaryService.getSummary(entityType, entityId)
+  --> GET /api/{entityType}/{id}/summary
+  |
+  v
+Backend: Aggregation query per entity type
+  For a Contact:
+    - Deal count + total pipeline value (from DealContacts)
+    - Activity count (open + overdue)
+    - Quote count + total value
+    - Request count (open)
+    - Email count
+    - Note count
+    - Last activity timestamp
+    - Recent feed items (limit 5, filtered by EntityType='Contact' + EntityId)
+  |
+  v
+Returns EntitySummaryDto with counts, totals, and recent items
+  |
+  v
+EntitySummaryTabComponent renders:
+  - KPI cards row (deal value, open activities, etc.)
+  - Recent activity mini-timeline (last 5 feed items)
+  - Quick-action buttons (log activity, send email, add note)
 ```
 
-#### Flow 3: Report Builder Query Execution
+#### 3. Entity-Linked Feed Tab
 
 ```
-User configures report in UI:
-  Entity: Deal
-  Columns: [Title, Value, Stage, Owner, "Weighted Value" (formula field)]
-  Filters: [Stage != Lost, CreatedAt > 30 days ago]
-  Group By: Stage
-  Aggregation: SUM(Value), COUNT(*)
-       |
-       v
-POST /api/reports/preview { reportDefinition }
-       |
-       v
-ReportQueryBuilder.ExecuteAsync(definition)
-  1. Start with _db.Deals.AsQueryable()
-     (EF Core global query filters apply -- tenant-scoped automatically)
-  2. Apply filters via Expression<Func<Deal, bool>> building
-  3. Execute query to get materialized results
-  4. Compute formula fields in-memory via FormulaEvaluator
-  5. Apply GroupBy + aggregation
-  6. Project to ReportRow DTOs
-       |
-       v
-Return paginated results with column metadata
+Detail page: user clicks "Feed" tab
+  |
+  v
+EntityFeedTabComponent receives entityType + entityId
+  |
+  v
+FeedService.getEntityFeed(entityType, entityId, page, pageSize)
+  --> GET /api/feed?entityType={type}&entityId={id}&page=1&pageSize=20
+  |
+  v
+Backend: FeedController.GetList extended
+  - Adds optional [FromQuery] string? entityType, Guid? entityId
+  - Filters FeedItems where EntityType == type AND EntityId == id
+  - Returns same FeedPagedResponse shape
+  |
+  v
+EntityFeedTabComponent renders feed items
+  - Reuses feed item card styling from FeedListComponent
+  - Includes inline comment toggle (same pattern)
+  - Includes post form for entity-scoped social posts
+  - SignalR FeedUpdate events filtered client-side by entity match
 ```
 
-#### Flow 4: Webhook Delivery with Retry
+#### 4. "My Day" Personal Dashboard
 
 ```
-WebhookPublisher.EnqueueAsync("deal.updated", dealId, payload, tenantId)
-       |
-       v
-BackgroundJob.Enqueue(() => webhookDeliveryService.DeliverAsync(subscriptionId, eventType, payload))
-       |
-       v
-[Hangfire executes immediately:]
-WebhookDeliveryService.DeliverAsync(...)
-  1. Load subscription (URL, secret, headers)
-  2. Sign payload with HMAC-SHA256 using subscription secret
-  3. POST to target URL via IHttpClientFactory ("WebhookClient")
-     - Polly pipeline: 3 immediate retries with jitter for transient HTTP errors
-  4. If 2xx response: log as Delivered
-  5. If non-2xx after Polly retries: throw exception
-     -> Hangfire auto-retries the job with backoff (attempt 2, 3, ... up to 7)
-     -> After 7 total failures: moves to Hangfire failed queue (dead letter)
-  6. Log all attempts to WebhookDeliveryLog for admin visibility
+Dashboard page loads (existing flow)
+  |
+  v
+DashboardComponent renders mat-tab-group
+  (NEW: "My Day" tab added before "Dashboard" tab)
+  |
+  v
+MyDayComponent initializes, calls MyDayStore.loadMyDay()
+  |
+  v
+MyDayApiService.getMyDay()
+  --> GET /api/my-day
+  |
+  v
+Backend: MyDayController
+  - Queries current user's data only (no team-wide):
+    - Today's activities (due today or overdue, assigned to user)
+    - Recent deals (user-owned, updated in last 7 days)
+    - Pending items (activities overdue, requests awaiting response)
+    - Today's feed items (limit 10, authored by user or @mentioning user)
+    - Quick stats (activities completed today, deals progressed today)
+  |
+  v
+Returns MyDayDto with sections
+  |
+  v
+MyDayComponent renders:
+  - Greeting header (reuses existing DashboardComponent greeting pattern)
+  - "Today's Tasks" checklist (activities, with status toggle)
+  - "Recent Deals" mini cards
+  - "Your Feed" compact feed list
+  - Quick-action buttons (new activity, new deal, compose email)
 ```
 
-## New Domain Entities
+## Integration Points: New vs Modified
 
-### Workflow Automation Entities
+### NEW Components (to create from scratch)
 
-```csharp
-// Domain/Entities/WorkflowDefinition.cs
-public class WorkflowDefinition
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-    public string EntityType { get; set; }          // "Deal", "Contact", etc.
-    public string TriggerType { get; set; }          // "Created", "Updated", "FieldChanged", "StageChanged"
-    public Dictionary<string, object?> TriggerConfig { get; set; }  // JSONB: { "field": "stage", "from": "...", "to": "..." }
-    public List<WorkflowCondition> Conditions { get; set; }         // JSON array in JSONB
-    public List<WorkflowAction> Actions { get; set; }               // JSON array in JSONB
-    public bool IsActive { get; set; }
-    public int ExecutionOrder { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-}
+| Component | Location | Type |
+|-----------|----------|------|
+| `EntityPreviewSidebarComponent` | `shared/components/entity-preview-sidebar/` | Shared component, imported in AppComponent |
+| `PreviewSidebarStore` | `shared/components/entity-preview-sidebar/preview-sidebar.store.ts` | Root signal store (providedIn: 'root') |
+| `EntityPreviewService` | `shared/components/entity-preview-sidebar/entity-preview.service.ts` | Root service |
+| `EntitySummaryTabComponent` | `shared/components/entity-summary-tab/` | Shared component, used in detail pages |
+| `EntitySummaryService` | `shared/components/entity-summary-tab/entity-summary.service.ts` | Root service |
+| `EntityFeedTabComponent` | `shared/components/entity-feed-tab/` | Shared component, used in detail pages |
+| `MyDayComponent` | `features/dashboard/pages/my-day/` | Feature component |
+| `MyDayStore` | `features/dashboard/stores/my-day.store.ts` | Per-page signal store |
+| `MyDayApiService` | `features/dashboard/services/my-day-api.service.ts` | Root service |
+| `EntityPreviewController` | `Controllers/EntityPreviewController.cs` | API controller |
+| `EntitySummaryController` | `Controllers/EntitySummaryController.cs` | API controller |
+| `MyDayController` | `Controllers/MyDayController.cs` | API controller |
 
-// Stored as JSONB within WorkflowDefinition
-public class WorkflowCondition
-{
-    public string Field { get; set; }        // "value", "stage.name", "customFields.abc123"
-    public string Operator { get; set; }     // "equals", "greaterThan", "contains", "changed", "changedTo"
-    public object? Value { get; set; }
-    public string? LogicalOperator { get; set; }  // "and", "or" for chaining
-}
+### MODIFIED Components (add to existing)
 
-public class WorkflowAction
-{
-    public string ActionType { get; set; }   // "sendEmail", "createActivity", "updateField", "sendWebhook", "startSequence", "notify"
-    public Dictionary<string, object?> Config { get; set; }  // Action-specific params as JSONB
-    public int Order { get; set; }
-}
-
-// Domain/Entities/WorkflowExecutionLog.cs
-public class WorkflowExecutionLog
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public Guid WorkflowDefinitionId { get; set; }
-    public string EntityType { get; set; }
-    public Guid EntityId { get; set; }
-    public string TriggerType { get; set; }
-    public string Status { get; set; }       // "Success", "Failed", "Skipped"
-    public string? ErrorMessage { get; set; }
-    public Dictionary<string, object?>? ExecutionDetails { get; set; }  // JSONB
-    public DateTimeOffset ExecutedAt { get; set; }
-}
-```
-
-### Email Template & Sequence Entities
-
-```csharp
-// Domain/Entities/EmailTemplate.cs
-public class EmailTemplate
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; }
-    public string Subject { get; set; }          // Liquid template: "Hi {{contact.firstName}}"
-    public string BodyHtml { get; set; }         // Liquid template with HTML
-    public string? BodyText { get; set; }        // Plain text fallback
-    public string EntityType { get; set; }       // "Contact", "Deal", etc.
-    public string? Category { get; set; }        // "Welcome", "Follow-up", etc.
-    public bool IsActive { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-}
-
-// Domain/Entities/EmailSequence.cs
-public class EmailSequence
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-    public string EntityType { get; set; }       // "Contact" (primary target)
-    public bool IsActive { get; set; }
-    public ICollection<EmailSequenceStep> Steps { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-}
-
-// Domain/Entities/EmailSequenceStep.cs
-public class EmailSequenceStep
-{
-    public Guid Id { get; set; }
-    public Guid SequenceId { get; set; }
-    public EmailSequence Sequence { get; set; }
-    public int StepNumber { get; set; }
-    public Guid EmailTemplateId { get; set; }
-    public EmailTemplate EmailTemplate { get; set; }
-    public int DelayDays { get; set; }           // Days to wait before sending
-    public int DelayHours { get; set; }          // Additional hours
-    public string? ConditionExpression { get; set; }  // Optional NCalc condition to skip step
-}
-
-// Domain/Entities/SequenceEnrollment.cs
-public class SequenceEnrollment
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public Guid SequenceId { get; set; }
-    public Guid ContactId { get; set; }
-    public int CurrentStep { get; set; }
-    public string Status { get; set; }           // "Active", "Completed", "Paused", "Unsubscribed"
-    public DateTimeOffset? NextStepAt { get; set; }
-    public DateTimeOffset EnrolledAt { get; set; }
-    public DateTimeOffset? CompletedAt { get; set; }
-    public Guid? EnrolledByWorkflowId { get; set; }  // Track which workflow enrolled
-    public string? HangfireJobId { get; set; }       // Track scheduled Hangfire job for cancellation
-}
-
-// Domain/Entities/SequenceStepLog.cs
-public class SequenceStepLog
-{
-    public Guid Id { get; set; }
-    public Guid EnrollmentId { get; set; }
-    public int StepNumber { get; set; }
-    public string Status { get; set; }           // "Sent", "Skipped", "Failed", "Opened", "Clicked"
-    public string? ErrorMessage { get; set; }
-    public DateTimeOffset ExecutedAt { get; set; }
-}
-```
-
-### Formula/Computed Field Extension
-
-```csharp
-// Extend existing CustomFieldType enum
-public enum CustomFieldType
-{
-    // ... existing values 0-8 ...
-    Formula = 9       // NEW: computed from other fields
-}
-
-// Extend existing CustomFieldDefinition entity
-// Add to CustomFieldDefinition:
-//   public string? FormulaExpression { get; set; }  // NCalc expression: "{Value} * {Probability}"
-//   public string? FormulaResultType { get; set; }  // "number", "text", "date", "currency"
-//
-// FormulaExpression uses {FieldName} for built-in fields
-// and {cf:GUID} for other custom fields
-```
-
-### Duplicate Detection Entities
-
-```csharp
-// Domain/Entities/DuplicateCandidate.cs
-public class DuplicateCandidate
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string EntityType { get; set; }       // "Contact", "Company"
-    public Guid SourceEntityId { get; set; }     // The record being checked
-    public Guid MatchEntityId { get; set; }      // The potential duplicate
-    public decimal SimilarityScore { get; set; } // 0.0-1.0 from pg_trgm + FuzzySharp
-    public string MatchedFields { get; set; }    // JSON: ["email", "firstName+lastName"]
-    public string Status { get; set; }           // "Pending", "Merged", "Dismissed"
-    public Guid? ResolvedById { get; set; }
-    public DateTimeOffset? ResolvedAt { get; set; }
-    public DateTimeOffset DetectedAt { get; set; }
-}
-
-// Domain/Entities/DuplicateRule.cs
-public class DuplicateRule
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string EntityType { get; set; }
-    public string Name { get; set; }
-    public List<DuplicateMatchField> MatchFields { get; set; }  // JSONB
-    public decimal SimilarityThreshold { get; set; }             // Default 0.85
-    public bool IsActive { get; set; }
-    public bool CheckOnCreate { get; set; }
-    public bool CheckOnImport { get; set; }
-}
-
-public class DuplicateMatchField
-{
-    public string FieldName { get; set; }    // "email", "firstName", "phone"
-    public string MatchType { get; set; }    // "exact", "fuzzy", "normalized"
-    public decimal Weight { get; set; }      // How much this field contributes to overall score
-}
-```
-
-### Webhook Entities
-
-```csharp
-// Domain/Entities/WebhookSubscription.cs
-public class WebhookSubscription
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; }
-    public string TargetUrl { get; set; }
-    public string Secret { get; set; }           // HMAC-SHA256 signing secret
-    public List<string> EventTypes { get; set; } // ["deal.created", "contact.updated", ...]
-    public bool IsActive { get; set; }
-    public Dictionary<string, string>? Headers { get; set; }  // Custom headers
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-}
-
-// Domain/Entities/WebhookDeliveryLog.cs
-public class WebhookDeliveryLog
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public Guid SubscriptionId { get; set; }
-    public string EventType { get; set; }
-    public string Payload { get; set; }          // JSON payload
-    public string Status { get; set; }           // "Pending", "Delivered", "Failed", "DeadLetter"
-    public int AttemptCount { get; set; }
-    public int? HttpStatusCode { get; set; }
-    public string? ResponseBody { get; set; }    // First 1000 chars
-    public string? ErrorMessage { get; set; }
-    public string? HangfireJobId { get; set; }   // Track Hangfire job for monitoring
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset? DeliveredAt { get; set; }
-}
-```
-
-### Report Builder Entities
-
-```csharp
-// Domain/Entities/ReportDefinition.cs
-public class ReportDefinition
-{
-    public Guid Id { get; set; }
-    public Guid TenantId { get; set; }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-    public string EntityType { get; set; }       // Primary entity
-    public List<ReportColumn> Columns { get; set; }      // JSONB
-    public List<ReportFilter> Filters { get; set; }      // JSONB
-    public List<ReportSort> Sorts { get; set; }          // JSONB
-    public ReportGrouping? Grouping { get; set; }        // JSONB
-    public string? ChartType { get; set; }               // "bar", "line", "pie", null (table only)
-    public Guid? OwnerId { get; set; }
-    public bool IsShared { get; set; }
-    public DateTimeOffset CreatedAt { get; set; }
-    public DateTimeOffset UpdatedAt { get; set; }
-}
-
-public class ReportColumn
-{
-    public string Field { get; set; }            // "title", "value", "stage.name", "customFields.GUID"
-    public string Label { get; set; }
-    public string? Aggregation { get; set; }     // "sum", "avg", "count", "min", "max", null
-    public string? Format { get; set; }          // "currency", "percent", "date"
-}
-
-public class ReportFilter
-{
-    public string Field { get; set; }
-    public string Operator { get; set; }         // "equals", "notEquals", "greaterThan", "contains", "in", "between"
-    public object? Value { get; set; }
-    public string? LogicalOperator { get; set; } // "and", "or"
-}
-```
-
-## Integration Points With Each Clean Architecture Layer
-
-### Domain Layer Changes
-
-| Change | Type | Description |
-|--------|------|-------------|
-| New entities (12) | ADD | WorkflowDefinition, WorkflowExecutionLog, EmailTemplate, EmailSequence, EmailSequenceStep, SequenceEnrollment, SequenceStepLog, DuplicateCandidate, DuplicateRule, WebhookSubscription, WebhookDeliveryLog, ReportDefinition |
-| CustomFieldType.Formula | MODIFY | Add Formula = 9 to existing enum |
-| CustomFieldDefinition | MODIFY | Add FormulaExpression, FormulaResultType nullable properties |
-| New enums | ADD | WorkflowTriggerType, WorkflowActionType, SequenceStatus, WebhookEventType, DuplicateStatus |
-| New interfaces | ADD | IWorkflowRepository, IEmailTemplateRepository, IEmailSequenceRepository, IDuplicateRepository, IWebhookRepository, IReportRepository |
-| IDomainEventHandler | ADD | Interface for event handling: `Task HandleAsync(DomainEvent event)` |
-
-### Application Layer Changes
-
-| Change | Type | Description |
-|--------|------|-------------|
-| IFormulaEvaluator | ADD | Abstraction: `object? Evaluate(string expression, Dictionary<string, object?> context)` |
-| IWorkflowEngine | ADD | Abstraction: `Task EvaluateTriggersAsync(DomainEvent event)` |
-| IDuplicateDetector | ADD | Abstraction: `Task<List<DuplicateCandidate>> FindDuplicatesAsync(string entityType, Dictionary<string, object?> entityData)` |
-| IWebhookPublisher | ADD | Abstraction: `Task EnqueueAsync(string eventType, Guid entityId, object payload)` |
-| IEmailTemplateRenderer | ADD | Abstraction: `Task<RenderedEmail> RenderAsync(string subjectTemplate, string bodyTemplate, Dictionary<string, object?> context)` |
-| IReportQueryBuilder | ADD | Abstraction: `Task<ReportResult> ExecuteAsync(ReportDefinition definition)` |
-
-### Infrastructure Layer Changes
-
-| Change | Type | Description |
-|--------|------|-------------|
-| DomainEventInterceptor | ADD | SaveChangesInterceptor that detects entity changes and publishes domain events |
-| WorkflowEngine | ADD | NCalc-based condition evaluation, Hangfire job dispatch for actions |
-| FormulaEvaluator | ADD | NCalc expression evaluation against entity data |
-| FluidEmailTemplateRenderer | ADD | Fluid (Liquid) template engine for user-defined templates |
-| EmailSequenceService | ADD | Enrollment management, Hangfire delayed job scheduling for steps |
-| DuplicateDetectionService | ADD | pg_trgm SQL queries + FuzzySharp composite scoring |
-| WebhookDeliveryService | ADD | Polly-resilient HttpClient delivery with HMAC signing |
-| WebhookPublisher | ADD | Enqueues Hangfire fire-and-forget jobs for webhook delivery |
-| ReportQueryBuilder | ADD | Dynamic LINQ/EF Core query builder from ReportDefinition |
-| Hangfire integration | ADD | `AddHangfire()` + `AddHangfireServer()` in DI, TenantJobFilter for multi-tenancy |
-| Hangfire job classes (4) | ADD | WorkflowActionJob, WebhookDeliveryJob, SequenceStepJob, DuplicateScanJob |
-| New EF Configurations (12) | ADD | One per new entity |
-| ApplicationDbContext | MODIFY | Add 12 new DbSet properties, new global query filters |
-| New Repositories (6) | ADD | One per new aggregate root |
-| DependencyInjection | MODIFY | Register via AddWorkflowServices(), AddWebhookServices(), AddEmailTemplateServices(), AddDuplicateServices(), AddReportServices() |
-
-### API Layer Changes
-
-| Change | Type | Description |
-|--------|------|-------------|
-| WorkflowsController | ADD | CRUD for workflow definitions, execution logs, manual trigger |
-| EmailTemplatesController | ADD | CRUD for templates, preview/render endpoint |
-| EmailSequencesController | ADD | CRUD for sequences/steps, enrollment management |
-| DuplicatesController | ADD | List candidates, merge, dismiss, configure rules |
-| WebhooksController | ADD | CRUD for subscriptions, delivery logs, test endpoint |
-| ReportBuilderController | ADD | CRUD for report definitions, preview/execute, export |
-| Existing Controllers | MODIFY | DealsController etc. expose formula field values in DTOs |
-| Program.cs | MODIFY | Add Hangfire server, map Hangfire dashboard at /hangfire (admin-only) |
-
-### Frontend Changes
-
-| Change | Type | Description |
-|--------|------|-------------|
-| `features/workflows/` | ADD | Workflow builder UI with trigger/condition/action configuration (@foblex/flow) |
-| `features/email-templates/` | ADD | Template editor with Liquid syntax, preview, variable picker |
-| `features/email-sequences/` | ADD | Sequence builder, enrollment list, step logs |
-| `features/duplicates/` | ADD | Duplicate review queue, side-by-side comparison, merge UI |
-| `features/webhooks/` | ADD | Subscription management, delivery log viewer, test UI |
-| `features/reports/` | ADD | Visual report builder, column/filter/group configuration, chart preview |
-| `core/custom-fields/` | MODIFY | Support Formula field type display (read-only, shows computed value) |
-| `features/settings/` | MODIFY | Add admin sections for workflow, duplicate rules, webhook management |
+| Component | What Changes | Why |
+|-----------|-------------|-----|
+| `AppComponent` | Add `EntityPreviewSidebarComponent` to template, after `<router-outlet>` | Preview sidebar is a global overlay |
+| `FeedController.GetList` | Add optional `entityType` + `entityId` query params for filtering | Entity-scoped feed |
+| `FeedService` | Add `getEntityFeed(entityType, entityId, page, pageSize)` method | Frontend entity-scoped feed calls |
+| `FeedRepository.GetFeedAsync` | Add optional entity filter params, or add new `GetEntityFeedAsync` method | Backend entity-scoped feed query |
+| `IFeedRepository` | Add `GetEntityFeedAsync(entityType, entityId, page, pageSize)` interface method | Interface contract |
+| `COMPANY_TABS` | Add `{ label: 'Summary', icon: 'summarize', enabled: true }` at index 0, add `{ label: 'Feed', icon: 'dynamic_feed', enabled: true }` | New tabs on detail pages |
+| `CONTACT_TABS` | Same: add Summary + Feed tabs | New tabs on detail pages |
+| `DEAL_TABS` | Same: add Summary + Feed tabs | New tabs on detail pages |
+| `CompanyDetailComponent` | Add Summary tab content + Feed tab content using shared components | Wire new tabs |
+| `ContactDetailComponent` | Same | Wire new tabs |
+| `DealDetailComponent` | Same | Wire new tabs |
+| `LeadDetailComponent` | Same | Wire new tabs |
+| `DashboardComponent` | Add "My Day" tab to mat-tab-group, lazy-load MyDayComponent | Personal dashboard |
+| `FeedListComponent` | Entity links trigger `PreviewSidebarStore.open()` instead of `router.navigate` | Preview on hover/click |
+| `GlobalSearchComponent` | Search hits trigger `PreviewSidebarStore.open()` as secondary action | Preview from search |
+| `SignalRService` | No changes needed -- existing FeedUpdate/FeedCommentAdded events suffice | Real-time already works |
 
 ## Patterns to Follow
 
-### Pattern 1: Domain Event Interceptor
+### Pattern 1: Global Overlay Component (Preview Sidebar)
 
-The centerpiece of v1.1. Intercepts `SaveChangesAsync` to detect entity changes and dispatch events. This reuses the existing interceptor pattern (see `AuditableEntityInterceptor`).
+**What:** A component that lives at the AppComponent level, managed by a root signal store, rendered as a fixed-position overlay.
 
-**What:** A `SaveChangesInterceptor` that captures `ChangeTracker` entries before save, then dispatches events after successful save.
+**When:** When a UI element needs to be accessible from any route without navigating away.
 
-**When:** Every `SaveChangesAsync` call on `ApplicationDbContext`.
+**Why this over MatSidenav:** The existing app uses a CSS-only sidebar for navigation (no MatSidenav). Adding MatSidenav for the preview panel would conflict. A custom overlay is simpler, more controllable, and consistent with the existing nav pattern.
 
-**Why:** Ensures workflows, webhooks, and formula recalculation happen reliably without modifying every controller. Single integration point.
+**Example:**
 
-```csharp
-// Infrastructure/Events/DomainEventInterceptor.cs
-public class DomainEventInterceptor : SaveChangesInterceptor
-{
-    private readonly IServiceProvider _serviceProvider;
-    private List<DomainEvent> _capturedEvents = new();
+```typescript
+// preview-sidebar.store.ts
+export const PreviewSidebarStore = signalStore(
+  { providedIn: 'root' },
+  withState({
+    isOpen: false,
+    entityType: null as string | null,
+    entityId: null as string | null,
+    data: null as EntityPreviewDto | null,
+    isLoading: false,
+  }),
+  withMethods((store) => {
+    const previewService = inject(EntityPreviewService);
+    return {
+      open(entityType: string, entityId: string): void {
+        patchState(store, {
+          isOpen: true,
+          entityType,
+          entityId,
+          isLoading: true,
+          data: null,
+        });
+        previewService.getPreview(entityType, entityId).subscribe({
+          next: (data) => patchState(store, { data, isLoading: false }),
+          error: () => patchState(store, { isLoading: false }),
+        });
+      },
+      close(): void {
+        patchState(store, { isOpen: false, entityType: null, entityId: null, data: null });
+      },
+    };
+  }),
+);
+```
 
-    // Capture changes BEFORE save (while ChangeTracker has original values)
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(
-        DbContextEventData eventData,
-        InterceptionResult<int> result,
-        CancellationToken cancellationToken = default)
-    {
-        var context = eventData.Context as ApplicationDbContext;
-        if (context == null) return ValueTask.FromResult(result);
-
-        _capturedEvents = CaptureEntityChanges(context.ChangeTracker);
-        return ValueTask.FromResult(result);
+```typescript
+// entity-preview-sidebar.component.ts
+@Component({
+  selector: 'app-entity-preview-sidebar',
+  standalone: true,
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  // Renders as fixed overlay, 400px wide, slides from right
+  host: {
+    '[class.open]': 'store.isOpen()',
+  },
+  template: `
+    @if (store.isOpen()) {
+      <div class="preview-backdrop" (click)="store.close()"></div>
+      <aside class="preview-panel">
+        <!-- header with close button -->
+        <!-- loading state -->
+        <!-- entity-type-specific content via @switch -->
+        <!-- "View Full Record" footer link -->
+      </aside>
     }
-
-    // Dispatch events AFTER successful save
-    public override async ValueTask<int> SavedChangesAsync(
-        SaveChangesCompletedEventData eventData,
-        int result,
-        CancellationToken cancellationToken = default)
-    {
-        if (_capturedEvents.Count == 0) return result;
-
-        using var scope = _serviceProvider.CreateScope();
-        var dispatcher = scope.ServiceProvider.GetRequiredService<IDomainEventDispatcher>();
-
-        foreach (var domainEvent in _capturedEvents)
-        {
-            // Fire-and-forget with error logging (same pattern as NotificationDispatcher)
-            try { await dispatcher.DispatchAsync(domainEvent); }
-            catch (Exception ex) { /* log, don't fail the save */ }
-        }
-
-        _capturedEvents.Clear();
-        return result;
-    }
-
-    private List<DomainEvent> CaptureEntityChanges(ChangeTracker tracker)
-    {
-        var events = new List<DomainEvent>();
-        foreach (var entry in tracker.Entries())
-        {
-            if (entry.Entity is not ITenantEntity tenantEntity) continue;
-
-            var entityType = entry.Entity.GetType().Name;
-            var changes = entry.State switch
-            {
-                EntityState.Added => new DomainEvent(entityType, "Created", tenantEntity.TenantId, ...),
-                EntityState.Modified => CaptureFieldChanges(entry, entityType, tenantEntity.TenantId),
-                EntityState.Deleted => new DomainEvent(entityType, "Deleted", tenantEntity.TenantId, ...),
-                _ => null
-            };
-
-            if (changes != null) events.Add(changes);
-        }
-        return events;
-    }
+  `,
+})
+export class EntityPreviewSidebarComponent {
+  readonly store = inject(PreviewSidebarStore);
 }
 ```
 
-**Critical Design Decision:** Events are captured in `SavingChangesAsync` (while `ChangeTracker` still has `OriginalValues` for detecting what changed) but dispatched in `SavedChangesAsync` (after the entity is persisted). This ensures:
-1. We know exactly which fields changed (old vs new values)
-2. The entity is safely persisted before workflows/webhooks fire
-3. Workflow actions that modify other entities use their own `SaveChangesAsync` call
+```typescript
+// In AppComponent template, add after <router-outlet>:
+// <app-entity-preview-sidebar />
+```
 
-### Pattern 2: Hangfire Job Dispatch for Async Actions
+### Pattern 2: Aggregation Endpoint (Summary + My Day)
 
-**What:** Workflow actions, webhook deliveries, and email sequence steps are enqueued as Hangfire jobs rather than executed inline.
+**What:** A single backend endpoint that runs multiple targeted queries and returns a composite DTO, avoiding N+1 API calls from the frontend.
 
-**When:** Any action that involves external I/O (HTTP calls, email sending) or needs delayed execution.
+**When:** When a UI component needs to display counts/totals from multiple entity types simultaneously.
 
-**Why:** Decouples the API response time from action execution time. Provides automatic retry with backoff, persistence across app restarts, delayed scheduling for email sequences, and a monitoring dashboard for ops.
+**Why not reuse existing list endpoints:** Existing list endpoints (`GET /api/contacts?page=1&pageSize=1`) return full DTOs with pagination overhead. Summary data needs only counts and totals, which are much cheaper as `COUNT(*)` and `SUM()` aggregate queries.
+
+**Example:**
 
 ```csharp
-// Infrastructure/Workflows/WorkflowEngine.cs
-public class WorkflowEngine : IWorkflowEngine
+// EntitySummaryController.cs
+[HttpGet("api/contacts/{id:guid}/summary")]
+[Authorize(Policy = "Permission:Contact:View")]
+public async Task<IActionResult> GetContactSummary(Guid id)
 {
-    private readonly ApplicationDbContext _db;
-    private readonly IBackgroundJobClient _hangfire;
-    private readonly ILogger<WorkflowEngine> _logger;
+    var userId = GetCurrentUserId();
+    var tenantId = GetTenantId();
 
-    public async Task EvaluateTriggersAsync(DomainEvent domainEvent)
+    // All queries run against tenant-scoped DbContext (global filter active)
+    var dealCount = await _db.DealContacts
+        .Where(dc => dc.ContactId == id)
+        .CountAsync();
+
+    var dealTotalValue = await _db.DealContacts
+        .Where(dc => dc.ContactId == id)
+        .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
+        .SumAsync(d => d.Value ?? 0);
+
+    var openActivityCount = await _db.Activities
+        .Where(a => a.LinkedEntityType == "Contact" && a.LinkedEntityId == id)
+        .Where(a => a.Status != "Completed" && a.Status != "Cancelled")
+        .CountAsync();
+
+    var noteCount = await _db.Notes
+        .Where(n => n.EntityType == "Contact" && n.EntityId == id)
+        .CountAsync();
+
+    var recentFeed = await _db.FeedItems
+        .Where(f => f.EntityType == "Contact" && f.EntityId == id)
+        .OrderByDescending(f => f.CreatedAt)
+        .Take(5)
+        .Include(f => f.Author)
+        .Select(f => FeedItemDto.FromEntity(f))
+        .ToListAsync();
+
+    return Ok(new ContactSummaryDto
     {
-        var workflows = await _db.WorkflowDefinitions
-            .Where(w => w.IsActive && w.EntityType == domainEvent.EntityType
-                        && w.TriggerType == domainEvent.TriggerType)
-            .OrderBy(w => w.ExecutionOrder)
-            .ToListAsync();
-
-        foreach (var workflow in workflows)
-        {
-            if (!EvaluateConditions(workflow.Conditions, domainEvent))
-            {
-                LogExecution(workflow, domainEvent, "Skipped", "Conditions not met");
-                continue;
-            }
-
-            foreach (var action in workflow.Actions.OrderBy(a => a.Order))
-            {
-                switch (action.ActionType)
-                {
-                    case "updateField":
-                        // Quick action: execute inline
-                        await ExecuteFieldUpdate(domainEvent, action.Config);
-                        break;
-
-                    case "sendEmail":
-                        // Slow action: enqueue via Hangfire
-                        _hangfire.Enqueue<WorkflowActionJob>(
-                            j => j.SendEmailAsync(domainEvent.TenantId, workflow.Id,
-                                domainEvent.EntityId, action.Config));
-                        break;
-
-                    case "sendWebhook":
-                        _hangfire.Enqueue<WorkflowActionJob>(
-                            j => j.FireWebhookAsync(domainEvent.TenantId, workflow.Id,
-                                domainEvent.EntityId, action.Config));
-                        break;
-
-                    case "startSequence":
-                        _hangfire.Enqueue<WorkflowActionJob>(
-                            j => j.StartSequenceAsync(domainEvent.TenantId,
-                                domainEvent.EntityId, action.Config));
-                        break;
-                }
-            }
-
-            LogExecution(workflow, domainEvent, "Success", null);
-        }
-    }
-
-    private bool EvaluateConditions(List<WorkflowCondition> conditions, DomainEvent domainEvent)
-    {
-        // Use NCalc for condition evaluation
-        // Build expression from conditions and evaluate against entity data
-        // ...
-    }
+        DealCount = dealCount,
+        DealTotalValue = dealTotalValue,
+        OpenActivityCount = openActivityCount,
+        NoteCount = noteCount,
+        RecentFeedItems = recentFeed,
+        // ... more counts
+    });
 }
 ```
 
-**Hangfire multi-tenancy:** Every Hangfire job receives `tenantId` as a parameter. A `TenantJobFilter` (Hangfire `IServerFilter`) sets the tenant context before job execution:
+### Pattern 3: Tab Constant Extension
 
-```csharp
-// Infrastructure/Hangfire/TenantJobFilter.cs
-public class TenantJobFilter : IServerFilter
-{
-    public void OnPerforming(PerformingContext context)
-    {
-        // Extract tenantId from job arguments
-        // Set ITenantProvider context for the scoped DI container
-        // This enables EF Core global query filters inside jobs
-    }
-}
+**What:** Adding new tabs to existing `ENTITY_TABS` arrays with shared tab content components.
+
+**When:** Adding Summary and Feed tabs to all entity detail pages.
+
+**Important:** Tab order matters because existing `onTabChanged(index)` handlers use hardcoded index numbers. New tabs should be inserted carefully, and all existing index references must be updated.
+
+**Example:**
+
+```typescript
+// Before (existing):
+export const CONTACT_TABS: EntityTab[] = [
+  { label: 'Details', icon: 'info', enabled: true },        // 0
+  { label: 'Company', icon: 'business', enabled: true },     // 1
+  { label: 'Deals', icon: 'handshake', enabled: true },      // 2
+  // ...
+];
+
+// After (v1.2):
+export const CONTACT_TABS: EntityTab[] = [
+  { label: 'Summary', icon: 'summarize', enabled: true },    // 0 (NEW)
+  { label: 'Details', icon: 'info', enabled: true },          // 1 (was 0)
+  { label: 'Company', icon: 'business', enabled: true },      // 2 (was 1)
+  { label: 'Deals', icon: 'handshake', enabled: true },       // 3 (was 2)
+  // ...
+  { label: 'Feed', icon: 'dynamic_feed', enabled: true },     // N (NEW, last)
+];
 ```
 
-### Pattern 3: Formula Field Evaluation with NCalc
-
-**What:** Formula custom fields are evaluated server-side using NCalc expressions. Values are computed on-read (not stored), keeping JSONB `custom_fields` free of stale data.
-
-**When:** Any GET request that returns entity data with formula fields.
-
-**Why:** Formulas depend on other field values that may have changed. Computing on-read guarantees freshness. NCalc provides safe sandboxed evaluation with no code injection risk.
-
-```csharp
-// Application layer (pure business logic, no infrastructure dependencies)
-// FormulaEvaluator.cs
-public class FormulaEvaluator : IFormulaEvaluator
-{
-    public object? Evaluate(string expression, Dictionary<string, object?> context)
-    {
-        var ncalcExpression = new Expression(TranslateFieldRefs(expression));
-
-        // Register built-in fields as parameters
-        foreach (var (key, value) in context)
-        {
-            ncalcExpression.Parameters[key] = value;
-        }
-
-        // Register custom functions (IF, CONCAT, DATEDIFF, etc.)
-        ncalcExpression.EvaluateFunction += OnEvaluateFunction;
-
-        return ncalcExpression.Evaluate();
-    }
-
-    // Translate {FieldName} syntax to NCalc [FieldName] parameter syntax
-    private string TranslateFieldRefs(string expression)
-    {
-        return Regex.Replace(expression, @"\{(\w+)\}", "[$1]");
-    }
-
-    private void OnEvaluateFunction(string name, FunctionArgs args)
-    {
-        switch (name.ToUpperInvariant())
-        {
-            case "IF":
-                args.Result = (bool)args.Parameters[0].Evaluate()
-                    ? args.Parameters[1].Evaluate()
-                    : args.Parameters[2].Evaluate();
-                break;
-            case "CONCAT":
-                args.Result = string.Join("", args.Parameters.Select(p => p.Evaluate()?.ToString()));
-                break;
-            case "DATEDIFF":
-                var d1 = Convert.ToDateTime(args.Parameters[0].Evaluate());
-                var d2 = Convert.ToDateTime(args.Parameters[1].Evaluate());
-                args.Result = (d2 - d1).TotalDays;
-                break;
-            // TODAY(), NOW(), ROUND(), UPPER(), LOWER(), etc.
-        }
-    }
-}
+**CRITICAL:** All `onTabChanged(index)` handlers in detail components use hardcoded numbers:
+```typescript
+// ContactDetailComponent.onTabChanged -- ALL indices shift by +1
+if (index === 3) { this.loadLinkedActivities(); }  // was 3, becomes 4
 ```
 
-**Evaluation context includes:**
-- Built-in entity fields (Value, Probability, CreatedAt, etc.)
-- Other custom field values from the same entity's JSONB
-- Related entity fields (e.g., `company.industry` for a Contact formula)
+This is a mechanical but error-prone change. Each detail component's index mapping must be updated.
 
-### Pattern 4: Liquid Templates with Fluid
+### Pattern 4: Entity-Type-Specific Content Switching
 
-**What:** User-created email templates use Liquid syntax (via the Fluid library). This coexists with the existing `RazorEmailRenderer` used for system emails.
+**What:** A single shared component that renders different content based on entity type, using Angular's `@switch` control flow.
 
-**When:** Rendering workflow email actions and email sequence steps.
+**When:** The preview sidebar and summary tab need to show different fields for contacts vs deals vs companies.
 
-**Why:** Liquid is safe (no code execution), user-friendly, and the Fluid library is the fastest .NET implementation. Existing Razor templates continue to serve system emails (verification, password reset, invitations).
+**Example:**
 
-```csharp
-// Infrastructure/Email/FluidEmailTemplateRenderer.cs
-public class FluidEmailTemplateRenderer : IEmailTemplateRenderer
-{
-    private readonly FluidParser _parser = new();
-
-    public async Task<RenderedEmail> RenderAsync(string subjectTemplate, string bodyTemplate,
-        Dictionary<string, object?> context)
-    {
-        if (!_parser.TryParse(subjectTemplate, out var subjectFluid, out var subjectError))
-            throw new TemplateParseException($"Subject template error: {subjectError}");
-
-        if (!_parser.TryParse(bodyTemplate, out var bodyFluid, out var bodyError))
-            throw new TemplateParseException($"Body template error: {bodyError}");
-
-        var templateContext = new TemplateContext();
-        foreach (var (key, value) in context)
-        {
-            templateContext.SetValue(key, FluidValue.Create(value, templateContext.Options));
-        }
-
-        // Register custom filters (currency formatting, date formatting, etc.)
-        templateContext.Options.Filters.AddFilter("currency", CurrencyFilter);
-
-        return new RenderedEmail
-        {
-            Subject = await subjectFluid.RenderAsync(templateContext),
-            BodyHtml = await bodyFluid.RenderAsync(templateContext)
-        };
-    }
-}
-```
-
-**Template variable convention:**
-```liquid
-Hi {{contact.firstName}},
-
-Your deal "{{deal.title}}" worth {{deal.value | currency}} has moved to {{deal.stage}}.
-
-{% if deal.probability > 0.8 %}
-This deal is looking great!
-{% endif %}
-```
-
-**Context building for templates:** A `TemplateContextBuilder` service assembles the variable dictionary for any entity type:
-- `contact.*` - Contact fields (firstName, lastName, email, company.name, etc.)
-- `deal.*` - Deal fields (title, value, stage, probability, owner.name, etc.)
-- `company.*` - Company fields (name, domain, industry, etc.)
-- `user.*` - Current user / workflow owner
-- `org.*` - Organization/tenant name, settings
-
-### Pattern 5: Two-Tier Duplicate Detection (pg_trgm + FuzzySharp)
-
-**What:** Use PostgreSQL's `pg_trgm` extension for fast database-level candidate pre-filtering, then FuzzySharp for nuanced in-memory scoring and ranking.
-
-**When:** On entity creation (real-time check) and on-demand batch scanning via Hangfire.
-
-**Why:** pg_trgm runs entirely in PostgreSQL with GIN index support. FuzzySharp adds weighted multi-field scoring for accurate ranking. Two tiers avoid loading all records into memory.
-
-```sql
--- Migration: Enable pg_trgm extension
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
-
--- Add trigram indexes on key contact fields
-CREATE INDEX idx_contacts_email_trgm ON contacts USING gin (email gin_trgm_ops);
-CREATE INDEX idx_contacts_name_trgm ON contacts
-    USING gin ((first_name || ' ' || last_name) gin_trgm_ops);
-CREATE INDEX idx_companies_name_trgm ON companies USING gin (name gin_trgm_ops);
-```
-
-```csharp
-// Infrastructure/Duplicates/DuplicateDetectionService.cs
-public class DuplicateDetectionService : IDuplicateDetector
-{
-    public async Task<List<DuplicateCandidate>> FindDuplicatesAsync(
-        string entityType, Guid sourceId, Dictionary<string, object?> entityData, Guid tenantId)
-    {
-        // Tier 1: pg_trgm database pre-filter (returns ~10-50 candidates)
-        var candidates = await ExecuteTrgmQuery(entityType, sourceId, entityData, tenantId);
-
-        // Tier 2: FuzzySharp composite scoring
-        var scored = candidates.Select(c => new DuplicateCandidate
-        {
-            SourceEntityId = sourceId,
-            MatchEntityId = c.Id,
-            SimilarityScore = ComputeWeightedScore(entityData, c),
-            MatchedFields = GetMatchedFields(entityData, c),
-            // ...
-        })
-        .Where(c => c.SimilarityScore >= 0.7m)
-        .OrderByDescending(c => c.SimilarityScore)
-        .Take(10)
-        .ToList();
-
-        return scored;
-    }
-
-    private decimal ComputeWeightedScore(Dictionary<string, object?> source, CandidateRecord match)
-    {
-        decimal score = 0;
-        // Email: 30% weight, exact or fuzzy
-        if (source.TryGetValue("email", out var email) && email != null)
-            score += 0.3m * (Fuzz.Ratio(email.ToString(), match.Email) / 100m);
-
-        // Name: 40% weight, token sort for "John Smith" vs "Smith, John"
-        score += 0.4m * (Fuzz.TokenSortRatio(source["name"]?.ToString(), match.Name) / 100m);
-
-        // Phone: 20% weight, normalized comparison
-        // Company: 10% weight
-        return score;
-    }
-}
-```
-
-### Pattern 6: Dynamic Report Query Building
-
-**What:** Translate JSON report definitions into EF Core IQueryable chains using Expression Trees.
-
-**When:** Report preview and execution endpoints.
-
-**Why:** Keeps reports within the existing tenant isolation (EF Core global query filters + RLS apply automatically). No raw SQL leaves the server boundary.
-
-```csharp
-// Infrastructure/Reporting/ReportQueryBuilder.cs
-public class ReportQueryBuilder : IReportQueryBuilder
-{
-    private readonly ApplicationDbContext _db;
-    private readonly IFormulaEvaluator _formulaEvaluator;
-    private readonly ICustomFieldRepository _customFieldRepository;
-
-    public async Task<ReportResult> ExecuteAsync(ReportDefinition definition)
-    {
-        // 1. Get base queryable for entity type
-        //    (EF Core global query filters apply automatically -- tenant-scoped)
-        var entityType = definition.EntityType;
-
-        // 2. Build dynamic filter expressions
-        var filters = BuildFilterExpressions(definition.Filters, entityType);
-
-        // 3. Apply filters to queryable
-        // 4. Execute query to materialize results
-        // 5. Compute formula fields in-memory via FormulaEvaluator
-        // 6. Apply grouping + aggregation
-        // 7. Apply sorting
-        // 8. Return paginated ReportResult with column metadata
-
-        // For simple aggregations (COUNT, SUM, AVG over built-in fields),
-        // push to database via EF Core GroupBy/Select projections
-        // (same approach as DashboardAggregationService)
-
-        // For formula fields in aggregations, must materialize first,
-        // compute formulas, then aggregate in-memory
-    }
+```typescript
+// Inside EntityPreviewSidebarComponent template:
+@switch (store.entityType()) {
+  @case ('Contact') {
+    <div class="preview-contact">
+      <div class="preview-avatar">{{ data.initials }}</div>
+      <h3>{{ data.fullName }}</h3>
+      <span class="preview-subtitle">{{ data.jobTitle }} at {{ data.companyName }}</span>
+      <div class="preview-fields">
+        <!-- email, phone, company link -->
+      </div>
+    </div>
+  }
+  @case ('Deal') {
+    <div class="preview-deal">
+      <h3>{{ data.title }}</h3>
+      <div class="preview-stage-badge">{{ data.stageName }}</div>
+      <span class="preview-value">{{ data.value | currency }}</span>
+      <!-- probability, expected close, company -->
+    </div>
+  }
+  @case ('Company') {
+    <!-- company-specific preview -->
+  }
 }
 ```
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Synchronous Workflow Execution in Request Pipeline
+### Anti-Pattern 1: Preview Sidebar Inside Feature Modules
 
-**What:** Executing all workflow actions (send email, create activity, fire webhook) inside the HTTP request handler before returning the response.
+**What:** Placing the preview sidebar component inside `features/feed/` or `features/contacts/` and trying to import it cross-module.
 
-**Why bad:** If a workflow sends 5 emails and fires 3 webhooks, the API response could take 10+ seconds. External service failures would cause 500 errors for simple CRUD operations.
+**Why bad:** The preview needs to be triggered from feed, search, detail page links, and potentially future contexts. Placing it in a feature module creates circular dependency chains and breaks lazy-loading boundaries.
 
-**Instead:** Domain events trigger workflow evaluation. Quick actions (update a field) happen synchronously. Slow actions (send email, fire webhook) are enqueued as Hangfire jobs. The API response returns immediately after the entity save.
+**Instead:** Put it in `shared/components/entity-preview-sidebar/` with a root-provided store and service. Import the component in `AppComponent` only. Other components interact solely through `PreviewSidebarStore.open()`.
 
-### Anti-Pattern 2: Storing Formula Results in JSONB
+### Anti-Pattern 2: Reusing Full Detail DTOs for Preview
 
-**What:** Computing formula field values and saving them back to the `custom_fields` JSONB column alongside user-entered values.
+**What:** Calling the existing `GET /api/contacts/{id}` endpoint to populate the preview sidebar.
 
-**Why bad:** Formula values become stale when dependent fields change. You would need to track every dependency and trigger recalculation cascades. The JSONB would grow with computed data that has no user-authored source of truth.
+**Why bad:** Detail DTOs include deep navigation properties (linked contacts, products, timeline, custom fields) that the preview sidebar does not need. This wastes bandwidth and database joins for a 400px sidebar that shows 5-8 fields.
 
-**Instead:** Compute formula fields on-read. The `FormulaExpression` lives in `CustomFieldDefinition`. When an entity is fetched, evaluate formulas against current field values and include the result in the DTO. Formula fields are never written to JSONB.
+**Instead:** Create a dedicated `GET /api/entities/{type}/{id}/preview` endpoint that returns a slim DTO with only the fields shown in the preview panel. Example: for a contact, return `fullName`, `jobTitle`, `companyName`, `email`, `phone`, `avatarUrl`, `ownerName`, `createdAt`. No linked entities, no custom fields, no timeline.
 
-### Anti-Pattern 3: N+1 Duplicate Checks
+### Anti-Pattern 3: Duplicating Feed Logic
 
-**What:** Checking for duplicates by loading every record in the entity table and comparing in C# code.
+**What:** Creating a separate feed component and store for entity-scoped feed tabs, duplicating the paging, comment, and real-time logic from `FeedListComponent`.
 
-**Why bad:** For a tenant with 50,000 contacts, this means loading 50K records into memory for every new contact creation. Extremely slow and memory-intensive.
+**Why bad:** The feed card rendering, comment toggle, comment submission, relative time formatting, and SignalR subscription logic are non-trivial. Duplicating them creates maintenance burden and divergence.
 
-**Instead:** Use pg_trgm similarity queries that run entirely in PostgreSQL with GIN indexes. The database engine handles the fuzzy matching in a single indexed query, returning only the top N candidates. FuzzySharp scoring runs only on the pre-filtered candidates (10-50 records).
+**Instead:** Extract a `FeedCardComponent` from `FeedListComponent` that renders a single feed item with comments. Both `FeedListComponent` and `EntityFeedTabComponent` compose this card component. The entity feed tab uses a lightweight local signal store that delegates to `FeedService` with entity filter params.
 
-### Anti-Pattern 4: Storing Report SQL as User-Authored Strings
+### Anti-Pattern 4: Making Summary Tab Hit Multiple Existing Endpoints
 
-**What:** Letting users write raw SQL or allowing the report builder to generate arbitrary SQL strings that are executed directly.
+**What:** Having the summary tab's frontend component call `GET /api/activities?contactId=X&page=1&pageSize=1` (for count), `GET /api/deals?contactId=X&page=1&pageSize=1` (for count), etc., stitching together N API calls client-side.
 
-**Why bad:** SQL injection risk. Bypasses tenant isolation (EF Core query filters and RLS). Difficult to validate and secure.
+**Why bad:** N+1 HTTP requests per summary tab load. Each existing list endpoint runs full query pipelines (RBAC scope check, filter parsing, pagination, DTO mapping) when all we need is `COUNT(*)`.
 
-**Instead:** Report definitions are structured JSON (entity type, columns, filters, grouping). The `ReportQueryBuilder` translates these into EF Core IQueryable chains, which automatically apply tenant filters. No raw SQL leaves the server boundary.
+**Instead:** Single `GET /api/contacts/{id}/summary` endpoint that runs optimized aggregate queries in one database round-trip and returns all counts/totals in one response.
 
-### Anti-Pattern 5: Mixing Hangfire and BackgroundService for New Features
+### Anti-Pattern 5: Hardcoded Index Shifts Without Constants
 
-**What:** Using some `BackgroundService` polling loops alongside Hangfire for new v1.1 features, creating two parallel job processing systems.
+**What:** Updating `onTabChanged(index)` handlers by manually incrementing all numbers by 1 (or 2) to account for new tabs.
 
-**Why bad:** Increases operational complexity, makes monitoring harder, splits retry logic between two systems, and creates confusion about where to put new background work.
+**Why bad:** Index-based tab switching is fragile. If tabs are reordered or conditionally shown, all indices break silently.
 
-**Instead:** All new v1.1 background processing uses Hangfire exclusively. Existing `BackgroundService` implementations (`DueDateNotificationService`, `EmailSyncBackgroundService`) continue unchanged -- they are simple periodic tasks that predate Hangfire and work fine. Future enhancements may migrate them to Hangfire recurring jobs, but that is not a v1.1 priority.
+**Mitigation (not full fix):** Use named constants for tab indices in each detail component:
 
-## Tenant Isolation for New Entities
+```typescript
+const TAB = { SUMMARY: 0, DETAILS: 1, COMPANY: 2, DEALS: 3, ACTIVITIES: 4, /* ... */ FEED: 10 };
 
-All 12 new entities follow the existing triple-layer isolation pattern:
+onTabChanged(index: number): void {
+  if (index === TAB.ACTIVITIES) { this.loadLinkedActivities(); }
+  if (index === TAB.QUOTES) { this.loadLinkedQuotes(); }
+}
+```
 
-1. **Entity property:** Every new entity has `Guid TenantId`.
-2. **EF Core global query filter:** Added to `ApplicationDbContext.OnModelCreating()` using the same `_tenantProvider` pattern.
-3. **PostgreSQL RLS:** Add policies in `scripts/rls-setup.sql` for each new table.
+This does not change the RelatedEntityTabsComponent API (which is index-based), but makes the consuming code self-documenting and less error-prone.
 
-Child entities (WorkflowCondition/WorkflowAction stored as JSONB, EmailSequenceStep via SequenceId FK, SequenceStepLog via EnrollmentId FK) inherit isolation through their parent's filter -- consistent with existing patterns (e.g., DealContact, QuoteLineItem).
+## New Backend Endpoints Specification
 
-**Hangfire job tenant isolation:** Hangfire jobs run outside the HTTP request pipeline, so there is no Finbuckle tenant context. The `TenantJobFilter` sets the tenant context from the `tenantId` job parameter before execution, mirroring the pattern in `DueDateNotificationService` (which uses `IgnoreQueryFilters()` and passes explicit tenantId).
+### GET /api/entities/{entityType}/{entityId}/preview
 
-## Hangfire Integration Architecture
+**Purpose:** Lightweight entity snapshot for preview sidebar.
 
-### Registration in Program.cs
+**Response:** `EntityPreviewDto` (polymorphic by type)
 
-```csharp
-// Program.cs additions
-builder.Services.AddHangfire(config => config
-    .UsePostgreSqlStorage(connectionString, new PostgreSqlStorageOptions
-    {
-        SchemaName = "hangfire"  // Separate schema from CRM data
-    })
-    .UseSimpleAssemblyNameTypeSerializer()
-    .UseRecommendedSerializerSettings());
-
-builder.Services.AddHangfireServer(options =>
+```json
 {
-    options.WorkerCount = Environment.ProcessorCount * 2;
-    options.Queues = new[] { "default", "webhooks", "emails", "workflows" };
-});
+  "entityType": "Contact",
+  "entityId": "guid",
+  "title": "Jane Smith",
+  "subtitle": "VP Sales at Acme Corp",
+  "avatarUrl": null,
+  "fields": [
+    { "label": "Email", "value": "jane@acme.com", "icon": "email" },
+    { "label": "Phone", "value": "+1 555-1234", "icon": "phone" },
+    { "label": "Company", "value": "Acme Corp", "icon": "business", "linkType": "Company", "linkId": "guid" },
+    { "label": "Owner", "value": "John Doe", "icon": "person" }
+  ],
+  "createdAt": "2026-01-15T10:00:00Z",
+  "updatedAt": "2026-02-20T14:30:00Z"
+}
+```
 
-// Map dashboard (admin only)
-app.MapHangfireDashboard("/hangfire", new DashboardOptions
+**Design rationale:** A generic field-list DTO rather than type-specific DTOs allows the frontend to render any entity type with the same component structure. The `linkType`/`linkId` on individual fields enables chained preview navigation (click company name in contact preview to preview the company).
+
+### GET /api/{entityType}/{id}/summary
+
+**Purpose:** Aggregated relationship counts and recent activity for summary tab.
+
+**Response shape varies by entity type.** Example for Contact:
+
+```json
 {
-    Authorization = new[] { new HangfireAdminAuthFilter() }
-});
+  "entityType": "Contact",
+  "stats": [
+    { "label": "Open Deals", "value": 3, "icon": "handshake" },
+    { "label": "Pipeline Value", "value": 125000, "format": "currency", "icon": "attach_money" },
+    { "label": "Open Activities", "value": 5, "icon": "task_alt" },
+    { "label": "Overdue", "value": 1, "icon": "warning", "color": "danger" },
+    { "label": "Quotes", "value": 2, "icon": "request_quote" },
+    { "label": "Emails", "value": 15, "icon": "email" },
+    { "label": "Notes", "value": 4, "icon": "note" }
+  ],
+  "recentActivity": [
+    { "id": "guid", "type": "SystemEvent", "content": "Deal 'Enterprise License' moved to Negotiation", "createdAt": "..." },
+    { "id": "guid", "type": "SystemEvent", "content": "Email sent: Follow-up proposal", "createdAt": "..." }
+  ],
+  "lastActivityAt": "2026-02-20T14:30:00Z"
+}
 ```
 
-### Job Queues
+**Implementation:** Per-entity-type method in a new `EntitySummaryService` in Infrastructure layer. Each method runs optimized aggregate queries using the existing `ApplicationDbContext`. RBAC scope checking should be applied (user can only see summary data they have permission to view).
 
-| Queue | Purpose | Concurrency |
-|-------|---------|-------------|
-| `default` | General workflow actions, duplicate scans | Default |
-| `webhooks` | Webhook delivery (may have slow external endpoints) | Higher concurrency |
-| `emails` | Email sending (workflow emails, sequence steps) | Moderate |
-| `workflows` | Workflow evaluation for scheduled/date-based triggers | Default |
+### GET /api/feed (extended)
 
-### Recurring Jobs
+**Existing:** `GET /api/feed?page=1&pageSize=20`
 
-```csharp
-// Date-based workflow trigger evaluation (check conditions like "3 days before close date")
-RecurringJob.AddOrUpdate<WorkflowDateTriggerJob>(
-    "workflow-date-triggers",
-    j => j.EvaluateDateTriggersAsync(),
-    "*/15 * * * *");  // Every 15 minutes
+**Extended with:** `?entityType=Contact&entityId={guid}`
 
-// Batch duplicate scan (full-table scan for existing duplicates)
-RecurringJob.AddOrUpdate<DuplicateScanJob>(
-    "duplicate-batch-scan",
-    j => j.ScanAllTenantsAsync(),
-    "0 2 * * *");  // Daily at 2 AM
+When `entityType` and `entityId` are provided, filter `FeedItems` to only those with matching `EntityType` and `EntityId`. This reuses the existing paged response shape and all existing DTO mapping.
+
+### GET /api/my-day
+
+**Purpose:** Personal daily dashboard data for current user.
+
+**Response:**
+
+```json
+{
+  "greeting": "Good morning",
+  "todayActivities": [
+    { "id": "guid", "subject": "Follow up with Jane", "type": "Call", "status": "Planned", "dueDate": "2026-02-20", "linkedEntityType": "Contact", "linkedEntityId": "guid", "linkedEntityName": "Jane Smith" }
+  ],
+  "overdueActivities": [
+    { "id": "guid", "subject": "Send proposal", "dueDate": "2026-02-18", "linkedEntityName": "Acme Deal" }
+  ],
+  "recentDeals": [
+    { "id": "guid", "title": "Enterprise License", "value": 50000, "stageName": "Negotiation", "stageColor": "#f59e0b", "updatedAt": "2026-02-20T..." }
+  ],
+  "stats": {
+    "activitiesCompletedToday": 3,
+    "activitiesDueToday": 5,
+    "dealsUpdatedToday": 2,
+    "unreadNotifications": 4
+  },
+  "recentFeed": [
+    { "id": "guid", "type": "SocialPost", "content": "...", "authorName": "...", "createdAt": "..." }
+  ]
+}
 ```
 
-## Migration Strategy
-
-### Database Migrations
-
-```
-Migration 1: AddHangfireSchema
-  - Hangfire auto-creates its tables in the 'hangfire' schema
-  - No manual migration needed, but document it
-
-Migration 2: AddEmailTemplateEntities
-  - email_templates, email_sequences, email_sequence_steps
-  - sequence_enrollments, sequence_step_logs
-  - Global query filters
-
-Migration 3: AddFormulaFieldSupport
-  - ALTER custom_field_definitions ADD formula_expression text NULL, formula_result_type text NULL
-  - No new tables, extends existing entity
-
-Migration 4: AddWorkflowEntities
-  - workflow_definitions (with JSONB columns for conditions, actions, trigger_config)
-  - workflow_execution_logs
-  - Global query filters
-
-Migration 5: AddDuplicateDetection
-  - CREATE EXTENSION IF NOT EXISTS pg_trgm
-  - duplicate_rules, duplicate_candidates
-  - GIN trigram indexes on contacts (email, name), companies (name)
-
-Migration 6: AddWebhookEntities
-  - webhook_subscriptions (with JSONB for event_types, headers)
-  - webhook_delivery_logs
-  - Index on (status, created_at) for monitoring queries
-
-Migration 7: AddReportBuilder
-  - report_definitions (with JSONB for columns, filters, sorts, grouping)
-
-Migration 8: UpdateRlsPolicies
-  - RLS policies for all new tables in scripts/rls-setup.sql
-```
-
-### NuGet Packages Required
-
-```xml
-<!-- Infrastructure layer -->
-<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
-<PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
-<PackageReference Include="Fluid.Core" Version="2.31.0" />
-<PackageReference Include="Polly" Version="8.6.5" />
-<PackageReference Include="Microsoft.Extensions.Http.Polly" Version="10.0.3" />
-<PackageReference Include="FuzzySharp" Version="2.0.2" />
-
-<!-- Application layer -->
-<PackageReference Include="NCalcSync" Version="5.11.0" />
-```
-
-**Note:** Microsoft.RulesEngine was considered for workflow condition evaluation but is **not recommended**. Its JSON schema is overly complex for CRM workflow conditions (which are simple field comparisons). Instead, use NCalc for condition evaluation -- the same dependency used for formula fields. Workflow conditions translate naturally to NCalc expressions: `[value] > 10000 && [stage] == 'Won'`. This keeps the dependency count low and the condition evaluation consistent across features.
-
-## Build Order (Feature Dependencies)
-
-```
-Phase 1: Foundation (Hangfire + Email Templates + Formula Fields)
-  - Add Hangfire infrastructure (shared by all subsequent features)
-  - Email templates: Fluid renderer, CRUD, preview
-  - Formula fields: NCalc evaluator, CustomFieldType.Formula, on-read evaluation
-  - No dependencies on other v1.1 features
-  - Email templates needed by workflows and sequences
-  - Formula fields needed by reporting
-
-Phase 2: Domain Events + Workflow Automation Engine
-  - Depends on: Phase 1 (Hangfire for action dispatch, email templates for "send email" action)
-  - DomainEventInterceptor, WorkflowEngine, WorkflowActionJob
-  - Workflow builder UI (@foblex/flow)
-  - This is the largest and most complex phase
-
-Phase 3: Email Sequences
-  - Depends on: Phase 1 (email templates for step content, Hangfire for delayed scheduling)
-  - Optional: Phase 2 (workflows can trigger "start sequence" action)
-  - EmailSequenceService, SequenceStepJob, enrollment management
-
-Phase 4: Webhooks
-  - Depends on: Phase 1 (Hangfire for delivery jobs), Phase 2 (domain events trigger webhooks)
-  - WebhookPublisher, WebhookDeliveryService (Polly), delivery logs
-
-Phase 5: Duplicate Detection & Merge
-  - Depends on: Phase 2 (domain events for on-create checking)
-  - pg_trgm extension + FuzzySharp, DuplicateDetectionService
-  - Most complex merge logic (combining records, reassigning FKs)
-  - Hangfire recurring job for batch scanning
-
-Phase 6: Advanced Reporting Builder
-  - Depends on: Phase 1 (formula fields for computed columns in reports)
-  - Extends: Existing DashboardAggregationService patterns
-  - ReportQueryBuilder, report builder UI
-```
-
-**Rationale:** Phase 1 installs Hangfire and the two leaf dependencies (email templates, formula fields) that every other feature uses. Workflows are Phase 2 because they are the orchestration layer connecting everything. Sequences and Webhooks are relatively independent after that. Duplicate Detection has the most complex data mutation (merge). Reporting comes last because it benefits from all other data being in place and can reference formula fields.
+**Queries:** All scoped to current user (by `OwnerId` or `AssignedToId`). Activities filtered by `DueDate` for today + overdue. Deals filtered by `OwnerId` + `UpdatedAt >= 7 days ago`. Feed filtered by `AuthorId == currentUser OR content contains @mention of user`.
 
 ## Scalability Considerations
 
 | Concern | At 100 users | At 10K users | At 1M users |
 |---------|--------------|--------------|-------------|
-| Workflow evaluation | Inline in interceptor, Hangfire for actions | Same, increase Hangfire worker count | Dedicated Hangfire worker servers |
-| Webhook delivery | Hangfire fire-and-forget with Polly | Increase "webhooks" queue workers | Separate webhook service + message queue |
-| Formula evaluation | On-read per request | Cache formula results in-memory (tenant-scoped) | Materialized formula columns in PostgreSQL |
-| Duplicate detection | On-create via pg_trgm | On-create + nightly Hangfire batch scan | Dedicated dedup worker + bloom filter pre-screen |
-| Report execution | Direct EF Core query | Query timeout limits + result caching | Pre-aggregated materialized views |
-| Email sequences | Hangfire delayed jobs | Same, no polling needed | Separate Hangfire server for email queue |
+| Preview sidebar API | Direct DB query, <50ms | Same, tenant isolation limits data set | Add response caching (5-10s TTL) |
+| Summary tab aggregation | Single DB round-trip, OK | Add composite index on (EntityType, EntityId) for FeedItems | Consider materialized view or cache layer for counts |
+| Entity-scoped feed queries | Simple WHERE clause, fast | Index on (TenantId, EntityType, EntityId, CreatedAt) already exists via global filter | Partition FeedItems by TenantId if table exceeds 10M rows |
+| My Day endpoint | 4-5 queries per request | Same -- all queries scoped to single user | Cache per-user with 60s TTL, invalidate on write |
+| Preview sidebar concurrent opens | N/A (one at a time) | Same | Same (single sidebar instance) |
 
-**Current target: 100-10K users.** The architecture above handles this range. Hangfire scales horizontally by adding worker servers against the same PostgreSQL storage. The domain/application layer interfaces remain unchanged when scaling.
+## Database Index Recommendations
+
+The existing indexes should suffice for most v1.2 queries. Verify the following exist or add:
+
+```sql
+-- For entity-scoped feed queries (may already exist via global filter)
+CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_feed_items_entity
+  ON feed_items (tenant_id, entity_type, entity_id, created_at DESC)
+  WHERE entity_type IS NOT NULL;
+
+-- For My Day: activities due today for a user
+CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_activities_user_due
+  ON activities (tenant_id, assigned_to_id, due_date, status)
+  WHERE status NOT IN ('Completed', 'Cancelled');
+
+-- For summary: deal-contact junction count queries
+-- (likely already indexed as FK)
+CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_deal_contacts_contact
+  ON deal_contacts (contact_id, deal_id);
+```
+
+## Suggested Build Order
+
+Build order is driven by dependency chains:
+
+```
+Phase A: Foundation Components (no dependencies between each other)
+  A1: EntityPreviewService + backend endpoint
+  A2: Preview sidebar store + component shell
+  A3: EntitySummaryService + backend endpoint
+  A4: FeedController entity filter extension
+
+Phase B: Integration (depends on A)
+  B1: Wire preview sidebar into AppComponent (depends on A1, A2)
+  B2: EntitySummaryTabComponent (depends on A3)
+  B3: EntityFeedTabComponent + FeedCardComponent extraction (depends on A4)
+  B4: MyDayController + MyDayApiService (independent backend work)
+
+Phase C: Wiring into Existing Pages (depends on B)
+  C1: Add Summary + Feed tabs to all detail pages (depends on B2, B3)
+  C2: Update tab index constants and onTabChanged handlers
+  C3: Wire preview triggers into feed, search, entity links
+  C4: MyDayComponent + MyDayStore (depends on B4)
+  C5: Add My Day tab to DashboardComponent (depends on C4)
+
+Phase D: Polish (depends on C)
+  D1: Animations (slide-in/out for preview sidebar)
+  D2: Keyboard navigation (Escape closes preview, arrow keys in search open preview)
+  D3: Responsive behavior (preview as full-screen on mobile)
+  D4: Loading skeletons for summary tab and My Day
+```
+
+**Rationale for this order:**
+1. Backend endpoints and services first (A) because they have no frontend dependencies and can be tested independently.
+2. Component shells second (B) because they need working services to function.
+3. Integration into existing pages third (C) because this is where the tab index shift risk lives -- doing it after components are working means you can test each integration immediately.
+4. Polish last (D) because animations and edge cases should not block core functionality.
+
+**Parallelism opportunities:**
+- A1+A2 can parallel with A3+A4 (preview sidebar vs summary/feed backend work)
+- B1+B4 can parallel with B2+B3
+- C1+C2 should be sequential (tab constants then handlers)
+- C3 can parallel with C4+C5
 
 ## Sources
 
-- [NCalc Expression Evaluator](https://github.com/ncalc/ncalc) - Recommended for formula evaluation and workflow conditions
-- [Fluid Template Engine](https://github.com/sebastienros/fluid) - Recommended for Liquid email templates
-- [Hangfire Documentation](https://docs.hangfire.io/en/latest/) - Background job processing with PostgreSQL storage
-- [PostgreSQL pg_trgm Documentation](https://www.postgresql.org/docs/current/pgtrgm.html) - Fuzzy matching for duplicate detection
-- [FuzzySharp](https://github.com/JakeBayer/FuzzySharp) - In-memory fuzzy string matching for duplicate scoring
-- [Polly Documentation](https://www.pollydocs.org/) - Resilient HTTP for webhook delivery
-- [Outbox Pattern in ASP.NET Core](https://www.milanjovanovic.tech/blog/implementing-the-outbox-pattern) - Webhook delivery reliability pattern
-- [Webhook Delivery Best Practices](https://developersvoice.com/blog/dotnet/scalable_webhook_delivery_security_asp_net_core/) - Retry, signing, architecture
-- [PostgreSQL JSON Functions](https://www.postgresql.org/docs/current/functions-json.html) - JSONB querying for report builder
-- [Dynamic Query Building with EF Core Expression Trees](https://en.ittrip.xyz/c-sharp/dynamic-query-builder-cs) - Report query building approach
-- [Microsoft RulesEngine](https://github.com/microsoft/RulesEngine) - Evaluated but not recommended (too complex for CRM conditions)
-- [@foblex/flow](https://flow.foblex.com/) - Angular flow-based UI for workflow builder
+- Codebase analysis: `FeedController.cs`, `FeedRepository.cs`, `FeedItem.cs` (feed architecture)
+- Codebase analysis: `related-entity-tabs.component.ts`, tab constants pattern
+- Codebase analysis: `contact-detail.component.ts/html/scss` (detail page layout pattern)
+- Codebase analysis: `dashboard.component.ts/html`, `dashboard.store.ts` (dashboard architecture)
+- Codebase analysis: `app.component.ts` (global layout, sidebar integration point)
+- Codebase analysis: `sidebar-state.service.ts` (existing sidebar state management pattern)
+- Codebase analysis: `global-search.component.ts` (overlay panel pattern reference)
+- Codebase analysis: `signalr.service.ts` (real-time event patterns)
+- Codebase analysis: `feed.store.ts`, `feed-list.component.ts` (feed store pattern)
+- Codebase analysis: `entity-timeline.component.ts` (shared component pattern for timeline)
+- Angular 19 signal store patterns: existing codebase conventions (HIGH confidence)

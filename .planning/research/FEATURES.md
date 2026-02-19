@@ -1,348 +1,290 @@
-# Feature Landscape: v1.1 Automation & Intelligence
+# Feature Landscape: GlobCRM v1.2 Connected Experience
 
-**Domain:** CRM Automation, Email Sequences, Computed Fields, Data Quality, Webhooks, Advanced Reporting
-**Researched:** 2026-02-18
-**Confidence:** HIGH (multi-source verification across HubSpot, Pipedrive, Zoho, Salesforce Dynamics 365, Freshsales)
-**Milestone:** v1.1 -- building on shipped v1.0 MVP (~124,200 LOC)
-
----
-
-## Table Stakes
-
-Features users expect when a CRM advertises "automation" and "intelligence." Missing any of these makes the feature set feel half-built.
-
-### 1. Workflow Automation
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Record-event triggers (created, updated, deleted) | Every CRM automation starts with "when X happens" | MEDIUM | All entity controllers (hook into save paths) | Triggers must fire on Contact, Company, Deal, Activity, Quote, Request. Must detect which fields changed, not just "record updated." |
-| Field-change triggers ("deal value > 10000", "stage moved to Won") | Users need conditional logic beyond "any update" | MEDIUM | Entity change tracking (EF Core ChangeTracker) | Compare old vs new values. Support operators: equals, not equals, greater than, less than, contains, is empty, is not empty, changed to, changed from. |
-| Date-based triggers ("3 days before close date", "30 days since last activity") | Time-based automation is core to follow-up workflows | HIGH | Background job scheduler (needs recurring evaluation) | Requires a scheduled evaluator that runs periodically (e.g., every 15 min) and checks date conditions against records. This is architecturally different from event triggers. |
-| Field update action | Auto-set fields when conditions met (e.g., set owner, change status) | LOW | Entity repositories | Most common action. Must respect field-level RBAC -- system actions bypass user permissions but log as "Workflow" actor. |
-| Send notification action | Alert a user or team when condition triggers | LOW | Existing NotificationDispatcher | Reuse existing notification infrastructure. Add "Workflow" as a NotificationType. |
-| Create activity/task action | Auto-create follow-up tasks (e.g., "call new lead within 24h") | MEDIUM | Activity entity, user assignment | Must allow template-based activity creation: type, title, description, due date offset, assignee (owner, specific user, round-robin). |
-| Send email action (from template) | Automation without email is just field updates | MEDIUM | Email template system (new, see below) | Merge entity fields into template. Send via SendGrid (transactional) not Gmail (user mailbox). |
-| Workflow execution log | Users need visibility into what ran and why | MEDIUM | New WorkflowLog entity | Log trigger event, matched conditions, actions taken, success/failure. Essential for debugging. Without it, users cannot trust automation. |
-| Enable/disable toggle | Users must be able to pause workflows without deleting | LOW | Boolean flag on workflow entity | Also needed: "last triggered" timestamp for monitoring. |
-| Multi-action workflows | A single trigger fires multiple actions in sequence | MEDIUM | Action ordering, sequential execution | Example: "When deal moves to Won: (1) update status field, (2) create follow-up task, (3) send congratulations email, (4) fire webhook." |
-
-### 2. Email Templates
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Rich text template editor | Users design branded email content | MEDIUM | Existing ngx-quill editor (reuse) | HTML email with WYSIWYG editing. Support bold, italic, links, images, headers. |
-| Merge fields / placeholders | "Hello {{contact.firstName}}" personalization | MEDIUM | Entity field registry | Support all core fields + custom fields. Syntax: `{{entity.fieldName}}`. Must handle missing values gracefully (empty string or configurable fallback). |
-| Template categories/folders | Organize templates by purpose | LOW | New entity | Categories: Sales, Support, Follow-up, Onboarding, Custom. |
-| Template preview with sample data | See what email looks like before sending | LOW | Merge field resolver | Pick a real contact/deal to preview merged template. |
-| Clone/duplicate template | Copy existing template as starting point | LOW | CRUD operation | Standard convenience feature. |
-
-### 3. Email Sequences (Drip Campaigns)
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Multi-step sequence builder | Define ordered series of emails with delays | HIGH | Email templates, background scheduler | Each step: template + delay (days/hours) + optional conditions. Visual step list (not drag-drop flowchart -- see Anti-Features). |
-| Delay between steps (days/hours) | Control timing of follow-ups | LOW | Step configuration | "Wait 2 days, then send step 2." Delays calculated from enrollment or previous step completion. |
-| Enrollment (manual + workflow-triggered) | Add contacts to sequences | MEDIUM | Contact entity, Workflow actions | Manual: select contacts from list. Automatic: workflow action "enroll in sequence." Bulk enrollment from dynamic table selection. |
-| Auto-unenroll on reply | Stop sequence when contact responds | HIGH | Gmail sync integration, reply detection | Match incoming email address against active sequence enrollments. This is the most critical behavioral trigger. Without it, sequences feel robotic. |
-| Per-step open/click tracking | Measure engagement at each step | HIGH | Email tracking pixels, link wrapping | Open tracking via 1x1 pixel. Click tracking via redirect URLs. Privacy note: some email clients block pixels, so open rates are approximate. |
-| Sequence-level analytics | Overall performance: enrolled, completed, replied, bounced | MEDIUM | Aggregation over enrollment records | Dashboard showing funnel: Enrolled -> Opened -> Clicked -> Replied. Per-step breakdown. |
-| Pause/resume individual enrollments | Handle exceptions without removing from sequence | LOW | Enrollment status field | Statuses: Active, Paused, Completed, Unenrolled, Bounced. |
-| Business hours / send window | Send emails during business hours only | MEDIUM | Timezone handling, send scheduling | "Send between 9am-5pm recipient local time." Requires timezone on contact or default to tenant timezone. |
-
-### 4. Formula / Computed Custom Fields
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Arithmetic formulas (+, -, *, /, %) | Calculate values from other fields | MEDIUM | Custom field system (extend CustomFieldType enum) | Reference other number/currency fields: `#Deal Value * 0.15` for commission. Must handle null inputs (return null or 0). |
-| Field references in formulas | Point to core and custom fields | MEDIUM | Field registry per entity type | Syntax: `#fieldName` for core fields, `#cf_custom_field_name` for custom fields. Only same-entity references (no cross-entity in v1.1). |
-| Date difference calculations | Days between dates (e.g., deal age) | MEDIUM | Date arithmetic | `DATEDIFF(#createdAt, NOW(), "days")` -- common for "days in pipeline", "time since last contact." |
-| Conditional logic (IF/THEN) | Business rules in formulas | HIGH | Expression parser | `IF(#deal_value > 10000, "Enterprise", "SMB")`. Keep simple -- not a full programming language. |
-| String concatenation | Combine text fields | LOW | Expression parser | `CONCAT(#firstName, " ", #lastName)`. Useful for display names, full addresses. |
-| Real-time recalculation | Values update when source fields change | HIGH | Interceptor or computed column strategy | Two options: (A) Recompute on read (virtual, no storage), (B) Recompute on write (stored, faster reads). Recommend B: store computed values in JSONB on save. Trigger recalculation when dependency fields change. |
-| Formula validation on save | Catch errors before saving definition | MEDIUM | Expression parser with validation mode | Check: field references exist, types compatible, no circular references, syntax valid. Show clear error messages. |
-
-### 5. Duplicate Detection & Merge
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| On-demand duplicate scan | "Find duplicates" button on contacts/companies list | MEDIUM | Matching algorithms, new UI page | Scan all records, return clusters of potential duplicates with confidence scores. Runs as background job for large datasets. |
-| Real-time duplicate warning | Alert when creating/editing a record that matches existing | MEDIUM | Matching service called from create/update endpoints | "A contact with this email already exists" -- shown before save, not blocking. User can proceed or navigate to existing record. |
-| Configurable match rules | Admin defines which fields to match on | MEDIUM | Admin settings UI, match rule entity | Default rules: Contact (email exact, name fuzzy), Company (name fuzzy, domain exact). Admin can add/remove rules and set thresholds. |
-| Fuzzy name matching | Catch "John Smith" vs "Jon Smyth" | MEDIUM | Levenshtein distance, Jaro-Winkler, or trigram similarity | PostgreSQL `pg_trgm` extension provides `similarity()` function with GIN/GiST indexes. Use this over application-level algorithms for performance. Threshold: 0.6-0.8 depending on field. |
-| Side-by-side merge UI | Compare two records and choose which values to keep | HIGH | New merge page component | Show both records side by side. For each field, user picks "keep left", "keep right", or "keep both" (for multi-value fields). Preview merged result before confirming. |
-| Relationship transfer on merge | Losing record's deals, activities, notes transfer to winner | HIGH | All FK references must be updated | Update all foreign keys pointing to the merged-away record. This includes: deals, activities, notes, quotes, attachments, email links, feed items, sequence enrollments. Must be transactional. |
-| Merge audit trail | Record what was merged and when | LOW | MergeHistory entity | Store: winner ID, loser ID, merged-by user, timestamp, field-level decisions. Enable "undo" is anti-feature (too complex), but audit is table stakes. |
-| Bulk duplicate review | Review and resolve multiple duplicate clusters | MEDIUM | Paginated duplicate review list | Show clusters ranked by confidence. "Merge", "Not Duplicate" (dismiss), "Skip" actions per cluster. |
-
-### 6. Webhooks (Outgoing)
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Webhook subscription management | Admin registers URLs for specific events | MEDIUM | New WebhookSubscription entity, Admin UI | CRUD for subscriptions: URL, events to subscribe to, active/inactive toggle, secret key for signing. |
-| Event selection per subscription | Choose which entity events fire the webhook | LOW | Event type enum | Events: `contact.created`, `contact.updated`, `contact.deleted`, `deal.created`, `deal.stage_changed`, etc. Granular per entity + action. |
-| HMAC-SHA256 payload signing | Receiver can verify payload authenticity | LOW | Crypto library (built-in .NET) | Sign payload with shared secret. Include signature in `X-Webhook-Signature` header. Industry standard (Stripe, GitHub pattern). |
-| JSON payload with entity data | Webhook body contains the changed entity | LOW | DTO serialization | Payload: `{ event, timestamp, data: { entity } }`. Use existing DTOs. Include `previous_data` for updates so receiver knows what changed. |
-| Retry with exponential backoff | Handle temporary receiver failures | HIGH | Background job queue, retry tracking | Retry schedule: 1m, 5m, 30m, 2h, 8h (5 attempts). Track each attempt. After exhaustion, mark as failed. Auto-disable subscription after N consecutive failures (e.g., 50). |
-| Delivery log | Admin sees webhook delivery history | MEDIUM | WebhookDeliveryLog entity | Log: event, URL, HTTP status, response time, attempt count, payload (truncated), timestamp. Retention: 30 days. |
-| Manual retry / redeliver | Resend a failed webhook delivery | LOW | Delivery log + retry mechanism | "Retry" button on failed deliveries. Useful for debugging receiver issues. |
-| Test webhook (ping) | Verify URL is reachable before enabling | LOW | HTTP client call | Send a `ping` event with sample payload. Show success/failure immediately. |
-
-### 7. Advanced Reporting Builder
-
-| Feature | Why Expected | Complexity | Dependencies | Notes |
-|---------|--------------|------------|--------------|-------|
-| Entity source selection | Pick which entity to report on | LOW | Entity type registry | Sources: Contacts, Companies, Deals, Activities, Quotes, Requests. Single entity per report (joins handled via related entity fields). |
-| Field selection (columns) | Choose which fields appear in report | LOW | Core + custom field registry | Include computed/formula fields. Group by entity sections. |
-| Filter builder | WHERE clause equivalent -- filter report data | MEDIUM | Reuse FilterPanel patterns from dynamic tables | Same filter operators as dynamic tables: equals, contains, greater than, date range, is empty, etc. Compound AND/OR logic. |
-| Grouping and aggregation | GROUP BY with SUM, COUNT, AVG, MIN, MAX | HIGH | Query builder that generates SQL/EF queries | Group by any field (including custom fields). Aggregate numeric/currency fields. This is the core reporting capability that goes beyond dashboards. |
-| Related entity fields | Include company name on contact report, deal value on activity report | HIGH | Entity relationship mapping | Allow one level of relation traversal: Contact report can include Company.Name, Company.Industry. Deal report can include Contact.Email. Not unlimited joins. |
-| Chart visualization | Bar, line, pie, table views of report data | MEDIUM | Chart.js (already in project for dashboards) | Reuse dashboard chart components. Report output toggles between table view and chart view. |
-| Save and share reports | Named reports accessible by team | LOW | SavedReport entity | Owner, name, description, entity type, configuration JSON (fields, filters, groups). Share with team or keep personal. |
-| Export report results | Download as CSV or Excel | LOW | CsvHelper (already in project for imports) | Export the rendered report data. Include headers matching selected columns. |
-| Date range parameter | Reports filtered by time period | LOW | Date range picker (reuse from dashboards) | Preset ranges: Today, This Week, This Month, This Quarter, This Year, Custom. |
-| Scheduled report delivery | Auto-send report via email on schedule | HIGH | Background scheduler, PDF/CSV generation, email | Daily/weekly/monthly email with report as attachment. Defer to v1.2 if needed -- nice to have but not table stakes. |
+**Domain:** CRM entity connectivity, preview panels, summary dashboards, personal workspace
+**Researched:** 2026-02-20
+**Overall Confidence:** MEDIUM-HIGH (patterns well-established across HubSpot, Salesforce, Pipedrive, Dynamics 365; validated against existing codebase)
 
 ---
 
-## Differentiators
+## Feature Area 1: Entity Preview Sidebar (Feed Integration)
 
-Features that set GlobCRM apart from competitors. Not expected, but valued.
+### Table Stakes
 
-| Feature | Value Proposition | Complexity | Dependencies | Notes |
-|---------|-------------------|------------|--------------|-------|
-| Workflow-triggered email sequences | Workflows can enroll contacts in sequences -- connected automation | MEDIUM | Workflow engine + Sequence system | Most mid-tier CRMs treat workflows and sequences as separate features. Connecting them ("When deal moves to Negotiation, enroll primary contact in pricing sequence") is a significant UX win. |
-| Computed fields in reports and filters | Formula fields are usable in report builder and dynamic table filters | MEDIUM | Computed field evaluation in queries | Pipedrive limits formula fields to display-only. Allowing them in filters and report aggregations makes custom fields genuinely powerful. |
-| Webhook + workflow integration | Workflows can fire webhooks as actions | LOW | Webhook delivery from workflow action context | Enables "When contact created in CRM, POST to Slack/Zapier/custom system" without requiring separate webhook subscriptions for every event. |
-| Cross-entity workflow triggers | "When a deal's company gets updated" triggers on the deal | HIGH | Entity relationship tracking, cross-entity change detection | Example: company industry changes -> all related deals get a field update. Defer to v1.2 -- powerful but complex. |
-| Duplicate detection on import enhancement | Upgrade existing import duplicate detection with the new fuzzy matching engine | LOW | Duplicate detection service, existing import flow | Import already has basic duplicate detection (exact match on email). Plug in the new fuzzy matching to give import better detection without building separate code. |
-| Sequence A/B testing | Test two email variants in a sequence step | HIGH | Variant assignment, statistical tracking | Send version A to 50%, version B to 50%. Track open/click/reply rates per variant. Powerful but complex -- defer to v1.2 unless implementation is clean. |
-| Workflow templates (prebuilt) | Ship 5-10 common workflow templates users can activate | LOW | Seed data for workflow definitions | Templates: "New lead follow-up", "Deal won celebration", "Stale deal reminder", "Welcome sequence for new contacts", "Activity overdue escalation." Dramatically reduces time-to-value. |
-| Report drill-down to records | Click a bar in a chart to see the underlying records | MEDIUM | Dynamic table filtered by report criteria | When user clicks "Deals Won in March" bar, open deals list filtered to won deals in March. Reuse existing dynamic table infrastructure. |
-| Bulk merge from duplicate review | Select multiple duplicate clusters and merge in batch | HIGH | Merge service, batch processing | Review list with "merge all" button for high-confidence matches. Requires careful UX to avoid accidental data loss. |
+Features users expect when entity references are clickable in a feed/activity stream. Missing = feels broken or half-built.
 
----
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Clickable entity names in feed items | HubSpot, Salesforce, Pipedrive all make entity references clickable inline. Currently feed items show "View [Entity]" link that navigates away. Users expect to peek without losing context. | Low | Feed items already have `entityType`/`entityId`. Need to change navigation behavior from `router.navigate` to sidebar open. |
+| Slide-in preview panel (not full navigation) | HubSpot's preview panel, Salesforce's hover cards, Dynamics 365's side panel forms -- every major CRM lets you peek at a record without leaving context. Full navigation breaks workflow. | Medium | Use Angular CDK Overlay with `GlobalPositionStrategy` (right-anchored). Panel slides from right, ~400px wide. Overlays the page without displacing content. Alternative: MatDrawer with `mode="over"` (simpler, already in Material). |
+| Key properties display | HubSpot shows up to 6 preview properties per entity type. Salesforce compact layouts show 4 key fields in highlights panel. Users expect name, status/stage, owner, and primary contact info at minimum. | Low | Existing `*ListDto` models already contain these fields (e.g., `DealListDto` has title, value, stageName, companyName, ownerName). No new API endpoint needed for basic preview -- list DTOs are sufficient. |
+| "Open full record" link | Every CRM preview panel has a clear path to the full detail page. The escape hatch when preview is insufficient. | Low | Simple `routerLink` to `/{entityType}s/{id}`. Prominent button at top or bottom of preview. |
+| Close on outside click / Escape key | Standard overlay behavior. HubSpot, Salesforce, all dismiss on click-outside or Escape. | Low | CDK Overlay provides this via `hasBackdrop` and keyboard handling. MatDrawer handles natively with `mode="over"`. |
+| Loading skeleton while fetching | Salesforce shows shimmer/skeleton placeholders. Empty panel while loading feels broken. | Low | Reuse existing skeleton pattern from dashboard loading. Show 4-5 placeholder bars. |
+| Scroll-position preservation | When user closes preview, feed must maintain its scroll position. This is fundamental -- reopening at the top after closing a preview is infuriating. | Low | MatDrawer `mode="over"` handles by default (no layout shift). CDK Overlay also avoids page reflow. |
+| Responsive: full-width on mobile | On mobile, a 400px sidebar leaves no room. HubSpot goes full-width on small screens. | Low | `BreakpointObserver` already in use in navbar. Conditionally set width to `100vw` at `(max-width: 768px)`. |
+| Entity preview from global search | Global search results currently navigate to full page. Quick-look preview from search results is expected in HubSpot and Salesforce. | Medium | Same sidebar component triggered from `GlobalSearchComponent` hits. Requires adding a "preview" action alongside existing "navigate" action on search results. |
 
-## Anti-Features
+### Differentiators
 
-Features to explicitly NOT build. Commonly requested, but problematic for this project scope.
+Features that set the product apart. Not universally expected, but valued when present.
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Quick actions in preview (Call, Email, Note, Activity) | HubSpot's preview sidebar includes quick action buttons. Lets users act without navigating. This is the "connected" in "Connected Experience." See a mention, take action, stay in feed. | Medium | 3-4 action buttons opening small forms (existing `entity-form-dialog` for notes, compose for email). Each action needs entity context (type + id). |
+| User preview (click author names) | Feed shows author names. Clicking to see their profile (name, role, email, avatar, recent activity count) adds social/team context. HubSpot workspace shows user cards. | Low-Medium | Lightweight user preview. Requires new endpoint `GET /api/users/{id}/preview` returning name, role, email, avatar, activity count. |
+| Association chips in preview | HubSpot preview shows associated records as clickable chips (Company on a Contact preview, Contacts on a Deal preview). Enables "drill across" without full navigation. | Medium | Existing detail DTOs include associations (e.g., `DealDetailDto.linkedContacts`). Fetch detail DTO for preview and render associations as chips. Clicking navigates to full record (not nested preview -- see anti-features). |
+| Recent activity summary in preview | HubSpot's preview sidebar shows "Recent activities" card with last 3 activities. Quick temporal context for the record. | Medium | Reuse existing timeline endpoint with `pageSize=3`. Display as compact list (icon + description + relative time). |
+| Inline entity references in feed content | Rather than just "View Deal" below content, make entity names clickable inline (e.g., "Closed deal **Acme Corp Renewal**"). HubSpot does this for all entity mentions. | Medium-High | Backend needs structured entity references alongside content (array of `{type, id, name, startIndex, endIndex}`). Frontend renders as clickable `<span>` elements within content. Defer to later in v1.2 or v1.3 if time-constrained. |
+
+### Anti-Features
+
+Features to explicitly NOT build for the preview sidebar.
 
 | Anti-Feature | Why Avoid | What to Do Instead |
 |--------------|-----------|-------------------|
-| Visual flowchart workflow builder (drag-and-drop nodes) | Enormous frontend complexity (need a canvas library like ReactFlow/JointJS), debugging is harder with visual spaghetti, most users create simple linear workflows anyway | Linear trigger -> conditions -> actions form. Covers 90% of use cases with 20% of the complexity. HubSpot's most-used workflows are linear, not branching. |
-| Branching/conditional workflow paths | "If email opened, do X; if not, do Y" creates exponential complexity in both builder and execution engine | Keep workflows linear with conditions on the trigger. Use separate workflows for different conditions. Email sequences handle the branching case (send next step only if not replied). |
-| Full SQL query builder for reports | Non-technical users cannot write SQL; SQL injection risk; maintenance burden | Structured query builder with dropdowns for fields, operators, and values. Translates to EF Core queries server-side. No raw SQL exposure. |
-| Real-time formula evaluation in browser | Computing formulas client-side duplicates logic, creates inconsistency, and exposes business rules | Compute on the server during save. Return computed values in DTOs. Client displays them as read-only. |
-| Unlimited webhook retry (forever) | Endless retries waste resources and mask dead endpoints | 5 retries over ~16 hours with exponential backoff. Auto-disable subscription after 50 consecutive failures. Admin can manually re-enable. |
-| Cross-entity formula fields | Formula on Contact that references related Deal fields | Requires join queries, dependency tracking across entities, cache invalidation nightmares | Allow same-entity references only in v1.1. A Contact formula can reference Contact fields. A Deal formula can reference Deal fields. Cross-entity is v2+. |
-| Undo merge | Reversing a merge after related records have been reassigned | Requires storing complete pre-merge state of both records plus all relationship changes. Enormous storage and complexity for a rarely-used feature. | Provide merge audit trail and pre-merge preview. If wrong, admin manually separates by creating a new record and reassigning relationships. |
-| Workflow execution debugging with step-through | Pause workflow mid-execution and inspect state | Unnecessary complexity for a CRM. Users need logs, not a debugger. | Detailed execution logs showing trigger event, condition evaluation results (true/false with values), and action outcomes. |
-| Scheduled email sequences (time-of-day targeting) with per-contact timezone | Sending at "9am in the contact's local timezone" | Requires timezone data on every contact (rarely populated), complex scheduling queue, DST handling | Send during tenant's business hours as default. Optional: simple send window (9am-5pm tenant timezone). Per-contact timezone is v2+. |
-| Report builder with unlimited joins | Joining Contacts -> Companies -> Deals -> Activities -> Quotes in one report | Query performance degrades, UI becomes confusing, result sets are unpredictable | One level of related entity inclusion (e.g., Contact report with Company.Name). For complex analysis, export to Excel/BI tools. |
+| Full entity editing in preview | Preview is for quick context, not a form editor replacement. Editing in a narrow ~400px panel creates poor UX for complex entities with many fields. Pipedrive's sidebar summary is read-only for good reason. | Read-only field display + "Open full record" for editing. Quick actions (add note, log call) are the exception since they are small, focused forms. |
+| Nested preview-within-preview | Clicking an association in a preview opens another preview, which has its own associations... leads to confusion and z-index nightmares. HubSpot limits preview to one level. | Allow one level of preview. Association clicks in a preview navigate to the full detail page. |
+| Custom field display in preview | Custom fields are user-configured and variable-length. Including them makes the preview unpredictable in height and content density. | Show only core system fields. Custom fields live on the full detail page. |
+| Preview panel resizing/docking | Over-engineering. HubSpot's preview is fixed-width. Dynamics 365 side panel is fixed. Resize/dock adds complexity for minimal UX gain. | Fixed ~400px width. Users needing more space click "Open full record." |
+| Real-time updates while preview is open | If the entity changes while preview is open, pushing updates is over-engineering for v1.2. | Refresh on re-open. Simple stale-on-close pattern. |
+| App-wide MatSidenav replacement | Do NOT replace the existing custom left sidebar with MatSidenav. The current sidebar works well and is deeply integrated (SidebarStateService, responsive behavior). | Use MatDrawer (scoped) or CDK Overlay only for the right-side preview panel. Keep existing left sidebar untouched. |
 
----
-
-## Feature Dependencies (v1.1 Internal)
+### Feature Dependencies
 
 ```
-Formula / Computed Custom Fields (no dependencies on other v1.1 features)
-    └── extends: CustomFieldDefinition entity (add Formula type)
-    └── extends: Custom field evaluation in dynamic tables
-    └── extends: Custom field rendering (read-only display)
-
-Email Templates (no dependencies on other v1.1 features)
-    └── uses: Existing ngx-quill rich text editor
-    └── uses: Existing SendGrid email infrastructure
-    └── extends: Entity field registry (for merge fields)
-
-Email Sequences
-    └── REQUIRES: Email Templates (sequences use templates for each step)
-    └── uses: Existing Gmail sync (for reply detection / auto-unenroll)
-    └── uses: Background job scheduler (for delayed step execution)
-
-Duplicate Detection & Merge
-    └── uses: pg_trgm PostgreSQL extension (for fuzzy matching)
-    └── extends: Existing import duplicate detection (upgrade matching)
-    └── touches: ALL entity FK relationships (for merge relationship transfer)
-
-Webhook System (no dependencies on other v1.1 features)
-    └── uses: Existing entity event patterns (create/update/delete in controllers)
-    └── uses: Background job queue (for retry with backoff)
-
-Workflow Automation Engine
-    └── REQUIRES: Email Templates (for "send email" action)
-    └── INTEGRATES WITH: Email Sequences (for "enroll in sequence" action)
-    └── INTEGRATES WITH: Webhook System (for "fire webhook" action)
-    └── uses: Existing NotificationDispatcher (for "send notification" action)
-    └── uses: Entity change tracking (for field-change triggers)
-    └── uses: Background scheduler (for date-based triggers)
-
-Advanced Reporting Builder
-    └── BENEFITS FROM: Formula/Computed Fields (use in report columns/filters)
-    └── uses: Existing Chart.js + dashboard chart components
-    └── uses: Existing CsvHelper (for CSV export)
-    └── uses: Existing dynamic table filter patterns
+Feed entity references (structured) --> Clickable mentions in feed content
+Clickable mentions --> Preview sidebar trigger
+Preview sidebar component (MatDrawer/CDK Overlay) --> Key properties display
+Preview sidebar --> Quick action buttons
+Quick action buttons --> Existing entity-form-dialog / email compose
+User preview --> New user preview API endpoint
+Association chips --> Detail DTO fetch (existing endpoints)
+Global search preview --> Same sidebar component
 ```
 
-### Dependency Summary -- Build Order Implications
+---
 
-1. **No dependencies:** Formula Fields, Email Templates, Duplicate Detection, Webhooks -- can start in parallel
-2. **Depends on Email Templates:** Email Sequences (needs templates for step content)
-3. **Depends on multiple v1.1 features:** Workflow Engine (needs templates for email action, benefits from sequences and webhooks for actions)
-4. **Benefits from Formula Fields:** Reporting Builder (computed fields in report columns)
+## Feature Area 2: Summary Tabs on Detail Pages
 
-**Recommended build order:**
-1. Formula Fields + Email Templates + Duplicate Detection + Webhooks (parallel, foundational)
-2. Email Sequences (needs templates)
-3. Workflow Automation Engine (orchestrates templates, sequences, webhooks, notifications)
-4. Advanced Reporting Builder (can use computed fields, stands alone otherwise)
+### Table Stakes
+
+Features users expect on a Summary/Overview tab. HubSpot ships this as their "Overview" tab (first tab on every record, default landing). Salesforce provides a "highlights panel" at the top of every record page.
+
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Key properties card | HubSpot Overview starts with "About this [entity]" card showing 4-8 key fields. Salesforce highlights panel shows compact layout fields. This anchors the summary. | Low | Already have all fields in `*DetailDto`. Create a card component displaying a configured subset per entity type. |
+| Association counts with tab links | "5 Contacts, 3 Deals, 2 Quotes" -- each clickable to jump to the respective tab. HubSpot shows this prominently on Overview. Salesforce shows related list counts. | Low | Existing detail pages lazy-load associations per tab. Add a lightweight count-only mechanism: either `pageSize=0` returning `totalCount` from existing endpoints, or new summary count endpoint. |
+| Recent activities card (3-5 items) | HubSpot Overview shows "Recent activities" card with last 3 activities. Salesforce shows "Activity Timeline" component. Users land on Summary and immediately see "what happened recently." | Low-Medium | Reuse existing activity list endpoint with `linkedEntityType` + `pageSize=5`. Display as condensed timeline (simpler than full `EntityTimelineComponent`). |
+| Upcoming activities card | HubSpot shows "Upcoming activities" alongside recent. Salesforce Home has "Today's Events." Gives "what's next" at a glance. | Low-Medium | Filter activities by `status != done` AND `dueDate >= today`, sorted ascending, limit 3-5. |
+| Stage/status indicator | For Deals: pipeline stage progress bar (stages as steps, current highlighted). For Leads: stage indicator with temperature badge. For Quotes: status badge with transition options. For Requests: status + priority badges. Per-entity visual indicator at top of summary. | Medium | Each entity type has different status semantics. Need per-entity summary header configs. Deals get a stage stepper (pipeline stages), Leads get stage + temperature chip, Quotes/Requests get status badges. |
+| Quick action bar | HubSpot Overview has "Actions" row: Create Task, Create Note, Log Call, Send Email. Salesforce has quick action buttons on the record header. Saves navigating to another tab for common operations. | Medium | 4-5 contextual action buttons at top of Summary tab. Actions open existing dialogs. Actions vary by entity type (e.g., Deals get "Add Contact" + "Add Product" alongside generic actions). |
+| Summary tab as first/default tab | HubSpot's Overview is the first tab and the default landing. Salesforce's highlights panel is always visible. Summary must be tab index 0. | Low | Modify `COMPANY_TABS`, `CONTACT_TABS`, `DEAL_TABS`, `LEAD_TABS` (need to add), `QUOTE_TABS` (need to add), `REQUEST_TABS` (need to add) to insert Summary at index 0. Shift existing "Details" to index 1. Update `onTabChanged` index logic. |
+
+### Differentiators
+
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Mini deal/pipeline summary on Company/Contact | For Companies: total deal value, deals by stage (mini bar chart), win rate. For Contacts: associated deals value summary. HubSpot's company Overview includes deal summaries with pipeline visualization. | Medium | New backend endpoint: `GET /api/companies/{id}/summary` returning aggregated deal stats (total value, count by stage, win rate). Chart.js mini bar chart. |
+| Email engagement summary | On Contact Summary: last email sent/received, total emails exchanged, last open timestamp. HubSpot tracks email engagement prominently on contact records. | Medium | Aggregation query against email entities filtered by contact. Compact stats row display. |
+| Notes preview | Last 2-3 notes (truncated to ~100 chars) on Summary tab. HubSpot includes pinned notes on Overview. Context without tab-switching. | Low | Reuse `NoteService.getEntityNotes()` with limit. Truncate content display. |
+| Sparkline trend charts | Visual trend of deal values, activity volume, email engagement over 30/60/90 days. Goes beyond static numbers to show trajectory. | Medium | Chart.js sparkline configuration (line chart, no axes, small). Backend needs time-series aggregation endpoint. |
+| Last interaction timestamp | "Last contacted: 3 days ago" -- prominently displayed. HubSpot shows this on company record summary. Helps users identify records needing attention. | Low-Medium | Compute from most recent activity/email/note timestamp. Could be a computed field on backend or assembled from timeline data. |
+| Attachments count badge | "12 files" as context, not a full list. Pipedrive's sidebar shows attachment count. | Low | Count from existing attachment endpoint. |
+
+### Anti-Features
+
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| Editable fields on Summary tab | Summary is read-oriented. Inline editing on Summary creates confusion about what's saved vs. not saved, and duplicates the Details tab's editing capability. Salesforce Dynamic Forms tried mixing edit + read and it fragments the experience. | Summary is read-only. "Edit" button navigates to Details tab. Quick actions (note, call, email) are the exception since they create new records, not edit existing fields. |
+| Full timeline duplicate on Summary | Summary tab should NOT replicate the Activities tab. It shows a condensed "recent" view (3-5 items). Full timeline is its own tab. | Show 3-5 recent items with "View all activities" link that switches to the Activities tab. |
+| Configurable Summary layout per user/admin | HubSpot lets admins customize Overview cards. This is significant build/maintain effort (card ordering, visibility toggles, per-team configs). Overkill for v1.2. | Ship a well-designed default layout per entity type. Admin customization deferred to future milestone. |
+| AI-generated record summaries | HubSpot Breeze generates AI record summaries with sentiment analysis. Requires AI infrastructure, token costs, prompt engineering. | Focus on data-driven cards surfacing existing information. AI summaries deferred to v2+. |
+| Summary tabs for Products only | Products have minimal connected data (no activities, no emails, no notes linked by default). A summary tab would be nearly empty. | Products keep current tab structure. Add Summary to Products later when they have richer connections. |
+
+### Feature Dependencies
+
+```
+Summary tab addition --> RelatedEntityTabsComponent (insert tab at index 0)
+Tab index shift --> ALL existing detail components (onTabChanged index logic must update)
+Key properties card --> *DetailDto (existing, no new endpoint)
+Association counts --> Lightweight count mechanism (pageSize=0 or new endpoint)
+Recent activities card --> Activity list endpoint (filtered, existing)
+Upcoming activities card --> Activity list endpoint (filtered by date, existing)
+Stage/status indicator --> Pipeline stages (deals), Lead stages, Quote/Request statuses (existing)
+Quick action bar --> Existing entity-form-dialog, email compose
+Mini deal summary --> New aggregation endpoint (backend work)
+Sparkline charts --> Chart.js (existing) + new time-series aggregation (backend)
+```
 
 ---
 
-## Existing Infrastructure Leverage
+## Feature Area 3: Personal "My Day" Dashboard
 
-These v1.0 systems are directly reused by v1.1 features:
+### Table Stakes
 
-| Existing System | Used By (v1.1) | How |
-|----------------|----------------|-----|
-| `NotificationDispatcher` | Workflow Engine | "Send notification" action reuses existing dispatch pipeline (DB + SignalR + email) |
-| `IEmailService` (SendGrid) | Email Templates, Sequences | Transactional email sending for templates and sequence steps |
-| Gmail Sync Service | Email Sequences | Reply detection for auto-unenroll (match inbound email address against active enrollments) |
-| `CustomFieldDefinition` entity | Formula Fields | Add `Formula` to `CustomFieldType` enum; store formula expression in new column |
-| `CustomFieldValidation` | Formula Fields | Extend validation to include formula-specific rules (expression syntax, field references) |
-| Dynamic Table filter operators | Reporting Builder | Reuse filter operator logic (equals, contains, greater than, date range) |
-| Chart.js + dashboard widgets | Reporting Builder | Reuse chart rendering components for report visualizations |
-| CsvHelper | Reporting Builder | CSV export of report results |
-| Import duplicate detection | Duplicate Detection | Upgrade import's basic email-matching with new fuzzy matching service |
-| `FeedItem` system | Workflow Engine | Workflow actions can create feed items for audit trail visibility |
-| SignalR Hub | Webhooks, Workflows | Real-time delivery status updates; workflow execution notifications |
-| Entity change tracking (EF Core) | Workflows | Detect field changes for trigger evaluation via `ChangeTracker.Entries()` |
-| RBAC Permission system | All features | Workflow management (Admin only), report sharing, webhook management permissions |
-| Background job (import uses background execution) | Sequences, Webhooks, Workflows, Duplicate Detection | Extend existing background job pattern for scheduled/queued work |
+Every major CRM has evolved their homepage to be personal. Salesforce Lightning Home: Assistant + Key Deals + Today's Tasks + Today's Events + Performance. HubSpot Sales Workspace: tasks + leads + deals + guided actions + prospecting queue. Pipedrive: personal pipeline + activities due today.
 
----
+| Feature | Why Expected | Complexity | Notes |
+|---------|--------------|------------|-------|
+| Greeting with date/time context | HubSpot and existing GlobCRM dashboard already have "Good morning, [Name]." Salesforce Home doesn't but most modern apps do. Sets personal tone. Already built in current `DashboardComponent`. | Low | Move/reuse existing greeting from `DashboardComponent` (it has `greeting()`, `timeIcon()`, `firstName()` computeds). |
+| Today's tasks/activities widget | Salesforce: "Today's Tasks" is a standard Home component. HubSpot workspace: task queue with type sorting. THE core of a personal dashboard -- "what do I need to do today?" | Medium | Query activities where `assignedTo = currentUser` AND `dueDate = today` AND `status != done`. Display as checklist with status toggle buttons and priority indicators. |
+| Overdue tasks widget / section | Salesforce Assistant surfaces overdue tasks prominently. HubSpot shows overdue counts with urgency indicators. Users need to see what slipped. | Low | Query activities where `assignedTo = currentUser` AND `dueDate < today` AND `status != done`. Can be a red-highlighted section within the tasks widget rather than separate. |
+| Upcoming events/calendar widget | Salesforce: "Today's Events." HubSpot: calendar integration. Shows today's meetings and upcoming appointments as compact agenda. | Medium | Use existing activity data filtered by type (meeting/call). Display as compact agenda list (time + title + linked entity) for today + next 2 days. NOT a full FullCalendar embed -- just a simple agenda. |
+| My pipeline summary widget | Salesforce: "Key Deals" and "Performance" components. Pipedrive: personal pipeline view on homepage. Sales reps need their deals at a glance -- count by stage, total value, deals closing soon. | Medium | Query deals where `ownerId = currentUser` and status is open. Group by stage, show total value per stage, highlight deals closing this week. Mini horizontal bar chart or stage-pill visualization. |
+| Quick actions row | Salesforce Home has global "New" actions. HubSpot workspace has create dropdown. Fast paths to create entities from homepage. | Low | Row of icon buttons: New Contact, New Deal, Log Activity, New Note, Send Email. Each opens respective create form/dialog (all already built). |
+| Recent records widget | Salesforce: "Recent Records" standard component. Shows what user was working on recently. Reduces navigation friction. | Low-Medium | Track recently viewed entities client-side (localStorage keyed by userId) or server-side (new `RecentRecords` table). Show last 5-8 with entity type icon, name, and relative time. Client-side is simpler and avoids backend changes. |
+| Org dashboard relocation | Moving existing org dashboard from `/dashboard` (current home) to its own menu item. My Day takes over as the default landing page. | Low-Medium | Route change: `''` redirects to My Day page. Org dashboard moves to `/dashboards` or `/analytics`. Update navbar to show both: "My Day" (home icon) and "Dashboards" (grid_view icon). |
 
-## Complexity Assessment
+### Differentiators
 
-| Feature Area | Backend Complexity | Frontend Complexity | Overall | Risk Areas |
-|-------------|-------------------|--------------------|---------|-----------|
-| Formula Fields | HIGH (expression parser, recalculation) | MEDIUM (formula editor, read-only display) | HIGH | Expression parser correctness, circular reference detection, performance of recalculation on save |
-| Email Templates | LOW (CRUD + merge field resolution) | MEDIUM (template editor with merge field picker) | MEDIUM | HTML email rendering consistency across email clients |
-| Email Sequences | HIGH (step scheduler, tracking, unenroll) | HIGH (sequence builder, enrollment management, analytics) | HIGH | Reliable step scheduling, reply detection accuracy, tracking pixel delivery |
-| Duplicate Detection | HIGH (fuzzy matching algorithms, merge logic) | HIGH (side-by-side merge UI, duplicate review list) | HIGH | Performance of fuzzy scan on large datasets, merge relationship integrity |
-| Webhooks | MEDIUM (delivery queue, retry, signing) | LOW (subscription CRUD, delivery log viewer) | MEDIUM | Retry reliability, dead endpoint handling, payload size limits |
-| Workflow Engine | HIGH (trigger evaluation, action execution, scheduling) | HIGH (workflow builder form, execution log viewer) | HIGH | Date-based trigger evaluation performance, action failure handling, execution ordering |
-| Reporting Builder | HIGH (dynamic query generation, aggregation) | HIGH (query builder UI, chart rendering, export) | HIGH | Query performance with grouping + custom fields in JSONB, preventing slow queries |
+| Feature | Value Proposition | Complexity | Notes |
+|---------|-------------------|------------|-------|
+| Configurable widget layout (gridster) | Existing org dashboard uses angular-gridster2. Bringing the same drag-and-drop configurability to My Day lets each user arrange their workspace. HubSpot Sales Workspace is NOT user-configurable in layout; Salesforce Lightning Home is admin-only configurable. User-configurable is a genuine differentiator. | Medium | Reuse `DashboardGridComponent` and widget infrastructure. Backend: `UserDashboardPreferences` entity scoped to user (not team). New widget types for My Day-specific data. |
+| Email summary widget | Unread count, recent emails, emails needing response. HubSpot Sales Workspace shows inbox preview inline. | Medium | Query existing email service for current user's recent emails. Compact list: sender avatar, subject (truncated), time, read/unread dot. |
+| Feed preview widget | Last 3-5 feed items inline on My Day. Social awareness without navigating to Feed page. Team pulse at a glance. | Low | Reuse `FeedService` with `pageSize=5`. Compact card format showing author + content preview + relative time. |
+| Notification digest widget | Today's notifications grouped by type. Not just the bell icon, but "4 deal updates, 2 mentions, 1 assignment" as a summary card. | Low-Medium | Reuse existing notification data. Group by type, show counts with expand/collapse to see individual items. |
+| Smart nudges (rule-based) | Simpler version of HubSpot's "Guided Actions": "You have 3 deals closing this week," "5 activities are overdue," "Lead X has been idle for 14 days." Rule-based, not AI. | Medium | Business rules checking overdue counts, deals closing soon, idle leads, unread emails. Generate prioritized action cards with direct links to the relevant records. |
 
----
+### Anti-Features
 
-## MVP Recommendation for v1.1
+| Anti-Feature | Why Avoid | What to Do Instead |
+|--------------|-----------|-------------------|
+| Replacing org dashboard entirely | My Day is personal (my tasks, my pipeline, my activities). Org dashboard is team-level (KPIs, leaderboards, targets). They serve different audiences. HubSpot and Salesforce both maintain separate personal and team views. | My Day = personal starting page. Org Dashboard = team/admin metrics view. Both accessible from navbar as separate items. |
+| Real-time auto-refresh polling on all widgets | Polling every widget every 30 seconds creates unnecessary server load. My Day data is relatively static (tasks don't change every 30s unless someone else updates them). | Refresh on page load + manual refresh button. SignalR push for specific events only (new assignment, deal stage change on my deal, new mention). |
+| Embedding external calendar (Google/Outlook widget) | Deep external calendar integration requires OAuth for each provider, bidirectional sync, and complex rendering. Existing FullCalendar shows CRM activities already. | Show CRM activities/events as the calendar widget content. External calendar sync is a separate future feature (already noted in PROJECT.md as future). |
+| Admin-controlled My Day layouts | My Day is personal. Admins should NOT force a layout on individual users. This is fundamentally different from the org dashboard where admin control makes sense. | Users own their My Day layout. Provide sensible defaults that users can customize. Admin can influence only through the org dashboard. |
+| Full FullCalendar embed as a widget | FullCalendar is heavyweight (~200KB) and already available at `/calendar`. Embedding it again in My Day is redundant and slow. | Compact agenda-style list showing today's events and next 2 days. "View full calendar" link to the Calendar page. |
 
-### Must Ship (Table Stakes for "Automation & Intelligence")
+### Feature Dependencies
 
-1. **Workflow Automation** -- Core feature. Without it, v1.1 has no automation story.
-   - Event triggers (record created/updated/deleted, field changed)
-   - Date-based triggers (basic: X days after/before date field)
-   - Actions: field update, create task, send notification, send email (from template), fire webhook, enroll in sequence
-   - Execution log
-   - Enable/disable
-
-2. **Email Templates** -- Required by both workflows and sequences.
-   - Rich text editor with merge fields
-   - Template CRUD with categories
-   - Preview with sample data
-
-3. **Email Sequences** -- Primary use case for sales automation.
-   - Multi-step builder with delays
-   - Manual + workflow-triggered enrollment
-   - Auto-unenroll on reply
-   - Per-step tracking (open, click)
-   - Sequence analytics
-
-4. **Formula / Computed Fields** -- Completes the custom field story.
-   - Arithmetic formulas with field references
-   - Date difference calculations
-   - String concatenation
-   - Real-time recalculation on save
-   - Formula validation
-
-5. **Duplicate Detection & Merge** -- Data quality is expected alongside automation.
-   - On-demand duplicate scan for contacts and companies
-   - Real-time duplicate warning on create/edit
-   - Configurable match rules (admin)
-   - Fuzzy matching (pg_trgm)
-   - Side-by-side merge with relationship transfer
-
-6. **Webhooks** -- Enables external integration story.
-   - Subscription management (Admin)
-   - Event selection per subscription
-   - HMAC-SHA256 signing
-   - Retry with exponential backoff
-   - Delivery log
-
-7. **Advanced Reporting Builder** -- Goes beyond fixed dashboards.
-   - Entity source + field selection
-   - Filter builder (reuse dynamic table patterns)
-   - Grouping and aggregation (COUNT, SUM, AVG)
-   - Related entity fields (one level)
-   - Chart + table visualization
-   - Save, share, export
-
-### Defer to v1.2
-
-- Scheduled report delivery (email on schedule)
-- Sequence A/B testing
-- Cross-entity workflow triggers
-- Cross-entity formula fields
-- Bulk merge from duplicate review
-- Per-contact timezone for sequence send windows
+```
+My Day page component --> New route (/ or /my-day)
+Org Dashboard relocation --> Route change (/dashboard --> /dashboards or /analytics)
+Navbar update --> Two entries: "My Day" (home) + "Dashboards" (analytics)
+Widget infrastructure --> Reuse angular-gridster2 + DashboardGridComponent
+Today's tasks widget --> Activity list endpoint (filtered by user + today)
+Overdue tasks section --> Activity list endpoint (filtered by user + overdue)
+Calendar widget --> Activity list endpoint (filtered by user + date range)
+My pipeline widget --> Deal list endpoint (filtered by user + open)
+Quick actions --> Existing create form dialogs
+Recent records widget --> New tracking mechanism (localStorage preferred)
+Email widget --> Existing EmailService endpoints
+Feed widget --> Existing FeedService
+Widget persistence --> New user preferences endpoint or extend existing dashboard API
+```
 
 ---
+
+## Cross-Feature Dependencies
+
+```
+Entity Preview Sidebar ----depends-on----> Existing entity services + list/detail DTOs
+Summary Tabs ----depends-on----> Existing RelatedEntityTabsComponent + entity detail pages
+My Day Dashboard ----depends-on----> Existing widget infrastructure (angular-gridster2, Chart.js)
+
+Summary Tabs (quick action bar) ----shares-pattern-with----> Preview Sidebar (quick actions)
+Summary Tabs (recent activities card) ----shares-pattern-with----> My Day (tasks widget)
+Summary Tabs (association counts) ----shares-data-with----> Preview Sidebar (association chips)
+
+All three ----should-share----> EntityPreviewService (lightweight entity lookups by type+id)
+All three ----should-share----> QuickActionBarComponent (reusable action buttons per entity type)
+```
+
+## Entity Coverage Matrix
+
+Which entity types get which features in v1.2:
+
+| Entity | Preview Sidebar | Summary Tab | Notes |
+|--------|----------------|-------------|-------|
+| Company | Yes | Yes | Rich: contacts, deals, activities, emails, quotes, requests |
+| Contact | Yes | Yes | Rich: company link, deals, activities, emails |
+| Deal | Yes | Yes | Rich: pipeline progress, contacts, products, activities, quotes |
+| Lead | Yes | Yes | Moderate: stage progress, temperature, source, activities |
+| Quote | Yes | Yes | Moderate: status badge, line item summary, linked deal/company/contact |
+| Request | Yes | Yes | Moderate: status + priority badges, linked contact/company |
+| Product | Yes (basic) | No | Preview shows name, price, description. No summary tab -- insufficient connected data. |
+| User/Team Member | Yes (feed only) | No | Preview from feed author names. Shows name, role, email, avatar. |
+
+## MVP Recommendation
+
+### Phase 1: Summary Tabs on Detail Pages
+
+**Rationale:** Summary tabs add value to the most-used part of the app (detail pages) with the least risk. They build entirely on existing infrastructure (RelatedEntityTabsComponent, detail DTOs, entity services) without introducing new UX paradigms. Every user benefits immediately on pages they already visit daily.
+
+Build order:
+1. Summary tab skeleton -- add "Summary" as tab index 0 on all 6 entity types (Companies, Contacts, Deals, Leads, Quotes, Requests)
+2. Key properties card -- read-only highlight fields per entity type
+3. Association counts with tab links -- "5 Contacts, 3 Deals" clickable to switch tabs
+4. Recent activities card -- last 3-5 activities in condensed format
+5. Stage/status indicator -- pipeline progress for Deals, stage+temperature for Leads, status badges for Quotes/Requests
+6. Quick action bar -- Add Note, Log Activity, Send Email (shared component)
+
+### Phase 2: Entity Preview Sidebar + Feed Integration
+
+**Rationale:** Preview sidebar is a new UX paradigm (CDK Overlay or MatDrawer slide-in) requiring careful implementation. It depends on having a reusable preview panel component. Ships after Summary tabs because the preview panel benefits from the Summary tab's "key properties card" pattern (same data, different container).
+
+Build order:
+1. Reusable slide-in panel component (MatDrawer `mode="over"` or CDK Overlay)
+2. Per-entity preview content templates (name, key fields, associations, actions)
+3. Feed entity link integration -- replace `navigateToEntity()` with sidebar open
+4. Quick actions in preview -- Add Note, Log Call, Send Email (reuse from Summary)
+5. User preview for feed author names
+6. Global search preview integration (optional, if time allows)
+
+### Phase 3: My Day Personal Dashboard
+
+**Rationale:** My Day is the most complex feature (new page, new widget types, route restructuring, navbar changes, user preference persistence). It also requires relocating the org dashboard, which is a coordination risk. Ships last because it touches the most infrastructure.
+
+Build order:
+1. Route restructuring -- `/` goes to My Day page, org dashboard moves to `/dashboards`
+2. Navbar update -- add "My Day" and rename/move "Dashboard"
+3. My Day page with gridster -- reuse existing widget infrastructure
+4. Today's tasks widget (core personal productivity view)
+5. My pipeline summary widget
+6. Quick actions row + recent records widget
+7. User preference persistence for widget layout
+
+### Defer to v1.3+
+
+| Feature | Reason |
+|---------|--------|
+| Inline entity references in feed content | Requires backend content parsing and structured mention system |
+| Cross-entity relationship map visualization | Custom SVG/canvas rendering, high complexity |
+| Admin-customizable Summary tab layout | Default layout sufficient for v1.2 |
+| AI-generated record summaries | Requires AI infrastructure |
+| Smart nudges / guided actions | Rule engine is medium complexity, better standalone |
+| Sparkline trend charts on summary | Needs time-series aggregation endpoints, better as polish |
+| Feed entity mentions with hover preview (@mention) | Requires mention parsing system |
+
+## CRM Benchmark References
+
+| Feature | HubSpot | Salesforce | Pipedrive | Dynamics 365 |
+|---------|---------|------------|-----------|--------------|
+| **Entity preview** | Preview panel: customizable cards, up to 6 properties, associations, attachments, quick actions. Customizable per team. | Compact layout hover cards (4 fields), mini page layouts on lookup hover. Side panel available in some contexts. | Detail view sidebar: summary section (customizable field order, drag-reorder), collapsible sections. | Quick view forms (read-only lookup preview), side panel forms for editing. |
+| **Summary/Overview tab** | Overview tab (first tab by default): "About this record" properties, recent/upcoming activities, associations cards, Breeze AI summary, sentiment card, challenges card. Customizable by admins. | Highlights panel (compact layout at page top, always visible). Dynamic Forms for inline sections. Related lists with counts. Lightning record page templates. | Summary section at top of detail sidebar (always visible, not a tab). Customizable field order with drag-reorder. | Quick view forms embedded in related record lookups. Main form sections. |
+| **Personal homepage** | Sales Workspace: personal task queue (by type: email, call, LinkedIn), lead management, deal tracking, guided actions (AI-recommended next steps), prospecting agent. Separate from team dashboard. | Lightning Home: Assistant (overdue/ignored items), Key Deals (filterable opportunities), Today's Tasks, Today's Events, Performance (quarterly), Recent Records. Customizable per app/profile by admins. | Pipeline view (personal deals) + activities due today as default landing. Clean, sales-focused. | Personal dashboards + activity feeds. Home page with charts, activity stream, queues. |
 
 ## Sources
 
-### Workflow Automation
-- [Zoho CRM Workflow Rules](https://help.zoho.com/portal/en/kb/crm/automate-business-processes/workflow-management/articles/configuring-workflow-rules) -- trigger types, instant vs scheduled actions
-- [HubSpot Workflows Guide](https://knowledge.hubspot.com/workflows/create-workflows) -- enrollment triggers, action types, conditions
-- [HubSpot Workflow Actions](https://knowledge.hubspot.com/workflows/choose-your-workflow-actions) -- comprehensive action catalog
-- [CRM Automation Rules 2025](https://isitdev.com/crm-automation-rules-workflow-examples-2025/) -- 21 proven workflow patterns
-- [SuiteCRM Workflows Documentation](https://docs.suitecrm.com/user/advanced-modules/workflow/) -- open-source CRM workflow reference
-- [Freshsales Workflow Configuration](https://crmsupport.freshworks.com/support/solutions/articles/50000002143-how-to-configure-a-workflow-) -- trigger and action patterns
-
-### Email Templates & Sequences
-- [HubSpot Sequences](https://knowledge.hubspot.com/sequences/create-and-edit-sequences) -- sequence creation, enrollment, tracking
-- [FluentCRM Email Sequences](https://fluentcrm.com/docs/email-sequence/) -- step delays, conditions, analytics
-- [Pipeliner CRM Sequences](https://help.pipelinersales.com/en/articles/5694513-using-email-sequences-in-pipeliner) -- CRM-native sequence patterns
-- [HubSpot Drip Campaign Guide](https://blog.hubspot.com/sales/drip-emails-opens) -- best practices for drip campaigns
-- [Nimble CRM Email Sequences](https://www.nimble.com/blog/nimbles-new-email-sequences/) -- enrollment and tracking patterns
-
-### Formula Fields
-- [Pipedrive Formula Fields](https://support.pipedrive.com/en/article/custom-fields-formula-fields) -- formula syntax, operators, limitations
-- [Pipedrive Formula Field Blog](https://www.pipedrive.com/en/blog/formula-custom-field) -- use cases and examples
-- [Microsoft Dynamics 365 Calculated Fields](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/define-calculated-fields?view=op-9-1) -- condition/action formula model
-- [Freshsales Formula Fields](https://crmsupport.freshworks.com/support/solutions/articles/50000002577-what-are-formula-fields-how-to-use-formula-fields-) -- function library and field references
-- [Microsoft Dataverse Formula Columns](https://www.forvismazars.us/forsights/2025/05/how-to-use-formula-columns-in-microsoft-dataverse) -- Power Fx transition
-
-### Duplicate Detection & Merge
-- [CRM Deduplication Guide 2025](https://www.rtdynamic.com/blog/crm-deduplication-guide-2025/) -- algorithms, thresholds, best practices
-- [Dynamics 365 Duplicate Detection](https://www.inogic.com/blog/2025/10/step-by-step-guide-to-duplicate-detection-and-merge-rules-in-dynamics-365-crm/) -- rule configuration and merge flow
-- [Dynamics 365 Fuzzy Matching](https://www.inogic.com/blog/2025/08/make-your-crm-ai-ready-clean-duplicate-data-in-dynamics-365-crm-with-fuzzy-matching/) -- Levenshtein, Jaro-Winkler, Soundex
-- [HubSpot Deduplication](https://knowledge.hubspot.com/records/deduplication-of-records) -- automatic and manual dedup
-- [CRM Deduplication Guide (Databar)](https://databar.ai/blog/article/crm-deduplication-complete-guide-to-finding-merging-duplicate-records) -- algorithm comparison and threshold tuning
-
-### Webhooks
-- [Webhook Architecture Design](https://beeceptor.com/docs/webhook-feature-design/) -- subscription, delivery, retry patterns
-- [Event-Driven Webhooks (CodeOpinion)](https://codeopinion.com/building-a-webhooks-system-with-event-driven-architecture/) -- decoupled architecture
-- [Webhook System Design Guide](https://grokkingthesystemdesign.com/guides/webhook-system-design/) -- step-by-step design
-- [.NET Webhook System](https://www.c-sharpcorner.com/article/creating-a-net-webhook-receiver-and-sender-system-architecture-implementation/) -- .NET-specific implementation
-- [Webhook Best Practices](https://www.integrate.io/blog/apply-webhook-best-practices/) -- HMAC, retry, idempotency
-
-### Reporting
-- [DevExpress SQL Query Builder](https://docs.devexpress.com/XtraReports/17308/visual-studio-report-designer/sql-query-builder) -- query builder UX patterns
-- [Dynamics 365 Cross-Entity Reports](https://meganvwalker.com/creating-dynamics-365-reports-with-multiple-entities/) -- entity join patterns
-- [Agile CRM Reporting](https://www.agilecrm.com/crm-reporting) -- CRM-specific report builder features
-- [Ad Hoc Reporting Tools 2026](https://www.cubesoftware.com/blog/best-ad-hoc-reporting-software-tools) -- modern reporting tool landscape
-
----
-*Feature research for: v1.1 Automation & Intelligence*
-*Researched: 2026-02-18*
-*Previous: v1.0 MVP feature research (2026-02-16)*
+- [HubSpot: Preview a record](https://knowledge.hubspot.com/records/preview-a-record) -- MEDIUM confidence
+- [HubSpot: Customize record previews](https://knowledge.hubspot.com/object-settings/customize-record-previews) -- MEDIUM confidence
+- [HubSpot: View and customize record overviews](https://knowledge.hubspot.com/crm-setup/view-and-customize-record-overviews) -- MEDIUM confidence
+- [HubSpot: View a company record summary](https://knowledge.hubspot.com/records/view-a-company-record-summary) -- MEDIUM confidence
+- [HubSpot: Sales Workspace activities](https://knowledge.hubspot.com/prospecting/review-sales-activity-in-the-sales-workspace) -- MEDIUM confidence
+- [HubSpot: Customize preview sidebar in workspace](https://knowledge.hubspot.com/customize-the-record-preview-sidebar-in-the-customer-success-workspace) -- MEDIUM confidence
+- [HubSpot Spring 2025 Spotlight: Workspaces](https://www.hubspot.com/company-news/spring-2025-spotlight-workspaces) -- MEDIUM confidence
+- [Salesforce: Custom Lightning Home Page](https://trailhead.salesforce.com/content/learn/modules/lightning_app_builder/lightning_app_builder_homepage) -- MEDIUM confidence
+- [Salesforce: Compact Layouts](https://trailhead.salesforce.com/content/learn/modules/lex_customization/lex_customization_compact_layouts) -- MEDIUM confidence
+- [Salesforce: Tasks and Events management](https://trailhead.salesforce.com/content/learn/modules/lightning-experience-productivity/manage-your-tasks-events-and-email) -- MEDIUM confidence
+- [Salesforce: Customize Lightning Home Page](https://www.salesforceben.com/customize-your-salesforce-home-page-with-the-lightning-app-builder/) -- MEDIUM confidence
+- [Salesforce: Today's Tasks in Lightning](https://help.salesforce.com/s/articleView?id=000382898&language=en_US&type=1) -- MEDIUM confidence
+- [Pipedrive: Detail view sidebar](https://support.pipedrive.com/en/article/detail-view-sidebar) -- MEDIUM confidence
+- [Pipedrive: Deal detail view](https://support.pipedrive.com/en/article/deal-detail-view) -- MEDIUM confidence
+- [Pipedrive: Contact detail view](https://support.pipedrive.com/en/article/contact-detail-view) -- MEDIUM confidence
+- [Dynamics 365: Quick view forms](https://learn.microsoft.com/en-us/dynamics365/customerengagement/on-premises/customize/create-edit-quick-view-forms?view=op-9-1) -- MEDIUM confidence
+- [Dynamics 365: Side panel forms](https://learn.microsoft.com/en-us/dynamics365-release-plan/2021wave1/sales/dynamics365-sales/enhanced-productivity-new-record-side-panel-form) -- MEDIUM confidence
+- [Angular CDK Overlay](https://material.angular.dev/cdk/overlay) -- HIGH confidence (official docs)
+- [Angular CDK Overlay Tutorial (v19+)](https://briantree.se/angular-cdk-overlay-tutorial-learn-the-basics/) -- MEDIUM confidence
+- [Adobe: Slide-out Panels Pattern Library](https://developer.adobe.com/commerce/admin-developer/pattern-library/containers/slideouts-modals-overlays) -- MEDIUM confidence (design pattern reference)
+- [Everything About CRM Record Overview Tab in HubSpot](https://www.mergeyourdata.com/blog/everything-about-the-crm-record-overview-tab-in-hubspot) -- LOW confidence (third-party blog)
+- Existing codebase analysis: `feed-list.component.ts`, `company-detail.component.ts`, `related-entity-tabs.component.ts`, `dashboard.component.ts`, `dashboard.models.ts`, entity model files -- HIGH confidence

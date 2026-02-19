@@ -1,489 +1,273 @@
-# Technology Stack: GlobCRM v1.1 Automation & Intelligence
+# Technology Stack: GlobCRM v1.2 Connected Experience
 
-**Project:** GlobCRM v1.1 -- Automation, Intelligence, and Extensibility
-**Researched:** 2026-02-18
-**Scope:** Stack ADDITIONS for v1.1 features only. Core stack (Angular 19, .NET 10, PostgreSQL 17) is validated and unchanged.
+**Project:** GlobCRM v1.2 -- Connected Experience (Entity Preview, Summary Tabs, My Day Dashboard)
+**Researched:** 2026-02-20
+**Scope:** Stack ADDITIONS/CHANGES for v1.2 features only. Core stack (Angular 19, .NET 10, PostgreSQL 17) and v1.1 additions (Hangfire, Foblex, NCalc, etc.) are validated and unchanged.
 
 ---
 
 ## Executive Summary
 
-v1.1 adds six interconnected capabilities: workflow automation, email templates/sequences, formula/computed custom fields, duplicate detection & merge, webhooks, and advanced reporting. The existing stack handles most of the infrastructure needs. The key additions are:
+v1.2 adds three interconnected UX capabilities: entity preview sidebars (slide-out panels showing entity details from feed/search), summary tabs on all major detail pages, and a personal "My Day" dashboard replacing the current home page. The critical finding is: **no new library installations are required**. Every v1.2 feature is buildable with the existing stack.
 
-1. **Hangfire** for reliable background job processing (workflow actions, webhook delivery, email sequences)
-2. **Fluid** (Liquid) for user-editable email templates (replacing RazorLight for user-facing templates only)
-3. **NCalc** for formula/computed field evaluation
-4. **FuzzySharp** + PostgreSQL `pg_trgm` for duplicate detection
-5. **Microsoft.Extensions.Http.Resilience** (built on Polly) for resilient webhook delivery
-6. **@foblex/flow** for the visual workflow builder UI
+The existing stack already includes everything needed:
+1. **Angular Material `MatDrawer`** (already in `@angular/material`) for the preview sidebar -- position it on the right with `mode="over"`
+2. **`angular-gridster2`** (already installed, v19) for the "My Day" personal dashboard -- reuse the exact same `DashboardGridComponent` infrastructure
+3. **Chart.js + ng2-charts** (already installed) for mini sparkline charts on summary tabs -- Chart.js natively supports minimal configurations with hidden axes
+4. **`@angular/cdk` Overlay + BreakpointObserver** (already installed, already used) for responsive sidebar behavior
+5. **FullCalendar** (already installed) for the "My Day" agenda/today view widget
 
-No architectural changes to the existing 4-layer Clean Architecture. All new features plug into the existing Infrastructure and Application layers.
+This is a pure **architecture and component design** milestone, not a technology acquisition milestone.
 
 ---
 
 ## What We Already Have (DO NOT Add)
 
-These existing components cover significant v1.1 needs with zero additions:
+Every v1.2 feature maps to existing installed packages:
 
-| Existing Component | v1.1 Usage |
-|---|---|
-| **RazorLight 2.3.1** | System email templates (verification, password reset). Keep for these. |
-| **SendGrid 9.29.3** | Email sending for sequences and workflow-triggered emails. |
-| **SignalR** | Real-time notifications when workflows trigger, webhook delivery status updates. |
-| **BackgroundService pattern** | Already used for EmailSync and DueDateNotification. Pattern extends to workflow processing. |
-| **EF Core 10.0.3 + Npgsql 10.0.0** | All new entities (workflows, templates, webhooks, reports) store in PostgreSQL. |
-| **JSONB + GIN indexes** | Workflow definitions, template variables, report configs store as JSONB. |
-| **tsvector full-text search** | Existing on Company, Contact, Deal. Complemented by pg_trgm for fuzzy duplicate matching. |
-| **FluentValidation 12.1.1** | Validates workflow definitions, template content, formula syntax. |
-| **Angular CDK Drag-Drop** | Already used in Kanban boards. Reused for workflow step reordering. |
-| **Chart.js + ng2-charts** | Advanced reports render through existing chart infrastructure. |
-| **@ngrx/signals** | Signal stores for workflow builder, template editor, report builder features. |
-| **Angular Material M3** | All new UI forms, dialogs, and editors use existing Material components. |
-| **Serilog** | Structured logging for workflow execution audit trails. |
-| **IHttpClientFactory** | Not currently registered but available in .NET 10. Needed for webhook HTTP calls. |
+| Existing Component | v1.2 Usage | Confidence |
+|---|---|---|
+| **`@angular/material` MatSidenavModule** | `MatDrawer` with `position="end" mode="over"` for entity preview sidebar. Already in `package.json` as `@angular/material: ^19.2.19`. Module includes `MatDrawer`, `MatDrawerContainer`, `MatDrawerContent` -- designed for exactly this use case. | HIGH |
+| **`@angular/cdk` BreakpointObserver** | Already used in `app.component.ts` and `navbar.component.ts`. Reuse for responsive sidebar behavior (auto-close on mobile, adjust width). | HIGH |
+| **`@angular/cdk` DragDropModule** | Already used in kanban boards and sequence builder. NOT needed for v1.2 (gridster handles dashboard drag). | HIGH |
+| **`angular-gridster2` v19** | Already powering org dashboard with full widget system (DashboardGridComponent, WidgetWrapperComponent, 5 widget types). "My Day" personal dashboard reuses this entire infrastructure -- just new widget types and a user-scoped dashboard entity. | HIGH |
+| **Chart.js 4.5.1 + ng2-charts 8.0.0** | Already rendering bar, line, pie, doughnut charts in dashboard widgets. Summary tab mini-charts use the same library with `responsive: true`, hidden axes (`display: false` on scales), no legend, no tooltips -- pure sparkline config. No separate sparkline library needed. | HIGH |
+| **FullCalendar 6.1.20** | Already used for calendar views. "My Day" agenda widget uses `@fullcalendar/list` plugin (may need to add this one plugin) for today's schedule view, or renders a custom component using the existing daygrid/timegrid plugins. | MEDIUM |
+| **`@ngrx/signals`** | Signal stores for preview sidebar state, summary data, My Day dashboard. Same patterns as existing stores. | HIGH |
+| **SignalR** | Real-time feed updates already push to sidebar (no change). Summary tab counts can refresh on `FeedUpdate` events. | HIGH |
+| **MatTabsModule** | Already used in `RelatedEntityTabsComponent`. Summary tab is simply a new tab added to existing tab arrays (`CONTACT_TABS`, `COMPANY_TABS`, `DEAL_TABS`). | HIGH |
 
 ---
 
-## Recommended Stack Additions
+## Stack Additions: ZERO New Packages
 
-### 1. Background Job Processing: Hangfire
+### Confirmed: No New npm Packages
 
-| Technology | Version | Layer | Purpose |
+After thorough analysis of the v1.2 feature requirements against the installed stack:
+
+| v1.2 Feature | Implementation Approach | New Library? |
+|---|---|---|
+| Entity preview sidebar | `MatDrawer` from existing `@angular/material` | NO |
+| Sidebar slide animation | Built into `MatDrawer` (uses Angular animations) | NO |
+| Sidebar backdrop/overlay | Built into `MatDrawer` (`hasBackdrop` property) | NO |
+| Summary tab on detail pages | New `<ng-template>` in existing `RelatedEntityTabsComponent` | NO |
+| Mini sparkline charts | Chart.js with minimal config (hidden axes/legend/tooltips) | NO |
+| Summary KPI cards | Reuse existing `KpiCardComponent` pattern | NO |
+| "My Day" dashboard layout | Reuse existing `angular-gridster2` `DashboardGridComponent` | NO |
+| "My Day" widgets (tasks, calendar, deals) | New widget components following existing `WidgetWrapperComponent` pattern | NO |
+| "My Day" drag/resize | Already in `angular-gridster2` config | NO |
+| Today's agenda view | FullCalendar existing plugins OR custom HTML list | NO |
+| Personal dashboard persistence | Backend API with existing Dashboard entity pattern | NO |
+
+### One Possible Addition: @fullcalendar/list (Optional)
+
+| Technology | Version | Purpose | When to Add |
 |---|---|---|---|
-| Hangfire.AspNetCore | 1.8.23 | Infrastructure | Job server integration with ASP.NET Core DI |
-| Hangfire.PostgreSql | 1.21.1 | Infrastructure | PostgreSQL storage for job persistence |
+| `@fullcalendar/list` | ^6.1.20 | List/agenda view for "My Day" today's schedule widget | Only if the team wants the native FullCalendar list view; a custom HTML list component is equally viable |
 
-**Why Hangfire over continuing with BackgroundService:**
-- The existing `BackgroundService` pattern works for simple periodic tasks (email sync every 5 min). Workflow automation needs **delayed jobs** (send email in 3 days), **fire-and-forget jobs** (trigger webhook now), **recurring jobs** (check conditions hourly), and **continuations** (after step A completes, run step B). BackgroundService cannot do any of these without reinventing a job queue.
-- Hangfire persists jobs in PostgreSQL (reuses existing database), survives app restarts, provides automatic retries with configurable backoff, and includes a built-in monitoring dashboard at `/hangfire`.
-- No new infrastructure dependency -- uses the same PostgreSQL 17 connection string.
+**Why optional:** FullCalendar's list plugin renders a clean agenda-style list of events for a day. However, the "My Day" widget just needs "show my activities due today" -- a simple `*ngFor` over an array of activities sorted by time is likely simpler and more customizable than pulling in another FullCalendar plugin. The existing `ActivityService.getList()` with a date filter already provides this data.
 
-**Why NOT Quartz.NET:** Quartz is better for complex cron-based scheduling but lacks Hangfire's persistence model, retry mechanism, and monitoring dashboard. Workflow automation needs job persistence and retry more than complex cron expressions.
-
-**Why NOT Temporal:** Overkill for CRM workflows. Temporal is for long-running distributed workflows across microservices. GlobCRM is a monolith.
-
-**Integration points:**
-- Workflow engine enqueues Hangfire jobs for each action step
-- Email sequences schedule delayed jobs for follow-up emails
-- Webhook delivery uses fire-and-forget with automatic retry
-- Report generation runs as background jobs for large datasets
-
-**Multi-tenancy consideration:** Every Hangfire job must carry `TenantId` as a job parameter. Create a `TenantJobFilter` that sets the tenant context before job execution, following the same pattern as `EmailSyncBackgroundService` (create scope, resolve scoped services).
-
-**Confidence:** HIGH -- Hangfire 1.8.23 released 2026-02-05, actively maintained, PostgreSQL storage mature at v1.21.1. Widely used in .NET CRM/SaaS applications.
+**Recommendation:** Skip `@fullcalendar/list`. Build a custom `TodayAgendaWidgetComponent` that calls the Activity API with `dueDate=today` filter. Simpler, more CRM-specific, and avoids FullCalendar's opinionated styling in a dashboard widget context.
 
 ---
 
-### 2. User-Editable Email Templates: Fluid (Liquid)
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| Fluid.Core | 2.31.0 | Infrastructure | Liquid template parsing and rendering |
-
-**Why Fluid for user templates vs keeping RazorLight for everything:**
-- RazorLight (already in project at 2.3.1) compiles Razor/C# templates. This is powerful but **unsafe for user-editable content** -- users could inject C# code. RazorLight also has not had a release since 2023-01-16.
-- Fluid implements the Liquid template language (originally from Shopify), which is **sandboxed by design** -- no arbitrary code execution, only variable substitution and simple logic (`{% if %}`, `{% for %}`). This is exactly what CRM email templates need: `Hello {{contact.first_name}}, your deal {{deal.name}} has moved to {{deal.stage}}`.
-- Fluid is 8x faster than DotLiquid and allocates 14x less memory. Actively maintained (v2.31.0 released 2025-11-07).
-- Template syntax is widely known from Shopify, HubSpot, and other CRM/marketing tools, so users will recognize it.
-
-**What stays with RazorLight:** System templates (verification emails, password reset, notification emails) that are developer-controlled `.cshtml` files remain on RazorLight. These are not user-editable.
-
-**What uses Fluid:** User-created email templates, email sequences, workflow notification content, merge field rendering in any user-facing template.
-
-**Why NOT Scriban:** Scriban is also excellent but Liquid syntax is more widely known among CRM users. Scriban's extended syntax adds power users don't need and that could confuse them.
-
-**Why NOT Handlebars.NET:** Less actively maintained, no sandboxing guarantees, fewer built-in filters.
-
-**Integration points:**
-- `FluidTemplateRenderer` service in Infrastructure layer renders user templates with entity data as context
-- Workflow "Send Email" action resolves template, renders with Fluid, sends via SendGrid
-- Template editor UI provides merge field picker (e.g., `{{contact.email}}`, `{{deal.amount | currency}}`)
-
-**Confidence:** HIGH -- Fluid.Core 2.31.0 verified on NuGet, targets .NET Standard 2.0+ (compatible with .NET 10). Liquid is the de facto standard for user-editable templates in SaaS products.
-
----
-
-### 3. Formula/Computed Field Evaluation: NCalc
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| NCalcSync | 5.11.0 | Application | Expression parsing and evaluation for computed fields |
-
-**Why NCalc:**
-- NCalc evaluates mathematical and logical expressions with custom functions and variables: `[deal_amount] * [discount_percentage] / 100`, `IF([status] = 'Won', [amount], 0)`, `DATEDIFF([close_date], TODAY())`.
-- Supports custom function registration -- we can add CRM-specific functions like `COALESCE()`, `CONCATENATE()`, `DATEDIFF()`, `TODAY()`, `NOW()`, `UPPER()`, `LOWER()`, `ROUND()`, `SUM()` (aggregate over related entities).
-- Lightweight, zero external dependencies, fast evaluation (no compilation step).
-- NCalcSync (synchronous) is correct for field evaluation -- no I/O involved, pure computation.
-
-**Why NOT mXparser:** mXparser is focused on mathematical expressions only. NCalc handles string operations, boolean logic, and custom functions needed for CRM computed fields.
-
-**Why NOT CodingSeb.ExpressionEvaluator:** Evaluates C# expressions -- too powerful, security risk for user-defined formulas.
-
-**Why NOT Z.Expressions.Eval:** Commercial license required, evaluates full C# (unsafe for user input).
-
-**Integration points:**
-- New `CustomFieldType.Formula = 9` enum value added to existing `CustomFieldType`
-- `FormulaEvaluator` service in Application layer takes formula string + entity data, returns computed value
-- `CustomFieldDefinition` gets a `FormulaExpression` property (nullable, only for Formula type fields)
-- Computed values are calculated on read (not stored) -- they reference other field values that may change
-- Frontend formula editor provides function autocomplete and field reference picker
-
-**Where it lives:** Application layer (not Infrastructure) because formula evaluation is pure business logic with no external dependencies. NCalc has no infrastructure concerns.
-
-**Confidence:** HIGH -- NCalcSync 5.11.0 on NuGet, targets .NET 8+ and .NET Standard 2.0, actively maintained (ncalc/ncalc GitHub org). Well-established library with 10+ years of production use.
-
----
-
-### 4. Duplicate Detection: FuzzySharp + PostgreSQL pg_trgm
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| FuzzySharp | 2.0.2 | Infrastructure | In-memory fuzzy string matching (Levenshtein, Jaro-Winkler) |
-| PostgreSQL pg_trgm | Built-in extension | Database | Database-level trigram similarity with GIN indexing |
-
-**Two-tier approach (database pre-filter + application-level scoring):**
-
-**Tier 1 -- pg_trgm at the database level:**
-- PostgreSQL's `pg_trgm` extension provides `similarity()` and `%` operator for trigram-based fuzzy matching, with GIN index support for fast lookups on large datasets.
-- Use `CREATE EXTENSION IF NOT EXISTS pg_trgm;` (one-time migration).
-- Create GIN trigram indexes on `contacts.first_name`, `contacts.last_name`, `contacts.email`, `companies.name`, `companies.domain`.
-- SQL query: `SELECT * FROM contacts WHERE similarity(email, @email) > 0.6 OR (first_name % @first_name AND last_name % @last_name)` -- returns candidates quickly using the index.
-- This handles the "find candidates" step efficiently even with 100K+ records per tenant.
-
-**Tier 2 -- FuzzySharp for scoring and ranking:**
-- FuzzySharp (C# port of Python FuzzyWuzzy) provides `Fuzz.Ratio()`, `Fuzz.PartialRatio()`, `Fuzz.TokenSortRatio()`, `Fuzz.WeightedRatio()` for nuanced string comparison.
-- After pg_trgm returns candidates (typically 10-50 rows), FuzzySharp computes a weighted composite score across multiple fields (name: 40%, email: 30%, phone: 20%, company: 10%).
-- Scoring thresholds: >90 = auto-flag as duplicate, 70-90 = suggest for review, <70 = not a duplicate.
-
-**Why NOT FuzzySharp alone:** Cannot use FuzzySharp at the database level -- would require loading all records into memory. pg_trgm pre-filters using indexes.
-
-**Why NOT pg_trgm alone:** Trigram similarity is a blunt instrument. FuzzySharp's weighted ratio and token sort handle transpositions ("John Smith" vs "Smith, John") and partial matches better.
-
-**Why NOT Elasticsearch:** Adding a full search engine for duplicate detection is overkill. PostgreSQL pg_trgm with GIN indexes handles the scale (10K-100K contacts per tenant) efficiently.
-
-**Integration points:**
-- `DuplicateDetectionService` in Infrastructure runs pg_trgm query, then FuzzySharp scoring
-- Called on contact/company create and import (existing CSV import already has basic duplicate detection)
-- Background job (Hangfire) for full-scan duplicate detection across all records
-- Merge UI presents duplicates with confidence score and field-by-field comparison
-
-**Confidence:** HIGH -- pg_trgm is a core PostgreSQL extension (not third-party). FuzzySharp 2.0.2 is stable, no dependencies, well-tested port of proven Python library.
-
----
-
-### 5. Webhook Delivery: Microsoft.Extensions.Http.Resilience (Polly-based)
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| Microsoft.Extensions.Http.Resilience | 10.3.0 | Infrastructure | Resilient HttpClient with retry, circuit breaker, timeout for webhook delivery |
-
-**Why Microsoft.Extensions.Http.Resilience:**
-- Webhook delivery requires retry with exponential backoff + jitter (industry standard: 5s, 25s, 125s, 625s, 3125s), circuit breaker (stop sending to consistently failing endpoints), and timeout (don't wait forever for slow endpoints).
-- `Microsoft.Extensions.Http.Resilience` is Microsoft's official resilience layer for `IHttpClientFactory`, built on Polly 8.x. It provides pre-configured resilience pipelines (standard resilience handler) with sensible defaults that can be customized.
-- This replaces the deprecated `Microsoft.Extensions.Http.Polly` package. The new package offers a higher-level API with built-in standard resilience patterns.
-- The project currently has no resilience library -- this fills the gap for webhooks and could also benefit other HTTP calls (Gmail API, SendGrid API).
-
-**Why Microsoft.Extensions.Http.Resilience over raw Polly:**
-- `Microsoft.Extensions.Http.Resilience` wraps Polly 8.x and integrates directly with `IHttpClientFactory` and ASP.NET Core DI. It provides a `AddStandardResilienceHandler()` method that configures retry, circuit breaker, and timeout in one call. For custom configurations, it exposes the full Polly pipeline builder.
-- No need to separately install `Polly` -- it is a transitive dependency of `Microsoft.Extensions.Http.Resilience`.
-
-**Why IHttpClientFactory (not raw HttpClient):**
-- The project currently uses `HttpClient` directly only in Gmail services. For webhook delivery, `IHttpClientFactory` provides proper connection pooling, DNS rotation, and resilience pipeline integration.
-- Register a named client `"WebhookClient"` with resilience pipeline.
-
-**Why NOT building retry from scratch:** Exponential backoff with jitter, circuit breaker state management, and timeout composition are tricky to get right. The Microsoft resilience package is battle-tested and the recommended .NET approach.
-
-**Webhook delivery architecture:**
-1. Entity event fires (create, update, delete) or workflow triggers webhook action
-2. `WebhookDispatcher` enqueues a Hangfire fire-and-forget job
-3. Hangfire job resolves `IHttpClientFactory`, creates request with HMAC-SHA256 signature
-4. Resilience pipeline handles retry (5 attempts, exponential backoff + jitter, max 1 hour)
-5. After all retries exhausted, log to `webhook_delivery_logs` table with failure details
-6. Dead letter: admin can view failed deliveries and manually retry from UI
-
-**Confidence:** HIGH -- Microsoft.Extensions.Http.Resilience 10.3.0 is Microsoft-maintained, built on Polly 8.x (.NET Foundation project). This is the officially recommended approach for resilient HTTP in .NET 10.
-
----
-
-### 6. Visual Workflow Builder UI: @foblex/flow
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| @foblex/flow | 18.1.2 | Frontend | Flow-based visual editor for workflow trigger-condition-action chains |
-
-**Why @foblex/flow:**
-- Angular-native library built for exactly this use case: visual node-based editors with drag-and-drop nodes and connections.
-- Supports standalone components, Angular Signals, SSR, and zoneless mode -- aligns perfectly with the project's Angular 19 patterns.
-- Provides drag-and-drop node placement, connection drawing between nodes, zoom/pan, customizable node templates (use Angular Material components inside nodes), and event-driven architecture.
-- MIT licensed, actively maintained (v18.1.2 as of Feb 2026).
-
-**Why NOT building from scratch with CDK Drag-Drop:**
-- Angular CDK Drag-Drop handles list reordering and free-form dragging, but does NOT handle connection lines between nodes, path routing, zoom/pan canvas, or the visual graph data model. Building a workflow canvas from CDK primitives would take weeks.
-
-**Why NOT react-flow / xyflow:** React-only library. Would require a React wrapper inside Angular, creating an impedance mismatch.
-
-**Why NOT Joint.js / mxGraph:** jQuery-based or vanilla JS libraries that don't integrate well with Angular's change detection and signals. Wrapper components would be brittle.
-
-**Integration points:**
-- Workflow builder page renders @foblex/flow canvas
-- Custom node components (Trigger, Condition, Action) use Angular Material forms inside flow nodes
-- Workflow definition serializes to JSON (stored as JSONB in `workflow_definitions` table)
-- Flow canvas is read-only when viewing workflow execution history
-
-**Confidence:** MEDIUM -- @foblex/flow is the best Angular-native option but is a smaller community library. Verify that v18.1.2 works with Angular 19.2.x before committing. Fallback: build a simpler list-based workflow builder (trigger -> conditions -> actions as a vertical list) using existing Angular Material + CDK, upgrade to visual flow later.
-
----
-
-### 7. Formula Editor UI (Frontend)
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| No new dependency | -- | Frontend | Build with Angular Material + custom component |
-
-**Recommendation: Custom formula editor, NOT Monaco Editor.**
-
-Monaco Editor is 5MB+ and designed for code editing. Formula fields in a CRM need a simple text input with:
-- Autocomplete for field references (`[deal_amount]`, `[contact.email]`)
-- Function autocomplete (`SUM()`, `IF()`, `CONCATENATE()`)
-- Syntax validation feedback (red border + error message)
-- Preview of computed result
-
-This is achievable with Angular Material's `mat-form-field` + a custom `mat-autocomplete` overlay triggered by `[` or function names. Total custom code: ~200-300 lines of TypeScript. Adding Monaco for this would be 50x the bundle size for 5% of the functionality.
-
-**If formula complexity grows later** (nested functions, multi-line expressions): add `ngx-monaco-editor-v2` (latest version supports Angular 19) at that point. Not needed for v1.1 MVP.
-
-**Confidence:** HIGH -- custom approach is simpler, lighter, and consistent with existing UI patterns.
-
----
-
-### 8. Advanced Report Builder (Frontend)
-
-| Technology | Version | Layer | Purpose |
-|---|---|---|---|
-| No new dependency | -- | Frontend | Build with existing Angular Material + reactive forms |
-
-**Recommendation: Custom query/filter builder using Angular Material, NOT angular2-query-builder.**
-
-`angular2-query-builder` (v0.6.2) was last published 6 years ago and only supports Angular 10-15. The maintained fork `@eliot-ragueneau/ngx-query-builder` exists but brings PrimeNG as a dependency, conflicting with our Angular Material design system.
-
-The report builder needs:
-- Entity/field selector (mat-select)
-- Filter condition builder (field + operator + value rows, add/remove with Angular CDK)
-- Aggregation picker (count, sum, avg, min, max)
-- Grouping selector
-- Chart type selector
-- Date range picker (mat-date-range-input)
-
-All of these are standard Angular Material form components. The filter condition builder pattern already exists in the project's `FilterPanelComponent`. Extend that pattern for the report builder.
-
-**Backend report engine:** No new dependency needed. Use EF Core for simple reports and raw SQL via `Npgsql` (already in Domain project) for complex aggregation queries. The report definition (entity, filters, grouping, aggregation) serializes to JSON, and a `ReportQueryBuilder` service in Infrastructure translates it to parameterized SQL.
-
-**Confidence:** HIGH -- custom approach reuses existing patterns and avoids dependency on unmaintained or incompatible libraries.
-
----
-
-## Complete Additions Summary
-
-### Backend (.NET) -- Add to GlobCRM.Infrastructure.csproj
-
-```xml
-<!-- Background job processing -->
-<PackageReference Include="Hangfire.AspNetCore" Version="1.8.23" />
-<PackageReference Include="Hangfire.PostgreSql" Version="1.21.1" />
-
-<!-- User-editable email templates (Liquid syntax) -->
-<PackageReference Include="Fluid.Core" Version="2.31.0" />
-
-<!-- Resilient HTTP for webhook delivery (built on Polly 8.x) -->
-<PackageReference Include="Microsoft.Extensions.Http.Resilience" Version="10.3.0" />
-
-<!-- Fuzzy string matching for duplicate detection -->
-<PackageReference Include="FuzzySharp" Version="2.0.2" />
+## Implementation Patterns for New Features
+
+### 1. Entity Preview Sidebar: MatDrawer
+
+**Component:** `MatDrawer` from `@angular/material/sidenav`
+
+The key distinction: use `MatDrawer` (scoped to a section), NOT `MatSidenav` (app-wide). The left navigation already uses a custom sidebar (not MatSidenav). Adding a `MatDrawer` on the right side of the feed/search page is architecturally clean.
+
+```typescript
+// In feed-list.component.ts or a wrapper component
+import { MatDrawer, MatDrawerContainer, MatDrawerContent } from '@angular/material/sidenav';
+
+// Template pattern:
+// <mat-drawer-container>
+//   <mat-drawer position="end" mode="over" [opened]="previewOpen()">
+//     <app-entity-preview [entityType]="previewEntityType()" [entityId]="previewEntityId()" />
+//   </mat-drawer>
+//   <mat-drawer-content>
+//     <!-- existing feed/search content -->
+//   </mat-drawer-content>
+// </mat-drawer-container>
 ```
 
-### Backend (.NET) -- Add to GlobCRM.Application.csproj
+**Configuration decisions:**
+- `position="end"` -- right side (standard for preview panels)
+- `mode="over"` -- overlay on top of content with backdrop, does NOT push main content
+- `hasBackdrop="true"` -- click backdrop to close (default for "over" mode)
+- Width: fixed at `420px` (standard CRM preview width, fits entity header + key fields + mini timeline)
+- Animation: built into MatDrawer, uses Angular's animation system (already imported by Angular Material)
 
-```xml
-<!-- Formula/computed field expression evaluation -->
-<PackageReference Include="NCalcSync" Version="5.11.0" />
+**Why MatDrawer over CDK Overlay:**
+- MatDrawer provides slide animation, backdrop, keyboard (Esc) handling, and focus trapping out of the box
+- CDK Overlay would require building all of that manually
+- MatDrawer is designed for exactly this use case -- side content panels
+- The project already depends on `@angular/material/sidenav` (it is in the Angular Material package even if not yet imported)
+
+**Confidence:** HIGH -- MatDrawer is the standard Angular Material solution for right-side panels. The existing `@angular/material ^19.2.19` package includes it.
+
+### 2. Summary Tabs: Existing Infrastructure
+
+No new components needed at the framework level. The pattern is:
+
+1. Add a `Summary` entry to each entity's tab array (e.g., `CONTACT_TABS`)
+2. Create a `ContactSummaryComponent` (and similar for Company, Deal) that:
+   - Fetches summary data from a new backend endpoint (`GET /api/contacts/{id}/summary`)
+   - Renders KPI cards (reuse `KpiCardComponent` pattern)
+   - Renders mini sparkline charts (Chart.js with minimal config)
+   - Renders recent activity list (plain HTML, data from existing timeline endpoint)
+
+**Mini Sparkline Chart Pattern (Chart.js):**
+
+```typescript
+// Sparkline config -- Chart.js with everything stripped down
+const sparklineOptions: ChartOptions = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: { enabled: false },
+    title: { display: false },
+  },
+  scales: {
+    x: { display: false },
+    y: { display: false },
+  },
+  elements: {
+    point: { radius: 0 },
+    line: { borderWidth: 2, tension: 0.4, fill: true },
+  },
+};
+// Canvas container: height: 40px, width: 100%
+// Result: clean sparkline with just the line and fill area
 ```
 
-### Frontend (Angular) -- npm install
+**Confidence:** HIGH -- Chart.js sparklines are a well-documented pattern. The existing `ChartWidgetComponent` already demonstrates Chart.js integration with `ng2-charts`. The sparkline is just a simpler configuration.
 
-```bash
-npm install @foblex/flow@18.1.2
-```
+### 3. "My Day" Dashboard: Reuse Gridster Infrastructure
 
-### Database (PostgreSQL) -- Migration
+The existing org dashboard has a complete widget system:
+- `DashboardGridComponent` -- gridster grid with drag/resize
+- `WidgetWrapperComponent` -- card wrapper with edit/remove actions
+- `DashboardStore` -- signal store with CRUD, real-time refresh
+- `DashboardApiService` -- API service for persistence
+- 5 widget types: KpiCard, ChartWidget, Leaderboard, TableWidget, TargetProgress
 
-```sql
--- Enable trigram extension for fuzzy duplicate detection
-CREATE EXTENSION IF NOT EXISTS pg_trgm;
+**"My Day" reuses all of this** with these additions:
 
--- Create trigram GIN indexes for duplicate detection
-CREATE INDEX idx_contacts_name_trgm ON contacts USING GIN (
-  (first_name || ' ' || last_name) gin_trgm_ops
-);
-CREATE INDEX idx_contacts_email_trgm ON contacts USING GIN (email gin_trgm_ops);
-CREATE INDEX idx_companies_name_trgm ON companies USING GIN (name gin_trgm_ops);
-CREATE INDEX idx_companies_domain_trgm ON companies USING GIN (domain gin_trgm_ops);
-```
+| New Component | Purpose | Based On |
+|---|---|---|
+| `MyDayDashboardComponent` | Page component for /my-day route | `DashboardComponent` (same pattern) |
+| `MyDayStore` | Signal store for personal dashboard | `DashboardStore` (same pattern, user-scoped) |
+| `TodayAgendaWidget` | Shows today's activities | New widget, uses `ActivityService` |
+| `MyDealsWidget` | Shows user's active deals with mini pipeline | New widget, uses `DealService` |
+| `RecentFeedWidget` | Shows recent feed items | New widget, uses `FeedService` |
+| `QuickActionsWidget` | Shortcut buttons for common actions | New widget, simple button grid |
+| `UpcomingTasksWidget` | Shows upcoming tasks/activities | New widget, uses `ActivityService` |
+
+**No new layout library, no new charting library, no new state management pattern.** Just new widget components plugged into the existing gridster infrastructure.
+
+---
+
+## Backend: New API Endpoints (No New Libraries)
+
+The backend needs new endpoints but NO new NuGet packages:
+
+| Endpoint | Purpose | Implementation |
+|---|---|---|
+| `GET /api/contacts/{id}/summary` | Summary data for contact (KPIs, recent activity, sparkline data) | New controller action, queries existing repositories |
+| `GET /api/companies/{id}/summary` | Summary data for company | Same pattern |
+| `GET /api/deals/{id}/summary` | Summary data for deal | Same pattern |
+| `GET /api/{entityType}/{id}/preview` | Lightweight preview data for sidebar | Returns subset of detail DTO |
+| `GET /api/dashboards/personal` | Get current user's "My Day" dashboard | Extends existing `DashboardsController` with user scope |
+| `GET /api/my-day/agenda` | Today's activities for current user | Wraps `ActivityRepository` with date + owner filter |
+| `GET /api/my-day/deals` | Current user's active deals | Wraps `DealRepository` with owner filter |
+
+All of these are standard EF Core queries against existing entities. No new NuGet packages.
 
 ---
 
 ## Alternatives Considered
 
-| Category | Recommended | Alternative | Why Not |
+| Feature | Recommended | Alternative | Why Not |
 |---|---|---|---|
-| Background Jobs | Hangfire 1.8.23 | Quartz.NET 3.x | No built-in persistence dashboard, no retry mechanism, more complex setup |
-| Background Jobs | Hangfire 1.8.23 | BackgroundService (existing) | Cannot schedule delayed/recurring jobs, no persistence across restarts |
-| Background Jobs | Hangfire 1.8.23 | Temporal | Overkill for monolith CRM, requires separate server |
-| User Templates | Fluid 2.31.0 | RazorLight (existing) | Unsafe for user-editable content (C# injection), last release 2023 |
-| User Templates | Fluid 2.31.0 | DotLiquid | 8x slower, 14x more memory, less actively maintained |
-| User Templates | Fluid 2.31.0 | Scriban | Good library but Liquid syntax more recognized by CRM users |
-| Formula Engine | NCalcSync 5.11.0 | mXparser 6.1.0 | Math-only, no string/boolean operations or custom functions |
-| Formula Engine | NCalcSync 5.11.0 | Z.Expressions.Eval | Commercial license, evaluates full C# (security risk) |
-| Formula Engine | NCalcSync 5.11.0 | CodingSeb.ExpressionEvaluator | Too powerful (full C# eval), security risk for user formulas |
-| Duplicate Detection | FuzzySharp 2.0.2 + pg_trgm | Elasticsearch | New infrastructure dependency for a focused use case |
-| Duplicate Detection | FuzzySharp 2.0.2 + pg_trgm | FuzzySharp only | Cannot index at DB level, requires loading all records to memory |
-| Webhook Resilience | Http.Resilience 10.3.0 | Microsoft.Extensions.Http.Polly | Deprecated in favor of Http.Resilience |
-| Webhook Resilience | Http.Resilience 10.3.0 | Custom retry loop | Error-prone, missing circuit breaker, reinventing the wheel |
-| Workflow UI | @foblex/flow 18.1.2 | CDK Drag-Drop only | No connection lines, zoom/pan, or graph data model |
-| Workflow UI | @foblex/flow 18.1.2 | react-flow / xyflow | React-only, would need wrapper in Angular app |
-| Workflow UI | @foblex/flow 18.1.2 | Joint.js | jQuery-based, poor Angular integration |
-| Report Query Builder | Custom (Angular Material) | angular2-query-builder 0.6.2 | Last updated 6 years ago, max Angular 15 |
-| Report Query Builder | Custom (Angular Material) | Syncfusion QueryBuilder | Commercial license, heavy bundle, design system mismatch |
-| Formula Editor | Custom (mat-autocomplete) | Monaco Editor | 5MB+ for a simple formula input, massive overkill |
+| Preview sidebar | `MatDrawer` | CDK Overlay | CDK Overlay requires manual animation, backdrop, focus trap, Esc handling. MatDrawer provides all of this. |
+| Preview sidebar | `MatDrawer` | MatDialog (side-positioned) | MatDialog is semantically a dialog, not a panel. Requires CSS hacks to position on the right edge. MatDrawer is the correct semantic choice. |
+| Mini sparklines | Chart.js (existing) | `sparklines.js` (new library) | Adding a separate library for sparklines when Chart.js already does it is unnecessary bloat. One less dependency to maintain. |
+| Mini sparklines | Chart.js (existing) | Inline SVG sparklines | Custom SVG is more work for the same visual result. Chart.js sparklines are 10 lines of config. |
+| My Day layout | `angular-gridster2` (existing) | CSS Grid manual layout | The whole point is user-configurable widget layout. CSS Grid requires custom drag/resize implementation. Gridster already does this. |
+| My Day layout | `angular-gridster2` (existing) | New dashboard library (e.g., gridstack) | We already have gridster working perfectly with a full widget system. Switching would mean rewriting all existing dashboard components. |
+| Today's agenda | Custom component | `@fullcalendar/list` plugin | FullCalendar list plugin brings opinionated styling and FullCalendar's heavy event model for what is essentially a filtered activity list. A simple `*ngFor` is lighter and more CRM-specific. |
 
 ---
 
-## What NOT to Add
+## Integration Points with Existing Stack
 
-| Do NOT Add | Reason |
-|---|---|
-| **MediatR** | The project uses hand-rolled command/handler pattern. Adding MediatR for v1.1 would require refactoring all existing commands. Workflow events use Hangfire job dispatch instead. |
-| **Event Bus (MassTransit, NServiceBus)** | Monolith architecture. Workflow actions dispatch directly via Hangfire. Event bus is for microservices. |
-| **Elasticsearch** | PostgreSQL pg_trgm + tsvector handles duplicate detection and search at CRM scale. |
-| **Redis** | Not needed yet. Hangfire uses PostgreSQL storage. SignalR runs in-process. Add Redis when scaling to multiple server instances. |
-| **Dapper** | Mentioned in v1.0 research but never adopted. Report queries can use raw SQL via Npgsql (already in Domain project) or EF Core's `FromSqlRaw()`. |
-| **PrimeNG** | Mentioned in v1.0 research but never adopted. All UI is Angular Material. Keep it that way. |
-| **ngx-formly** | Mentioned in v1.0 research but never adopted. Custom field forms are hand-built with Angular Material. |
-| **Monaco Editor** | Formula editor is a simple input with autocomplete, not a code editor. |
-| **Quill extensions** | Email template editor uses Liquid syntax (plain text with merge fields), not rich text. The existing ngx-quill is for notes/descriptions, not templates. |
-| **GraphQL** | REST API serves all report builder needs. Report definitions are stored as JSON, executed server-side. |
-| **Polly (standalone)** | Use Microsoft.Extensions.Http.Resilience instead -- it wraps Polly 8.x and integrates with IHttpClientFactory. No need to install Polly separately. |
-| **Microsoft.Extensions.Http.Polly** | Deprecated. Use Microsoft.Extensions.Http.Resilience (its replacement). |
+### Feed Entity Links -> Preview Sidebar
 
----
+The feed already has `entityType` and `entityId` on `FeedItemDto`. The current behavior navigates to the entity page. v1.2 changes this to:
+1. Click entity link in feed -> open preview sidebar (not navigate away)
+2. Preview sidebar shows lightweight entity data
+3. "Open full" button in sidebar navigates to full detail page
 
-## Integration Map: How New Libraries Connect
+**Existing code touchpoint:** `feed-list.component.ts` line 331-336 (`navigateToEntity` method) changes from `router.navigate` to `previewSidebar.open(entityType, entityId)`.
 
-```
-User Action (Frontend)
-  |
-  v
-API Controller
-  |
-  v
-Workflow Engine (Application Layer)
-  |--- Evaluates conditions using NCalcSync
-  |--- Dispatches actions:
-  |      |--- "Send Email" --> Fluid renders template --> SendGrid sends
-  |      |--- "Fire Webhook" --> Hangfire job --> Resilient HttpClient
-  |      |--- "Update Field" --> EF Core entity update
-  |      |--- "Create Activity" --> Existing activity service
-  |
-  v
-Hangfire (Infrastructure Layer)
-  |--- Persists jobs in PostgreSQL
-  |--- Handles retry, scheduling, delayed execution
-  |--- Email sequence: schedules next email as delayed job
+### Summary Tabs -> Existing Detail Pages
 
-Duplicate Detection (Infrastructure Layer)
-  |--- pg_trgm SQL query (Tier 1: database pre-filter)
-  |--- FuzzySharp scoring (Tier 2: in-memory ranking)
-  |--- Returns scored candidates to UI
+Each detail page (contacts, companies, deals) already uses `RelatedEntityTabsComponent` with tab arrays. Adding a "Summary" tab means:
+1. Add `{ label: 'Summary', icon: 'dashboard', enabled: true }` as the FIRST tab in each tab array
+2. Insert a new `<ng-template>` at index 0 in each detail component template
+3. The summary component fetches data from the new `/summary` endpoint
 
-Report Builder (Infrastructure Layer)
-  |--- Reads report definition JSON
-  |--- Builds parameterized SQL from definition
-  |--- Executes via EF Core / raw Npgsql
-  |--- Returns aggregated data to Chart.js frontend
-```
+**Tab index shift:** All existing `onTabChanged` index references shift by +1. This is the main integration risk.
+
+### My Day Dashboard -> Existing Dashboard Infrastructure
+
+The `DashboardGridComponent`, `WidgetWrapperComponent`, and `DashboardStore` pattern are designed to be reusable. "My Day" creates a parallel dashboard instance scoped to the current user with different default widgets.
+
+**Backend integration:** The existing `Dashboard` entity already has `OwnerId` (personal vs team-wide). "My Day" is simply a personal dashboard with `IsDefault: true` auto-created on first login.
 
 ---
 
-## Version Verification Status
+## Version Matrix (Existing -- No Changes)
 
-| Package | Version | Verified Source | Status |
-|---|---|---|---|
-| Hangfire.AspNetCore | 1.8.23 | NuGet.org (released 2026-02-05) | VERIFIED |
-| Hangfire.PostgreSql | 1.21.1 | NuGet.org | VERIFIED |
-| Fluid.Core | 2.31.0 | NuGet.org (released 2025-11-07) | VERIFIED |
-| NCalcSync | 5.11.0 | NuGet.org | VERIFIED |
-| FuzzySharp | 2.0.2 | NuGet.org | VERIFIED |
-| Microsoft.Extensions.Http.Resilience | 10.3.0 | NuGet.org | VERIFIED |
-| @foblex/flow | 18.1.2 | npm registry (checked live) | VERIFIED |
-| pg_trgm | Built-in | PostgreSQL 17 docs | VERIFIED |
-
----
-
-## Dependency Impact Assessment
-
-### Bundle Size Impact (Frontend)
-
-| Addition | Estimated Size | Impact |
+| Package | Current Version | Purpose in v1.2 |
 |---|---|---|
-| @foblex/flow | ~80-120 KB (gzipped) | Moderate -- only loaded in workflow builder route (lazy-loaded) |
-| No Monaco Editor | 0 KB saved | Avoided 5MB+ addition |
-| No PrimeNG / QueryBuilder | 0 KB saved | Avoided 200KB+ addition |
+| `@angular/core` | ^19.2.0 | Framework |
+| `@angular/material` | ^19.2.19 | MatDrawer for preview sidebar, MatTabs for summary tabs |
+| `@angular/cdk` | ^19.2.19 | BreakpointObserver for responsive sidebar, a11y for focus trap |
+| `angular-gridster2` | ^19.0.0 | "My Day" dashboard widget layout |
+| `chart.js` | ^4.5.1 | Mini sparkline charts on summary tabs |
+| `ng2-charts` | ^8.0.0 | Angular wrapper for Chart.js sparklines |
+| `@fullcalendar/core` | ^6.1.20 | Calendar integration (if needed for agenda widget) |
+| `@fullcalendar/daygrid` | ^6.1.20 | Already installed, used in calendar views |
+| `@ngrx/signals` | ^19.2.1 | Signal stores for preview state, summary data, My Day |
+| `@microsoft/signalr` | ^10.0.0 | Real-time updates for feed/preview/summary refresh |
+| `rxjs` | ~7.8.0 | Reactive patterns |
 
-**Total frontend addition: ~100 KB** (lazy-loaded, not on critical path).
+---
 
-### Package Count Impact (Backend)
+## Installation
 
-| Current NuGet packages | 17 |
-|---|---|
-| New packages | 5 |
-| Total after v1.1 | 22 |
+```bash
+# No new packages to install for v1.2
 
-All new packages are well-maintained, MIT/Apache licensed, and have no conflicting transitive dependencies with existing packages.
-
-### Database Impact
-
-| Addition | Impact |
-|---|---|
-| pg_trgm extension | One-time `CREATE EXTENSION`, no schema changes |
-| Trigram GIN indexes | 4 new indexes on existing tables, small storage overhead |
-| Hangfire schema | Hangfire auto-creates its tables (hangfire.job, hangfire.state, etc.) in a `hangfire` schema |
-| New entity tables | ~8-10 new tables for workflows, templates, webhooks, reports |
+# If you decide to add FullCalendar list plugin (OPTIONAL):
+cd globcrm-web && npm install @fullcalendar/list@^6.1.20
+```
 
 ---
 
 ## Sources
 
-### NuGet Packages
-- [Hangfire.AspNetCore 1.8.23](https://www.nuget.org/packages/hangfire.aspnetcore/)
-- [Hangfire.PostgreSql 1.21.1](https://www.nuget.org/packages/Hangfire.PostgreSql/)
-- [Fluid.Core 2.31.0](https://www.nuget.org/packages/Fluid.Core/)
-- [NCalcSync 5.11.0](https://www.nuget.org/packages/NCalcSync)
-- [FuzzySharp 2.0.2](https://www.nuget.org/packages/FuzzySharp)
-- [Microsoft.Extensions.Http.Resilience 10.3.0](https://www.nuget.org/packages/Microsoft.Extensions.Http.Resilience/)
-
-### npm Packages
-- [@foblex/flow](https://www.npmjs.com/package/@foblex/flow) -- Angular flow-based UI library
-- [Foblex Flow Documentation](https://flow.foblex.com/)
-
-### PostgreSQL
-- [pg_trgm Documentation](https://www.postgresql.org/docs/current/pgtrgm.html)
-
-### Architecture References
-- [Hangfire Documentation](https://docs.hangfire.io/en/latest/)
-- [Fluid Template Engine (GitHub)](https://github.com/sebastienros/fluid)
-- [NCalc Documentation](https://ncalc.github.io/ncalc/)
-- [Polly Documentation](https://www.pollydocs.org/)
-- [Microsoft Resilient HTTP Apps (.NET)](https://learn.microsoft.com/en-us/dotnet/core/resilience/http-resilience)
-- [Webhook Retry Best Practices (Svix)](https://www.svix.com/resources/webhook-best-practices/retries/)
-- [Webhook Delivery Platform Architecture](https://james-carr.org/posts/2025-12-31-advent-of-eip-day-8-webhook-delivery-platform/)
-- [FuzzySharp (GitHub)](https://github.com/JakeBayer/FuzzySharp)
-- [Microsoft.Extensions.Http.Polly deprecation (GitHub Issue)](https://github.com/dotnet/aspnetcore/issues/57209)
+- Angular Material Sidenav API: https://material.angular.dev/components/sidenav/api
+- Angular Material Sidenav Overview: https://material.angular.dev/components/sidenav
+- Angular CDK Overlay docs: https://material.angular.dev/cdk/overlay/overview
+- Chart.js sparkline pattern: https://www.ethangunderson.com/sparklines-in-chartjs/
+- angular-gridster2 GitHub: https://github.com/tiberiuzuld/angular-gridster2
+- angular-gridster2 npm: https://www.npmjs.com/package/angular-gridster2
+- FullCalendar Angular docs: https://fullcalendar.io/docs/angular
+- Existing codebase analysis: `package.json`, `dashboard-grid.component.ts`, `chart-widget.component.ts`, `related-entity-tabs.component.ts`, `contact-detail.component.ts`, `feed.models.ts`, `feed-list.component.ts`, `app.component.ts`, `navbar.component.html`
