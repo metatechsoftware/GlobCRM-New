@@ -54,6 +54,7 @@ Progress: [███████████████████████
 | 19-06 | Workflow Detail & Execution Logs (detail page + log list + log detail) | 8min | 2 | 7 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
+| Phase 19 P05 | 11min | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -181,6 +182,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [19-06] All 19-06 components created during 19-05 execution as build dependency (Rule 3) -- verified correct and complete
 - [19-06] ExecutionLogListComponent dual-input pattern (workflowId for embedded, id for routed) with computed resolver
 - [19-06] Action timeline uses vertical left-aligned layout with status dots, halt markers, and unreached action count
+- [Phase 19]: @foblex/flow FFlowModule single import pattern for all canvas directives; branch dual output_yes/output_no connectors; ActionConfigComponent shared for action+wait nodes
 
 ### Pending Todos
 
