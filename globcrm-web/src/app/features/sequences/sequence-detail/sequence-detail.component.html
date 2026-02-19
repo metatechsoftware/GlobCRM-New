@@ -1,0 +1,298 @@
+<div class="detail">
+  @if (store.loading() && !store.selectedSequence()) {
+    <div class="detail__loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (store.selectedSequence(); as seq) {
+    <!-- Header -->
+    <div class="detail__header">
+      <button mat-icon-button routerLink="/sequences" aria-label="Back to sequences">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="detail__header-info">
+        <h1>{{ seq.name }}</h1>
+        @if (seq.description) {
+          <p class="detail__description">{{ seq.description }}</p>
+        }
+      </div>
+      <span class="detail__status"
+            [class.status--draft]="seq.status === 'draft'"
+            [class.status--active]="seq.status === 'active'"
+            [class.status--paused]="seq.status === 'paused'"
+            [class.status--archived]="seq.status === 'archived'">
+        {{ seq.status | titlecase }}
+      </span>
+      <div class="detail__header-actions">
+        @if (seq.status === 'draft') {
+          <button mat-stroked-button (click)="activateSequence()">
+            <mat-icon>play_arrow</mat-icon>
+            Activate
+          </button>
+        }
+        @if (seq.status === 'active') {
+          <button mat-stroked-button (click)="pauseSequence()">
+            <mat-icon>pause</mat-icon>
+            Pause
+          </button>
+        }
+        @if (seq.status === 'paused') {
+          <button mat-stroked-button (click)="activateSequence()">
+            <mat-icon>play_arrow</mat-icon>
+            Resume
+          </button>
+        }
+        @if (seq.status !== 'archived') {
+          <button mat-stroked-button (click)="archiveSequence()">
+            <mat-icon>archive</mat-icon>
+            Archive
+          </button>
+        }
+        <button mat-flat-button
+                color="primary"
+                (click)="openEnrollmentDialog()">
+          <mat-icon>person_add</mat-icon>
+          Add Contacts
+        </button>
+        <a mat-stroked-button [routerLink]="['/sequences', seq.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </a>
+      </div>
+    </div>
+
+    <!-- Summary Metrics -->
+    @if (store.analytics(); as analytics) {
+      <div class="detail__metrics">
+        <div class="metric-card">
+          <span class="metric-card__value">{{ analytics.totalEnrolled }}</span>
+          <span class="metric-card__label">Total Enrolled</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card__value">{{ analytics.active }}</span>
+          <span class="metric-card__label">Active</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card__value">{{ analytics.completed }}</span>
+          <span class="metric-card__label">Completed</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card__value">{{ analytics.replied }}</span>
+          <span class="metric-card__label">Replied</span>
+        </div>
+        <div class="metric-card">
+          <span class="metric-card__value">{{ analytics.bounced }}</span>
+          <span class="metric-card__label">Bounced</span>
+        </div>
+      </div>
+    }
+
+    <!-- Steps Overview -->
+    <div class="detail__section">
+      <h2>Steps</h2>
+      @if (seq.steps.length === 0) {
+        <p class="detail__empty-hint">No steps configured. <a [routerLink]="['/sequences', seq.id, 'edit']">Add steps</a></p>
+      } @else {
+        <div class="detail__steps">
+          @for (step of seq.steps; track step.id) {
+            <div class="step-overview"
+                 [class.step-overview--expanded]="expandedStepId() === step.id"
+                 (click)="toggleStepExpand(step.id)">
+              <div class="step-overview__header">
+                <span class="step-overview__badge">{{ step.stepNumber }}</span>
+                <div class="step-overview__info">
+                  <span class="step-overview__name">{{ step.emailTemplateName || 'No template' }}</span>
+                  <span class="step-overview__delay">
+                    @if (step.delayDays === 0 && step.stepNumber === 1) {
+                      Send immediately
+                    } @else if (step.delayDays === 0) {
+                      No delay
+                    } @else {
+                      Wait {{ step.delayDays }} day{{ step.delayDays !== 1 ? 's' : '' }}
+                    }
+                    @if (step.preferredSendTime) {
+                      at {{ step.preferredSendTime }}
+                    }
+                  </span>
+                </div>
+                <!-- Inline step metrics -->
+                @if (getStepMetric(step.stepNumber); as metric) {
+                  <div class="step-overview__metrics">
+                    <span class="step-metric" matTooltip="Sent">{{ metric.sent }} sent</span>
+                    <span class="step-metric" matTooltip="Open rate">{{ metric.openRate }}% opens</span>
+                    <span class="step-metric" matTooltip="Click rate">{{ metric.clickRate }}% clicks</span>
+                  </div>
+                }
+                <mat-icon class="step-overview__chevron">
+                  {{ expandedStepId() === step.id ? 'expand_less' : 'expand_more' }}
+                </mat-icon>
+              </div>
+              @if (expandedStepId() === step.id) {
+                <div class="step-overview__detail">
+                  @if (step.subjectOverride) {
+                    <div class="step-overview__field">
+                      <span class="step-overview__field-label">Subject Override:</span>
+                      {{ step.subjectOverride }}
+                    </div>
+                  }
+                  @if (getStepMetric(step.stepNumber); as metric) {
+                    <div class="step-overview__field">
+                      <span class="step-overview__field-label">Unique Opens:</span>
+                      {{ metric.uniqueOpens }} / {{ metric.sent }}
+                    </div>
+                    <div class="step-overview__field">
+                      <span class="step-overview__field-label">Unique Clicks:</span>
+                      {{ metric.uniqueClicks }} / {{ metric.sent }}
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Enrollment List -->
+    <div class="detail__section">
+      <div class="detail__section-header">
+        <h2>Enrollments</h2>
+        @if (selectedEnrollmentIds().size > 0) {
+          <div class="detail__bulk-actions">
+            <span class="detail__bulk-count">{{ selectedEnrollmentIds().size }} selected</span>
+            <button mat-stroked-button (click)="bulkPause()">
+              <mat-icon>pause</mat-icon>
+              Pause Selected
+            </button>
+            <button mat-stroked-button (click)="bulkResume()">
+              <mat-icon>play_arrow</mat-icon>
+              Resume Selected
+            </button>
+          </div>
+        }
+      </div>
+
+      @if (store.enrollments(); as enrollmentData) {
+        @if (enrollmentData.items.length === 0) {
+          <div class="detail__empty-enrollment">
+            <mat-icon>people_outline</mat-icon>
+            <p>No contacts enrolled</p>
+            <button mat-flat-button color="primary" (click)="openEnrollmentDialog()">
+              <mat-icon>person_add</mat-icon>
+              Add Contacts
+            </button>
+          </div>
+        } @else {
+          <div class="detail__table-wrap">
+            <table mat-table [dataSource]="enrollmentData.items">
+              <!-- Select Column -->
+              <ng-container matColumnDef="select">
+                <th mat-header-cell *matHeaderCellDef>
+                  <mat-checkbox
+                    [checked]="isAllSelected()"
+                    [indeterminate]="selectedEnrollmentIds().size > 0 && !isAllSelected()"
+                    (change)="toggleSelectAll($event.checked)">
+                  </mat-checkbox>
+                </th>
+                <td mat-cell *matCellDef="let enrollment">
+                  <mat-checkbox
+                    [checked]="selectedEnrollmentIds().has(enrollment.id)"
+                    (change)="toggleEnrollmentSelect(enrollment.id, $event.checked)">
+                  </mat-checkbox>
+                </td>
+              </ng-container>
+
+              <!-- Contact Column -->
+              <ng-container matColumnDef="contact">
+                <th mat-header-cell *matHeaderCellDef>Contact</th>
+                <td mat-cell *matCellDef="let enrollment">
+                  <a class="detail__contact-link" [routerLink]="['/contacts', enrollment.contactId]">
+                    {{ enrollment.contactName || 'Unknown' }}
+                  </a>
+                  <div class="detail__contact-email">{{ enrollment.contactEmail }}</div>
+                </td>
+              </ng-container>
+
+              <!-- Status Column -->
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <td mat-cell *matCellDef="let enrollment">
+                  <span class="enrollment-status"
+                        [class]="'enrollment-status--' + enrollment.status">
+                    {{ enrollment.status | titlecase }}
+                  </span>
+                </td>
+              </ng-container>
+
+              <!-- Current Step Column -->
+              <ng-container matColumnDef="currentStep">
+                <th mat-header-cell *matHeaderCellDef>Current Step</th>
+                <td mat-cell *matCellDef="let enrollment">
+                  {{ enrollment.currentStepNumber || '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Steps Sent Column -->
+              <ng-container matColumnDef="stepsSent">
+                <th mat-header-cell *matHeaderCellDef>Sent</th>
+                <td mat-cell *matCellDef="let enrollment">{{ enrollment.stepsSent }}</td>
+              </ng-container>
+
+              <!-- Last Sent Column -->
+              <ng-container matColumnDef="lastSent">
+                <th mat-header-cell *matHeaderCellDef>Last Sent</th>
+                <td mat-cell *matCellDef="let enrollment">
+                  {{ enrollment.lastStepSentAt ? (enrollment.lastStepSentAt | date:'short') : '-' }}
+                </td>
+              </ng-container>
+
+              <!-- Actions Column -->
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <td mat-cell *matCellDef="let enrollment">
+                  <div class="detail__enrollment-actions" (click)="$event.stopPropagation()">
+                    @if (enrollment.status === 'active') {
+                      <mat-slide-toggle
+                        [checked]="true"
+                        matTooltip="Pause enrollment"
+                        (change)="onToggleEnrollment(enrollment)">
+                      </mat-slide-toggle>
+                    }
+                    @if (enrollment.status === 'paused') {
+                      <mat-slide-toggle
+                        [checked]="false"
+                        matTooltip="Resume enrollment"
+                        (change)="onToggleEnrollment(enrollment)">
+                      </mat-slide-toggle>
+                    }
+                    @if (enrollment.status === 'active' || enrollment.status === 'paused') {
+                      <button mat-icon-button
+                              matTooltip="Unenroll"
+                              color="warn"
+                              (click)="onUnenroll(enrollment)">
+                        <mat-icon>person_remove</mat-icon>
+                      </button>
+                    }
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="enrollmentColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: enrollmentColumns;"></tr>
+            </table>
+          </div>
+
+          <mat-paginator
+            [length]="enrollmentData.totalCount"
+            [pageSize]="pageSize"
+            [pageIndex]="currentPage() - 1"
+            [pageSizeOptions]="[10, 25, 50]"
+            (page)="onPageChange($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        }
+      }
+    </div>
+  }
+</div>

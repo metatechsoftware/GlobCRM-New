@@ -11,6 +11,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 import { SidebarStateService } from '../../services/sidebar-state.service';
 import { NotificationCenterComponent } from '../../../features/notifications/notification-center/notification-center.component';
 import { GlobalSearchComponent } from '../global-search/global-search.component';
@@ -50,6 +51,7 @@ export class NavbarComponent {
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
   readonly sidebarState = inject(SidebarStateService);
+  readonly themeService = inject(ThemeService);
 
   isMobile = toSignal(
     this.breakpointObserver.observe(['(max-width: 768px)'])
@@ -90,6 +92,7 @@ export class NavbarComponent {
       items: [
         { route: '/emails', icon: 'email', label: 'Emails' },
         { route: '/email-templates', icon: 'drafts', label: 'Templates' },
+        { route: '/sequences', icon: 'schedule_send', label: 'Sequences' },
         { route: '/feed', icon: 'dynamic_feed', label: 'Feed' },
         { route: '/calendar', icon: 'calendar_month', label: 'Calendar' },
       ]

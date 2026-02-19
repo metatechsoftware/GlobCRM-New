@@ -161,6 +161,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'sequences',
+    canActivate: [authGuard, permissionGuard('EmailSequence', 'View')],
+    loadChildren: () =>
+      import('./features/sequences/sequences.routes').then(
+        (m) => m.SEQUENCE_ROUTES
+      ),
+  },
+  {
     path: 'duplicates',
     canActivate: [authGuard],
     loadChildren: () =>
