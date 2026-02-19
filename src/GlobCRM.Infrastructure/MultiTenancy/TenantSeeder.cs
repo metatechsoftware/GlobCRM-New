@@ -1430,6 +1430,7 @@ public class TenantSeeder : ITenantSeeder
             Content = "Deal 'Cloud Migration Project' moved from Proposal to Negotiation stage.",
             EntityType = "Deal",
             EntityId = dealMap.GetValueOrDefault("Cloud Migration Project")?.Id,
+            EntityName = "Cloud Migration Project",
             AuthorId = emily.Id,
             CreatedAt = DateTimeOffset.UtcNow.AddDays(-7),
             UpdatedAt = DateTimeOffset.UtcNow.AddDays(-7)
@@ -1444,6 +1445,7 @@ public class TenantSeeder : ITenantSeeder
             Content = "New contact 'Sophie Laurent' (Freelance Consultant) added to the system.",
             EntityType = "Contact",
             EntityId = contactMap.GetValueOrDefault("sophie.laurent@example.com")?.Id,
+            EntityName = "Sophie Laurent",
             AuthorId = priya.Id,
             CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
             UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5)

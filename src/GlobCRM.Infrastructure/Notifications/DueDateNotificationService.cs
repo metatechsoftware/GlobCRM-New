@@ -176,6 +176,7 @@ public class DueDateNotificationService : BackgroundService
                     Content = $"Activity '{activity.Subject}' is due soon",
                     EntityType = "Activity",
                     EntityId = activity.Id,
+                    EntityName = activity.Subject,
                     AuthorId = null, // System-generated
                     CreatedAt = DateTimeOffset.UtcNow,
                     UpdatedAt = DateTimeOffset.UtcNow

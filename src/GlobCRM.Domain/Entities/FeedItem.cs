@@ -38,6 +38,12 @@ public class FeedItem
     public Guid? EntityId { get; set; }
 
     /// <summary>
+    /// Denormalized display name of the linked entity (for hover tooltips without extra API call).
+    /// Populated at feed item creation time. May become stale if entity is renamed.
+    /// </summary>
+    public string? EntityName { get; set; }
+
+    /// <summary>
     /// The user who authored this feed item (post author or action performer).
     /// Set to null if the author is deleted (SET NULL on delete).
     /// </summary>

@@ -67,6 +67,12 @@ public class CustomFieldDefinition
     /// </summary>
     public List<string>? DependsOnFieldIds { get; set; }
 
+    /// <summary>
+    /// When true, this custom field is shown in entity preview sidebars.
+    /// Defaults to false. Managed by admin in custom field settings.
+    /// </summary>
+    public bool ShowInPreview { get; set; } = false;
+
     /// <summary>Soft delete flag. When true, the field is hidden but data is preserved.</summary>
     public bool IsDeleted { get; set; } = false;
 

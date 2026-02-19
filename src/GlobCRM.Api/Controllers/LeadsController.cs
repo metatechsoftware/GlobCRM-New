@@ -197,6 +197,7 @@ public class LeadsController : ControllerBase
                 Content = $"Lead '{created.FullName}' was created",
                 EntityType = "Lead",
                 EntityId = created.Id,
+                EntityName = created.FullName,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -402,6 +403,7 @@ public class LeadsController : ControllerBase
                 Content = $"Lead '{lead.FullName}' moved to {targetStage.Name}",
                 EntityType = "Lead",
                 EntityId = lead.Id,
+                EntityName = lead.FullName,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -488,6 +490,7 @@ public class LeadsController : ControllerBase
                 Content = $"Lead '{lead.FullName}' was reopened to {targetStage.Name}",
                 EntityType = "Lead",
                 EntityId = lead.Id,
+                EntityName = lead.FullName,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -971,6 +974,7 @@ public class LeadsController : ControllerBase
                 Content = $"Lead '{lead.FullName}' was converted to a contact",
                 EntityType = "Lead",
                 EntityId = lead.Id,
+                EntityName = lead.FullName,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);

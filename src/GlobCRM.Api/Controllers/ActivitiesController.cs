@@ -232,6 +232,7 @@ public class ActivitiesController : ControllerBase
                 Content = $"Activity '{created.Subject}' was created",
                 EntityType = "Activity",
                 EntityId = created.Id,
+                EntityName = created.Subject,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -446,6 +447,7 @@ public class ActivitiesController : ControllerBase
                 Content = $"Activity '{activity.Subject}' status changed to {newStatus}",
                 EntityType = "Activity",
                 EntityId = activity.Id,
+                EntityName = activity.Subject,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);

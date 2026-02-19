@@ -80,6 +80,10 @@ public class CustomFieldDefinitionConfiguration : IEntityTypeConfiguration<Custo
             .HasColumnName("depends_on_field_ids")
             .HasColumnType("jsonb");
 
+        builder.Property(f => f.ShowInPreview)
+            .HasColumnName("show_in_preview")
+            .HasDefaultValue(false);
+
         builder.Property(f => f.IsDeleted)
             .HasColumnName("is_deleted")
             .IsRequired()

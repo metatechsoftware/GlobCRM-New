@@ -225,6 +225,7 @@ public class DealsController : ControllerBase
                 Content = $"Deal '{created.Title}' was created",
                 EntityType = "Deal",
                 EntityId = created.Id,
+                EntityName = created.Title,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -377,6 +378,7 @@ public class DealsController : ControllerBase
                     Content = $"Deal '{deal.Title}' moved to {stageName}",
                     EntityType = "Deal",
                     EntityId = deal.Id,
+                    EntityName = deal.Title,
                     AuthorId = userId
                 };
                 await _feedRepository.CreateFeedItemAsync(feedItem);
@@ -511,6 +513,7 @@ public class DealsController : ControllerBase
                 Content = $"Deal '{deal.Title}' moved to {newStage.Name}",
                 EntityType = "Deal",
                 EntityId = deal.Id,
+                EntityName = deal.Title,
                 AuthorId = userId
             };
             await _feedRepository.CreateFeedItemAsync(feedItem);

@@ -289,6 +289,7 @@ public record FeedItemDto
     public string Content { get; init; } = string.Empty;
     public string? EntityType { get; init; }
     public Guid? EntityId { get; init; }
+    public string? EntityName { get; init; }
     public Guid? AuthorId { get; init; }
     public string AuthorName { get; init; } = string.Empty;
     public string? AuthorAvatarUrl { get; init; }
@@ -302,6 +303,7 @@ public record FeedItemDto
         Content = entity.Content,
         EntityType = entity.EntityType,
         EntityId = entity.EntityId,
+        EntityName = entity.EntityName,
         AuthorId = entity.AuthorId,
         AuthorName = entity.Author?.FullName ?? string.Empty,
         AuthorAvatarUrl = entity.Author?.AvatarUrl,
@@ -320,6 +322,7 @@ public record FeedItemDetailDto
     public string Content { get; init; } = string.Empty;
     public string? EntityType { get; init; }
     public Guid? EntityId { get; init; }
+    public string? EntityName { get; init; }
     public Guid? AuthorId { get; init; }
     public string AuthorName { get; init; } = string.Empty;
     public string? AuthorAvatarUrl { get; init; }
@@ -333,6 +336,7 @@ public record FeedItemDetailDto
         Content = entity.Content,
         EntityType = entity.EntityType,
         EntityId = entity.EntityId,
+        EntityName = entity.EntityName,
         AuthorId = entity.AuthorId,
         AuthorName = entity.Author?.FullName ?? string.Empty,
         AuthorAvatarUrl = entity.Author?.AvatarUrl,

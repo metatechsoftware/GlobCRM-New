@@ -117,7 +117,8 @@ public class CustomFieldsController : ControllerBase
             SectionId = request.SectionId,
             Validation = request.Validation ?? new CustomFieldValidation(),
             Options = request.Options,
-            RelationEntityType = request.RelationEntityType
+            RelationEntityType = request.RelationEntityType,
+            ShowInPreview = request.ShowInPreview
         };
 
         // Map formula-specific properties when FieldType is Formula
@@ -212,6 +213,9 @@ public class CustomFieldsController : ControllerBase
 
         if (request.Options is not null)
             field.Options = request.Options;
+
+        if (request.ShowInPreview.HasValue)
+            field.ShowInPreview = request.ShowInPreview.Value;
 
         // Allow updating formula expression and result type for Formula fields
         if (field.FieldType == CustomFieldType.Formula)
@@ -465,6 +469,7 @@ public record CustomFieldDefinitionDto
     public string? FormulaExpression { get; init; }
     public string? FormulaResultType { get; init; }
     public List<string>? DependsOnFieldIds { get; init; }
+    public bool ShowInPreview { get; init; }
     public bool IsDeleted { get; init; }
     public DateTimeOffset? DeletedAt { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
@@ -486,6 +491,7 @@ public record CustomFieldDefinitionDto
         FormulaExpression = entity.FormulaExpression,
         FormulaResultType = entity.FormulaResultType,
         DependsOnFieldIds = entity.DependsOnFieldIds,
+        ShowInPreview = entity.ShowInPreview,
         IsDeleted = entity.IsDeleted,
         DeletedAt = entity.DeletedAt,
         CreatedAt = entity.CreatedAt,
@@ -534,6 +540,7 @@ public record CreateCustomFieldRequest
     public string? RelationEntityType { get; init; }
     public string? FormulaExpression { get; init; }
     public string? FormulaResultType { get; init; }
+    public bool ShowInPreview { get; init; }
 }
 
 /// <summary>
@@ -549,6 +556,7 @@ public record UpdateCustomFieldRequest
     public List<FieldOption>? Options { get; init; }
     public string? FormulaExpression { get; init; }
     public string? FormulaResultType { get; init; }
+    public bool? ShowInPreview { get; init; }
 }
 
 /// <summary>

@@ -398,6 +398,7 @@ public class GmailSyncService
                     Content = $"New email received from {(string.IsNullOrEmpty(fromName) ? fromAddress : fromName)}",
                     EntityType = "Email",
                     EntityId = emailMessage.Id,
+                    EntityName = string.IsNullOrEmpty(fromName) ? fromAddress : fromName,
                     AuthorId = account.UserId
                 };
                 await _feedRepository.CreateFeedItemAsync(feedItem);

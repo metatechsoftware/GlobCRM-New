@@ -41,6 +41,10 @@ public class FeedItemConfiguration : IEntityTypeConfiguration<FeedItem>
         builder.Property(f => f.EntityId)
             .HasColumnName("entity_id");
 
+        builder.Property(f => f.EntityName)
+            .HasColumnName("entity_name")
+            .HasMaxLength(200);
+
         builder.Property(f => f.AuthorId)
             .HasColumnName("author_id");
 
