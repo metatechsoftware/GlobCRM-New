@@ -195,8 +195,8 @@ public static class DependencyInjection
         services.AddScoped<IEmailSequenceRepository, EmailSequenceRepository>();
         services.AddScoped<ISequenceEnrollmentRepository, SequenceEnrollmentRepository>();
 
-        // ---- Workflow automation repository ----
-        services.AddScoped<IWorkflowRepository, WorkflowRepository>();
+        // ---- Workflow automation services (handler, execution engine, actions, repository) ----
+        services.AddWorkflowServices();
 
         return services;
     }

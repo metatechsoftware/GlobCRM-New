@@ -1,5 +1,6 @@
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.BackgroundJobs;
 using GlobCRM.Infrastructure.Persistence;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +13,12 @@ namespace GlobCRM.Infrastructure.Workflows;
 /// Runs hourly and checks if any entity's date field matches the trigger's
 /// date offset + preferred time window. When matched, enqueues the workflow
 /// for execution via WorkflowExecutionService.
+///
+/// Duplicate prevention: checks WorkflowExecutionLog to ensure each workflow+entity
+/// pair is only fired once per trigger window (prevents re-firing on repeated scans).
+///
+/// Follows the DueDateNotificationService pattern: scans across all tenants using
+/// IgnoreQueryFilters, then sets TenantScope for each workflow's tenant.
 /// </summary>
 public class DateTriggerScanService
 {
@@ -47,6 +54,7 @@ public class DateTriggerScanService
     /// for workflow execution. Called hourly by Hangfire recurring job.
     /// </summary>
     [Queue(QueueName)]
+    [AutomaticRetry(Attempts = 1)]
     public async Task ScanAsync()
     {
         _logger.LogInformation("Starting date trigger scan...");
@@ -60,12 +68,16 @@ public class DateTriggerScanService
         }
 
         var now = DateTimeOffset.UtcNow;
+        var scanWindowStart = now.AddHours(-1); // Last hour for hourly scan
         var processedCount = 0;
 
         foreach (var workflow in workflows)
         {
             try
             {
+                // Set tenant scope for each workflow's tenant
+                TenantScope.SetCurrentTenant(workflow.TenantId);
+
                 var dateTriggers = workflow.Definition.Triggers
                     .Where(t => t.TriggerType == WorkflowTriggerType.DateBased)
                     .ToList();
@@ -95,7 +107,19 @@ public class DateTriggerScanService
 
                     foreach (var entityId in matchingEntityIds)
                     {
-                        // Enqueue workflow execution with positional record constructor
+                        // Duplicate prevention: check if already fired within the scan window
+                        var alreadyFired = await _db.WorkflowExecutionLogs
+                            .IgnoreQueryFilters()
+                            .AnyAsync(l =>
+                                l.WorkflowId == workflow.Id &&
+                                l.EntityId == entityId &&
+                                l.TriggerType == "DateBased" &&
+                                l.StartedAt >= scanWindowStart);
+
+                        if (alreadyFired)
+                            continue;
+
+                        // Enqueue workflow execution
                         var context = new WorkflowTriggerContext(
                             WorkflowId: workflow.Id,
                             EntityId: entityId,
@@ -112,6 +136,10 @@ public class DateTriggerScanService
                             svc => svc.ExecuteAsync(context));
 
                         processedCount++;
+
+                        _logger.LogDebug(
+                            "Date trigger fired: workflow {WorkflowId}, entity {EntityType}/{EntityId}, field {FieldName}",
+                            workflow.Id, workflow.EntityType, entityId, trigger.FieldName);
                     }
                 }
             }
@@ -143,12 +171,14 @@ public class DateTriggerScanService
             {
                 "Deal" when fieldName.Equals("ExpectedCloseDate", StringComparison.OrdinalIgnoreCase) =>
                     await _db.Deals
+                        .IgnoreQueryFilters()
                         .Where(d => d.TenantId == tenantId && d.ExpectedCloseDate == targetDate)
                         .Select(d => d.Id)
                         .ToListAsync(),
 
                 "Activity" when fieldName.Equals("DueDate", StringComparison.OrdinalIgnoreCase) =>
                     await _db.Activities
+                        .IgnoreQueryFilters()
                         .Where(a => a.TenantId == tenantId &&
                                     a.DueDate.HasValue &&
                                     DateOnly.FromDateTime(a.DueDate.Value.UtcDateTime) == targetDate)
