@@ -10,5 +10,6 @@ public enum NotificationType
     DealStageChanged,
     Mention,
     DueDateApproaching,
-    EmailReceived
+    EmailReceived,
+    WebhookAutoDisabled
 }
