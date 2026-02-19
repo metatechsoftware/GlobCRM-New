@@ -200,7 +200,7 @@ public class SequenceExecutionService
     /// Uses DelayDays and optional PreferredSendTime (UTC for v1 simplicity).
     /// If DelayDays is 0, executes immediately (or at preferred time today/tomorrow).
     /// </summary>
-    internal static TimeSpan CalculateDelay(int delayDays, TimeOnly? preferredSendTime)
+    public static TimeSpan CalculateDelay(int delayDays, TimeOnly? preferredSendTime)
     {
         if (delayDays == 0 && preferredSendTime is null)
         {
