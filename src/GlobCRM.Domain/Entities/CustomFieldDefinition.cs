@@ -48,6 +48,25 @@ public class CustomFieldDefinition
     /// </summary>
     public string? RelationEntityType { get; set; }
 
+    /// <summary>
+    /// Formula expression string (only for Formula field type).
+    /// e.g., "[value] * [probability] / 100"
+    /// </summary>
+    public string? FormulaExpression { get; set; }
+
+    /// <summary>
+    /// Expected result type for the formula: "number", "text", or "date".
+    /// Used for display formatting on the frontend.
+    /// </summary>
+    public string? FormulaResultType { get; set; }
+
+    /// <summary>
+    /// Cached list of field reference names this formula depends on.
+    /// Used for topological sorting and circular dependency validation.
+    /// Stored as JSONB array.
+    /// </summary>
+    public List<string>? DependsOnFieldIds { get; set; }
+
     /// <summary>Soft delete flag. When true, the field is hidden but data is preserved.</summary>
     public bool IsDeleted { get; set; } = false;
 

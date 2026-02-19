@@ -67,6 +67,19 @@ public class CustomFieldDefinitionConfiguration : IEntityTypeConfiguration<Custo
             .HasColumnName("relation_entity_type")
             .HasMaxLength(50);
 
+        // Formula field properties
+        builder.Property(f => f.FormulaExpression)
+            .HasColumnName("formula_expression")
+            .HasMaxLength(2000);
+
+        builder.Property(f => f.FormulaResultType)
+            .HasColumnName("formula_result_type")
+            .HasMaxLength(20);
+
+        builder.Property(f => f.DependsOnFieldIds)
+            .HasColumnName("depends_on_field_ids")
+            .HasColumnType("jsonb");
+
         builder.Property(f => f.IsDeleted)
             .HasColumnName("is_deleted")
             .IsRequired()

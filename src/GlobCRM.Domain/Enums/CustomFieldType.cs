@@ -31,5 +31,8 @@ public enum CustomFieldType
     File = 7,
 
     /// <summary>Relation to another entity (e.g., Contact -> Company).</summary>
-    Relation = 8
+    Relation = 8,
+
+    /// <summary>Formula field with computed expression. Read-only, evaluated on-read from other fields.</summary>
+    Formula = 10
 }

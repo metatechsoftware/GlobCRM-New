@@ -113,6 +113,13 @@ public class CustomFieldsController : ControllerBase
             RelationEntityType = request.RelationEntityType
         };
 
+        // Map formula-specific properties when FieldType is Formula
+        if (request.FieldType == CustomFieldType.Formula)
+        {
+            field.FormulaExpression = request.FormulaExpression;
+            field.FormulaResultType = request.FormulaResultType;
+        }
+
         try
         {
             var created = await _repository.CreateAsync(field);
@@ -172,6 +179,16 @@ public class CustomFieldsController : ControllerBase
 
         if (request.Options is not null)
             field.Options = request.Options;
+
+        // Allow updating formula expression and result type for Formula fields
+        if (field.FieldType == CustomFieldType.Formula)
+        {
+            if (request.FormulaExpression is not null)
+                field.FormulaExpression = request.FormulaExpression;
+
+            if (request.FormulaResultType is not null)
+                field.FormulaResultType = request.FormulaResultType;
+        }
 
         await _repository.UpdateAsync(field);
 
@@ -336,6 +353,9 @@ public record CustomFieldDefinitionDto
     public CustomFieldValidation Validation { get; init; } = new();
     public List<FieldOption>? Options { get; init; }
     public string? RelationEntityType { get; init; }
+    public string? FormulaExpression { get; init; }
+    public string? FormulaResultType { get; init; }
+    public List<string>? DependsOnFieldIds { get; init; }
     public bool IsDeleted { get; init; }
     public DateTimeOffset? DeletedAt { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
@@ -354,6 +374,9 @@ public record CustomFieldDefinitionDto
         Validation = entity.Validation,
         Options = entity.Options,
         RelationEntityType = entity.RelationEntityType,
+        FormulaExpression = entity.FormulaExpression,
+        FormulaResultType = entity.FormulaResultType,
+        DependsOnFieldIds = entity.DependsOnFieldIds,
         IsDeleted = entity.IsDeleted,
         DeletedAt = entity.DeletedAt,
         CreatedAt = entity.CreatedAt,
@@ -400,6 +423,8 @@ public record CreateCustomFieldRequest
     public CustomFieldValidation? Validation { get; init; }
     public List<FieldOption>? Options { get; init; }
     public string? RelationEntityType { get; init; }
+    public string? FormulaExpression { get; init; }
+    public string? FormulaResultType { get; init; }
 }
 
 /// <summary>
@@ -413,6 +438,8 @@ public record UpdateCustomFieldRequest
     public Guid? SectionId { get; init; }
     public CustomFieldValidation? Validation { get; init; }
     public List<FieldOption>? Options { get; init; }
+    public string? FormulaExpression { get; init; }
+    public string? FormulaResultType { get; init; }
 }
 
 /// <summary>
@@ -475,5 +502,20 @@ public class CreateCustomFieldRequestValidator : AbstractValidator<CreateCustomF
         RuleFor(x => x.RelationEntityType)
             .NotEmpty().WithMessage("RelationEntityType is required for Relation fields.")
             .When(x => x.FieldType == CustomFieldType.Relation);
+
+        // Formula field validation rules
+        RuleFor(x => x.FormulaExpression)
+            .NotEmpty().WithMessage("FormulaExpression is required for Formula fields.")
+            .When(x => x.FieldType == CustomFieldType.Formula);
+
+        RuleFor(x => x.FormulaResultType)
+            .NotEmpty().WithMessage("FormulaResultType is required for Formula fields.")
+            .Must(rt => rt is "number" or "text" or "date")
+            .WithMessage("FormulaResultType must be one of: number, text, date.")
+            .When(x => x.FieldType == CustomFieldType.Formula);
+
+        RuleFor(x => x.Options)
+            .Null().WithMessage("Options must be null for Formula fields.")
+            .When(x => x.FieldType == CustomFieldType.Formula);
     }
 }
