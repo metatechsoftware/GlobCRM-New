@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 1 of 6 complete
+Plan: 2 of 6 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 20-01 (Report Domain Foundation)
+Last activity: 2026-02-19 — Completed 20-02 (Report Engine Core)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 34/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 1/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 35/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 2/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 34
-- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 1/6)
+- v1.1 plans completed: 35
+- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 2/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -55,6 +55,7 @@ Progress: [███████████████████████
 | 19-07 | Canvas Node Projection & Template Gallery Fix (gap closure) | 4min | 2 | 2 |
 | 19-08 | Permission Reload After Token Refresh (auth interceptor gap closure) | 2min | 1 | 1 |
 | 20-01 | Report Domain Foundation (entities + migration + RLS + repository) | 5min | 2 | 17 |
+| 20-02 | Report Engine Core (field metadata + query engine + DI) | 4min | 2 | 4 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -193,6 +194,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-01] ReportDefinition uses recursive ReportFilterGroup with nested Groups for complex AND/OR filter trees
 - [20-01] Report access control via OwnerId/IsShared/IsSeedData triple -- no separate sharing table
 - [20-01] Three levels of filter group nesting supported in EF Core owned type mapping
+- [20-02] Custom/formula field filters skipped in SQL expression tree -- applied in-memory for JSONB values
+- [20-02] Conditional .Include() based on report field references -- prevents N+1 without loading unnecessary navigation properties
+- [20-02] Formula fields display-only in reports -- computed via FormulaEvaluationService on result rows, not in SQL
+- [20-02] IsCustomOrFormulaField heuristic: snake_case = custom field, camelCase = system field
 
 ### Pending Todos
 
@@ -208,6 +213,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-01-PLAN.md
-Resume file: .planning/phases/20-advanced-reporting-builder/20-01-SUMMARY.md
-Next step: Execute Phase 20 Plan 02 (/gsd:execute-phase 20)
+Stopped at: Completed 20-02-PLAN.md
+Resume file: .planning/phases/20-advanced-reporting-builder/20-02-SUMMARY.md
+Next step: Execute Phase 20 Plan 03 (/gsd:execute-phase 20)

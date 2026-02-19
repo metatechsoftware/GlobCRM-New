@@ -71,12 +71,12 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 ### Advanced Reporting Builder
 
 - [x] **RPT-01**: User can select an entity source and choose fields/columns for a report
-- [ ] **RPT-02**: User can add filters with multiple conditions (AND/OR) to narrow report data
-- [ ] **RPT-03**: User can group results and apply aggregations (count, sum, average, min, max)
+- [x] **RPT-02**: User can add filters with multiple conditions (AND/OR) to narrow report data
+- [x] **RPT-03**: User can group results and apply aggregations (count, sum, average, min, max)
 - [ ] **RPT-04**: User can visualize report results as charts (bar, line, pie) or tables
 - [x] **RPT-05**: User can save reports and share them with team members
 - [ ] **RPT-06**: User can export report results to CSV
-- [ ] **RPT-07**: User can include related entity fields in reports (one level, e.g., Contact's Company name)
+- [x] **RPT-07**: User can include related entity fields in reports (one level, e.g., Contact's Company name)
 - [ ] **RPT-08**: User can drill down from a chart data point to view the underlying records
 
 ### Leads
@@ -190,12 +190,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WFLOW-12 | Phase 19 | Complete |
 | WFLOW-13 | Phase 19 | Complete |
 | RPT-01 | Phase 20 | Complete |
-| RPT-02 | Phase 20 | Pending |
-| RPT-03 | Phase 20 | Pending |
+| RPT-02 | Phase 20 | Complete |
+| RPT-03 | Phase 20 | Complete |
 | RPT-04 | Phase 20 | Pending |
 | RPT-05 | Phase 20 | Complete |
 | RPT-06 | Phase 20 | Pending |
-| RPT-07 | Phase 20 | Pending |
+| RPT-07 | Phase 20 | Complete |
 | RPT-08 | Phase 20 | Pending |
 
 **Coverage:**
