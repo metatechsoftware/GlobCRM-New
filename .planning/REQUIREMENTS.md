@@ -73,11 +73,11 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 - [x] **RPT-01**: User can select an entity source and choose fields/columns for a report
 - [x] **RPT-02**: User can add filters with multiple conditions (AND/OR) to narrow report data
 - [x] **RPT-03**: User can group results and apply aggregations (count, sum, average, min, max)
-- [ ] **RPT-04**: User can visualize report results as charts (bar, line, pie) or tables
+- [x] **RPT-04**: User can visualize report results as charts (bar, line, pie) or tables
 - [x] **RPT-05**: User can save reports and share them with team members
 - [x] **RPT-06**: User can export report results to CSV
 - [x] **RPT-07**: User can include related entity fields in reports (one level, e.g., Contact's Company name)
-- [ ] **RPT-08**: User can drill down from a chart data point to view the underlying records
+- [x] **RPT-08**: User can drill down from a chart data point to view the underlying records
 
 ### Leads
 
@@ -192,11 +192,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RPT-01 | Phase 20 | Complete |
 | RPT-02 | Phase 20 | Complete |
 | RPT-03 | Phase 20 | Complete |
-| RPT-04 | Phase 20 | Pending |
+| RPT-04 | Phase 20 | Complete |
 | RPT-05 | Phase 20 | Complete |
 | RPT-06 | Phase 20 | Complete |
 | RPT-07 | Phase 20 | Complete |
-| RPT-08 | Phase 20 | Pending |
+| RPT-08 | Phase 20 | Complete |
 
 **Coverage:**
 - v1.1 requirements: 57 total

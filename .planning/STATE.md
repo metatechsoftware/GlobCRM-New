@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 20 (Advanced Reporting Builder)
+**Current focus:** v1.1 Automation & Intelligence — Phase 20 (Advanced Reporting Builder) -- COMPLETE
 
 ## Current Position
 
 Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 5 of 6 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 20-05 (Report Builder Sidebar)
+Plan: 6 of 6 complete
+Status: Complete
+Last activity: 2026-02-19 — Completed 20-06 (Report Viewer Components)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 38/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 5/6)
+Progress: [████████████████████████████████████████████████] 100% (v1.0: 96/96 plans, v1.1: 39/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 6/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 38
-- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 5/6)
+- v1.1 plans completed: 39
+- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 6/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -59,6 +59,7 @@ Progress: [███████████████████████
 | 20-03 | Report API + CSV Export + Seed Reports | 6min | 2 | 3 |
 | 20-04 | Report Frontend Foundation (gallery + service + store + routes) | 5min | 2 | 11 |
 | 20-05 | Report Builder Sidebar (5 config panels + builder layout wiring) | 6min | 2 | 8 |
+| 20-06 | Report Viewer (chart + data table + aggregation cards + builder wiring) | 5min | 2 | 8 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -212,6 +213,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-05] Checkbox list with search for field selection (not drag-drop) -- simpler UX for report column selection
 - [20-05] Recursive FilterBuilderPanelComponent with isNested input for wrapper toggle -- supports unlimited AND/OR nesting depth
 - [20-05] Local signals in builder component for panel state (not direct store) -- enables canSave/canRun computed guards
+- [20-06] Pie chart uses doughnut variant (cutout 50%) with hoverOffset animation for modern look
+- [20-06] Chart drill-down emits ReportFilterCondition, re-executes report with drillDownFilter, data table shows clearable amber filter bar
+- [20-06] Data table row click navigates via static ENTITY_ROUTE_MAP (8 entity types to route paths)
+- [20-06] CSV export triggers Hangfire background job via store.exportCsv() with MatSnackBar feedback
 
 ### Pending Todos
 
@@ -227,6 +232,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-05-PLAN.md
-Resume file: .planning/phases/20-advanced-reporting-builder/20-05-SUMMARY.md
-Next step: Execute Phase 20 Plan 06 (/gsd:execute-phase 20)
+Stopped at: Completed 20-06-PLAN.md (Phase 20 complete, v1.1 milestone complete)
+Resume file: .planning/phases/20-advanced-reporting-builder/20-06-SUMMARY.md
+Next step: v1.1 Automation & Intelligence milestone complete. All 39 plans across 8 phases delivered.
