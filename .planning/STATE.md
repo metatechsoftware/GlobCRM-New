@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 19 complete (Workflow Automation)
+**Current focus:** v1.1 Automation & Intelligence — Phase 19 gap closure (Workflow Automation)
 
 ## Current Position
 
 Phase: 19 of 20 (Workflow Automation)
-Plan: 6 of 6 complete
+Plan: 8 of 8 complete
 Status: Complete
-Last activity: 2026-02-19 — Completed 19-06 (Workflow Detail & Execution Logs)
+Last activity: 2026-02-19 — Completed 19-08 (Permission Reload After Token Refresh)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 31/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 6/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 33/33+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 31
-- v1.1 plans total: 31+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 6/6)
+- v1.1 plans completed: 33
+- v1.1 plans total: 33+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -52,6 +52,7 @@ Progress: [███████████████████████
 | 19-04 | Workflow Frontend (models + service + store + card grid list + SVG thumbnails) | 6min | 2 | 14 |
 | 19-05 | Workflow Visual Builder (@foblex/flow canvas + node components) | 7min | 2 | 8 |
 | 19-06 | Workflow Detail & Execution Logs (detail page + log list + log detail) | 8min | 2 | 7 |
+| 19-08 | Permission Reload After Token Refresh (auth interceptor gap closure) | 2min | 1 | 1 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -183,6 +184,7 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [19-06] ExecutionLogListComponent dual-input pattern (workflowId for embedded, id for routed) with computed resolver
 - [19-06] Action timeline uses vertical left-aligned layout with status dots, halt markers, and unreached action count
 - [Phase 19]: @foblex/flow FFlowModule single import pattern for all canvas directives; branch dual output_yes/output_no connectors; ActionConfigComponent shared for action+wait nodes
+- [19-08] Fire-and-forget loadPermissions() in auth interceptor 401-retry path -- does not block request retry since JWT already valid and permissions update reactively via signals
 
 ### Pending Todos
 
@@ -198,6 +200,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 19-06-PLAN.md (Phase 19 complete)
-Resume file: .planning/phases/19-workflow-automation/19-06-SUMMARY.md
-Next step: Execute Phase 20 or final integration testing
+Stopped at: Completed 19-08-PLAN.md (Phase 19 gap closure complete)
+Resume file: .planning/phases/19-workflow-automation/19-08-SUMMARY.md
+Next step: Execute remaining gap closure plans or Phase 20
