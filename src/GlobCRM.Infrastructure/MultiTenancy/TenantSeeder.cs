@@ -152,6 +152,11 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Report seed data ──────────────────────
+        // Reports before categories (FK constraint)
+        await _db.Reports.Where(r => r.TenantId == organizationId && r.IsSeedData).ExecuteDeleteAsync();
+        await _db.ReportCategories.Where(c => c.TenantId == organizationId && c.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing Workflow seed data ────────────────────
         // Execution logs and action logs cascade-delete with workflow, but templates are separate
         await _db.WorkflowTemplates.Where(t => t.TenantId == organizationId && t.IsSeedData).ExecuteDeleteAsync();
@@ -1637,6 +1642,11 @@ public class TenantSeeder : ITenantSeeder
         // STEP 13: Workflow Automations + System Templates
         // ══════════════════════════════════════════════════════════
         await SeedWorkflowsAsync(organizationId);
+
+        // ══════════════════════════════════════════════════════════
+        // STEP 14: Report Categories + Starter Reports
+        // ══════════════════════════════════════════════════════════
+        await SeedReportsAsync(organizationId);
     }
 
     /// <summary>
@@ -2598,6 +2608,275 @@ public class TenantSeeder : ITenantSeeder
                 new ActivitySeed { Subject = "Sprint planning for Q4 features", Type = "Meeting", Status = "Accepted", Priority = "Medium", DueDateOffset = 3, Description = "Plan Q4 product features based on customer feedback and roadmap priorities", CreatedDaysAgo = -1 },
             ]
         };
+    }
+    /// <summary>
+    /// Seeds 3 report categories and 6 starter reports demonstrating all chart types
+    /// and common reporting patterns (deals by stage, revenue by month, etc.).
+    /// </summary>
+    private async Task SeedReportsAsync(Guid organizationId)
+    {
+        // ── Categories ──────────────────────────────────────────
+        var salesCategory = new ReportCategory
+        {
+            TenantId = organizationId,
+            Name = "Sales Reports",
+            Description = "Revenue, deal, and sales performance reports",
+            SortOrder = 1,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var pipelineCategory = new ReportCategory
+        {
+            TenantId = organizationId,
+            Name = "Pipeline Analysis",
+            Description = "Deal pipeline funnel and stage analysis reports",
+            SortOrder = 2,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var teamCategory = new ReportCategory
+        {
+            TenantId = organizationId,
+            Name = "Team Performance",
+            Description = "Team activity and performance tracking reports",
+            SortOrder = 3,
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _db.ReportCategories.AddRange(salesCategory, pipelineCategory, teamCategory);
+
+        // ── Report 1: Deals by Stage (Funnel) ──────────────────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Deals by Stage",
+            Description = "Funnel visualization of deal count and total value grouped by pipeline stage.",
+            EntityType = "Deal",
+            ChartType = ReportChartType.Funnel,
+            CategoryId = pipelineCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "related.Stage.name", Label = "Stage", FieldType = "related", SortOrder = 0 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 1 },
+                    new ReportField { FieldId = "value", Label = "Total Value", FieldType = "system", Aggregation = AggregationType.Sum, SortOrder = 2 }
+                ],
+                FilterGroup = null,
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "related.Stage.name" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Funnel,
+                    ShowLegend = true,
+                    ShowDataLabels = true
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        // ── Report 2: Revenue by Month (Bar) ───────────────────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Revenue by Month",
+            Description = "Monthly revenue trend showing deal value and count over time.",
+            EntityType = "Deal",
+            ChartType = ReportChartType.Bar,
+            CategoryId = salesCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "createdAt", Label = "Month", FieldType = "system", SortOrder = 0 },
+                    new ReportField { FieldId = "value", Label = "Total Value", FieldType = "system", Aggregation = AggregationType.Sum, SortOrder = 1 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 2 }
+                ],
+                FilterGroup = null,
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "createdAt", DateTruncation = "month" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Bar,
+                    ShowLegend = true,
+                    ShowDataLabels = false
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        // ── Report 3: Contacts by Company Industry (Pie) ───────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Contacts by Company Industry",
+            Description = "Distribution of contacts across company industries.",
+            EntityType = "Contact",
+            ChartType = ReportChartType.Pie,
+            CategoryId = salesCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "related.Company.industry", Label = "Industry", FieldType = "related", SortOrder = 0 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 1 }
+                ],
+                FilterGroup = null,
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "related.Company.industry" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Pie,
+                    ShowLegend = true,
+                    ShowDataLabels = true
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        // ── Report 4: Activities This Week (Bar) ───────────────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Activities This Week",
+            Description = "Breakdown of activities by status for the current week.",
+            EntityType = "Activity",
+            ChartType = ReportChartType.Bar,
+            CategoryId = teamCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "status", Label = "Status", FieldType = "system", SortOrder = 0 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 1 }
+                ],
+                FilterGroup = new ReportFilterGroup
+                {
+                    Logic = FilterLogic.And,
+                    Conditions =
+                    [
+                        new ReportFilterCondition
+                        {
+                            FieldId = "dueDate",
+                            Operator = "greater_than_or_equal",
+                            Value = DateTimeOffset.UtcNow.AddDays(-(int)DateTimeOffset.UtcNow.DayOfWeek).Date.ToString("o")
+                        }
+                    ],
+                    Groups = []
+                },
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "status" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Bar,
+                    ShowLegend = true,
+                    ShowDataLabels = true
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        // ── Report 5: Quotes by Status (Pie) ──────────────────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Quotes by Status",
+            Description = "Quote distribution by status with total amounts.",
+            EntityType = "Quote",
+            ChartType = ReportChartType.Pie,
+            CategoryId = salesCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "status", Label = "Status", FieldType = "system", SortOrder = 0 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 1 },
+                    new ReportField { FieldId = "totalAmount", Label = "Total Amount", FieldType = "system", Aggregation = AggregationType.Sum, SortOrder = 2 }
+                ],
+                FilterGroup = null,
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "status" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Pie,
+                    ShowLegend = true,
+                    ShowDataLabels = true
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        // ── Report 6: Top Deal Owners (Bar) ────────────────────
+        _db.Reports.Add(new Report
+        {
+            TenantId = organizationId,
+            Name = "Top Deal Owners",
+            Description = "Deal count and total value grouped by deal owner.",
+            EntityType = "Deal",
+            ChartType = ReportChartType.Bar,
+            CategoryId = teamCategory.Id,
+            IsShared = true,
+            IsSeedData = true,
+            Definition = new ReportDefinition
+            {
+                Fields =
+                [
+                    new ReportField { FieldId = "related.Owner.lastName", Label = "Owner", FieldType = "related", SortOrder = 0 },
+                    new ReportField { FieldId = "id", Label = "Count", FieldType = "system", Aggregation = AggregationType.Count, SortOrder = 1 },
+                    new ReportField { FieldId = "value", Label = "Total Value", FieldType = "system", Aggregation = AggregationType.Sum, SortOrder = 2 }
+                ],
+                FilterGroup = null,
+                Groupings =
+                [
+                    new ReportGrouping { FieldId = "related.Owner.lastName" }
+                ],
+                ChartConfig = new ReportChartConfig
+                {
+                    ChartType = ReportChartType.Bar,
+                    ShowLegend = true,
+                    ShowDataLabels = false
+                }
+            },
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        });
+
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Report seed data created for organization {OrgId}: 3 categories, 6 starter reports",
+            organizationId);
     }
 }
 
