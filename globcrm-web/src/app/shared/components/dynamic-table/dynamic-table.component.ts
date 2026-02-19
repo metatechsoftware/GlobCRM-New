@@ -28,7 +28,7 @@ import { ColumnResizeDirective } from '../../directives/column-resize.directive'
 import { ColumnPickerComponent } from './column-picker.component';
 import { QuickAddFieldComponent } from './quick-add-field.component';
 import { AuthStore } from '../../../core/auth/auth.store';
-import { CustomFieldDefinition } from '../../../core/custom-fields/custom-field.models';
+import { CustomFieldDefinition, isFormulaError } from '../../../core/custom-fields/custom-field.models';
 import {
   ColumnDefinition,
   ViewColumn,
@@ -147,6 +147,20 @@ export class DynamicTableComponent {
     }
     // Direct property access for core fields
     return row[fieldId] ?? '';
+  }
+
+  /**
+   * Check if a cell value is a formula error marker.
+   */
+  isFormulaErrorValue(value: any): boolean {
+    return isFormulaError(value);
+  }
+
+  /**
+   * Get the error tooltip for a formula error value.
+   */
+  getFormulaErrorTooltip(value: any): string {
+    return isFormulaError(value) ? value.message : '';
   }
 
   /**

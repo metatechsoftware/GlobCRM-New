@@ -54,7 +54,14 @@
           <td mat-cell *matCellDef="let row"
               [style.width]="getColumnWidth(col.fieldId)"
               [attr.data-field]="col.fieldId">
-            {{ getCellValue(row, col.fieldId) }}
+            @if (isFormulaErrorValue(getCellValue(row, col.fieldId))) {
+              <span class="formula-error"
+                    [matTooltip]="getFormulaErrorTooltip(getCellValue(row, col.fieldId))">
+                #ERR
+              </span>
+            } @else {
+              {{ getCellValue(row, col.fieldId) }}
+            }
           </td>
         </ng-container>
       }

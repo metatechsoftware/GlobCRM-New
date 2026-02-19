@@ -204,7 +204,7 @@ export class RequestListComponent implements OnInit {
       isCustomField: true,
       fieldType: field.fieldType.toLowerCase(),
       sortable: false,
-      filterable: true,
+      filterable: field.fieldType !== 'formula', // Formula fields are computed, not filterable
     }));
 
     this.columnDefs.set([...this.coreColumnDefs, ...customColumnDefs]);

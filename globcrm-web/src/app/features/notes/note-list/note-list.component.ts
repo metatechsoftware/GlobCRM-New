@@ -194,7 +194,7 @@ export class NoteListComponent implements OnInit {
       isCustomField: true,
       fieldType: field.fieldType.toLowerCase(),
       sortable: false, // Custom field sorting not supported (JSONB limitation)
-      filterable: true,
+      filterable: field.fieldType !== 'formula', // Formula fields are computed, not filterable
     }));
 
     this.columnDefs.set([...this.coreColumnDefs, ...customColumnDefs]);

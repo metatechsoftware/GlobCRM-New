@@ -183,6 +183,15 @@ td.mat-mdc-cell {
   }
 }
 
+// ─── Formula Error ───────────────────────────────────────
+.formula-error {
+  color: var(--color-danger, #ef4444);
+  font-weight: var(--font-semibold);
+  cursor: help;
+  font-size: var(--text-xs);
+  letter-spacing: 0.5px;
+}
+
 // ─── Add Column (Quick-Add Field) ─────────────────────────
 .add-column-header,
 .add-column-cell {

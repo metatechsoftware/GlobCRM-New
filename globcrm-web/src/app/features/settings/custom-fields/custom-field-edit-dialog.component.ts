@@ -30,6 +30,7 @@ import {
   CreateCustomFieldRequest,
   UpdateCustomFieldRequest,
 } from '../../../core/custom-fields/custom-field.models';
+import { FormulaEditorComponent } from './formula-editor/formula-editor.component';
 
 export interface CustomFieldEditDialogData {
   mode: 'create' | 'edit';
@@ -64,6 +65,7 @@ const ENTITY_TYPES = [
     MatExpansionModule,
     MatDividerModule,
     MatTooltipModule,
+    FormulaEditorComponent,
   ],
   templateUrl: './custom-field-edit-dialog.component.html',
 })
@@ -103,6 +105,18 @@ export class CustomFieldEditDialogComponent implements OnInit {
     return t === CustomFieldType.Relation;
   });
 
+  readonly showFormula = computed(() => {
+    return this.selectedFieldType() === CustomFieldType.Formula;
+  });
+
+  readonly formulaValid = signal(true);
+  readonly formulaExpression = signal('');
+  readonly resultTypes = [
+    { value: 'number', label: 'Number' },
+    { value: 'text', label: 'Text' },
+    { value: 'date', label: 'Date' },
+  ] as const;
+
   ngOnInit(): void {
     this.buildForm();
     if (this.data.field) {
@@ -130,6 +144,8 @@ export class CustomFieldEditDialogComponent implements OnInit {
       regexPattern: [''],
       // Relation
       relationEntityType: [null],
+      // Formula
+      formulaResultType: ['number'],
       // Options managed separately
     });
 
@@ -173,6 +189,14 @@ export class CustomFieldEditDialogComponent implements OnInit {
       regexPattern: field.validation?.regexPattern ?? '',
       relationEntityType: field.relationEntityType,
     });
+
+    // Populate formula fields
+    if (field.formulaExpression) {
+      this.formulaExpression.set(field.formulaExpression);
+    }
+    if (field.formulaResultType) {
+      this.form.patchValue({ formulaResultType: field.formulaResultType });
+    }
 
     // Populate options
     if (field.options) {
@@ -229,9 +253,22 @@ export class CustomFieldEditDialogComponent implements OnInit {
     this.options.insert(newIndex, current);
   }
 
+  onFormulaChange(expression: string): void {
+    this.formulaExpression.set(expression);
+  }
+
+  onValidationChange(result: { valid: boolean; errors: string[] }): void {
+    this.formulaValid.set(result.valid);
+  }
+
   save(): void {
     if (this.form.invalid) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    // Block save if formula type and formula is invalid
+    if (this.showFormula() && !this.formulaValid()) {
       return;
     }
 
@@ -259,6 +296,12 @@ export class CustomFieldEditDialogComponent implements OnInit {
         relationEntityType: this.showRelation()
           ? formValue.relationEntityType
           : undefined,
+        formulaExpression: this.showFormula()
+          ? this.formulaExpression()
+          : undefined,
+        formulaResultType: this.showFormula()
+          ? formValue.formulaResultType
+          : undefined,
       };
 
       this.fieldService.createField(request).subscribe({
@@ -285,6 +328,12 @@ export class CustomFieldEditDialogComponent implements OnInit {
           regexPattern: formValue.regexPattern || null,
         },
         options: this.showOptions() ? formValue.options : undefined,
+        formulaExpression: this.showFormula()
+          ? this.formulaExpression()
+          : undefined,
+        formulaResultType: this.showFormula()
+          ? formValue.formulaResultType
+          : undefined,
       };
 
       this.fieldService.updateField(this.data.field!.id, request).subscribe({

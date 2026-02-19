@@ -122,7 +122,7 @@ export class ProductListComponent implements OnInit {
           isCustomField: true,
           fieldType: f.fieldType.toLowerCase(),
           sortable: false,
-          filterable: true,
+          filterable: f.fieldType !== 'formula', // Formula fields are computed, not filterable
         }));
         this.columnDefinitions.set([...PRODUCT_CORE_COLUMNS, ...customColDefs]);
 
@@ -209,7 +209,7 @@ export class ProductListComponent implements OnInit {
       isCustomField: true,
       fieldType: field.fieldType.toLowerCase(),
       sortable: false,
-      filterable: true,
+      filterable: field.fieldType !== 'formula', // Formula fields are computed, not filterable
     };
     this.columnDefinitions.set([...this.columnDefinitions(), newColDef]);
 

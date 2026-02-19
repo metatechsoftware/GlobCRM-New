@@ -1,0 +1,95 @@
+<div class="formula-editor">
+  <!-- Formula textarea -->
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Formula Expression</mat-label>
+    <textarea matInput
+              #formulaTextarea
+              [formControl]="formulaControl"
+              (keyup)="onKeyUp($event)"
+              rows="3"
+              placeholder="e.g. [value] * [probability] / 100"
+              spellcheck="false"></textarea>
+    @if (validationErrors().length > 0) {
+      <mat-error>{{ validationErrors()[0] }}</mat-error>
+    }
+    <mat-hint>Type [ to insert a field reference</mat-hint>
+  </mat-form-field>
+
+  <!-- Autocomplete dropdown -->
+  @if (showAutocomplete()) {
+    <div class="autocomplete-panel"
+         [style.top.px]="autocompletePosition().top"
+         [style.left.px]="autocompletePosition().left">
+      @for (group of ['System', 'Custom', 'Formula']; track group) {
+        @if (groupedFields()[group]?.length) {
+          <div class="autocomplete-group">
+            <div class="group-label">{{ group }} Fields</div>
+            @for (field of groupedFields()[group]; track field.name) {
+              <button class="autocomplete-item" (mousedown)="insertField(field)" type="button">
+                <span class="field-name">[{{ field.name }}]</span>
+                <span class="field-label">{{ field.label }}</span>
+                <span class="field-type">{{ field.dataType }}</span>
+              </button>
+            }
+          </div>
+        }
+      }
+      @if (!groupedFields()['System']?.length && !groupedFields()['Custom']?.length && !groupedFields()['Formula']?.length) {
+        <div class="autocomplete-empty">No matching fields</div>
+      }
+    </div>
+  }
+
+  <!-- Validation errors list (when more than one) -->
+  @if (validationErrors().length > 1) {
+    <div class="validation-errors">
+      @for (error of validationErrors(); track error) {
+        <div class="validation-error">
+          <mat-icon class="error-icon">error</mat-icon>
+          <span>{{ error }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Live Preview panel -->
+  <div class="formula-preview">
+    <div class="preview-label">Preview</div>
+    @if (isValidating() || isPreviewLoading()) {
+      <div class="preview-content">
+        <mat-spinner diameter="16"></mat-spinner>
+        <span class="preview-loading">Evaluating...</span>
+      </div>
+    } @else if (previewError()) {
+      <span class="preview-error">#ERR: {{ previewError() }}</span>
+    } @else if (previewResult() !== null && previewResult() !== undefined) {
+      <span class="preview-result">{{ previewResult() }}</span>
+    } @else {
+      <span class="preview-placeholder">Enter a formula to see the result</span>
+    }
+  </div>
+
+  <!-- Collapsible Formula Help -->
+  <button type="button" class="help-toggle" (click)="toggleHelp()">
+    <mat-icon>{{ showHelp() ? 'expand_less' : 'help_outline' }}</mat-icon>
+    {{ showHelp() ? 'Hide' : 'Formula' }} Help
+  </button>
+  @if (showHelp()) {
+    <div class="formula-help">
+      <h4>Available Functions</h4>
+      <table class="help-table">
+        <tr><td><code>+ - * /</code></td><td>Arithmetic operators</td></tr>
+        <tr><td><code>IF(condition, true_value, false_value)</code></td><td>Conditional logic</td></tr>
+        <tr><td><code>DATEDIFF(date1, date2)</code></td><td>Days between two dates</td></tr>
+        <tr><td><code>CONCAT(value1, value2, ...)</code></td><td>Join text values</td></tr>
+      </table>
+      <h4>Examples</h4>
+      <ul class="help-examples">
+        <li><code>[value] * [probability] / 100</code> -- Weighted deal value</li>
+        <li><code>IF([status] == 'won', [value], 0)</code> -- Value if won</li>
+        <li><code>DATEDIFF([createdAt], [expectedCloseDate])</code> -- Days to close</li>
+        <li><code>CONCAT([firstName], ' ', [lastName])</code> -- Full name</li>
+      </ul>
+    </div>
+  }
+</div>

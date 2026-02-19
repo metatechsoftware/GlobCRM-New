@@ -142,9 +142,36 @@
       </div>
     }
 
-    <mat-divider></mat-divider>
+    @if (showFormula()) {
+      <mat-divider></mat-divider>
+      <div class="form-section">
+        <h3>Formula Configuration</h3>
 
-    <!-- Validation section -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Result Type</mat-label>
+          <mat-select formControlName="formulaResultType">
+            @for (type of resultTypes; track type.value) {
+              <mat-option [value]="type.value">{{ type.label }}</mat-option>
+            }
+          </mat-select>
+          <mat-hint>How the formula result should be displayed</mat-hint>
+        </mat-form-field>
+
+        <app-formula-editor
+          [entityType]="data.entityType"
+          [initialFormula]="data.field?.formulaExpression ?? ''"
+          [excludeFieldId]="data.field?.id ?? null"
+          (formulaChange)="onFormulaChange($event)"
+          (validationChange)="onValidationChange($event)" />
+      </div>
+    }
+
+    @if (!showFormula()) {
+      <mat-divider></mat-divider>
+    }
+
+    <!-- Validation section (hidden for formula fields) -->
+    @if (!showFormula()) {
     <mat-expansion-panel class="validation-panel">
       <mat-expansion-panel-header>
         <mat-panel-title>Validation Rules</mat-panel-title>
@@ -155,6 +182,7 @@
         <mat-checkbox formControlName="unique">Unique</mat-checkbox>
       </div>
     </mat-expansion-panel>
+    }
   </form>
 </mat-dialog-content>
 
@@ -164,7 +192,7 @@
     mat-flat-button
     color="primary"
     (click)="save()"
-    [disabled]="saving()">
+    [disabled]="saving() || (showFormula() && !formulaValid())">
     {{ saving() ? 'Saving...' : (isCreateMode() ? 'Create' : 'Save') }}
   </button>
 </mat-dialog-actions>
