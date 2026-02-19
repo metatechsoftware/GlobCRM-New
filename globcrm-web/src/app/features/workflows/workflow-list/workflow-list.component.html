@@ -1,0 +1,106 @@
+<div class="workflow-list">
+  <!-- Header -->
+  <div class="workflow-list__header">
+    <div>
+      <h1>Workflows</h1>
+      <p class="workflow-list__subtitle">
+        Automate actions when events occur across your CRM
+      </p>
+    </div>
+    <a mat-raised-button color="primary" routerLink="/workflows/new">
+      <mat-icon>add</mat-icon>
+      New Workflow
+    </a>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="workflow-list__filters">
+    <mat-form-field appearance="outline" class="workflow-list__filter-field">
+      <mat-label>Entity Type</mat-label>
+      <mat-select
+        [value]="entityTypeFilter()"
+        (selectionChange)="onEntityTypeChange($event.value)"
+      >
+        @for (type of entityTypes; track type.value) {
+          <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="workflow-list__filter-field">
+      <mat-label>Status</mat-label>
+      <mat-select
+        [value]="statusFilter()"
+        (selectionChange)="onStatusChange($event.value)"
+      >
+        @for (status of statuses; track status.value) {
+          <mat-option [value]="status.value">{{ status.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <!-- Loading State -->
+  @if (store.loading()) {
+    <div class="workflow-list__grid">
+      @for (item of skeletonItems; track item) {
+        <div class="workflow-list__skeleton-card">
+          <div class="skeleton-thumbnail"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--desc"></div>
+            <div class="skeleton-badges">
+              <div class="skeleton-badge"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+          </div>
+          <div class="skeleton-footer">
+            <div class="skeleton-line skeleton-line--stat"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @if (!store.loading() && store.workflows().length === 0) {
+    <div class="workflow-list__empty">
+      <mat-icon>account_tree</mat-icon>
+      <h3>No workflows yet</h3>
+      <p>
+        Workflows automate repetitive tasks when CRM events occur. Create your
+        first workflow to get started.
+      </p>
+      <a mat-raised-button color="primary" routerLink="/workflows/new">
+        Create your first workflow
+      </a>
+    </div>
+  }
+
+  <!-- Card Grid -->
+  @if (!store.loading() && store.workflows().length > 0) {
+    <div class="workflow-list__grid">
+      @for (workflow of store.workflows(); track workflow.id) {
+        <app-workflow-card
+          [workflow]="workflow"
+          (toggleStatus)="onToggleStatus(workflow)"
+          (edit)="onEdit(workflow)"
+          (duplicate)="onDuplicate(workflow)"
+          (deleteWorkflow)="onDelete(workflow)"
+          (click)="onCardClick(workflow)"
+        />
+      }
+    </div>
+
+    <!-- Pagination -->
+    @if (store.totalCount() > 20) {
+      <mat-paginator
+        [length]="store.totalCount()"
+        [pageSize]="20"
+        [pageSizeOptions]="[10, 20, 50]"
+        (page)="onPageChange($event)"
+        class="workflow-list__paginator"
+      />
+    }
+  }
+</div>

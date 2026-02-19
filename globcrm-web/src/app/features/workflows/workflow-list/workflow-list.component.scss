@@ -1,0 +1,183 @@
+:host {
+  display: block;
+}
+
+.workflow-list {
+  max-width: var(--container-max, 1280px);
+  margin: 0 auto;
+  padding: var(--space-6, 24px);
+}
+
+// ---- Header ----
+.workflow-list__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--space-6, 24px);
+
+  h1 {
+    margin: 0;
+    font-size: var(--text-2xl, 24px);
+    font-weight: var(--font-semibold, 600);
+    color: var(--color-text, #1A1A1A);
+  }
+}
+
+.workflow-list__subtitle {
+  color: var(--color-text-secondary, #6B7280);
+  font-size: var(--text-base, 14px);
+  margin: var(--space-1, 4px) 0 0 0;
+}
+
+// ---- Filters ----
+.workflow-list__filters {
+  display: flex;
+  gap: var(--space-3, 12px);
+  margin-bottom: var(--space-5, 20px);
+}
+
+.workflow-list__filter-field {
+  width: 180px;
+
+  ::ng-deep .mat-mdc-form-field-subscript-wrapper {
+    display: none;
+  }
+}
+
+// ---- Card Grid ----
+.workflow-list__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-4, 16px);
+}
+
+// ---- Empty State ----
+.workflow-list__empty {
+  text-align: center;
+  padding: var(--space-16, 64px) var(--space-6, 24px);
+  color: var(--color-text-secondary, #6B7280);
+
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: var(--space-4, 16px);
+    opacity: 0.5;
+  }
+
+  h3 {
+    margin: 0 0 var(--space-2, 8px) 0;
+    font-weight: var(--font-medium, 500);
+    color: var(--color-text, #1A1A1A);
+  }
+
+  p {
+    margin: 0 0 var(--space-6, 24px) 0;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+// ---- Skeleton Loading ----
+.workflow-list__skeleton-card {
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #E8E8E6);
+  border-radius: var(--radius-lg, 12px);
+  overflow: hidden;
+}
+
+.skeleton-thumbnail {
+  height: 120px;
+  background: var(--color-bg-secondary, #F0F0EE);
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-body {
+  padding: var(--space-4, 16px);
+}
+
+.skeleton-line {
+  background: var(--color-bg-secondary, #F0F0EE);
+  border-radius: var(--radius-sm, 4px);
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-line--title {
+  height: 16px;
+  width: 70%;
+  margin-bottom: var(--space-2, 8px);
+}
+
+.skeleton-line--desc {
+  height: 12px;
+  width: 90%;
+  margin-bottom: var(--space-3, 12px);
+}
+
+.skeleton-badges {
+  display: flex;
+  gap: var(--space-2, 8px);
+}
+
+.skeleton-badge {
+  height: 20px;
+  width: 60px;
+  background: var(--color-bg-secondary, #F0F0EE);
+  border-radius: var(--radius-sm, 4px);
+  animation: skeleton-pulse 1.5s infinite ease-in-out;
+}
+
+.skeleton-footer {
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  border-top: 1px solid var(--color-border-subtle, #F0F0EE);
+}
+
+.skeleton-line--stat {
+  height: 12px;
+  width: 50%;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+// ---- Paginator ----
+.workflow-list__paginator {
+  margin-top: var(--space-6, 24px);
+}
+
+// ---- Responsive ----
+@media (max-width: 768px) {
+  .workflow-list {
+    padding: var(--space-4, 16px);
+  }
+
+  .workflow-list__header {
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+  }
+
+  .workflow-list__filters {
+    flex-direction: column;
+  }
+
+  .workflow-list__filter-field {
+    width: 100%;
+  }
+
+  .workflow-list__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .workflow-list__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
