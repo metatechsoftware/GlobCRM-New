@@ -1,0 +1,130 @@
+<div class="preview-dialog">
+  <!-- Header -->
+  <div class="preview-header">
+    <h2>Preview Template</h2>
+    <button mat-icon-button (click)="close()" aria-label="Close preview">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Control Bar -->
+  <div class="control-bar">
+    <!-- Device Toggle -->
+    <mat-button-toggle-group
+      [value]="deviceMode()"
+      (change)="onDeviceChange($event.value)"
+      aria-label="Device preview mode"
+    >
+      <mat-button-toggle value="desktop" matTooltip="Desktop (600px)">
+        <mat-icon>monitor</mat-icon>
+      </mat-button-toggle>
+      <mat-button-toggle value="mobile" matTooltip="Mobile (320px)">
+        <mat-icon>smartphone</mat-icon>
+      </mat-button-toggle>
+    </mat-button-toggle-group>
+
+    <!-- Entity Selector -->
+    <div class="entity-selector">
+      <span class="entity-label">Preview with:</span>
+
+      <mat-form-field appearance="outline" class="entity-type-field">
+        <mat-select
+          [value]="entityType()"
+          (selectionChange)="onEntityTypeChange($event.value)"
+        >
+          @for (type of entityTypes; track type.value) {
+            <mat-option [value]="type.value">{{ type.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (showEntitySearch) {
+        <mat-form-field appearance="outline" class="entity-search-field">
+          <mat-label>Search {{ entityType() | lowercase }}...</mat-label>
+          <input
+            matInput
+            [value]="entitySearchQuery()"
+            (input)="onEntitySearchInput($any($event.target).value)"
+            [matAutocomplete]="entityAuto"
+            placeholder="Type to search..."
+          />
+          @if (searchingEntities()) {
+            <mat-spinner matSuffix diameter="18"></mat-spinner>
+          }
+          <mat-autocomplete
+            #entityAuto="matAutocomplete"
+            (optionSelected)="onEntitySelected($event.option.value)"
+          >
+            @for (entity of entityOptions(); track entity.id) {
+              <mat-option [value]="entity">
+                <span class="entity-option-name">{{ entity.name }}</span>
+                @if (entity.detail) {
+                  <span class="entity-option-detail">({{ entity.detail }})</span>
+                }
+              </mat-option>
+            }
+          </mat-autocomplete>
+        </mat-form-field>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="control-actions">
+      <button
+        mat-icon-button
+        matTooltip="Refresh preview"
+        (click)="loadPreview()"
+        [disabled]="previewLoading()"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+      <button
+        mat-raised-button
+        color="accent"
+        (click)="sendTestEmail()"
+        [disabled]="sendingTest()"
+        class="send-test-btn"
+      >
+        @if (sendingTest()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          <mat-icon>send</mat-icon>
+        }
+        Send Test
+      </button>
+    </div>
+  </div>
+
+  <!-- Preview Area -->
+  <div class="preview-area">
+    <!-- Subject Line -->
+    @if (renderedSubject()) {
+      <div class="subject-bar">
+        <strong>Subject:</strong> {{ renderedSubject() }}
+      </div>
+    }
+
+    <!-- Preview Container -->
+    <div class="preview-viewport">
+      <div
+        class="preview-container"
+        [class.desktop]="deviceMode() === 'desktop'"
+        [class.mobile]="deviceMode() === 'mobile'"
+      >
+        @if (previewLoading()) {
+          <div class="preview-loading">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Loading preview...</p>
+          </div>
+        }
+        <iframe
+          class="preview-iframe"
+          [srcdoc]="iframeSrcdoc()"
+          sandbox
+          [class.hidden]="previewLoading()"
+        ></iframe>
+      </div>
+    </div>
+  </div>
+</div>

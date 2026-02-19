@@ -62,6 +62,16 @@
       </button>
 
       <button
+        mat-stroked-button
+        (click)="openPreview()"
+        [disabled]="saving()"
+        matTooltip="Preview template with sample or real data"
+      >
+        <mat-icon>visibility</mat-icon>
+        Preview
+      </button>
+
+      <button
         mat-raised-button
         color="primary"
         [disabled]="saving() || !templateName()"

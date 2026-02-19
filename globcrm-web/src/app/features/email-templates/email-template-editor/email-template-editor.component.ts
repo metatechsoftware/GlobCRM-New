@@ -20,10 +20,16 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { EmailEditorModule, EmailEditorComponent } from 'angular-email-editor';
 import { EmailTemplateStore } from '../email-template.store';
 import { MergeFieldGroup } from '../email-template.models';
 import { MergeFieldPanelComponent } from '../merge-field-panel/merge-field-panel.component';
+import {
+  EmailTemplatePreviewComponent,
+  PreviewDialogData,
+} from '../email-template-preview/email-template-preview.component';
 
 /**
  * Email template editor page wrapping the Unlayer drag-and-drop editor.
@@ -45,6 +51,8 @@ import { MergeFieldPanelComponent } from '../merge-field-panel/merge-field-panel
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatSidenavModule,
+    MatDialogModule,
+    MatTooltipModule,
     EmailEditorModule,
     MergeFieldPanelComponent,
   ],
@@ -62,6 +70,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   readonly store = inject(EmailTemplateStore);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   // ─── Form State ────────────────────────────────────────────────────────
 
@@ -211,6 +220,40 @@ export class EmailTemplateEditorComponent implements OnInit {
           this.router.navigate(['/email-templates']);
         });
       }
+    });
+  }
+
+  openPreview(): void {
+    const templateId = this.id();
+    if (!templateId) {
+      this.snackBar.open('Please save the template before previewing', 'Close', {
+        duration: 3000,
+      });
+      return;
+    }
+
+    // Save current state first, then open preview
+    this.saving.set(true);
+    this.emailEditor.exportHtml((data: { design: object; html: string }) => {
+      const request = {
+        name: this.templateName().trim(),
+        subject: this.templateSubject().trim() || null,
+        designJson: JSON.stringify(data.design),
+        htmlBody: data.html,
+        categoryId: this.selectedCategoryId(),
+        isShared: this.isShared(),
+      };
+
+      this.store.updateTemplate(templateId, request, () => {
+        this.saving.set(false);
+        this.dialog.open(EmailTemplatePreviewComponent, {
+          width: '90vw',
+          maxWidth: '800px',
+          height: '85vh',
+          data: { templateId } as PreviewDialogData,
+          panelClass: 'preview-dialog-panel',
+        });
+      });
     });
   }
 
