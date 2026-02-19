@@ -97,6 +97,7 @@ export class NavbarComponent {
     {
       label: 'Admin',
       items: [
+        { route: '/duplicates', icon: 'compare_arrows', label: 'Duplicates' },
         { route: '/import', icon: 'upload_file', label: 'Import' },
         { route: '/team-directory', icon: 'groups', label: 'Team' },
         { route: '/settings', icon: 'settings', label: 'Settings' },

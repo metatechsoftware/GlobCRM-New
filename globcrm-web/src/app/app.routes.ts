@@ -161,6 +161,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'duplicates',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/duplicates/duplicates.routes').then(
+        (m) => m.duplicatesRoutes
+      ),
+  },
+  {
     path: '',
     redirectTo: 'dashboard',
     pathMatch: 'full',
