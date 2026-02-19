@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 15 complete
+**Current focus:** v1.1 Automation & Intelligence — Phase 16 in progress
 
 ## Current Position
 
-Phase: 15 of 20 (Formula / Computed Custom Fields)
-Plan: 4 of 4 complete
-Status: Phase Complete
-Last activity: 2026-02-19 — Completed 15-04 (Formula Field Frontend Display)
+Phase: 16 of 20 (Duplicate Detection & Merge)
+Plan: 1 of 4 complete
+Status: In Progress
+Last activity: 2026-02-19 — Completed 16-01 (Backend Foundation)
 
-Progress: [██████████████████████████████████████░░░░] 82% (v1.0: 96/96 plans, v1.1: 12/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4)
+Progress: [███████████████████████████████████████░░░] 83% (v1.0: 96/96 plans, v1.1: 13/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 1/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 12
-- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4)
+- v1.1 plans completed: 13
+- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 1/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -33,6 +33,7 @@ Progress: [███████████████████████
 | 15-02 | Formula API endpoints + entity controller DTO enrichment | 8min | 2 | 9 |
 | 15-03 | Formula Editor Frontend (autocomplete + validation + preview) | 4min | 2 | 7 |
 | 15-04 | Formula Field Frontend Display (dynamic table + custom-field-form) | 6min | 2 | 1 |
+| 16-01 | Backend Foundation (domain + pg_trgm + merge services) | 6min | 2 | 20 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -89,6 +90,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [15-03] FormulaEditorComponent uses output() signals; parent dialog owns save logic
 - [15-04] Formula fields skip FormControl creation entirely -- cleaner separation of computed vs. editable
 - [15-04] Formula value lookup checks field.name then field.id fallback to match API response shape
+- [16-01] Two-tier detection: pg_trgm GIN-indexed pre-filter at 50% threshold, FuzzySharp weighted scoring in-memory
+- [16-01] Contact scoring: name 50% + email 50% (redistributed when field missing); Company: name 60% + domain 40%
+- [16-01] Merge via explicit BeginTransactionAsync/CommitAsync; ExecuteUpdateAsync for bulk FK transfers
+- [16-01] Merged records excluded via global query filter (MergedIntoId == null) -- IgnoreQueryFilters for redirect
+- [16-01] Composite PK deduplication: query survivor links, remove conflicting loser links, update rest
 
 ### Pending Todos
 
@@ -99,11 +105,11 @@ None.
 - @foblex/flow Angular 19.2.x compatibility unverified — fallback is linear form builder (decision needed before Phase 19 planning)
 - DomainEventInterceptor ordering resolved in 14-01: Auditable first (sets timestamps), DomainEvent second (captures final state)
 - Gmail reply detection accuracy for sequence auto-unenroll (Phase 18) — false positive/negative handling needs explicit design
-- Complete FK reference map needed before Phase 16 (Duplicate Merge) implementation to avoid data loss
+- Complete FK reference map implemented in 16-01: Contact 12 refs, Company 13 refs transferred in merge services
 
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Phase 16 context gathered
-Resume file: .planning/phases/16-duplicate-detection-merge/16-CONTEXT.md
-Next step: Plan Phase 16 (Duplicate Detection & Merge)
+Stopped at: Completed 16-01-PLAN.md
+Resume file: .planning/phases/16-duplicate-detection-merge/16-01-SUMMARY.md
+Next step: Execute 16-02-PLAN.md (API Endpoints)

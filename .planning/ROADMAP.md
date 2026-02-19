@@ -182,7 +182,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 13. Leads | v1.1 | Complete    | 2026-02-18 | 2026-02-18 |
 | 14. Foundation Infrastructure & Email Templates | 4/4 | Complete    | 2026-02-19 | - |
 | 15. Formula / Computed Custom Fields | 4/4 | Complete    | 2026-02-19 | - |
-| 16. Duplicate Detection & Merge | v1.1 | 0/? | Not started | - |
+| 16. Duplicate Detection & Merge | 1/4 | In Progress|  | - |
 | 17. Webhooks | v1.1 | 0/? | Not started | - |
 | 18. Email Sequences | v1.1 | 0/? | Not started | - |
 | 19. Workflow Automation | v1.1 | 0/? | Not started | - |

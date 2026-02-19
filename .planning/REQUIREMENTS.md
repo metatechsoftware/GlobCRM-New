@@ -54,10 +54,10 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 - [ ] **DUP-01**: System warns user of potential duplicates when creating a contact or company
 - [ ] **DUP-02**: User can run an on-demand duplicate scan for contacts and companies
 - [ ] **DUP-03**: Admin can configure matching rules and similarity thresholds
-- [ ] **DUP-04**: System uses fuzzy matching (handles typos, name variations) for duplicate detection
+- [x] **DUP-04**: System uses fuzzy matching (handles typos, name variations) for duplicate detection
 - [ ] **DUP-05**: User can view a side-by-side comparison of duplicate records
-- [ ] **DUP-06**: User can merge duplicate contacts with relationship transfer to the surviving record
-- [ ] **DUP-07**: User can merge duplicate companies with relationship transfer to the surviving record
+- [x] **DUP-06**: User can merge duplicate contacts with relationship transfer to the surviving record
+- [x] **DUP-07**: User can merge duplicate companies with relationship transfer to the surviving record
 
 ### Webhooks
 
@@ -159,10 +159,10 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DUP-01 | Phase 16 | Pending |
 | DUP-02 | Phase 16 | Pending |
 | DUP-03 | Phase 16 | Pending |
-| DUP-04 | Phase 16 | Pending |
+| DUP-04 | Phase 16 | Complete |
 | DUP-05 | Phase 16 | Pending |
-| DUP-06 | Phase 16 | Pending |
-| DUP-07 | Phase 16 | Pending |
+| DUP-06 | Phase 16 | Complete |
+| DUP-07 | Phase 16 | Complete |
 | WHOOK-01 | Phase 17 | Pending |
 | WHOOK-02 | Phase 17 | Pending |
 | WHOOK-03 | Phase 17 | Pending |
