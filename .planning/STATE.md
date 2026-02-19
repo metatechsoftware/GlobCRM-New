@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 18 in progress (Email Sequences)
+**Current focus:** v1.1 Automation & Intelligence — Phase 18 complete (Email Sequences)
 
 ## Current Position
 
 Phase: 18 of 20 (Email Sequences)
-Plan: 4 of 5 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 18-04 (Sequence Frontend)
+Plan: 5 of 5 complete
+Status: Complete
+Last activity: 2026-02-19 — Completed 18-05 (Tracking & Analytics Dashboard)
 
-Progress: [█████████████████████████████████████████████░] 94% (v1.0: 96/96 plans, v1.1: 24/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 4/5)
+Progress: [██████████████████████████████████████████████░] 95% (v1.0: 96/96 plans, v1.1: 25/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 24
-- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 4/5)
+- v1.1 plans completed: 25
+- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -45,6 +45,7 @@ Progress: [███████████████████████
 | 18-02 | Sequence Execution Engine (Hangfire jobs + email sender + tracking + reply detection) | 5min | 2 | 9 |
 | 18-03 | Sequence API Endpoints (SequencesController + 20 endpoints + DTOs + validators) | 5min | 2 | 2 |
 | 18-04 | Sequence Frontend (builder + list + detail + enrollment dialog + nav) | 8min | 2 | 15 |
+| 18-05 | Tracking & Analytics Dashboard (DynamicTable selection + analytics + funnel chart + enrollment) | 6min | 2 | 12 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -151,6 +152,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [18-04] SequenceStore component-provided (not root) following WebhookStore pattern -- each page gets fresh state
 - [18-04] Sequence list uses mat-table (not DynamicTable) since sequences have fixed columns without user-configurable custom fields
 - [18-04] Separate @if blocks instead of @else if...as for Angular template compatibility (same limitation found in 17-04)
+- [18-05] DynamicTable selection is fully generic -- no sequence-specific code; usable by any entity list page via enableSelection input
+- [18-05] SequencePickerDialog lazy-imported via dynamic import() from contacts list and contact detail to avoid eagerly loading sequence module
+- [18-05] Contact detail uses mat-menu more_vert trigger for "Enroll in Sequence" action -- keeps header clean, extensible for future actions
 
 ### Pending Todos
 
@@ -166,6 +170,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 18-04-PLAN.md
-Resume file: .planning/phases/18-email-sequences/18-04-SUMMARY.md
-Next step: Execute 18-05-PLAN.md (Tracking & Analytics Dashboard)
+Stopped at: Completed 18-05-PLAN.md (Phase 18 complete)
+Resume file: .planning/phases/18-email-sequences/18-05-SUMMARY.md
+Next step: Plan Phase 19 (Workflows)

@@ -36,7 +36,7 @@
 - [x] **Phase 15: Formula / Computed Custom Fields** - NCalc expression evaluator, formula field type with arithmetic/date/string/conditional support, on-read evaluation, and circular dependency detection (completed 2026-02-19)
 - [x] **Phase 16: Duplicate Detection & Merge** - Two-tier fuzzy matching (pg_trgm + FuzzySharp), configurable rules, side-by-side merge UI, and full relationship transfer (completed 2026-02-19)
 - [x] **Phase 17: Webhooks** - HMAC-signed webhook delivery with exponential retry, subscription management, delivery logs, SSRF prevention (completed 2026-02-19)
-- [ ] **Phase 18: Email Sequences** - Multi-step drip sequences with delays, enrollment management, reply-based auto-unenroll, and per-step open/click tracking
+- [x] **Phase 18: Email Sequences** - Multi-step drip sequences with delays, enrollment management, reply-based auto-unenroll, and per-step open/click tracking (completed 2026-02-19)
 - [ ] **Phase 19: Workflow Automation** - Trigger-based automation engine with event/field-change/date triggers, multi-action execution (field update, notify, task, email, webhook, sequence), execution logs, and prebuilt templates
 - [ ] **Phase 20: Advanced Reporting Builder** - Dynamic report builder with entity/field selection, filter conditions, grouping/aggregation, chart visualization, related entity fields, save/share, CSV export, and drill-down
 
@@ -195,6 +195,6 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 15. Formula / Computed Custom Fields | 4/4 | Complete    | 2026-02-19 | - |
 | 16. Duplicate Detection & Merge | 4/4 | Complete    | 2026-02-19 | - |
 | 17. Webhooks | 4/4 | Complete    | 2026-02-19 | - |
-| 18. Email Sequences | 4/5 | In Progress|  | - |
+| 18. Email Sequences | 5/5 | Complete   | 2026-02-19 | - |
 | 19. Workflow Automation | v1.1 | 0/? | Not started | - |
 | 20. Advanced Reporting Builder | v1.1 | 0/? | Not started | - |
