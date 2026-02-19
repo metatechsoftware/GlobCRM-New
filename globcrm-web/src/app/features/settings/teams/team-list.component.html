@@ -1,9 +1,20 @@
 <div class="teams-page">
   <!-- Header -->
   <div class="teams-header">
-    <div class="header-text">
-      <h1>Teams</h1>
-      <p class="header-subtitle">Organize your people into collaborative groups</p>
+    <div class="teams-header__left">
+      <a routerLink="/settings" class="teams-back">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Settings</span>
+      </a>
+      <div class="teams-title-row">
+        <div class="teams-icon-wrap">
+          <mat-icon>groups</mat-icon>
+        </div>
+        <div>
+          <h1>Teams</h1>
+          <p class="header-subtitle">Organize your people into collaborative groups</p>
+        </div>
+      </div>
     </div>
     <button
       *appHasPermission="'Contact:Create'"

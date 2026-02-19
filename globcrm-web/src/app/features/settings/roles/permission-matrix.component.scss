@@ -1,28 +1,30 @@
-.permission-matrix {
-  margin-top: var(--space-4);
+// Permission Matrix — Elevated Design
+
+.pm-matrix {
+  margin-top: var(--space-2);
 }
 
-.matrix-title {
-  margin: 0 0 var(--space-1) 0;
-  font-size: var(--text-md);
-  font-weight: var(--font-medium);
-}
-
-.matrix-description {
-  margin: 0 0 var(--space-4) 0;
+.pm-hint {
+  margin: 0 0 var(--space-5) 0;
   color: var(--color-text-secondary);
   font-size: var(--text-sm);
+  line-height: var(--leading-relaxed);
+
+  strong {
+    color: var(--color-text);
+    font-weight: var(--font-medium);
+  }
 }
 
-.matrix-container {
+.pm-container {
   overflow-x: auto;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-lg);
 }
 
-.matrix-table {
+.pm-table {
   width: 100%;
   border-collapse: collapse;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-sm);
 
   th,
   td {
@@ -32,28 +34,51 @@
   }
 }
 
-.entity-header {
+// ─── Header ──────────────────────────────────
+.pm-entity-header {
   text-align: left !important;
-  font-weight: var(--font-medium);
-  font-size: var(--text-base);
-  width: 140px;
-  min-width: 140px;
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  width: 160px;
+  min-width: 160px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5);
+
+  &__icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+  }
 }
 
-.operation-header {
-  font-weight: var(--font-medium);
-  font-size: var(--text-base);
-  min-width: 120px;
+.pm-op-header {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-sm);
+  min-width: 130px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg-secondary);
+  vertical-align: bottom;
 
-  .op-header-content {
+  &__content {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: var(--space-1);
   }
+
+  &__icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-muted);
+  }
 }
 
-.quick-set-field {
+.pm-quick-set {
   width: 90px;
 
   ::ng-deep {
@@ -84,7 +109,10 @@
   }
 }
 
-.entity-row {
+// ─── Rows ────────────────────────────────────
+.pm-row {
+  animation: pmRowEntrance var(--duration-slow) var(--ease-out) both;
+
   &:hover {
     background-color: var(--color-surface-hover);
   }
@@ -94,18 +122,47 @@
   }
 }
 
-.entity-name {
+.pm-entity-name {
   text-align: left !important;
-  font-weight: var(--font-normal);
+  font-weight: var(--font-medium);
   font-size: var(--text-base);
   color: var(--color-text);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.scope-cell {
+.pm-entity-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+// ─── Cells ───────────────────────────────────
+.pm-cell {
   padding: var(--space-1) var(--space-2);
+  transition: background-color var(--duration-fast) var(--ease-default);
+  border-radius: 0;
+
+  &--none {
+    background-color: transparent;
+  }
+
+  &--own {
+    background-color: var(--color-warning-soft);
+  }
+
+  &--team {
+    background-color: var(--color-info-soft);
+  }
+
+  &--all {
+    background-color: var(--color-success-soft);
+  }
 }
 
-.scope-select-field {
+.pm-scope-select {
   width: 100px;
 
   ::ng-deep {
@@ -132,7 +189,7 @@
   }
 }
 
-// Scope color coding
+// ─── Scope Color Coding ─────────────────────
 :host ::ng-deep {
   .scope-none .mat-mdc-select-value-text {
     color: var(--color-text-muted);
@@ -140,17 +197,20 @@
 
   .scope-own .mat-mdc-select-value-text {
     color: var(--color-warning-text);
+    font-weight: var(--font-medium);
   }
 
   .scope-team .mat-mdc-select-value-text {
     color: var(--color-info-text);
+    font-weight: var(--font-medium);
   }
 
   .scope-all .mat-mdc-select-value-text {
     color: var(--color-success-text);
+    font-weight: var(--font-medium);
   }
 
-  .scope-panel {
+  .pm-scope-panel {
     .scope-none {
       color: var(--color-text-muted);
     }
@@ -166,5 +226,34 @@
     .scope-all {
       color: var(--color-success-text);
     }
+  }
+}
+
+// ─── Animations ──────────────────────────────
+@keyframes pmRowEntrance {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pm-row {
+    animation: none !important;
+    opacity: 1;
+  }
+}
+
+// ─── Responsive ──────────────────────────────
+@media (max-width: 768px) {
+  .pm-container {
+    margin: 0 calc(-1 * var(--space-4));
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
   }
 }

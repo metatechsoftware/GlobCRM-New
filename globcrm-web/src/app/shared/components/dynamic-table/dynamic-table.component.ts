@@ -477,11 +477,59 @@ export class DynamicTableComponent {
   }
 
   /**
-   * Get the renderAs type for a column, defaulting to 'text'.
+   * Get the effective renderAs type for a column.
+   * Auto-detects 'date' from fieldType when no explicit renderAs is set.
    */
-  getColumnRenderAs(fieldId: string): 'text' | 'badge' | 'email' {
+  getEffectiveRenderAs(fieldId: string): 'text' | 'badge' | 'email' | 'date' | 'avatar' {
     const def = this.columnDefinitions().find((d) => d.fieldId === fieldId);
-    return def?.renderAs ?? 'text';
+    if (def?.renderAs) return def.renderAs;
+    if (def?.fieldType === 'date') return 'date';
+    return 'text';
+  }
+
+  /**
+   * Format an ISO date string to a human-readable format (e.g., "Feb 19, 2026").
+   */
+  formatDate(value: any): string {
+    if (!value) return '';
+    const date = new Date(value);
+    if (isNaN(date.getTime())) return String(value);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    }).format(date);
+  }
+
+  /**
+   * Extract initials from a name (first + last initial).
+   */
+  getInitials(value: any): string {
+    if (!value) return '';
+    const parts = String(value).trim().split(/\s+/);
+    if (parts.length === 1) return parts[0].charAt(0).toUpperCase();
+    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
+  }
+
+  private static readonly AVATAR_COLORS = [
+    '#f97316', '#ef4444', '#8b5cf6', '#06b6d4',
+    '#10b981', '#f59e0b', '#ec4899', '#6366f1',
+    '#14b8a6', '#e11d48',
+  ];
+
+  /**
+   * Get a deterministic avatar background color from a name string.
+   */
+  getAvatarColor(value: any): string {
+    if (!value) return DynamicTableComponent.AVATAR_COLORS[0];
+    const str = String(value);
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+    }
+    return DynamicTableComponent.AVATAR_COLORS[
+      Math.abs(hash) % DynamicTableComponent.AVATAR_COLORS.length
+    ];
   }
 
   /**

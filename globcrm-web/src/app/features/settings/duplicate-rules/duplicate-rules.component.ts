@@ -49,251 +49,635 @@ interface EntityRuleConfig {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* ---- Keyframes ----------------------------------------- */
+    @keyframes drFadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes drSectionEntrance {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ---- Host ---------------------------------------------- */
     :host {
       display: block;
     }
 
-    .rules-container {
+    /* ---- Container ----------------------------------------- */
+    .dr-container {
       max-width: 900px;
       margin: 0 auto;
-      padding: 24px;
+      padding: var(--space-8) var(--space-6);
     }
 
-    .rules-header {
+    /* ---- Breadcrumb ---------------------------------------- */
+    .dr-breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      margin-bottom: var(--space-5);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
+      transition: color var(--duration-normal) var(--ease-default),
+                  background var(--duration-normal) var(--ease-default);
+      opacity: 0;
+      animation: drFadeSlideUp var(--duration-slow) var(--ease-out) forwards;
+    }
+
+    .dr-breadcrumb:hover {
+      color: var(--color-primary);
+      background: var(--color-primary-soft);
+    }
+
+    .dr-breadcrumb mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    /* ---- Header -------------------------------------------- */
+    .dr-header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: var(--space-5);
+      margin-bottom: var(--space-8);
+      opacity: 0;
+      animation: drFadeSlideUp var(--duration-slower) var(--ease-out) 60ms forwards;
     }
 
-    .rules-header h1 {
+    .dr-header__icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow:
+        0 4px 16px rgba(139, 92, 246, 0.25),
+        0 0 0 4px rgba(139, 92, 246, 0.08);
+    }
+
+    .dr-header__icon-wrap mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-secondary-fg);
+    }
+
+    .dr-header__text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dr-header__title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
       margin: 0;
-      font-size: 24px;
-      font-weight: 500;
+      color: var(--color-text);
+      line-height: var(--leading-tight);
     }
 
-    .rules-subtitle {
+    .dr-header__subtitle {
+      font-size: var(--text-base);
       color: var(--color-text-secondary);
-      font-size: 14px;
-      margin: 0 0 24px 0;
-      padding-left: 48px;
+      margin: var(--space-1) 0 0;
+      line-height: var(--leading-normal);
     }
 
-    .rules-loading {
+    /* ---- Loading ------------------------------------------- */
+    .dr-loading {
       display: flex;
       justify-content: center;
-      padding: 64px;
+      padding: var(--space-16);
     }
 
-    .rule-card {
-      margin-bottom: 24px;
+    /* ---- Section Card -------------------------------------- */
+    .dr-section {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      padding: var(--space-6);
+      margin-bottom: var(--space-5);
+      opacity: 0;
+      animation: drSectionEntrance var(--duration-slower) var(--ease-out) both;
     }
 
-    .rule-card mat-card-title {
-      font-size: 18px;
-      font-weight: 500;
+    .dr-section__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-6);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
-    .rule-section {
-      margin-bottom: 24px;
+    .dr-section__icon-wrap {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-lg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
     }
 
-    .rule-section:last-child {
-      margin-bottom: 0;
+    .dr-section__icon-wrap--contact {
+      background: var(--color-primary-soft);
     }
 
-    .rule-section-label {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 4px;
+    .dr-section__icon-wrap--contact mat-icon {
+      color: var(--color-primary);
+    }
+
+    .dr-section__icon-wrap--company {
+      background: var(--color-info-soft);
+    }
+
+    .dr-section__icon-wrap--company mat-icon {
+      color: var(--color-info);
+    }
+
+    .dr-section__icon-wrap mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    .dr-section__title {
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin: 0;
       color: var(--color-text);
     }
 
-    .rule-section-helper {
-      font-size: 13px;
-      color: var(--color-text-secondary);
-      margin: 4px 0 0 0;
+    /* ---- Rule Block ---------------------------------------- */
+    .dr-rule {
+      margin-bottom: var(--space-6);
     }
 
-    .toggle-section {
+    .dr-rule:last-of-type {
+      margin-bottom: 0;
+    }
+
+    .dr-rule__label {
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      margin: 0 0 var(--space-1) 0;
+      color: var(--color-text);
+    }
+
+    .dr-rule__helper {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: var(--space-1) 0 0 0;
+      line-height: var(--leading-normal);
+    }
+
+    /* ---- Toggle Row ---------------------------------------- */
+    .dr-toggle {
       display: flex;
       align-items: flex-start;
-      gap: 16px;
+      gap: var(--space-4);
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-subtle);
+      transition: border-color var(--duration-normal) var(--ease-default),
+                  background var(--duration-normal) var(--ease-default);
     }
 
-    .toggle-content {
+    .dr-toggle:hover {
+      border-color: var(--color-border);
+    }
+
+    .dr-toggle__content {
       flex: 1;
+      padding-top: var(--space-0-5);
     }
 
-    .threshold-section {
-      padding-top: 8px;
+    /* ---- Threshold ----------------------------------------- */
+    .dr-threshold {
+      padding: var(--space-4);
+      border-radius: var(--radius-lg);
+      background: var(--color-bg);
+      border: 1px solid var(--color-border-subtle);
     }
 
-    .threshold-label {
+    .dr-threshold__header {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
     }
 
-    .threshold-value {
-      font-weight: 600;
-      font-size: 14px;
+    .dr-threshold__value {
+      font-weight: var(--font-bold);
+      font-size: var(--text-md);
+      color: var(--color-text);
     }
 
-    .threshold-indicator {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
+    .dr-threshold__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
 
-    .threshold-indicator--strict {
-      background-color: var(--color-success);
+    .dr-threshold__badge--strict {
+      background: var(--color-success-soft);
+      color: var(--color-success-text);
     }
 
-    .threshold-indicator--moderate {
-      background-color: var(--color-warning);
+    .dr-threshold__badge--moderate {
+      background: var(--color-warning-soft);
+      color: var(--color-warning-text);
     }
 
-    .threshold-indicator--permissive {
-      background-color: var(--color-danger);
+    .dr-threshold__badge--permissive {
+      background: var(--color-danger-soft);
+      color: var(--color-danger-text);
     }
 
-    .threshold-slider {
+    .dr-threshold__slider-wrap {
+      position: relative;
+      margin-bottom: var(--space-2);
+    }
+
+    .dr-threshold__track {
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 6px;
+      border-radius: var(--radius-full);
+      transform: translateY(-50%);
+      background: linear-gradient(
+        90deg,
+        var(--color-danger) 0%,
+        var(--color-warning) 40%,
+        var(--color-success) 100%
+      );
+      opacity: 0.2;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .dr-threshold__slider {
       width: 100%;
+      position: relative;
+      z-index: 1;
     }
 
-    .fields-section {
-      padding-top: 8px;
+    /* ---- Fields -------------------------------------------- */
+    .dr-fields {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
     }
 
-    .field-checkbox {
-      display: block;
-      margin-bottom: 8px;
+    .dr-field-card {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border: 1.5px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      background: var(--color-surface);
+      transition: border-color var(--duration-normal) var(--ease-default),
+                  box-shadow var(--duration-normal) var(--ease-default);
     }
 
-    .card-actions {
+    .dr-field-card:hover {
+      border-color: var(--color-border-strong);
+    }
+
+    .dr-field-card--active {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.08);
+    }
+
+    .dr-field-card--disabled {
+      opacity: 0.7;
+      background: var(--color-bg);
+    }
+
+    .dr-field-card__icon-wrap {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      background: var(--color-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .dr-field-card__icon-wrap mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+      color: var(--color-text-secondary);
+    }
+
+    .dr-field-card--active .dr-field-card__icon-wrap {
+      background: var(--color-primary-soft);
+    }
+
+    .dr-field-card--active .dr-field-card__icon-wrap mat-icon {
+      color: var(--color-primary);
+    }
+
+    .dr-field-card__body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .dr-field-card__name {
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .dr-field-card__desc {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      margin: var(--space-0-5) 0 0;
+    }
+
+    .dr-field-card__required {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      color: var(--color-text-muted);
+      background: var(--color-bg-secondary);
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* ---- Actions ------------------------------------------- */
+    .dr-actions {
       display: flex;
       justify-content: flex-end;
-      padding-top: 16px;
-      border-top: 1px solid var(--color-border);
+      padding-top: var(--space-5);
+      margin-top: var(--space-6);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .dr-actions button {
+      min-width: 160px;
+    }
+
+    .dr-actions mat-spinner {
+      display: inline-block;
+      margin-right: var(--space-2);
+      vertical-align: middle;
+    }
+
+    /* ---- Responsive ---------------------------------------- */
+    @media (max-width: 768px) {
+      .dr-container {
+        padding: var(--space-5) var(--space-4);
+      }
+
+      .dr-header {
+        gap: var(--space-3);
+      }
+
+      .dr-header__icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-lg);
+      }
+
+      .dr-header__icon-wrap mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      .dr-header__title {
+        font-size: var(--text-xl);
+      }
+
+      .dr-header__subtitle {
+        font-size: var(--text-sm);
+      }
+
+      .dr-section {
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+      }
+
+      .dr-section__header {
+        padding-bottom: var(--space-3);
+        margin-bottom: var(--space-4);
+      }
+
+      .dr-toggle {
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+
+      .dr-field-card {
+        padding: var(--space-2) var(--space-3);
+      }
+
+      .dr-actions {
+        justify-content: stretch;
+      }
+
+      .dr-actions button {
+        width: 100%;
+      }
+    }
+
+    /* ---- Reduced Motion ------------------------------------ */
+    @media (prefers-reduced-motion: reduce) {
+      .dr-breadcrumb,
+      .dr-header,
+      .dr-section {
+        animation: none;
+        opacity: 1;
+      }
     }
   `,
   template: `
-    <div class="rules-container">
-      <div class="rules-header">
-        <a mat-icon-button routerLink="/settings" aria-label="Back to settings">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>Duplicate Detection Rules</h1>
+    <div class="dr-container">
+      <!-- Breadcrumb -->
+      <a routerLink="/settings" class="dr-breadcrumb">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Settings</span>
+      </a>
+
+      <!-- Header -->
+      <div class="dr-header">
+        <div class="dr-header__icon-wrap">
+          <mat-icon>compare_arrows</mat-icon>
+        </div>
+        <div class="dr-header__text">
+          <h1 class="dr-header__title">Duplicate Detection Rules</h1>
+          <p class="dr-header__subtitle">Configure how the system detects potential duplicate records</p>
+        </div>
       </div>
-      <p class="rules-subtitle">Configure how the system detects potential duplicate records</p>
 
       @if (isLoading()) {
-        <div class="rules-loading">
+        <div class="dr-loading">
           <mat-spinner diameter="48"></mat-spinner>
         </div>
       } @else {
-        @for (config of configs(); track config.entityType) {
-          <mat-card class="rule-card">
-            <mat-card-header>
-              <mat-card-title>
+        @for (config of configs(); track config.entityType; let i = $index) {
+          <div class="dr-section"
+               [style.animation-delay]="(i * 120 + 150) + 'ms'">
+            <!-- Section Header -->
+            <div class="dr-section__header">
+              <div class="dr-section__icon-wrap"
+                   [class.dr-section__icon-wrap--contact]="config.entityType === 'Contact'"
+                   [class.dr-section__icon-wrap--company]="config.entityType !== 'Contact'">
+                <mat-icon>{{ config.entityType === 'Contact' ? 'person' : 'business' }}</mat-icon>
+              </div>
+              <h2 class="dr-section__title">
                 {{ config.entityType === 'Contact' ? 'Contact Matching Rules' : 'Company Matching Rules' }}
-              </mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <!-- Auto-detection toggle -->
-              <div class="rule-section">
-                <div class="toggle-section">
-                  <mat-slide-toggle
-                    [checked]="config.autoDetectionEnabled"
-                    (change)="config.autoDetectionEnabled = $event.checked">
-                  </mat-slide-toggle>
-                  <div class="toggle-content">
-                    <div class="rule-section-label">Enable auto-detection on create</div>
-                    <p class="rule-section-helper">
-                      When enabled, the system warns users about potential duplicates when creating new records
-                    </p>
-                  </div>
+              </h2>
+            </div>
+
+            <!-- Auto-detection toggle -->
+            <div class="dr-rule">
+              <div class="dr-toggle">
+                <mat-slide-toggle
+                  [checked]="config.autoDetectionEnabled"
+                  (change)="config.autoDetectionEnabled = $event.checked">
+                </mat-slide-toggle>
+                <div class="dr-toggle__content">
+                  <div class="dr-rule__label">Enable auto-detection on create</div>
+                  <p class="dr-rule__helper">
+                    When enabled, the system warns users about potential duplicates when creating new records
+                  </p>
                 </div>
               </div>
+            </div>
 
-              <!-- Similarity threshold slider -->
-              <div class="rule-section threshold-section">
-                <div class="threshold-label">
-                  <span class="rule-section-label">Similarity Threshold:</span>
-                  <span class="threshold-value">{{ config.similarityThreshold }}%</span>
-                  <span class="threshold-indicator"
-                        [class.threshold-indicator--strict]="config.similarityThreshold > 85"
-                        [class.threshold-indicator--moderate]="config.similarityThreshold >= 70 && config.similarityThreshold <= 85"
-                        [class.threshold-indicator--permissive]="config.similarityThreshold < 70">
+            <!-- Similarity threshold slider -->
+            <div class="dr-rule">
+              <div class="dr-threshold">
+                <div class="dr-threshold__header">
+                  <span class="dr-rule__label">Similarity Threshold:</span>
+                  <span class="dr-threshold__value">{{ config.similarityThreshold }}%</span>
+                  <span class="dr-threshold__badge"
+                        [class.dr-threshold__badge--strict]="config.similarityThreshold > 85"
+                        [class.dr-threshold__badge--moderate]="config.similarityThreshold >= 70 && config.similarityThreshold <= 85"
+                        [class.dr-threshold__badge--permissive]="config.similarityThreshold < 70">
+                    {{ config.similarityThreshold > 85 ? 'Strict' : (config.similarityThreshold >= 70 ? 'Moderate' : 'Permissive') }}
                   </span>
                 </div>
-                <mat-slider
-                  class="threshold-slider"
-                  [min]="50"
-                  [max]="100"
-                  [step]="5"
-                  [discrete]="true"
-                  [showTickMarks]="true">
-                  <input matSliderThumb
-                         [value]="config.similarityThreshold"
-                         (valueChange)="config.similarityThreshold = $event">
-                </mat-slider>
-                <p class="rule-section-helper">
+                <div class="dr-threshold__slider-wrap">
+                  <div class="dr-threshold__track"></div>
+                  <mat-slider
+                    class="dr-threshold__slider"
+                    [min]="50"
+                    [max]="100"
+                    [step]="5"
+                    [discrete]="true"
+                    [showTickMarks]="true">
+                    <input matSliderThumb
+                           [value]="config.similarityThreshold"
+                           (valueChange)="config.similarityThreshold = $event">
+                  </mat-slider>
+                </div>
+                <p class="dr-rule__helper">
                   Records scoring above this threshold are flagged as potential duplicates
                 </p>
               </div>
+            </div>
 
-              <!-- Matching fields checkboxes -->
-              <div class="rule-section fields-section">
-                <div class="rule-section-label">Matching Fields</div>
-                <p class="rule-section-helper" style="margin-bottom: 12px;">
-                  Checked fields participate in duplicate matching
-                </p>
+            <!-- Matching fields -->
+            <div class="dr-rule">
+              <div class="dr-rule__label">Matching Fields</div>
+              <p class="dr-rule__helper" style="margin-bottom: var(--space-3)">
+                Select which fields participate in duplicate matching
+              </p>
+              <div class="dr-fields">
                 @if (config.entityType === 'Contact') {
-                  <mat-checkbox
-                    class="field-checkbox"
-                    [checked]="true"
-                    [disabled]="true">
-                    Name (always required)
-                  </mat-checkbox>
-                  <mat-checkbox
-                    class="field-checkbox"
-                    [checked]="isFieldEnabled(config, 'email')"
-                    (change)="toggleField(config, 'email', $event.checked)">
-                    Email
-                  </mat-checkbox>
+                  <div class="dr-field-card dr-field-card--active dr-field-card--disabled">
+                    <div class="dr-field-card__icon-wrap">
+                      <mat-icon>badge</mat-icon>
+                    </div>
+                    <div class="dr-field-card__body">
+                      <div class="dr-field-card__name">Name</div>
+                      <div class="dr-field-card__desc">First and last name comparison</div>
+                    </div>
+                    <span class="dr-field-card__required">Required</span>
+                  </div>
+                  <label class="dr-field-card"
+                         [class.dr-field-card--active]="isFieldEnabled(config, 'email')">
+                    <div class="dr-field-card__icon-wrap">
+                      <mat-icon>email</mat-icon>
+                    </div>
+                    <div class="dr-field-card__body">
+                      <div class="dr-field-card__name">Email</div>
+                      <div class="dr-field-card__desc">Match by email address similarity</div>
+                    </div>
+                    <mat-checkbox
+                      [checked]="isFieldEnabled(config, 'email')"
+                      (change)="toggleField(config, 'email', $event.checked)">
+                    </mat-checkbox>
+                  </label>
                 } @else {
-                  <mat-checkbox
-                    class="field-checkbox"
-                    [checked]="true"
-                    [disabled]="true">
-                    Company Name (always required)
-                  </mat-checkbox>
-                  <mat-checkbox
-                    class="field-checkbox"
-                    [checked]="isFieldEnabled(config, 'website')"
-                    (change)="toggleField(config, 'website', $event.checked)">
-                    Website / Domain
-                  </mat-checkbox>
+                  <div class="dr-field-card dr-field-card--active dr-field-card--disabled">
+                    <div class="dr-field-card__icon-wrap">
+                      <mat-icon>business</mat-icon>
+                    </div>
+                    <div class="dr-field-card__body">
+                      <div class="dr-field-card__name">Company Name</div>
+                      <div class="dr-field-card__desc">Primary name and alias matching</div>
+                    </div>
+                    <span class="dr-field-card__required">Required</span>
+                  </div>
+                  <label class="dr-field-card"
+                         [class.dr-field-card--active]="isFieldEnabled(config, 'website')">
+                    <div class="dr-field-card__icon-wrap">
+                      <mat-icon>language</mat-icon>
+                    </div>
+                    <div class="dr-field-card__body">
+                      <div class="dr-field-card__name">Website / Domain</div>
+                      <div class="dr-field-card__desc">Compare website URLs and domain names</div>
+                    </div>
+                    <mat-checkbox
+                      [checked]="isFieldEnabled(config, 'website')"
+                      (change)="toggleField(config, 'website', $event.checked)">
+                    </mat-checkbox>
+                  </label>
                 }
               </div>
-            </mat-card-content>
-            <mat-card-actions>
-              <div class="card-actions">
-                <button mat-raised-button color="primary"
-                        [disabled]="config.saving"
-                        (click)="saveConfig(config)">
-                  @if (config.saving) {
-                    <mat-spinner diameter="20"></mat-spinner>
-                  }
-                  Save {{ config.entityType }} Rules
-                </button>
-              </div>
-            </mat-card-actions>
-          </mat-card>
+            </div>
+
+            <!-- Save action -->
+            <div class="dr-actions">
+              <button mat-raised-button color="primary"
+                      [disabled]="config.saving"
+                      (click)="saveConfig(config)">
+                @if (config.saving) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                Save {{ config.entityType }} Rules
+              </button>
+            </div>
+          </div>
         }
       }
     </div>

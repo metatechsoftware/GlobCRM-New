@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
   effect,
 } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -12,8 +13,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { FullCalendarModule } from '@fullcalendar/angular';
-import { CalendarOptions, EventInput, EventDropArg } from '@fullcalendar/core';
+import { CalendarOptions, EventInput, EventDropArg, EventContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin, { DateClickArg } from '@fullcalendar/interaction';
@@ -40,6 +42,7 @@ import { ACTIVITY_TYPES, ACTIVITY_PRIORITIES } from '../activities/activity.mode
     MatIconModule,
     MatProgressBarModule,
     MatSnackBarModule,
+    MatTooltipModule,
     FullCalendarModule,
   ],
   templateUrl: './calendar.component.html',
@@ -56,6 +59,9 @@ export class CalendarComponent implements OnInit {
 
   /** Loading state. */
   isLoading = signal(false);
+
+  /** Whether at least one load has completed (prevents empty state flash on init). */
+  hasLoaded = signal(false);
 
   /** Calendar events from API. */
   events = signal<CalendarEventDto[]>([]);
@@ -80,6 +86,23 @@ export class CalendarComponent implements OnInit {
 
   /** Priority legend items. */
   readonly priorityLegend = ACTIVITY_PRIORITIES;
+
+  /** Activity type → Material Icon name mapping. */
+  private readonly typeIconMap: Record<string, string> = {
+    Task: 'task_alt',
+    Call: 'phone',
+    Meeting: 'groups',
+  };
+
+  /** Event counts by activity type for stat chips. */
+  typeCounts = computed(() => {
+    const counts: Record<string, number> = {};
+    for (const e of this.events()) {
+      const type = e.extendedProps?.type || 'Other';
+      counts[type] = (counts[type] || 0) + 1;
+    }
+    return counts;
+  });
 
   /** Entity type options for filter dropdown. */
   readonly entityTypes = [
@@ -113,6 +136,7 @@ export class CalendarComponent implements OnInit {
     allDaySlot: true,
     height: 'auto',
     events: [],
+    eventContent: (arg: EventContentArg) => this.renderEventContent(arg),
     eventDrop: (info: EventDropArg) => this.handleEventDrop(info),
     dateClick: (info: DateClickArg) => this.handleDateClick(info),
     eventClick: (info) => this.handleEventClick(info),
@@ -269,6 +293,7 @@ export class CalendarComponent implements OnInit {
         const calendarEvents = this.mapToCalendarEvents(events);
         this.calendarOptions.update((opts) => ({ ...opts, events: calendarEvents }));
         this.isLoading.set(false);
+        this.hasLoaded.set(true);
       },
       error: () => {
         this.isLoading.set(false);
@@ -278,7 +303,29 @@ export class CalendarComponent implements OnInit {
   }
 
   /**
-   * Map CalendarEventDto[] to FullCalendar EventInput[] with priority-based coloring.
+   * Custom event content renderer — shows type icon + time + truncated title.
+   * Returns HTML string for FullCalendar to render inside each event element.
+   */
+  renderEventContent(arg: EventContentArg): { html: string } {
+    const type = arg.event.extendedProps?.['type'] || 'Task';
+    const icon = this.typeIconMap[type] || 'event';
+    const time = arg.timeText || '';
+    const title = this.escapeHtml(arg.event.title || '');
+
+    return {
+      html: `<div class="cal-event-inner">
+        <span class="material-icons cal-event-inner__icon">${icon}</span>
+        <div class="cal-event-inner__content">
+          ${time ? `<span class="cal-event-inner__time">${this.escapeHtml(time)}</span>` : ''}
+          <span class="cal-event-inner__title">${title}</span>
+        </div>
+      </div>`,
+    };
+  }
+
+  /**
+   * Map CalendarEventDto[] to FullCalendar EventInput[] with priority/type classNames.
+   * CSS custom properties on the className handle coloring via the stylesheet.
    */
   private mapToCalendarEvents(events: CalendarEventDto[]): EventInput[] {
     return events.map((e) => ({
@@ -286,22 +333,20 @@ export class CalendarComponent implements OnInit {
       title: e.title,
       start: e.start,
       end: e.end,
-      backgroundColor: e.color || this.getPriorityColor(e.extendedProps?.priority),
-      borderColor: e.color || this.getPriorityColor(e.extendedProps?.priority),
+      classNames: [
+        `cal-priority-${(e.extendedProps?.priority || 'Medium').toLowerCase()}`,
+        `cal-type-${(e.extendedProps?.type || 'Task').toLowerCase()}`,
+      ],
       extendedProps: e.extendedProps,
     }));
   }
 
-  /**
-   * Priority-to-color mapping matching existing activity calendar.
-   */
-  private getPriorityColor(priority: string): string {
-    const colors: Record<string, string> = {
-      Low: 'var(--color-success)',
-      Medium: 'var(--color-info)',
-      High: 'var(--color-warning)',
-      Urgent: 'var(--color-danger)',
-    };
-    return colors[priority] ?? 'var(--color-text-muted)';
+  /** Escape HTML to prevent XSS in custom event content. */
+  private escapeHtml(text: string): string {
+    return text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 }

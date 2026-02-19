@@ -137,7 +137,8 @@ const ENTITY_OPTIONS: EntityOption[] = [
         font-size: 18px;
         width: 18px;
         height: 18px;
-        color: var(--color-text-secondary, #6B7280);
+        color: var(--color-primary, #F97316);
+        opacity: 0.7;
       }
     }
   `,

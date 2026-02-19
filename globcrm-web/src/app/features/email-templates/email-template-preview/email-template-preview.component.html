@@ -98,10 +98,13 @@
 
   <!-- Preview Area -->
   <div class="preview-area">
-    <!-- Subject Line -->
+    <!-- Email-Client Header -->
     @if (renderedSubject()) {
-      <div class="subject-bar">
-        <strong>Subject:</strong> {{ renderedSubject() }}
+      <div class="email-client-header">
+        <div class="email-header-row">
+          <span class="email-header-label">Subject</span>
+          <span class="email-header-value">{{ renderedSubject() }}</span>
+        </div>
       </div>
     }
 
@@ -112,6 +115,16 @@
         [class.desktop]="deviceMode() === 'desktop'"
         [class.mobile]="deviceMode() === 'mobile'"
       >
+        <div class="device-chrome-bar">
+          @if (deviceMode() === 'desktop') {
+            <span class="chrome-dot" style="background:#FF5F57"></span>
+            <span class="chrome-dot" style="background:#FEBC2E"></span>
+            <span class="chrome-dot" style="background:#28C840"></span>
+          }
+          @if (deviceMode() === 'mobile') {
+            <span class="mobile-notch"></span>
+          }
+        </div>
         @if (previewLoading()) {
           <div class="preview-loading">
             <mat-spinner diameter="40"></mat-spinner>

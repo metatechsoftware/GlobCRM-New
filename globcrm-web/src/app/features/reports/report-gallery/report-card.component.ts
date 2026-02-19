@@ -123,7 +123,7 @@ import { ReportListItem, ReportChartType } from '../report.models';
         }
 
         <div class="report-card__meta">
-          <span class="report-card__entity-chip">
+          <span class="report-card__entity-chip" [attr.data-entity]="report().entityType">
             <mat-icon class="report-card__entity-icon">{{ entityIcon() }}</mat-icon>
             {{ report().entityType }}
           </span>
@@ -159,6 +159,27 @@ import { ReportListItem, ReportChartType } from '../report.models';
     </div>
   `,
   styles: `
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @keyframes svgFadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    :host {
+      animation: cardEntrance 500ms cubic-bezier(0, 0, 0.2, 1) backwards;
+      animation-delay: calc(var(--card-index, 0) * 60ms);
+    }
+
     .report-card {
       display: flex;
       flex-direction: column;
@@ -168,21 +189,21 @@ import { ReportListItem, ReportChartType } from '../report.models';
       box-shadow: var(--shadow-sm);
       overflow: hidden;
       cursor: pointer;
-      transition: box-shadow var(--duration-normal, 200ms) var(--ease-default),
-                  border-color var(--duration-normal, 200ms) var(--ease-default),
-                  transform var(--duration-normal, 200ms) var(--ease-default);
+      transition: box-shadow var(--duration-normal, 200ms) cubic-bezier(0, 0, 0.2, 1),
+                  border-color var(--duration-normal, 200ms) cubic-bezier(0, 0, 0.2, 1),
+                  transform var(--duration-normal, 200ms) cubic-bezier(0, 0, 0.2, 1);
     }
 
     .report-card:hover {
-      box-shadow: var(--shadow-md);
+      box-shadow: 0 8px 25px rgba(249, 115, 22, 0.08), var(--shadow-md);
       border-color: var(--color-primary, #F97316);
-      transform: translateY(-1px);
+      transform: translateY(-2px) scale(1.01);
     }
 
     /* Thumbnail */
     .report-card__thumbnail {
-      height: 120px;
-      background: var(--color-bg-secondary, #F0F0EE);
+      height: 140px;
+      background: linear-gradient(135deg, var(--color-primary-soft, #FFF7ED), var(--color-bg-secondary, #F0F0EE));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -194,6 +215,7 @@ import { ReportListItem, ReportChartType } from '../report.models';
       width: 100%;
       height: 100%;
       padding: 0 16px;
+      animation: svgFadeIn 400ms cubic-bezier(0, 0, 0.2, 1) 300ms backwards;
     }
 
     /* Info */
@@ -245,6 +267,32 @@ import { ReportListItem, ReportChartType } from '../report.models';
       text-transform: capitalize;
     }
 
+    /* Entity-colored chips */
+    .report-card__entity-chip[data-entity="Contact"] {
+      background: #EFF6FF; color: #1D4ED8;
+    }
+    .report-card__entity-chip[data-entity="Deal"] {
+      background: #F0FDF4; color: #16A34A;
+    }
+    .report-card__entity-chip[data-entity="Company"] {
+      background: #F5F3FF; color: #7C3AED;
+    }
+    .report-card__entity-chip[data-entity="Lead"] {
+      background: #FFF7ED; color: #EA580C;
+    }
+    .report-card__entity-chip[data-entity="Activity"] {
+      background: #F0FDFA; color: #0D9488;
+    }
+    .report-card__entity-chip[data-entity="Quote"] {
+      background: #FFFBEB; color: #D97706;
+    }
+    .report-card__entity-chip[data-entity="Request"] {
+      background: #FEF2F2; color: #DC2626;
+    }
+    .report-card__entity-chip[data-entity="Product"] {
+      background: #F0FDFA; color: #0D9488;
+    }
+
     .report-card__entity-icon {
       font-size: 12px;
       width: 12px;
@@ -277,6 +325,7 @@ import { ReportListItem, ReportChartType } from '../report.models';
       justify-content: space-between;
       margin-top: auto;
       padding-top: var(--space-3, 12px);
+      border-top: 1px solid var(--color-border-subtle, #F0F0EE);
     }
 
     .report-card__last-run {

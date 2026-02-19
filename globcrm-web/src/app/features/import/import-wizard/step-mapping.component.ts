@@ -7,12 +7,10 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatRadioModule } from '@angular/material/radio';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImportStore } from '../stores/import.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -41,177 +39,93 @@ interface MappingRow {
   selector: 'app-step-mapping',
   standalone: true,
   imports: [
-    FormsModule,
     MatFormFieldModule,
     MatSelectModule,
     MatButtonModule,
     MatIconModule,
-    MatRadioModule,
     MatProgressSpinnerModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .mapping-container {
-      padding: 24px 0;
-    }
-
-    .mapping-table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .mapping-table th {
-      text-align: left;
-      padding: 8px 12px;
-      font-weight: 500;
-      font-size: 13px;
-      color: var(--color-text-secondary);
-      border-bottom: 2px solid var(--color-border);
-    }
-
-    .mapping-table td {
-      padding: 8px 12px;
-      border-bottom: 1px solid var(--color-border-subtle);
-      vertical-align: middle;
-    }
-
-    .csv-column-name {
-      font-weight: 500;
-      font-size: 14px;
-    }
-
-    .sample-data {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-      margin-top: 4px;
-    }
-
-    .sample-data span {
-      display: inline-block;
-      background: var(--color-surface-hover);
-      border-radius: 4px;
-      padding: 2px 6px;
-      margin-right: 4px;
-      margin-top: 2px;
-    }
-
-    .field-select {
-      width: 100%;
-    }
-
-    .arrow-cell {
-      text-align: center;
-      color: var(--color-text-muted);
-    }
-
-    .duplicate-section {
-      margin-top: 24px;
-      padding: 16px;
-      border-radius: 8px;
-      background: var(--color-surface-hover);
-    }
-
-    .duplicate-section h3 {
-      margin: 0 0 12px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .duplicate-options {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .duplicate-description {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-      margin-left: 32px;
-      margin-top: -4px;
-    }
-
-    .step-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 24px;
-      padding-top: 16px;
-    }
-
-    .error-msg {
-      color: var(--color-danger);
-      margin-top: 12px;
-      font-size: 14px;
-    }
-  `,
+  styleUrl: './step-mapping.component.scss',
   template: `
     <div class="mapping-container">
-      <table class="mapping-table">
-        <thead>
-          <tr>
-            <th>CSV Column</th>
-            <th></th>
-            <th>Map to Field</th>
-          </tr>
-        </thead>
-        <tbody>
-          @for (row of mappings(); track row.csvColumn) {
-            <tr>
-              <td>
-                <div class="csv-column-name">{{ row.csvColumn }}</div>
-                <div class="sample-data">
-                  @for (sample of getSampleValues(row.csvColumn); track $index) {
-                    <span>{{ sample }}</span>
-                  }
-                </div>
-              </td>
-              <td class="arrow-cell">
-                <mat-icon>arrow_forward</mat-icon>
-              </td>
-              <td>
-                <mat-form-field appearance="outline" class="field-select">
-                  <mat-label>Map to</mat-label>
-                  <mat-select [(value)]="row.entityField"
-                              (selectionChange)="onFieldChange(row, $event.value)">
-                    <mat-option value="">(Skip this column)</mat-option>
-                    <mat-optgroup label="Core Fields">
-                      @for (field of coreFields(); track field.key) {
-                        <mat-option [value]="field.key">
+      <!-- Mapping Rows -->
+      <div class="mapping-rows">
+        @for (row of mappings(); track row.csvColumn; let i = $index) {
+          <div class="mapping-row" [style.animation-delay]="i * 40 + 'ms'">
+            <div class="mapping-source">
+              <span class="column-badge">{{ row.csvColumn }}</span>
+              <div class="sample-chips">
+                @for (sample of getSampleValues(row.csvColumn); track $index) {
+                  <span class="sample-chip">{{ sample }}</span>
+                }
+              </div>
+            </div>
+
+            <div class="mapping-arrow">
+              <div class="arrow-line"></div>
+              <mat-icon>arrow_forward</mat-icon>
+              <div class="arrow-line"></div>
+            </div>
+
+            <div class="mapping-target">
+              <mat-form-field appearance="outline" class="field-select">
+                <mat-label>Map to field</mat-label>
+                <mat-select [(value)]="row.entityField"
+                            (selectionChange)="onFieldChange(row, $event.value)">
+                  <mat-option value="">(Skip this column)</mat-option>
+                  <mat-optgroup label="Core Fields">
+                    @for (field of coreFields(); track field.key) {
+                      <mat-option [value]="field.key">
+                        {{ field.label }}
+                        @if (field.required) {
+                          <span style="color: var(--color-danger);"> *</span>
+                        }
+                      </mat-option>
+                    }
+                  </mat-optgroup>
+                  @if (customFields().length > 0) {
+                    <mat-optgroup label="Custom Fields">
+                      @for (field of customFields(); track field.key) {
+                        <mat-option [value]="'custom:' + field.key">
                           {{ field.label }}
-                          @if (field.required) {
-                            <span style="color: var(--color-danger);"> *</span>
-                          }
                         </mat-option>
                       }
                     </mat-optgroup>
-                    @if (customFields().length > 0) {
-                      <mat-optgroup label="Custom Fields">
-                        @for (field of customFields(); track field.key) {
-                          <mat-option [value]="'custom:' + field.key">
-                            {{ field.label }}
-                          </mat-option>
-                        }
-                      </mat-optgroup>
-                    }
-                  </mat-select>
-                </mat-form-field>
-              </td>
-            </tr>
-          }
-        </tbody>
-      </table>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </div>
+          </div>
+        }
+      </div>
 
-      <div class="duplicate-section">
+      <!-- Duplicate Strategy Cards -->
+      <div class="strategy-section">
         <h3>Duplicate Handling</h3>
-        <mat-radio-group [(ngModel)]="duplicateStrategy" class="duplicate-options">
-          <mat-radio-button value="skip">Skip duplicates</mat-radio-button>
-          <div class="duplicate-description">Existing records will not be modified</div>
-
-          <mat-radio-button value="overwrite">Overwrite existing</mat-radio-button>
-          <div class="duplicate-description">Replace all fields in existing records with imported data</div>
-
-          <mat-radio-button value="merge">Merge (update non-empty)</mat-radio-button>
-          <div class="duplicate-description">Only update fields that have values in the CSV</div>
-        </mat-radio-group>
+        <div class="strategy-cards">
+          <button class="strategy-card"
+                  [class.selected]="duplicateStrategy === 'skip'"
+                  (click)="duplicateStrategy = 'skip'">
+            <mat-icon>block</mat-icon>
+            <span class="strategy-label">Skip</span>
+            <span class="strategy-desc">Existing records won't be modified</span>
+          </button>
+          <button class="strategy-card"
+                  [class.selected]="duplicateStrategy === 'overwrite'"
+                  (click)="duplicateStrategy = 'overwrite'">
+            <mat-icon>swap_horiz</mat-icon>
+            <span class="strategy-label">Overwrite</span>
+            <span class="strategy-desc">Replace all fields with imported data</span>
+          </button>
+          <button class="strategy-card"
+                  [class.selected]="duplicateStrategy === 'merge'"
+                  (click)="duplicateStrategy = 'merge'">
+            <mat-icon>merge_type</mat-icon>
+            <span class="strategy-label">Merge</span>
+            <span class="strategy-desc">Only update non-empty fields</span>
+          </button>
+        </div>
       </div>
 
       @if (store.error()) {

@@ -1,14 +1,15 @@
 <div class="detail">
   @if (store.loading() && !store.selectedSequence()) {
     <div class="detail__loading">
-      <mat-spinner diameter="48"></mat-spinner>
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
   }
 
   @if (store.selectedSequence(); as seq) {
-    <!-- Header -->
+    <!-- Hero Header -->
     <div class="detail__header">
-      <button mat-icon-button routerLink="/sequences" aria-label="Back to sequences">
+      <button mat-icon-button routerLink="/sequences" aria-label="Back to sequences"
+              class="detail__back-btn">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div class="detail__header-info">
@@ -22,6 +23,7 @@
             [class.status--active]="seq.status === 'active'"
             [class.status--paused]="seq.status === 'paused'"
             [class.status--archived]="seq.status === 'archived'">
+        <span class="detail__status-dot"></span>
         {{ seq.status | titlecase }}
       </span>
       <div class="detail__header-actions">
@@ -62,15 +64,18 @@
       </div>
     </div>
 
-    <!-- Analytics Section (summary cards + funnel chart + per-step metrics) -->
+    <!-- Analytics Section -->
     <app-sequence-analytics
       [analytics]="store.analytics()"
       [stepMetrics]="store.stepMetrics()"
       [funnelData]="store.funnelData()" />
 
-    <!-- Steps Overview -->
+    <!-- Steps Pipeline Timeline -->
     <div class="detail__section">
-      <h2>Steps</h2>
+      <h2 class="detail__section-title">
+        <mat-icon>route</mat-icon>
+        Steps
+      </h2>
       @if (seq.steps.length === 0) {
         <p class="detail__empty-hint">No steps configured. <a [routerLink]="['/sequences', seq.id, 'edit']">Add steps</a></p>
       } @else {
@@ -79,11 +84,12 @@
             <div class="step-overview"
                  [class.step-overview--expanded]="expandedStepId() === step.id"
                  (click)="toggleStepExpand(step.id)">
+              <span class="step-overview__badge">{{ step.stepNumber }}</span>
               <div class="step-overview__header">
-                <span class="step-overview__badge">{{ step.stepNumber }}</span>
                 <div class="step-overview__info">
                   <span class="step-overview__name">{{ step.emailTemplateName || 'No template' }}</span>
                   <span class="step-overview__delay">
+                    <mat-icon>schedule</mat-icon>
                     @if (step.delayDays === 0 && step.stepNumber === 1) {
                       Send immediately
                     } @else if (step.delayDays === 0) {
@@ -99,9 +105,18 @@
                 <!-- Inline step metrics -->
                 @if (getStepMetric(step.stepNumber); as metric) {
                   <div class="step-overview__metrics">
-                    <span class="step-metric" matTooltip="Sent">{{ metric.sent }} sent</span>
-                    <span class="step-metric" matTooltip="Open rate">{{ metric.openRate }}% opens</span>
-                    <span class="step-metric" matTooltip="Click rate">{{ metric.clickRate }}% clicks</span>
+                    <span class="step-metric" matTooltip="Emails sent">
+                      <strong>{{ metric.sent }}</strong>
+                      sent
+                    </span>
+                    <span class="step-metric" matTooltip="Open rate">
+                      <strong>{{ metric.openRate }}%</strong>
+                      opens
+                    </span>
+                    <span class="step-metric" matTooltip="Click rate">
+                      <strong>{{ metric.clickRate }}%</strong>
+                      clicks
+                    </span>
                   </div>
                 }
                 <mat-icon class="step-overview__chevron">
@@ -137,7 +152,10 @@
     <!-- Enrollment List -->
     <div class="detail__section">
       <div class="detail__section-header">
-        <h2>Enrollments</h2>
+        <h2 class="detail__section-title">
+          <mat-icon>people</mat-icon>
+          Enrollments
+        </h2>
         @if (selectedEnrollmentIds().size > 0) {
           <div class="detail__bulk-actions">
             <span class="detail__bulk-count">{{ selectedEnrollmentIds().size }} selected</span>
@@ -156,7 +174,9 @@
       @if (store.enrollments(); as enrollmentData) {
         @if (enrollmentData.items.length === 0) {
           <div class="detail__empty-enrollment">
-            <mat-icon>people_outline</mat-icon>
+            <div class="detail__empty-enrollment-icon">
+              <mat-icon>people_outline</mat-icon>
+            </div>
             <p>No contacts enrolled</p>
             <button mat-flat-button color="primary" (click)="openEnrollmentDialog()">
               <mat-icon>person_add</mat-icon>
@@ -187,10 +207,12 @@
               <ng-container matColumnDef="contact">
                 <th mat-header-cell *matHeaderCellDef>Contact</th>
                 <td mat-cell *matCellDef="let enrollment">
-                  <a class="detail__contact-link" [routerLink]="['/contacts', enrollment.contactId]">
-                    {{ enrollment.contactName || 'Unknown' }}
-                  </a>
-                  <div class="detail__contact-email">{{ enrollment.contactEmail }}</div>
+                  <div class="detail__contact-cell">
+                    <a class="detail__contact-link" [routerLink]="['/contacts', enrollment.contactId]">
+                      {{ enrollment.contactName || 'Unknown' }}
+                    </a>
+                    <div class="detail__contact-email">{{ enrollment.contactEmail }}</div>
+                  </div>
                 </td>
               </ng-container>
 
@@ -200,6 +222,7 @@
                 <td mat-cell *matCellDef="let enrollment">
                   <span class="enrollment-status"
                         [class]="'enrollment-status--' + enrollment.status">
+                    <span class="enrollment-status__dot"></span>
                     {{ enrollment.status | titlecase }}
                   </span>
                 </td>

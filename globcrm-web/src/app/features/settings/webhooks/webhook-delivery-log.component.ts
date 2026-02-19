@@ -43,298 +43,517 @@ import { WebhookService } from './webhook.service';
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* ── Keyframes ─────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(59,130,246,0.25), 0 0 0 4px rgba(59,130,246,0.08); }
+      50%      { box-shadow: 0 4px 20px rgba(59,130,246,0.35), 0 0 0 6px rgba(59,130,246,0.12); }
+    }
+
+    /* ── Host ──────────────────────────────────────── */
     :host {
       display: block;
     }
 
-    .delivery-log {
+    /* ── Page Container ────────────────────────────── */
+    .dl-page {
       max-width: 1100px;
       margin: 0 auto;
-      padding: 24px;
+      padding: var(--space-6);
     }
 
-    .delivery-log__header {
+    /* ── Header ────────────────────────────────────── */
+    .dl-header {
+      margin-bottom: var(--space-8);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) forwards;
+    }
+
+    .dl-header__breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      margin-bottom: var(--space-4);
+      transition: color var(--duration-fast) var(--ease-default);
+    }
+
+    .dl-header__breadcrumb mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .dl-header__breadcrumb:hover {
+      color: var(--color-info);
+    }
+
+    .dl-header__top {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: var(--space-5);
     }
 
-    .delivery-log__header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
+    .dl-header__icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-text) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    .dl-header__icon-wrap mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+      color: #fff;
+    }
+
+    .dl-header__text {
       flex: 1;
+      min-width: 0;
     }
 
-    .delivery-log__subtitle {
+    .dl-header__title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
+      margin: 0;
+      color: var(--color-text);
+      line-height: var(--leading-tight);
+    }
+
+    .dl-header__subtitle {
+      font-size: var(--text-base);
       color: var(--color-text-secondary);
-      font-size: 14px;
-      margin: 0 0 24px 0;
-      padding-left: 48px;
+      margin: var(--space-1) 0 0;
+      line-height: var(--leading-normal);
     }
 
-    .delivery-log__filters {
+    /* ── Section Card ──────────────────────────────── */
+    .dl-section {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      padding: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) 0.1s forwards;
+    }
+
+    /* ── Filters ───────────────────────────────────── */
+    .dl-filters {
       display: flex;
       align-items: center;
-      gap: 16px;
-      margin-bottom: 16px;
+      gap: var(--space-4);
+      padding-bottom: var(--space-5);
+      margin-bottom: var(--space-5);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
-    .delivery-log__loading {
+    .dl-filters__icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--color-info);
+      flex-shrink: 0;
+    }
+
+    .dl-filters__label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-semibold);
+      color: var(--color-text-secondary);
+      flex-shrink: 0;
+    }
+
+    /* ── Loading ───────────────────────────────────── */
+    .dl-loading {
       display: flex;
       justify-content: center;
-      padding: 64px;
+      padding: var(--space-16);
+      opacity: 0;
+      animation: fadeSlideUp 0.35s var(--ease-out) forwards;
     }
 
-    .delivery-log__empty {
+    /* ── Empty State ───────────────────────────────── */
+    .dl-empty {
       text-align: center;
-      padding: 64px 24px;
-      color: var(--color-text-secondary);
+      padding: var(--space-16) var(--space-6);
+      opacity: 0;
+      animation: fadeSlideUp 0.35s var(--ease-out) 0.15s forwards;
     }
 
-    .delivery-log__empty mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      margin-bottom: 16px;
-      color: var(--color-primary);
+    .dl-empty__icon-wrap {
+      width: 80px;
+      height: 80px;
+      border-radius: var(--radius-full);
+      background: var(--color-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-5);
+    }
+
+    .dl-empty__icon-wrap mat-icon {
+      font-size: 36px;
+      width: 36px;
+      height: 36px;
+      color: var(--color-text-muted);
       opacity: 0.6;
     }
 
-    .delivery-log__empty h3 {
-      margin: 0 0 8px 0;
-      font-weight: 500;
+    .dl-empty__title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
       color: var(--color-text);
+      margin: 0 0 var(--space-2) 0;
     }
 
-    .delivery-table {
+    .dl-empty__text {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: var(--leading-relaxed);
+    }
+
+    /* ── Delivery Table ────────────────────────────── */
+    .dl-table {
       width: 100%;
       border-collapse: collapse;
     }
 
-    .delivery-table th {
+    .dl-table th {
       text-align: left;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--color-text-secondary);
-      padding: 8px 12px;
+      color: var(--color-text-muted);
+      padding: var(--space-2) var(--space-3);
       border-bottom: 2px solid var(--color-border);
     }
 
-    .delivery-table td {
-      font-size: 13px;
-      padding: 10px 12px;
+    .dl-table td {
+      font-size: var(--text-sm);
+      padding: var(--space-3) var(--space-3);
       border-bottom: 1px solid var(--color-border-subtle);
       color: var(--color-text);
     }
 
-    .delivery-row {
+    .dl-row {
       cursor: pointer;
-      transition: background-color 0.1s;
+      transition: background-color var(--duration-fast) var(--ease-default);
+      border-left: 3px solid transparent;
     }
 
-    .delivery-row:hover {
-      background-color: var(--color-surface-hover);
+    .dl-row:hover {
+      background: var(--color-surface-hover);
     }
 
-    .delivery-badge {
+    .dl-row--success {
+      border-left-color: var(--color-success);
+    }
+
+    .dl-row--failed {
+      border-left-color: var(--color-danger);
+    }
+
+    .dl-row--retrying {
+      border-left-color: var(--color-warning);
+    }
+
+    /* ── Delivery Badge ────────────────────────────── */
+    .dl-badge {
       display: inline-block;
       font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 600;
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      font-weight: var(--font-semibold);
     }
 
-    .delivery-badge--success {
-      background-color: var(--color-success-soft);
+    .dl-badge--success {
+      background: var(--color-success-soft);
       color: var(--color-success-text);
     }
 
-    .delivery-badge--failed {
-      background-color: var(--color-danger-soft);
+    .dl-badge--failed {
+      background: var(--color-danger-soft);
       color: var(--color-danger-text);
     }
 
-    .delivery-badge--retrying {
-      background-color: var(--color-warning-soft);
+    .dl-badge--retrying {
+      background: var(--color-warning-soft);
       color: var(--color-warning-text);
     }
 
-    .delivery-expanded {
-      background-color: var(--color-surface-hover);
+    /* ── Expanded Row ──────────────────────────────── */
+    .dl-expanded {
+      background: var(--color-surface-hover);
     }
 
-    .delivery-expanded td {
-      padding: 16px 12px;
+    .dl-expanded td {
+      padding: var(--space-4) var(--space-3);
     }
 
-    .delivery-detail {
+    .dl-detail {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: var(--space-3);
     }
 
-    .delivery-detail__section {
+    .dl-detail__section {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--space-1);
     }
 
-    .delivery-detail__label {
+    .dl-detail__label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: var(--font-semibold);
       text-transform: uppercase;
-      color: var(--color-text-secondary);
+      color: var(--color-text-muted);
     }
 
-    .delivery-detail__value {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 12px;
-      background-color: var(--color-bg);
+    .dl-detail__value {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      background: var(--color-bg);
       color: var(--color-text);
       border: 1px solid var(--color-border);
-      padding: 12px;
-      border-radius: 6px;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 200px;
       overflow-y: auto;
     }
 
-    .subscription-link {
-      color: var(--color-primary);
-      text-decoration: none;
-      cursor: pointer;
+    .dl-detail__attempt {
+      font-size: var(--text-base);
+      color: var(--color-text);
     }
 
-    .subscription-link:hover {
+    /* ── Subscription Link ─────────────────────────── */
+    .dl-sub-link {
+      color: var(--color-info);
+      text-decoration: none;
+      font-weight: var(--font-medium);
+      cursor: pointer;
+      transition: color var(--duration-fast) var(--ease-default);
+    }
+
+    .dl-sub-link:hover {
+      color: var(--color-info-text);
       text-decoration: underline;
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 768px) {
+      .dl-page {
+        padding: var(--space-4);
+      }
+
+      .dl-header__top {
+        flex-wrap: wrap;
+      }
+
+      .dl-header__icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-md);
+      }
+
+      .dl-header__icon-wrap mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      .dl-header__title {
+        font-size: var(--text-xl);
+      }
+
+      .dl-section {
+        padding: var(--space-4);
+      }
+
+      .dl-filters {
+        flex-wrap: wrap;
+      }
+
+      .dl-table th:nth-child(6),
+      .dl-table td:nth-child(6) {
+        display: none;
+      }
+    }
+
+    /* ── Reduced Motion ────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .dl-header,
+      .dl-section,
+      .dl-loading,
+      .dl-empty {
+        animation: none;
+        opacity: 1;
+      }
+      .dl-header__icon-wrap {
+        animation: none;
+      }
     }
   `,
   template: `
-    <div class="delivery-log">
-      <div class="delivery-log__header">
-        <a mat-icon-button routerLink="/settings/webhooks" aria-label="Back to webhooks">
+    <div class="dl-page">
+      <!-- Header -->
+      <div class="dl-header">
+        <a class="dl-header__breadcrumb" routerLink="/settings/webhooks">
           <mat-icon>arrow_back</mat-icon>
+          Webhooks
         </a>
-        <h1>Delivery Logs</h1>
-      </div>
-      <p class="delivery-log__subtitle">Monitor webhook delivery attempts across all subscriptions</p>
 
-      <!-- Subscription filter -->
-      <div class="delivery-log__filters">
-        <mat-form-field appearance="outline" style="width: 300px">
-          <mat-label>Filter by subscription</mat-label>
-          <mat-select [value]="selectedSubscriptionId()" (selectionChange)="onFilterChange($event.value)">
-            <mat-option value="">All subscriptions</mat-option>
-            @for (sub of subscriptions(); track sub.id) {
-              <mat-option [value]="sub.id">{{ sub.name }}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </div>
-
-      @if (store.loading() && !store.deliveryLogs()) {
-        <div class="delivery-log__loading">
-          <mat-spinner diameter="48"></mat-spinner>
-        </div>
-      }
-      @if (store.deliveryLogs(); as logs) {
-        @if (logs.items.length === 0) {
-          <div class="delivery-log__empty">
-            <mat-icon>inbox</mat-icon>
-            <h3>No delivery logs</h3>
-            <p>Delivery logs will appear here once webhooks start firing.</p>
+        <div class="dl-header__top">
+          <div class="dl-header__icon-wrap">
+            <mat-icon>history</mat-icon>
           </div>
-        } @else {
-          <table class="delivery-table">
-            <thead>
-              <tr>
-                <th>Timestamp</th>
-                <th>Subscription</th>
-                <th>Event</th>
-                <th>Status</th>
-                <th>HTTP Code</th>
-                <th>Duration</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (log of logs.items; track log.id) {
-                <tr class="delivery-row" (click)="toggleExpanded(log.id)">
-                  <td>{{ log.createdAt | date:'short' }}</td>
-                  <td>
-                    <a class="subscription-link"
-                       [routerLink]="['/settings/webhooks', log.subscriptionId]"
-                       (click)="$event.stopPropagation()">
-                      {{ log.subscriptionName }}
-                    </a>
-                  </td>
-                  <td>{{ formatEvent(log.eventType) }}</td>
-                  <td>
-                    <span class="delivery-badge"
-                          [class.delivery-badge--success]="log.success"
-                          [class.delivery-badge--failed]="!log.success && log.attemptNumber >= 7"
-                          [class.delivery-badge--retrying]="!log.success && log.attemptNumber < 7">
-                      {{ log.success ? 'Success' : (log.attemptNumber < 7 ? 'Retrying' : 'Failed') }}
-                    </span>
-                  </td>
-                  <td>{{ log.httpStatusCode ?? '-' }}</td>
-                  <td>{{ log.durationMs }}ms</td>
-                  <td>
-                    @if (!log.success) {
-                      <button mat-icon-button
-                              matTooltip="Retry delivery"
-                              (click)="onRetry(log, $event)">
-                        <mat-icon>replay</mat-icon>
-                      </button>
-                    }
-                  </td>
+          <div class="dl-header__text">
+            <h1 class="dl-header__title">Delivery Logs</h1>
+            <p class="dl-header__subtitle">View all webhook delivery attempts</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Section Card -->
+      <div class="dl-section">
+        <!-- Filters -->
+        <div class="dl-filters">
+          <mat-icon class="dl-filters__icon">filter_list</mat-icon>
+          <span class="dl-filters__label">Filter</span>
+          <mat-form-field appearance="outline" style="width: 300px">
+            <mat-label>Filter by subscription</mat-label>
+            <mat-select [value]="selectedSubscriptionId()" (selectionChange)="onFilterChange($event.value)">
+              <mat-option value="">All subscriptions</mat-option>
+              @for (sub of subscriptions(); track sub.id) {
+                <mat-option [value]="sub.id">{{ sub.name }}</mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
+        </div>
+
+        @if (store.loading() && !store.deliveryLogs()) {
+          <div class="dl-loading">
+            <mat-spinner diameter="48"></mat-spinner>
+          </div>
+        }
+        @if (store.deliveryLogs(); as logs) {
+          @if (logs.items.length === 0) {
+            <div class="dl-empty">
+              <div class="dl-empty__icon-wrap">
+                <mat-icon>send</mat-icon>
+              </div>
+              <h3 class="dl-empty__title">No delivery logs</h3>
+              <p class="dl-empty__text">Delivery logs will appear here once webhooks start firing.</p>
+            </div>
+          } @else {
+            <table class="dl-table">
+              <thead>
+                <tr>
+                  <th>Timestamp</th>
+                  <th>Subscription</th>
+                  <th>Event</th>
+                  <th>Status</th>
+                  <th>HTTP Code</th>
+                  <th>Duration</th>
+                  <th>Actions</th>
                 </tr>
-                @if (isExpanded(log.id)) {
-                  <tr class="delivery-expanded">
-                    <td colspan="7">
-                      <div class="delivery-detail">
-                        <div class="delivery-detail__section">
-                          <span class="delivery-detail__label">Request Payload</span>
-                          <pre class="delivery-detail__value">{{ formatJson(log.requestPayload) }}</pre>
-                        </div>
-                        @if (log.responseBody) {
-                          <div class="delivery-detail__section">
-                            <span class="delivery-detail__label">Response Body</span>
-                            <pre class="delivery-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
-                          </div>
-                        }
-                        @if (log.errorMessage) {
-                          <div class="delivery-detail__section">
-                            <span class="delivery-detail__label">Error Message</span>
-                            <pre class="delivery-detail__value">{{ log.errorMessage }}</pre>
-                          </div>
-                        }
-                        <div class="delivery-detail__section">
-                          <span class="delivery-detail__label">Attempt Number</span>
-                          <span style="font-size: 14px; color: var(--color-text)">{{ log.attemptNumber }}</span>
-                        </div>
-                      </div>
+              </thead>
+              <tbody>
+                @for (log of logs.items; track log.id) {
+                  <tr class="dl-row"
+                      [class.dl-row--success]="log.success"
+                      [class.dl-row--failed]="!log.success && log.attemptNumber >= 7"
+                      [class.dl-row--retrying]="!log.success && log.attemptNumber < 7"
+                      (click)="toggleExpanded(log.id)">
+                    <td>{{ log.createdAt | date:'short' }}</td>
+                    <td>
+                      <a class="dl-sub-link"
+                         [routerLink]="['/settings/webhooks', log.subscriptionId]"
+                         (click)="$event.stopPropagation()">
+                        {{ log.subscriptionName }}
+                      </a>
+                    </td>
+                    <td>{{ formatEvent(log.eventType) }}</td>
+                    <td>
+                      <span class="dl-badge"
+                            [class.dl-badge--success]="log.success"
+                            [class.dl-badge--failed]="!log.success && log.attemptNumber >= 7"
+                            [class.dl-badge--retrying]="!log.success && log.attemptNumber < 7">
+                        {{ log.success ? 'Success' : (log.attemptNumber < 7 ? 'Retrying' : 'Failed') }}
+                      </span>
+                    </td>
+                    <td>{{ log.httpStatusCode ?? '-' }}</td>
+                    <td>{{ log.durationMs }}ms</td>
+                    <td>
+                      @if (!log.success) {
+                        <button mat-icon-button
+                                matTooltip="Retry delivery"
+                                (click)="onRetry(log, $event)">
+                          <mat-icon>replay</mat-icon>
+                        </button>
+                      }
                     </td>
                   </tr>
+                  @if (isExpanded(log.id)) {
+                    <tr class="dl-expanded">
+                      <td colspan="7">
+                        <div class="dl-detail">
+                          <div class="dl-detail__section">
+                            <span class="dl-detail__label">Request Payload</span>
+                            <pre class="dl-detail__value">{{ formatJson(log.requestPayload) }}</pre>
+                          </div>
+                          @if (log.responseBody) {
+                            <div class="dl-detail__section">
+                              <span class="dl-detail__label">Response Body</span>
+                              <pre class="dl-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
+                            </div>
+                          }
+                          @if (log.errorMessage) {
+                            <div class="dl-detail__section">
+                              <span class="dl-detail__label">Error Message</span>
+                              <pre class="dl-detail__value">{{ log.errorMessage }}</pre>
+                            </div>
+                          }
+                          <div class="dl-detail__section">
+                            <span class="dl-detail__label">Attempt Number</span>
+                            <span class="dl-detail__attempt">{{ log.attemptNumber }}</span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  }
                 }
-              }
-            </tbody>
-          </table>
+              </tbody>
+            </table>
 
-          <mat-paginator
-            [length]="logs.totalCount"
-            [pageSize]="pageSize"
-            [pageIndex]="page() - 1"
-            [pageSizeOptions]="[10, 25, 50, 100]"
-            (page)="onPageChange($event)">
-          </mat-paginator>
+            <mat-paginator
+              [length]="logs.totalCount"
+              [pageSize]="pageSize"
+              [pageIndex]="page() - 1"
+              [pageSizeOptions]="[10, 25, 50, 100]"
+              (page)="onPageChange($event)">
+            </mat-paginator>
+          }
         }
-      }
+      </div>
     </div>
   `,
 })

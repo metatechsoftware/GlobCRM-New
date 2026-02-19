@@ -5,14 +5,13 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ImportStore } from '../stores/import.store';
 
 /**
- * Step 4: Progress -- real-time progress bar via SignalR + completion summary.
+ * Step 4: Progress -- SVG ring progress via SignalR + completion summary.
  * SignalR subscription is handled by the parent ImportWizardComponent.
  * Displays processedRows/totalRows, success/error counts.
  * On completion: shows summary banner, first 10 errors, "Import Another" button.
@@ -21,189 +20,88 @@ import { ImportStore } from '../stores/import.store';
   selector: 'app-step-progress',
   standalone: true,
   imports: [
-    MatProgressBarModule,
     MatButtonModule,
     MatIconModule,
     RouterLink,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .progress-container {
-      padding: 24px 0;
-    }
-
-    .progress-section {
-      margin-bottom: 24px;
-    }
-
-    .progress-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 12px;
-    }
-
-    .progress-title {
-      font-size: 18px;
-      font-weight: 500;
-    }
-
-    .progress-percent {
-      font-size: 24px;
-      font-weight: 600;
-      color: var(--color-primary);
-    }
-
-    .progress-stats {
-      display: flex;
-      gap: 24px;
-      margin-top: 16px;
-      font-size: 14px;
-    }
-
-    .stat {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .stat mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .stat.processed {
-      color: var(--color-text);
-    }
-
-    .stat.success {
-      color: #4caf50;
-    }
-
-    .stat.errors {
-      color: #f44336;
-    }
-
-    .completion-banner {
-      padding: 24px;
-      border-radius: 12px;
-      text-align: center;
-      margin-bottom: 24px;
-    }
-
-    .completion-banner.completed {
-      background: rgba(76, 175, 80, 0.1);
-      border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    .completion-banner.failed {
-      background: var(--color-danger-soft);
-      border: 1px solid rgba(244, 67, 54, 0.3);
-    }
-
-    .completion-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      margin-bottom: 12px;
-    }
-
-    .completion-banner.completed .completion-icon {
-      color: #4caf50;
-    }
-
-    .completion-banner.failed .completion-icon {
-      color: #f44336;
-    }
-
-    .completion-title {
-      font-size: 20px;
-      font-weight: 500;
-      margin-bottom: 8px;
-    }
-
-    .completion-summary {
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-
-    .error-list {
-      margin-top: 16px;
-    }
-
-    .error-list h3 {
-      margin: 0 0 12px;
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .error-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .error-table th {
-      text-align: left;
-      padding: 8px;
-      font-weight: 500;
-      background: var(--color-surface-hover);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .error-table td {
-      padding: 8px;
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .completion-actions {
-      display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 24px;
-    }
-  `,
+  styleUrl: './step-progress.component.scss',
   template: `
     <div class="progress-container">
       @if (!store.isComplete()) {
         <div class="progress-section">
-          <div class="progress-header">
-            <span class="progress-title">Importing data...</span>
-            <span class="progress-percent">{{ store.progressPercent() }}%</span>
+          <div class="progress-ring-container">
+            <svg class="progress-ring" viewBox="0 0 140 140">
+              <circle class="ring-track" cx="70" cy="70" r="58" />
+              <circle class="ring-fill" cx="70" cy="70" r="58"
+                      [attr.stroke-dasharray]="circumference"
+                      [attr.stroke-dashoffset]="circumference - (circumference * store.progressPercent() / 100)" />
+            </svg>
+            <div class="ring-center">
+              <span class="ring-percent">{{ store.progressPercent() }}%</span>
+              <span class="ring-text">Complete</span>
+            </div>
           </div>
-          <mat-progress-bar
-            mode="determinate"
-            [value]="store.progressPercent()">
-          </mat-progress-bar>
-          <div class="progress-stats">
-            <div class="stat processed">
-              <mat-icon>sync</mat-icon>
-              {{ store.progress()?.processedRows ?? 0 }} / {{ store.progress()?.totalRows ?? 0 }} processed
+
+          <div class="progress-title">Importing data...</div>
+
+          <div class="live-stats">
+            <div class="stat-item">
+              <div class="stat-icon processed">
+                <mat-icon>sync</mat-icon>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value">{{ store.progress()?.processedRows ?? 0 }} / {{ store.progress()?.totalRows ?? 0 }}</span>
+                <span class="stat-label">Processed</span>
+              </div>
             </div>
-            <div class="stat success">
-              <mat-icon>check_circle</mat-icon>
-              {{ store.progress()?.successCount ?? 0 }} succeeded
+            <div class="stat-item">
+              <div class="stat-icon success">
+                <mat-icon>check_circle</mat-icon>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value">{{ store.progress()?.successCount ?? 0 }}</span>
+                <span class="stat-label">Succeeded</span>
+              </div>
             </div>
-            <div class="stat errors">
-              <mat-icon>error</mat-icon>
-              {{ store.progress()?.errorCount ?? 0 }} errors
+            <div class="stat-item">
+              <div class="stat-icon errors">
+                <mat-icon>error</mat-icon>
+              </div>
+              <div class="stat-info">
+                <span class="stat-value">{{ store.progress()?.errorCount ?? 0 }}</span>
+                <span class="stat-label">Errors</span>
+              </div>
             </div>
           </div>
         </div>
       } @else {
+        <!-- Completion Banner -->
         <div class="completion-banner"
              [class.completed]="store.progress()?.status === 'Completed'"
              [class.failed]="store.progress()?.status === 'Failed'">
-          <mat-icon class="completion-icon">
-            {{ store.progress()?.status === 'Completed' ? 'check_circle' : 'error' }}
-          </mat-icon>
+          <div class="completion-icon-wrapper">
+            <mat-icon>
+              {{ store.progress()?.status === 'Completed' ? 'check_circle' : 'error' }}
+            </mat-icon>
+          </div>
           <div class="completion-title">
             {{ store.progress()?.status === 'Completed' ? 'Import Complete' : 'Import Failed' }}
           </div>
           <div class="completion-summary">
-            {{ store.progress()?.successCount ?? 0 }} records imported successfully,
-            {{ store.progress()?.errorCount ?? 0 }} errors
+            Your data has been processed successfully
+          </div>
+          <div class="completion-detail-chips">
+            <span class="detail-chip success">
+              <mat-icon>check_circle</mat-icon>
+              {{ store.progress()?.successCount ?? 0 }} imported
+            </span>
+            @if ((store.progress()?.errorCount ?? 0) > 0) {
+              <span class="detail-chip errors">
+                <mat-icon>error</mat-icon>
+                {{ store.progress()?.errorCount ?? 0 }} errors
+              </span>
+            }
           </div>
         </div>
 
@@ -236,7 +134,7 @@ import { ImportStore } from '../stores/import.store';
             <mat-icon>add</mat-icon>
             Import Another
           </button>
-          <a mat-button routerLink="/settings">
+          <a mat-button routerLink="/import/history">
             View Import History
           </a>
         </div>
@@ -247,6 +145,7 @@ import { ImportStore } from '../stores/import.store';
 export class StepProgressComponent {
   readonly store = inject(ImportStore);
   readonly Math = Math;
+  readonly circumference = 2 * Math.PI * 58;
 
   @Output() importAnother = new EventEmitter<void>();
 }

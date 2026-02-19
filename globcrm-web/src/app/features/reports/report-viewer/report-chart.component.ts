@@ -8,6 +8,7 @@ import {
   ElementRef,
   afterNextRender,
   OnDestroy,
+  inject,
 } from '@angular/core';
 import { BaseChartDirective } from 'ng2-charts';
 import {
@@ -67,21 +68,34 @@ const FUNNEL_COLORS = [
   imports: [BaseChartDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     :host {
       display: block;
       position: relative;
+      height: 100%;
+      animation: fadeSlideUp 400ms cubic-bezier(0, 0, 0.2, 1) backwards;
     }
 
     .report-chart {
       position: relative;
       width: 100%;
       height: 100%;
-      min-height: 300px;
     }
 
     .report-chart canvas {
       width: 100% !important;
       height: 100% !important;
+      border-radius: 8px;
     }
   `,
   template: `
@@ -104,6 +118,7 @@ export class ReportChartComponent implements OnDestroy {
   readonly drillDown = output<ReportFilterCondition>();
 
   readonly chartDirective = viewChild(BaseChartDirective);
+  private readonly elementRef = inject(ElementRef);
 
   private resizeObserver: ResizeObserver | null = null;
 
@@ -180,18 +195,24 @@ export class ReportChartComponent implements OnDestroy {
     }, 0) ?? 0;
 
     const sharedTooltip = {
-      backgroundColor: 'rgba(0,0,0,0.8)',
+      backgroundColor: 'rgba(26,26,26,0.9)',
       padding: 12,
       cornerRadius: 8,
-      titleFont: { weight: 'bold' as const },
-      bodyFont: { size: 13 },
+      titleFont: { weight: 'bold' as const, family: 'Inter, system-ui, sans-serif' },
+      titleColor: '#fff',
+      bodyFont: { size: 13, family: 'Inter, system-ui, sans-serif' },
+      bodyColor: 'rgba(255,255,255,0.85)',
+      borderColor: 'rgba(255,255,255,0.1)',
+      borderWidth: 1,
+      boxPadding: 4,
     };
 
     const sharedLegend = {
       labels: {
         usePointStyle: true,
-        padding: 16,
-        font: { size: 12 },
+        padding: 20,
+        font: { size: 12, weight: 500, family: 'Inter, system-ui, sans-serif' },
+        color: '#6B7280',
       },
     };
 
@@ -240,7 +261,7 @@ export class ReportChartComponent implements OnDestroy {
           },
           y: {
             beginAtZero: true,
-            grid: { color: '#f3f4f6' },
+            grid: { color: 'rgba(0,0,0,0.04)' },
             ticks: { font: { size: 11 }, color: '#6B7280' },
             border: { display: false },
           },
@@ -283,7 +304,7 @@ export class ReportChartComponent implements OnDestroy {
           },
           y: {
             beginAtZero: true,
-            grid: { color: '#f3f4f6' },
+            grid: { color: 'rgba(0,0,0,0.04)' },
             ticks: { font: { size: 11 }, color: '#6B7280' },
             border: { display: false },
           },
@@ -296,6 +317,7 @@ export class ReportChartComponent implements OnDestroy {
         responsive: true,
         maintainAspectRatio: false,
         onClick,
+        layout: { padding: 8 },
         animation: {
           duration: 800,
           easing: 'easeOutQuart',
@@ -304,6 +326,8 @@ export class ReportChartComponent implements OnDestroy {
           legend: {
             ...sharedLegend,
             position: 'right',
+            maxWidth: 180,
+            maxHeight: 300,
           },
           tooltip: {
             ...sharedTooltip,
@@ -489,14 +513,11 @@ export class ReportChartComponent implements OnDestroy {
   }
 
   private setupResizeObserver(): void {
-    const container = document.querySelector('.report-chart');
+    const container = this.elementRef.nativeElement.querySelector('.report-chart');
     if (!container) return;
 
     this.resizeObserver = new ResizeObserver(() => {
-      const directive = this.chartDirective();
-      if (directive?.chart) {
-        directive.chart.resize();
-      }
+      this.chartDirective()?.chart?.resize();
     });
     this.resizeObserver.observe(container);
   }

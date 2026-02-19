@@ -49,8 +49,20 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     :host {
       display: block;
+      animation: fadeSlideUp 400ms cubic-bezier(0, 0, 0.2, 1) 200ms backwards;
     }
 
     .drill-down-bar {
@@ -59,10 +71,11 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       gap: 8px;
       padding: 8px 12px;
       margin-bottom: 12px;
-      background: #FEF3C7;
-      border: 1px solid #FDE68A;
-      border-radius: 8px;
+      background: #FFFBEB;
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius-lg, 12px);
       font-size: 13px;
+      font-weight: 500;
       color: #92400E;
     }
 
@@ -71,6 +84,11 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       width: 18px;
       height: 18px;
       color: #D97706;
+      background: rgba(245, 158, 11, 0.1);
+      border-radius: 4px;
+      padding: 2px;
+      width: 22px;
+      height: 22px;
     }
 
     .drill-down-bar span {
@@ -81,7 +99,8 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       overflow-x: auto;
       background: var(--color-surface, #fff);
       border: 1px solid var(--color-border, #e2e8f0);
-      border-radius: 8px;
+      border-radius: var(--radius-lg, 12px);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
     }
 
     table {
@@ -89,13 +108,14 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
     }
 
     th.mat-mdc-header-cell {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: 700;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.06em;
       color: var(--color-text-secondary, #6B7280);
       background: var(--color-bg-secondary, #F9FAFB);
       white-space: nowrap;
+      border-bottom: 2px solid var(--color-border, #E8E8E6);
     }
 
     td.mat-mdc-cell {
@@ -105,26 +125,37 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+    }
+
+    tr.mat-mdc-row:nth-child(even) {
+      background: rgba(0, 0, 0, 0.015);
     }
 
     .report-table__row--clickable {
       cursor: pointer;
-      transition: background-color 0.15s;
+      transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1),
+                  box-shadow 200ms cubic-bezier(0, 0, 0.2, 1);
     }
 
     .report-table__row--clickable:hover {
-      background: var(--color-bg-secondary, #F9FAFB);
+      background: var(--color-primary-soft, #FFF7ED) !important;
+      box-shadow: inset 3px 0 0 var(--color-primary, #F97316);
     }
 
     .report-table__empty {
       text-align: center;
-      padding: 32px;
+      padding: 48px 32px;
       color: var(--color-text-secondary, #6B7280);
       font-size: 14px;
+      border: 1px dashed var(--color-border, #e2e8f0);
+      border-radius: var(--radius-lg, 12px);
+      background: var(--color-surface, #fff);
     }
 
     ::ng-deep .mat-mdc-paginator {
       border-top: 1px solid var(--color-border, #e2e8f0);
+      border-radius: 0 0 var(--radius-lg, 12px) var(--radius-lg, 12px);
     }
   `,
   template: `
@@ -225,9 +256,18 @@ export class ReportDataTableComponent {
     return headerLabel;
   }
 
+  /** UUID pattern: 8-4-4-4-12 hex chars */
+  private readonly UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+  /** Date-only pattern: YYYY-MM-DD (no time component) */
+  private readonly DATE_ONLY_RE = /^\d{4}-\d{2}-\d{2}$/;
+
+  /** Compact number formatter for large values */
+  private readonly compactFormatter = new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 });
+
   /**
    * Format cell values for display.
-   * Handles dates, numbers, booleans, and null/undefined.
+   * Handles arrays, objects, dates, UUIDs, large numbers, booleans, and null/undefined.
    */
   formatCell(value: any): string {
     if (value == null) return '\u2014'; // em dash
@@ -236,13 +276,46 @@ export class ReportDataTableComponent {
       return value ? 'Yes' : 'No';
     }
 
-    // ISO date string detection
-    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
-      const formatted = this.datePipe.transform(value, 'MMM d, yyyy');
-      return formatted ?? value;
+    // Arrays — recursively format each item
+    if (Array.isArray(value)) {
+      return value.map((item) => this.formatCell(item)).join(', ');
+    }
+
+    // Plain objects — show up to 3 key-value pairs
+    if (typeof value === 'object') {
+      const entries = Object.entries(value);
+      const shown = entries.slice(0, 3).map(([k, v]) => `${k}: ${v}`);
+      return entries.length > 3 ? shown.join(', ') + ' \u2026' : shown.join(', ');
+    }
+
+    if (typeof value === 'string') {
+      // ISO datetime string detection
+      if (/^\d{4}-\d{2}-\d{2}T/.test(value)) {
+        return this.datePipe.transform(value, 'MMM d, yyyy') ?? value;
+      }
+
+      // Date-only string (YYYY-MM-DD)
+      if (this.DATE_ONLY_RE.test(value)) {
+        return this.datePipe.transform(value + 'T00:00:00', 'MMM d, yyyy') ?? value;
+      }
+
+      // UUID — truncate to first 8 chars
+      if (this.UUID_RE.test(value)) {
+        return value.substring(0, 8) + '\u2026';
+      }
+
+      return value;
     }
 
     if (typeof value === 'number') {
+      if (!isFinite(value)) return String(value);
+
+      // Large numbers — compact notation
+      const abs = Math.abs(value);
+      if (abs >= 1_000_000) {
+        return this.compactFormatter.format(value);
+      }
+
       // Currency-like detection (has decimals)
       if (value !== Math.floor(value)) {
         return value.toLocaleString(undefined, {

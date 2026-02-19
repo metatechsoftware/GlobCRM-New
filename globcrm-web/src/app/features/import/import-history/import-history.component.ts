@@ -18,18 +18,33 @@ import { ImportJob, ImportEntityType } from '../import.models';
     MatProgressSpinnerModule,
     DatePipe,
   ],
+  styleUrl: './import-history.component.scss',
   template: `
     <div class="import-history">
-      <!-- Header -->
-      <div class="import-history__header">
-        <div>
-          <h1 class="import-history__title">Import History</h1>
-          <p class="import-history__subtitle">View past import jobs and their results</p>
+      <!-- Hero Header -->
+      <div class="import-history__hero">
+        <div class="import-history__mesh"></div>
+        <div class="import-history__hero-content">
+          <div class="import-history__header-left">
+            <a routerLink="/settings" class="import-history__back">
+              <mat-icon>arrow_back</mat-icon>
+              <span>Settings</span>
+            </a>
+            <div class="import-history__heading">
+              <div class="import-history__icon-wrap">
+                <mat-icon>history</mat-icon>
+              </div>
+              <div>
+                <h1 class="import-history__title">Import History</h1>
+                <p class="import-history__subtitle">View past import jobs and their results</p>
+              </div>
+            </div>
+          </div>
+          <a mat-flat-button color="primary" routerLink="/import" class="import-history__new-btn">
+            <mat-icon>upload_file</mat-icon>
+            New Import
+          </a>
         </div>
-        <a mat-flat-button color="primary" routerLink="/import" class="import-history__new-btn">
-          <mat-icon>upload_file</mat-icon>
-          New Import
-        </a>
       </div>
 
       <!-- Loading -->
@@ -43,9 +58,11 @@ import { ImportJob, ImportEntityType } from '../import.models';
       <!-- Empty State -->
       @if (!loading() && jobs().length === 0) {
         <div class="import-history__empty">
-          <mat-icon class="import-history__empty-icon">cloud_upload</mat-icon>
+          <div class="import-history__empty-icon-wrapper">
+            <mat-icon class="import-history__empty-icon">cloud_upload</mat-icon>
+          </div>
           <h3>No imports yet</h3>
-          <p>Import your first CSV file.</p>
+          <p>Import your first CSV file to get started.</p>
           <a mat-flat-button color="primary" routerLink="/import">
             <mat-icon>upload_file</mat-icon>
             Import Data
@@ -157,258 +174,6 @@ import { ImportJob, ImportEntityType } from '../import.models';
       }
     </div>
   `,
-  styles: [`
-    .import-history {
-      padding: 24px 32px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .import-history__header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 24px;
-    }
-
-    .import-history__title {
-      font-size: 24px;
-      font-weight: 600;
-      margin: 0 0 4px 0;
-      color: var(--text-primary, #1e293b);
-    }
-
-    .import-history__subtitle {
-      font-size: 14px;
-      color: var(--text-secondary, #64748b);
-      margin: 0;
-    }
-
-    .import-history__new-btn mat-icon {
-      margin-right: 8px;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .import-history__loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 64px 0;
-      color: var(--text-secondary, #64748b);
-    }
-
-    .import-history__empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      padding: 64px 0;
-      text-align: center;
-    }
-
-    .import-history__empty-icon {
-      font-size: 64px;
-      width: 64px;
-      height: 64px;
-      color: var(--text-secondary, #94a3b8);
-    }
-
-    .import-history__empty h3 {
-      font-size: 18px;
-      font-weight: 600;
-      margin: 0;
-      color: var(--text-primary, #1e293b);
-    }
-
-    .import-history__empty p {
-      font-size: 14px;
-      color: var(--text-secondary, #64748b);
-      margin: 0;
-    }
-
-    .import-history__table-wrapper {
-      border: 1px solid var(--border-color, #e2e8f0);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-
-    .import-history__table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    .import-history__table thead th {
-      padding: 12px 16px;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--text-secondary, #64748b);
-      background: var(--bg-secondary, #f8fafc);
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
-      text-align: left;
-    }
-
-    .import-history__table tbody td {
-      padding: 12px 16px;
-      font-size: 14px;
-      color: var(--text-primary, #334155);
-      border-bottom: 1px solid var(--border-color, #f1f5f9);
-      vertical-align: middle;
-    }
-
-    .import-history__row:hover {
-      background: var(--bg-hover, #f8fafc);
-    }
-
-    .text-right {
-      text-align: right;
-    }
-
-    .import-history__filename {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 500;
-    }
-
-    .import-history__file-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--text-secondary, #94a3b8);
-    }
-
-    .import-history__entity-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      background: var(--bg-secondary, #f1f5f9);
-      font-size: 13px;
-      font-weight: 500;
-    }
-
-    .import-history__entity-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-
-    .import-history__status {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 600;
-    }
-
-    .import-history__status--completed {
-      background: #dcfce7;
-      color: #166534;
-    }
-
-    .import-history__status--processing {
-      background: #dbeafe;
-      color: #1e40af;
-    }
-
-    .import-history__status--pending,
-    .import-history__status--mapping,
-    .import-history__status--previewing {
-      background: #f1f5f9;
-      color: #475569;
-    }
-
-    .import-history__status--failed {
-      background: #fee2e2;
-      color: #991b1b;
-    }
-
-    .import-history__success {
-      color: #16a34a;
-      font-weight: 600;
-    }
-
-    .import-history__error-count {
-      color: #dc2626;
-      font-weight: 600;
-    }
-
-    .import-history__no-errors {
-      color: var(--text-secondary, #94a3b8);
-    }
-
-    .import-history__details-btn {
-      font-size: 13px;
-    }
-
-    .import-history__error-row td {
-      padding: 0 !important;
-      border-bottom: 1px solid var(--border-color, #e2e8f0);
-    }
-
-    .import-history__errors {
-      padding: 16px 24px;
-      background: #fef2f2;
-    }
-
-    .import-history__errors-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      font-weight: 600;
-      color: #991b1b;
-      margin: 0 0 12px 0;
-    }
-
-    .import-history__errors-title mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-
-    .import-history__errors-table {
-      width: 100%;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-
-    .import-history__errors-table thead th {
-      padding: 8px 12px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: var(--text-secondary, #64748b);
-      background: var(--bg-secondary, #f8fafc);
-      text-align: left;
-    }
-
-    .import-history__errors-table tbody td {
-      padding: 8px 12px;
-      font-size: 13px;
-      border-bottom: 1px solid #f1f5f9;
-    }
-
-    .import-history__raw-value {
-      font-family: monospace;
-      font-size: 12px;
-      color: var(--text-secondary, #64748b);
-    }
-
-    .import-history__load-more {
-      display: flex;
-      justify-content: center;
-      padding: 16px 0;
-    }
-  `],
 })
 export class ImportHistoryComponent implements OnInit {
   private readonly importService = inject(ImportService);

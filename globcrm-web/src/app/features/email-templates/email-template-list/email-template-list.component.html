@@ -3,8 +3,10 @@
   <div class="page-header">
     <div class="header-left">
       <h1>Email Templates</h1>
+      <p class="page-tagline">Craft beautiful emails that convert</p>
     </div>
     <div class="header-right">
+      <span class="template-count">{{ store.filteredTemplates().length }} templates</span>
       <mat-form-field appearance="outline" class="search-field">
         <mat-icon matPrefix>search</mat-icon>
         <input
@@ -27,23 +29,25 @@
   </div>
 
   <!-- Category Filter -->
-  <div class="category-filter">
-    <mat-chip-set>
-      <mat-chip
-        [highlighted]="selectedCategoryId() === null"
+  <div class="category-tabs">
+    <div class="category-tabs__track">
+      <button
+        class="category-tab"
+        [class.is-active]="selectedCategoryId() === null"
         (click)="onCategorySelect(null)"
       >
         All
-      </mat-chip>
+      </button>
       @for (category of store.categories(); track category.id) {
-        <mat-chip
-          [highlighted]="selectedCategoryId() === category.id"
+        <button
+          class="category-tab"
+          [class.is-active]="selectedCategoryId() === category.id"
           (click)="onCategorySelect(category.id)"
         >
           {{ category.name }}
-        </mat-chip>
+        </button>
       }
-    </mat-chip-set>
+    </div>
   </div>
 
   <!-- Loading State -->
@@ -58,8 +62,8 @@
   @if (!store.loading()) {
     @if (store.filteredTemplates().length > 0) {
       <div class="template-grid">
-        @for (template of store.filteredTemplates(); track template.id) {
-          <mat-card class="template-card">
+        @for (template of store.filteredTemplates(); track template.id; let idx = $index) {
+          <mat-card class="template-card" [style.--card-index]="idx">
             <!-- Thumbnail -->
             <div class="thumbnail-container" (click)="editTemplate(template)">
               <iframe
@@ -69,6 +73,7 @@
                 scrolling="no"
                 tabindex="-1"
               ></iframe>
+              <div class="thumbnail-overlay"></div>
             </div>
 
             <!-- Info Section -->
@@ -95,31 +100,33 @@
 
             <!-- Actions -->
             <mat-card-actions class="template-actions">
-              <button
-                mat-icon-button
-                *appHasPermission="'EmailTemplate:Edit'"
-                matTooltip="Edit"
-                (click)="editTemplate(template)"
-              >
-                <mat-icon>edit</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                *appHasPermission="'EmailTemplate:Create'"
-                matTooltip="Clone"
-                (click)="cloneTemplate(template)"
-              >
-                <mat-icon>content_copy</mat-icon>
-              </button>
-              <button
-                mat-icon-button
-                *appHasPermission="'EmailTemplate:Delete'"
-                matTooltip="Delete"
-                color="warn"
-                (click)="deleteTemplate(template)"
-              >
-                <mat-icon>delete</mat-icon>
-              </button>
+              <div class="template-actions__reveal">
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Edit'"
+                  matTooltip="Edit"
+                  (click)="editTemplate(template)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Create'"
+                  matTooltip="Clone"
+                  (click)="cloneTemplate(template)"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Delete'"
+                  matTooltip="Delete"
+                  color="warn"
+                  (click)="deleteTemplate(template)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </mat-card-actions>
           </mat-card>
         }
@@ -127,7 +134,9 @@
     } @else {
       <!-- Empty State -->
       <div class="empty-state">
-        <mat-icon class="empty-icon">mail_outline</mat-icon>
+        <div class="empty-icon-wrap">
+          <mat-icon class="empty-icon">mail_outline</mat-icon>
+        </div>
         <h2>No email templates yet</h2>
         <p>Create your first email template to start sending personalized emails.</p>
         <button

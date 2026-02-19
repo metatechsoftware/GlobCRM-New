@@ -214,7 +214,13 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
       gap: 4px;
       padding: 4px 8px;
       background: var(--color-bg-secondary, #F0F0EE);
-      border-radius: 6px;
+      border: 1px solid var(--color-border, #E8E8E6);
+      border-radius: var(--radius-md, 8px);
+      transition: border-color 200ms cubic-bezier(0, 0, 0.2, 1);
+
+      &:hover {
+        border-color: var(--color-primary, #F97316);
+      }
 
       &__label {
         flex: 1;

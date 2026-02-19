@@ -93,7 +93,7 @@ export class ContactListComponent implements OnInit {
 
   /** Core column definitions for Contact entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
     { fieldId: 'firstName', label: 'First Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'lastName', label: 'Last Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },

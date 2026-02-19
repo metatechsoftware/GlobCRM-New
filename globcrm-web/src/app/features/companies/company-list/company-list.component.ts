@@ -84,7 +84,7 @@ export class CompanyListComponent implements OnInit {
 
   /** Core column definitions for Company entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'name', label: 'Company Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'name', label: 'Company Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
     { fieldId: 'industry', label: 'Industry', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
     { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
     { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },

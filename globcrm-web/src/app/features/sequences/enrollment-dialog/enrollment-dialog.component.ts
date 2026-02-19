@@ -73,55 +73,74 @@ interface SelectedContact {
 
     .enrollment-dialog__search {
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-4, 16px);
     }
 
     .enrollment-dialog__results {
       max-height: 200px;
       overflow-y: auto;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-4, 16px);
+      border: 1px solid var(--color-border-subtle, #f1f5f9);
+      border-radius: var(--radius-md, 8px);
+      padding: var(--space-1, 4px);
     }
 
     .enrollment-dialog__result-item {
       display: flex;
       align-items: center;
-      gap: 8px;
-      padding: 8px 12px;
+      gap: var(--space-3, 12px);
+      padding: var(--space-2, 8px) var(--space-3, 12px);
       cursor: pointer;
-      border-radius: 4px;
-      transition: background-color 0.15s;
+      border-radius: var(--radius-md, 8px);
+      transition:
+        background-color var(--duration-fast, 100ms) var(--ease-default);
     }
 
     .enrollment-dialog__result-item:hover {
-      background-color: var(--surface-hover, rgba(0, 0, 0, 0.04));
+      background-color: var(--color-highlight, rgba(249, 115, 22, 0.06));
+    }
+
+    .enrollment-dialog__result-item mat-icon {
+      color: var(--color-text-muted, #9CA3AF);
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
 
     .enrollment-dialog__result-name {
-      font-weight: 500;
-      font-size: 14px;
+      font-weight: var(--font-semibold, 600);
+      font-size: var(--text-base, 14px);
+      color: var(--color-text, #1A1A1A);
     }
 
     .enrollment-dialog__result-email {
-      font-size: 12px;
-      color: var(--text-secondary, #64748b);
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-secondary, #64748b);
     }
 
     .enrollment-dialog__chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
+      gap: var(--space-2, 8px);
+      margin-bottom: var(--space-4, 16px);
     }
 
     .enrollment-dialog__chip {
       display: flex;
       align-items: center;
-      gap: 4px;
-      background: var(--primary-light, #fff7ed);
-      border: 1px solid var(--primary, #f97316);
-      border-radius: 16px;
-      padding: 4px 8px 4px 12px;
-      font-size: 13px;
+      gap: var(--space-1, 4px);
+      background: var(--color-primary-soft, #FFF7ED);
+      border: 1px solid var(--color-primary, #f97316);
+      border-radius: var(--radius-full, 9999px);
+      padding: var(--space-1, 4px) var(--space-2, 8px) var(--space-1, 4px) var(--space-3, 12px);
+      font-size: var(--text-sm, 13px);
+      font-weight: var(--font-medium, 500);
+      color: var(--color-primary-text, #C2410C);
+      transition: background-color var(--duration-fast, 100ms) var(--ease-default);
+    }
+
+    .enrollment-dialog__chip:hover {
+      background: var(--color-primary-soft-hover, #FFEDD5);
     }
 
     .enrollment-dialog__chip-remove {
@@ -129,19 +148,25 @@ interface SelectedContact {
       font-size: 16px;
       width: 16px;
       height: 16px;
-      color: var(--text-secondary, #64748b);
+      color: var(--color-primary, #f97316);
+      transition: color var(--duration-fast, 100ms) var(--ease-default);
+    }
+
+    .enrollment-dialog__chip-remove:hover {
+      color: var(--color-danger, #EF4444);
     }
 
     .enrollment-dialog__warning {
       display: flex;
       align-items: flex-start;
-      gap: 8px;
-      padding: 12px;
-      background: #fef3c7;
-      border-radius: 8px;
-      margin-bottom: 16px;
-      font-size: 13px;
-      color: #92400e;
+      gap: var(--space-2, 8px);
+      padding: var(--space-3, 12px);
+      background: var(--color-warning-soft, #FFFBEB);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      border-radius: var(--radius-md, 8px);
+      margin-bottom: var(--space-4, 16px);
+      font-size: var(--text-sm, 13px);
+      color: var(--color-warning-text, #B45309);
     }
 
     .enrollment-dialog__warning mat-icon {
@@ -150,24 +175,27 @@ interface SelectedContact {
       height: 18px;
       flex-shrink: 0;
       margin-top: 1px;
+      color: var(--color-warning, #F59E0B);
     }
 
     .enrollment-dialog__re-enroll {
-      margin-top: 16px;
+      margin-top: var(--space-4, 16px);
     }
 
     .enrollment-dialog__re-enroll-label {
-      font-size: 14px;
-      font-weight: 500;
-      margin-bottom: 8px;
+      font-size: var(--text-base, 14px);
+      font-weight: var(--font-semibold, 600);
+      margin-bottom: var(--space-2, 8px);
     }
 
     .enrollment-dialog__submitting {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-2, 8px);
       justify-content: center;
-      padding: 16px;
+      padding: var(--space-4, 16px);
+      color: var(--color-text-secondary, #6B7280);
+      font-size: var(--text-sm, 13px);
     }
   `,
   template: `

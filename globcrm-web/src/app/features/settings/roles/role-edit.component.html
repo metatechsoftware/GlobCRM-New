@@ -1,83 +1,111 @@
-<div class="role-edit-container">
-  <div class="page-header">
-    <button mat-icon-button routerLink="/settings/roles">
+<div class="re-page">
+  <!-- Header -->
+  <div class="re-header">
+    <a routerLink="/settings/roles" class="re-back">
       <mat-icon>arrow_back</mat-icon>
-    </button>
-    <h1>{{ pageTitle }}</h1>
+      <span>Roles</span>
+    </a>
+    <div class="re-title-row">
+      <div class="re-icon-wrap">
+        <mat-icon>{{ mode() === 'create' ? 'add_moderator' : 'edit' }}</mat-icon>
+      </div>
+      <div>
+        <h1 class="re-title">{{ pageTitle }}</h1>
+        <p class="re-subtitle">{{ mode() === 'create' ? 'Define a new role with permissions' : 'Update role details and permissions' }}</p>
+      </div>
+    </div>
   </div>
 
   @if (isLoading()) {
-    <div class="loading-container">
-      <mat-spinner diameter="48"></mat-spinner>
+    <div class="re-loading">
+      <mat-spinner diameter="40"></mat-spinner>
       <p>Loading role...</p>
     </div>
   } @else if (errorMessage() && mode() === 'edit' && !roleForm.dirty) {
-    <div class="error-container">
-      <mat-icon class="error-icon">error_outline</mat-icon>
+    <div class="re-error">
+      <div class="re-error__icon-wrap">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+      <h3>Couldn't load role</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" routerLink="/settings/roles">
         Back to Roles
       </button>
     </div>
   } @else {
-    <mat-card class="role-form-card">
-      <mat-card-content>
-        <form [formGroup]="roleForm" class="role-form">
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Role Name</mat-label>
-            <input
-              matInput
-              formControlName="name"
-              placeholder="Enter role name"
-              maxlength="100"
-            />
-            @if (roleForm.get('name')?.hasError('required') && roleForm.get('name')?.touched) {
-              <mat-error>Role name is required.</mat-error>
-            }
-            @if (roleForm.get('name')?.hasError('maxlength')) {
-              <mat-error>Role name must be 100 characters or less.</mat-error>
-            }
-          </mat-form-field>
+    <!-- Details Section -->
+    <div class="re-section" style="animation-delay: 0ms">
+      <div class="re-section__header">
+        <mat-icon class="re-section__icon">tune</mat-icon>
+        <h2>Role Details</h2>
+      </div>
 
-          <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
-            <textarea
-              matInput
-              formControlName="description"
-              placeholder="Optional description"
-              rows="3"
-            ></textarea>
-          </mat-form-field>
-        </form>
-
-        <app-permission-matrix
-          [permissions]="currentPermissions()"
-          (permissionsChanged)="onPermissionsChanged($event)"
-        ></app-permission-matrix>
-
-        @if (errorMessage()) {
-          <div class="form-error">
-            <mat-icon>error_outline</mat-icon>
-            <span>{{ errorMessage() }}</span>
-          </div>
-        }
-      </mat-card-content>
-
-      <mat-card-actions align="end">
-        <button mat-button routerLink="/settings/roles">Cancel</button>
-        <button
-          mat-flat-button
-          color="primary"
-          (click)="onSave()"
-          [disabled]="isSaving() || roleForm.invalid"
-        >
-          @if (isSaving()) {
-            <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-          } @else {
-            {{ mode() === 'create' ? 'Create Role' : 'Save Changes' }}
+      <form [formGroup]="roleForm" class="re-form">
+        <mat-form-field appearance="outline" class="re-full-width">
+          <mat-label>Role Name</mat-label>
+          <input
+            matInput
+            formControlName="name"
+            placeholder="e.g. Sales Manager, Viewer, Editor"
+            maxlength="100"
+          />
+          @if (roleForm.get('name')?.hasError('required') && roleForm.get('name')?.touched) {
+            <mat-error>Role name is required.</mat-error>
           }
-        </button>
-      </mat-card-actions>
-    </mat-card>
+          @if (roleForm.get('name')?.hasError('maxlength')) {
+            <mat-error>Role name must be 100 characters or less.</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="re-full-width">
+          <mat-label>Description</mat-label>
+          <textarea
+            matInput
+            formControlName="description"
+            placeholder="What can users with this role do?"
+            rows="3"
+          ></textarea>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- Permissions Section -->
+    <div class="re-section" style="animation-delay: 80ms">
+      <div class="re-section__header">
+        <mat-icon class="re-section__icon">lock</mat-icon>
+        <h2>Permissions</h2>
+      </div>
+
+      <app-permission-matrix
+        [permissions]="currentPermissions()"
+        (permissionsChanged)="onPermissionsChanged($event)"
+      ></app-permission-matrix>
+    </div>
+
+    @if (errorMessage()) {
+      <div class="re-form-error">
+        <mat-icon>error_outline</mat-icon>
+        <span>{{ errorMessage() }}</span>
+      </div>
+    }
+
+    <!-- Actions -->
+    <div class="re-actions">
+      <button mat-button routerLink="/settings/roles" class="re-cancel-btn">Cancel</button>
+      <button
+        mat-flat-button
+        color="primary"
+        (click)="onSave()"
+        [disabled]="isSaving() || roleForm.invalid"
+        class="re-save-btn"
+      >
+        @if (isSaving()) {
+          <mat-spinner diameter="18" class="re-btn-spinner"></mat-spinner>
+        } @else {
+          <mat-icon>{{ mode() === 'create' ? 'add' : 'check' }}</mat-icon>
+          {{ mode() === 'create' ? 'Create Role' : 'Save Changes' }}
+        }
+      </button>
+    </div>
   }
 </div>

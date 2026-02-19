@@ -4,6 +4,7 @@ import {
   inject,
   input,
   output,
+  signal,
 } from '@angular/core';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -61,6 +62,8 @@ export class MergeFieldPanelComponent {
     return Object.keys(this.mergeFields());
   }
 
+  readonly copiedField = signal<string | null>(null);
+
   /** Get the display config for an entity group */
   getEntityConfig(group: string): { bg: string; text: string; label: string } {
     return ENTITY_COLORS[group.toLowerCase()] || {
@@ -68,6 +71,17 @@ export class MergeFieldPanelComponent {
       text: '#37474F',
       label: group,
     };
+  }
+
+  /** Get icon name for an entity group */
+  getEntityIcon(group: string): string {
+    const icons: Record<string, string> = {
+      contact: 'people',
+      company: 'business',
+      deal: 'handshake',
+      lead: 'person_search',
+    };
+    return icons[group.toLowerCase()] ?? 'label';
   }
 
   /** Get fields for a specific group */
@@ -79,6 +93,8 @@ export class MergeFieldPanelComponent {
   copyMergeTag(field: MergeField): void {
     const tag = `{{${field.key}}}`;
     this.clipboard.copy(tag);
+    this.copiedField.set(field.key);
+    setTimeout(() => this.copiedField.set(null), 1500);
     this.snackBar.open(
       `Copied ${tag} -- paste in editor or use Unlayer toolbar to insert`,
       'Close',

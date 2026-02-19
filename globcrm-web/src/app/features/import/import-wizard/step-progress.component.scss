@@ -1,0 +1,396 @@
+// ─── Step Progress — SVG Ring + Completion Banner ────────────
+@keyframes bannerReveal {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes iconPop {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes ringGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.2)); }
+  50% { filter: drop-shadow(0 0 12px rgba(249, 115, 22, 0.35)); }
+}
+
+@keyframes statSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes confettiBurst {
+  0% { opacity: 1; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+:host {
+  display: block;
+}
+
+.progress-container {
+  padding: var(--space-4) 0;
+}
+
+// ─── Progress Section ────────────────────────────────────────
+.progress-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: var(--space-8) 0;
+}
+
+.progress-ring-container {
+  position: relative;
+  width: 180px;
+  height: 180px;
+  margin-bottom: var(--space-6);
+  animation: ringGlow 3s ease-in-out infinite;
+}
+
+.progress-ring {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.ring-track {
+  fill: none;
+  stroke: var(--color-border);
+  stroke-width: 7;
+}
+
+.ring-fill {
+  fill: none;
+  stroke: var(--color-primary);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: stroke-dashoffset var(--duration-slow) var(--ease-out);
+}
+
+.ring-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-percent {
+  font-size: 36px;
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  letter-spacing: -1px;
+  line-height: 1;
+}
+
+.ring-text {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: var(--space-1);
+}
+
+.progress-title {
+  font-size: var(--text-lg);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+  margin-bottom: var(--space-6);
+}
+
+// ─── Live Stats ──────────────────────────────────────────────
+.live-stats {
+  display: flex;
+  gap: var(--space-8);
+  justify-content: center;
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  opacity: 0;
+  animation: statSlideIn 0.35s var(--ease-out) forwards;
+
+  &:nth-child(1) { animation-delay: 100ms; }
+  &:nth-child(2) { animation-delay: 200ms; }
+  &:nth-child(3) { animation-delay: 300ms; }
+}
+
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  transition: transform var(--duration-normal) var(--ease-default);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.processed {
+    background: var(--color-info-soft);
+    mat-icon { color: var(--color-info); }
+  }
+
+  &.success {
+    background: var(--color-success-soft);
+    mat-icon { color: var(--color-success); }
+  }
+
+  &.errors {
+    background: var(--color-danger-soft);
+    mat-icon { color: var(--color-danger); }
+  }
+}
+
+.stat-item:hover .stat-icon {
+  transform: scale(1.1);
+}
+
+.stat-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-weight: var(--font-semibold);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.2;
+}
+
+.stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+}
+
+// ─── Completion Banner ───────────────────────────────────────
+.completion-banner {
+  padding: var(--space-8) var(--space-6);
+  border-radius: var(--radius-xl);
+  text-align: center;
+  margin-bottom: var(--space-6);
+  animation: bannerReveal var(--duration-slower) var(--ease-spring) both;
+}
+
+.completion-banner.completed {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(34, 197, 94, 0.08) 0%, transparent 60%),
+    var(--color-success-soft);
+  border: 1px solid rgba(34, 197, 94, 0.2);
+}
+
+.completion-banner.failed {
+  background:
+    radial-gradient(circle at 50% 0%, rgba(239, 68, 68, 0.08) 0%, transparent 60%),
+    var(--color-danger-soft);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.completion-icon-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  margin-bottom: var(--space-4);
+  animation: iconPop var(--duration-slower) var(--ease-spring) 0.2s both;
+}
+
+.completion-banner.completed .completion-icon-wrapper {
+  background: rgba(34, 197, 94, 0.15);
+  box-shadow: 0 0 0 6px rgba(34, 197, 94, 0.08);
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--color-success);
+  }
+}
+
+.completion-banner.failed .completion-icon-wrapper {
+  background: rgba(239, 68, 68, 0.15);
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.08);
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--color-danger);
+  }
+}
+
+.completion-title {
+  font-size: var(--text-xl);
+  font-weight: var(--font-bold);
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+
+.completion-summary {
+  font-size: var(--text-base);
+  color: var(--color-text-secondary);
+}
+
+.completion-detail-chips {
+  display: flex;
+  gap: var(--space-3);
+  justify-content: center;
+  margin-top: var(--space-4);
+}
+
+.detail-chip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  opacity: 0;
+  animation: confettiBurst 0.5s var(--ease-out) 0.5s forwards;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &.success {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--color-success-text);
+  }
+
+  &.errors {
+    background: rgba(239, 68, 68, 0.15);
+    color: var(--color-danger-text);
+  }
+}
+
+// ─── Error List ──────────────────────────────────────────────
+.error-list {
+  margin-top: var(--space-4);
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+
+  h3 {
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--text-sm);
+    font-weight: var(--font-semibold);
+    color: var(--color-danger-text);
+    background: var(--color-danger-soft);
+    border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+  }
+}
+
+.error-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+
+  th {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-hover);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
+  }
+
+  tr {
+    transition: background var(--duration-fast) var(--ease-default);
+
+    &:hover td {
+      background: var(--color-surface-hover);
+    }
+  }
+}
+
+// ─── Completion Actions ──────────────────────────────────────
+.completion-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-top: var(--space-6);
+}
+
+// ─── Responsive ──────────────────────────────────────────────
+@media (max-width: 600px) {
+  .live-stats {
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: center;
+  }
+
+  .completion-detail-chips {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .progress-ring-container {
+    width: 140px;
+    height: 140px;
+  }
+
+  .ring-percent {
+    font-size: 28px;
+  }
+}
+
+// ─── Reduced Motion ─────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .progress-ring-container {
+    animation: none;
+    filter: none;
+  }
+
+  .stat-item {
+    animation: none;
+    opacity: 1;
+  }
+
+  .completion-banner,
+  .completion-icon-wrapper,
+  .detail-chip {
+    animation: none;
+    opacity: 1;
+  }
+}

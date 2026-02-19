@@ -39,43 +39,54 @@ import { StepProgressComponent } from './step-progress.component';
   ],
   providers: [ImportStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    :host {
-      display: block;
-    }
-
-    .wizard-container {
-      max-width: 960px;
-      margin: 0 auto;
-      padding: 24px;
-    }
-
-    .wizard-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 24px;
-    }
-
-    .wizard-header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    .mat-stepper-horizontal {
-      background: transparent;
-    }
-  `,
+  styleUrl: './import-wizard.component.scss',
   template: `
-    <div class="wizard-container">
-      <div class="wizard-header">
-        <a mat-icon-button routerLink="/settings" aria-label="Back to settings">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>Import Data</h1>
+    <div class="wizard-shell">
+      <!-- Hero Header -->
+      <div class="wizard-hero">
+        <div class="wizard-hero__mesh"></div>
+        <div class="wizard-hero__content">
+          <a class="wizard-back" routerLink="/settings">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Settings</span>
+          </a>
+          <div class="wizard-hero__heading">
+            <div class="wizard-hero__icon-wrap">
+              <mat-icon>upload_file</mat-icon>
+            </div>
+            <div>
+              <h1>Import Data</h1>
+              <p class="header-subtitle">Upload, map, and import your CSV data</p>
+            </div>
+          </div>
+        </div>
       </div>
 
+      <!-- Custom Step Pipeline -->
+      <div class="step-pipeline">
+        @for (s of steps; track s.index) {
+          <div class="pipeline-node"
+               [class.active]="store.step() === s.index"
+               [class.completed]="store.step() > s.index"
+               [style.animation-delay]="(s.index * 80 + 100) + 'ms'">
+            <div class="node-circle">
+              @if (store.step() > s.index) {
+                <mat-icon>check</mat-icon>
+              } @else {
+                <span>{{ s.index + 1 }}</span>
+              }
+            </div>
+            <span class="node-label">{{ s.label }}</span>
+          </div>
+          @if (!$last) {
+            <div class="pipeline-connector"
+                 [class.filled]="store.step() > s.index">
+            </div>
+          }
+        }
+      </div>
+
+      <!-- Stepper (header hidden via CSS, content still used) -->
       <mat-stepper #stepper linear [selectedIndex]="store.step()">
         <mat-step label="Upload File" [completed]="store.hasUpload()">
           <app-step-upload (stepComplete)="goToStep(1)" />
@@ -101,6 +112,13 @@ export class ImportWizardComponent implements OnInit, OnDestroy {
   private readonly signalR = inject(SignalRService);
 
   @ViewChild('stepper') stepper!: MatStepper;
+
+  readonly steps = [
+    { index: 0, label: 'Upload' },
+    { index: 1, label: 'Map Fields' },
+    { index: 2, label: 'Preview' },
+    { index: 3, label: 'Import' },
+  ];
 
   private signalRSub?: Subscription;
 

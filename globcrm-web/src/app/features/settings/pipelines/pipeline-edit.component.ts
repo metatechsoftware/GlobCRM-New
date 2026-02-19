@@ -14,11 +14,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   CdkDragDrop,
   CdkDrag,
@@ -46,449 +45,286 @@ import {
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatCardModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatChipsModule,
     MatExpansionModule,
+    MatTooltipModule,
     CdkDrag,
     CdkDropList,
   ],
   template: `
-    <div class="pipeline-edit-container">
-      <div class="page-header">
-        <button mat-icon-button routerLink="/settings/pipelines">
+    <div class="pe-page">
+      <!-- Header -->
+      <div class="pe-header">
+        <a routerLink="/settings/pipelines" class="pe-back">
           <mat-icon>arrow_back</mat-icon>
-        </button>
-        <h1>{{ pageTitle }}</h1>
+          <span>Pipelines</span>
+        </a>
+        <div class="pe-title-row">
+          <div class="pe-icon-wrap">
+            <mat-icon>{{ mode() === 'create' ? 'add' : 'edit' }}</mat-icon>
+          </div>
+          <div>
+            <h1 class="pe-title">{{ pageTitle }}</h1>
+            <p class="pe-subtitle">{{ mode() === 'create' ? 'Define stages and flow for a new pipeline' : 'Update pipeline configuration and stages' }}</p>
+          </div>
+        </div>
       </div>
 
       @if (isLoading()) {
-        <div class="loading-container">
-          <mat-spinner diameter="48"></mat-spinner>
+        <div class="pe-loading">
+          <mat-spinner diameter="40"></mat-spinner>
           <p>Loading pipeline...</p>
         </div>
       } @else if (errorMessage() && mode() === 'edit' && !pipelineForm.dirty) {
-        <div class="error-container">
-          <mat-icon class="error-icon">error_outline</mat-icon>
+        <div class="pe-error">
+          <div class="pe-error__icon-wrap">
+            <mat-icon>error_outline</mat-icon>
+          </div>
+          <h3>Couldn't load pipeline</h3>
           <p>{{ errorMessage() }}</p>
           <button mat-flat-button color="primary" routerLink="/settings/pipelines">
             Back to Pipelines
           </button>
         </div>
       } @else {
-        <mat-card class="pipeline-form-card">
-          <mat-card-content>
-            <form [formGroup]="pipelineForm" class="pipeline-form">
-              <h2 class="section-title">Pipeline Details</h2>
+        <!-- Details Section -->
+        <div class="pe-section" style="animation-delay: 0ms">
+          <div class="pe-section__header">
+            <mat-icon class="pe-section__icon">tune</mat-icon>
+            <h2>Pipeline Details</h2>
+          </div>
 
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Pipeline Name</mat-label>
-                <input
-                  matInput
-                  formControlName="name"
-                  placeholder="Enter pipeline name"
-                  maxlength="200"
-                />
-                @if (pipelineForm.get('name')?.hasError('required') && pipelineForm.get('name')?.touched) {
-                  <mat-error>Pipeline name is required.</mat-error>
-                }
-                @if (pipelineForm.get('name')?.hasError('maxlength')) {
-                  <mat-error>Pipeline name must be 200 characters or less.</mat-error>
-                }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
-                <textarea
-                  matInput
-                  formControlName="description"
-                  placeholder="Optional description"
-                  rows="3"
-                ></textarea>
-              </mat-form-field>
-
-              <mat-checkbox formControlName="isDefault">
-                Set as default pipeline
-              </mat-checkbox>
-            </form>
-
-            <!-- Stage Management Section -->
-            <div class="stages-section">
-              <div class="stages-header">
-                <h2 class="section-title">Stages</h2>
-                <button mat-stroked-button color="primary" (click)="addStage()">
-                  <mat-icon>add</mat-icon>
-                  Add Stage
-                </button>
-              </div>
-
-              <!-- Stage Preview -->
-              @if (stagesArray.length > 0) {
-                <div class="stage-preview">
-                  @for (stage of stagesArray.controls; track stage; let i = $index) {
-                    <div class="stage-chip"
-                      [style.background-color]="stage.get('color')?.value || '#9e9e9e'"
-                      [style.color]="getContrastColor(stage.get('color')?.value || '#9e9e9e')"
-                    >
-                      {{ stage.get('name')?.value || 'Unnamed' }}
-                      <span class="stage-probability">{{ stage.get('defaultProbability')?.value || 0 }}%</span>
-                    </div>
-                  }
-                </div>
+          <form [formGroup]="pipelineForm" class="pe-form">
+            <mat-form-field appearance="outline" class="pe-full-width">
+              <mat-label>Pipeline Name</mat-label>
+              <input
+                matInput
+                formControlName="name"
+                placeholder="e.g. Sales Pipeline, Enterprise Deals"
+                maxlength="200"
+              />
+              @if (pipelineForm.get('name')?.hasError('required') && pipelineForm.get('name')?.touched) {
+                <mat-error>Pipeline name is required.</mat-error>
               }
+            </mat-form-field>
 
-              <!-- Draggable Stage List -->
-              <div cdkDropList
-                class="stage-list"
-                (cdkDropListDropped)="onStageDrop($event)"
-              >
-                @for (stage of stagesArray.controls; track stage; let i = $index) {
-                  <div class="stage-item" cdkDrag [formGroup]="getStageFormGroup(i)">
-                    <div class="stage-drag-handle" cdkDragHandle>
-                      <mat-icon>drag_indicator</mat-icon>
-                    </div>
+            <mat-form-field appearance="outline" class="pe-full-width">
+              <mat-label>Description</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                placeholder="What is this pipeline used for?"
+                rows="3"
+              ></textarea>
+            </mat-form-field>
 
-                    <div class="stage-content">
-                      <div class="stage-row">
-                        <mat-form-field appearance="outline" class="stage-name-field">
-                          <mat-label>Stage Name</mat-label>
-                          <input matInput formControlName="name" placeholder="e.g. Qualification" />
-                          @if (getStageFormGroup(i).get('name')?.hasError('required') && getStageFormGroup(i).get('name')?.touched) {
-                            <mat-error>Stage name is required.</mat-error>
-                          }
-                        </mat-form-field>
+            <mat-checkbox formControlName="isDefault" color="primary">
+              Set as default pipeline
+            </mat-checkbox>
+          </form>
+        </div>
 
-                        <mat-form-field appearance="outline" class="stage-color-field">
-                          <mat-label>Color</mat-label>
-                          <input matInput formControlName="color" placeholder="#4caf50" maxlength="7" />
-                          @if (getStageFormGroup(i).get('color')?.hasError('pattern')) {
-                            <mat-error>Must be a hex color (e.g. #4caf50).</mat-error>
-                          }
-                        </mat-form-field>
+        <!-- Stages Section -->
+        <div class="pe-section" style="animation-delay: 80ms">
+          <div class="pe-section__header">
+            <mat-icon class="pe-section__icon">layers</mat-icon>
+            <h2>Stages</h2>
+            <button mat-stroked-button color="primary" (click)="addStage()" class="pe-add-stage-btn">
+              <mat-icon>add</mat-icon>
+              Add Stage
+            </button>
+          </div>
 
-                        <mat-form-field appearance="outline" class="stage-probability-field">
-                          <mat-label>Probability %</mat-label>
-                          <input matInput type="number" formControlName="defaultProbability"
-                            min="0" max="100" />
-                        </mat-form-field>
-
-                        <mat-checkbox formControlName="isWon" class="stage-checkbox">Won</mat-checkbox>
-                        <mat-checkbox formControlName="isLost" class="stage-checkbox">Lost</mat-checkbox>
-
-                        <button mat-icon-button color="warn" (click)="removeStage(i)"
-                          matTooltip="Remove stage">
-                          <mat-icon>close</mat-icon>
-                        </button>
-                      </div>
-
-                      <!-- Required Fields (expandable) -->
-                      <mat-expansion-panel class="required-fields-panel">
-                        <mat-expansion-panel-header>
-                          <mat-panel-title>
-                            Required Fields
-                            @if (getRequiredFieldCount(i) > 0) {
-                              <span class="required-count">({{ getRequiredFieldCount(i) }})</span>
-                            }
-                          </mat-panel-title>
-                        </mat-expansion-panel-header>
-                        <div class="required-fields-grid" formGroupName="requiredFields">
-                          <mat-checkbox formControlName="value">Deal Value</mat-checkbox>
-                          <mat-checkbox formControlName="probability">Probability</mat-checkbox>
-                          <mat-checkbox formControlName="expectedCloseDate">Expected Close Date</mat-checkbox>
-                          <mat-checkbox formControlName="companyId">Company</mat-checkbox>
-                          <mat-checkbox formControlName="ownerId">Owner</mat-checkbox>
-                        </div>
-                      </mat-expansion-panel>
-                    </div>
-                  </div>
-                }
-              </div>
-
-              @if (stagesArray.length === 0) {
-                <div class="no-stages">
-                  <mat-icon>layers</mat-icon>
-                  <p>No stages defined. Add stages to configure the deal pipeline flow.</p>
+          <!-- Stage Flow Preview -->
+          @if (stagesArray.length > 0) {
+            <div class="pe-stage-flow">
+              @for (stage of stagesArray.controls; track stage; let last = $last) {
+                <div class="pe-flow-chip"
+                  [style.background-color]="stage.get('color')?.value || '#9e9e9e'"
+                  [style.color]="getContrastColor(stage.get('color')?.value || '#9e9e9e')"
+                >
+                  {{ stage.get('name')?.value || 'Unnamed' }}
+                  <span class="pe-flow-prob">{{ stage.get('defaultProbability')?.value || 0 }}%</span>
                 </div>
+                @if (!last) {
+                  <mat-icon class="pe-flow-arrow">chevron_right</mat-icon>
+                }
               }
             </div>
+          }
 
-            @if (errorMessage()) {
-              <div class="form-error">
-                <mat-icon>error_outline</mat-icon>
-                <span>{{ errorMessage() }}</span>
+          <!-- Draggable Stage List -->
+          <div cdkDropList class="pe-stage-list" (cdkDropListDropped)="onStageDrop($event)">
+            @for (stage of stagesArray.controls; track stage; let i = $index) {
+              <div class="pe-stage-item" cdkDrag [formGroup]="getStageFormGroup(i)" [style.animation-delay]="(i * 40) + 'ms'">
+                <div class="pe-stage-drag" cdkDragHandle>
+                  <mat-icon>drag_indicator</mat-icon>
+                </div>
+
+                <div class="pe-stage-color-bar"
+                  [style.background]="stage.get('color')?.value || '#9e9e9e'"
+                ></div>
+
+                <div class="pe-stage-content">
+                  <div class="pe-stage-row">
+                    <mat-form-field appearance="outline" class="pe-stage-name">
+                      <mat-label>Stage Name</mat-label>
+                      <input matInput formControlName="name" placeholder="e.g. Qualification" />
+                      @if (getStageFormGroup(i).get('name')?.hasError('required') && getStageFormGroup(i).get('name')?.touched) {
+                        <mat-error>Required</mat-error>
+                      }
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="pe-stage-color">
+                      <mat-label>Color</mat-label>
+                      <input matInput formControlName="color" placeholder="#4caf50" maxlength="7" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="pe-stage-prob">
+                      <mat-label>Probability %</mat-label>
+                      <input matInput type="number" formControlName="defaultProbability" min="0" max="100" />
+                    </mat-form-field>
+
+                    <mat-checkbox formControlName="isWon" class="pe-stage-check">Won</mat-checkbox>
+                    <mat-checkbox formControlName="isLost" class="pe-stage-check">Lost</mat-checkbox>
+
+                    <button mat-icon-button (click)="removeStage(i)" matTooltip="Remove stage" class="pe-stage-remove">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </div>
+
+                  <mat-expansion-panel class="pe-req-panel">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        Required Fields
+                        @if (getRequiredFieldCount(i) > 0) {
+                          <span class="pe-req-count">({{ getRequiredFieldCount(i) }})</span>
+                        }
+                      </mat-panel-title>
+                    </mat-expansion-panel-header>
+                    <div class="pe-req-grid" formGroupName="requiredFields">
+                      <mat-checkbox formControlName="value">Deal Value</mat-checkbox>
+                      <mat-checkbox formControlName="probability">Probability</mat-checkbox>
+                      <mat-checkbox formControlName="expectedCloseDate">Expected Close Date</mat-checkbox>
+                      <mat-checkbox formControlName="companyId">Company</mat-checkbox>
+                      <mat-checkbox formControlName="ownerId">Owner</mat-checkbox>
+                    </div>
+                  </mat-expansion-panel>
+                </div>
               </div>
             }
-          </mat-card-content>
+          </div>
 
-          <mat-card-actions align="end">
-            <button mat-button routerLink="/settings/pipelines">Cancel</button>
-            <button
-              mat-flat-button
-              color="primary"
-              (click)="onSave()"
-              [disabled]="isSaving() || pipelineForm.invalid"
-            >
-              @if (isSaving()) {
-                <mat-spinner diameter="20" class="button-spinner"></mat-spinner>
-              } @else {
-                {{ mode() === 'create' ? 'Create Pipeline' : 'Save Changes' }}
-              }
-            </button>
-          </mat-card-actions>
-        </mat-card>
+          @if (stagesArray.length === 0) {
+            <div class="pe-no-stages">
+              <div class="pe-no-stages__visual">
+                <mat-icon>layers</mat-icon>
+              </div>
+              <p>No stages defined</p>
+              <span class="pe-no-stages__hint">Add stages to configure the deal pipeline flow</span>
+            </div>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="pe-form-error">
+            <mat-icon>error_outline</mat-icon>
+            <span>{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <div class="pe-actions">
+          <button mat-button routerLink="/settings/pipelines">Cancel</button>
+          <button
+            mat-flat-button color="primary"
+            (click)="onSave()"
+            [disabled]="isSaving() || pipelineForm.invalid"
+            class="pe-save-btn"
+          >
+            @if (isSaving()) {
+              <mat-spinner diameter="18" class="pe-btn-spinner"></mat-spinner>
+            } @else {
+              <mat-icon>{{ mode() === 'create' ? 'add' : 'check' }}</mat-icon>
+              {{ mode() === 'create' ? 'Create Pipeline' : 'Save Changes' }}
+            }
+          </button>
+        </div>
       }
     </div>
   `,
   styles: [`
-    .pipeline-edit-container {
-      padding: 24px;
-      max-width: 1000px;
-      margin: 0 auto;
+    .pe-page { padding: var(--space-6) var(--space-8); max-width: 1000px; margin: 0 auto; }
+    .pe-header { margin-bottom: var(--space-6); animation: peFadeSlideUp var(--duration-slower) var(--ease-out) both; }
+    .pe-back { display: inline-flex; align-items: center; gap: var(--space-1); color: var(--color-text-secondary); font-size: var(--text-sm); font-weight: var(--font-medium); text-decoration: none; margin-bottom: var(--space-3); transition: color var(--duration-fast) var(--ease-default);
+      mat-icon { font-size: 18px; width: 18px; height: 18px; }
+      &:hover { color: var(--color-primary); }
     }
-
-    .page-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 24px;
-
-      h1 {
-        margin: 0;
-        font-size: 24px;
-        font-weight: 500;
-      }
+    .pe-title-row { display: flex; align-items: center; gap: var(--space-4); }
+    .pe-icon-wrap { width: 48px; height: 48px; border-radius: var(--radius-lg); background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover)); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3); flex-shrink: 0;
+      mat-icon { color: var(--color-accent-fg); font-size: 24px; width: 24px; height: 24px; }
     }
+    .pe-title { margin: 0; font-size: var(--text-2xl); font-weight: var(--font-bold); letter-spacing: -0.3px; color: var(--color-text); }
+    .pe-subtitle { margin: var(--space-1) 0 0; font-size: var(--text-sm); color: var(--color-text-secondary); }
 
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 0;
-
-      p {
-        margin-top: 16px;
-        color: var(--color-text-secondary);
-      }
+    .pe-section { background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: 14px; padding: var(--space-6); margin-bottom: var(--space-5); animation: peSectionEntrance var(--duration-slower) var(--ease-out) both; }
+    .pe-section__header { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); padding-bottom: var(--space-4); border-bottom: 1px solid var(--color-border-subtle);
+      h2 { margin: 0; font-size: var(--text-lg); font-weight: var(--font-semibold); letter-spacing: -0.2px; }
     }
+    .pe-section__icon { font-size: 20px; width: 20px; height: 20px; color: var(--color-text-muted); }
+    .pe-add-stage-btn { margin-left: auto; mat-icon { margin-right: var(--space-1); } }
+    .pe-form { display: flex; flex-direction: column; gap: var(--space-2); }
+    .pe-full-width { width: 100%; }
 
-    .error-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 0;
+    .pe-stage-flow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-1-5); margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); background: var(--color-bg-secondary); border-radius: var(--radius-md); }
+    .pe-flow-chip { display: inline-flex; align-items: center; gap: var(--space-1); padding: var(--space-0-5) var(--space-3); border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: var(--font-medium); }
+    .pe-flow-prob { opacity: 0.75; font-size: 10px; }
+    .pe-flow-arrow { font-size: 16px; width: 16px; height: 16px; color: var(--color-text-muted); }
 
-      .error-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        color: var(--color-danger);
-      }
-
-      p {
-        margin: 16px 0;
-        color: var(--color-text-secondary);
-      }
+    .pe-stage-list { display: flex; flex-direction: column; gap: var(--space-3); }
+    .pe-stage-item { display: flex; align-items: flex-start; gap: var(--space-3); padding: var(--space-4); background: var(--color-surface); border: 1.5px solid var(--color-border); border-radius: var(--radius-lg); transition: box-shadow var(--duration-normal) var(--ease-default), border-color var(--duration-normal) var(--ease-default); animation: peStageEntrance var(--duration-slow) var(--ease-out) both;
+      &:hover { box-shadow: var(--shadow-md); border-color: var(--color-border-strong); }
     }
+    .pe-stage-drag { cursor: grab; color: var(--color-text-muted); padding-top: var(--space-3); &:active { cursor: grabbing; } &:hover { color: var(--color-text-secondary); } }
+    .pe-stage-color-bar { width: 4px; border-radius: var(--radius-full); align-self: stretch; flex-shrink: 0; }
+    .pe-stage-content { flex: 1; min-width: 0; }
+    .pe-stage-row { display: flex; align-items: flex-start; gap: var(--space-3); flex-wrap: wrap; }
+    .pe-stage-name { flex: 1; min-width: 180px; }
+    .pe-stage-color { width: 120px; }
+    .pe-stage-prob { width: 120px; }
+    .pe-stage-check { padding-top: var(--space-3); }
+    .pe-stage-remove { color: var(--color-text-muted); &:hover { color: var(--color-danger); } }
+    .pe-req-panel { margin-top: var(--space-2); ::ng-deep .mat-expansion-panel-body { padding: var(--space-2) var(--space-6) var(--space-4); } }
+    .pe-req-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: var(--space-2); }
+    .pe-req-count { margin-left: var(--space-2); font-size: var(--text-xs); color: var(--color-text-secondary); }
 
-    .pipeline-form-card {
-      margin-bottom: 24px;
+    .pe-no-stages { display: flex; flex-direction: column; align-items: center; padding: var(--space-8) var(--space-4); text-align: center;
+      p { margin: var(--space-3) 0 var(--space-1); font-size: var(--text-base); font-weight: var(--font-medium); color: var(--color-text); }
     }
-
-    .pipeline-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 16px;
+    .pe-no-stages__visual { width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--color-accent-soft); display: flex; align-items: center; justify-content: center;
+      mat-icon { font-size: 28px; width: 28px; height: 28px; color: var(--color-accent); }
     }
+    .pe-no-stages__hint { font-size: var(--text-sm); color: var(--color-text-muted); }
 
-    .section-title {
-      font-size: 18px;
-      font-weight: 500;
-      margin: 0 0 16px 0;
+    .pe-form-error { display: flex; align-items: center; gap: var(--space-2); margin-bottom: var(--space-5); padding: var(--space-3) var(--space-4); background-color: var(--color-danger-soft); border-radius: var(--radius-md); color: var(--color-danger-text); font-size: var(--text-sm); border: 1px solid var(--color-danger);
+      mat-icon { font-size: 18px; width: 18px; height: 18px; flex-shrink: 0; }
     }
+    .pe-actions { display: flex; justify-content: flex-end; gap: var(--space-3); padding-top: var(--space-4); animation: peFadeSlideUp var(--duration-slower) var(--ease-out) both; animation-delay: 160ms; }
+    .pe-save-btn { mat-icon { margin-right: var(--space-1); font-size: 18px; } }
+    .pe-btn-spinner { display: inline-block; ::ng-deep circle { stroke: white; } }
 
-    .full-width {
-      width: 100%;
-    }
+    .pe-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-20) 0; gap: var(--space-4); p { margin: 0; color: var(--color-text-secondary); font-size: var(--text-sm); } }
+    .pe-error { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: var(--space-16) 0; text-align: center; h3 { margin: var(--space-4) 0 var(--space-2); font-size: var(--text-lg); } p { margin: 0 0 var(--space-5); color: var(--color-text-secondary); max-width: 360px; } }
+    .pe-error__icon-wrap { width: 56px; height: 56px; border-radius: var(--radius-full); background: var(--color-danger-soft); display: flex; align-items: center; justify-content: center; mat-icon { font-size: 28px; width: 28px; height: 28px; color: var(--color-danger); } }
 
-    .stages-section {
-      margin-top: 24px;
-      padding-top: 24px;
-      border-top: 1px solid var(--color-border);
-    }
-
-    .stages-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 16px;
-    }
-
-    .stage-preview {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-bottom: 16px;
-      padding: 12px;
-      background: var(--color-primary-soft);
-      border-radius: 8px;
-    }
-
-    .stage-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 13px;
-      font-weight: 500;
-
-      .stage-probability {
-        opacity: 0.8;
-        font-size: 11px;
-      }
-    }
-
-    .stage-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .stage-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 8px;
-      padding: 16px;
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: 8px;
-      transition: box-shadow 200ms, border-color 200ms;
-
-      &:hover {
-        box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
-        border-color: var(--color-primary);
-      }
-    }
-
-    .stage-drag-handle {
-      cursor: grab;
-      color: var(--color-text-muted);
-      padding-top: 12px;
-
-      &:active {
-        cursor: grabbing;
-      }
-    }
-
-    .stage-content {
-      flex: 1;
-      min-width: 0;
-    }
-
-    .stage-row {
-      display: flex;
-      align-items: flex-start;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .stage-name-field {
-      flex: 1;
-      min-width: 180px;
-    }
-
-    .stage-color-field {
-      width: 120px;
-    }
-
-    .stage-probability-field {
-      width: 120px;
-    }
-
-    .stage-checkbox {
-      padding-top: 12px;
-    }
-
-    .required-fields-panel {
-      margin-top: 8px;
-
-      ::ng-deep .mat-expansion-panel-body {
-        padding: 8px 24px 16px;
-      }
-    }
-
-    .required-fields-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-      gap: 8px;
-    }
-
-    .required-count {
-      margin-left: 8px;
-      font-size: 12px;
-      color: var(--color-text-secondary);
-    }
-
-    .no-stages {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 32px;
-      color: var(--color-text-secondary);
-
-      mat-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
-        margin-bottom: 8px;
-        color: var(--color-primary);
-        opacity: 0.6;
-      }
-    }
-
-    .form-error {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-top: 16px;
-      padding: 12px;
-      background-color: var(--color-danger-soft);
-      border-radius: var(--radius-sm);
-      color: var(--color-danger-text);
-
-      mat-icon {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
-    }
-
-    .button-spinner {
-      display: inline-block;
-
-      ::ng-deep circle {
-        stroke: white;
-      }
-    }
-
-    /* CDK Drag styles */
-    .cdk-drag-preview {
-      box-sizing: border-box;
-      border-radius: 8px;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .cdk-drag-placeholder {
-      opacity: 0.3;
-    }
-
-    .cdk-drag-animating {
-      transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-    }
+    @keyframes peFadeSlideUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes peSectionEntrance { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+    @keyframes peStageEntrance { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: translateX(0); } }
+    @media (prefers-reduced-motion: reduce) { .pe-section, .pe-header, .pe-actions, .pe-stage-item { animation: none !important; opacity: 1; } }
+    .cdk-drag-preview { box-sizing: border-box; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl); }
+    .cdk-drag-placeholder { opacity: 0.3; }
+    .cdk-drag-animating { transition: transform 250ms var(--ease-default); }
+    @media (max-width: 768px) { .pe-page { padding: var(--space-4); } .pe-title { font-size: var(--text-xl); } .pe-section { padding: var(--space-4); } .pe-stage-row { flex-direction: column; gap: var(--space-2); } .pe-stage-name, .pe-stage-color, .pe-stage-prob { width: 100%; min-width: unset; } }
   `],
 })
 export class PipelineEditComponent implements OnInit {
@@ -538,7 +374,6 @@ export class PipelineEditComponent implements OnInit {
           isDefault: pipeline.isDefault,
         });
 
-        // Clear and rebuild stages array
         this.stagesArray.clear();
         pipeline.stages
           .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -600,7 +435,6 @@ export class PipelineEditComponent implements OnInit {
   onStageDrop(event: CdkDragDrop<any>): void {
     const controls = this.stagesArray.controls;
     moveItemInArray(controls, event.previousIndex, event.currentIndex);
-    // Update the FormArray by clearing and re-adding in new order
     const values = controls.map((c) => c.value);
     this.stagesArray.clear();
     values.forEach((val) => {
@@ -632,7 +466,6 @@ export class PipelineEditComponent implements OnInit {
     const r = parseInt(hex.slice(1, 3), 16);
     const g = parseInt(hex.slice(3, 5), 16);
     const b = parseInt(hex.slice(5, 7), 16);
-    // Perceived brightness formula
     const brightness = (r * 299 + g * 587 + b * 114) / 1000;
     return brightness > 128 ? '#000000' : '#ffffff';
   }
@@ -650,7 +483,6 @@ export class PipelineEditComponent implements OnInit {
     const stages: CreateStageRequest[] = this.stagesArray.controls.map(
       (control, index) => {
         const val = control.value;
-        // Build requiredFields as a Record, filtering only true values
         const requiredFields: Record<string, boolean> = {};
         if (val.requiredFields) {
           Object.entries(val.requiredFields).forEach(([key, value]) => {
@@ -663,7 +495,7 @@ export class PipelineEditComponent implements OnInit {
           name: val.name,
           sortOrder: index,
           color: val.color,
-          defaultProbability: (val.defaultProbability || 0) / 100, // Convert percentage to 0-1
+          defaultProbability: (val.defaultProbability || 0) / 100,
           isWon: val.isWon || false,
           isLost: val.isLost || false,
           requiredFields,
@@ -673,18 +505,12 @@ export class PipelineEditComponent implements OnInit {
 
     if (this.mode() === 'create') {
       const request: CreatePipelineRequest = {
-        name,
-        description: description || null,
-        isDefault,
-        stages,
+        name, description: description || null, isDefault, stages,
       };
-
       this.pipelineService.create(request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Pipeline created successfully.', 'Close', {
-            duration: 3000,
-          });
+          this.snackBar.open('Pipeline created successfully.', 'Close', { duration: 3000 });
           this.router.navigate(['/settings/pipelines']);
         },
         error: (err) => {
@@ -695,18 +521,12 @@ export class PipelineEditComponent implements OnInit {
     } else {
       const id = this.pipelineId()!;
       const request: UpdatePipelineRequest = {
-        name,
-        description: description || null,
-        isDefault,
-        stages,
+        name, description: description || null, isDefault, stages,
       };
-
       this.pipelineService.update(id, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Pipeline updated successfully.', 'Close', {
-            duration: 3000,
-          });
+          this.snackBar.open('Pipeline updated successfully.', 'Close', { duration: 3000 });
           this.router.navigate(['/settings/pipelines']);
         },
         error: (err) => {

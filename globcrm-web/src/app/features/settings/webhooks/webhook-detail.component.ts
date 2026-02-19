@@ -43,309 +43,576 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* ── Keyframes ─────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 4px 16px rgba(139,92,246,0.25), 0 0 0 4px rgba(139,92,246,0.08); }
+      50%      { box-shadow: 0 4px 20px rgba(139,92,246,0.35), 0 0 0 6px rgba(139,92,246,0.12); }
+    }
+
+    /* ── Host ──────────────────────────────────────── */
     :host {
       display: block;
     }
 
-    .webhook-detail {
-      max-width: 900px;
+    /* ── Page Container ────────────────────────────── */
+    .wd-page {
+      max-width: 940px;
       margin: 0 auto;
-      padding: 24px;
+      padding: var(--space-6);
     }
 
-    .webhook-detail__header {
+    /* ── Loading ───────────────────────────────────── */
+    .wd-loading {
+      display: flex;
+      justify-content: center;
+      padding: var(--space-16);
+      opacity: 0;
+      animation: fadeSlideUp 0.35s var(--ease-out) forwards;
+    }
+
+    /* ── Header ────────────────────────────────────── */
+    .wd-header {
+      margin-bottom: var(--space-8);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) forwards;
+    }
+
+    .wd-header__breadcrumb {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--color-text-muted);
+      text-decoration: none;
+      margin-bottom: var(--space-4);
+      transition: color var(--duration-fast) var(--ease-default);
+    }
+
+    .wd-header__breadcrumb mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .wd-header__breadcrumb:hover {
+      color: var(--color-secondary);
+    }
+
+    .wd-header__top {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 24px;
+      gap: var(--space-5);
     }
 
-    .webhook-detail__header h1 {
+    .wd-header__icon-wrap {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      animation: glowPulse 4s ease-in-out infinite;
+    }
+
+    .wd-header__icon-wrap mat-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+      color: var(--color-secondary-fg);
+    }
+
+    .wd-header__text {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .wd-header__title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
       margin: 0;
+      color: var(--color-text);
+      line-height: var(--leading-tight);
+    }
+
+    .wd-header__subtitle {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      margin: var(--space-1) 0 0;
+      line-height: var(--leading-normal);
+    }
+
+    .wd-header__actions {
+      display: flex;
+      gap: var(--space-2);
+      flex-shrink: 0;
+      flex-wrap: wrap;
+    }
+
+    /* ── Disabled Banner ───────────────────────────── */
+    .wd-banner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-4) var(--space-5);
+      background: var(--color-danger-soft);
+      border: 1.5px solid var(--color-danger);
+      border-radius: 14px;
+      margin-bottom: var(--space-6);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) 0.1s forwards;
+    }
+
+    .wd-banner__icon {
+      color: var(--color-danger);
+      flex-shrink: 0;
       font-size: 24px;
-      font-weight: 500;
+      width: 24px;
+      height: 24px;
+    }
+
+    .wd-banner__content {
       flex: 1;
     }
 
-    .webhook-detail__actions {
+    .wd-banner__content p {
+      margin: 0;
+      font-size: var(--text-base);
+      color: var(--color-danger-text);
+    }
+
+    .wd-banner__content p:first-child {
+      font-weight: var(--font-semibold);
+    }
+
+    .wd-banner__content p + p {
+      font-size: var(--text-sm);
+      margin-top: var(--space-1);
+    }
+
+    /* ── Section Card ──────────────────────────────── */
+    .wd-section {
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      box-shadow: var(--shadow-sm);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) forwards;
+    }
+
+    .wd-section--info {
+      animation-delay: 0.1s;
+    }
+
+    .wd-section--delivery {
+      animation-delay: 0.2s;
+    }
+
+    .wd-section__header {
       display: flex;
-      gap: 8px;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
     }
 
-    .webhook-detail__loading {
-      display: flex;
-      justify-content: center;
-      padding: 64px;
+    .wd-section__header-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--color-secondary);
     }
 
-    .info-card {
-      margin-bottom: 24px;
-    }
-
-    .info-card mat-card-title {
-      font-size: 16px;
-      font-weight: 500;
-    }
-
-    .info-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .info-item {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .info-item--full {
-      grid-column: 1 / -1;
-    }
-
-    .info-label {
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-text-secondary);
-    }
-
-    .info-value {
-      font-size: 14px;
+    .wd-section__header-title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      margin: 0;
       color: var(--color-text);
     }
 
-    .info-value--mono {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 13px;
+    /* ── Info Grid ─────────────────────────────────── */
+    .wd-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-5);
     }
 
-    .status-badge {
-      display: inline-block;
-      font-size: 12px;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-weight: 500;
+    .wd-info-item {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1-5);
     }
 
-    .status-badge--active {
-      background-color: var(--color-success-soft);
+    .wd-info-item--full {
+      grid-column: 1 / -1;
+    }
+
+    .wd-info-label {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1-5);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-text-muted);
+    }
+
+    .wd-info-label mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .wd-info-value {
+      font-size: var(--text-base);
+      color: var(--color-text);
+    }
+
+    .wd-info-value--mono {
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+      background: var(--color-bg-secondary);
+      padding: var(--space-1-5) var(--space-3);
+      border-radius: var(--radius-md);
+      word-break: break-all;
+    }
+
+    .wd-info-value--failure {
+      color: var(--color-danger-text);
+      font-weight: var(--font-semibold);
+    }
+
+    /* ── Status Badge ──────────────────────────────── */
+    .wd-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1-5);
+      font-size: var(--text-xs);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-weight: var(--font-semibold);
+    }
+
+    .wd-status-badge__dot {
+      width: 7px;
+      height: 7px;
+      border-radius: var(--radius-full);
+    }
+
+    .wd-status-badge--active {
+      background: var(--color-success-soft);
       color: var(--color-success-text);
     }
 
-    .status-badge--disabled {
-      background-color: var(--color-danger-soft);
+    .wd-status-badge--active .wd-status-badge__dot {
+      background: var(--color-success);
+    }
+
+    .wd-status-badge--paused {
+      background: var(--color-warning-soft);
+      color: var(--color-warning-text);
+    }
+
+    .wd-status-badge--paused .wd-status-badge__dot {
+      background: var(--color-warning);
+    }
+
+    .wd-status-badge--disabled {
+      background: var(--color-danger-soft);
       color: var(--color-danger-text);
     }
 
-    .status-badge--paused {
-      background-color: var(--color-surface-active);
-      color: var(--color-text-secondary);
+    .wd-status-badge--disabled .wd-status-badge__dot {
+      background: var(--color-danger);
     }
 
-    .event-chips {
+    /* ── Event Chips ───────────────────────────────── */
+    .wd-event-chips {
       display: flex;
       flex-wrap: wrap;
-      gap: 6px;
+      gap: var(--space-1-5);
     }
 
-    .event-chip {
+    .wd-event-chip {
       display: inline-block;
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 4px;
-      background-color: var(--color-primary-soft);
+      font-size: var(--text-xs);
+      padding: var(--space-1) var(--space-2);
+      border-radius: var(--radius-md);
+      background: var(--color-primary-soft);
       color: var(--color-primary-text);
-      font-weight: 500;
+      font-weight: var(--font-medium);
     }
 
-    .disabled-banner {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
-      background-color: var(--color-danger-soft);
-      border: 1px solid var(--color-danger);
-      border-radius: 8px;
-      margin-bottom: 24px;
-    }
-
-    .disabled-banner mat-icon {
-      color: var(--color-danger);
-      flex-shrink: 0;
-    }
-
-    .disabled-banner__content {
-      flex: 1;
-    }
-
-    .disabled-banner__content p {
-      margin: 0;
-      font-size: 14px;
-      color: var(--color-danger-text);
-    }
-
-    .disabled-banner__content p:first-child {
-      font-weight: 600;
-    }
-
-    .disabled-banner__content p:last-child {
-      font-size: 13px;
-      margin-top: 4px;
-    }
-
-    .delivery-section {
-      margin-top: 24px;
-    }
-
-    .delivery-section h2 {
-      font-size: 18px;
-      font-weight: 500;
-      margin: 0 0 16px 0;
-    }
-
-    .delivery-table {
+    /* ── Delivery Table ────────────────────────────── */
+    .wd-delivery-table {
       width: 100%;
       border-collapse: collapse;
     }
 
-    .delivery-table th {
+    .wd-delivery-table th {
       text-align: left;
-      font-size: 12px;
-      font-weight: 600;
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--color-text-secondary);
-      padding: 8px 12px;
+      color: var(--color-text-muted);
+      padding: var(--space-2) var(--space-3);
       border-bottom: 2px solid var(--color-border);
     }
 
-    .delivery-table td {
-      font-size: 13px;
-      padding: 10px 12px;
+    .wd-delivery-table td {
+      font-size: var(--text-sm);
+      padding: var(--space-3) var(--space-3);
       border-bottom: 1px solid var(--color-border-subtle);
       color: var(--color-text);
     }
 
-    .delivery-row {
+    .wd-delivery-row {
       cursor: pointer;
-      transition: background-color 0.1s;
+      transition: background-color var(--duration-fast) var(--ease-default);
+      border-left: 3px solid transparent;
     }
 
-    .delivery-row:hover {
-      background-color: var(--color-surface-hover);
+    .wd-delivery-row:hover {
+      background: var(--color-surface-hover);
     }
 
-    .delivery-badge {
+    .wd-delivery-row--success {
+      border-left-color: var(--color-success);
+    }
+
+    .wd-delivery-row--failed {
+      border-left-color: var(--color-danger);
+    }
+
+    .wd-delivery-row--retrying {
+      border-left-color: var(--color-warning);
+    }
+
+    /* ── Delivery Badge ────────────────────────────── */
+    .wd-delivery-badge {
       display: inline-block;
       font-size: 11px;
-      padding: 2px 8px;
-      border-radius: 10px;
-      font-weight: 600;
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      font-weight: var(--font-semibold);
     }
 
-    .delivery-badge--success {
-      background-color: var(--color-success-soft);
+    .wd-delivery-badge--success {
+      background: var(--color-success-soft);
       color: var(--color-success-text);
     }
 
-    .delivery-badge--failed {
-      background-color: var(--color-danger-soft);
+    .wd-delivery-badge--failed {
+      background: var(--color-danger-soft);
       color: var(--color-danger-text);
     }
 
-    .delivery-badge--retrying {
-      background-color: var(--color-warning-soft);
+    .wd-delivery-badge--retrying {
+      background: var(--color-warning-soft);
       color: var(--color-warning-text);
     }
 
-    .delivery-expanded {
-      background-color: var(--color-surface-hover);
+    /* ── Delivery Expanded Row ─────────────────────── */
+    .wd-delivery-expanded {
+      background: var(--color-surface-hover);
     }
 
-    .delivery-expanded td {
-      padding: 16px 12px;
+    .wd-delivery-expanded td {
+      padding: var(--space-4) var(--space-3);
     }
 
-    .delivery-detail {
+    .wd-delivery-detail {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: var(--space-3);
     }
 
-    .delivery-detail__section {
+    .wd-delivery-detail__section {
       display: flex;
       flex-direction: column;
-      gap: 4px;
+      gap: var(--space-1);
     }
 
-    .delivery-detail__label {
+    .wd-delivery-detail__label {
       font-size: 11px;
-      font-weight: 600;
+      font-weight: var(--font-semibold);
       text-transform: uppercase;
-      color: var(--color-text-secondary);
+      color: var(--color-text-muted);
     }
 
-    .delivery-detail__value {
-      font-family: 'SF Mono', 'Fira Code', monospace;
-      font-size: 12px;
-      background-color: var(--color-bg);
+    .wd-delivery-detail__value {
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      background: var(--color-bg);
       color: var(--color-text);
       border: 1px solid var(--color-border);
-      padding: 12px;
-      border-radius: 6px;
+      padding: var(--space-3);
+      border-radius: var(--radius-md);
       white-space: pre-wrap;
       word-break: break-all;
       max-height: 200px;
       overflow-y: auto;
     }
 
-    .delivery-empty {
+    /* ── Delivery Empty ────────────────────────────── */
+    .wd-delivery-empty {
       text-align: center;
-      padding: 48px 24px;
+      padding: var(--space-12) var(--space-6);
+    }
+
+    .wd-delivery-empty__icon-wrap {
+      width: 64px;
+      height: 64px;
+      border-radius: var(--radius-full);
+      background: var(--color-bg-secondary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-4);
+    }
+
+    .wd-delivery-empty__icon-wrap mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-text-muted);
+    }
+
+    .wd-delivery-empty__text {
+      font-size: var(--text-base);
       color: var(--color-text-secondary);
-      font-size: 14px;
+      margin: 0;
+    }
+
+    /* ── Delivery Spinner ──────────────────────────── */
+    .wd-delivery-spinner {
+      display: flex;
+      justify-content: center;
+      padding: var(--space-6);
+    }
+
+    /* ── Responsive ────────────────────────────────── */
+    @media (max-width: 768px) {
+      .wd-page {
+        padding: var(--space-4);
+      }
+
+      .wd-header__top {
+        flex-wrap: wrap;
+      }
+
+      .wd-header__icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-md);
+      }
+
+      .wd-header__icon-wrap mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      .wd-header__title {
+        font-size: var(--text-xl);
+      }
+
+      .wd-header__actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+
+      .wd-info-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .wd-section {
+        padding: var(--space-4);
+      }
+
+      .wd-delivery-table th:nth-child(5),
+      .wd-delivery-table td:nth-child(5) {
+        display: none;
+      }
+    }
+
+    /* ── Reduced Motion ────────────────────────────── */
+    @media (prefers-reduced-motion: reduce) {
+      .wd-header,
+      .wd-section,
+      .wd-banner,
+      .wd-loading {
+        animation: none;
+        opacity: 1;
+      }
+      .wd-header__icon-wrap {
+        animation: none;
+      }
     }
   `,
   template: `
-    <div class="webhook-detail">
+    <div class="wd-page">
       @if (store.loading() && !store.selectedSubscription()) {
-        <div class="webhook-detail__loading">
+        <div class="wd-loading">
           <mat-spinner diameter="48"></mat-spinner>
         </div>
       }
       @if (store.selectedSubscription(); as sub) {
-        <div class="webhook-detail__header">
-          <a mat-icon-button routerLink="/settings/webhooks" aria-label="Back to list">
+        <!-- Header -->
+        <div class="wd-header">
+          <a class="wd-header__breadcrumb" routerLink="/settings/webhooks">
             <mat-icon>arrow_back</mat-icon>
+            Webhooks
           </a>
-          <h1>{{ sub.name }}</h1>
-          <div class="webhook-detail__actions">
-            <button mat-stroked-button (click)="onTest()">
-              <mat-icon>science</mat-icon>
-              Test
-            </button>
-            <button mat-stroked-button (click)="onRegenerateSecret()">
-              <mat-icon>key</mat-icon>
-              Regenerate Secret
-            </button>
-            <button mat-stroked-button (click)="onToggle()">
-              <mat-icon>{{ sub.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-              {{ sub.isActive ? 'Pause' : 'Enable' }}
-            </button>
-            <a mat-stroked-button [routerLink]="['/settings/webhooks', sub.id, 'edit']">
-              <mat-icon>edit</mat-icon>
-              Edit
-            </a>
+
+          <div class="wd-header__top">
+            <div class="wd-header__icon-wrap">
+              <mat-icon>webhook</mat-icon>
+            </div>
+            <div class="wd-header__text">
+              <h1 class="wd-header__title">{{ sub.name }}</h1>
+              <p class="wd-header__subtitle">Webhook details and delivery history</p>
+            </div>
+            <div class="wd-header__actions">
+              <button mat-stroked-button (click)="onTest()">
+                <mat-icon>science</mat-icon>
+                Test
+              </button>
+              <button mat-stroked-button (click)="onRegenerateSecret()">
+                <mat-icon>key</mat-icon>
+                Regenerate Secret
+              </button>
+              <button mat-stroked-button (click)="onToggle()">
+                <mat-icon>{{ sub.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
+                {{ sub.isActive ? 'Pause' : 'Enable' }}
+              </button>
+              <a mat-stroked-button [routerLink]="['/settings/webhooks', sub.id, 'edit']">
+                <mat-icon>edit</mat-icon>
+                Edit
+              </a>
+            </div>
           </div>
         </div>
 
         <!-- Auto-disabled banner -->
         @if (sub.isDisabled) {
-          <div class="disabled-banner">
-            <mat-icon>error</mat-icon>
-            <div class="disabled-banner__content">
+          <div class="wd-banner">
+            <mat-icon class="wd-banner__icon">error</mat-icon>
+            <div class="wd-banner__content">
               <p>This webhook has been automatically disabled</p>
               @if (sub.disabledReason) {
                 <p>{{ sub.disabledReason }}</p>
@@ -360,84 +627,116 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
           </div>
         }
 
-        <!-- Info Card -->
-        <mat-card class="info-card">
-          <mat-card-header>
-            <mat-card-title>Subscription Details</mat-card-title>
-          </mat-card-header>
-          <mat-card-content>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="info-label">Status</span>
-                <span>
-                  <span class="status-badge"
-                        [class.status-badge--active]="sub.isActive && !sub.isDisabled"
-                        [class.status-badge--disabled]="sub.isDisabled"
-                        [class.status-badge--paused]="!sub.isActive && !sub.isDisabled">
-                    {{ getStatusLabel(sub) }}
-                  </span>
+        <!-- Info Section Card -->
+        <div class="wd-section wd-section--info">
+          <div class="wd-section__header">
+            <mat-icon class="wd-section__header-icon">info</mat-icon>
+            <h2 class="wd-section__header-title">Subscription Details</h2>
+          </div>
+
+          <div class="wd-info-grid">
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>toggle_on</mat-icon>
+                Status
+              </span>
+              <span>
+                <span class="wd-status-badge"
+                      [class.wd-status-badge--active]="sub.isActive && !sub.isDisabled"
+                      [class.wd-status-badge--disabled]="sub.isDisabled"
+                      [class.wd-status-badge--paused]="!sub.isActive && !sub.isDisabled">
+                  <span class="wd-status-badge__dot"></span>
+                  {{ getStatusLabel(sub) }}
                 </span>
-              </div>
+              </span>
+            </div>
 
-              <div class="info-item">
-                <span class="info-label">Secret</span>
-                <span class="info-value info-value--mono">{{ sub.secretMask }}</span>
-              </div>
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>vpn_key</mat-icon>
+                Secret
+              </span>
+              <span class="wd-info-value wd-info-value--mono">{{ sub.secretMask }}</span>
+            </div>
 
-              <div class="info-item info-item--full">
-                <span class="info-label">URL</span>
-                <span class="info-value info-value--mono">{{ sub.url }}</span>
-              </div>
+            <div class="wd-info-item wd-info-item--full">
+              <span class="wd-info-label">
+                <mat-icon>link</mat-icon>
+                URL
+              </span>
+              <span class="wd-info-value wd-info-value--mono">{{ sub.url }}</span>
+            </div>
 
-              <div class="info-item info-item--full">
-                <span class="info-label">Event Subscriptions</span>
-                <div class="event-chips">
-                  @for (event of sub.eventSubscriptions; track event) {
-                    <span class="event-chip">{{ formatEvent(event) }}</span>
-                  }
-                </div>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label">Include Custom Fields</span>
-                <span class="info-value">{{ sub.includeCustomFields ? 'Yes' : 'No' }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label">Created</span>
-                <span class="info-value">{{ sub.createdAt | date:'medium' }}</span>
-              </div>
-
-              <div class="info-item">
-                <span class="info-label">Last Delivery</span>
-                @if (sub.lastDeliveryAt) {
-                  <span class="info-value">{{ sub.lastDeliveryAt | date:'medium' }}</span>
-                } @else {
-                  <span class="info-value">Never</span>
+            <div class="wd-info-item wd-info-item--full">
+              <span class="wd-info-label">
+                <mat-icon>notification_add</mat-icon>
+                Event Subscriptions
+              </span>
+              <div class="wd-event-chips">
+                @for (event of sub.eventSubscriptions; track event) {
+                  <span class="wd-event-chip">{{ formatEvent(event) }}</span>
                 }
               </div>
-
-              <div class="info-item">
-                <span class="info-label">Consecutive Failures</span>
-                <span class="info-value" [style.color]="sub.consecutiveFailureCount > 0 ? '#dc2626' : ''">
-                  {{ sub.consecutiveFailureCount }}
-                </span>
-              </div>
             </div>
-          </mat-card-content>
-        </mat-card>
 
-        <!-- Delivery Logs Section -->
-        <div class="delivery-section">
-          <h2>Delivery Logs</h2>
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>tune</mat-icon>
+                Include Custom Fields
+              </span>
+              <span class="wd-info-value">{{ sub.includeCustomFields ? 'Yes' : 'No' }}</span>
+            </div>
+
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>calendar_today</mat-icon>
+                Created
+              </span>
+              <span class="wd-info-value">{{ sub.createdAt | date:'medium' }}</span>
+            </div>
+
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>schedule</mat-icon>
+                Last Delivery
+              </span>
+              @if (sub.lastDeliveryAt) {
+                <span class="wd-info-value">{{ sub.lastDeliveryAt | date:'medium' }}</span>
+              } @else {
+                <span class="wd-info-value">Never</span>
+              }
+            </div>
+
+            <div class="wd-info-item">
+              <span class="wd-info-label">
+                <mat-icon>warning</mat-icon>
+                Consecutive Failures
+              </span>
+              <span class="wd-info-value"
+                    [class.wd-info-value--failure]="sub.consecutiveFailureCount > 0">
+                {{ sub.consecutiveFailureCount }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Logs Section Card -->
+        <div class="wd-section wd-section--delivery">
+          <div class="wd-section__header">
+            <mat-icon class="wd-section__header-icon">history</mat-icon>
+            <h2 class="wd-section__header-title">Delivery Logs</h2>
+          </div>
 
           @if (store.deliveryLogs(); as logs) {
             @if (logs.items.length === 0) {
-              <div class="delivery-empty">
-                No delivery logs found for this subscription.
+              <div class="wd-delivery-empty">
+                <div class="wd-delivery-empty__icon-wrap">
+                  <mat-icon>inbox</mat-icon>
+                </div>
+                <p class="wd-delivery-empty__text">No delivery logs found for this subscription.</p>
               </div>
             } @else {
-              <table class="delivery-table">
+              <table class="wd-delivery-table">
                 <thead>
                   <tr>
                     <th>Timestamp</th>
@@ -450,14 +749,18 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                 </thead>
                 <tbody>
                   @for (log of logs.items; track log.id) {
-                    <tr class="delivery-row" (click)="toggleExpanded(log.id)">
+                    <tr class="wd-delivery-row"
+                        [class.wd-delivery-row--success]="log.success"
+                        [class.wd-delivery-row--failed]="!log.success && log.attemptNumber >= 7"
+                        [class.wd-delivery-row--retrying]="!log.success && log.attemptNumber < 7"
+                        (click)="toggleExpanded(log.id)">
                       <td>{{ log.createdAt | date:'short' }}</td>
                       <td>{{ formatEvent(log.eventType) }}</td>
                       <td>
-                        <span class="delivery-badge"
-                              [class.delivery-badge--success]="log.success"
-                              [class.delivery-badge--failed]="!log.success && log.attemptNumber >= 7"
-                              [class.delivery-badge--retrying]="!log.success && log.attemptNumber < 7">
+                        <span class="wd-delivery-badge"
+                              [class.wd-delivery-badge--success]="log.success"
+                              [class.wd-delivery-badge--failed]="!log.success && log.attemptNumber >= 7"
+                              [class.wd-delivery-badge--retrying]="!log.success && log.attemptNumber < 7">
                           {{ log.success ? 'Success' : (log.attemptNumber < 7 ? 'Retrying' : 'Failed') }}
                         </span>
                       </td>
@@ -474,28 +777,28 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                       </td>
                     </tr>
                     @if (isExpanded(log.id)) {
-                      <tr class="delivery-expanded">
+                      <tr class="wd-delivery-expanded">
                         <td colspan="6">
-                          <div class="delivery-detail">
-                            <div class="delivery-detail__section">
-                              <span class="delivery-detail__label">Request Payload</span>
-                              <pre class="delivery-detail__value">{{ formatJson(log.requestPayload) }}</pre>
+                          <div class="wd-delivery-detail">
+                            <div class="wd-delivery-detail__section">
+                              <span class="wd-delivery-detail__label">Request Payload</span>
+                              <pre class="wd-delivery-detail__value">{{ formatJson(log.requestPayload) }}</pre>
                             </div>
                             @if (log.responseBody) {
-                              <div class="delivery-detail__section">
-                                <span class="delivery-detail__label">Response Body</span>
-                                <pre class="delivery-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
+                              <div class="wd-delivery-detail__section">
+                                <span class="wd-delivery-detail__label">Response Body</span>
+                                <pre class="wd-delivery-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
                               </div>
                             }
                             @if (log.errorMessage) {
-                              <div class="delivery-detail__section">
-                                <span class="delivery-detail__label">Error Message</span>
-                                <pre class="delivery-detail__value">{{ log.errorMessage }}</pre>
+                              <div class="wd-delivery-detail__section">
+                                <span class="wd-delivery-detail__label">Error Message</span>
+                                <pre class="wd-delivery-detail__value">{{ log.errorMessage }}</pre>
                               </div>
                             }
-                            <div class="delivery-detail__section">
-                              <span class="delivery-detail__label">Attempt Number</span>
-                              <span class="info-value">{{ log.attemptNumber }}</span>
+                            <div class="wd-delivery-detail__section">
+                              <span class="wd-delivery-detail__label">Attempt Number</span>
+                              <span class="wd-info-value">{{ log.attemptNumber }}</span>
                             </div>
                           </div>
                         </td>
@@ -514,7 +817,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
               </mat-paginator>
             }
           } @else {
-            <div style="display: flex; justify-content: center; padding: 24px">
+            <div class="wd-delivery-spinner">
               <mat-spinner diameter="32"></mat-spinner>
             </div>
           }

@@ -2,18 +2,67 @@
   display: block;
 }
 
+// ---- Dot-Grid Background ----
 .workflow-list {
   max-width: var(--container-max, 1280px);
   margin: 0 auto;
   padding: var(--space-6, 24px);
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(
+      circle,
+      var(--color-border-subtle, #E8E8E6) 1px,
+      transparent 1px
+    );
+    background-size: 20px 20px;
+    opacity: 0.35;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  > * {
+    position: relative;
+    z-index: 1;
+  }
 }
 
-// ---- Header ----
+// ---- Hero Header ----
 .workflow-list__header {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   margin-bottom: var(--space-6, 24px);
+  padding: var(--space-6, 24px);
+  border-radius: var(--radius-xl, 16px);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-soft, #FFF7ED) 0%,
+    transparent 70%
+  );
+  position: relative;
+  overflow: hidden;
+
+  // Radial accent glow
+  &::after {
+    content: '';
+    position: absolute;
+    top: -40px;
+    right: -40px;
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      var(--color-primary, #F97316) 0%,
+      transparent 70%
+    );
+    opacity: 0.06;
+    pointer-events: none;
+  }
 
   h1 {
     margin: 0;
@@ -23,17 +72,125 @@
   }
 }
 
+.workflow-list__header-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1, 4px);
+}
+
+.workflow-list__title-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+}
+
+.workflow-list__icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
 .workflow-list__subtitle {
   color: var(--color-text-secondary, #6B7280);
   font-size: var(--text-base, 14px);
-  margin: var(--space-1, 4px) 0 0 0;
+  margin: 0;
 }
 
-// ---- Filters ----
-.workflow-list__filters {
+// ---- Stats Ribbon ----
+.workflow-list__stats-ribbon {
   display: flex;
   gap: var(--space-3, 12px);
   margin-bottom: var(--space-5, 20px);
+  animation: statsEntrance 400ms var(--ease-default, ease-out) both;
+}
+
+@keyframes statsEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #E8E8E6);
+  border-radius: var(--radius-lg, 12px);
+  min-width: 100px;
+}
+
+.stats-card__indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stats-card__indicator--active {
+  background: var(--color-success, #10B981);
+  box-shadow: 0 0 6px var(--color-success, #10B981);
+  animation: indicatorPulse 2s infinite ease-in-out;
+}
+
+.stats-card__indicator--paused {
+  background: var(--color-warning, #F59E0B);
+  box-shadow: 0 0 6px var(--color-warning, #F59E0B);
+  animation: indicatorPulse 2.5s infinite ease-in-out;
+}
+
+.stats-card__indicator--draft {
+  background: var(--color-text-muted, #9CA3AF);
+}
+
+@keyframes indicatorPulse {
+  0%, 100% {
+    box-shadow: 0 0 4px currentColor;
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 10px currentColor;
+    opacity: 0.75;
+  }
+}
+
+.stats-card__label {
+  font-size: var(--text-xs, 12px);
+  color: var(--color-text-secondary, #6B7280);
+  font-weight: var(--font-medium, 500);
+}
+
+.stats-card__value {
+  font-size: var(--text-lg, 18px);
+  font-weight: var(--font-semibold, 600);
+  color: var(--color-text, #1A1A1A);
+  margin-left: auto;
+}
+
+// ---- Filter Toolbar ----
+.workflow-list__filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 12px);
+  margin-bottom: var(--space-5, 20px);
+  padding: var(--space-3, 12px) var(--space-4, 16px);
+  background: var(--color-surface, #fff);
+  border: 1px solid var(--color-border, #E8E8E6);
+  border-radius: var(--radius-lg, 12px);
+}
+
+.workflow-list__filters-icon {
+  color: var(--color-text-secondary, #6B7280);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .workflow-list__filter-field {
@@ -54,19 +211,12 @@
 // ---- Empty State ----
 .workflow-list__empty {
   text-align: center;
-  padding: var(--space-16, 64px) var(--space-6, 24px);
+  padding: var(--space-12, 48px) var(--space-6, 24px);
   color: var(--color-text-secondary, #6B7280);
-
-  mat-icon {
-    font-size: 48px;
-    width: 48px;
-    height: 48px;
-    margin-bottom: var(--space-4, 16px);
-    opacity: 0.5;
-  }
+  animation: emptyFadeUp 600ms var(--ease-default, ease-out) both;
 
   h3 {
-    margin: 0 0 var(--space-2, 8px) 0;
+    margin: var(--space-4, 16px) 0 var(--space-2, 8px) 0;
     font-weight: var(--font-medium, 500);
     color: var(--color-text, #1A1A1A);
   }
@@ -79,18 +229,97 @@
   }
 }
 
-// ---- Skeleton Loading ----
+@keyframes emptyFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.workflow-list__empty-svg {
+  width: 240px;
+  height: 140px;
+  margin: 0 auto;
+  display: block;
+}
+
+// Empty state flow path animation
+.empty-flow-path {
+  animation: emptyPathFlow 3s linear infinite;
+}
+
+.empty-flow-path--1 { stroke-dashoffset: 0; }
+.empty-flow-path--2 { animation-delay: 0.4s; }
+.empty-flow-path--3 { animation-delay: 0.8s; }
+.empty-flow-path--4 { animation-delay: 1.2s; }
+
+@keyframes emptyPathFlow {
+  from {
+    stroke-dashoffset: 14;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+// Empty state node pulse
+.empty-node-pulse {
+  animation: emptyNodePulse 2.5s ease-in-out infinite;
+}
+
+.empty-node-pulse--trigger { animation-delay: 0s; }
+.empty-node-pulse--condition { animation-delay: 0.5s; }
+.empty-node-pulse--action { animation-delay: 1s; }
+
+@keyframes emptyNodePulse {
+  0%, 100% {
+    r: inherit;
+    opacity: 0;
+  }
+  50% {
+    r: 18;
+    opacity: 0.3;
+  }
+}
+
+// Empty state plus bounce
+.empty-plus-hint {
+  animation: emptyPlusBounce 2s ease-in-out infinite;
+}
+
+@keyframes emptyPlusBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+// ---- Skeleton Loading (Shimmer) ----
 .workflow-list__skeleton-card {
   background: var(--color-surface, #fff);
   border: 1px solid var(--color-border, #E8E8E6);
   border-radius: var(--radius-lg, 12px);
   overflow: hidden;
+  animation: cardEntrance 400ms var(--ease-default, ease-out) both;
+  animation-delay: calc(var(--card-index, 0) * 60ms);
 }
 
 .skeleton-thumbnail {
   height: 120px;
-  background: var(--color-bg-secondary, #F0F0EE);
-  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary, #F0F0EE) 25%,
+    var(--color-surface-hover, #F7F7F5) 50%,
+    var(--color-bg-secondary, #F0F0EE) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s infinite linear;
 }
 
 .skeleton-body {
@@ -98,9 +327,15 @@
 }
 
 .skeleton-line {
-  background: var(--color-bg-secondary, #F0F0EE);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary, #F0F0EE) 25%,
+    var(--color-surface-hover, #F7F7F5) 50%,
+    var(--color-bg-secondary, #F0F0EE) 75%
+  );
+  background-size: 200% 100%;
   border-radius: var(--radius-sm, 4px);
-  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  animation: skeletonShimmer 1.5s infinite linear;
 }
 
 .skeleton-line--title {
@@ -123,9 +358,15 @@
 .skeleton-badge {
   height: 20px;
   width: 60px;
-  background: var(--color-bg-secondary, #F0F0EE);
+  background: linear-gradient(
+    90deg,
+    var(--color-bg-secondary, #F0F0EE) 25%,
+    var(--color-surface-hover, #F7F7F5) 50%,
+    var(--color-bg-secondary, #F0F0EE) 75%
+  );
+  background-size: 200% 100%;
   border-radius: var(--radius-sm, 4px);
-  animation: skeleton-pulse 1.5s infinite ease-in-out;
+  animation: skeletonShimmer 1.5s infinite linear;
 }
 
 .skeleton-footer {
@@ -138,12 +379,23 @@
   width: 50%;
 }
 
-@keyframes skeleton-pulse {
-  0%, 100% {
-    opacity: 1;
+@keyframes skeletonShimmer {
+  from {
+    background-position: 200% 0;
   }
-  50% {
-    opacity: 0.4;
+  to {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes cardEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
@@ -161,10 +413,20 @@
   .workflow-list__header {
     flex-direction: column;
     gap: var(--space-3, 12px);
+    padding: var(--space-4, 16px);
+  }
+
+  .workflow-list__stats-ribbon {
+    flex-wrap: wrap;
+  }
+
+  .stats-card {
+    flex: 1 1 calc(50% - var(--space-3, 12px) / 2);
+    min-width: 0;
   }
 
   .workflow-list__filters {
-    flex-direction: column;
+    flex-wrap: wrap;
   }
 
   .workflow-list__filter-field {

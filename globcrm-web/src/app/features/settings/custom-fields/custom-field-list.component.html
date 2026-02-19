@@ -1,84 +1,135 @@
-<div class="custom-field-list">
-  <div class="page-header">
-    <h1>Custom Field Definitions</h1>
-    <div class="header-actions">
-      <mat-slide-toggle
-        [checked]="showDeleted()"
-        (change)="toggleShowDeleted()"
-        color="primary">
-        Show Deleted
-      </mat-slide-toggle>
+<div class="cf-page">
+  <!-- Header -->
+  <div class="cf-header">
+    <div class="cf-header__left">
+      <a routerLink="/settings" class="cf-back">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Settings</span>
+      </a>
+      <div class="cf-title-row">
+        <div class="cf-icon-wrap">
+          <mat-icon>tune</mat-icon>
+        </div>
+        <div>
+          <h1 class="cf-title">Custom Fields</h1>
+          <p class="cf-subtitle">Define and manage custom data fields for your CRM entities</p>
+        </div>
+      </div>
+    </div>
+    <div class="cf-header__actions">
+      <div class="cf-toggle-deleted">
+        <mat-slide-toggle
+          [checked]="showDeleted()"
+          (change)="toggleShowDeleted()"
+          color="primary">
+          Show Deleted
+        </mat-slide-toggle>
+      </div>
       <button mat-stroked-button (click)="toggleSectionManager()">
         <mat-icon>folder_open</mat-icon>
         Manage Sections
       </button>
-      <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" (click)="openAddDialog()">
+      <button
+        *appHasPermission="'Contact:Create'"
+        mat-flat-button
+        color="primary"
+        (click)="openAddDialog()"
+        class="cf-create-btn"
+      >
         <mat-icon>add</mat-icon>
         Add Field
       </button>
     </div>
   </div>
 
-  <mat-tab-group (selectedIndexChange)="onTabChange($event)" animationDuration="200ms">
+  <mat-tab-group
+    class="cf-tabs"
+    (selectedIndexChange)="onTabChange($event)"
+    animationDuration="200ms"
+  >
     @for (entityType of entityTypes; track entityType) {
       <mat-tab [label]="entityType">
-        <div class="tab-content">
+        <div class="cf-tab-content">
           @if (showSectionManager()) {
-            <div class="section-manager">
+            <div class="cf-section-manager">
               <h3>Sections for {{ selectedEntityType() }}</h3>
-              @for (section of sections(); track section.id) {
-                <div class="section-item">
-                  <span class="section-name">{{ section.name }}</span>
-                  <span class="section-order">Order: {{ section.sortOrder }}</span>
-                </div>
-              }
+              <div class="cf-section-manager__list">
+                @for (section of sections(); track section.id) {
+                  <div class="cf-section-item">
+                    <span class="cf-section-item__name">{{ section.name }}</span>
+                    <span class="cf-section-item__order">Order: {{ section.sortOrder }}</span>
+                  </div>
+                }
+              </div>
               @if (sections().length === 0) {
-                <p class="empty-message">No sections defined. Fields will appear under "General".</p>
+                <p class="cf-section-manager__empty">No sections defined. Fields will appear under "General".</p>
               }
             </div>
           }
 
           @if (loading()) {
-            <div class="loading-indicator">
+            <div class="cf-loading">
               <p>Loading fields...</p>
             </div>
           } @else if (fieldGroups().length === 0) {
-            <div class="empty-state">
-              <mat-icon class="empty-icon">playlist_add</mat-icon>
+            <div class="cf-empty">
+              <div class="cf-empty__visual">
+                <div class="cf-empty__circles">
+                  <div class="cf-circle cf-circle--1"></div>
+                  <div class="cf-circle cf-circle--2"></div>
+                  <div class="cf-circle cf-circle--3"></div>
+                </div>
+                <mat-icon class="cf-empty__icon">playlist_add</mat-icon>
+              </div>
               <h3>No custom fields defined</h3>
               <p>Add custom fields to extend {{ selectedEntityType() }} records with additional data.</p>
-              <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" (click)="openAddDialog()">
+              <button
+                *appHasPermission="'Contact:Create'"
+                mat-flat-button
+                color="primary"
+                (click)="openAddDialog()"
+              >
                 <mat-icon>add</mat-icon>
                 Add First Field
               </button>
             </div>
           } @else {
-            @for (group of fieldGroups(); track group.sectionId) {
-              <mat-expansion-panel [expanded]="true" class="section-panel">
+            @for (group of fieldGroups(); track group.sectionId; let i = $index) {
+              <mat-expansion-panel
+                [expanded]="true"
+                class="cf-section"
+                [style.animation-delay]="(i * 80) + 'ms'"
+              >
                 <mat-expansion-panel-header>
                   <mat-panel-title>
-                    {{ group.sectionName }}
-                    <span class="field-count">({{ group.fields.length }} fields)</span>
+                    <span class="cf-section__title">
+                      <mat-icon class="cf-section__icon">folder_open</mat-icon>
+                      {{ group.sectionName }}
+                      <span class="cf-section__count">{{ group.fields.length }} {{ group.fields.length === 1 ? 'field' : 'fields' }}</span>
+                    </span>
                   </mat-panel-title>
                 </mat-expansion-panel-header>
 
-                <table mat-table [dataSource]="group.fields" class="fields-table">
+                <table mat-table [dataSource]="group.fields" class="cf-table">
                   <ng-container matColumnDef="label">
                     <th mat-header-cell *matHeaderCellDef>Label</th>
-                    <td mat-cell *matCellDef="let field">{{ field.label }}</td>
+                    <td mat-cell *matCellDef="let field">
+                      <span class="cf-field-label">{{ field.label }}</span>
+                    </td>
                   </ng-container>
 
                   <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef>Name</th>
                     <td mat-cell *matCellDef="let field">
-                      <code class="field-name">{{ field.name }}</code>
+                      <code class="cf-field-name">{{ field.name }}</code>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="fieldType">
                     <th mat-header-cell *matHeaderCellDef>Type</th>
                     <td mat-cell *matCellDef="let field">
-                      <span class="type-chip" [attr.data-type]="field.fieldType">
+                      <span class="cf-type-badge" [attr.data-type]="field.fieldType">
+                        <mat-icon>{{ getFieldTypeIcon(field.fieldType) }}</mat-icon>
                         {{ fieldTypeLabels[field.fieldType] || field.fieldType }}
                       </span>
                     </td>
@@ -88,27 +139,42 @@
                     <th mat-header-cell *matHeaderCellDef>Required</th>
                     <td mat-cell *matCellDef="let field">
                       @if (field.validation?.required) {
-                        <mat-icon class="required-icon">check_circle</mat-icon>
+                        <mat-icon class="cf-required-icon">check_circle</mat-icon>
                       } @else {
-                        <mat-icon class="optional-icon">radio_button_unchecked</mat-icon>
+                        <mat-icon class="cf-optional-icon">radio_button_unchecked</mat-icon>
                       }
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="sortOrder">
-                    <th mat-header-cell *matHeaderCellDef>Order</th>
-                    <td mat-cell *matCellDef="let field">{{ field.sortOrder }}</td>
+                    <th mat-header-cell *matHeaderCellDef class="cf-col-order">Order</th>
+                    <td mat-cell *matCellDef="let field" class="cf-col-order">{{ field.sortOrder }}</td>
                   </ng-container>
 
                   <ng-container matColumnDef="actions">
                     <th mat-header-cell *matHeaderCellDef>Actions</th>
                     <td mat-cell *matCellDef="let field">
-                      <button *appHasPermission="'Contact:Edit'" mat-icon-button matTooltip="Edit" (click)="openEditDialog(field)">
-                        <mat-icon>edit</mat-icon>
-                      </button>
-                      <button *appHasPermission="'Contact:Delete'" mat-icon-button matTooltip="Delete" color="warn" (click)="deleteField(field)">
-                        <mat-icon>delete</mat-icon>
-                      </button>
+                      <div class="cf-actions-cell">
+                        <button
+                          *appHasPermission="'Contact:Edit'"
+                          mat-icon-button
+                          matTooltip="Edit"
+                          (click)="openEditDialog(field)"
+                          class="cf-action-btn"
+                        >
+                          <mat-icon>edit</mat-icon>
+                        </button>
+                        <button
+                          *appHasPermission="'Contact:Delete'"
+                          mat-icon-button
+                          matTooltip="Delete"
+                          color="warn"
+                          (click)="deleteField(field)"
+                          class="cf-action-btn cf-action-btn--danger"
+                        >
+                          <mat-icon>delete</mat-icon>
+                        </button>
+                      </div>
                     </td>
                   </ng-container>
 

@@ -1,63 +1,90 @@
-<div class="calendar-layout">
-  <!-- Page header -->
-  <div class="calendar-header">
-    <div class="header-title">
-      <mat-icon class="header-icon">calendar_month</mat-icon>
-      <h1>Calendar</h1>
+<div class="calendar-page">
+  <!-- Hero: gradient backdrop with header + glassmorphic filters -->
+  <div class="cal-hero">
+    <header class="cal-header">
+      <div class="cal-header__left">
+        <div class="cal-header__icon">
+          <mat-icon>calendar_month</mat-icon>
+        </div>
+        <div>
+          <h1 class="cal-header__title">Calendar</h1>
+          <p class="cal-header__subtitle">
+            {{ events().length }} activit{{ events().length === 1 ? 'y' : 'ies' }} in view
+          </p>
+        </div>
+      </div>
+
+      <div class="cal-header__stats">
+        @for (type of activityTypes; track type.value) {
+          <button
+            class="stat-chip"
+            [class.stat-chip--active]="filterType() === type.value"
+            (click)="onTypeChanged(filterType() === type.value ? null : type.value)"
+            [matTooltip]="'Filter by ' + type.label + 's'">
+            <mat-icon class="stat-chip__icon">{{ type.icon }}</mat-icon>
+            <span class="stat-chip__count">{{ typeCounts()[type.value] || 0 }}</span>
+            <span class="stat-chip__label">{{ type.label }}s</span>
+          </button>
+        }
+      </div>
+    </header>
+
+    <!-- Filter dropdowns -->
+    <div class="cal-filters">
+      <mat-form-field appearance="outline" class="cal-filter">
+        <mat-label>Entity Type</mat-label>
+        <mat-select [value]="filterEntityType()" (selectionChange)="onEntityTypeChanged($event.value)">
+          @for (et of entityTypes; track et.value) {
+            <mat-option [value]="et.value">{{ et.label }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="cal-filter">
+        <mat-label>Owner</mat-label>
+        <mat-select [value]="filterOwnerId()" (selectionChange)="onOwnerChanged($event.value)">
+          <mat-option [value]="null">All Owners</mat-option>
+          @for (member of teamMembers(); track member.id) {
+            <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
     </div>
   </div>
 
-  <!-- Filter bar -->
-  <div class="filter-bar">
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Entity Type</mat-label>
-      <mat-select [value]="filterEntityType()" (selectionChange)="onEntityTypeChanged($event.value)">
-        @for (et of entityTypes; track et.value) {
-          <mat-option [value]="et.value">{{ et.label }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Activity Type</mat-label>
-      <mat-select [value]="filterType()" (selectionChange)="onTypeChanged($event.value)">
-        <mat-option [value]="null">All Types</mat-option>
-        @for (t of activityTypes; track t.value) {
-          <mat-option [value]="t.value">
-            <mat-icon>{{ t.icon }}</mat-icon> {{ t.label }}
-          </mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="filter-field">
-      <mat-label>Owner</mat-label>
-      <mat-select [value]="filterOwnerId()" (selectionChange)="onOwnerChanged($event.value)">
-        <mat-option [value]="null">All Owners</mat-option>
-        @for (member of teamMembers(); track member.id) {
-          <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
-        }
-      </mat-select>
-    </mat-form-field>
-  </div>
-
-  <!-- Loading bar -->
+  <!-- Loading indicator -->
   @if (isLoading()) {
-    <mat-progress-bar mode="indeterminate" class="calendar-loading"></mat-progress-bar>
+    <div class="cal-loading">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    </div>
   }
 
-  <!-- Calendar -->
-  <div class="calendar-container">
+  <!-- Calendar body with loading state -->
+  <div class="cal-body" [class.is-loading]="isLoading()">
     <full-calendar [options]="calendarOptions()" />
-  </div>
 
-  <!-- Priority color legend -->
-  <div class="priority-legend">
-    @for (item of priorityLegend; track item.value) {
-      <div class="legend-item">
-        <span class="legend-dot" [style.background-color]="item.color"></span>
-        <span class="legend-label">{{ item.label }}</span>
+    <!-- Empty state overlay -->
+    @if (events().length === 0 && !isLoading() && hasLoaded()) {
+      <div class="cal-empty">
+        <div class="cal-empty__decoration">
+          <mat-icon>event_available</mat-icon>
+        </div>
+        <h2 class="cal-empty__title">No activities found</h2>
+        <p class="cal-empty__text">Try adjusting your filters or date range to see calendar events.</p>
       </div>
     }
   </div>
+
+  <!-- Priority legend -->
+  <footer class="cal-legend">
+    <span class="cal-legend__label">Priority</span>
+    <div class="cal-legend__items">
+      @for (item of priorityLegend; track item.value) {
+        <div class="cal-legend__item">
+          <span class="cal-legend__dot" [style.background]="item.color"></span>
+          <span class="cal-legend__text">{{ item.label }}</span>
+        </div>
+      }
+    </div>
+  </footer>
 </div>

@@ -39,6 +39,18 @@ import {
   WEBHOOK_EVENTS,
 } from './webhook.models';
 
+/** Entity icon + color mapping for the event matrix */
+const ENTITY_META: Record<string, { icon: string; color: string; soft: string }> = {
+  Contact:  { icon: 'person',         color: 'var(--color-info)',      soft: 'var(--color-info-soft)' },
+  Company:  { icon: 'business',       color: 'var(--color-secondary)', soft: 'var(--color-secondary-soft)' },
+  Deal:     { icon: 'handshake',      color: 'var(--color-success)',   soft: 'var(--color-success-soft)' },
+  Lead:     { icon: 'person_search',  color: 'var(--color-primary)',   soft: 'var(--color-primary-soft)' },
+  Activity: { icon: 'event',          color: 'var(--color-accent)',    soft: 'var(--color-accent-soft)' },
+  Quote:    { icon: 'request_quote',  color: 'var(--color-warning)',   soft: 'var(--color-warning-soft)' },
+  Request:  { icon: 'support_agent',  color: 'var(--color-danger)',    soft: 'var(--color-danger-soft)' },
+  Product:  { icon: 'inventory_2',    color: 'var(--color-accent)',    soft: 'var(--color-accent-soft)' },
+};
+
 @Component({
   selector: 'app-webhook-edit',
   standalone: true,
@@ -61,220 +73,539 @@ import {
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* ── Keyframes ──────────────────────────────────── */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes iconGlow {
+      0%, 100% { box-shadow: 0 4px 16px rgba(139,92,246,0.25), 0 0 0 4px rgba(139,92,246,0.08); }
+      50%      { box-shadow: 0 6px 24px rgba(139,92,246,0.35), 0 0 0 6px rgba(139,92,246,0.12); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+
+    /* ── Host ───────────────────────────────────────── */
     :host {
       display: block;
     }
 
-    .webhook-edit {
-      max-width: 700px;
+    /* ── Layout container ───────────────────────────── */
+    .we-page {
+      max-width: 740px;
       margin: 0 auto;
-      padding: 24px;
+      padding: var(--space-6) var(--space-6) var(--space-12);
     }
 
-    .webhook-edit__header {
-      display: flex;
+    /* ── Breadcrumb ─────────────────────────────────── */
+    .we-breadcrumb {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .webhook-edit__header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-    }
-
-    .webhook-edit__subtitle {
+      gap: var(--space-1-5);
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
       color: var(--color-text-secondary);
-      font-size: 14px;
-      margin: 0 0 24px 0;
-      padding-left: 48px;
+      text-decoration: none;
+      padding: var(--space-1-5) var(--space-3);
+      border-radius: var(--radius-md);
+      transition: color var(--duration-normal) var(--ease-default),
+                  background var(--duration-normal) var(--ease-default);
+      margin-bottom: var(--space-5);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) forwards;
     }
 
-    .form-card {
-      margin-bottom: 24px;
+    .we-breadcrumb:hover {
+      color: var(--color-secondary);
+      background: var(--color-secondary-soft);
     }
 
-    .form-card mat-card-title {
-      font-size: 16px;
-      font-weight: 500;
+    .we-breadcrumb mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
 
-    .form-field {
-      width: 100%;
-      margin-bottom: 16px;
-    }
-
-    .toggle-row {
+    /* ── Header ─────────────────────────────────────── */
+    .we-header {
       display: flex;
       align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
+      gap: var(--space-5);
+      margin-bottom: var(--space-8);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) 60ms forwards;
     }
 
-    .toggle-label {
-      font-size: 14px;
+    .we-header__icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-xl);
+      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      animation: iconGlow 4s ease-in-out infinite;
+    }
+
+    .we-header__icon-wrap mat-icon {
+      font-size: 28px;
+      width: 28px;
+      height: 28px;
+      color: var(--color-secondary-fg);
+    }
+
+    .we-header__text {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1);
+    }
+
+    .we-header__title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
+      margin: 0;
+      color: var(--color-text);
+      line-height: var(--leading-tight);
+    }
+
+    .we-header__subtitle {
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: var(--leading-normal);
+    }
+
+    /* ── Section card ───────────────────────────────── */
+    .we-section {
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      background: var(--color-surface);
+      padding: var(--space-6);
+      margin-bottom: var(--space-6);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) forwards;
+      transition: border-color var(--duration-normal) var(--ease-default),
+                  box-shadow var(--duration-normal) var(--ease-default);
+    }
+
+    .we-section:hover {
+      border-color: var(--color-border-strong);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .we-section--details {
+      animation-delay: 120ms;
+    }
+
+    .we-section--events {
+      animation-delay: 200ms;
+    }
+
+    .we-section__header {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-5);
+      padding-bottom: var(--space-4);
+      border-bottom: 1px solid var(--color-border-subtle);
+    }
+
+    .we-section__icon {
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .we-section__icon--details {
+      background: var(--color-secondary-soft);
+      color: var(--color-secondary);
+    }
+
+    .we-section__icon--events {
+      background: var(--color-accent-soft);
+      color: var(--color-accent);
+    }
+
+    .we-section__icon mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    .we-section__title-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-0-5);
+    }
+
+    .we-section__title {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      margin: 0;
+    }
+
+    .we-section__desc {
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      margin: 0;
+      line-height: var(--leading-normal);
+    }
+
+    /* ── Form fields ────────────────────────────────── */
+    .we-field {
+      width: 100%;
+      margin-bottom: var(--space-4);
+    }
+
+    .we-toggle-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-secondary);
+      border: 1px solid var(--color-border-subtle);
+      transition: border-color var(--duration-normal) var(--ease-default);
+    }
+
+    .we-toggle-row:hover {
+      border-color: var(--color-border);
+    }
+
+    .we-toggle-label {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-0-5);
+    }
+
+    .we-toggle-label__text {
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
       color: var(--color-text);
     }
 
-    .event-matrix {
-      margin-top: 8px;
+    .we-toggle-label__hint {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
     }
 
-    .event-matrix__header {
+    /* ── Event matrix ───────────────────────────────── */
+    .we-matrix {
+      margin-top: var(--space-2);
+    }
+
+    .we-matrix__header {
       display: grid;
-      grid-template-columns: 120px repeat(3, 1fr);
-      gap: 8px;
-      margin-bottom: 8px;
-      padding-bottom: 8px;
-      border-bottom: 1px solid var(--color-border);
+      grid-template-columns: 1fr repeat(3, 80px);
+      gap: var(--space-2);
+      margin-bottom: var(--space-3);
+      padding-bottom: var(--space-3);
+      border-bottom: 1.5px solid var(--color-border);
     }
 
-    .event-matrix__header span {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--color-text-secondary);
+    .we-matrix__header-label {
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-muted);
       text-align: center;
     }
 
-    .event-matrix__header span:first-child {
+    .we-matrix__header-label:first-child {
       text-align: left;
     }
 
-    .event-matrix__row {
+    .we-matrix__row {
       display: grid;
-      grid-template-columns: 120px repeat(3, 1fr);
-      gap: 8px;
+      grid-template-columns: 1fr repeat(3, 80px);
+      gap: var(--space-2);
       align-items: center;
-      padding: 4px 0;
+      padding: var(--space-2) 0;
+      border-radius: var(--radius-md);
+      transition: background var(--duration-fast) var(--ease-default);
     }
 
-    .event-matrix__entity {
-      font-size: 14px;
-      font-weight: 500;
+    .we-matrix__row:hover {
+      background: var(--color-highlight);
+    }
+
+    .we-matrix__row + .we-matrix__row {
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .we-matrix__entity {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding-left: var(--space-2);
+    }
+
+    .we-matrix__entity-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .we-matrix__entity-icon mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .we-matrix__entity-name {
+      font-size: var(--text-base);
+      font-weight: var(--font-medium);
       color: var(--color-text);
     }
 
-    .event-matrix__cell {
-      text-align: center;
-    }
-
-    .event-matrix__actions {
+    .we-matrix__cell {
       display: flex;
-      gap: 8px;
-      margin-top: 12px;
+      align-items: center;
+      justify-content: center;
     }
 
-    .form-actions {
+    .we-matrix__actions {
+      display: flex;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .we-matrix__error {
+      color: var(--color-danger-text);
+      font-size: var(--text-sm);
+      margin-top: var(--space-2);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1-5);
+    }
+
+    .we-matrix__error mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      color: var(--color-danger);
+    }
+
+    /* ── Form actions bar ───────────────────────────── */
+    .we-actions {
       display: flex;
       justify-content: flex-end;
-      gap: 12px;
-      margin-top: 24px;
+      gap: var(--space-3);
+      margin-top: var(--space-6);
+      opacity: 0;
+      animation: fadeSlideUp 0.4s var(--ease-out) 280ms forwards;
+    }
+
+    /* ── Loading state ──────────────────────────────── */
+    .we-loading {
+      display: flex;
+      justify-content: center;
+      padding: var(--space-16);
+    }
+
+    /* ── Responsive ─────────────────────────────────── */
+    @media (max-width: 768px) {
+      .we-page {
+        padding: var(--space-4) var(--space-4) var(--space-8);
+      }
+
+      .we-header {
+        gap: var(--space-3);
+      }
+
+      .we-header__icon-wrap {
+        width: 44px;
+        height: 44px;
+        border-radius: var(--radius-lg);
+      }
+
+      .we-header__icon-wrap mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+
+      .we-header__title {
+        font-size: var(--text-xl);
+      }
+
+      .we-section {
+        padding: var(--space-4);
+      }
+
+      .we-matrix__header {
+        grid-template-columns: 1fr repeat(3, 60px);
+      }
+
+      .we-matrix__row {
+        grid-template-columns: 1fr repeat(3, 60px);
+      }
+
+      .we-matrix__entity-name {
+        font-size: var(--text-sm);
+      }
+
+      .we-actions {
+        flex-direction: column-reverse;
+      }
+
+      .we-actions a,
+      .we-actions button {
+        width: 100%;
+      }
     }
   `,
   template: `
-    <div class="webhook-edit">
-      <div class="webhook-edit__header">
-        <a mat-icon-button
-           [routerLink]="isEditMode() ? ['/settings/webhooks', id()] : ['/settings/webhooks']"
-           aria-label="Back">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode() ? 'Edit Webhook' : 'Create Webhook' }}</h1>
+    <div class="we-page">
+      <!-- Breadcrumb -->
+      <a class="we-breadcrumb"
+         [routerLink]="isEditMode() ? ['/settings/webhooks', id()] : ['/settings/webhooks']">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Webhooks</span>
+      </a>
+
+      <!-- Header -->
+      <div class="we-header">
+        <div class="we-header__icon-wrap">
+          <mat-icon>webhook</mat-icon>
+        </div>
+        <div class="we-header__text">
+          <h1 class="we-header__title">{{ isEditMode() ? 'Edit Webhook' : 'Create Webhook' }}</h1>
+          <p class="we-header__subtitle">
+            {{ isEditMode()
+              ? 'Update the webhook subscription configuration'
+              : 'Configure a new webhook subscription to receive event notifications' }}
+          </p>
+        </div>
       </div>
-      <p class="webhook-edit__subtitle">
-        {{ isEditMode() ? 'Update the webhook subscription configuration' : 'Configure a new webhook subscription to receive event notifications' }}
-      </p>
 
       @if (store.loading() && isEditMode()) {
-        <div style="display: flex; justify-content: center; padding: 64px">
+        <div class="we-loading">
           <mat-spinner diameter="48"></mat-spinner>
         </div>
       } @else {
         <form [formGroup]="form" (ngSubmit)="onSubmit()">
-          <!-- Basic Info Card -->
-          <mat-card class="form-card">
-            <mat-card-header>
-              <mat-card-title>Basic Information</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>Name</mat-label>
-                <input matInput formControlName="name" placeholder="My Webhook" maxlength="200" />
-                @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-                  <mat-error>Name is required</mat-error>
-                }
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="form-field">
-                <mat-label>URL</mat-label>
-                <input matInput formControlName="url" placeholder="https://your-endpoint.com/webhook" maxlength="2048" />
-                @if (form.get('url')?.hasError('required') && form.get('url')?.touched) {
-                  <mat-error>URL is required</mat-error>
-                }
-                @if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
-                  <mat-error>URL must start with https://</mat-error>
-                }
-              </mat-form-field>
-
-              <div class="toggle-row">
-                <mat-slide-toggle formControlName="includeCustomFields"></mat-slide-toggle>
-                <span class="toggle-label">Include custom fields in payload</span>
+          <!-- Section: Webhook Details -->
+          <div class="we-section we-section--details">
+            <div class="we-section__header">
+              <div class="we-section__icon we-section__icon--details">
+                <mat-icon>tune</mat-icon>
               </div>
-            </mat-card-content>
-          </mat-card>
+              <div class="we-section__title-group">
+                <h2 class="we-section__title">Webhook Details</h2>
+                <p class="we-section__desc">Name, endpoint URL, and payload options</p>
+              </div>
+            </div>
 
-          <!-- Event Subscription Matrix Card -->
-          <mat-card class="form-card">
-            <mat-card-header>
-              <mat-card-title>Event Subscriptions</mat-card-title>
-            </mat-card-header>
-            <mat-card-content>
-              <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0 0 16px 0">
-                Select which entity events trigger this webhook
-              </p>
+            <mat-form-field appearance="outline" class="we-field">
+              <mat-label>Name</mat-label>
+              <input matInput formControlName="name" placeholder="My Webhook" maxlength="200" />
+              @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+                <mat-error>Name is required</mat-error>
+              }
+            </mat-form-field>
 
-              <div class="event-matrix">
-                <div class="event-matrix__header">
-                  <span>Entity</span>
+            <mat-form-field appearance="outline" class="we-field">
+              <mat-label>URL</mat-label>
+              <input matInput formControlName="url" placeholder="https://your-endpoint.com/webhook" maxlength="2048" />
+              @if (form.get('url')?.hasError('required') && form.get('url')?.touched) {
+                <mat-error>URL is required</mat-error>
+              }
+              @if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
+                <mat-error>URL must start with https://</mat-error>
+              }
+            </mat-form-field>
+
+            <div class="we-toggle-row">
+              <mat-slide-toggle formControlName="includeCustomFields"></mat-slide-toggle>
+              <div class="we-toggle-label">
+                <span class="we-toggle-label__text">Include custom fields in payload</span>
+                <span class="we-toggle-label__hint">Adds all custom field values to the webhook JSON body</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Section: Event Subscriptions -->
+          <div class="we-section we-section--events">
+            <div class="we-section__header">
+              <div class="we-section__icon we-section__icon--events">
+                <mat-icon>notifications_active</mat-icon>
+              </div>
+              <div class="we-section__title-group">
+                <h2 class="we-section__title">Event Subscriptions</h2>
+                <p class="we-section__desc">Select which entity events trigger this webhook</p>
+              </div>
+            </div>
+
+            <div class="we-matrix">
+              <div class="we-matrix__header">
+                <span class="we-matrix__header-label">Entity</span>
+                @for (event of events; track event) {
+                  <span class="we-matrix__header-label">{{ event }}</span>
+                }
+              </div>
+              @for (entity of entities; track entity) {
+                <div class="we-matrix__row">
+                  <div class="we-matrix__entity">
+                    <div class="we-matrix__entity-icon"
+                         [style.background]="getEntityMeta(entity).soft"
+                         [style.color]="getEntityMeta(entity).color">
+                      <mat-icon>{{ getEntityMeta(entity).icon }}</mat-icon>
+                    </div>
+                    <span class="we-matrix__entity-name">{{ entity }}</span>
+                  </div>
                   @for (event of events; track event) {
-                    <span>{{ event }}</span>
+                    <div class="we-matrix__cell">
+                      <mat-checkbox
+                        [checked]="isEventSelected(entity, event)"
+                        (change)="toggleEvent(entity, event, $event.checked)">
+                      </mat-checkbox>
+                    </div>
                   }
                 </div>
-                @for (entity of entities; track entity) {
-                  <div class="event-matrix__row">
-                    <span class="event-matrix__entity">{{ entity }}</span>
-                    @for (event of events; track event) {
-                      <div class="event-matrix__cell">
-                        <mat-checkbox
-                          [checked]="isEventSelected(entity, event)"
-                          (change)="toggleEvent(entity, event, $event.checked)">
-                        </mat-checkbox>
-                      </div>
-                    }
-                  </div>
-                }
-              </div>
-
-              <div class="event-matrix__actions">
-                <button mat-stroked-button type="button" (click)="selectAll()">
-                  Select All
-                </button>
-                <button mat-stroked-button type="button" (click)="deselectAll()">
-                  Deselect All
-                </button>
-              </div>
-
-              @if (selectedEvents().length === 0 && formSubmitted()) {
-                <p style="color: #dc2626; font-size: 13px; margin-top: 8px">
-                  At least one event subscription is required
-                </p>
               }
-            </mat-card-content>
-          </mat-card>
+            </div>
+
+            <div class="we-matrix__actions">
+              <button mat-stroked-button type="button" (click)="selectAll()">
+                Select All
+              </button>
+              <button mat-stroked-button type="button" (click)="deselectAll()">
+                Deselect All
+              </button>
+            </div>
+
+            @if (selectedEvents().length === 0 && formSubmitted()) {
+              <div class="we-matrix__error">
+                <mat-icon>error_outline</mat-icon>
+                <span>At least one event subscription is required</span>
+              </div>
+            }
+          </div>
 
           <!-- Form Actions -->
-          <div class="form-actions">
+          <div class="we-actions">
             <a mat-stroked-button
                [routerLink]="isEditMode() ? ['/settings/webhooks', id()] : ['/settings/webhooks']">
               Cancel
@@ -343,6 +674,10 @@ export class WebhookEditComponent implements OnInit {
         }
       }, 100);
     }
+  }
+
+  getEntityMeta(entity: string): { icon: string; color: string; soft: string } {
+    return ENTITY_META[entity] ?? { icon: 'category', color: 'var(--color-text-secondary)', soft: 'var(--color-bg-secondary)' };
   }
 
   isEventSelected(entity: string, event: string): boolean {

@@ -236,12 +236,18 @@ interface RelatedFieldGroup {
         display: flex;
         align-items: center;
         gap: 4px;
-        padding: 8px 0;
+        padding: 8px 4px;
         cursor: pointer;
         font-size: var(--text-sm, 13px);
         font-weight: 500;
         color: var(--color-text, #1A1A1A);
         user-select: none;
+        border-radius: var(--radius-sm, 4px);
+        transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+
+        &:hover {
+          background: var(--color-surface-hover, #F7F7F5);
+        }
 
         mat-icon {
           font-size: 18px;
@@ -270,8 +276,14 @@ interface RelatedFieldGroup {
       display: flex;
       align-items: center;
       gap: 4px;
-      padding: 3px 0;
+      padding: 3px 4px;
       cursor: pointer;
+      border-radius: var(--radius-sm, 4px);
+      transition: background-color 200ms cubic-bezier(0, 0, 0.2, 1);
+
+      &:hover {
+        background: var(--color-surface-hover, #F7F7F5);
+      }
 
       &__label {
         flex: 1;

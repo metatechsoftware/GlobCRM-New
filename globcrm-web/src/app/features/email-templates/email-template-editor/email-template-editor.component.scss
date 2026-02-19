@@ -1,3 +1,25 @@
+// ─── Keyframes ────────────────────────────────────────────────────────────
+
+@keyframes panelSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @keyframes panelSlideIn {
+    from { opacity: 1; transform: none; }
+    to   { opacity: 1; transform: none; }
+  }
+}
+
+// ─── Page Layout ──────────────────────────────────────────────────────────
+
 .editor-page {
   display: flex;
   flex-direction: column;
@@ -12,8 +34,10 @@
   align-items: center;
   gap: var(--space-3);
   padding: var(--space-2) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 0 var(--color-border), 0 4px 12px rgba(0, 0, 0, 0.04);
   flex-wrap: wrap;
   min-height: 56px;
   z-index: 10;
@@ -38,6 +62,18 @@
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  flex: 1;
+  min-width: 0;
+}
+
+.fields-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-md);
+  padding: var(--space-1) var(--space-3);
+  border: 1px solid var(--color-border-subtle);
   flex: 1;
   min-width: 0;
 }
@@ -77,6 +113,16 @@
   flex-shrink: 0;
 }
 
+// ─── Save Button Micro-interaction ────────────────────────────────────────
+
+.save-btn {
+  transition: transform var(--duration-fast) var(--ease-default);
+
+  &:active {
+    transform: scale(0.96);
+  }
+}
+
 // ─── Editor Content ───────────────────────────────────────────────────────
 
 .editor-content {
@@ -103,6 +149,14 @@
   border-left: 1px solid var(--color-border);
   background-color: var(--color-surface);
   overflow-y: auto;
+  animation: panelSlideIn var(--duration-slow, 300ms) var(--ease-out, ease-out) backwards;
+  border-top: 3px solid var(--color-primary);
+}
+
+// ─── Mobile Scrim ─────────────────────────────────────────────────────────
+
+.merge-panel-scrim {
+  display: none;
 }
 
 // ─── Responsive ───────────────────────────────────────────────────────────
@@ -115,7 +169,11 @@
   .toolbar-center {
     order: 3;
     width: 100%;
+  }
+
+  .fields-group {
     flex-wrap: wrap;
+    width: 100%;
   }
 
   .name-field,
@@ -138,5 +196,13 @@
     bottom: 0;
     z-index: var(--z-overlay);
     box-shadow: var(--shadow-xl);
+  }
+
+  .merge-panel-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: var(--color-overlay, rgba(0, 0, 0, 0.5));
+    z-index: calc(var(--z-overlay, 1000) - 1);
   }
 }

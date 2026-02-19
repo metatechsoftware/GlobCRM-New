@@ -1,0 +1,310 @@
+// ============================================================
+// Sequence Builder — Visual Pipeline Constructor
+// Connector lines between steps, polished cards, refined form
+// ============================================================
+
+:host {
+  display: block;
+  min-height: 100vh;
+  background: var(--color-bg);
+}
+
+@keyframes seq-fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ─── Page Container ─────────────────────────────────────────
+.builder {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: var(--space-6);
+  animation: seq-fadeInUp 0.4s var(--ease-out) both;
+}
+
+// ─── Header ─────────────────────────────────────────────────
+.builder__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-6);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.builder__header h1 {
+  margin: 0;
+  flex: 1;
+}
+
+.builder__loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-16);
+}
+
+// ─── Form Section ───────────────────────────────────────────
+.builder__section {
+  margin-bottom: var(--space-8);
+}
+
+.builder__form-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-xs);
+}
+
+.builder__field {
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.builder__status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+.builder__status-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-medium);
+}
+
+.builder__status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5);
+  font-size: 11px;
+  padding: 3px 10px 3px 8px;
+  border-radius: var(--radius-full);
+  font-weight: var(--font-semibold);
+  letter-spacing: 0.2px;
+}
+
+.builder__status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+}
+
+.status--draft {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  .builder__status-dot { background: var(--color-text-muted); }
+}
+
+.status--active {
+  background: var(--color-success-soft);
+  color: var(--color-success-text);
+  box-shadow: inset 0 0 0 1px rgba(34, 197, 94, 0.15);
+  .builder__status-dot { background: var(--color-success); }
+}
+
+.status--paused {
+  background: var(--color-warning-soft);
+  color: var(--color-warning-text);
+  box-shadow: inset 0 0 0 1px rgba(245, 158, 11, 0.15);
+  .builder__status-dot { background: var(--color-warning); }
+}
+
+.status--archived {
+  background: var(--color-bg-secondary);
+  color: var(--color-text-muted);
+  .builder__status-dot { background: var(--color-text-muted); }
+}
+
+// ─── Steps Section ──────────────────────────────────────────
+.builder__section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.builder__section-header h2 {
+  margin: 0;
+  font-size: var(--text-lg);
+}
+
+.builder__section-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+  color: var(--color-primary);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.builder__step-count {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-left: auto;
+  font-variant-numeric: tabular-nums;
+}
+
+// Empty steps
+.builder__empty-steps {
+  text-align: center;
+  padding: var(--space-10) var(--space-6);
+  border: 2px dashed var(--color-border);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--space-4);
+  background: var(--color-surface);
+  transition: border-color var(--duration-fast) var(--ease-default);
+
+  &:hover {
+    border-color: var(--color-primary);
+  }
+}
+
+.builder__empty-steps-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-primary-soft);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    color: var(--color-primary);
+  }
+}
+
+.builder__empty-steps p {
+  color: var(--color-text-secondary);
+  font-size: var(--text-sm);
+  margin: 0;
+}
+
+// ─── Step List with Pipeline Connectors ─────────────────────
+.builder__step-list {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: var(--space-4);
+  position: relative;
+}
+
+.builder__step-drag-item {
+  position: relative;
+  transition: box-shadow var(--duration-fast) var(--ease-default);
+
+  // Pipeline connector between steps
+  &:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -8px;
+    transform: translateX(-50%);
+    width: 2px;
+    height: 16px;
+    background: var(--color-border);
+    z-index: 0;
+  }
+
+  // Connector arrow
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -12px;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--color-border);
+    z-index: 1;
+  }
+
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// CDK Drag styles
+.cdk-drag-preview {
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  opacity: 0.95;
+}
+
+.cdk-drag-placeholder {
+  opacity: 0.3;
+  border: 2px dashed var(--color-primary);
+  border-radius: var(--radius-md);
+  background: var(--color-primary-soft);
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+// Add step button
+.builder__add-step {
+  width: 100%;
+  border-style: dashed !important;
+  padding: var(--space-3) !important;
+  transition:
+    border-color var(--duration-fast) var(--ease-default),
+    background-color var(--duration-fast) var(--ease-default);
+
+  &:hover {
+    border-color: var(--color-primary) !important;
+    background: var(--color-primary-soft) !important;
+  }
+}
+
+// ─── Actions Bar ────────────────────────────────────────────
+.builder__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-border);
+}
+
+// ─── Responsive ─────────────────────────────────────────────
+@media (max-width: 768px) {
+  .builder {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .builder__form-card {
+    padding: var(--space-4);
+  }
+
+  .builder__step-drag-item {
+    &:not(:last-child)::after,
+    &:not(:last-child)::before {
+      display: none;
+    }
+    margin-bottom: var(--space-3);
+  }
+}

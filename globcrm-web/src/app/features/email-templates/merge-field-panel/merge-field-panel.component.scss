@@ -12,6 +12,7 @@
   justify-content: space-between;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
+  background: linear-gradient(to bottom, var(--color-primary-soft) 0px, var(--color-primary-soft) 2px, var(--color-surface) 2px);
 
   h3 {
     font-size: var(--text-md);
@@ -33,6 +34,8 @@
   color: var(--color-text-secondary);
   background-color: var(--color-bg-secondary);
   border-bottom: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-info);
+  background: var(--color-info-soft, #e3f2fd);
 
   .hint-icon {
     font-size: 16px;
@@ -55,6 +58,8 @@
   margin-top: auto;
   border-top: 1px solid var(--color-border);
   border-bottom: none;
+  border-left-color: var(--color-warning);
+  background: var(--color-warning-soft, #fff3e0);
 }
 
 // ─── Entity Groups ────────────────────────────────────────────────────────
@@ -73,13 +78,17 @@ mat-expansion-panel {
   }
 }
 
-.entity-dot {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: var(--radius-full);
+.entity-group-icon {
+  display: inline-flex;
+  align-items: center;
   margin-right: var(--space-2);
   flex-shrink: 0;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
 }
 
 .field-count {
@@ -101,7 +110,7 @@ mat-expansion-panel {
   display: inline-flex;
   align-items: center;
   gap: var(--space-1);
-  padding: var(--space-1) var(--space-2);
+  padding: 4px 10px;
   border-radius: var(--radius-full);
   border: 1px solid;
   font-size: var(--text-xs);
@@ -120,6 +129,11 @@ mat-expansion-panel {
 
   &:active {
     transform: scale(0.98);
+  }
+
+  &.is-copied .copy-icon {
+    opacity: 1;
+    color: var(--color-success);
   }
 }
 
@@ -140,4 +154,6 @@ mat-expansion-panel {
   width: 12px;
   height: 12px;
   opacity: 0.5;
+  transition: color var(--duration-normal) var(--ease-default),
+    opacity var(--duration-normal) var(--ease-default);
 }

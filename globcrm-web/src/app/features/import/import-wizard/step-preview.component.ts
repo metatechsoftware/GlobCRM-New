@@ -5,7 +5,6 @@ import {
   OnInit,
   Output,
   EventEmitter,
-  signal,
 } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -28,108 +27,7 @@ import { ImportStore } from '../stores/import.store';
     MatExpansionModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .preview-container {
-      padding: 24px 0;
-    }
-
-    .summary-cards {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .summary-card {
-      padding: 20px;
-      border-radius: 12px;
-      text-align: center;
-    }
-
-    .summary-card.valid {
-      background: var(--color-success-soft);
-      border: 1px solid rgba(76, 175, 80, 0.3);
-    }
-
-    .summary-card.invalid {
-      background: var(--color-danger-soft);
-      border: 1px solid rgba(244, 67, 54, 0.3);
-    }
-
-    .summary-card.duplicate {
-      background: rgba(255, 193, 7, 0.1);
-      border: 1px solid rgba(255, 193, 7, 0.3);
-    }
-
-    .card-count {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-
-    .valid .card-count {
-      color: #4caf50;
-    }
-
-    .invalid .card-count {
-      color: #f44336;
-    }
-
-    .duplicate .card-count {
-      color: #ff9800;
-    }
-
-    .card-label {
-      font-size: 14px;
-      color: var(--color-text-secondary);
-    }
-
-    .error-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 13px;
-    }
-
-    .error-table th {
-      text-align: left;
-      padding: 8px;
-      font-weight: 500;
-      background: var(--color-surface-hover);
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .error-table td {
-      padding: 8px;
-      border-bottom: 1px solid var(--color-border-subtle);
-    }
-
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 48px;
-    }
-
-    .step-actions {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 24px;
-      padding-top: 16px;
-    }
-
-    .error-msg {
-      color: var(--color-danger);
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    @media (max-width: 600px) {
-      .summary-cards {
-        grid-template-columns: 1fr;
-      }
-    }
-  `,
+  styleUrl: './step-preview.component.scss',
   template: `
     <div class="preview-container">
       @if (store.loading()) {
@@ -138,80 +36,96 @@ import { ImportStore } from '../stores/import.store';
           <p>Running validation preview...</p>
         </div>
       } @else if (store.previewResponse()) {
+        <!-- Summary Cards -->
         <div class="summary-cards">
           <div class="summary-card valid">
-            <div class="card-count">{{ store.previewResponse()!.validCount }}</div>
+            <div class="card-icon-wrapper valid">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <div class="card-value">{{ store.previewResponse()!.validCount }}</div>
             <div class="card-label">Valid Rows</div>
+            <div class="card-sublabel">Ready to import</div>
           </div>
           <div class="summary-card invalid">
-            <div class="card-count">{{ store.previewResponse()!.invalidCount }}</div>
+            <div class="card-icon-wrapper invalid">
+              <mat-icon>error</mat-icon>
+            </div>
+            <div class="card-value">{{ store.previewResponse()!.invalidCount }}</div>
             <div class="card-label">Invalid Rows</div>
+            <div class="card-sublabel">Will be skipped</div>
           </div>
           <div class="summary-card duplicate">
-            <div class="card-count">{{ store.previewResponse()!.duplicateCount }}</div>
-            <div class="card-label">Duplicates Found</div>
+            <div class="card-icon-wrapper duplicate">
+              <mat-icon>content_copy</mat-icon>
+            </div>
+            <div class="card-value">{{ store.previewResponse()!.duplicateCount }}</div>
+            <div class="card-label">Duplicates</div>
+            <div class="card-sublabel">Matched existing records</div>
           </div>
         </div>
 
-        @if (store.previewResponse()!.errors.length > 0) {
-          <mat-expansion-panel>
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <mat-icon style="color: #f44336; margin-right: 8px;">error</mat-icon>
-                Validation Errors ({{ store.previewResponse()!.errors.length }})
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <table class="error-table">
-              <thead>
-                <tr>
-                  <th>Row</th>
-                  <th>Field</th>
-                  <th>Error</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (error of store.previewResponse()!.errors; track $index) {
+        <!-- Detail Panels -->
+        <div class="detail-panels">
+          @if (store.previewResponse()!.errors.length > 0) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="panel-icon error">error</mat-icon>
+                  Validation Errors ({{ store.previewResponse()!.errors.length }})
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <table class="detail-table">
+                <thead>
                   <tr>
-                    <td>{{ error.rowNumber }}</td>
-                    <td>{{ error.fieldName }}</td>
-                    <td>{{ error.errorMessage }}</td>
-                    <td>{{ error.rawValue ?? '-' }}</td>
+                    <th>Row</th>
+                    <th>Field</th>
+                    <th>Error</th>
+                    <th>Value</th>
                   </tr>
-                }
-              </tbody>
-            </table>
-          </mat-expansion-panel>
-        }
+                </thead>
+                <tbody>
+                  @for (error of store.previewResponse()!.errors; track $index) {
+                    <tr>
+                      <td>{{ error.rowNumber }}</td>
+                      <td>{{ error.fieldName }}</td>
+                      <td>{{ error.errorMessage }}</td>
+                      <td>{{ error.rawValue ?? '-' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          }
 
-        @if (store.previewResponse()!.duplicates.length > 0) {
-          <mat-expansion-panel style="margin-top: 8px;">
-            <mat-expansion-panel-header>
-              <mat-panel-title>
-                <mat-icon style="color: #ff9800; margin-right: 8px;">content_copy</mat-icon>
-                Duplicate Matches ({{ store.previewResponse()!.duplicates.length }})
-              </mat-panel-title>
-            </mat-expansion-panel-header>
-            <table class="error-table">
-              <thead>
-                <tr>
-                  <th>Row</th>
-                  <th>Match Field</th>
-                  <th>Match Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                @for (dup of store.previewResponse()!.duplicates; track $index) {
+          @if (store.previewResponse()!.duplicates.length > 0) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  <mat-icon class="panel-icon warning">content_copy</mat-icon>
+                  Duplicate Matches ({{ store.previewResponse()!.duplicates.length }})
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <table class="detail-table">
+                <thead>
                   <tr>
-                    <td>{{ dup.rowIndex }}</td>
-                    <td>{{ dup.matchField }}</td>
-                    <td>{{ dup.matchValue }}</td>
+                    <th>Row</th>
+                    <th>Match Field</th>
+                    <th>Match Value</th>
                   </tr>
-                }
-              </tbody>
-            </table>
-          </mat-expansion-panel>
-        }
+                </thead>
+                <tbody>
+                  @for (dup of store.previewResponse()!.duplicates; track $index) {
+                    <tr>
+                      <td>{{ dup.rowIndex }}</td>
+                      <td>{{ dup.matchField }}</td>
+                      <td>{{ dup.matchValue }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </mat-expansion-panel>
+          }
+        </div>
       }
 
       @if (store.error()) {

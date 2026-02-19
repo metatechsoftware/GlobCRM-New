@@ -1,5 +1,6 @@
 import { Component, inject, signal, computed, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
@@ -20,6 +21,7 @@ import {
   CUSTOM_FIELD_TYPE_LABELS,
 } from '../../../core/custom-fields/custom-field.models';
 import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component';
+import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 interface FieldGroup {
@@ -44,6 +46,7 @@ const ENTITY_TYPES = [
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     FormsModule,
     MatTabsModule,
     MatTableModule,
@@ -60,6 +63,7 @@ const ENTITY_TYPES = [
     HasPermissionDirective,
   ],
   templateUrl: './custom-field-list.component.html',
+  styleUrl: './custom-field-list.component.scss',
 })
 export class CustomFieldListComponent implements OnInit {
   private readonly fieldService = inject(CustomFieldService);
@@ -221,17 +225,23 @@ export class CustomFieldListComponent implements OnInit {
   }
 
   deleteField(field: CustomFieldDefinition): void {
-    if (!confirm(`Are you sure you want to delete "${field.label}"?`)) {
-      return;
-    }
-    this.fieldService.deleteField(field.id).subscribe({
-      next: () => {
-        this.loadData();
-        this.snackBar.open('Field deleted', 'Close', { duration: 3000 });
-      },
-      error: () => {
-        this.snackBar.open('Failed to delete field', 'Close', { duration: 3000 });
-      },
+    const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent, {
+      width: '400px',
+      data: { name: field.label, type: 'custom field' },
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (!confirmed) return;
+
+      this.fieldService.deleteField(field.id).subscribe({
+        next: () => {
+          this.loadData();
+          this.snackBar.open('Field deleted', 'Close', { duration: 3000 });
+        },
+        error: () => {
+          this.snackBar.open('Failed to delete field', 'Close', { duration: 3000 });
+        },
+      });
     });
   }
 
@@ -264,5 +274,20 @@ export class CustomFieldListComponent implements OnInit {
       relation: 'primary',
     };
     return colors[type] ?? 'primary';
+  }
+
+  getFieldTypeIcon(type: string): string {
+    const icons: Record<string, string> = {
+      text: 'text_fields',
+      number: 'numbers',
+      date: 'calendar_today',
+      dropdown: 'arrow_drop_down_circle',
+      checkbox: 'check_box',
+      multiSelect: 'checklist',
+      currency: 'attach_money',
+      file: 'attach_file',
+      relation: 'link',
+    };
+    return icons[type] ?? 'text_fields';
   }
 }

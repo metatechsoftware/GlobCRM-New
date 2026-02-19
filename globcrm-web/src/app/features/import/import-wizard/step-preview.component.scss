@@ -1,0 +1,272 @@
+// ─── Step Preview — Rich Summary Cards ───────────────────────
+@keyframes cardFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes iconBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+:host {
+  display: block;
+}
+
+.preview-container {
+  padding: var(--space-4) 0;
+}
+
+// ─── Summary Cards ───────────────────────────────────────────
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.summary-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-4);
+  border-radius: var(--radius-lg);
+  border: 1px solid transparent;
+  text-align: center;
+  opacity: 0;
+  animation: cardFadeIn var(--duration-slow) var(--ease-out) both;
+  transition: transform var(--duration-normal) var(--ease-default), box-shadow var(--duration-normal) var(--ease-default);
+
+  &:nth-child(1) { animation-delay: 0ms; }
+  &:nth-child(2) { animation-delay: 100ms; }
+  &:nth-child(3) { animation-delay: 200ms; }
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.summary-card.valid {
+  background: var(--color-success-soft);
+  border-color: rgba(34, 197, 94, 0.2);
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(34, 197, 94, 0.12);
+  }
+}
+
+.summary-card.invalid {
+  background: var(--color-danger-soft);
+  border-color: rgba(239, 68, 68, 0.2);
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(239, 68, 68, 0.12);
+  }
+}
+
+.summary-card.duplicate {
+  background: var(--color-warning-soft);
+  border-color: rgba(245, 158, 11, 0.2);
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.12);
+  }
+}
+
+.card-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  transition: transform var(--duration-normal) var(--ease-default);
+
+  mat-icon {
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+  }
+
+  &.valid {
+    background: rgba(34, 197, 94, 0.15);
+    mat-icon { color: var(--color-success); }
+  }
+
+  &.invalid {
+    background: rgba(239, 68, 68, 0.15);
+    mat-icon { color: var(--color-danger); }
+  }
+
+  &.duplicate {
+    background: rgba(245, 158, 11, 0.15);
+    mat-icon { color: var(--color-warning); }
+  }
+}
+
+.summary-card:hover .card-icon-wrapper {
+  animation: iconBounce 0.5s var(--ease-default);
+}
+
+.card-value {
+  font-size: var(--text-3xl);
+  font-weight: var(--font-bold);
+  line-height: 1;
+  letter-spacing: -1px;
+}
+
+.summary-card.valid .card-value { color: var(--color-success-text); }
+.summary-card.invalid .card-value { color: var(--color-danger-text); }
+.summary-card.duplicate .card-value { color: var(--color-warning-text); }
+
+.card-label {
+  font-size: var(--text-sm);
+  font-weight: var(--font-semibold);
+  color: var(--color-text);
+}
+
+.card-sublabel {
+  font-size: var(--text-xs);
+  color: var(--color-text-secondary);
+  margin-top: calc(var(--space-1) * -1);
+}
+
+// ─── Expansion Panels ────────────────────────────────────────
+.detail-panels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  opacity: 0;
+  animation: fadeSlideUp 0.4s var(--ease-out) 300ms forwards;
+}
+
+:host ::ng-deep {
+  .mat-expansion-panel {
+    border-radius: var(--radius-lg) !important;
+    box-shadow: none !important;
+    border: 1px solid var(--color-border-subtle);
+    transition: border-color var(--duration-normal) var(--ease-default);
+
+    &::before {
+      display: none;
+    }
+
+    &:hover {
+      border-color: var(--color-border);
+    }
+  }
+
+  .mat-expansion-panel-header {
+    font-size: var(--text-base);
+    font-weight: var(--font-medium);
+  }
+}
+
+.panel-icon {
+  margin-right: var(--space-2);
+  font-size: 20px !important;
+  width: 20px !important;
+  height: 20px !important;
+
+  &.error { color: var(--color-danger); }
+  &.warning { color: var(--color-warning); }
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+
+  th {
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    font-weight: var(--font-semibold);
+    font-size: var(--text-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    background: var(--color-surface-hover);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  td {
+    padding: var(--space-2) var(--space-3);
+    border-bottom: 1px solid var(--color-border-subtle);
+    color: var(--color-text);
+  }
+
+  tr {
+    transition: background var(--duration-fast) var(--ease-default);
+
+    &:hover td {
+      background: var(--color-surface-hover);
+    }
+  }
+}
+
+// ─── Loading ─────────────────────────────────────────────────
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-12);
+
+  p {
+    margin: 0;
+    font-size: var(--text-base);
+    color: var(--color-text-secondary);
+    font-weight: var(--font-medium);
+  }
+}
+
+// ─── Error / Actions ─────────────────────────────────────────
+.error-msg {
+  color: var(--color-danger-text);
+  margin-top: var(--space-3);
+  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-danger-soft);
+  border-radius: var(--radius-md);
+  border-left: 3px solid var(--color-danger);
+}
+
+.step-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: var(--space-8);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-border-subtle);
+}
+
+// ─── Responsive ──────────────────────────────────────────────
+@media (max-width: 600px) {
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Reduced Motion ─────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .summary-card,
+  .detail-panels {
+    animation: none;
+    opacity: 1;
+  }
+
+  .summary-card:hover .card-icon-wrapper {
+    animation: none;
+  }
+}

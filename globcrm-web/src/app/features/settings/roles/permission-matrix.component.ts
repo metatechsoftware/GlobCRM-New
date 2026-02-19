@@ -189,4 +189,43 @@ export class PermissionMatrixComponent implements OnInit {
   getQuickSetValue(operation: string): Scope | '' {
     return this.quickSet()[operation] ?? '';
   }
+
+  /** Get icon for an entity type */
+  getEntityIcon(entity: string): string {
+    const icons: Record<string, string> = {
+      Contact: 'person',
+      Company: 'business',
+      Deal: 'handshake',
+      Activity: 'event',
+      Quote: 'request_quote',
+      Request: 'support_agent',
+      Product: 'inventory_2',
+    };
+    return icons[entity] || 'category';
+  }
+
+  /** Get color for an entity type */
+  getEntityColor(entity: string): string {
+    const colors: Record<string, string> = {
+      Contact: 'var(--color-primary)',
+      Company: 'var(--color-secondary)',
+      Deal: 'var(--color-success)',
+      Activity: 'var(--color-info)',
+      Quote: 'var(--color-warning)',
+      Request: 'var(--color-accent)',
+      Product: 'var(--color-danger)',
+    };
+    return colors[entity] || 'var(--color-text-muted)';
+  }
+
+  /** Get icon for a CRUD operation */
+  getOperationIcon(operation: string): string {
+    const icons: Record<string, string> = {
+      View: 'visibility',
+      Create: 'add_circle',
+      Edit: 'edit',
+      Delete: 'delete',
+    };
+    return icons[operation] || 'settings';
+  }
 }

@@ -2,10 +2,8 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import {
@@ -28,10 +26,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
   imports: [
     CommonModule,
     RouterLink,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
@@ -50,15 +46,6 @@ export class RoleListComponent implements OnInit {
   roles = signal<RoleDto[]>([]);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
-
-  displayedColumns = [
-    'name',
-    'description',
-    'type',
-    'permissionCount',
-    'assignedUserCount',
-    'actions',
-  ];
 
   ngOnInit(): void {
     this.loadRoles();
@@ -86,10 +73,22 @@ export class RoleListComponent implements OnInit {
     return 'Custom';
   }
 
-  getRoleTypeColor(role: RoleDto): string {
-    if (role.isSystem) return 'warn';
-    if (role.isTemplate) return 'accent';
-    return 'primary';
+  getRoleIcon(role: RoleDto): string {
+    if (role.isSystem) return 'admin_panel_settings';
+    if (role.isTemplate) return 'content_copy';
+    return 'shield';
+  }
+
+  getRoleAccentColor(role: RoleDto): string {
+    if (role.isSystem) return 'var(--color-primary)';
+    if (role.isTemplate) return 'var(--color-secondary)';
+    return 'var(--color-accent)';
+  }
+
+  getRoleAccentSoft(role: RoleDto): string {
+    if (role.isSystem) return 'var(--color-primary-soft)';
+    if (role.isTemplate) return 'var(--color-secondary-soft)';
+    return 'var(--color-accent-soft)';
   }
 
   onClone(role: RoleDto): void {
@@ -202,4 +201,3 @@ export class CloneRoleDialogComponent {
   readonly data: { roleName: string } = inject(MAT_DIALOG_DATA);
   newName = '';
 }
-

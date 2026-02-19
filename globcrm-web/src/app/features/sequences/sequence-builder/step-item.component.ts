@@ -42,33 +42,62 @@ import {
     }
 
     .step-item {
-      border: 1px solid var(--border-color, #e2e8f0);
-      border-radius: 8px;
-      background: var(--surface, #fff);
-      transition: border-color 0.15s, box-shadow 0.15s;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-surface, #fff);
+      transition:
+        border-color var(--duration-fast, 100ms) var(--ease-default),
+        box-shadow var(--duration-fast, 100ms) var(--ease-default),
+        transform var(--duration-fast, 100ms) var(--ease-default);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .step-item::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: var(--color-primary, #f97316);
+      opacity: 0;
+      transition: opacity var(--duration-fast, 100ms) var(--ease-default);
     }
 
     .step-item:hover {
-      border-color: var(--primary, #f97316);
+      border-color: var(--color-primary, #f97316);
+      box-shadow: var(--shadow-md, 0 4px 6px rgba(0,0,0,0.05));
+      transform: translateY(-1px);
+    }
+
+    .step-item:hover::before {
+      opacity: 1;
     }
 
     .step-item__collapsed {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 16px;
+      gap: var(--space-3, 12px);
+      padding: var(--space-3, 12px) var(--space-4, 16px);
       cursor: pointer;
     }
 
     .step-item__drag-handle {
       cursor: grab;
-      color: var(--text-secondary, #94a3b8);
+      color: var(--color-text-muted, #9CA3AF);
       display: flex;
       align-items: center;
+      transition: color var(--duration-fast, 100ms) var(--ease-default);
+    }
+
+    .step-item__drag-handle:hover {
+      color: var(--color-text-secondary, #6B7280);
     }
 
     .step-item__drag-handle:active {
       cursor: grabbing;
+      color: var(--color-primary, #f97316);
     }
 
     .step-item__badge {
@@ -77,12 +106,13 @@ import {
       justify-content: center;
       width: 28px;
       height: 28px;
-      border-radius: 50%;
-      background: var(--primary, #f97316);
-      color: white;
-      font-size: 13px;
-      font-weight: 600;
+      border-radius: var(--radius-full, 9999px);
+      background: linear-gradient(135deg, var(--color-primary, #f97316) 0%, var(--color-primary-hover, #EA580C) 100%);
+      color: var(--color-primary-fg, white);
+      font-size: 12px;
+      font-weight: var(--font-bold, 700);
       flex-shrink: 0;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.25);
     }
 
     .step-item__info {
@@ -91,59 +121,92 @@ import {
     }
 
     .step-item__template-name {
-      font-weight: 500;
-      font-size: 14px;
-      color: var(--text-primary, #1e293b);
+      font-weight: var(--font-semibold, 600);
+      font-size: var(--text-base, 14px);
+      color: var(--color-text, #1e293b);
     }
 
     .step-item__delay {
-      font-size: 12px;
-      color: var(--text-secondary, #64748b);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1, 4px);
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-secondary, #64748b);
       margin-top: 2px;
+    }
+
+    .step-item__delay mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
     }
 
     .step-item__actions {
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 2px;
       flex-shrink: 0;
+      opacity: 0.5;
+      transition: opacity var(--duration-fast, 100ms) var(--ease-default);
+    }
+
+    .step-item:hover .step-item__actions {
+      opacity: 1;
     }
 
     .step-item__expanded {
-      padding: 0 16px 16px;
-      border-top: 1px solid var(--border-color, #e2e8f0);
+      padding: var(--space-4, 16px);
+      border-top: 1px solid var(--color-border-subtle, #f1f5f9);
+      background: var(--color-bg-secondary, #F0F0EE);
+      animation: stepExpandIn 0.2s var(--ease-out, ease-out) both;
+    }
+
+    @keyframes stepExpandIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
     .step-item__section {
-      margin-top: 16px;
+      margin-top: var(--space-4, 16px);
+    }
+
+    .step-item__section:first-child {
+      margin-top: 0;
     }
 
     .step-item__section-label {
-      font-size: 12px;
-      font-weight: 600;
+      font-size: 11px;
+      font-weight: var(--font-semibold, 600);
       text-transform: uppercase;
-      color: var(--text-secondary, #64748b);
-      margin-bottom: 8px;
+      letter-spacing: 0.6px;
+      color: var(--color-text-secondary, #64748b);
+      margin-bottom: var(--space-2, 8px);
     }
 
     .step-item__template-select {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: var(--space-2, 8px);
     }
 
     .step-item__template-preview {
       width: 100%;
       height: 120px;
-      border: 1px solid var(--border-color, #e2e8f0);
-      border-radius: 4px;
-      margin-top: 8px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: var(--radius-sm, 4px);
+      margin-top: var(--space-2, 8px);
       pointer-events: none;
     }
 
     .step-item__delay-row {
       display: flex;
-      gap: 12px;
+      gap: var(--space-3, 12px);
       align-items: flex-start;
     }
 
@@ -152,15 +215,20 @@ import {
     }
 
     .step-item__edit-link {
-      font-size: 12px;
-      color: var(--primary, #f97316);
+      font-size: var(--text-xs, 12px);
+      color: var(--color-primary, #f97316);
       cursor: pointer;
       text-decoration: none;
-      margin-top: 4px;
-      display: inline-block;
+      margin-top: var(--space-1, 4px);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1, 4px);
+      font-weight: var(--font-medium, 500);
+      transition: color var(--duration-fast, 100ms) var(--ease-default);
     }
 
     .step-item__edit-link:hover {
+      color: var(--color-primary-hover, #EA580C);
       text-decoration: underline;
     }
   `,
@@ -179,6 +247,7 @@ import {
             {{ step().emailTemplateName || 'No template selected' }}
           </div>
           <div class="step-item__delay">
+            <mat-icon>schedule</mat-icon>
             {{ getDelaySummary() }}
           </div>
         </div>

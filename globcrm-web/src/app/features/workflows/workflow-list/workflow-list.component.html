@@ -1,8 +1,21 @@
 <div class="workflow-list">
-  <!-- Header -->
+  <!-- Hero Header -->
   <div class="workflow-list__header">
-    <div>
-      <h1>Workflows</h1>
+    <div class="workflow-list__header-content">
+      <div class="workflow-list__title-row">
+        <svg class="workflow-list__icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="6" cy="14" r="3" fill="var(--color-primary, #F97316)" opacity="0.85"/>
+          <circle cx="14" cy="6" r="2.5" fill="var(--color-info, #3B82F6)" opacity="0.75"/>
+          <circle cx="14" cy="22" r="2.5" fill="var(--color-success, #10B981)" opacity="0.75"/>
+          <circle cx="22" cy="10" r="2" fill="var(--color-warning, #F59E0B)" opacity="0.7"/>
+          <circle cx="22" cy="18" r="2" fill="var(--color-info, #3B82F6)" opacity="0.7"/>
+          <path d="M9 14 Q11 6 14 6" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
+          <path d="M9 14 Q11 22 14 22" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
+          <path d="M16.5 6 Q19 6 22 10" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
+          <path d="M16.5 22 Q19 22 22 18" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
+        </svg>
+        <h1>Workflows</h1>
+      </div>
       <p class="workflow-list__subtitle">
         Automate actions when events occur across your CRM
       </p>
@@ -13,8 +26,34 @@
     </a>
   </div>
 
-  <!-- Filter Bar -->
+  <!-- Stats Ribbon -->
+  @if (!store.loading() && store.totalCount() > 0) {
+    <div class="workflow-list__stats-ribbon">
+      <div class="stats-card">
+        <span class="stats-card__label">Total</span>
+        <span class="stats-card__value">{{ store.totalCount() }}</span>
+      </div>
+      <div class="stats-card">
+        <span class="stats-card__indicator stats-card__indicator--active"></span>
+        <span class="stats-card__label">Active</span>
+        <span class="stats-card__value">{{ activeCount() }}</span>
+      </div>
+      <div class="stats-card">
+        <span class="stats-card__indicator stats-card__indicator--paused"></span>
+        <span class="stats-card__label">Paused</span>
+        <span class="stats-card__value">{{ pausedCount() }}</span>
+      </div>
+      <div class="stats-card">
+        <span class="stats-card__indicator stats-card__indicator--draft"></span>
+        <span class="stats-card__label">Draft</span>
+        <span class="stats-card__value">{{ draftCount() }}</span>
+      </div>
+    </div>
+  }
+
+  <!-- Filter Toolbar -->
   <div class="workflow-list__filters">
+    <mat-icon class="workflow-list__filters-icon">tune</mat-icon>
     <mat-form-field appearance="outline" class="workflow-list__filter-field">
       <mat-label>Entity Type</mat-label>
       <mat-select
@@ -43,8 +82,8 @@
   <!-- Loading State -->
   @if (store.loading()) {
     <div class="workflow-list__grid">
-      @for (item of skeletonItems; track item) {
-        <div class="workflow-list__skeleton-card">
+      @for (item of skeletonItems; track item; let i = $index) {
+        <div class="workflow-list__skeleton-card" [style.--card-index]="i">
           <div class="skeleton-thumbnail"></div>
           <div class="skeleton-body">
             <div class="skeleton-line skeleton-line--title"></div>
@@ -65,7 +104,38 @@
   <!-- Empty State -->
   @if (!store.loading() && store.workflows().length === 0) {
     <div class="workflow-list__empty">
-      <mat-icon>account_tree</mat-icon>
+      <svg class="workflow-list__empty-svg" viewBox="0 0 240 140" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Connection paths with flowing dashes -->
+        <path class="empty-flow-path empty-flow-path--1" d="M60 70 C90 70, 90 45, 120 45" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+        <path class="empty-flow-path empty-flow-path--2" d="M60 70 C90 70, 90 95, 120 95" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+        <path class="empty-flow-path empty-flow-path--3" d="M150 45 C170 45, 170 70, 190 70" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+        <path class="empty-flow-path empty-flow-path--4" d="M150 95 C170 95, 170 70, 190 70" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.5" stroke-dasharray="4 3" fill="none"/>
+
+        <!-- Trigger node -->
+        <circle class="empty-node empty-node--trigger" cx="50" cy="70" r="12" fill="var(--color-primary-soft, #FFF7ED)" stroke="var(--color-primary, #F97316)" stroke-width="1.5"/>
+        <circle class="empty-node-pulse empty-node-pulse--trigger" cx="50" cy="70" r="12" fill="none" stroke="var(--color-primary, #F97316)" stroke-width="0.5"/>
+        <text x="50" y="74" text-anchor="middle" fill="var(--color-primary, #F97316)" font-size="10" font-weight="600">T</text>
+
+        <!-- Condition nodes -->
+        <circle class="empty-node empty-node--condition" cx="135" cy="45" r="10" fill="var(--color-warning-soft, #FFFBEB)" stroke="var(--color-warning, #F59E0B)" stroke-width="1.5"/>
+        <circle class="empty-node-pulse empty-node-pulse--condition" cx="135" cy="45" r="10" fill="none" stroke="var(--color-warning, #F59E0B)" stroke-width="0.5"/>
+        <text x="135" y="49" text-anchor="middle" fill="var(--color-warning, #F59E0B)" font-size="9" font-weight="600">C</text>
+
+        <circle class="empty-node empty-node--condition2" cx="135" cy="95" r="10" fill="var(--color-warning-soft, #FFFBEB)" stroke="var(--color-warning, #F59E0B)" stroke-width="1.5"/>
+        <text x="135" y="99" text-anchor="middle" fill="var(--color-warning, #F59E0B)" font-size="9" font-weight="600">C</text>
+
+        <!-- Action node -->
+        <circle class="empty-node empty-node--action" cx="200" cy="70" r="11" fill="var(--color-success-soft, #F0FDF4)" stroke="var(--color-success, #10B981)" stroke-width="1.5"/>
+        <circle class="empty-node-pulse empty-node-pulse--action" cx="200" cy="70" r="11" fill="none" stroke="var(--color-success, #10B981)" stroke-width="0.5"/>
+        <text x="200" y="74" text-anchor="middle" fill="var(--color-success, #10B981)" font-size="10" font-weight="600">A</text>
+
+        <!-- Plus icon hint -->
+        <g class="empty-plus-hint">
+          <circle cx="120" cy="120" r="10" fill="var(--color-primary, #F97316)" opacity="0.15"/>
+          <line x1="116" y1="120" x2="124" y2="120" stroke="var(--color-primary, #F97316)" stroke-width="1.5" stroke-linecap="round"/>
+          <line x1="120" y1="116" x2="120" y2="124" stroke="var(--color-primary, #F97316)" stroke-width="1.5" stroke-linecap="round"/>
+        </g>
+      </svg>
       <h3>No workflows yet</h3>
       <p>
         Workflows automate repetitive tasks when CRM events occur. Create your
@@ -80,9 +150,10 @@
   <!-- Card Grid -->
   @if (!store.loading() && store.workflows().length > 0) {
     <div class="workflow-list__grid">
-      @for (workflow of store.workflows(); track workflow.id) {
+      @for (workflow of store.workflows(); track workflow.id; let i = $index) {
         <app-workflow-card
           [workflow]="workflow"
+          [style.--card-index]="i"
           (toggleStatus)="onToggleStatus(workflow)"
           (edit)="onEdit(workflow)"
           (duplicate)="onDuplicate(workflow)"

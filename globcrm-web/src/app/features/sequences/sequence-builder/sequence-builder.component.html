@@ -9,51 +9,59 @@
 
   @if (store.loading() && isEditMode()) {
     <div class="builder__loading">
-      <mat-spinner diameter="48"></mat-spinner>
+      <mat-spinner diameter="40"></mat-spinner>
     </div>
   } @else {
     <!-- Sequence Info -->
     <div class="builder__section">
-      <mat-form-field class="builder__field" appearance="outline">
-        <mat-label>Sequence Name</mat-label>
-        <input matInput
-               [(ngModel)]="name"
-               placeholder="e.g., New Customer Onboarding"
-               required />
-      </mat-form-field>
+      <div class="builder__form-card">
+        <mat-form-field class="builder__field" appearance="outline">
+          <mat-label>Sequence Name</mat-label>
+          <input matInput
+                 [(ngModel)]="name"
+                 placeholder="e.g., New Customer Onboarding"
+                 required />
+        </mat-form-field>
 
-      <mat-form-field class="builder__field" appearance="outline">
-        <mat-label>Description (optional)</mat-label>
-        <textarea matInput
-                  [(ngModel)]="description"
-                  rows="2"
-                  placeholder="Brief description of this sequence"></textarea>
-      </mat-form-field>
+        <mat-form-field class="builder__field" appearance="outline">
+          <mat-label>Description (optional)</mat-label>
+          <textarea matInput
+                    [(ngModel)]="description"
+                    rows="2"
+                    placeholder="Brief description of this sequence"></textarea>
+        </mat-form-field>
 
-      @if (isEditMode() && store.selectedSequence()) {
-        <div class="builder__status-row">
-          <span class="builder__status-label">Status:</span>
-          <span class="builder__status-badge"
-                [class.status--draft]="store.selectedSequence()!.status === 'draft'"
-                [class.status--active]="store.selectedSequence()!.status === 'active'"
-                [class.status--paused]="store.selectedSequence()!.status === 'paused'"
-                [class.status--archived]="store.selectedSequence()!.status === 'archived'">
-            {{ store.selectedSequence()!.status | titlecase }}
-          </span>
-        </div>
-      }
+        @if (isEditMode() && store.selectedSequence()) {
+          <div class="builder__status-row">
+            <span class="builder__status-label">Status:</span>
+            <span class="builder__status-badge"
+                  [class.status--draft]="store.selectedSequence()!.status === 'draft'"
+                  [class.status--active]="store.selectedSequence()!.status === 'active'"
+                  [class.status--paused]="store.selectedSequence()!.status === 'paused'"
+                  [class.status--archived]="store.selectedSequence()!.status === 'archived'">
+              <span class="builder__status-dot"></span>
+              {{ store.selectedSequence()!.status | titlecase }}
+            </span>
+          </div>
+        }
+      </div>
     </div>
 
     <!-- Steps Section -->
     <div class="builder__section">
       <div class="builder__section-header">
+        <div class="builder__section-icon">
+          <mat-icon>route</mat-icon>
+        </div>
         <h2>Steps</h2>
         <span class="builder__step-count">{{ steps().length }} step{{ steps().length !== 1 ? 's' : '' }}</span>
       </div>
 
       @if (steps().length === 0) {
         <div class="builder__empty-steps">
-          <mat-icon>mail_outline</mat-icon>
+          <div class="builder__empty-steps-icon">
+            <mat-icon>mail_outline</mat-icon>
+          </div>
           <p>No steps yet. Add your first email step below.</p>
         </div>
       } @else {

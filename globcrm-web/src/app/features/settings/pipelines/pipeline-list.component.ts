@@ -1,15 +1,12 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatCardModule } from '@angular/material/card';
 import { PipelineService } from '../../deals/pipeline.service';
 import { PipelineDto } from '../../deals/deal.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
@@ -20,201 +17,683 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
   imports: [
     CommonModule,
     RouterLink,
-    MatTableModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
-    MatCardModule,
   ],
   template: `
-    <div class="pipeline-list-container">
-      <div class="page-header">
-        <h1>Pipeline Management</h1>
-        <button mat-flat-button color="primary" routerLink="/settings/pipelines/new">
+    <div class="pl-page">
+      <!-- Header -->
+      <div class="pl-header">
+        <div class="pl-header__left">
+          <a routerLink="/settings" class="pl-back">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Settings</span>
+          </a>
+          <div class="pl-title-row">
+            <div class="pl-icon-wrap">
+              <mat-icon>linear_scale</mat-icon>
+            </div>
+            <div>
+              <h1 class="pl-title">Pipelines</h1>
+              <p class="pl-subtitle">Configure deal flow stages and progression</p>
+            </div>
+          </div>
+        </div>
+        <button
+          mat-flat-button
+          color="primary"
+          routerLink="/settings/pipelines/new"
+          class="pl-create-btn"
+        >
           <mat-icon>add</mat-icon>
           New Pipeline
         </button>
       </div>
 
       @if (isLoading()) {
-        <div class="loading-container">
-          <mat-spinner diameter="48"></mat-spinner>
+        <div class="pl-loading">
+          <mat-spinner diameter="40"></mat-spinner>
           <p>Loading pipelines...</p>
         </div>
       } @else if (errorMessage()) {
-        <div class="error-container">
-          <mat-icon class="error-icon">error_outline</mat-icon>
+        <div class="pl-error">
+          <div class="pl-error__icon-wrap">
+            <mat-icon>wifi_off</mat-icon>
+          </div>
+          <h3>Something went wrong</h3>
           <p>{{ errorMessage() }}</p>
           <button mat-flat-button color="primary" (click)="loadPipelines()">
             <mat-icon>refresh</mat-icon>
-            Retry
+            Try Again
+          </button>
+        </div>
+      } @else if (pipelines().length === 0) {
+        <div class="pl-empty">
+          <div class="pl-empty__visual">
+            <div class="pl-empty__circles">
+              <div class="pl-circle pl-circle--1"></div>
+              <div class="pl-circle pl-circle--2"></div>
+              <div class="pl-circle pl-circle--3"></div>
+            </div>
+            <mat-icon class="pl-empty__icon">linear_scale</mat-icon>
+          </div>
+          <h3>No pipelines yet</h3>
+          <p>Create your first pipeline to define deal stages and track progression through your sales process.</p>
+          <button mat-flat-button color="primary" routerLink="/settings/pipelines/new">
+            <mat-icon>add</mat-icon>
+            Create First Pipeline
           </button>
         </div>
       } @else {
-        <table mat-table [dataSource]="pipelines()" class="pipelines-table">
-          <!-- Name Column -->
-          <ng-container matColumnDef="name">
-            <th mat-header-cell *matHeaderCellDef>Name</th>
-            <td mat-cell *matCellDef="let pipeline">{{ pipeline.name }}</td>
-          </ng-container>
+        <div class="pl-grid">
+          @for (pipeline of pipelines(); track pipeline.id; let i = $index) {
+            <div
+              class="pl-card"
+              [style.animation-delay]="(i * 60) + 'ms'"
+              tabindex="0"
+              (click)="onEdit(pipeline)"
+              (keydown.enter)="onEdit(pipeline)"
+            >
+              <div class="pl-card__accent" [style.background]="pipeline.isDefault ? 'var(--color-primary)' : 'var(--color-accent)'"></div>
 
-          <!-- Description Column -->
-          <ng-container matColumnDef="description">
-            <th mat-header-cell *matHeaderCellDef>Description</th>
-            <td mat-cell *matCellDef="let pipeline" class="description-cell">
-              {{ pipeline.description || '-' }}
-            </td>
-          </ng-container>
+              <div class="pl-card__body">
+                <div class="pl-card__top">
+                  <div
+                    class="pl-card__icon"
+                    [style.background]="pipeline.isDefault ? 'var(--color-primary-soft)' : 'var(--color-accent-soft)'"
+                    [style.color]="pipeline.isDefault ? 'var(--color-primary)' : 'var(--color-accent)'"
+                  >
+                    <mat-icon>linear_scale</mat-icon>
+                  </div>
+                  <div class="pl-card__actions" (click)="$event.stopPropagation()">
+                    <button
+                      mat-icon-button
+                      (click)="onEdit(pipeline)"
+                      matTooltip="Edit pipeline"
+                      class="pl-action-btn"
+                    >
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button
+                      mat-icon-button
+                      (click)="onDelete(pipeline)"
+                      [disabled]="pipeline.dealCount > 0"
+                      [matTooltip]="pipeline.dealCount > 0 ? 'Cannot delete with active deals' : 'Delete pipeline'"
+                      class="pl-action-btn pl-action-btn--danger"
+                    >
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
 
-          <!-- Team Column -->
-          <ng-container matColumnDef="team">
-            <th mat-header-cell *matHeaderCellDef>Team</th>
-            <td mat-cell *matCellDef="let pipeline">
-              {{ pipeline.teamName || 'All Teams' }}
-            </td>
-          </ng-container>
+                <div class="pl-card__content">
+                  <div class="pl-card__name-row">
+                    <h3 class="pl-card__name">{{ pipeline.name }}</h3>
+                    @if (pipeline.isDefault) {
+                      <span class="pl-default-badge">Default</span>
+                    }
+                  </div>
+                  <p class="pl-card__desc">{{ pipeline.description || 'No description' }}</p>
+                </div>
 
-          <!-- Stages Column -->
-          <ng-container matColumnDef="stageCount">
-            <th mat-header-cell *matHeaderCellDef>Stages</th>
-            <td mat-cell *matCellDef="let pipeline">{{ pipeline.stageCount }}</td>
-          </ng-container>
+                <!-- Stage Preview -->
+                @if (pipeline.stageCount > 0) {
+                  <div class="pl-stage-bar">
+                    @for (stage of getStagePreview(pipeline); track $index) {
+                      <div class="pl-stage-chip" [style.background]="stage.color" [style.color]="getContrastColor(stage.color)">
+                        {{ stage.name }}
+                      </div>
+                    }
+                    @if (pipeline.stageCount > 4) {
+                      <span class="pl-stage-more">+{{ pipeline.stageCount - 4 }} more</span>
+                    }
+                  </div>
+                }
 
-          <!-- Deals Column -->
-          <ng-container matColumnDef="dealCount">
-            <th mat-header-cell *matHeaderCellDef>Deals</th>
-            <td mat-cell *matCellDef="let pipeline">{{ pipeline.dealCount }}</td>
-          </ng-container>
-
-          <!-- Default Column -->
-          <ng-container matColumnDef="isDefault">
-            <th mat-header-cell *matHeaderCellDef>Default</th>
-            <td mat-cell *matCellDef="let pipeline">
-              @if (pipeline.isDefault) {
-                <mat-chip-set>
-                  <mat-chip color="primary" highlighted>Default</mat-chip>
-                </mat-chip-set>
-              }
-            </td>
-          </ng-container>
-
-          <!-- Actions Column -->
-          <ng-container matColumnDef="actions">
-            <th mat-header-cell *matHeaderCellDef>Actions</th>
-            <td mat-cell *matCellDef="let pipeline">
-              <div class="action-buttons">
-                <button
-                  mat-icon-button
-                  (click)="onEdit(pipeline)"
-                  matTooltip="Edit pipeline"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  color="warn"
-                  (click)="onDelete(pipeline)"
-                  [disabled]="pipeline.dealCount > 0"
-                  [matTooltip]="pipeline.dealCount > 0 ? 'Cannot delete pipeline with deals' : 'Delete pipeline'"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
+                <div class="pl-card__footer">
+                  <div class="pl-metric">
+                    <mat-icon class="pl-metric__icon">layers</mat-icon>
+                    <span class="pl-metric__value">{{ pipeline.stageCount }}</span>
+                    <span class="pl-metric__label">{{ pipeline.stageCount === 1 ? 'stage' : 'stages' }}</span>
+                  </div>
+                  <div class="pl-metric">
+                    <mat-icon class="pl-metric__icon">handshake</mat-icon>
+                    <span class="pl-metric__value">{{ pipeline.dealCount }}</span>
+                    <span class="pl-metric__label">{{ pipeline.dealCount === 1 ? 'deal' : 'deals' }}</span>
+                  </div>
+                  @if (pipeline.teamName) {
+                    <div class="pl-team-badge">
+                      {{ pipeline.teamName }}
+                    </div>
+                  }
+                </div>
               </div>
-            </td>
-          </ng-container>
-
-          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-          <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-          <!-- No data row -->
-          <tr class="mat-mdc-no-data-row" *matNoDataRow>
-            <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
-              No pipelines found. Create your first pipeline to get started.
-            </td>
-          </tr>
-        </table>
+            </div>
+          }
+        </div>
       }
     </div>
   `,
   styles: [`
-    .pipeline-list-container {
-      padding: 24px;
+    .pl-page {
+      padding: var(--space-6) var(--space-8);
       max-width: 1200px;
       margin: 0 auto;
     }
 
-    .page-header {
+    // ─── Header ──────────────────────────────────
+    .pl-header {
       display: flex;
+      align-items: flex-start;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: var(--space-8);
+      gap: var(--space-4);
+      animation: plFadeSlideUp var(--duration-slower) var(--ease-out) both;
+    }
 
-      h1 {
-        margin: 0;
+    .pl-back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      margin-bottom: var(--space-3);
+      transition: color var(--duration-normal) var(--ease-default);
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &:hover {
+        color: var(--color-primary);
+      }
+    }
+
+    .pl-title-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .pl-icon-wrap {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--color-accent), var(--color-accent-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(20, 184, 166, 0.3);
+      flex-shrink: 0;
+
+      mat-icon {
+        color: var(--color-accent-fg);
         font-size: 24px;
-        font-weight: 500;
+        width: 24px;
+        height: 24px;
       }
     }
 
-    .loading-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 64px 0;
+    .pl-title {
+      margin: 0;
+      font-size: var(--text-3xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
+      color: var(--color-text);
+    }
 
-      p {
-        margin-top: 16px;
-        color: var(--color-text-secondary);
+    .pl-subtitle {
+      margin: var(--space-1) 0 0;
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
+    }
+
+    .pl-create-btn {
+      flex-shrink: 0;
+      margin-top: var(--space-6);
+
+      mat-icon {
+        margin-right: var(--space-1);
       }
     }
 
-    .error-container {
+    // ─── Card Grid ───────────────────────────────
+    .pl-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: var(--space-5);
+    }
+
+    .pl-card {
+      position: relative;
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      outline: none;
+      transition:
+        box-shadow var(--duration-normal) var(--ease-default),
+        transform var(--duration-normal) var(--ease-default),
+        border-color var(--duration-normal) var(--ease-default);
+      animation: plCardEntrance var(--duration-slower) var(--ease-out) both;
+
+      &:hover,
+      &:focus-visible {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        border-color: var(--color-border-strong);
+
+        .pl-card__actions {
+          opacity: 1;
+          transform: translateX(0);
+        }
+
+        .pl-card__accent {
+          height: 4px;
+        }
+      }
+
+      &:focus-visible {
+        box-shadow: var(--shadow-focus);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-md);
+      }
+    }
+
+    .pl-card__accent {
+      height: 3px;
+      transition: height var(--duration-normal) var(--ease-default);
+    }
+
+    .pl-card__body {
+      padding: var(--space-5);
+    }
+
+    .pl-card__top {
       display: flex;
-      flex-direction: column;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-4);
+    }
+
+    .pl-card__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
       align-items: center;
       justify-content: center;
-      padding: 64px 0;
+      flex-shrink: 0;
 
-      .error-icon {
-        font-size: 48px;
-        width: 48px;
-        height: 48px;
+      mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+      }
+    }
+
+    .pl-card__actions {
+      display: flex;
+      gap: var(--space-0-5);
+      opacity: 0;
+      transform: translateX(8px);
+      transition:
+        opacity var(--duration-normal) var(--ease-default),
+        transform var(--duration-normal) var(--ease-default);
+    }
+
+    .pl-action-btn {
+      width: 32px !important;
+      height: 32px !important;
+      line-height: 32px !important;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
+
+      &--danger:hover {
         color: var(--color-danger);
       }
+    }
+
+    .pl-card__content {
+      margin-bottom: var(--space-4);
+    }
+
+    .pl-card__name-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      margin-bottom: var(--space-1);
+    }
+
+    .pl-card__name {
+      margin: 0;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+      letter-spacing: -0.3px;
+    }
+
+    .pl-card__desc {
+      margin: 0;
+      font-size: var(--text-sm);
+      color: var(--color-text-secondary);
+      line-height: var(--leading-relaxed);
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .pl-default-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-0-5) var(--space-2);
+      background: var(--color-primary-soft);
+      color: var(--color-primary-text);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-semibold);
+    }
+
+    // ─── Stage Preview ───────────────────────────
+    .pl-stage-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-1-5);
+      margin-bottom: var(--space-4);
+      padding: var(--space-3);
+      background: var(--color-bg-secondary);
+      border-radius: var(--radius-md);
+    }
+
+    .pl-stage-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+    }
+
+    .pl-stage-more {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-0-5) var(--space-2);
+      color: var(--color-text-muted);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+    }
+
+    // ─── Footer ──────────────────────────────────
+    .pl-card__footer {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding-top: var(--space-4);
+      border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .pl-metric {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    .pl-metric__icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .pl-metric__value {
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+    }
+
+    .pl-metric__label {
+      color: var(--color-text-muted);
+    }
+
+    .pl-team-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: var(--space-0-5) var(--space-2);
+      background: var(--color-secondary-soft);
+      color: var(--color-secondary-text);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs);
+      font-weight: var(--font-medium);
+      margin-left: auto;
+    }
+
+    // ─── States ──────────────────────────────────
+    .pl-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-20) 0;
+      gap: var(--space-4);
 
       p {
-        margin: 16px 0;
+        margin: 0;
         color: var(--color-text-secondary);
+        font-size: var(--text-sm);
       }
     }
 
-    .pipelines-table {
-      width: 100%;
-      box-shadow: var(--shadow-sm);
-      border-radius: var(--radius-sm);
-    }
-
-    .description-cell {
-      max-width: 300px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .action-buttons {
+    .pl-error {
       display: flex;
-      gap: 4px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) 0;
+      text-align: center;
+
+      h3 {
+        margin: var(--space-4) 0 var(--space-2);
+        font-size: var(--text-lg);
+      }
+
+      p {
+        margin: 0 0 var(--space-5);
+        color: var(--color-text-secondary);
+        max-width: 360px;
+      }
     }
 
-    .no-data-cell {
+    .pl-error__icon-wrap {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-full);
+      background: var(--color-danger-soft);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      mat-icon {
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
+        color: var(--color-danger);
+      }
+    }
+
+    .pl-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) 0;
       text-align: center;
-      padding: 32px !important;
-      color: var(--color-text-secondary);
+
+      h3 {
+        margin: var(--space-5) 0 var(--space-2);
+        font-size: var(--text-xl);
+        font-weight: var(--font-semibold);
+      }
+
+      p {
+        margin: 0 0 var(--space-6);
+        color: var(--color-text-secondary);
+        max-width: 400px;
+        line-height: var(--leading-relaxed);
+      }
+    }
+
+    .pl-empty__visual {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .pl-empty__circles {
+      position: absolute;
+      inset: 0;
+    }
+
+    .pl-circle {
+      position: absolute;
+      border-radius: var(--radius-full);
+      opacity: 0;
+      animation: plCircleFloat 3s var(--ease-default) infinite;
+
+      &--1 {
+        width: 40px;
+        height: 40px;
+        background: var(--color-accent-soft);
+        border: 2px solid var(--color-accent);
+        top: 0;
+        left: 10px;
+        animation-delay: 0s;
+      }
+
+      &--2 {
+        width: 32px;
+        height: 32px;
+        background: var(--color-primary-soft);
+        border: 2px solid var(--color-primary);
+        top: 8px;
+        right: 5px;
+        animation-delay: 0.5s;
+      }
+
+      &--3 {
+        width: 28px;
+        height: 28px;
+        background: var(--color-secondary-soft);
+        border: 2px solid var(--color-secondary);
+        bottom: 10px;
+        left: 22px;
+        animation-delay: 1s;
+      }
+    }
+
+    .pl-empty__icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--color-text-muted);
+      z-index: 1;
+    }
+
+    // ─── Animations ──────────────────────────────
+    @keyframes plFadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes plCardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes plCircleFloat {
+      0%,
+      100% {
+        opacity: 0.4;
+        transform: translateY(0);
+      }
+      50% {
+        opacity: 0.8;
+        transform: translateY(-8px);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .pl-card,
+      .pl-header,
+      .pl-circle {
+        animation: none !important;
+      }
+
+      .pl-card {
+        opacity: 1;
+      }
+    }
+
+    // ─── Responsive ──────────────────────────────
+    @media (max-width: 768px) {
+      .pl-page {
+        padding: var(--space-4);
+      }
+
+      .pl-header {
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+      }
+
+      .pl-title {
+        font-size: var(--text-2xl);
+      }
+
+      .pl-create-btn {
+        margin-top: 0;
+      }
+
+      .pl-grid {
+        grid-template-columns: 1fr;
+        gap: var(--space-4);
+      }
+
+      .pl-card__actions {
+        opacity: 1;
+        transform: translateX(0);
+      }
     }
   `],
 })
@@ -227,16 +706,6 @@ export class PipelineListComponent implements OnInit {
   pipelines = signal<PipelineDto[]>([]);
   isLoading = signal(true);
   errorMessage = signal<string | null>(null);
-
-  displayedColumns = [
-    'name',
-    'description',
-    'team',
-    'stageCount',
-    'dealCount',
-    'isDefault',
-    'actions',
-  ];
 
   ngOnInit(): void {
     this.loadPipelines();
@@ -298,5 +767,25 @@ export class PipelineListComponent implements OnInit {
         },
       });
     });
+  }
+
+  getStagePreview(pipeline: PipelineDto): { name: string; color: string }[] {
+    // Pipeline list DTO may include stage names — fallback to placeholder chips
+    if ((pipeline as any).stages?.length) {
+      return (pipeline as any).stages.slice(0, 4).map((s: any) => ({
+        name: s.name,
+        color: s.color || '#9e9e9e',
+      }));
+    }
+    return [];
+  }
+
+  getContrastColor(hex: string): string {
+    if (!hex || hex.length !== 7) return '#ffffff';
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+    return brightness > 128 ? '#000000' : '#ffffff';
   }
 }

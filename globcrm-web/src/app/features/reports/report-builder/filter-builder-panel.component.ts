@@ -255,6 +255,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
         margin-left: 12px;
         padding-left: 12px;
         border-left: 2px solid var(--color-primary, #F97316);
+        border-bottom-left-radius: var(--radius-sm, 4px);
         margin-top: 8px;
         margin-bottom: 8px;
       }

@@ -22,6 +22,12 @@ import { WorkflowListItem } from '../workflow.models';
  * renders trigger nodes on the left, action nodes on the right, connected
  * by bezier curves within a 280x100 viewBox. Node colors match the
  * workflow node type color scheme.
+ *
+ * Enhanced with "Precision Control Room" visual treatment:
+ * - Left status stripe (green/amber/gray)
+ * - Animated SVG flow dashes + pulsing node rings on active workflows
+ * - Staggered card entrance animation
+ * - Enhanced hover with orange border glow
  */
 @Component({
   selector: 'app-workflow-card',
@@ -37,7 +43,16 @@ import { WorkflowListItem } from '../workflow.models';
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <div class="workflow-card" (click)="onCardClick($event)">
+    <div
+      class="workflow-card"
+      [class.is-active]="workflow().status === 'active'"
+      [class.is-paused]="workflow().status === 'paused'"
+      [class.is-draft]="workflow().status === 'draft'"
+      (click)="onCardClick($event)"
+    >
+      <!-- Status Stripe -->
+      <div class="workflow-card__status-stripe"></div>
+
       <!-- SVG Thumbnail -->
       <div class="workflow-card__thumbnail">
         @if (workflow().nodeCount === 0) {
@@ -52,17 +67,33 @@ import { WorkflowListItem } from '../workflow.models';
             preserveAspectRatio="xMidYMid meet"
           >
             <!-- Connections -->
-            @for (conn of svgConnections(); track conn.id) {
+            @for (conn of svgConnections(); track conn.id; let ci = $index) {
               <path
                 [attr.d]="conn.path"
                 fill="none"
                 stroke="var(--color-border-strong, #D1D5DB)"
                 stroke-width="1.5"
                 stroke-opacity="0.6"
+                [attr.stroke-dasharray]="workflow().status === 'active' ? '4 3' : null"
+                [class.flow-path]="workflow().status === 'active'"
+                [style.animation-delay]="workflow().status === 'active' ? (ci * 200) + 'ms' : null"
               />
             }
             <!-- Nodes -->
             @for (node of svgNodes(); track node.id) {
+              <!-- Pulse ring for active workflows -->
+              @if (workflow().status === 'active') {
+                <circle
+                  class="node-pulse"
+                  [attr.cx]="node.x"
+                  [attr.cy]="node.y"
+                  [attr.r]="node.r"
+                  fill="none"
+                  [attr.stroke]="node.color"
+                  stroke-width="0.5"
+                  [style.animation-delay]="node.pulseDelay"
+                />
+              }
               <circle
                 [attr.cx]="node.x"
                 [attr.cy]="node.y"
@@ -154,6 +185,23 @@ import { WorkflowListItem } from '../workflow.models';
     </div>
   `,
   styles: `
+    :host {
+      display: block;
+      animation: cardEntrance 400ms var(--ease-default, ease-out) both;
+      animation-delay: calc(var(--card-index, 0) * 60ms);
+    }
+
+    @keyframes cardEntrance {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
     .workflow-card {
       display: flex;
       flex-direction: column;
@@ -163,24 +211,84 @@ import { WorkflowListItem } from '../workflow.models';
       box-shadow: var(--shadow-sm);
       overflow: hidden;
       cursor: pointer;
+      position: relative;
       transition: box-shadow var(--duration-normal, 200ms) var(--ease-default),
-                  transform var(--duration-normal, 200ms) var(--ease-default);
+                  transform var(--duration-normal, 200ms) var(--ease-default),
+                  border-color var(--duration-normal, 200ms) var(--ease-default);
     }
 
     .workflow-card:hover {
-      box-shadow: var(--shadow-md);
-      transform: translateY(-1px);
+      box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1));
+      transform: translateY(-2px);
+      border-color: var(--color-primary, #F97316);
+    }
+
+    .workflow-card.is-active:hover {
+      box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.1)),
+                  0 0 0 1px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Status Stripe */
+    .workflow-card__status-stripe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 4px;
+      border-radius: var(--radius-lg, 12px) 0 0 var(--radius-lg, 12px);
+      z-index: 2;
+    }
+
+    .is-active .workflow-card__status-stripe {
+      background: var(--color-success, #10B981);
+      box-shadow: 2px 0 8px rgba(16, 185, 129, 0.25);
+    }
+
+    .is-paused .workflow-card__status-stripe {
+      background: var(--color-warning, #F59E0B);
+      box-shadow: 2px 0 8px rgba(245, 158, 11, 0.2);
+    }
+
+    .is-draft .workflow-card__status-stripe {
+      background: var(--color-text-muted, #9CA3AF);
     }
 
     /* Thumbnail */
     .workflow-card__thumbnail {
       height: 120px;
-      background: var(--color-bg-secondary, #F0F0EE);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       border-bottom: 1px solid var(--color-border-subtle, #F0F0EE);
+      position: relative;
+    }
+
+    .is-active .workflow-card__thumbnail {
+      background: linear-gradient(135deg, #F0FDF8 0%, var(--color-bg-secondary, #F0F0EE) 100%);
+    }
+
+    .is-paused .workflow-card__thumbnail {
+      background: linear-gradient(135deg, #FFFDF5 0%, var(--color-bg-secondary, #F0F0EE) 100%);
+    }
+
+    .is-draft .workflow-card__thumbnail {
+      background: var(--color-bg-secondary, #F0F0EE);
+    }
+
+    /* Thumbnail hover radial glow */
+    .workflow-card__thumbnail::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, var(--color-primary, #F97316) 0%, transparent 70%);
+      opacity: 0;
+      transition: opacity var(--duration-normal, 200ms) var(--ease-default);
+      pointer-events: none;
+    }
+
+    .workflow-card:hover .workflow-card__thumbnail::after {
+      opacity: 0.06;
     }
 
     .workflow-card__thumbnail-empty {
@@ -208,9 +316,43 @@ import { WorkflowListItem } from '../workflow.models';
       padding: 8px 16px;
     }
 
+    /* Flow path animation for active workflows */
+    .flow-path {
+      animation: flowDash 1.5s linear infinite;
+    }
+
+    @keyframes flowDash {
+      from {
+        stroke-dashoffset: 14;
+      }
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    /* Node pulse ring animation for active workflows */
+    .node-pulse {
+      animation: nodeRingExpand 2.5s ease-out infinite;
+    }
+
+    @keyframes nodeRingExpand {
+      0% {
+        r: inherit;
+        opacity: 0.6;
+      }
+      70% {
+        opacity: 0;
+      }
+      100% {
+        r: 16;
+        opacity: 0;
+      }
+    }
+
     /* Info */
     .workflow-card__info {
       padding: var(--space-4, 16px);
+      padding-left: calc(var(--space-4, 16px) + 4px);
       flex: 1;
     }
 
@@ -289,8 +431,8 @@ import { WorkflowListItem } from '../workflow.models';
       font-size: 10px;
       padding: 1px 6px;
       border-radius: var(--radius-sm, 4px);
-      background: var(--color-surface-hover, #F7F7F5);
-      color: var(--color-text-secondary, #6B7280);
+      background: #F5F3FF;
+      color: #6D28D9;
       white-space: nowrap;
     }
 
@@ -303,6 +445,7 @@ import { WorkflowListItem } from '../workflow.models';
     /* Actions */
     .workflow-card__actions {
       padding: var(--space-3, 12px) var(--space-4, 16px);
+      padding-left: calc(var(--space-4, 16px) + 4px);
       border-top: 1px solid var(--color-border-subtle, #F0F0EE);
       display: flex;
       align-items: center;
@@ -345,6 +488,27 @@ import { WorkflowListItem } from '../workflow.models';
     .workflow-card__delete-item {
       color: var(--color-danger, #EF4444);
     }
+
+    /* Dark mode overrides */
+    :host-context([data-theme="dark"]) {
+      .is-active .workflow-card__thumbnail {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, var(--color-bg-secondary, #1F2937) 100%);
+      }
+
+      .is-paused .workflow-card__thumbnail {
+        background: linear-gradient(135deg, rgba(245, 158, 11, 0.08) 0%, var(--color-bg-secondary, #1F2937) 100%);
+      }
+
+      .workflow-card:hover {
+        box-shadow: var(--shadow-lg, 0 10px 15px -3px rgba(0,0,0,0.3)),
+                    0 0 0 1px rgba(249, 115, 22, 0.3);
+      }
+
+      .workflow-card__trigger-chip {
+        background: rgba(109, 40, 217, 0.15);
+        color: #C4B5FD;
+      }
+    }
   `,
 })
 export class WorkflowCardComponent {
@@ -376,12 +540,13 @@ export class WorkflowCardComponent {
   /**
    * SVG thumbnail nodes using schematic approach (approach 2):
    * Trigger nodes on left, action nodes on right, proportionally spaced.
+   * Each node includes a pulseDelay for staggered animation on active workflows.
    */
   readonly svgNodes = computed(() => {
     const wf = this.workflow();
     const triggerCount = Math.max(wf.triggerSummary.length, 1);
     const actionCount = Math.max(wf.nodeCount - triggerCount, 1);
-    const nodes: { id: string; x: number; y: number; r: number; color: string }[] = [];
+    const nodes: { id: string; x: number; y: number; r: number; color: string; pulseDelay: string }[] = [];
 
     // Trigger nodes (left side, blue)
     for (let i = 0; i < triggerCount; i++) {
@@ -392,6 +557,7 @@ export class WorkflowCardComponent {
         y,
         r: 8,
         color: '#3B82F6',
+        pulseDelay: `${i * 300}ms`,
       });
     }
 
@@ -403,6 +569,7 @@ export class WorkflowCardComponent {
         y: 50,
         r: 7,
         color: '#F59E0B',
+        pulseDelay: `${triggerCount * 300}ms`,
       });
     }
 
@@ -416,6 +583,7 @@ export class WorkflowCardComponent {
         y,
         r: 7,
         color: '#10B981',
+        pulseDelay: `${(triggerCount + 1 + i) * 300}ms`,
       });
     }
 

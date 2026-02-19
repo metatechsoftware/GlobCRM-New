@@ -1,19 +1,23 @@
-<div class="permission-matrix">
-  <h3 class="matrix-title">Permission Matrix</h3>
-  <p class="matrix-description">
-    Set access levels for each entity type. Choose scope per operation: None, Own (created by user), Team (same team), or All.
+<div class="pm-matrix">
+  <p class="pm-hint">
+    Set access levels for each entity type. Scopes: <strong>None</strong> (no access), <strong>Own</strong> (created by user),
+    <strong>Team</strong> (same team), or <strong>All</strong> (full access).
   </p>
 
-  <div class="matrix-container">
-    <table class="matrix-table">
+  <div class="pm-container">
+    <table class="pm-table">
       <thead>
         <tr>
-          <th class="entity-header">Entity</th>
+          <th class="pm-entity-header">
+            <mat-icon class="pm-entity-header__icon">category</mat-icon>
+            Entity
+          </th>
           @for (op of operations; track op) {
-            <th class="operation-header">
-              <div class="op-header-content">
+            <th class="pm-op-header">
+              <div class="pm-op-header__content">
+                <mat-icon class="pm-op-header__icon">{{ getOperationIcon(op) }}</mat-icon>
                 <span>{{ op }}</span>
-                <mat-form-field appearance="outline" class="quick-set-field">
+                <mat-form-field appearance="outline" class="pm-quick-set">
                   <mat-label>Set all</mat-label>
                   <mat-select
                     [value]="getQuickSetValue(op)"
@@ -32,17 +36,19 @@
         </tr>
       </thead>
       <tbody>
-        @for (entity of entityTypes; track entity) {
-          <tr class="entity-row">
-            <td class="entity-name">{{ entity }}</td>
+        @for (entity of entityTypes; track entity; let i = $index) {
+          <tr class="pm-row" [style.animation-delay]="(i * 40) + 'ms'">
+            <td class="pm-entity-name">
+              <mat-icon class="pm-entity-icon" [style.color]="getEntityColor(entity)">{{ getEntityIcon(entity) }}</mat-icon>
+              {{ entity }}
+            </td>
             @for (op of operations; track op) {
-              <td class="scope-cell">
-                <mat-form-field appearance="outline" class="scope-select-field">
+              <td class="pm-cell" [class]="'pm-cell--' + getScope(entity, op)">
+                <mat-form-field appearance="outline" class="pm-scope-select">
                   <mat-select
                     [value]="getScope(entity, op)"
                     (selectionChange)="onCellChange(entity, op, $event.value)"
-                    [class]="getScopeClass(getScope(entity, op))"
-                    [panelClass]="'scope-panel'"
+                    [panelClass]="'pm-scope-panel'"
                   >
                     @for (scope of scopes; track scope) {
                       <mat-option [value]="scope" [class]="getScopeClass(scope)">

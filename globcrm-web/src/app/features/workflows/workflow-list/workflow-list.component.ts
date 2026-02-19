@@ -4,6 +4,7 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
@@ -82,6 +83,17 @@ export class WorkflowListComponent implements OnInit {
 
   /** Skeleton items for loading state */
   readonly skeletonItems = [1, 2, 3, 4];
+
+  /** Stats ribbon counts */
+  readonly activeCount = computed(() =>
+    this.store.workflows().filter(w => w.status === 'active').length,
+  );
+  readonly pausedCount = computed(() =>
+    this.store.workflows().filter(w => w.status === 'paused').length,
+  );
+  readonly draftCount = computed(() =>
+    this.store.workflows().filter(w => w.status === 'draft').length,
+  );
 
   ngOnInit(): void {
     this.loadWorkflows();

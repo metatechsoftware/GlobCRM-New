@@ -1,8 +1,13 @@
 <div class="sequence-list">
   <!-- Header -->
   <div class="sequence-list__header">
-    <div>
-      <h1>Sequences</h1>
+    <div class="sequence-list__title-group">
+      <div class="sequence-list__title-row">
+        <div class="sequence-list__icon">
+          <mat-icon>route</mat-icon>
+        </div>
+        <h1>Sequences</h1>
+      </div>
       <p class="sequence-list__subtitle">Automate multi-step email outreach to contacts</p>
     </div>
     <a mat-flat-button color="primary" routerLink="/sequences/new">
@@ -14,20 +19,46 @@
   <!-- Loading -->
   @if (store.loading()) {
     <div class="sequence-list__loading">
-      <mat-spinner diameter="48"></mat-spinner>
+      <mat-spinner diameter="40"></mat-spinner>
+      <span>Loading sequences...</span>
     </div>
   } @else if (store.sequences().length === 0) {
     <!-- Empty State -->
     <div class="sequence-list__empty">
-      <mat-icon>campaign</mat-icon>
+      <div class="sequence-list__empty-icon">
+        <mat-icon>campaign</mat-icon>
+      </div>
       <h3>No sequences yet</h3>
       <p>Create your first email sequence to automate outreach</p>
-      <a mat-flat-button color="primary" routerLink="/sequences/new" style="margin-top: 16px">
+      <a mat-flat-button color="primary" routerLink="/sequences/new">
         <mat-icon>add</mat-icon>
         Create Sequence
       </a>
     </div>
   } @else {
+    <!-- Summary Stats Bar -->
+    <div class="sequence-list__stats-bar">
+      <div class="sequence-list__stat-item">
+        <span class="sequence-list__stat-dot sequence-list__stat-dot--active"></span>
+        <span class="sequence-list__stat-value">{{ getActiveCount() }}</span>
+        Active
+      </div>
+      <div class="sequence-list__stat-item">
+        <span class="sequence-list__stat-dot sequence-list__stat-dot--paused"></span>
+        <span class="sequence-list__stat-value">{{ getPausedCount() }}</span>
+        Paused
+      </div>
+      <div class="sequence-list__stat-item">
+        <span class="sequence-list__stat-dot sequence-list__stat-dot--draft"></span>
+        <span class="sequence-list__stat-value">{{ getDraftCount() }}</span>
+        Draft
+      </div>
+      <div class="sequence-list__stat-item" style="margin-left: auto;">
+        <span class="sequence-list__stat-value">{{ store.sequences().length }}</span>
+        Total
+      </div>
+    </div>
+
     <!-- Sequence Table -->
     <div class="sequence-list__table-wrap">
       <table mat-table [dataSource]="store.sequences()">
@@ -35,12 +66,14 @@
         <ng-container matColumnDef="name">
           <th mat-header-cell *matHeaderCellDef>Name</th>
           <td mat-cell *matCellDef="let seq">
-            <a class="sequence-list__name-link" [routerLink]="['/sequences', seq.id]">
-              {{ seq.name }}
-            </a>
-            @if (seq.description) {
-              <div class="sequence-list__desc">{{ seq.description }}</div>
-            }
+            <div class="sequence-list__name-cell">
+              <a class="sequence-list__name-link" [routerLink]="['/sequences', seq.id]">
+                {{ seq.name }}
+              </a>
+              @if (seq.description) {
+                <div class="sequence-list__desc">{{ seq.description }}</div>
+              }
+            </div>
           </td>
         </ng-container>
 
@@ -53,6 +86,7 @@
                   [class.status--active]="seq.status === 'active'"
                   [class.status--paused]="seq.status === 'paused'"
                   [class.status--archived]="seq.status === 'archived'">
+              <span class="sequence-list__status-dot"></span>
               {{ seq.status | titlecase }}
             </span>
           </td>
@@ -61,31 +95,47 @@
         <!-- Steps Column -->
         <ng-container matColumnDef="steps">
           <th mat-header-cell *matHeaderCellDef>Steps</th>
-          <td mat-cell *matCellDef="let seq">{{ seq.stepCount }}</td>
+          <td mat-cell *matCellDef="let seq">
+            <span class="sequence-list__stat">{{ seq.stepCount }}</span>
+          </td>
         </ng-container>
 
         <!-- Enrolled Column -->
         <ng-container matColumnDef="enrolled">
           <th mat-header-cell *matHeaderCellDef>Enrolled</th>
-          <td mat-cell *matCellDef="let seq">{{ seq.totalEnrolled }}</td>
+          <td mat-cell *matCellDef="let seq">
+            <span class="sequence-list__stat">{{ seq.totalEnrolled }}</span>
+          </td>
         </ng-container>
 
         <!-- Active Column -->
         <ng-container matColumnDef="active">
           <th mat-header-cell *matHeaderCellDef>Active</th>
-          <td mat-cell *matCellDef="let seq">{{ seq.activeEnrollments }}</td>
+          <td mat-cell *matCellDef="let seq">
+            <span class="sequence-list__stat">{{ seq.activeEnrollments }}</span>
+          </td>
         </ng-container>
 
         <!-- Completed Column -->
         <ng-container matColumnDef="completed">
           <th mat-header-cell *matHeaderCellDef>Completed</th>
-          <td mat-cell *matCellDef="let seq">{{ seq.completedEnrollments }}</td>
+          <td mat-cell *matCellDef="let seq">
+            <span class="sequence-list__stat">{{ seq.completedEnrollments }}</span>
+          </td>
         </ng-container>
 
         <!-- Reply Rate Column -->
         <ng-container matColumnDef="replyRate">
           <th mat-header-cell *matHeaderCellDef>Reply Rate</th>
-          <td mat-cell *matCellDef="let seq">{{ seq.replyRate }}%</td>
+          <td mat-cell *matCellDef="let seq">
+            <div class="sequence-list__reply-rate">
+              <div class="sequence-list__reply-bar">
+                <div class="sequence-list__reply-fill"
+                     [style.width.%]="seq.replyRate"></div>
+              </div>
+              <span class="sequence-list__reply-value">{{ seq.replyRate }}%</span>
+            </div>
+          </td>
         </ng-container>
 
         <!-- Actions Column -->

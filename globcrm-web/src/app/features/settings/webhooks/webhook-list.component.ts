@@ -37,169 +37,581 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    /* ---- Keyframes ---------------------------------------- */
+    @keyframes wlFadeSlideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes wlCardEntrance {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes wlCircleFloat {
+      0%, 100% { opacity: 0.4; transform: translateY(0); }
+      50%      { opacity: 0.8; transform: translateY(-8px); }
+    }
+
+    @keyframes wlStatusPulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: 0.5; }
+    }
+
+    /* ---- Host --------------------------------------------- */
     :host {
       display: block;
     }
 
-    .webhook-list {
-      max-width: 900px;
+    /* ---- Page Container ----------------------------------- */
+    .wl-page {
+      padding: var(--space-6) var(--space-8);
+      max-width: 960px;
       margin: 0 auto;
-      padding: 24px;
     }
 
-    .webhook-list__header {
+    /* ---- Header ------------------------------------------- */
+    .wl-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: var(--space-8);
+      gap: var(--space-4);
+      opacity: 0;
+      animation: wlFadeSlideUp var(--duration-slower) var(--ease-out) forwards;
+    }
+
+    .wl-header__left {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .wl-back {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      margin-bottom: var(--space-3);
+      transition: color var(--duration-normal) var(--ease-default);
+    }
+
+    .wl-back mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .wl-back:hover {
+      color: var(--color-primary);
+    }
+
+    .wl-title-row {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
+      gap: var(--space-4);
     }
 
-    .webhook-list__header h1 {
-      margin: 0;
-      font-size: 24px;
-      font-weight: 500;
-      flex: 1;
-    }
-
-    .webhook-list__subtitle {
-      color: var(--color-text-secondary);
-      font-size: 14px;
-      margin: 0 0 24px 0;
-      padding-left: 48px;
-    }
-
-    .webhook-list__actions {
-      display: flex;
-      gap: 8px;
-    }
-
-    .webhook-list__loading {
-      display: flex;
-      justify-content: center;
-      padding: 64px;
-    }
-
-    .webhook-list__empty {
-      text-align: center;
-      padding: 64px 24px;
-      color: var(--color-text-secondary);
-    }
-
-    .webhook-list__empty mat-icon {
-      font-size: 48px;
+    .wl-icon-wrap {
       width: 48px;
       height: 48px;
-      margin-bottom: 16px;
-      color: var(--color-primary);
-      opacity: 0.6;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-hover));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      flex-shrink: 0;
     }
 
-    .webhook-list__empty h3 {
-      margin: 0 0 8px 0;
-      font-weight: 500;
+    .wl-icon-wrap mat-icon {
+      color: var(--color-secondary-fg);
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+
+    .wl-title {
+      margin: 0;
+      font-size: var(--text-3xl);
+      font-weight: var(--font-bold);
+      letter-spacing: -0.5px;
       color: var(--color-text);
     }
 
-    .webhook-card {
-      margin-bottom: 12px;
-      cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s;
+    .wl-subtitle {
+      margin: var(--space-1) 0 0;
+      font-size: var(--text-base);
+      color: var(--color-text-secondary);
     }
 
-    .webhook-card:hover {
-      border-color: var(--color-primary);
-      box-shadow: 0 1px 6px rgba(249, 115, 22, 0.15);
+    .wl-header__actions {
+      display: flex;
+      gap: var(--space-2);
+      flex-shrink: 0;
+      margin-top: var(--space-6);
     }
 
-    .webhook-card__content {
+    .wl-header__actions mat-icon {
+      margin-right: var(--space-1);
+    }
+
+    /* ---- Loading State ------------------------------------ */
+    .wl-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-20) 0;
+      gap: var(--space-4);
+    }
+
+    .wl-loading p {
+      margin: 0;
+      color: var(--color-text-secondary);
+      font-size: var(--text-sm);
+    }
+
+    /* ---- Empty State -------------------------------------- */
+    .wl-empty {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-16) 0;
+      text-align: center;
+      opacity: 0;
+      animation: wlFadeSlideUp var(--duration-slower) var(--ease-out) 0.1s forwards;
+    }
+
+    .wl-empty__visual {
+      position: relative;
+      width: 120px;
+      height: 120px;
       display: flex;
       align-items: center;
-      gap: 16px;
-      padding: 16px 20px;
+      justify-content: center;
     }
 
-    .webhook-card__info {
+    .wl-empty__circles {
+      position: absolute;
+      inset: 0;
+    }
+
+    .wl-circle {
+      position: absolute;
+      border-radius: var(--radius-full);
+      opacity: 0;
+      animation: wlCircleFloat 3s var(--ease-default) infinite;
+    }
+
+    .wl-circle--1 {
+      width: 40px;
+      height: 40px;
+      background: var(--color-secondary-soft);
+      border: 2px solid var(--color-secondary);
+      top: 0;
+      left: 10px;
+      animation-delay: 0s;
+    }
+
+    .wl-circle--2 {
+      width: 32px;
+      height: 32px;
+      background: var(--color-primary-soft);
+      border: 2px solid var(--color-primary);
+      top: 8px;
+      right: 5px;
+      animation-delay: 0.5s;
+    }
+
+    .wl-circle--3 {
+      width: 28px;
+      height: 28px;
+      background: var(--color-accent-soft);
+      border: 2px solid var(--color-accent);
+      bottom: 10px;
+      left: 22px;
+      animation-delay: 1s;
+    }
+
+    .wl-empty__icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--color-text-muted);
+      z-index: 1;
+    }
+
+    .wl-empty h3 {
+      margin: var(--space-5) 0 var(--space-2);
+      font-size: var(--text-xl);
+      font-weight: var(--font-semibold);
+      color: var(--color-text);
+    }
+
+    .wl-empty p {
+      margin: 0 0 var(--space-6);
+      color: var(--color-text-secondary);
+      max-width: 400px;
+      line-height: var(--leading-relaxed);
+    }
+
+    .wl-empty__btn mat-icon {
+      margin-right: var(--space-1);
+    }
+
+    /* ---- Card List ---------------------------------------- */
+    .wl-cards {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    /* ---- Card --------------------------------------------- */
+    .wl-card {
+      position: relative;
+      background: var(--color-surface);
+      border: 1.5px solid var(--color-border);
+      border-radius: 14px;
+      cursor: pointer;
+      outline: none;
+      overflow: hidden;
+      opacity: 0;
+      animation: wlCardEntrance var(--duration-slower) var(--ease-out) both;
+      transition:
+        border-color var(--duration-normal) var(--ease-default),
+        box-shadow var(--duration-normal) var(--ease-default),
+        transform var(--duration-normal) var(--ease-default);
+    }
+
+    .wl-card:hover,
+    .wl-card:focus-visible {
+      transform: translateY(-2px);
+      border-color: var(--color-secondary);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .wl-card:focus-visible {
+      box-shadow: var(--shadow-focus);
+    }
+
+    .wl-card:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-md);
+    }
+
+    .wl-card:hover .wl-card__actions,
+    .wl-card:focus-visible .wl-card__actions {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .wl-card__inner {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-5);
+    }
+
+    /* ---- Status Indicator --------------------------------- */
+    .wl-card__status {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .wl-card__status--active {
+      background: var(--color-success-soft);
+    }
+
+    .wl-card__status--paused {
+      background: var(--color-warning-soft);
+    }
+
+    .wl-card__status--disabled {
+      background: var(--color-danger-soft);
+    }
+
+    .wl-card__status mat-icon {
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+
+    .wl-card__status--active mat-icon {
+      color: var(--color-success);
+    }
+
+    .wl-card__status--paused mat-icon {
+      color: var(--color-warning);
+    }
+
+    .wl-card__status--disabled mat-icon {
+      color: var(--color-danger);
+    }
+
+    .wl-status-dot {
+      position: absolute;
+      top: var(--space-1);
+      right: var(--space-1);
+      width: 10px;
+      height: 10px;
+      border-radius: var(--radius-full);
+      border: 2px solid var(--color-surface);
+    }
+
+    .wl-status-dot--active {
+      background: var(--color-success);
+      animation: wlStatusPulse 2s var(--ease-default) infinite;
+    }
+
+    .wl-status-dot--paused {
+      background: var(--color-warning);
+    }
+
+    .wl-status-dot--disabled {
+      background: var(--color-danger);
+    }
+
+    /* ---- Card Info ---------------------------------------- */
+    .wl-card__info {
       flex: 1;
       min-width: 0;
     }
 
-    .webhook-card__name {
-      font-size: 15px;
-      font-weight: 600;
-      margin: 0 0 4px 0;
+    .wl-card__name {
+      font-size: var(--text-md);
+      font-weight: var(--font-semibold);
+      margin: 0 0 var(--space-1) 0;
       color: var(--color-text);
+      letter-spacing: -0.2px;
     }
 
-    .webhook-card__url {
-      font-size: 13px;
+    .wl-card__url {
+      font-size: var(--text-sm);
       color: var(--color-text-secondary);
-      margin: 0 0 8px 0;
+      margin: 0 0 var(--space-2) 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 400px;
-      font-family: monospace;
+      max-width: 480px;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
     }
 
-    .webhook-card__meta {
+    /* ---- Card Meta Row ------------------------------------ */
+    .wl-card__meta {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: var(--space-3);
       flex-wrap: wrap;
     }
 
-    .webhook-card__badge {
-      font-size: 12px;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-weight: 500;
+    .wl-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1);
+      font-size: var(--text-xs);
+      padding: var(--space-0-5) var(--space-2);
+      border-radius: var(--radius-full);
+      font-weight: var(--font-semibold);
     }
 
-    .badge--active {
-      background-color: var(--color-success-soft);
+    .wl-badge__dot {
+      width: 6px;
+      height: 6px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+
+    .wl-badge--active {
+      background: var(--color-success-soft);
       color: var(--color-success-text);
     }
 
-    .badge--disabled {
-      background-color: var(--color-danger-soft);
+    .wl-badge--active .wl-badge__dot {
+      background: var(--color-success);
+    }
+
+    .wl-badge--paused {
+      background: var(--color-warning-soft);
+      color: var(--color-warning-text);
+    }
+
+    .wl-badge--paused .wl-badge__dot {
+      background: var(--color-warning);
+    }
+
+    .wl-badge--disabled {
+      background: var(--color-danger-soft);
       color: var(--color-danger-text);
     }
 
-    .badge--paused {
-      background-color: var(--color-surface-active);
+    .wl-badge--disabled .wl-badge__dot {
+      background: var(--color-danger);
+    }
+
+    .wl-card__events {
+      font-size: var(--text-xs);
       color: var(--color-text-secondary);
-    }
-
-    .webhook-card__events {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-    }
-
-    .webhook-card__failures {
-      font-size: 12px;
-      color: var(--color-danger-text);
-      font-weight: 500;
-    }
-
-    .webhook-card__last-delivery {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-    }
-
-    .webhook-card__actions {
       display: flex;
-      gap: 4px;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .wl-card__events mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted);
+    }
+
+    .wl-card__failures {
+      font-size: var(--text-xs);
+      color: var(--color-danger-text);
+      font-weight: var(--font-semibold);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .wl-card__failures mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    .wl-card__last-delivery {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .wl-card__last-delivery mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+    }
+
+    /* ---- Card Actions ------------------------------------- */
+    .wl-card__actions {
+      display: flex;
+      gap: var(--space-0-5);
       flex-shrink: 0;
+      opacity: 0;
+      transform: translateX(8px);
+      transition:
+        opacity var(--duration-normal) var(--ease-default),
+        transform var(--duration-normal) var(--ease-default);
+    }
+
+    .wl-action-btn {
+      width: 36px !important;
+      height: 36px !important;
+      line-height: 36px !important;
+    }
+
+    .wl-action-btn mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .wl-action-btn--danger:hover {
+      color: var(--color-danger) !important;
+    }
+
+    /* ---- Reduced Motion ----------------------------------- */
+    @media (prefers-reduced-motion: reduce) {
+      .wl-header,
+      .wl-card,
+      .wl-empty,
+      .wl-circle {
+        animation: none !important;
+        opacity: 1;
+      }
+
+      .wl-status-dot--active {
+        animation: none;
+      }
+
+      .wl-card:hover,
+      .wl-card:focus-visible {
+        transform: none;
+      }
+    }
+
+    /* ---- Responsive --------------------------------------- */
+    @media (max-width: 768px) {
+      .wl-page {
+        padding: var(--space-4);
+      }
+
+      .wl-header {
+        flex-direction: column;
+        gap: var(--space-3);
+        margin-bottom: var(--space-6);
+      }
+
+      .wl-header__actions {
+        margin-top: 0;
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .wl-title {
+        font-size: var(--text-2xl);
+      }
+
+      .wl-card__inner {
+        padding: var(--space-4);
+        gap: var(--space-3);
+      }
+
+      .wl-card__url {
+        max-width: 200px;
+      }
+
+      .wl-card__actions {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .wl-card__meta {
+        gap: var(--space-2);
+      }
     }
   `,
   template: `
-    <div class="webhook-list">
-      <div class="webhook-list__header">
-        <a mat-icon-button routerLink="/settings" aria-label="Back to settings">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>Webhooks</h1>
-        <div class="webhook-list__actions">
+    <div class="wl-page">
+      <!-- Header -->
+      <div class="wl-header">
+        <div class="wl-header__left">
+          <a routerLink="/settings" class="wl-back">
+            <mat-icon>arrow_back</mat-icon>
+            <span>Settings</span>
+          </a>
+          <div class="wl-title-row">
+            <div class="wl-icon-wrap">
+              <mat-icon>webhook</mat-icon>
+            </div>
+            <div>
+              <h1 class="wl-title">Webhooks</h1>
+              <p class="wl-subtitle">Manage webhook subscriptions and event notifications</p>
+            </div>
+          </div>
+        </div>
+        <div class="wl-header__actions">
           <a mat-stroked-button routerLink="/settings/webhooks/delivery-logs">
             <mat-icon>list_alt</mat-icon>
             View All Delivery Logs
@@ -210,67 +622,107 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
           </a>
         </div>
       </div>
-      <p class="webhook-list__subtitle">Manage webhook subscriptions for external integrations</p>
 
+      <!-- Loading -->
       @if (store.loading()) {
-        <div class="webhook-list__loading">
-          <mat-spinner diameter="48"></mat-spinner>
+        <div class="wl-loading">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Loading webhooks...</p>
         </div>
       } @else if (store.subscriptions().length === 0) {
-        <div class="webhook-list__empty">
-          <mat-icon>link</mat-icon>
+        <!-- Empty State -->
+        <div class="wl-empty">
+          <div class="wl-empty__visual">
+            <div class="wl-empty__circles">
+              <div class="wl-circle wl-circle--1"></div>
+              <div class="wl-circle wl-circle--2"></div>
+              <div class="wl-circle wl-circle--3"></div>
+            </div>
+            <mat-icon class="wl-empty__icon">webhook</mat-icon>
+          </div>
           <h3>No webhooks configured</h3>
           <p>Create a webhook subscription to send real-time event notifications to external systems.</p>
-          <a mat-flat-button color="primary" routerLink="/settings/webhooks/new" style="margin-top: 16px">
+          <a mat-flat-button color="primary" routerLink="/settings/webhooks/new" class="wl-empty__btn">
             <mat-icon>add</mat-icon>
             Add Webhook
           </a>
         </div>
       } @else {
-        @for (sub of store.subscriptions(); track sub.id) {
-          <mat-card class="webhook-card" (click)="onView(sub)">
-            <div class="webhook-card__content">
-              <div class="webhook-card__info">
-                <p class="webhook-card__name">{{ sub.name }}</p>
-                <p class="webhook-card__url">{{ sub.url }}</p>
-                <div class="webhook-card__meta">
-                  <span class="webhook-card__badge"
-                        [class.badge--active]="sub.isActive && !sub.isDisabled"
-                        [class.badge--disabled]="sub.isDisabled"
-                        [class.badge--paused]="!sub.isActive && !sub.isDisabled">
-                    {{ getStatusLabel(sub) }}
+        <!-- Card List -->
+        <div class="wl-cards">
+          @for (sub of store.subscriptions(); track sub.id; let i = $index) {
+            <div
+              class="wl-card"
+              [style.animation-delay]="(i * 60) + 'ms'"
+              tabindex="0"
+              (click)="onView(sub)"
+              (keydown.enter)="onView(sub)"
+            >
+              <div class="wl-card__inner">
+                <!-- Status Icon -->
+                <div class="wl-card__status"
+                     [class.wl-card__status--active]="sub.isActive && !sub.isDisabled"
+                     [class.wl-card__status--paused]="!sub.isActive && !sub.isDisabled"
+                     [class.wl-card__status--disabled]="sub.isDisabled">
+                  <mat-icon>webhook</mat-icon>
+                  <span class="wl-status-dot"
+                        [class.wl-status-dot--active]="sub.isActive && !sub.isDisabled"
+                        [class.wl-status-dot--paused]="!sub.isActive && !sub.isDisabled"
+                        [class.wl-status-dot--disabled]="sub.isDisabled">
                   </span>
-                  <span class="webhook-card__events">
-                    {{ sub.eventSubscriptions.length }} event{{ sub.eventSubscriptions.length !== 1 ? 's' : '' }}
-                  </span>
-                  @if (sub.consecutiveFailureCount > 0) {
-                    <span class="webhook-card__failures">
-                      {{ sub.consecutiveFailureCount }} consecutive failure{{ sub.consecutiveFailureCount !== 1 ? 's' : '' }}
+                </div>
+
+                <!-- Info -->
+                <div class="wl-card__info">
+                  <p class="wl-card__name">{{ sub.name }}</p>
+                  <p class="wl-card__url">{{ sub.url }}</p>
+                  <div class="wl-card__meta">
+                    <span class="wl-badge"
+                          [class.wl-badge--active]="sub.isActive && !sub.isDisabled"
+                          [class.wl-badge--disabled]="sub.isDisabled"
+                          [class.wl-badge--paused]="!sub.isActive && !sub.isDisabled">
+                      <span class="wl-badge__dot"></span>
+                      {{ getStatusLabel(sub) }}
                     </span>
-                  }
-                  @if (sub.lastDeliveryAt) {
-                    <span class="webhook-card__last-delivery">
-                      Last delivery: {{ sub.lastDeliveryAt | date:'short' }}
+                    <span class="wl-card__events">
+                      <mat-icon>notifications</mat-icon>
+                      {{ sub.eventSubscriptions.length }} event{{ sub.eventSubscriptions.length !== 1 ? 's' : '' }}
                     </span>
-                  }
+                    @if (sub.consecutiveFailureCount > 0) {
+                      <span class="wl-card__failures">
+                        <mat-icon>warning</mat-icon>
+                        {{ sub.consecutiveFailureCount }} consecutive failure{{ sub.consecutiveFailureCount !== 1 ? 's' : '' }}
+                      </span>
+                    }
+                    @if (sub.lastDeliveryAt) {
+                      <span class="wl-card__last-delivery">
+                        <mat-icon>schedule</mat-icon>
+                        Last delivery: {{ sub.lastDeliveryAt | date:'short' }}
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="wl-card__actions" (click)="$event.stopPropagation()">
+                  <button mat-icon-button
+                          matTooltip="Edit"
+                          class="wl-action-btn"
+                          (click)="onEdit(sub)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button
+                          matTooltip="Delete"
+                          color="warn"
+                          class="wl-action-btn wl-action-btn--danger"
+                          (click)="onDelete(sub)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
                 </div>
               </div>
-              <div class="webhook-card__actions" (click)="$event.stopPropagation()">
-                <button mat-icon-button
-                        matTooltip="Edit"
-                        (click)="onEdit(sub)">
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-icon-button
-                        matTooltip="Delete"
-                        color="warn"
-                        (click)="onDelete(sub)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
             </div>
-          </mat-card>
-        }
+          }
+        </div>
       }
     </div>
   `,

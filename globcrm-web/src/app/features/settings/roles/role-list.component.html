@@ -1,113 +1,159 @@
-<div class="role-list-container">
-  <div class="page-header">
-    <h1>Role Management</h1>
-    <button *appHasPermission="'Contact:Create'" mat-flat-button color="primary" routerLink="/settings/roles/new">
+<div class="rl-page">
+  <!-- Header -->
+  <div class="rl-header">
+    <div class="rl-header__left">
+      <a routerLink="/settings" class="rl-back">
+        <mat-icon>arrow_back</mat-icon>
+        <span>Settings</span>
+      </a>
+      <div class="rl-title-row">
+        <div class="rl-icon-wrap">
+          <mat-icon>shield</mat-icon>
+        </div>
+        <div>
+          <h1 class="rl-title">Roles</h1>
+          <p class="rl-subtitle">Manage permissions and access control for your team</p>
+        </div>
+      </div>
+    </div>
+    <button
+      *appHasPermission="'Contact:Create'"
+      mat-flat-button
+      color="primary"
+      routerLink="/settings/roles/new"
+      class="rl-create-btn"
+    >
       <mat-icon>add</mat-icon>
       Create Role
     </button>
   </div>
 
   @if (isLoading()) {
-    <div class="loading-container">
-      <mat-spinner diameter="48"></mat-spinner>
+    <div class="rl-loading">
+      <mat-spinner diameter="40"></mat-spinner>
       <p>Loading roles...</p>
     </div>
   } @else if (errorMessage()) {
-    <div class="error-container">
-      <mat-icon class="error-icon">error_outline</mat-icon>
+    <div class="rl-error">
+      <div class="rl-error__icon-wrap">
+        <mat-icon>wifi_off</mat-icon>
+      </div>
+      <h3>Something went wrong</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" (click)="loadRoles()">
         <mat-icon>refresh</mat-icon>
-        Retry
+        Try Again
+      </button>
+    </div>
+  } @else if (roles().length === 0) {
+    <div class="rl-empty">
+      <div class="rl-empty__visual">
+        <div class="rl-empty__circles">
+          <div class="rl-circle rl-circle--1"></div>
+          <div class="rl-circle rl-circle--2"></div>
+          <div class="rl-circle rl-circle--3"></div>
+        </div>
+        <mat-icon class="rl-empty__icon">shield</mat-icon>
+      </div>
+      <h3>No roles yet</h3>
+      <p>Create your first role to define permissions and control access across your organization.</p>
+      <button
+        *appHasPermission="'Contact:Create'"
+        mat-flat-button
+        color="primary"
+        routerLink="/settings/roles/new"
+      >
+        <mat-icon>add</mat-icon>
+        Create First Role
       </button>
     </div>
   } @else {
-    <table mat-table [dataSource]="roles()" class="roles-table">
-      <!-- Name Column -->
-      <ng-container matColumnDef="name">
-        <th mat-header-cell *matHeaderCellDef>Name</th>
-        <td mat-cell *matCellDef="let role">{{ role.name }}</td>
-      </ng-container>
+    <div class="rl-grid">
+      @for (role of roles(); track role.id; let i = $index) {
+        <div
+          class="rl-card"
+          [style.animation-delay]="(i * 60) + 'ms'"
+          tabindex="0"
+          (click)="onEdit(role)"
+          (keydown.enter)="onEdit(role)"
+          [class.rl-card--system]="role.isSystem"
+        >
+          <div class="rl-card__accent" [style.background]="getRoleAccentColor(role)"></div>
 
-      <!-- Description Column -->
-      <ng-container matColumnDef="description">
-        <th mat-header-cell *matHeaderCellDef>Description</th>
-        <td mat-cell *matCellDef="let role" class="description-cell">
-          {{ role.description || '-' }}
-        </td>
-      </ng-container>
-
-      <!-- Type Column -->
-      <ng-container matColumnDef="type">
-        <th mat-header-cell *matHeaderCellDef>Type</th>
-        <td mat-cell *matCellDef="let role">
-          <mat-chip-set>
-            <mat-chip [highlighted]="role.isSystem" [color]="getRoleTypeColor(role)">
-              {{ getRoleTypeLabel(role) }}
-            </mat-chip>
-          </mat-chip-set>
-        </td>
-      </ng-container>
-
-      <!-- Permission Count Column -->
-      <ng-container matColumnDef="permissionCount">
-        <th mat-header-cell *matHeaderCellDef>Permissions</th>
-        <td mat-cell *matCellDef="let role">{{ role.permissionCount }}</td>
-      </ng-container>
-
-      <!-- Assigned Users Column -->
-      <ng-container matColumnDef="assignedUserCount">
-        <th mat-header-cell *matHeaderCellDef>Users</th>
-        <td mat-cell *matCellDef="let role">{{ role.assignedUserCount }}</td>
-      </ng-container>
-
-      <!-- Actions Column -->
-      <ng-container matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef>Actions</th>
-        <td mat-cell *matCellDef="let role">
-          <div class="action-buttons">
-            <button
-              *appHasPermission="'Contact:Edit'"
-              mat-icon-button
-              (click)="onEdit(role)"
-              [disabled]="role.isSystem"
-              matTooltip="Edit role"
-            >
-              <mat-icon>edit</mat-icon>
-            </button>
-            @if (role.isTemplate) {
-              <button
-                *appHasPermission="'Contact:Create'"
-                mat-icon-button
-                (click)="onClone(role)"
-                matTooltip="Clone role"
+          <div class="rl-card__body">
+            <div class="rl-card__top">
+              <div
+                class="rl-card__icon"
+                [style.background]="getRoleAccentSoft(role)"
+                [style.color]="getRoleAccentColor(role)"
               >
-                <mat-icon>content_copy</mat-icon>
-              </button>
-            }
-            <button
-              *appHasPermission="'Contact:Delete'"
-              mat-icon-button
-              color="warn"
-              (click)="onDelete(role)"
-              [disabled]="role.isSystem"
-              matTooltip="Delete role"
-            >
-              <mat-icon>delete</mat-icon>
-            </button>
+                <mat-icon>{{ getRoleIcon(role) }}</mat-icon>
+              </div>
+              <div class="rl-card__actions" (click)="$event.stopPropagation()">
+                @if (role.isTemplate) {
+                  <button
+                    *appHasPermission="'Contact:Create'"
+                    mat-icon-button
+                    (click)="onClone(role)"
+                    matTooltip="Clone role"
+                    class="rl-action-btn"
+                  >
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                }
+                <button
+                  *appHasPermission="'Contact:Edit'"
+                  mat-icon-button
+                  (click)="onEdit(role)"
+                  [disabled]="role.isSystem"
+                  matTooltip="Edit role"
+                  class="rl-action-btn"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  *appHasPermission="'Contact:Delete'"
+                  mat-icon-button
+                  (click)="onDelete(role)"
+                  [disabled]="role.isSystem"
+                  matTooltip="Delete role"
+                  class="rl-action-btn rl-action-btn--danger"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="rl-card__content">
+              <div class="rl-card__name-row">
+                <h3 class="rl-card__name">{{ role.name }}</h3>
+                <span
+                  class="rl-type-badge"
+                  [class.rl-type-badge--system]="role.isSystem"
+                  [class.rl-type-badge--template]="role.isTemplate"
+                  [class.rl-type-badge--custom]="!role.isSystem && !role.isTemplate"
+                >
+                  {{ getRoleTypeLabel(role) }}
+                </span>
+              </div>
+              <p class="rl-card__desc">{{ role.description || 'No description' }}</p>
+            </div>
+
+            <div class="rl-card__footer">
+              <div class="rl-metric">
+                <mat-icon class="rl-metric__icon">lock</mat-icon>
+                <span class="rl-metric__value">{{ role.permissionCount }}</span>
+                <span class="rl-metric__label">{{ role.permissionCount === 1 ? 'permission' : 'permissions' }}</span>
+              </div>
+              <div class="rl-metric">
+                <mat-icon class="rl-metric__icon">people</mat-icon>
+                <span class="rl-metric__value">{{ role.assignedUserCount }}</span>
+                <span class="rl-metric__label">{{ role.assignedUserCount === 1 ? 'user' : 'users' }}</span>
+              </div>
+            </div>
           </div>
-        </td>
-      </ng-container>
-
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-
-      <!-- No data row -->
-      <tr class="mat-mdc-no-data-row" *matNoDataRow>
-        <td [attr.colspan]="displayedColumns.length" class="no-data-cell">
-          No roles found. Create your first role to get started.
-        </td>
-      </tr>
-    </table>
+        </div>
+      }
+    </div>
   }
 </div>

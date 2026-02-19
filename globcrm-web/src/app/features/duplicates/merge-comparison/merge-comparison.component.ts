@@ -81,329 +81,31 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
     MatDividerModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    :host {
-      display: block;
-      height: 100%;
-      overflow-y: auto;
-    }
-
-    .merge-page {
-      padding: var(--space-6);
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    /* Header */
-    .merge-header {
-      display: flex;
-      align-items: center;
-      gap: var(--space-3);
-      margin-bottom: var(--space-6);
-    }
-
-    .merge-header h1 {
-      margin: 0;
-      font-size: var(--text-2xl);
-      font-weight: var(--font-bold);
-      color: var(--color-text);
-      letter-spacing: -0.3px;
-    }
-
-    /* Primary selector cards */
-    .primary-selector {
-      display: grid;
-      grid-template-columns: 1fr auto 1fr;
-      gap: var(--space-4);
-      margin-bottom: var(--space-6);
-      align-items: stretch;
-    }
-
-    .record-card {
-      padding: var(--space-4);
-      border: 2px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      background: var(--color-surface);
-      cursor: pointer;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
-    }
-
-    .record-card:hover {
-      box-shadow: var(--shadow-sm);
-    }
-
-    .record-card--selected {
-      border-color: var(--color-primary);
-      background: color-mix(in srgb, var(--color-primary) 5%, var(--color-surface));
-    }
-
-    .record-card__label {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      margin-bottom: var(--space-2);
-      font-size: var(--text-xs);
-      font-weight: var(--font-semibold);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: var(--color-text-muted);
-    }
-
-    .primary-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--space-1);
-      padding: 2px var(--space-2);
-      border-radius: var(--radius-full);
-      font-size: var(--text-xs);
-      font-weight: var(--font-semibold);
-      background: color-mix(in srgb, var(--color-primary) 15%, transparent);
-      color: var(--color-primary);
-      text-transform: none;
-      letter-spacing: normal;
-    }
-
-    .record-card__name {
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: var(--color-text);
-      margin-bottom: var(--space-1);
-    }
-
-    .record-card__detail {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-    }
-
-    .swap-section {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* Field comparison table */
-    .comparison-section {
-      margin-bottom: var(--space-6);
-    }
-
-    .comparison-section h2 {
-      margin: 0 0 var(--space-4);
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: var(--color-text);
-    }
-
-    .comparison-table {
-      width: 100%;
-      border-collapse: collapse;
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-    }
-
-    .comparison-table th {
-      padding: var(--space-3) var(--space-4);
-      background: var(--color-surface-alt, #f8f9fa);
-      font-size: var(--text-sm);
-      font-weight: var(--font-semibold);
-      color: var(--color-text-muted);
-      text-align: left;
-      border-bottom: 1px solid var(--color-border);
-    }
-
-    .comparison-table th:nth-child(3) {
-      text-align: center;
-      width: 80px;
-    }
-
-    .comparison-table td {
-      padding: var(--space-3) var(--space-4);
-      font-size: var(--text-sm);
-      color: var(--color-text);
-      border-bottom: 1px solid var(--color-border);
-      vertical-align: middle;
-    }
-
-    .comparison-table tr:last-child td {
-      border-bottom: none;
-    }
-
-    .field-label {
-      font-weight: var(--font-medium);
-      color: var(--color-text-muted);
-      white-space: nowrap;
-    }
-
-    .field-value {
-      word-break: break-word;
-    }
-
-    .field-value--empty {
-      color: var(--color-text-muted);
-      font-style: italic;
-    }
-
-    .field-value--diff {
-      background: color-mix(in srgb, var(--color-warning) 12%, transparent);
-      padding: var(--space-1) var(--space-2);
-      border-radius: var(--radius-sm);
-    }
-
-    .field-value--same {
-      color: var(--color-text-muted);
-    }
-
-    .selection-cell {
-      text-align: center;
-    }
-
-    .custom-fields-divider {
-      background: var(--color-surface-alt, #f8f9fa);
-    }
-
-    .custom-fields-divider td {
-      font-weight: var(--font-semibold);
-      color: var(--color-text-muted);
-      font-size: var(--text-xs);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: var(--space-2) var(--space-4);
-    }
-
-    /* Relationship summary */
-    .relationship-section {
-      margin-bottom: var(--space-6);
-    }
-
-    .relationship-section h2 {
-      margin: 0 0 var(--space-4);
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: var(--color-text);
-    }
-
-    .relationship-card {
-      padding: var(--space-4);
-      background: var(--color-surface);
-      border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg);
-    }
-
-    .relationship-card__title {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      margin-bottom: var(--space-3);
-    }
-
-    .relationship-items {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--space-3);
-    }
-
-    .relationship-item {
-      display: flex;
-      align-items: center;
-      gap: var(--space-2);
-      padding: var(--space-2) var(--space-3);
-      background: var(--color-surface-alt, #f8f9fa);
-      border-radius: var(--radius-md);
-      font-size: var(--text-sm);
-    }
-
-    .relationship-item__count {
-      font-weight: var(--font-bold);
-      color: var(--color-primary);
-    }
-
-    .relationship-item__label {
-      color: var(--color-text-muted);
-    }
-
-    .no-relationships {
-      font-size: var(--text-sm);
-      color: var(--color-text-muted);
-      font-style: italic;
-    }
-
-    /* Action footer */
-    .action-footer {
-      display: flex;
-      justify-content: flex-end;
-      gap: var(--space-3);
-      padding-top: var(--space-4);
-      border-top: 1px solid var(--color-border);
-    }
-
-    /* Loading overlay */
-    .loading-overlay {
-      position: fixed;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      background: rgba(255, 255, 255, 0.85);
-      z-index: 1000;
-      gap: var(--space-4);
-    }
-
-    .loading-overlay p {
-      font-size: var(--text-lg);
-      font-weight: var(--font-semibold);
-      color: var(--color-text);
-    }
-
-    /* Loading state */
-    .page-loading {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: var(--space-12);
-      gap: var(--space-4);
-    }
-
-    .page-loading p {
-      color: var(--color-text-muted);
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-      .merge-page {
-        padding: var(--space-4);
-      }
-
-      .primary-selector {
-        grid-template-columns: 1fr;
-      }
-
-      .swap-section {
-        justify-content: center;
-      }
-
-      .comparison-table {
-        display: block;
-        overflow-x: auto;
-      }
-    }
-  `,
+  styleUrl: './merge-comparison.component.scss',
   template: `
     <!-- Merge overlay -->
     @if (merging()) {
       <div class="loading-overlay">
-        <mat-spinner diameter="48"></mat-spinner>
-        <p>Merging records...</p>
+        <div class="loading-overlay__visual">
+          <mat-spinner diameter="48"></mat-spinner>
+        </div>
+        <div class="loading-overlay__text">
+          <div class="loading-overlay__title">Merging Records</div>
+          <div class="loading-overlay__desc">Transferring relationships and consolidating data...</div>
+        </div>
       </div>
     }
 
     <div class="merge-page">
       <!-- Header -->
       <div class="merge-header">
-        <button mat-icon-button routerLink="/duplicates/scan" aria-label="Back to scan">
+        <button mat-icon-button class="back-btn" routerLink="/duplicates/scan" aria-label="Back to scan">
           <mat-icon>arrow_back</mat-icon>
         </button>
-        <h1>Merge {{ entityType() === 'contact' ? 'Contacts' : 'Companies' }}</h1>
+        <div class="merge-header__text">
+          <h1 class="merge-title">Merge {{ entityType() === 'contact' ? 'Contacts' : 'Companies' }}</h1>
+          <div class="merge-subtitle">Select the primary record and choose which field values to keep</div>
+        </div>
       </div>
 
       <!-- Loading -->
@@ -426,19 +128,23 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               Record A
               @if (primaryRecord() === 'a') {
                 <span class="primary-badge">
-                  <mat-icon style="font-size: 14px; width: 14px; height: 14px;">star</mat-icon>
-                  Primary (Survivor)
+                  <mat-icon>star</mat-icon>
+                  Survivor
                 </span>
               }
             </div>
             <div class="record-card__name">{{ getRecordDisplayName(recordA()!) }}</div>
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordA()!) }}</div>
+            <div class="record-card__date">
+              <mat-icon>schedule</mat-icon>
+              Updated {{ formatDate(recordA()!.updatedAt) }}
+            </div>
           </div>
 
           <div class="swap-section">
             <button
               mat-icon-button
-              color="primary"
+              class="swap-btn"
               (click)="swapPrimary()"
               aria-label="Swap primary record"
             >
@@ -455,19 +161,28 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               Record B
               @if (primaryRecord() === 'b') {
                 <span class="primary-badge">
-                  <mat-icon style="font-size: 14px; width: 14px; height: 14px;">star</mat-icon>
-                  Primary (Survivor)
+                  <mat-icon>star</mat-icon>
+                  Survivor
                 </span>
               }
             </div>
             <div class="record-card__name">{{ getRecordDisplayName(recordB()!) }}</div>
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordB()!) }}</div>
+            <div class="record-card__date">
+              <mat-icon>schedule</mat-icon>
+              Updated {{ formatDate(recordB()!.updatedAt) }}
+            </div>
           </div>
         </div>
 
         <!-- Field comparison table -->
         <div class="comparison-section">
-          <h2>Field Comparison</h2>
+          <div class="section-label">
+            <h2>Field Comparison</h2>
+            @if (diffCount() > 0) {
+              <span class="diff-count-badge">{{ diffCount() }} differences</span>
+            }
+          </div>
           <table class="comparison-table">
             <thead>
               <tr>
@@ -506,7 +221,9 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
                           <mat-radio-button value="b" aria-label="Select Record B value"></mat-radio-button>
                         </mat-radio-group>
                       } @else {
-                        <mat-icon style="font-size: 18px; width: 18px; height: 18px; color: var(--color-text-muted);">check</mat-icon>
+                        <span class="same-check">
+                          <mat-icon>check</mat-icon>
+                        </span>
                       }
                     </td>
                     <td>
@@ -528,12 +245,15 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
 
         <!-- Relationship summary -->
         <div class="relationship-section">
-          <h2>Relationships to Transfer</h2>
+          <div class="section-label">
+            <h2>Relationships to Transfer</h2>
+          </div>
           <div class="relationship-card">
             <div class="relationship-card__title">
-              Relationships will be transferred from
-              <strong>{{ getLoserName() }}</strong> to
-              <strong>{{ getSurvivorName() }}</strong>:
+              All relationships from
+              <strong>{{ getLoserName() }}</strong>
+              <span class="transfer-arrow"><mat-icon>east</mat-icon></span>
+              <strong>{{ getSurvivorName() }}</strong>
             </div>
 
             @if (nonZeroRelationships().length > 0) {
@@ -561,6 +281,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
           <button
             mat-raised-button
             color="warn"
+            class="merge-btn"
             (click)="openConfirmDialog()"
             [disabled]="merging()"
           >
@@ -656,6 +377,13 @@ export class MergeComparisonComponent implements OnInit {
     }
 
     return rows;
+  });
+
+  /** Count of differing fields */
+  readonly diffCount = computed(() => {
+    return this.fieldRows().filter(
+      (r) => r.isDifferent && r.fieldName !== '__custom_fields_divider'
+    ).length;
   });
 
   /** Non-zero relationship counts for display */
@@ -768,13 +496,13 @@ export class MergeComparisonComponent implements OnInit {
       const parts: string[] = [];
       if (c.email) parts.push(c.email);
       if (c.companyName) parts.push(c.companyName);
-      return parts.join(' - ') || '';
+      return parts.join(' \u00B7 ') || '';
     }
     const co = record as CompanyComparisonRecord;
     const parts: string[] = [];
     if (co.website) parts.push(co.website);
     if (co.email) parts.push(co.email);
-    return parts.join(' - ') || '';
+    return parts.join(' \u00B7 ') || '';
   }
 
   getSurvivorName(): string {
@@ -787,6 +515,19 @@ export class MergeComparisonComponent implements OnInit {
     const record =
       this.primaryRecord() === 'a' ? this.recordB() : this.recordA();
     return record ? this.getRecordDisplayName(record) : '';
+  }
+
+  formatDate(dateStr: string): string {
+    try {
+      const date = new Date(dateStr);
+      return date.toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return dateStr;
+    }
   }
 
   // ---- Private methods ----
@@ -964,13 +705,14 @@ export class MergeComparisonComponent implements OnInit {
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .dialog-content {
-      padding: var(--space-4) 0;
+      padding: var(--space-2) 0;
     }
 
     .dialog-title {
       margin: 0;
       font-size: var(--text-xl);
       font-weight: var(--font-bold);
+      letter-spacing: -0.3px;
     }
 
     .merge-summary {
@@ -981,32 +723,49 @@ export class MergeComparisonComponent implements OnInit {
       margin: var(--space-2) 0;
       font-size: var(--text-sm);
       color: var(--color-text);
+      line-height: var(--leading-relaxed);
     }
 
     .merge-summary strong {
       color: var(--color-text);
+      font-weight: var(--font-semibold);
     }
 
     .transfer-list {
       margin: var(--space-3) 0;
-      padding: var(--space-3);
-      background: var(--color-surface-alt, #f8f9fa);
+      padding: var(--space-3) var(--space-4);
+      background: var(--color-bg-secondary);
       border-radius: var(--radius-md);
+      border: 1px solid var(--color-border-subtle);
       font-size: var(--text-sm);
       color: var(--color-text);
+      line-height: var(--leading-relaxed);
     }
 
-    .warning-text {
+    .warning-banner {
       display: flex;
       align-items: center;
-      gap: var(--space-2);
+      gap: var(--space-3);
       margin-top: var(--space-4);
-      padding: var(--space-3);
-      background: color-mix(in srgb, var(--color-warning) 10%, transparent);
+      padding: var(--space-3) var(--space-4);
+      background: color-mix(in srgb, var(--color-danger) 6%, var(--color-surface));
+      border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
       border-radius: var(--radius-md);
+    }
+
+    .warning-banner mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: var(--color-danger);
+      flex-shrink: 0;
+    }
+
+    .warning-banner span {
       font-size: var(--text-sm);
-      color: var(--color-warning);
+      color: var(--color-danger-text);
       font-weight: var(--font-medium);
+      line-height: var(--leading-normal);
     }
 
     .dialog-actions {
@@ -1014,6 +773,13 @@ export class MergeComparisonComponent implements OnInit {
       justify-content: flex-end;
       gap: var(--space-3);
       padding-top: var(--space-4);
+    }
+
+    .dialog-actions button {
+      border-radius: var(--radius-md) !important;
+      font-weight: var(--font-semibold) !important;
+      height: 38px;
+      min-width: 100px;
     }
   `,
   template: `
@@ -1038,9 +804,9 @@ export class MergeComparisonComponent implements OnInit {
 
         <mat-divider></mat-divider>
 
-        <div class="warning-text">
+        <div class="warning-banner">
           <mat-icon>warning</mat-icon>
-          This action cannot be easily undone.
+          <span>This action cannot be easily undone. The merged record will be permanently deleted.</span>
         </div>
       </div>
     </mat-dialog-content>

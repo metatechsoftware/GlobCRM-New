@@ -19,13 +19,13 @@
   <!-- Entity Groups -->
   <mat-accordion multi>
     @for (group of entityGroups; track group) {
-      <mat-expansion-panel [expanded]="true">
+      <mat-expansion-panel [expanded]="true"
+        [style.border-left]="'3px solid ' + getEntityConfig(group).text + '80'">
         <mat-expansion-panel-header>
           <mat-panel-title>
-            <span
-              class="entity-dot"
-              [style.background-color]="getEntityConfig(group).text"
-            ></span>
+            <span class="entity-group-icon" [style.color]="getEntityConfig(group).text">
+              <mat-icon>{{ getEntityIcon(group) }}</mat-icon>
+            </span>
             {{ getEntityConfig(group).label }}
             <span class="field-count">{{ getFields(group).length }}</span>
           </mat-panel-title>
@@ -35,6 +35,7 @@
           @for (field of getFields(group); track field.key) {
             <button
               class="field-chip"
+              [class.is-copied]="copiedField() === field.key"
               [style.background-color]="getEntityConfig(group).bg"
               [style.color]="getEntityConfig(group).text"
               [style.border-color]="getEntityConfig(group).text + '33'"
@@ -45,7 +46,7 @@
               @if (field.isCustomField) {
                 <span class="custom-badge">Custom</span>
               }
-              <mat-icon class="copy-icon">content_copy</mat-icon>
+              <mat-icon class="copy-icon">{{ copiedField() === field.key ? 'check' : 'content_copy' }}</mat-icon>
             </button>
           }
         </div>

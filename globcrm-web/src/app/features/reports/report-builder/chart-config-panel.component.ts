@@ -106,6 +106,9 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
       &__type-group {
         display: flex;
         width: 100%;
+        border: 1px solid var(--color-border, #E8E8E6);
+        border-radius: var(--radius-md, 8px);
+        overflow: hidden;
       }
 
       &__type-toggle {
@@ -130,6 +133,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
         justify-content: space-between;
         font-size: var(--text-sm, 13px);
         color: var(--color-text, #1A1A1A);
+        padding: 4px 0;
       }
     }
   `,

@@ -6,8 +6,6 @@ import {
   Output,
   EventEmitter,
 } from '@angular/core';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -15,119 +13,48 @@ import { ImportStore } from '../stores/import.store';
 import { ImportEntityType } from '../import.models';
 
 /**
- * Step 1: Upload -- entity type selection + CSV file upload.
+ * Step 1: Upload -- entity type selection via visual cards + CSV file upload.
  * Displays file name, size, and row count after successful upload.
  */
 @Component({
   selector: 'app-step-upload',
   standalone: true,
   imports: [
-    MatFormFieldModule,
-    MatSelectModule,
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    .upload-container {
-      max-width: 600px;
-      padding: 24px 0;
-    }
-
-    .entity-type-select {
-      width: 100%;
-      margin-bottom: 24px;
-    }
-
-    .drop-zone {
-      border: 2px dashed var(--color-border);
-      border-radius: 12px;
-      padding: 48px 24px;
-      text-align: center;
-      cursor: pointer;
-      transition: border-color 0.2s, background-color 0.2s;
-    }
-
-    .drop-zone:hover,
-    .drop-zone.drag-over {
-      border-color: var(--color-primary);
-      background-color: var(--color-primary-soft);
-    }
-
-    .drop-zone mat-icon {
-      font-size: 48px;
-      width: 48px;
-      height: 48px;
-      color: var(--color-text-secondary);
-      margin-bottom: 16px;
-    }
-
-    .drop-zone p {
-      margin: 0;
-      color: var(--color-text-secondary);
-    }
-
-    .drop-zone .browse-link {
-      color: var(--color-primary);
-      font-weight: 500;
-      text-decoration: underline;
-      cursor: pointer;
-    }
-
-    .file-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      padding: 16px;
-      border-radius: 8px;
-      background: var(--color-surface-hover);
-      margin-top: 16px;
-    }
-
-    .file-info mat-icon {
-      color: var(--color-primary);
-    }
-
-    .file-details {
-      flex: 1;
-    }
-
-    .file-name {
-      font-weight: 500;
-    }
-
-    .file-meta {
-      font-size: 12px;
-      color: var(--color-text-secondary);
-    }
-
-    .error-msg {
-      color: var(--color-danger);
-      margin-top: 12px;
-      font-size: 14px;
-    }
-
-    .step-actions {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 24px;
-      padding-top: 16px;
-    }
-  `,
+  styleUrl: './step-upload.component.scss',
   template: `
     <div class="upload-container">
-      <mat-form-field appearance="outline" class="entity-type-select">
-        <mat-label>Entity Type</mat-label>
-        <mat-select [value]="entityType()" (selectionChange)="entityType.set($event.value)">
-          <mat-option value="Contact">Contacts</mat-option>
-          <mat-option value="Company">Companies</mat-option>
-          <mat-option value="Deal">Deals</mat-option>
-        </mat-select>
-      </mat-form-field>
+      <!-- Entity Type Cards -->
+      <div class="section-label">What are you importing?</div>
+      <div class="entity-type-cards">
+        <button class="entity-card"
+                [class.selected]="entityType() === 'Contact'"
+                (click)="entityType.set('Contact')">
+          <mat-icon class="entity-card__icon">person</mat-icon>
+          <span class="entity-card__label">Contacts</span>
+        </button>
+        <button class="entity-card"
+                [class.selected]="entityType() === 'Company'"
+                (click)="entityType.set('Company')">
+          <mat-icon class="entity-card__icon">business</mat-icon>
+          <span class="entity-card__label">Companies</span>
+        </button>
+        <button class="entity-card"
+                [class.selected]="entityType() === 'Deal'"
+                (click)="entityType.set('Deal')">
+          <mat-icon class="entity-card__icon">handshake</mat-icon>
+          <span class="entity-card__label">Deals</span>
+        </button>
+      </div>
 
+      <!-- Drop Zone -->
       <div class="drop-zone"
            [class.drag-over]="isDragOver()"
+           [class.has-file]="selectedFile()"
            (dragover)="onDragOver($event)"
            (dragleave)="isDragOver.set(false)"
            (drop)="onDrop($event)"
@@ -135,32 +62,42 @@ import { ImportEntityType } from '../import.models';
         <input #fileInput type="file" accept=".csv" hidden (change)="onFileSelected($event)">
 
         @if (store.loading()) {
-          <mat-spinner diameter="48"></mat-spinner>
-          <p>Uploading file...</p>
+          <div class="upload-loading">
+            <mat-spinner diameter="48"></mat-spinner>
+            <p>Processing your file...</p>
+          </div>
+        } @else if (!selectedFile()) {
+          <div class="drop-zone__content">
+            <div class="drop-zone__icon-bg">
+              <mat-icon>cloud_upload</mat-icon>
+            </div>
+            <h3 class="drop-zone__title">Drop your CSV file here</h3>
+            <p class="drop-zone__subtitle">or <span class="browse-link">browse files</span> from your computer</p>
+            <p class="drop-zone__hint">Supports .csv files up to 10MB</p>
+          </div>
         } @else {
-          <mat-icon>cloud_upload</mat-icon>
-          <p>Drag and drop a CSV file here</p>
-          <p>or <span class="browse-link">browse files</span></p>
+          <div class="file-card">
+            <div class="file-card__icon">
+              <mat-icon>description</mat-icon>
+            </div>
+            <div class="file-card__info">
+              <span class="file-card__name">{{ selectedFile()!.name }}</span>
+              <span class="file-card__meta">
+                {{ formatFileSize(selectedFile()!.size) }}
+                @if (store.uploadResponse()) {
+                  · {{ store.uploadResponse()!.totalRows }} rows detected
+                }
+              </span>
+            </div>
+            @if (store.hasUpload()) {
+              <div class="file-card__status">
+                <mat-icon>check_circle</mat-icon>
+                Ready
+              </div>
+            }
+          </div>
         }
       </div>
-
-      @if (selectedFile()) {
-        <div class="file-info">
-          <mat-icon>description</mat-icon>
-          <div class="file-details">
-            <div class="file-name">{{ selectedFile()!.name }}</div>
-            <div class="file-meta">
-              {{ formatFileSize(selectedFile()!.size) }}
-              @if (store.uploadResponse()) {
-                &mdash; {{ store.uploadResponse()!.totalRows }} rows detected
-              }
-            </div>
-          </div>
-          @if (store.hasUpload()) {
-            <mat-icon style="color: var(--color-success)">check_circle</mat-icon>
-          }
-        </div>
-      }
 
       @if (store.error()) {
         <div class="error-msg">{{ store.error() }}</div>

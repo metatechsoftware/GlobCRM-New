@@ -87,7 +87,7 @@
                 #ERR
               </span>
             } @else {
-              @switch (getColumnRenderAs(col.fieldId)) {
+              @switch (getEffectiveRenderAs(col.fieldId)) {
                 @case ('badge') {
                   @if (getCellValue(row, col.fieldId)) {
                     <span class="badge" [ngClass]="getBadgeClass(getCellValue(row, col.fieldId))">
@@ -102,6 +102,18 @@
                       {{ getCellValue(row, col.fieldId) }}
                     </a>
                   }
+                }
+                @case ('date') {
+                  <span class="cell-date">{{ formatDate(getCellValue(row, col.fieldId)) }}</span>
+                }
+                @case ('avatar') {
+                  <div class="cell-avatar">
+                    <span class="cell-avatar__circle"
+                          [style.background-color]="getAvatarColor(getCellValue(row, col.fieldId))">
+                      {{ getInitials(getCellValue(row, col.fieldId)) }}
+                    </span>
+                    <span class="cell-avatar__name">{{ getCellValue(row, col.fieldId) }}</span>
+                  </div>
                 }
                 @default {
                   {{ getCellValue(row, col.fieldId) }}
@@ -160,11 +172,14 @@
       <!-- No data row -->
       <tr class="mat-row no-data-row" *matNoDataRow>
         <td class="mat-cell" [attr.colspan]="displayedColumns().length">
-          @if (loading()) {
-            Loading data...
-          } @else {
-            No records found
-          }
+          <div class="empty-state">
+            @if (loading()) {
+              <span class="empty-state__loading">Loading data...</span>
+            } @else {
+              <mat-icon class="empty-state__icon">search_off</mat-icon>
+              <span class="empty-state__text">No records found</span>
+            }
+          </div>
         </td>
       </tr>
     </table>

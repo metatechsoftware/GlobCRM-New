@@ -52,75 +52,97 @@ export interface TemplatePickerResult {
 
     .picker__search {
       width: 100%;
-      margin-bottom: 16px;
+      margin-bottom: var(--space-4, 16px);
     }
 
     .picker__loading {
       display: flex;
       justify-content: center;
-      padding: 32px;
+      padding: var(--space-8, 32px);
     }
 
     .picker__empty {
       text-align: center;
-      padding: 32px;
-      color: var(--text-secondary, #64748b);
+      padding: var(--space-8, 32px);
+      color: var(--color-text-secondary, #64748b);
+    }
+
+    .picker__empty mat-icon {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      opacity: 0.4;
+      display: block;
+      margin: 0 auto var(--space-2, 8px);
     }
 
     .picker__grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 12px;
+      gap: var(--space-3, 12px);
       max-height: 400px;
       overflow-y: auto;
-      padding: 4px;
+      padding: var(--space-1, 4px);
     }
 
     .template-card {
-      border: 2px solid var(--border-color, #e2e8f0);
-      border-radius: 8px;
-      padding: 12px;
+      border: 2px solid var(--color-border, #e2e8f0);
+      border-radius: var(--radius-md, 8px);
+      padding: var(--space-3, 12px);
       cursor: pointer;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      background: var(--color-surface, #fff);
+      transition:
+        border-color var(--duration-fast, 100ms) var(--ease-default),
+        box-shadow var(--duration-fast, 100ms) var(--ease-default),
+        transform var(--duration-fast, 100ms) var(--ease-default);
     }
 
     .template-card:hover {
-      border-color: var(--primary, #f97316);
-      box-shadow: 0 2px 8px rgba(249, 115, 22, 0.1);
+      border-color: var(--color-primary, #f97316);
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.12);
+      transform: translateY(-1px);
     }
 
     .template-card--selected {
-      border-color: var(--primary, #f97316);
-      background-color: rgba(249, 115, 22, 0.04);
+      border-color: var(--color-primary, #f97316);
+      background: var(--color-primary-soft, #FFF7ED);
+      box-shadow: 0 0 0 1px var(--color-primary, #f97316), 0 4px 12px rgba(249, 115, 22, 0.15);
     }
 
     .template-card__name {
-      font-weight: 600;
-      font-size: 14px;
-      margin: 0 0 4px 0;
-      color: var(--text-primary, #1e293b);
+      font-weight: var(--font-semibold, 600);
+      font-size: var(--text-base, 14px);
+      margin: 0 0 var(--space-1, 4px) 0;
+      color: var(--color-text, #1e293b);
     }
 
     .template-card__subject {
-      font-size: 12px;
-      color: var(--text-secondary, #64748b);
-      margin: 0 0 8px 0;
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-secondary, #64748b);
+      margin: 0 0 var(--space-2, 8px) 0;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
     .template-card__category {
-      font-size: 11px;
-      color: var(--text-secondary, #94a3b8);
+      display: inline-block;
+      font-size: 10px;
+      font-weight: var(--font-semibold, 600);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted, #9CA3AF);
+      padding: 2px 6px;
+      background: var(--color-bg-secondary, #F0F0EE);
+      border-radius: var(--radius-sm, 4px);
     }
 
     .template-card__preview {
       width: 100%;
       height: 80px;
-      border: 1px solid var(--border-color, #e2e8f0);
-      border-radius: 4px;
-      margin-top: 8px;
+      border: 1px solid var(--color-border, #e2e8f0);
+      border-radius: var(--radius-sm, 4px);
+      margin-top: var(--space-2, 8px);
       pointer-events: none;
     }
   `,
