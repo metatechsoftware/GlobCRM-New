@@ -14,5 +14,6 @@ public enum EntityType
     Request,
     Product,
     Note,
-    Lead
+    Lead,
+    EmailTemplate
 }

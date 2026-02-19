@@ -467,6 +467,36 @@ COMMENT ON POLICY tenant_isolation_targets ON targets IS
 -- FK joins from its tenant-filtered parent (dashboards).
 
 -- =====================================================================
+-- email_template_categories - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_template_categories ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_template_categories FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_template_categories ON email_template_categories
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_template_categories ON email_template_categories IS
+    'Ensures email template category queries only return categories for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- email_templates - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE email_templates ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE email_templates FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_email_templates ON email_templates
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_email_templates ON email_templates IS
+    'Ensures email template queries only return templates for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

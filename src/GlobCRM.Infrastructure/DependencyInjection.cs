@@ -6,6 +6,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Authorization;
 using GlobCRM.Infrastructure.DomainEvents;
+using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
 using GlobCRM.Infrastructure.MultiTenancy;
@@ -172,6 +173,9 @@ public static class DependencyInjection
 
         // ---- Image processing and file storage ----
         services.AddImageServices(configuration);
+
+        // ---- Email template services (repository, render, merge fields) ----
+        services.AddEmailTemplateServices();
 
         return services;
     }

@@ -122,6 +122,10 @@ public class ApplicationDbContext
     public DbSet<Note> Notes => Set<Note>();
     public DbSet<Attachment> Attachments => Set<Attachment>();
 
+    // Email Templates DbSets
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+    public DbSet<EmailTemplateCategory> EmailTemplateCategories => Set<EmailTemplateCategory>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -203,6 +207,10 @@ public class ApplicationDbContext
         // Notes & Attachments entity configurations
         modelBuilder.ApplyConfiguration(new NoteConfiguration());
         modelBuilder.ApplyConfiguration(new AttachmentConfiguration());
+
+        // Email Templates entity configurations
+        modelBuilder.ApplyConfiguration(new EmailTemplateCategoryConfiguration());
+        modelBuilder.ApplyConfiguration(new EmailTemplateConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -348,5 +356,13 @@ public class ApplicationDbContext
         // Global query filter: filter Attachments by TenantId (tenant-scoped)
         modelBuilder.Entity<Attachment>().HasQueryFilter(
             a => _tenantProvider == null || _tenantProvider.GetTenantId() == null || a.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter EmailTemplates by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailTemplate>().HasQueryFilter(
+            et => _tenantProvider == null || _tenantProvider.GetTenantId() == null || et.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter EmailTemplateCategories by TenantId (tenant-scoped)
+        modelBuilder.Entity<EmailTemplateCategory>().HasQueryFilter(
+            etc => _tenantProvider == null || _tenantProvider.GetTenantId() == null || etc.TenantId == _tenantProvider.GetTenantId());
     }
 }
