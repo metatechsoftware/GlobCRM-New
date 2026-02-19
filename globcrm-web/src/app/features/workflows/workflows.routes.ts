@@ -32,15 +32,15 @@ export const WORKFLOW_ROUTES: Routes = [
   {
     path: ':id/logs',
     loadComponent: () =>
-      import('./workflow-logs/workflow-logs.component').then(
-        (m) => m.WorkflowLogsComponent,
+      import('./workflow-logs/execution-log-list.component').then(
+        (m) => m.ExecutionLogListComponent,
       ),
   },
   {
     path: ':id/logs/:logId',
     loadComponent: () =>
-      import('./workflow-log-detail/workflow-log-detail.component').then(
-        (m) => m.WorkflowLogDetailComponent,
+      import('./workflow-logs/execution-log-detail.component').then(
+        (m) => m.ExecutionLogDetailComponent,
       ),
   },
 ];

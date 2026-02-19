@@ -1,0 +1,136 @@
+<div class="detail">
+  @if (store.loading() && !store.selectedWorkflow()) {
+    <div class="detail__loading">
+      <mat-spinner diameter="48"></mat-spinner>
+    </div>
+  }
+
+  @if (store.selectedWorkflow(); as wf) {
+    <!-- Header -->
+    <div class="detail__header">
+      <button mat-icon-button routerLink="/workflows" aria-label="Back to workflows">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="detail__header-info">
+        <h1>{{ wf.name }}</h1>
+      </div>
+      <span class="detail__status"
+            [class.status--draft]="wf.status === 'draft'"
+            [class.status--active]="wf.status === 'active'"
+            [class.status--paused]="wf.status === 'paused'">
+        {{ wf.status | titlecase }}
+      </span>
+      <span class="detail__entity-chip">
+        <mat-icon class="detail__entity-chip-icon">{{ wf.entityType === 'Contact' ? 'person' : wf.entityType === 'Company' ? 'business' : wf.entityType === 'Deal' ? 'handshake' : wf.entityType === 'Lead' ? 'trending_up' : 'category' }}</mat-icon>
+        {{ wf.entityType }}
+      </span>
+      <div class="detail__header-actions">
+        <a mat-raised-button color="primary" [routerLink]="['/workflows', wf.id, 'edit']">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </a>
+        @if (wf.isActive) {
+          <button mat-stroked-button (click)="toggleStatus()">
+            <mat-icon>pause</mat-icon>
+            Deactivate
+          </button>
+        } @else {
+          <button mat-stroked-button (click)="toggleStatus()">
+            <mat-icon>play_arrow</mat-icon>
+            Activate
+          </button>
+        }
+        <button mat-stroked-button (click)="duplicateWorkflow()">
+          <mat-icon>content_copy</mat-icon>
+          Duplicate
+        </button>
+        <button mat-stroked-button (click)="openSaveAsTemplate()">
+          <mat-icon>bookmark_add</mat-icon>
+          Save as Template
+        </button>
+        <button mat-icon-button [matMenuTriggerFor]="overflowMenu" aria-label="More actions">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #overflowMenu="matMenu">
+          <button mat-menu-item (click)="confirmDelete()" class="detail__delete-item">
+            <mat-icon color="warn">delete</mat-icon>
+            <span>Delete Workflow</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="detail__stats">
+      <div class="stat-card">
+        <mat-icon class="stat-card__icon stat-card__icon--primary">play_circle</mat-icon>
+        <span class="stat-card__value">{{ wf.executionCount }}</span>
+        <span class="stat-card__label">Total Executions</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-card__icon stat-card__icon--info">schedule</mat-icon>
+        <span class="stat-card__value">{{ getRelativeTime(wf.lastExecutedAt) }}</span>
+        <span class="stat-card__label">Last Run</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-card__icon stat-card__icon--success">check_circle</mat-icon>
+        <span class="stat-card__value">{{ successRate() }}%</span>
+        <span class="stat-card__label">Success Rate</span>
+      </div>
+      <div class="stat-card">
+        <mat-icon class="stat-card__icon stat-card__icon--danger">error</mat-icon>
+        <span class="stat-card__value">{{ failedCount() }}</span>
+        <span class="stat-card__label">Failed</span>
+      </div>
+    </div>
+
+    <!-- Description -->
+    @if (wf.description) {
+      <div class="detail__section">
+        <h2>Description</h2>
+        <p class="detail__description-text">{{ wf.description }}</p>
+      </div>
+    }
+
+    <!-- Trigger Summary -->
+    @if (wf.triggerSummary && wf.triggerSummary.length > 0) {
+      <div class="detail__section">
+        <h2>Triggers</h2>
+        <div class="detail__triggers">
+          @for (trigger of wf.triggerSummary; track trigger) {
+            <span class="detail__trigger-chip">
+              <mat-icon class="detail__trigger-chip-icon">bolt</mat-icon>
+              {{ formatTrigger(trigger) }}
+            </span>
+          }
+        </div>
+      </div>
+    }
+
+    <!-- Workflow Flow Preview -->
+    @if (getFlowSummary()) {
+      <div class="detail__section">
+        <h2>Flow Overview</h2>
+        <div class="detail__flow-summary">
+          <mat-icon>account_tree</mat-icon>
+          <span>{{ getFlowSummary() }}</span>
+        </div>
+      </div>
+    }
+
+    <!-- Execution Logs Section (embedded) -->
+    <div class="detail__section">
+      <div class="detail__section-header">
+        <h2>Execution History</h2>
+        <a mat-stroked-button [routerLink]="['/workflows', wf.id, 'logs']">
+          View All
+          <mat-icon>arrow_forward</mat-icon>
+        </a>
+      </div>
+      <app-execution-log-list
+        [workflowId]="wf.id"
+        [embedded]="true">
+      </app-execution-log-list>
+    </div>
+  }
+</div>

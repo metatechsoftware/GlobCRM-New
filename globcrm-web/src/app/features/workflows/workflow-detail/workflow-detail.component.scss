@@ -1,0 +1,251 @@
+:host {
+  display: block;
+}
+
+.detail {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.detail__loading {
+  display: flex;
+  justify-content: center;
+  padding: 64px;
+}
+
+// ---- Header ----
+
+.detail__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.detail__header-info {
+  flex: 1;
+  min-width: 200px;
+
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 500;
+  }
+}
+
+.detail__status {
+  display: inline-block;
+  font-size: 12px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.status--draft {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.status--active {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.status--paused {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.detail__entity-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background-color: var(--color-info-soft, #eff6ff);
+  color: var(--color-info-text, #1d4ed8);
+  font-weight: 500;
+}
+
+.detail__entity-chip-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.detail__header-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.detail__delete-item {
+  color: var(--color-danger, #ef4444);
+}
+
+// ---- Stats Cards ----
+
+.detail__stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-card {
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px 16px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 12px;
+  background: var(--color-surface, #ffffff);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.stat-card__icon {
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  margin-bottom: 8px;
+
+  &--primary {
+    color: var(--color-primary, #f97316);
+  }
+
+  &--info {
+    color: var(--color-info, #3b82f6);
+  }
+
+  &--success {
+    color: var(--color-success, #22c55e);
+  }
+
+  &--danger {
+    color: var(--color-danger, #ef4444);
+  }
+}
+
+.stat-card__value {
+  display: block;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--color-text-primary, #1e293b);
+}
+
+.stat-card__label {
+  display: block;
+  font-size: 12px;
+  color: var(--color-text-secondary, #64748b);
+  margin-top: 4px;
+}
+
+// ---- Sections ----
+
+.detail__section {
+  margin-bottom: 32px;
+
+  h2 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 16px 0;
+  }
+}
+
+.detail__section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.detail__description-text {
+  color: var(--color-text-secondary, #64748b);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+}
+
+// ---- Triggers ----
+
+.detail__triggers {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.detail__trigger-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background-color: var(--color-warning-soft, #fffbeb);
+  color: var(--color-warning-text, #b45309);
+  font-weight: 500;
+}
+
+.detail__trigger-chip-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+// ---- Flow Overview ----
+
+.detail__flow-summary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--color-border, #e2e8f0);
+  border-radius: 8px;
+  background: var(--color-surface, #ffffff);
+  font-size: 14px;
+  color: var(--color-text-secondary, #64748b);
+
+  mat-icon {
+    color: var(--color-primary, #f97316);
+  }
+}
+
+// ---- Responsive ----
+
+@media (max-width: 768px) {
+  .detail__stats {
+    flex-wrap: wrap;
+  }
+
+  .stat-card {
+    min-width: calc(50% - 12px);
+    flex: 0 0 calc(50% - 8px);
+  }
+
+  .detail__header-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail {
+    padding: 16px;
+  }
+
+  .stat-card {
+    min-width: 100%;
+    flex: 0 0 100%;
+  }
+}
