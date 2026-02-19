@@ -6,6 +6,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Authorization;
 using GlobCRM.Infrastructure.DomainEvents;
+using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Identity;
 using GlobCRM.Infrastructure.Images;
@@ -176,6 +177,9 @@ public static class DependencyInjection
 
         // ---- Email template services (repository, render, merge fields) ----
         services.AddEmailTemplateServices();
+
+        // ---- Duplicate detection and merge services ----
+        services.AddDuplicateServices();
 
         return services;
     }
