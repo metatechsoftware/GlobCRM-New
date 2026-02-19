@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 20 of 20 (Advanced Reporting Builder)
-Plan: 3 of 6 complete
+Plan: 4 of 6 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 20-03 (Report API + CSV Export + Seed Reports)
+Last activity: 2026-02-19 — Completed 20-04 (Report Frontend Foundation)
 
-Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 36/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 3/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 37/39 Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 4/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 36
-- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 2/6)
+- v1.1 plans completed: 37
+- v1.1 plans total: 39 (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 8/8, Phase 20: 4/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -57,6 +57,7 @@ Progress: [███████████████████████
 | 20-01 | Report Domain Foundation (entities + migration + RLS + repository) | 5min | 2 | 17 |
 | 20-02 | Report Engine Core (field metadata + query engine + DI) | 4min | 2 | 4 |
 | 20-03 | Report API + CSV Export + Seed Reports | 6min | 2 | 3 |
+| 20-04 | Report Frontend Foundation (gallery + service + store + routes) | 5min | 2 | 11 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 | Phase 19 P05 | 11min | 2 tasks | 15 files |
@@ -202,6 +203,11 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [20-03] ReportCsvExportJob uses PermissionScope.All for export (already authorized at controller level)
 - [20-03] Category request records prefixed with Report (CreateReportCategoryRequest) to avoid name collision with EmailTemplateCategoriesController
 - [20-03] ReportCsvExportJob created in Task 1 alongside controller (build dependency -- controller references job type for Hangfire Enqueue)
+- [20-04] SVG schematic thumbnails per chart type (bar/line/pie/funnel/table) -- lightweight rendering without chart.js dependency
+- [20-04] ReportStore component-provided (not root) following WebhookStore/SequenceStore/WorkflowStore pattern
+- [20-04] Reports nav link in Analytics group next to Dashboard -- reports span all entities, not specific to Connect group
+- [20-04] Builder shell two-panel layout with 320px sidebar -- ready for Plan 05/06 expansion
+- [20-04] Gallery search uses server-side API search parameter -- leverages backend full-text search
 
 ### Pending Todos
 
@@ -217,6 +223,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 20-03-PLAN.md
-Resume file: .planning/phases/20-advanced-reporting-builder/20-03-SUMMARY.md
-Next step: Execute Phase 20 Plan 04 (/gsd:execute-phase 20)
+Stopped at: Completed 20-04-PLAN.md
+Resume file: .planning/phases/20-advanced-reporting-builder/20-04-SUMMARY.md
+Next step: Execute Phase 20 Plan 05 (/gsd:execute-phase 20)
