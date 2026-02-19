@@ -11,17 +11,17 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 
 - [ ] **PREVIEW-01**: User can click entity names in feed items to open a preview sidebar instead of navigating away
 - [ ] **PREVIEW-02**: Preview sidebar slides in from the right (~400px) as an overlay without displacing page content
-- [ ] **PREVIEW-03**: User sees key properties (name, status/stage, owner, primary info) for each entity type in preview
+- [x] **PREVIEW-03**: User sees key properties (name, status/stage, owner, primary info) for each entity type in preview
 - [ ] **PREVIEW-04**: User can click "Open full record" to navigate to the entity detail page from preview
 - [ ] **PREVIEW-05**: User can close the preview sidebar by clicking outside or pressing Escape
-- [ ] **PREVIEW-06**: User sees a loading skeleton while preview data is being fetched
+- [x] **PREVIEW-06**: User sees a loading skeleton while preview data is being fetched
 - [ ] **PREVIEW-07**: Feed scroll position is preserved when opening and closing the preview sidebar
 - [ ] **PREVIEW-08**: Preview sidebar displays full-width on mobile screens (< 768px)
 - [ ] **PREVIEW-09**: User can open entity preview from global search results
 - [ ] **PREVIEW-10**: User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) from the preview sidebar
 - [ ] **PREVIEW-11**: User can click author names in feed to preview user profiles (name, role, email, avatar)
-- [ ] **PREVIEW-12**: Preview sidebar displays association chips (related records) linking to their detail pages
-- [ ] **PREVIEW-13**: Preview sidebar shows last 3 recent activities in condensed timeline
+- [x] **PREVIEW-12**: Preview sidebar displays association chips (related records) linking to their detail pages
+- [x] **PREVIEW-13**: Preview sidebar shows last 3 recent activities in condensed timeline
 
 ### Summary Tabs on Detail Pages
 
@@ -101,17 +101,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 |-------------|-------|--------|
 | PREVIEW-01 | Phase 22 | Pending |
 | PREVIEW-02 | Phase 22 | Pending |
-| PREVIEW-03 | Phase 22 | Pending |
+| PREVIEW-03 | Phase 22 | Complete |
 | PREVIEW-04 | Phase 22 | Pending |
 | PREVIEW-05 | Phase 22 | Pending |
-| PREVIEW-06 | Phase 22 | Pending |
+| PREVIEW-06 | Phase 22 | Complete |
 | PREVIEW-07 | Phase 22 | Pending |
 | PREVIEW-08 | Phase 25 | Pending |
 | PREVIEW-09 | Phase 25 | Pending |
 | PREVIEW-10 | Phase 25 | Pending |
 | PREVIEW-11 | Phase 25 | Pending |
-| PREVIEW-12 | Phase 22 | Pending |
-| PREVIEW-13 | Phase 22 | Pending |
+| PREVIEW-12 | Phase 22 | Complete |
+| PREVIEW-13 | Phase 22 | Complete |
 | SUMMARY-01 | Phase 23 | Pending |
 | SUMMARY-02 | Phase 23 | Pending |
 | SUMMARY-03 | Phase 23 | Pending |

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar)
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-20 — Completed 22-01 (Shared Foundation)
+Last activity: 2026-02-20 — Completed 22-02 (Preview Backend Endpoint)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████░░░░░░░] 91% (140/153 plans)
+Progress: [███████████████████████████████████████████████████████████████████████████████████████████████░░░░░░] 92% (141/153 plans)
 
 ## Milestones
 
@@ -25,7 +25,7 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 139
+- Total plans completed: 140
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 
@@ -44,6 +44,8 @@ Recent decisions for v1.2:
 - EntityTypeRegistry as pure constant map (not injectable service) for tree-shaking
 - EntityName backfill via raw SQL JOINs in migration Up method
 - ShowInPreview uses nullable bool on update requests for partial update semantics
+- Preview endpoint uses per-type internal RBAC (no blanket policy attribute) for cross-entity access
+- Activity preview checks both OwnerId and AssignedToId; Product preview skips scope check
 
 ### Pending Todos
 
@@ -57,5 +59,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 22-01-PLAN.md
-Next step: Execute 22-02-PLAN.md
+Stopped at: Completed 22-02-PLAN.md
+Next step: Execute 22-03-PLAN.md
