@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 16 of 20 (Duplicate Detection & Merge)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 16-01 (Backend Foundation)
+Last activity: 2026-02-19 — Completed 16-02 (API Endpoints)
 
-Progress: [███████████████████████████████████████░░░] 83% (v1.0: 96/96 plans, v1.1: 13/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 1/4)
+Progress: [████████████████████████████████████████░░░] 84% (v1.0: 96/96 plans, v1.1: 14/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 2/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 13
-- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 1/4)
+- v1.1 plans completed: 14
+- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 2/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -34,6 +34,7 @@ Progress: [███████████████████████
 | 15-03 | Formula Editor Frontend (autocomplete + validation + preview) | 4min | 2 | 7 |
 | 15-04 | Formula Field Frontend Display (dynamic table + custom-field-form) | 6min | 2 | 1 |
 | 16-01 | Backend Foundation (domain + pg_trgm + merge services) | 6min | 2 | 20 |
+| 16-02 | API Endpoints (DuplicatesController + DuplicateSettingsController + merged redirect) | 5min | 2 | 4 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -95,6 +96,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [16-01] Merge via explicit BeginTransactionAsync/CommitAsync; ExecuteUpdateAsync for bulk FK transfers
 - [16-01] Merged records excluded via global query filter (MergedIntoId == null) -- IgnoreQueryFilters for redirect
 - [16-01] Composite PK deduplication: query survivor links, remove conflicting loser links, update rest
+- [16-02] DuplicatePairDto uses object-typed RecordA/RecordB for polymorphic contact/company match DTOs
+- [16-02] Merged-record redirect returns 200 with {isMerged, mergedIntoId} instead of 301 for simpler Angular handling
+- [16-02] DuplicateSettingsController auto-creates default configs (threshold 70, auto-detection on) on first access
+- [16-02] Comparison endpoints use IgnoreQueryFilters to load even recently merged records
 
 ### Pending Todos
 
@@ -110,6 +115,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 16-01-PLAN.md
-Resume file: .planning/phases/16-duplicate-detection-merge/16-01-SUMMARY.md
-Next step: Execute 16-02-PLAN.md (API Endpoints)
+Stopped at: Completed 16-02-PLAN.md
+Resume file: .planning/phases/16-duplicate-detection-merge/16-02-SUMMARY.md
+Next step: Execute 16-03-PLAN.md (Frontend)
