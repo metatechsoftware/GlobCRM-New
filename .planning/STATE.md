@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 16 of 20 (Duplicate Detection & Merge)
-Plan: 3 of 4 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 16-04 (Frontend Settings & Warnings)
+Plan: 4 of 4 complete
+Status: Phase Complete
+Last activity: 2026-02-19 — Completed 16-03 (Frontend Scan & Merge UI)
 
-Progress: [█████████████████████████████████████████░░] 85% (v1.0: 96/96 plans, v1.1: 15/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 3/4)
+Progress: [██████████████████████████████████████████░░] 86% (v1.0: 96/96 plans, v1.1: 16/16+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 15
-- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 3/4)
+- v1.1 plans completed: 16
+- v1.1 plans total: 16+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -35,6 +35,7 @@ Progress: [███████████████████████
 | 15-04 | Formula Field Frontend Display (dynamic table + custom-field-form) | 6min | 2 | 1 |
 | 16-01 | Backend Foundation (domain + pg_trgm + merge services) | 6min | 2 | 20 |
 | 16-02 | API Endpoints (DuplicatesController + DuplicateSettingsController + merged redirect) | 5min | 2 | 4 |
+| 16-03 | Frontend Scan & Merge UI (scan page + comparison page + confirmation dialog) | 10min | 2 | 7 |
 | 16-04 | Frontend Settings & Warnings (admin rules page + form banners + merged redirects) | 8min | 2 | 7 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
@@ -101,6 +102,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [16-02] Merged-record redirect returns 200 with {isMerged, mergedIntoId} instead of 301 for simpler Angular handling
 - [16-02] DuplicateSettingsController auto-creates default configs (threshold 70, auto-detection on) on first access
 - [16-02] Comparison endpoints use IgnoreQueryFilters to load even recently merged records
+- [16-03] Scan and merge pages separate routes with query param handoff (entityType, id1, id2) -- not a single wizard
+- [16-03] Field comparison uses computed signal with runtime diff detection -- amber highlighting for differences
+- [16-03] Primary record auto-selected by updatedAt comparison, swappable via click or swap button
+- [16-03] Contact vs Company observable branches separated to avoid TypeScript union type subscribe incompatibility
 - [16-04] Duplicate check fires on field blur (not debounced keystrokes) with value deduplication to avoid redundant API calls
 - [16-04] Warning banners positioned above form grid, amber styling, dismissible, reset dismissed state on new field values
 - [16-04] Merged-record redirect checks response shape (isMerged + mergedIntoId) with any type cast for simplicity
@@ -120,6 +125,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 16-04-PLAN.md
-Resume file: .planning/phases/16-duplicate-detection-merge/16-04-SUMMARY.md
-Next step: Execute 16-03-PLAN.md (Frontend Scan & Merge UI)
+Stopped at: Completed 16-03-PLAN.md (Phase 16 now fully complete: 4/4 plans)
+Resume file: .planning/phases/16-duplicate-detection-merge/16-03-SUMMARY.md
+Next step: Plan Phase 17
