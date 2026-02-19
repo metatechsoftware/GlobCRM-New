@@ -35,7 +35,7 @@
 - [x] **Phase 14: Foundation Infrastructure & Email Templates** - Hangfire background jobs, TenantScope wrapper, DomainEventInterceptor, Fluid template engine, and rich email templates with merge fields (completed 2026-02-19)
 - [x] **Phase 15: Formula / Computed Custom Fields** - NCalc expression evaluator, formula field type with arithmetic/date/string/conditional support, on-read evaluation, and circular dependency detection (completed 2026-02-19)
 - [x] **Phase 16: Duplicate Detection & Merge** - Two-tier fuzzy matching (pg_trgm + FuzzySharp), configurable rules, side-by-side merge UI, and full relationship transfer (completed 2026-02-19)
-- [ ] **Phase 17: Webhooks** - HMAC-signed webhook delivery with exponential retry, subscription management, delivery logs, SSRF prevention
+- [x] **Phase 17: Webhooks** - HMAC-signed webhook delivery with exponential retry, subscription management, delivery logs, SSRF prevention (completed 2026-02-19)
 - [ ] **Phase 18: Email Sequences** - Multi-step drip sequences with delays, enrollment management, reply-based auto-unenroll, and per-step open/click tracking
 - [ ] **Phase 19: Workflow Automation** - Trigger-based automation engine with event/field-change/date triggers, multi-action execution (field update, notify, task, email, webhook, sequence), execution logs, and prebuilt templates
 - [ ] **Phase 20: Advanced Reporting Builder** - Dynamic report builder with entity/field selection, filter conditions, grouping/aggregation, chart visualization, related entity fields, save/share, CSV export, and drill-down
@@ -122,7 +122,7 @@ Plans:
   3. Failed webhook deliveries are automatically retried with exponential backoff (up to 7 attempts), and subscriptions auto-disable after 50 consecutive failures
   4. Admin can view a delivery log showing each attempt's status, HTTP response code, and timing, and can test a subscription with a sample payload
   5. Webhook URLs are validated against SSRF attacks (HTTPS-only, RFC1918 rejection, DNS re-resolution on each delivery)
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 - [ ] 17-01-PLAN.md — Backend foundation: domain entities, EF configs, migration, RLS, DomainEvent OldValues enhancement, repository
 - [ ] 17-02-PLAN.md — Backend delivery pipeline: domain event handler, delivery service with HMAC signing and retry, SSRF validator, payload builder
 - [ ] 17-03-PLAN.md — Backend API: WebhooksController with subscription CRUD, delivery logs, test webhook, manual retry
@@ -187,7 +187,7 @@ Phases execute in numeric order: 13 -> 14 -> 15 -> 16 -> 17 -> 18 -> 19 -> 20
 | 14. Foundation Infrastructure & Email Templates | 4/4 | Complete    | 2026-02-19 | - |
 | 15. Formula / Computed Custom Fields | 4/4 | Complete    | 2026-02-19 | - |
 | 16. Duplicate Detection & Merge | 4/4 | Complete    | 2026-02-19 | - |
-| 17. Webhooks | 3/4 | In Progress|  | - |
+| 17. Webhooks | 4/4 | Complete   | 2026-02-19 | - |
 | 18. Email Sequences | v1.1 | 0/? | Not started | - |
 | 19. Workflow Automation | v1.1 | 0/? | Not started | - |
 | 20. Advanced Reporting Builder | v1.1 | 0/? | Not started | - |
