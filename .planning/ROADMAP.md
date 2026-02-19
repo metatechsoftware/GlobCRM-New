@@ -66,13 +66,13 @@
   3. User can close the preview by clicking outside, pressing Escape, or clicking "Open full record" to navigate to the full detail page
   4. Preview shows a loading skeleton while data loads, and gracefully displays a "deleted/not found" message for entities that no longer exist
   5. All 6 entity detail pages use label-based tab switching (refactored from index-based), unblocking safe tab insertion in Phase 23
-**Plans**: TBD
+**Plans**: 4 plans
 
 Plans:
-- [ ] 22-01: Shared infrastructure (EntityTypeRegistry, tab index refactor to label-based matching across all 6 detail pages, entity_name denormalization migration on feed_items)
-- [ ] 22-02: Backend preview endpoint (GET /api/entities/{type}/{id}/preview with RBAC scope checking, per-entity-type slim DTOs, graceful 404 for deleted entities)
-- [ ] 22-03: Frontend preview sidebar (EntityPreviewSidebarComponent with MatDrawer in AppComponent, PreviewSidebarStore, EntityPreviewService, entity-type-specific field templates)
-- [ ] 22-04: Feed integration + preview content (replace feed entity link navigation with sidebar open, association chips, recent activities mini-timeline, scroll position preservation)
+- [ ] 22-01-PLAN.md — Shared infrastructure: EntityTypeRegistry, tab index refactor to label-based matching across all 6 detail pages, entity_name denormalization + ShowInPreview migration
+- [ ] 22-02-PLAN.md — Backend preview endpoint: GET /api/entities/{type}/{id}/preview with RBAC scope checking, per-entity-type slim DTOs, associations, pipeline stages, recent activities
+- [ ] 22-03-PLAN.md — Frontend preview sidebar: AppComponent layout refactor, PreviewSidebarStore, EntityPreviewSidebarComponent, 6 entity-type preview templates, mini-stage-bar, mini-timeline, association chips
+- [ ] 22-04-PLAN.md — Feed integration: replace entity link navigation with sidebar open, Ctrl/Cmd+click, hover tooltips, scroll position preservation
 
 ### Phase 23: Summary Tabs on Detail Pages
 **Goal**: Users see a rich at-a-glance overview as the default tab on every major entity detail page — key properties, association counts, recent and upcoming activities, stage indicators, and quick actions — all loaded in a single batched request
