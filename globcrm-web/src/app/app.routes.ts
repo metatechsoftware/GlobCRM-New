@@ -177,6 +177,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'reports',
+    canActivate: [authGuard, permissionGuard('Report', 'View')],
+    loadChildren: () =>
+      import('./features/reports/reports.routes').then(
+        (m) => m.REPORT_ROUTES
+      ),
+  },
+  {
     path: 'duplicates',
     canActivate: [authGuard],
     loadChildren: () =>
