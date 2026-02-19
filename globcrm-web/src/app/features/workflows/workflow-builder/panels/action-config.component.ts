@@ -20,6 +20,8 @@ import {
   WorkflowActionType,
   EntityField,
 } from '../../workflow.models';
+import { EmailTemplateListItem } from '../../../email-templates/email-template.models';
+import { SequenceListItem } from '../../../sequences/sequence.models';
 
 interface ActionFormState {
   actionType: WorkflowActionType;
@@ -254,11 +256,30 @@ interface ActionFormState {
         <!-- Send Email -->
         @if (showSection('sendEmail')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email Template ID</mat-label>
-            <input matInput
-                   [ngModel]="form().emailTemplateId"
-                   (ngModelChange)="updateFormField('emailTemplateId', $event)"
-                   placeholder="Enter template ID" />
+            <mat-label>Email Template</mat-label>
+            <mat-select [ngModel]="form().emailTemplateId"
+                        (ngModelChange)="updateFormField('emailTemplateId', $event)"
+                        (opened)="templateSearch.set('')">
+              <div class="select-search">
+                <mat-icon>search</mat-icon>
+                <input matInput
+                       placeholder="Search templates..."
+                       [value]="templateSearch()"
+                       (input)="templateSearch.set($any($event.target).value)"
+                       (keydown)="$event.stopPropagation()" />
+              </div>
+              @for (t of filteredTemplates(); track t.id) {
+                <mat-option [value]="t.id">
+                  <span class="option-name">{{ t.name }}</span>
+                  @if (t.subject) {
+                    <span class="option-preview">{{ t.subject }}</span>
+                  }
+                </mat-option>
+              }
+              @empty {
+                <mat-option disabled>No templates found</mat-option>
+              }
+            </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
@@ -314,11 +335,31 @@ interface ActionFormState {
           }
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Sequence ID</mat-label>
-            <input matInput
-                   [ngModel]="form().sequenceId"
-                   (ngModelChange)="updateFormField('sequenceId', $event)"
-                   placeholder="Enter sequence ID" />
+            <mat-label>Sequence</mat-label>
+            <mat-select [ngModel]="form().sequenceId"
+                        (ngModelChange)="updateFormField('sequenceId', $event)"
+                        (opened)="sequenceSearch.set('')">
+              <div class="select-search">
+                <mat-icon>search</mat-icon>
+                <input matInput
+                       placeholder="Search sequences..."
+                       [value]="sequenceSearch()"
+                       (input)="sequenceSearch.set($any($event.target).value)"
+                       (keydown)="$event.stopPropagation()" />
+              </div>
+              @for (s of filteredSequences(); track s.id) {
+                <mat-option [value]="s.id">
+                  <span class="option-name">{{ s.name }}</span>
+                  <span class="option-meta">
+                    {{ s.stepCount }} {{ s.stepCount === 1 ? 'step' : 'steps' }}
+                  </span>
+                  <span class="status-badge" [class]="'status-' + s.status">{{ s.status }}</span>
+                </mat-option>
+              }
+              @empty {
+                <mat-option disabled>No sequences found</mat-option>
+              }
+            </mat-select>
           </mat-form-field>
         }
 
@@ -436,6 +477,67 @@ interface ActionFormState {
       }
     }
 
+    .select-search {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-bottom: 1px solid var(--color-border);
+      position: sticky;
+      top: 0;
+      background: var(--color-surface);
+      z-index: 1;
+
+      input {
+        border: none;
+        outline: none;
+        flex: 1;
+        font-size: var(--text-sm);
+        background: transparent;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        color: var(--color-text-secondary);
+      }
+    }
+
+    .option-name {
+      display: block;
+      font-weight: var(--font-medium);
+    }
+
+    .option-preview {
+      display: block;
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .option-meta {
+      font-size: var(--text-xs);
+      color: var(--color-text-secondary);
+      margin-left: 4px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: var(--font-semibold);
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: var(--radius-full);
+      margin-left: 8px;
+    }
+    .status-active { background: #d1fae5; color: #065f46; }
+    .status-draft { background: #e5e7eb; color: #374151; }
+    .status-paused { background: #fef3c7; color: #92400e; }
+    .status-archived { background: #fee2e2; color: #991b1b; }
+
     ::ng-deep .mat-mdc-form-field-subscript-wrapper {
       display: none;
     }
@@ -451,7 +553,29 @@ export class ActionConfigComponent {
   readonly node = input.required<WorkflowNode>();
   readonly entityType = input<string>('');
   readonly entityFields = input<EntityField[]>([]);
+  readonly templates = input<EmailTemplateListItem[]>([]);
+  readonly sequences = input<SequenceListItem[]>([]);
   readonly configChanged = output<Record<string, any>>();
+
+  readonly templateSearch = signal('');
+  readonly sequenceSearch = signal('');
+
+  readonly filteredTemplates = computed(() => {
+    const search = this.templateSearch().toLowerCase();
+    if (!search) return this.templates();
+    return this.templates().filter(t =>
+      t.name.toLowerCase().includes(search) ||
+      (t.subject?.toLowerCase().includes(search) ?? false)
+    );
+  });
+
+  readonly filteredSequences = computed(() => {
+    const search = this.sequenceSearch().toLowerCase();
+    if (!search) return this.sequences();
+    return this.sequences().filter(s =>
+      s.name.toLowerCase().includes(search)
+    );
+  });
 
   readonly nodeType = computed(() => this.node().type);
   readonly webhookPayloadPlaceholder = '{"event": "{{triggerType}}", "entity": "{{entityId}}"}';
