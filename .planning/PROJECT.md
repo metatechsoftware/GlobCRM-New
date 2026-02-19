@@ -43,6 +43,18 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 
 ### Active
 
+#### Current Milestone: v1.2 Connected Experience
+
+**Goal:** Make GlobCRM feel connected — entity links in feeds open preview sidebars, every detail page starts with a Summary tab, and a personal "My Day" dashboard replaces the home page.
+
+**Target features:**
+- Feed deep integration with entity links + preview sidebar with actions
+- Summary tabs on all major detail pages (Companies, Contacts, Deals, Leads, Quotes, Requests)
+- Personal "My Day" dashboard replacing home page (configurable widgets)
+- Org dashboard relocated to its own menu item
+
+#### Future
+
 - [ ] Native mobile apps (iOS/Android) via .NET MAUI
 - [ ] Outlook/Microsoft 365 email integration (Microsoft Graph API)
 - [ ] SSO/SAML/OIDC integration
@@ -116,4 +128,4 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 | Linear workflow model (not branching) | Covers 90% of use cases; branching adds exponential complexity | ✓ Good — trigger→conditions→actions sufficient for v1.1 |
 
 ---
-*Last updated: 2026-02-20 after v1.1 milestone*
+*Last updated: 2026-02-20 after v1.2 milestone start*
