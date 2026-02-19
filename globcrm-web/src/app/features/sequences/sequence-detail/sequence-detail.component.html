@@ -62,31 +62,11 @@
       </div>
     </div>
 
-    <!-- Summary Metrics -->
-    @if (store.analytics(); as analytics) {
-      <div class="detail__metrics">
-        <div class="metric-card">
-          <span class="metric-card__value">{{ analytics.totalEnrolled }}</span>
-          <span class="metric-card__label">Total Enrolled</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-card__value">{{ analytics.active }}</span>
-          <span class="metric-card__label">Active</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-card__value">{{ analytics.completed }}</span>
-          <span class="metric-card__label">Completed</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-card__value">{{ analytics.replied }}</span>
-          <span class="metric-card__label">Replied</span>
-        </div>
-        <div class="metric-card">
-          <span class="metric-card__value">{{ analytics.bounced }}</span>
-          <span class="metric-card__label">Bounced</span>
-        </div>
-      </div>
-    }
+    <!-- Analytics Section (summary cards + funnel chart + per-step metrics) -->
+    <app-sequence-analytics
+      [analytics]="store.analytics()"
+      [stepMetrics]="store.stepMetrics()"
+      [funnelData]="store.funnelData()" />
 
     <!-- Steps Overview -->
     <div class="detail__section">

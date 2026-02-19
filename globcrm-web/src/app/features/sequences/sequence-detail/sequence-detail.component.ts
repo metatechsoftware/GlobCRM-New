@@ -22,6 +22,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { SequenceStore } from '../sequence.store';
 import { EnrollmentListItem, StepMetrics } from '../sequence.models';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
+import { SequenceAnalyticsComponent } from '../sequence-analytics/sequence-analytics.component';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 
 @Component({
@@ -42,6 +43,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    SequenceAnalyticsComponent,
   ],
   providers: [SequenceStore],
   templateUrl: './sequence-detail.component.html',
@@ -359,6 +361,7 @@ export class SequenceDetailComponent implements OnInit {
     this.store.loadEnrollments(seqId, 1, this.pageSize);
     this.store.loadAnalytics(seqId);
     this.store.loadStepMetrics(seqId);
+    this.store.loadFunnelData(seqId);
   }
 
   getStepMetric(stepNumber: number): StepMetrics | undefined {

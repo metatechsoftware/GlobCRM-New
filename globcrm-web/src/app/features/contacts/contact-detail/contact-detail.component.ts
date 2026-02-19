@@ -10,6 +10,7 @@ import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -36,6 +37,8 @@ import { NoteListDto } from '../../notes/note.models';
 import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { SequenceService } from '../../sequences/sequence.service';
+import { SequenceListItem } from '../../sequences/sequence.models';
 
 /**
  * Contact detail page with tabs (Details, Company, and disabled future tabs)
@@ -50,6 +53,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatButtonModule,
     MatChipsModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     MatDialogModule,
     MatSnackBarModule,
@@ -327,6 +331,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly requestService = inject(RequestService);
   private readonly emailService = inject(EmailService);
   private readonly noteService = inject(NoteService);
+  private readonly sequenceService = inject(SequenceService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
@@ -591,6 +596,44 @@ export class ContactDetailComponent implements OnInit {
       hour: 'numeric',
       minute: '2-digit',
     }).format(new Date(dateStr));
+  }
+
+  /** Open sequence picker and enroll this contact in the selected sequence. */
+  enrollInSequence(): void {
+    if (!this.contactId) return;
+
+    // Lazy import to avoid eagerly loading sequence module
+    import('../../sequences/sequence-picker-dialog/sequence-picker-dialog.component').then(
+      ({ SequencePickerDialogComponent }) => {
+        const dialogRef = this.dialog.open(SequencePickerDialogComponent, {
+          width: '500px',
+          maxHeight: '80vh',
+        });
+
+        dialogRef.afterClosed().subscribe((selectedSequence: SequenceListItem | undefined) => {
+          if (!selectedSequence) return;
+
+          this.sequenceService
+            .enrollContact(selectedSequence.id, { contactId: this.contactId })
+            .subscribe({
+              next: () => {
+                this.snackBar.open(
+                  `Contact enrolled in ${selectedSequence.name}.`,
+                  'Close',
+                  { duration: 3000 },
+                );
+              },
+              error: (err) => {
+                this.snackBar.open(
+                  err?.message ?? 'Failed to enroll contact.',
+                  'Close',
+                  { duration: 5000 },
+                );
+              },
+            });
+        });
+      },
+    );
   }
 
   /** Handle delete with confirmation dialog. */
