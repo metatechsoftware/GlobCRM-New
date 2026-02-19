@@ -193,6 +193,13 @@ export class SettingsHubComponent {
           route: '/settings/duplicate-rules',
           adminOnly: true,
         },
+        {
+          icon: 'link',
+          label: 'Webhooks',
+          description: 'Manage webhook subscriptions for external integrations',
+          route: '/settings/webhooks',
+          adminOnly: true,
+        },
       ],
     },
     {

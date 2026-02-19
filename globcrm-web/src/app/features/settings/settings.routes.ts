@@ -91,6 +91,46 @@ export const SETTINGS_ROUTES: Routes = [
       ),
   },
   {
+    path: 'webhooks',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./webhooks/webhook-list.component').then(
+        (m) => m.WebhookListComponent
+      ),
+  },
+  {
+    path: 'webhooks/new',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./webhooks/webhook-edit.component').then(
+        (m) => m.WebhookEditComponent
+      ),
+  },
+  {
+    path: 'webhooks/delivery-logs',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./webhooks/webhook-delivery-log.component').then(
+        (m) => m.WebhookDeliveryLogComponent
+      ),
+  },
+  {
+    path: 'webhooks/:id',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./webhooks/webhook-detail.component').then(
+        (m) => m.WebhookDetailComponent
+      ),
+  },
+  {
+    path: 'webhooks/:id/edit',
+    canActivate: [adminGuard],
+    loadComponent: () =>
+      import('./webhooks/webhook-edit.component').then(
+        (m) => m.WebhookEditComponent
+      ),
+  },
+  {
     path: 'email-accounts',
     loadComponent: () =>
       import('./email-accounts/email-account-settings.component').then(
