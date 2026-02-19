@@ -65,7 +65,7 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 - [x] **WHOOK-02**: Webhook payloads are signed with HMAC-SHA256 for verification
 - [x] **WHOOK-03**: Failed webhook deliveries are retried with exponential backoff (up to 7 attempts)
 - [x] **WHOOK-04**: Admin can view webhook delivery logs with success/failure status
-- [ ] **WHOOK-05**: Admin can test a webhook subscription with a sample payload
+- [x] **WHOOK-05**: Admin can test a webhook subscription with a sample payload
 - [x] **WHOOK-06**: Subscriptions auto-disable after 50 consecutive failures
 
 ### Advanced Reporting Builder
@@ -167,7 +167,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WHOOK-02 | Phase 17 | Complete |
 | WHOOK-03 | Phase 17 | Complete |
 | WHOOK-04 | Phase 17 | Complete |
-| WHOOK-05 | Phase 17 | Pending |
+| WHOOK-05 | Phase 17 | Complete |
 | WHOOK-06 | Phase 17 | Complete |
 | ESEQ-01 | Phase 18 | Pending |
 | ESEQ-02 | Phase 18 | Pending |

@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 17 of 20 (Webhooks)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 17-02 (Webhook Delivery Pipeline)
+Last activity: 2026-02-19 — Completed 17-03 (Webhook API Controller)
 
-Progress: [██████████████████████████████████████████░░] 88% (v1.0: 96/96 plans, v1.1: 18/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 2/4)
+Progress: [███████████████████████████████████████████░░] 89% (v1.0: 96/96 plans, v1.1: 19/20+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 3/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 18
-- v1.1 plans total: 20+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 1/4)
+- v1.1 plans completed: 19
+- v1.1 plans total: 20+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 3/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -39,6 +39,7 @@ Progress: [███████████████████████
 | 16-04 | Frontend Settings & Warnings (admin rules page + form banners + merged redirects) | 8min | 2 | 7 |
 | 17-01 | Webhook Domain Foundation (entities + migration + RLS + repository + DomainEvent enhancement) | 4min | 2 | 14 |
 | 17-02 | Webhook Delivery Pipeline (handler + delivery service + HMAC + SSRF + retry + DI) | 4min | 2 | 7 |
+| 17-03 | Webhook API Controller (11 endpoints + DTOs + validators) | 3min | 2 | 3 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -121,6 +122,10 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [17-02] SSRF validator uses System.Net.IPNetwork for CIDR matching with fresh DNS resolution per delivery
 - [17-02] 429 Too Many Requests treated as retryable; other 4xx are permanent errors (no retry)
 - [17-02] Subscription cache: IMemoryCache with 60-second TTL keyed by tenant ID, InvalidateCache for CRUD
+- [17-03] GetAllSubscriptionsAsync added to repository -- admin listing needs all subscriptions including disabled
+- [17-03] Secret masked as whsec_****...{last4} in GET responses; full secret only on POST create and regenerate-secret
+- [17-03] Test webhook two-step flow: preview=true returns sample payload, preview=false enqueues real Hangfire delivery
+- [17-03] Manual retry validates failed status, subscription existence, active state, and non-disabled state
 
 ### Pending Todos
 
@@ -136,6 +141,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 17-02-PLAN.md
-Resume file: .planning/phases/17-webhooks/17-02-SUMMARY.md
-Next step: Execute 17-03-PLAN.md
+Stopped at: Completed 17-03-PLAN.md
+Resume file: .planning/phases/17-webhooks/17-03-SUMMARY.md
+Next step: Execute 17-04-PLAN.md
