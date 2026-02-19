@@ -12,5 +12,6 @@ public enum NotificationType
     DueDateApproaching,
     EmailReceived,
     WebhookAutoDisabled,
-    SequenceReply
+    SequenceReply,
+    WorkflowAction
 }

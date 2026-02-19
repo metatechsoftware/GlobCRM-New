@@ -2192,6 +2192,93 @@ public class TenantSeeder : ITenantSeeder
                 IsSeedData = true,
                 CreatedAt = DateTimeOffset.UtcNow,
                 UpdatedAt = DateTimeOffset.UtcNow
+            },
+
+            // 4. Lead Qualified Alert (sales)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "Lead Qualified Alert",
+                Description = "Alert the team when a lead status changes to Qualified.",
+                Category = "sales",
+                EntityType = "Lead",
+                Definition = new WorkflowDefinition
+                {
+                    Nodes =
+                    [
+                        new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Lead Updated", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                        new WorkflowNode { Id = "condition-1", Type = "condition", Label = "Status = Qualified", Position = new WorkflowNodePosition { X = 250, Y = 180 } },
+                        new WorkflowNode { Id = "action-1", Type = "action", Label = "Notify Team", Position = new WorkflowNodePosition { X = 250, Y = 330 } }
+                    ],
+                    Connections =
+                    [
+                        new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "condition-1" },
+                        new WorkflowConnection { Id = "conn-2", SourceNodeId = "condition-1", TargetNodeId = "action-1" }
+                    ],
+                    Triggers =
+                    [
+                        new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.FieldChanged, EventType = "Updated", FieldName = "Status" }
+                    ],
+                    Conditions =
+                    [
+                        new WorkflowConditionGroup
+                        {
+                            Id = "cg-1", NodeId = "condition-1",
+                            Conditions = [new WorkflowCondition { Field = "Status", Operator = "changed_to", Value = "Qualified" }]
+                        }
+                    ],
+                    Actions =
+                    [
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.SendNotification, Order = 1,
+                            Config = "{\"Title\":\"Lead Qualified\",\"Message\":\"A lead has been qualified and is ready for follow-up.\",\"RecipientType\":\"team\"}"
+                        }
+                    ]
+                },
+                IsSystem = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
+            },
+
+            // 5. New Company Enrichment Task (operational)
+            new()
+            {
+                TenantId = organizationId,
+                Name = "New Company Enrichment Task",
+                Description = "Create a research task when a new company is added to enrich its data.",
+                Category = "operational",
+                EntityType = "Company",
+                Definition = new WorkflowDefinition
+                {
+                    Nodes =
+                    [
+                        new WorkflowNode { Id = "trigger-1", Type = "trigger", Label = "Company Created", Position = new WorkflowNodePosition { X = 250, Y = 50 } },
+                        new WorkflowNode { Id = "action-1", Type = "action", Label = "Create Research Task", Position = new WorkflowNodePosition { X = 250, Y = 200 } }
+                    ],
+                    Connections =
+                    [
+                        new WorkflowConnection { Id = "conn-1", SourceNodeId = "trigger-1", TargetNodeId = "action-1" }
+                    ],
+                    Triggers =
+                    [
+                        new WorkflowTriggerConfig { Id = "trig-1", NodeId = "trigger-1", TriggerType = WorkflowTriggerType.RecordCreated, EventType = "Created" }
+                    ],
+                    Conditions = [],
+                    Actions =
+                    [
+                        new WorkflowActionConfig
+                        {
+                            Id = "act-1", NodeId = "action-1", ActionType = WorkflowActionType.CreateActivity, Order = 1,
+                            Config = "{\"Subject\":\"Research and enrich company data\",\"Type\":\"Task\",\"Priority\":\"Medium\",\"DueDateOffsetDays\":3,\"AssigneeType\":\"record_owner\"}"
+                        }
+                    ]
+                },
+                IsSystem = true,
+                IsSeedData = true,
+                CreatedAt = DateTimeOffset.UtcNow,
+                UpdatedAt = DateTimeOffset.UtcNow
             }
         };
 
@@ -2199,7 +2286,7 @@ public class TenantSeeder : ITenantSeeder
         await _db.SaveChangesAsync();
 
         _logger.LogInformation(
-            "Workflow seed data created for organization {OrgId}: 2 demo workflows, 3 system templates",
+            "Workflow seed data created for organization {OrgId}: 2 demo workflows, 5 system templates",
             organizationId);
     }
 

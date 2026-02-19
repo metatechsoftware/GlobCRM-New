@@ -22,6 +22,7 @@ using GlobCRM.Infrastructure.Search;
 using GlobCRM.Infrastructure.BackgroundJobs;
 using GlobCRM.Infrastructure.DomainEvents;
 using GlobCRM.Infrastructure.EmailTemplates;
+using GlobCRM.Infrastructure.Workflows;
 using Hangfire;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -144,6 +145,12 @@ app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
     Authorization = new[] { new HangfireDashboardAuthorizationFilter() }
 });
+
+// Workflow date trigger scanner -- hourly scan for date-based workflow triggers
+RecurringJob.AddOrUpdate<DateTriggerScanService>(
+    DateTriggerScanService.JobId,
+    svc => svc.ScanAsync(),
+    Cron.Hourly);
 
 // SignalR hub endpoint -- must be after UseAuthorization, before MapControllers
 app.MapHub<CrmHub>("/hubs/crm");
