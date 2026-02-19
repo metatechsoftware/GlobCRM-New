@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 15 in progress
+**Current focus:** v1.1 Automation & Intelligence — Phase 15 complete
 
 ## Current Position
 
 Phase: 15 of 20 (Formula / Computed Custom Fields)
-Plan: 3 of 4 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 15-03 (Formula Editor Frontend)
+Plan: 4 of 4 complete
+Status: Phase Complete
+Last activity: 2026-02-19 — Completed 15-04 (Formula Field Frontend Display)
 
-Progress: [█████████████████████████████████████░░░░░] 81% (v1.0: 96/96 plans, v1.1: 11/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 3/4)
+Progress: [██████████████████████████████████████░░░░] 82% (v1.0: 96/96 plans, v1.1: 12/12+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 11
-- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 3/4)
+- v1.1 plans completed: 12
+- v1.1 plans total: 12+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -32,6 +32,7 @@ Progress: [███████████████████████
 | 15-01 | Backend Foundation (domain + NCalc engine + services) | 5min | 2 | 13 |
 | 15-02 | Formula API endpoints + entity controller DTO enrichment | 8min | 2 | 9 |
 | 15-03 | Formula Editor Frontend (autocomplete + validation + preview) | 4min | 2 | 7 |
+| 15-04 | Formula Field Frontend Display (dynamic table + custom-field-form) | 6min | 2 | 1 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -86,6 +87,8 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [15-03] Validation+preview run sequentially -- preview only fires after validation passes
 - [15-03] Validation rules panel hidden for Formula type fields (required/unique/min/max not applicable)
 - [15-03] FormulaEditorComponent uses output() signals; parent dialog owns save logic
+- [15-04] Formula fields skip FormControl creation entirely -- cleaner separation of computed vs. editable
+- [15-04] Formula value lookup checks field.name then field.id fallback to match API response shape
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 15-03-PLAN.md
-Resume file: .planning/phases/15-formula-computed-custom-fields/15-03-SUMMARY.md
-Next step: Execute 15-04-PLAN.md (End-to-end integration)
+Stopped at: Completed 15-04-PLAN.md (Phase 15 complete)
+Resume file: .planning/phases/15-formula-computed-custom-fields/15-04-SUMMARY.md
+Next step: Plan Phase 16 (Duplicate Detection & Merge)
