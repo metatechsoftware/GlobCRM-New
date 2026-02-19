@@ -1,30 +1,46 @@
-import { Component, inject, computed, effect } from '@angular/core';
+import { Component, inject, computed, effect, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { filter, map } from 'rxjs';
 import { BreakpointObserver } from '@angular/cdk/layout';
+import { MatSidenavModule } from '@angular/material/sidenav';
 import { NavbarComponent } from './shared/components/navbar/navbar.component';
 import { AuthStore } from './core/auth/auth.store';
 import { SignalRService } from './core/signalr/signalr.service';
 import { NotificationStore } from './features/notifications/notification.store';
 import { SidebarStateService } from './shared/services/sidebar-state.service';
 import { ThemeService } from './core/theme/theme.service';
+import { PreviewSidebarStore } from './shared/stores/preview-sidebar.store';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, NavbarComponent],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, MatSidenavModule],
   template: `
     @if (showNavbar()) {
       <app-navbar />
     }
-    <main class="app-content"
-          [class.app-content--with-sidebar]="showNavbar() && !isMobile()"
-          [class.app-content--sidebar-collapsed]="showNavbar() && !isMobile() && sidebarState.isCollapsed()"
-          [class.app-content--with-topbar]="showNavbar() && isMobile()">
-      <router-outlet />
-    </main>
+    <mat-sidenav-container class="app-sidenav-container"
+                           [class.has-nav-sidebar]="showNavbar() && !isMobile()"
+                           [class.nav-sidebar-collapsed]="showNavbar() && !isMobile() && sidebarState.isCollapsed()">
+      <mat-sidenav-content class="app-content"
+                           [class.app-content--with-topbar]="showNavbar() && isMobile()"
+                           (click)="onContentClick()">
+        <router-outlet />
+      </mat-sidenav-content>
+
+      @if (showNavbar()) {
+        <mat-sidenav #previewDrawer
+                     position="end"
+                     mode="side"
+                     [opened]="previewStore.isOpen()"
+                     disableClose
+                     class="preview-drawer">
+          <!-- EntityPreviewSidebarComponent will be added by Task 2 -->
+        </mat-sidenav>
+      }
+    </mat-sidenav-container>
   `,
   styles: [
     `
@@ -33,26 +49,40 @@ import { ThemeService } from './core/theme/theme.service';
         height: 100vh;
       }
 
-      .app-content {
+      .app-sidenav-container {
         height: 100vh;
-        overflow: auto;
       }
 
-      /* Desktop: offset by sidebar width + content header height */
-      .app-content--with-sidebar {
+      .app-sidenav-container.has-nav-sidebar {
         margin-left: 240px;
         padding-top: 56px;
         transition: margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
-      .app-content--sidebar-collapsed {
+      .app-sidenav-container.nav-sidebar-collapsed {
         margin-left: 64px;
       }
 
-      /* Mobile: offset by top bar height only */
+      .app-content {
+        height: 100%;
+        overflow: auto;
+      }
+
       .app-content--with-topbar {
-        margin-left: 0;
         padding-top: 56px;
+      }
+
+      .preview-drawer {
+        width: 480px;
+        border-left: 1px solid var(--color-border);
+      }
+
+      ::ng-deep .preview-drawer .mat-drawer-inner-container {
+        overflow-y: auto;
+      }
+
+      ::ng-deep .mat-drawer.preview-drawer {
+        transition: transform 350ms ease !important;
       }
     `,
   ],
@@ -65,6 +95,7 @@ export class AppComponent {
   readonly sidebarState = inject(SidebarStateService);
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly themeService = inject(ThemeService);
+  readonly previewStore = inject(PreviewSidebarStore);
 
   /** Start/stop SignalR and load unread count based on auth state. */
   private readonly authEffect = effect(() => {
@@ -97,4 +128,17 @@ export class AppComponent {
     const isAuthPage = url.startsWith('/auth/');
     return isAuthenticated && !isAuthPage;
   });
+
+  onContentClick(): void {
+    if (this.previewStore.isOpen()) {
+      this.previewStore.close();
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.previewStore.isOpen()) {
+      this.previewStore.close();
+    }
+  }
 }
