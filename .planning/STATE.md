@@ -47,6 +47,7 @@ Progress: [███████████████████████
 | 18-04 | Sequence Frontend (builder + list + detail + enrollment dialog + nav) | 8min | 2 | 15 |
 | 18-05 | Tracking & Analytics Dashboard (DynamicTable selection + analytics + funnel chart + enrollment) | 6min | 2 | 12 |
 | 19-01 | Workflow Domain Foundation (entities + migration + RLS + repository + seeds) | 8min | 2 | 23 |
+| 19-02 | Workflow Execution Engine (handler + condition eval + actions + loop guard) | 11min | 2 | 15 |
 | 19-03 | Workflow REST API (17 endpoints + DTOs + validators + date trigger scanner) | 9min | 2 | 12 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
@@ -160,6 +161,12 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [19-01] WorkflowDefinition stored as JSONB owned entity via ToJson() with nested OwnsMany for nodes/connections/triggers/conditions/actions
 - [19-01] WorkflowActionConfig.Config and WorkflowNode.Config stored as string (serialized JSON) instead of Dictionary -- EF Core ToJson() doesn't support nested dictionaries in owned types
 - [19-01] TriggerSummary denormalized List<string> on Workflow entity for fast event matching without full definition deserialization
+- [19-02] WorkflowTriggerContext as positional record with primitive/string types for Hangfire serialization safety
+- [19-02] Branch node evaluation returns bool mapped to "yes"/"no" connection SourceOutput for graph traversal
+- [19-02] Wait nodes schedule continuation as separate Hangfire delayed jobs and halt current traversal
+- [19-02] Loop guard depth passed through Hangfire job parameters since AsyncLocal does not survive serialization
+- [19-02] Entity data loaded fresh in execution service (not from domain event) to get complete entity state
+- [19-02] Action implementations reuse existing infrastructure services exclusively -- no new service layer
 - [19-03] IMemoryCache direct injection in WorkflowsController for cache invalidation -- avoids compile-time dependency on WorkflowDomainEventHandler from parallel 19-02
 - [19-03] Stub action classes created for parallel 19-02 build compatibility -- 19-02 replaces with real implementations
 - [19-03] DateTriggerScanService supports Deal.ExpectedCloseDate and Activity.DueDate; custom field date querying deferred
@@ -179,6 +186,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 19-03-PLAN.md
-Resume file: .planning/phases/19-workflow-automation/19-03-SUMMARY.md
+Stopped at: Completed 19-02-PLAN.md (parallel with 19-03)
+Resume file: .planning/phases/19-workflow-automation/19-02-SUMMARY.md
 Next step: Execute 19-04-PLAN.md (Workflow Frontend)

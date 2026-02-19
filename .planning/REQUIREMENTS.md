@@ -12,13 +12,13 @@ Requirements for v1.1 Automation & Intelligence release. Each maps to roadmap ph
 - [x] **WFLOW-01**: User can create a workflow with event triggers (record created/updated/deleted)
 - [x] **WFLOW-02**: User can add field-change triggers with conditions (equals, greater than, changed to, etc.)
 - [x] **WFLOW-03**: User can add date-based triggers (X days before/after a date field)
-- [ ] **WFLOW-04**: User can add "update field" action to set field values automatically
-- [ ] **WFLOW-05**: User can add "send notification" action to alert users/teams
-- [ ] **WFLOW-06**: User can add "create activity/task" action with template-based configuration
-- [ ] **WFLOW-07**: User can add "send email" action using an email template with merge fields
-- [ ] **WFLOW-08**: User can add "fire webhook" action to trigger external integrations
-- [ ] **WFLOW-09**: User can add "enroll in sequence" action to start email sequences
-- [ ] **WFLOW-10**: User can chain multiple actions in a single workflow (multi-action)
+- [x] **WFLOW-04**: User can add "update field" action to set field values automatically
+- [x] **WFLOW-05**: User can add "send notification" action to alert users/teams
+- [x] **WFLOW-06**: User can add "create activity/task" action with template-based configuration
+- [x] **WFLOW-07**: User can add "send email" action using an email template with merge fields
+- [x] **WFLOW-08**: User can add "fire webhook" action to trigger external integrations
+- [x] **WFLOW-09**: User can add "enroll in sequence" action to start email sequences
+- [x] **WFLOW-10**: User can chain multiple actions in a single workflow (multi-action)
 - [x] **WFLOW-11**: User can view workflow execution logs showing trigger, conditions, and action results
 - [x] **WFLOW-12**: User can enable/disable workflows without deleting them
 - [x] **WFLOW-13**: Admin can select from pre-built workflow templates as starting points
@@ -179,13 +179,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | WFLOW-01 | Phase 19 | Complete |
 | WFLOW-02 | Phase 19 | Complete |
 | WFLOW-03 | Phase 19 | Complete |
-| WFLOW-04 | Phase 19 | Pending |
-| WFLOW-05 | Phase 19 | Pending |
-| WFLOW-06 | Phase 19 | Pending |
-| WFLOW-07 | Phase 19 | Pending |
-| WFLOW-08 | Phase 19 | Pending |
-| WFLOW-09 | Phase 19 | Pending |
-| WFLOW-10 | Phase 19 | Pending |
+| WFLOW-04 | Phase 19 | Complete |
+| WFLOW-05 | Phase 19 | Complete |
+| WFLOW-06 | Phase 19 | Complete |
+| WFLOW-07 | Phase 19 | Complete |
+| WFLOW-08 | Phase 19 | Complete |
+| WFLOW-09 | Phase 19 | Complete |
+| WFLOW-10 | Phase 19 | Complete |
 | WFLOW-11 | Phase 19 | Complete |
 | WFLOW-12 | Phase 19 | Complete |
 | WFLOW-13 | Phase 19 | Complete |
