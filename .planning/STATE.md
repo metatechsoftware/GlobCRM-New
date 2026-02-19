@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-18)
 ## Current Position
 
 Phase: 18 of 20 (Email Sequences)
-Plan: 3 of 5 complete
+Plan: 4 of 5 complete
 Status: In Progress
-Last activity: 2026-02-19 — Completed 18-03 (Sequence API Endpoints)
+Last activity: 2026-02-19 — Completed 18-04 (Sequence Frontend)
 
-Progress: [████████████████████████████████████████████░] 93% (v1.0: 96/96 plans, v1.1: 23/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 3/5)
+Progress: [█████████████████████████████████████████████░] 94% (v1.0: 96/96 plans, v1.1: 24/25+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 4/5)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 23
-- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 2/5)
+- v1.1 plans completed: 24
+- v1.1 plans total: 25+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 4/5)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -44,6 +44,7 @@ Progress: [███████████████████████
 | 18-01 | Email Sequence Data Layer (entities + migration + RLS + repos + seeds) | 6min | 2 | 22 |
 | 18-02 | Sequence Execution Engine (Hangfire jobs + email sender + tracking + reply detection) | 5min | 2 | 9 |
 | 18-03 | Sequence API Endpoints (SequencesController + 20 endpoints + DTOs + validators) | 5min | 2 | 2 |
+| 18-04 | Sequence Frontend (builder + list + detail + enrollment dialog + nav) | 8min | 2 | 15 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -147,6 +148,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [18-03] CalculateDelay changed from internal to public static for controller resume endpoint reuse
 - [18-03] RBAC permissions for EmailSequence auto-handled by existing RoleTemplateSeeder + PermissionPolicyProvider (zero code changes)
 - [18-03] 20 API endpoints including bulk-pause/resume for multi-select enrollment management
+- [18-04] SequenceStore component-provided (not root) following WebhookStore pattern -- each page gets fresh state
+- [18-04] Sequence list uses mat-table (not DynamicTable) since sequences have fixed columns without user-configurable custom fields
+- [18-04] Separate @if blocks instead of @else if...as for Angular template compatibility (same limitation found in 17-04)
 
 ### Pending Todos
 
@@ -162,6 +166,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 18-03-PLAN.md
-Resume file: .planning/phases/18-email-sequences/18-03-SUMMARY.md
-Next step: Execute 18-04-PLAN.md (Sequence Frontend)
+Stopped at: Completed 18-04-PLAN.md
+Resume file: .planning/phases/18-email-sequences/18-04-SUMMARY.md
+Next step: Execute 18-05-PLAN.md (Tracking & Analytics Dashboard)
