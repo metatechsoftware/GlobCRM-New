@@ -5,23 +5,23 @@
 See: .planning/PROJECT.md (updated 2026-02-18)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.1 Automation & Intelligence — Phase 19 in progress (Workflow Automation)
+**Current focus:** v1.1 Automation & Intelligence — Phase 19 complete (Workflow Automation)
 
 ## Current Position
 
 Phase: 19 of 20 (Workflow Automation)
-Plan: 4 of 6 complete
-Status: In Progress
-Last activity: 2026-02-19 — Completed 19-04 (Workflow Frontend Service Layer & List Page)
+Plan: 6 of 6 complete
+Status: Complete
+Last activity: 2026-02-19 — Completed 19-06 (Workflow Detail & Execution Logs)
 
-Progress: [██████████████████████████████████████████████░] 97% (v1.0: 96/96 plans, v1.1: 29/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 4/6)
+Progress: [████████████████████████████████████████████████] 99% (v1.0: 96/96 plans, v1.1: 31/31+ Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 6/6)
 
 ## Performance Metrics
 
 **Velocity:**
 - Total plans completed: 96 (v1.0)
-- v1.1 plans completed: 29
-- v1.1 plans total: 31+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 3/6)
+- v1.1 plans completed: 31
+- v1.1 plans total: 31+ (Phase 13: 4/4, Phase 14: 4/4, Phase 15: 4/4, Phase 16: 4/4, Phase 17: 4/4, Phase 18: 5/5, Phase 19: 6/6)
 
 | Phase | Plan | Duration | Tasks | Files |
 |-------|------|----------|-------|-------|
@@ -50,6 +50,8 @@ Progress: [███████████████████████
 | 19-02 | Workflow Execution Engine (handler + condition eval + actions + loop guard) | 11min | 2 | 15 |
 | 19-03 | Workflow REST API (17 endpoints + DTOs + validators + date trigger scanner) | 9min | 2 | 12 |
 | 19-04 | Workflow Frontend (models + service + store + card grid list + SVG thumbnails) | 6min | 2 | 14 |
+| 19-05 | Workflow Visual Builder (@foblex/flow canvas + node components) | 7min | 2 | 8 |
+| 19-06 | Workflow Detail & Execution Logs (detail page + log list + log detail) | 8min | 2 | 7 |
 
 **v1.0 Summary:** 12 phases, 96 plans, ~124,200 LOC shipped in 3 days
 
@@ -176,6 +178,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [19-04] Placeholder components for builder/detail/logs routes -- Angular compiler resolves lazy-loaded paths at compile time
 - [19-04] WorkflowStore component-provided (not root) following WebhookStore/SequenceStore pattern -- each page gets fresh instance
 - [19-04] Optimistic status toggle with revert-on-error pattern for responsive UX
+- [19-06] All 19-06 components created during 19-05 execution as build dependency (Rule 3) -- verified correct and complete
+- [19-06] ExecutionLogListComponent dual-input pattern (workflowId for embedded, id for routed) with computed resolver
+- [19-06] Action timeline uses vertical left-aligned layout with status dots, halt markers, and unreached action count
 
 ### Pending Todos
 
@@ -191,6 +196,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-19
-Stopped at: Completed 19-04-PLAN.md
-Resume file: .planning/phases/19-workflow-automation/19-04-SUMMARY.md
-Next step: Execute 19-05-PLAN.md (Workflow Visual Builder)
+Stopped at: Completed 19-06-PLAN.md (Phase 19 complete)
+Resume file: .planning/phases/19-workflow-automation/19-06-SUMMARY.md
+Next step: Execute Phase 20 or final integration testing
