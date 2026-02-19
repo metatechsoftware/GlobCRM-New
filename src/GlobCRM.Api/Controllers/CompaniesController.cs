@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ public class CompaniesController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<CompaniesController> _logger;
 
@@ -39,6 +41,7 @@ public class CompaniesController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<CompaniesController> logger)
     {
@@ -49,6 +52,7 @@ public class CompaniesController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -106,7 +110,8 @@ public class CompaniesController : ControllerBase
         var contacts = await _contactRepository.GetByCompanyIdAsync(id);
         var contactCount = contacts.Count;
 
-        var dto = CompanyDetailDto.FromEntity(company, contactCount);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Company", company, company.CustomFields);
+        var dto = CompanyDetailDto.FromEntity(company, contactCount, enriched);
         return Ok(dto);
     }
 
@@ -501,7 +506,7 @@ public record CompanyDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static CompanyDetailDto FromEntity(Company entity, int contactCount) => new()
+    public static CompanyDetailDto FromEntity(Company entity, int contactCount, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -520,7 +525,7 @@ public record CompanyDetailDto
             ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()
             : null,
         OwnerId = entity.OwnerId,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         ContactCount = contactCount,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt

@@ -3,6 +3,7 @@ using GlobCRM.Domain.Common;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -29,6 +30,7 @@ public class LeadsController : ControllerBase
     private readonly ITenantProvider _tenantProvider;
     private readonly NotificationDispatcher _dispatcher;
     private readonly IFeedRepository _feedRepository;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<LeadsController> _logger;
 
@@ -39,6 +41,7 @@ public class LeadsController : ControllerBase
         ITenantProvider tenantProvider,
         NotificationDispatcher dispatcher,
         IFeedRepository feedRepository,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<LeadsController> logger)
     {
@@ -48,6 +51,7 @@ public class LeadsController : ControllerBase
         _tenantProvider = tenantProvider;
         _dispatcher = dispatcher;
         _feedRepository = feedRepository;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -106,7 +110,8 @@ public class LeadsController : ControllerBase
         if (!IsWithinScope(lead.OwnerId, permission.Scope, userId, teamMemberIds))
             return Forbid();
 
-        var dto = LeadDetailDto.FromEntity(lead);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Lead", lead, lead.CustomFields);
+        var dto = LeadDetailDto.FromEntity(lead, enriched);
         return Ok(dto);
     }
 
@@ -1135,7 +1140,7 @@ public record LeadDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static LeadDetailDto FromEntity(Lead entity) => new()
+    public static LeadDetailDto FromEntity(Lead entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         FirstName = entity.FirstName,
@@ -1147,7 +1152,7 @@ public record LeadDetailDto
         JobTitle = entity.JobTitle,
         CompanyName = entity.CompanyName,
         Description = entity.Description,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         OwnerId = entity.OwnerId,
         OwnerName = entity.Owner != null
             ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()

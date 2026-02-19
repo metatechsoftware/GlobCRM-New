@@ -3,6 +3,7 @@ using GlobCRM.Domain.Common;
 using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +22,7 @@ public class ProductsController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ILogger<ProductsController> _logger;
 
     public ProductsController(
@@ -28,12 +30,14 @@ public class ProductsController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        FormulaEvaluationService formulaEvaluator,
         ILogger<ProductsController> logger)
     {
         _productRepository = productRepository;
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _formulaEvaluator = formulaEvaluator;
         _logger = logger;
     }
 
@@ -75,7 +79,8 @@ public class ProductsController : ControllerBase
         if (product is null)
             return NotFound(new { error = "Product not found." });
 
-        var dto = ProductDetailDto.FromEntity(product);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Product", product, product.CustomFields);
+        var dto = ProductDetailDto.FromEntity(product, enriched);
         return Ok(dto);
     }
 
@@ -263,7 +268,7 @@ public record ProductDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static ProductDetailDto FromEntity(Product entity) => new()
+    public static ProductDetailDto FromEntity(Product entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Name = entity.Name,
@@ -272,7 +277,7 @@ public record ProductDetailDto
         SKU = entity.SKU,
         Category = entity.Category,
         IsActive = entity.IsActive,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt
     };

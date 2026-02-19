@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -30,6 +31,7 @@ public class QuotesController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<QuotesController> _logger;
 
@@ -40,6 +42,7 @@ public class QuotesController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<QuotesController> logger)
     {
@@ -49,6 +52,7 @@ public class QuotesController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -107,7 +111,8 @@ public class QuotesController : ControllerBase
         var originalId = quote.OriginalQuoteId ?? quote.Id;
         var versions = await _quoteRepository.GetVersionsAsync(originalId);
 
-        var dto = QuoteDetailDto.FromEntity(quote, versions);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Quote", quote, quote.CustomFields);
+        var dto = QuoteDetailDto.FromEntity(quote, versions, enriched);
         return Ok(dto);
     }
 
@@ -829,7 +834,7 @@ public record QuoteDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static QuoteDetailDto FromEntity(Quote entity, List<Quote> versions) => new()
+    public static QuoteDetailDto FromEntity(Quote entity, List<Quote> versions, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         QuoteNumber = entity.QuoteNumber,
@@ -855,7 +860,7 @@ public record QuoteDetailDto
         TaxTotal = entity.TaxTotal,
         GrandTotal = entity.GrandTotal,
         Notes = entity.Notes,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         LineItems = entity.LineItems.OrderBy(li => li.SortOrder).Select(li => new QuoteLineItemDto
         {
             Id = li.Id,

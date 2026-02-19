@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,6 +30,7 @@ public class ContactsController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<ContactsController> _logger;
 
@@ -40,6 +42,7 @@ public class ContactsController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<ContactsController> logger)
     {
@@ -50,6 +53,7 @@ public class ContactsController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -103,7 +107,8 @@ public class ContactsController : ControllerBase
         if (!IsWithinScope(contact.OwnerId, permission.Scope, userId, teamMemberIds))
             return Forbid();
 
-        var dto = ContactDetailDto.FromEntity(contact);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Contact", contact, contact.CustomFields);
+        var dto = ContactDetailDto.FromEntity(contact, enriched);
         return Ok(dto);
     }
 
@@ -496,7 +501,7 @@ public record ContactDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static ContactDetailDto FromEntity(Contact entity) => new()
+    public static ContactDetailDto FromEntity(Contact entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         FirstName = entity.FirstName,
@@ -519,7 +524,7 @@ public record ContactDetailDto
             ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()
             : null,
         OwnerId = entity.OwnerId,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt
     };

@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,6 +29,7 @@ public class RequestsController : ControllerBase
     private readonly ICustomFieldRepository _customFieldRepository;
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<RequestsController> _logger;
 
@@ -38,6 +40,7 @@ public class RequestsController : ControllerBase
         ICustomFieldRepository customFieldRepository,
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<RequestsController> logger)
     {
@@ -47,6 +50,7 @@ public class RequestsController : ControllerBase
         _customFieldRepository = customFieldRepository;
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -105,7 +109,8 @@ public class RequestsController : ControllerBase
             .Select(s => s.ToString())
             .ToList();
 
-        var dto = RequestDetailDto.FromEntity(request, allowedTransitions);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Request", request, request.CustomFields);
+        var dto = RequestDetailDto.FromEntity(request, allowedTransitions, enriched);
         return Ok(dto);
     }
 
@@ -566,7 +571,7 @@ public record RequestDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static RequestDetailDto FromEntity(Request entity, List<string> allowedTransitions) => new()
+    public static RequestDetailDto FromEntity(Request entity, List<string> allowedTransitions, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Subject = entity.Subject,
@@ -588,7 +593,7 @@ public record RequestDetailDto
             : null,
         ResolvedAt = entity.ResolvedAt,
         ClosedAt = entity.ClosedAt,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         AllowedTransitions = allowedTransitions,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt,

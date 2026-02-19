@@ -4,6 +4,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,7 @@ public class DealsController : ControllerBase
     private readonly ITenantProvider _tenantProvider;
     private readonly NotificationDispatcher _dispatcher;
     private readonly IFeedRepository _feedRepository;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<DealsController> _logger;
 
@@ -45,6 +47,7 @@ public class DealsController : ControllerBase
         ITenantProvider tenantProvider,
         NotificationDispatcher dispatcher,
         IFeedRepository feedRepository,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<DealsController> logger)
     {
@@ -57,6 +60,7 @@ public class DealsController : ControllerBase
         _tenantProvider = tenantProvider;
         _dispatcher = dispatcher;
         _feedRepository = feedRepository;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -82,9 +86,17 @@ public class DealsController : ControllerBase
         var pagedResult = await _dealRepository.GetPagedAsync(
             queryParams, permission.Scope, userId, teamMemberIds, pipelineId, stageId);
 
+        // Enrich custom fields with formula values
+        var items = new List<DealListDto>();
+        foreach (var deal in pagedResult.Items)
+        {
+            var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Deal", deal, deal.CustomFields);
+            items.Add(DealListDto.FromEntity(deal, enriched));
+        }
+
         var dtoResult = new PagedResult<DealListDto>
         {
-            Items = pagedResult.Items.Select(DealListDto.FromEntity).ToList(),
+            Items = items,
             TotalCount = pagedResult.TotalCount,
             Page = pagedResult.Page,
             PageSize = pagedResult.PageSize
@@ -115,7 +127,8 @@ public class DealsController : ControllerBase
         if (!IsWithinScope(deal.OwnerId, permission.Scope, userId, teamMemberIds))
             return Forbid();
 
-        var dto = DealDetailDto.FromEntity(deal);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Deal", deal, deal.CustomFields);
+        var dto = DealDetailDto.FromEntity(deal, enriched);
         return Ok(dto);
     }
 
@@ -913,7 +926,7 @@ public record DealListDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static DealListDto FromEntity(Deal entity) => new()
+    public static DealListDto FromEntity(Deal entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Title = entity.Title,
@@ -927,7 +940,7 @@ public record DealListDto
         OwnerName = entity.Owner != null
             ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()
             : null,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt
     };
@@ -960,7 +973,7 @@ public record DealDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static DealDetailDto FromEntity(Deal entity) => new()
+    public static DealDetailDto FromEntity(Deal entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Title = entity.Title,
@@ -980,7 +993,7 @@ public record DealDetailDto
         OwnerName = entity.Owner != null
             ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()
             : null,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         LinkedContacts = entity.DealContacts.Select(dc => new LinkedContactDto
         {
             Id = dc.ContactId,

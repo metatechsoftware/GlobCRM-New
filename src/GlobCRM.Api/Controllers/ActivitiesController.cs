@@ -5,6 +5,7 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Notifications;
 using GlobCRM.Infrastructure.Persistence;
 using GlobCRM.Infrastructure.Storage;
@@ -38,6 +39,7 @@ public class ActivitiesController : ControllerBase
     private readonly ICompanyRepository _companyRepository;
     private readonly IContactRepository _contactRepository;
     private readonly IDealRepository _dealRepository;
+    private readonly FormulaEvaluationService _formulaEvaluator;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<ActivitiesController> _logger;
 
@@ -53,6 +55,7 @@ public class ActivitiesController : ControllerBase
         ICompanyRepository companyRepository,
         IContactRepository contactRepository,
         IDealRepository dealRepository,
+        FormulaEvaluationService formulaEvaluator,
         ApplicationDbContext db,
         ILogger<ActivitiesController> logger)
     {
@@ -67,6 +70,7 @@ public class ActivitiesController : ControllerBase
         _companyRepository = companyRepository;
         _contactRepository = contactRepository;
         _dealRepository = dealRepository;
+        _formulaEvaluator = formulaEvaluator;
         _db = db;
         _logger = logger;
     }
@@ -93,9 +97,16 @@ public class ActivitiesController : ControllerBase
             queryParams, userId, permission.Scope, teamMemberIds,
             linkedEntityType, linkedEntityId);
 
+        var items = new List<ActivityListDto>();
+        foreach (var activity in pagedResult.Items)
+        {
+            var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Activity", activity, activity.CustomFields);
+            items.Add(ActivityListDto.FromEntity(activity, enriched));
+        }
+
         var dtoResult = new PagedResult<ActivityListDto>
         {
-            Items = pagedResult.Items.Select(ActivityListDto.FromEntity).ToList(),
+            Items = items,
             TotalCount = pagedResult.TotalCount,
             Page = pagedResult.Page,
             PageSize = pagedResult.PageSize
@@ -126,7 +137,8 @@ public class ActivitiesController : ControllerBase
         if (!IsWithinScope(activity.OwnerId, activity.AssignedToId, permission.Scope, userId, teamMemberIds))
             return Forbid();
 
-        var dto = ActivityDetailDto.FromEntity(activity);
+        var enriched = await _formulaEvaluator.EvaluateFormulasForEntityAsync("Activity", activity, activity.CustomFields);
+        var dto = ActivityDetailDto.FromEntity(activity, enriched);
         return Ok(dto);
     }
 
@@ -1414,7 +1426,7 @@ public record ActivityListDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static ActivityListDto FromEntity(Activity entity) => new()
+    public static ActivityListDto FromEntity(Activity entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Subject = entity.Subject,
@@ -1428,7 +1440,7 @@ public record ActivityListDto
         AssignedToName = entity.AssignedTo != null
             ? $"{entity.AssignedTo.FirstName} {entity.AssignedTo.LastName}".Trim()
             : null,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         CreatedAt = entity.CreatedAt,
         UpdatedAt = entity.UpdatedAt
     };
@@ -1461,7 +1473,7 @@ public record ActivityDetailDto
     public DateTimeOffset CreatedAt { get; init; }
     public DateTimeOffset UpdatedAt { get; init; }
 
-    public static ActivityDetailDto FromEntity(Activity entity) => new()
+    public static ActivityDetailDto FromEntity(Activity entity, Dictionary<string, object?>? enrichedCustomFields = null) => new()
     {
         Id = entity.Id,
         Subject = entity.Subject,
@@ -1479,7 +1491,7 @@ public record ActivityDetailDto
         AssignedToName = entity.AssignedTo != null
             ? $"{entity.AssignedTo.FirstName} {entity.AssignedTo.LastName}".Trim()
             : null,
-        CustomFields = entity.CustomFields,
+        CustomFields = enrichedCustomFields ?? entity.CustomFields,
         Comments = entity.Comments.Select(c => new ActivityCommentDto
         {
             Id = c.Id,
