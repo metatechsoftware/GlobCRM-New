@@ -57,9 +57,25 @@ public class FeedController : ControllerBase
         var userId = GetCurrentUserId();
         var pagedResult = await _feedRepository.GetFeedAsync(userId, page, pageSize);
 
+        var items = pagedResult.Items.Select(FeedItemDto.FromEntity).ToList();
+
+        // Batch-query attachment counts for all feed items on this page
+        var feedItemIds = items.Select(i => i.Id).ToList();
+        var attachmentCounts = await _db.Attachments
+            .Where(a => a.EntityType == "Feeditem" && feedItemIds.Contains(a.EntityId))
+            .GroupBy(a => a.EntityId)
+            .Select(g => new { EntityId = g.Key, Count = g.Count() })
+            .ToDictionaryAsync(x => x.EntityId, x => x.Count);
+
+        for (var i = 0; i < items.Count; i++)
+        {
+            if (attachmentCounts.TryGetValue(items[i].Id, out var count))
+                items[i] = items[i] with { AttachmentCount = count };
+        }
+
         var response = new FeedPagedResponse
         {
-            Items = pagedResult.Items.Select(FeedItemDto.FromEntity).ToList(),
+            Items = items,
             TotalCount = pagedResult.TotalCount,
             Page = pagedResult.Page,
             PageSize = pagedResult.PageSize
@@ -80,7 +96,29 @@ public class FeedController : ControllerBase
         if (feedItem is null)
             return NotFound(new { error = "Feed item not found." });
 
-        return Ok(FeedItemDetailDto.FromEntity(feedItem));
+        var dto = FeedItemDetailDto.FromEntity(feedItem);
+
+        // Load attachments for this feed item
+        var attachments = await _db.Attachments
+            .Include(a => a.UploadedBy)
+            .Where(a => a.EntityType == "Feeditem" && a.EntityId == id)
+            .OrderByDescending(a => a.UploadedAt)
+            .Select(a => new AttachmentDto
+            {
+                Id = a.Id,
+                FileName = a.FileName,
+                ContentType = a.ContentType,
+                FileSizeBytes = a.FileSizeBytes,
+                UploadedByName = a.UploadedBy != null
+                    ? (a.UploadedBy.FirstName + " " + a.UploadedBy.LastName).Trim()
+                    : null,
+                UploadedAt = a.UploadedAt
+            })
+            .ToListAsync();
+
+        dto = dto with { Attachments = attachments };
+
+        return Ok(dto);
     }
 
     // ---- Social Posts ----
@@ -225,35 +263,58 @@ public class FeedController : ControllerBase
     {
         try
         {
-            var mentions = Regex.Matches(content, @"@(\w+)");
-            if (mentions.Count == 0) return;
+            var notifiedUserIds = new HashSet<Guid>();
 
-            var mentionedNames = mentions
+            // Rich mentions: @[Display Name](User:guid)
+            var richMentions = Regex.Matches(content, @"@\[([^\]]+)\]\(User:([a-f0-9\-]+)\)");
+            foreach (Match match in richMentions)
+            {
+                if (Guid.TryParse(match.Groups[2].Value, out var userId) && userId != senderId && notifiedUserIds.Add(userId))
+                {
+                    await _notificationDispatcher.DispatchAsync(new NotificationRequest
+                    {
+                        RecipientId = userId,
+                        Type = NotificationType.Mention,
+                        Title = "You were mentioned",
+                        Message = content.Length > 200 ? content[..200] + "..." : content,
+                        EntityType = entityType,
+                        EntityId = entityId,
+                        CreatedById = senderId
+                    });
+                }
+            }
+
+            // Plain text mentions (fallback): @word
+            var plainMentions = Regex.Matches(content, @"@(\w+)");
+            if (plainMentions.Count == 0 && richMentions.Count == 0) return;
+
+            var mentionedNames = plainMentions
                 .Select(m => m.Groups[1].Value.ToLower())
                 .Distinct()
                 .ToList();
 
-            // Look up users by first name or username matching mention text
-            var users = await _db.Users
-                .Where(u => mentionedNames.Contains(u.FirstName.ToLower())
-                    || mentionedNames.Contains(u.UserName!.ToLower()))
-                .ToListAsync();
-
-            foreach (var user in users)
+            if (mentionedNames.Count > 0)
             {
-                // Don't notify the sender about their own mention
-                if (user.Id == senderId) continue;
+                var users = await _db.Users
+                    .Where(u => mentionedNames.Contains(u.FirstName.ToLower())
+                        || mentionedNames.Contains(u.UserName!.ToLower()))
+                    .ToListAsync();
 
-                await _notificationDispatcher.DispatchAsync(new NotificationRequest
+                foreach (var user in users)
                 {
-                    RecipientId = user.Id,
-                    Type = NotificationType.Mention,
-                    Title = "You were mentioned",
-                    Message = content.Length > 200 ? content[..200] + "..." : content,
-                    EntityType = entityType,
-                    EntityId = entityId,
-                    CreatedById = senderId
-                });
+                    if (user.Id == senderId || !notifiedUserIds.Add(user.Id)) continue;
+
+                    await _notificationDispatcher.DispatchAsync(new NotificationRequest
+                    {
+                        RecipientId = user.Id,
+                        Type = NotificationType.Mention,
+                        Title = "You were mentioned",
+                        Message = content.Length > 200 ? content[..200] + "..." : content,
+                        EntityType = entityType,
+                        EntityId = entityId,
+                        CreatedById = senderId
+                    });
+                }
             }
         }
         catch (Exception ex)
@@ -295,6 +356,7 @@ public record FeedItemDto
     public string? AuthorAvatarUrl { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public int CommentCount { get; init; }
+    public int AttachmentCount { get; init; }
 
     public static FeedItemDto FromEntity(FeedItem entity) => new()
     {
@@ -328,6 +390,7 @@ public record FeedItemDetailDto
     public string? AuthorAvatarUrl { get; init; }
     public DateTimeOffset CreatedAt { get; init; }
     public List<FeedCommentDto> Comments { get; init; } = new();
+    public List<AttachmentDto> Attachments { get; init; } = new();
 
     public static FeedItemDetailDto FromEntity(FeedItem entity) => new()
     {

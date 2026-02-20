@@ -64,16 +64,50 @@
       <div class="template-grid">
         @for (template of store.filteredTemplates(); track template.id; let idx = $index) {
           <mat-card class="template-card" [style.--card-index]="idx">
+            <div class="card-accent-top"></div>
+
             <!-- Thumbnail -->
             <div class="thumbnail-container" (click)="editTemplate(template)">
               <iframe
                 class="thumbnail-iframe"
-                [srcdoc]="template.htmlBody || '<div style=&quot;display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-family:sans-serif;&quot;><p>No preview available</p></div>'"
+                [srcdoc]="(template.htmlBody || fallbackHtml) | safeHtml"
                 sandbox
                 scrolling="no"
                 tabindex="-1"
               ></iframe>
               <div class="thumbnail-overlay"></div>
+
+              <!-- Floating Action Bar -->
+              <div class="thumbnail-actions">
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Edit'"
+                  matTooltip="Edit"
+                  aria-label="Edit template"
+                  (click)="$event.stopPropagation(); editTemplate(template)"
+                >
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Create'"
+                  matTooltip="Clone"
+                  aria-label="Clone template"
+                  (click)="$event.stopPropagation(); cloneTemplate(template)"
+                >
+                  <mat-icon>content_copy</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  *appHasPermission="'EmailTemplate:Delete'"
+                  matTooltip="Delete"
+                  aria-label="Delete template"
+                  color="warn"
+                  (click)="$event.stopPropagation(); deleteTemplate(template)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
             </div>
 
             <!-- Info Section -->
@@ -97,37 +131,6 @@
                 }
               </div>
             </mat-card-content>
-
-            <!-- Actions -->
-            <mat-card-actions class="template-actions">
-              <div class="template-actions__reveal">
-                <button
-                  mat-icon-button
-                  *appHasPermission="'EmailTemplate:Edit'"
-                  matTooltip="Edit"
-                  (click)="editTemplate(template)"
-                >
-                  <mat-icon>edit</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  *appHasPermission="'EmailTemplate:Create'"
-                  matTooltip="Clone"
-                  (click)="cloneTemplate(template)"
-                >
-                  <mat-icon>content_copy</mat-icon>
-                </button>
-                <button
-                  mat-icon-button
-                  *appHasPermission="'EmailTemplate:Delete'"
-                  matTooltip="Delete"
-                  color="warn"
-                  (click)="deleteTemplate(template)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </div>
-            </mat-card-actions>
           </mat-card>
         }
       </div>
@@ -135,7 +138,7 @@
       <!-- Empty State -->
       <div class="empty-state">
         <div class="empty-icon-wrap">
-          <mat-icon class="empty-icon">mail_outline</mat-icon>
+          <mat-icon class="empty-icon">drafts</mat-icon>
         </div>
         <h2>No email templates yet</h2>
         <p>Create your first email template to start sending personalized emails.</p>

@@ -21,6 +21,7 @@ export interface FeedItemDto {
   authorAvatarUrl: string | null;
   createdAt: string;
   commentCount: number;
+  attachmentCount: number;
 }
 
 /**
@@ -33,6 +34,24 @@ export interface FeedCommentDto {
   authorName: string;
   authorAvatarUrl: string | null;
   createdAt: string;
+}
+
+/**
+ * DTO for feed item attachments.
+ */
+export interface FeedAttachmentDto {
+  id: string;
+  fileName: string;
+  contentType: string;
+  fileSizeBytes: number;
+}
+
+/**
+ * Payload for creating a feed post with optional file attachments.
+ */
+export interface CreateFeedPostPayload {
+  content: string;
+  files: File[];
 }
 
 /**

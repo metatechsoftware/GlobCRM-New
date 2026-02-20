@@ -37,6 +37,7 @@ import {
 import { EmailTemplateService } from '../email-template.service';
 import { PreviewResponse } from '../email-template.models';
 import { ApiService } from '../../../core/api/api.service';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
 export interface PreviewDialogData {
   templateId: string;
@@ -70,6 +71,7 @@ interface EntityOption {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    SafeHtmlPipe,
   ],
   templateUrl: './email-template-preview.component.html',
   styleUrl: './email-template-preview.component.scss',

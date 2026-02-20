@@ -40,8 +40,10 @@
   @if (stagesWithLeads().length > 0) {
     <div class="kanban-board" cdkDropListGroup>
       @for (stage of stagesWithLeads(); track stage.id) {
-        <div class="kanban-column" [class.terminal-column]="stage.isConverted || stage.isLost">
-          <div class="column-header" [style.border-top-color]="stage.color">
+        <div class="kanban-column"
+             [class.terminal-column]="stage.isConverted || stage.isLost"
+             [style.--stage-color]="stage.color">
+          <div class="column-header">
             <div class="column-header-left">
               <span class="column-title">{{ stage.name }}</span>
               <span class="column-count">{{ stage.leads.length }}</span>
@@ -57,6 +59,9 @@
               <div cdkDrag
                    [cdkDragDisabled]="stage.isConverted || stage.isLost"
                    class="lead-card"
+                   [class.temp-hot]="lead.temperature === 'hot'"
+                   [class.temp-warm]="lead.temperature === 'warm'"
+                   [class.temp-cold]="lead.temperature === 'cold'"
                    (click)="openLead(lead.id)">
                 <!-- Lead name -->
                 <div class="lead-name">{{ lead.fullName }}</div>
@@ -80,7 +85,9 @@
                 <!-- Bottom row: temperature badge, owner initials, days in stage -->
                 <div class="lead-card-footer">
                   <span class="temperature-badge"
-                        [style.background-color]="getTemperatureColor(lead.temperature)">
+                        [class.temp-hot]="lead.temperature === 'hot'"
+                        [class.temp-warm]="lead.temperature === 'warm'"
+                        [class.temp-cold]="lead.temperature === 'cold'">
                     {{ lead.temperature }}
                   </span>
 
@@ -90,14 +97,21 @@
                     </span>
                   }
 
-                  <span class="days-in-stage">{{ lead.daysInStage }}d</span>
+                  <span class="days-in-stage"
+                        [class.days-normal]="lead.daysInStage <= 14"
+                        [class.days-warning]="lead.daysInStage > 14 && lead.daysInStage <= 30"
+                        [class.days-danger]="lead.daysInStage > 30">
+                    {{ lead.daysInStage }}d
+                  </span>
                 </div>
 
                 <!-- Drag preview -->
                 <div *cdkDragPreview class="lead-card-preview">
                   <div class="lead-name">{{ lead.fullName }}</div>
                   <span class="temperature-badge"
-                        [style.background-color]="getTemperatureColor(lead.temperature)">
+                        [class.temp-hot]="lead.temperature === 'hot'"
+                        [class.temp-warm]="lead.temperature === 'warm'"
+                        [class.temp-cold]="lead.temperature === 'cold'">
                     {{ lead.temperature }}
                   </span>
                 </div>

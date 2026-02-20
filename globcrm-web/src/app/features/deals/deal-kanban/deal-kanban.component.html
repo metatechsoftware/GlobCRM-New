@@ -55,8 +55,10 @@
   @if (kanbanData(); as data) {
     <div class="kanban-board" cdkDropListGroup>
       @for (stage of data.stages; track stage.id) {
-        <div class="kanban-column">
-          <div class="column-header" [style.border-top-color]="stage.color">
+        <div class="kanban-column"
+             [class.terminal-column]="stage.isWon || stage.isLost"
+             [style.--stage-color]="stage.color">
+          <div class="column-header">
             <div class="column-header-left">
               <span class="column-title">{{ stage.name }}</span>
               <span class="column-count">{{ stage.deals.length }}</span>
@@ -65,11 +67,19 @@
           </div>
           <div cdkDropList
                [cdkDropListData]="stage.deals"
+               [cdkDropListDisabled]="stage.isWon || stage.isLost"
                [id]="'stage-' + stage.id"
                (cdkDropListDropped)="onDrop($event, stage.id)"
                class="column-body">
             @for (deal of stage.deals; track deal.id) {
-              <div cdkDrag class="deal-card" (click)="openDeal(deal.id)">
+              <div cdkDrag
+                   [cdkDragDisabled]="stage.isWon || stage.isLost"
+                   class="deal-card"
+                   [class.urgency-overdue]="getCloseUrgency(deal.expectedCloseDate) === 'overdue'"
+                   [class.urgency-soon]="getCloseUrgency(deal.expectedCloseDate) === 'soon'"
+                   [class.urgency-approaching]="getCloseUrgency(deal.expectedCloseDate) === 'approaching'"
+                   [class.urgency-future]="getCloseUrgency(deal.expectedCloseDate) === 'future'"
+                   (click)="openDeal(deal.id)">
                 <div class="deal-title">{{ deal.title }}</div>
                 @if (deal.value) {
                   <div class="deal-value">{{ deal.value | currency }}</div>
@@ -80,24 +90,47 @@
                     {{ deal.companyName }}
                   </div>
                 }
-                @if (deal.ownerName) {
-                  <div class="deal-owner">
-                    <mat-icon class="deal-meta-icon">person</mat-icon>
-                    {{ deal.ownerName }}
-                  </div>
-                }
-                @if (deal.expectedCloseDate) {
-                  <div class="deal-date">
-                    <mat-icon class="deal-meta-icon">event</mat-icon>
-                    {{ deal.expectedCloseDate }}
-                  </div>
-                }
+
+                <!-- Footer: urgency badge + owner avatar + close date -->
+                <div class="deal-card-footer">
+                  @if (getCloseUrgency(deal.expectedCloseDate); as urgency) {
+                    <span class="urgency-badge"
+                          [class.urgency-overdue]="urgency === 'overdue'"
+                          [class.urgency-soon]="urgency === 'soon'"
+                          [class.urgency-approaching]="urgency === 'approaching'"
+                          [class.urgency-future]="urgency === 'future'">
+                      {{ getCloseLabel(deal.expectedCloseDate) }}
+                    </span>
+                  }
+
+                  @if (deal.ownerName) {
+                    <span class="owner-avatar" [title]="deal.ownerName">
+                      {{ getOwnerInitials(deal.ownerName) }}
+                    </span>
+                  }
+
+                  @if (deal.expectedCloseDate) {
+                    <span class="close-date-label">
+                      <mat-icon class="deal-meta-icon">event</mat-icon>
+                      {{ deal.expectedCloseDate | date:'MMM d' }}
+                    </span>
+                  }
+                </div>
 
                 <!-- Drag preview -->
                 <div *cdkDragPreview class="deal-card-preview">
                   <div class="deal-title">{{ deal.title }}</div>
                   @if (deal.value) {
-                    <div class="deal-value">{{ deal.value | currency }}</div>
+                    <span class="deal-preview-value">{{ deal.value | currency }}</span>
+                  }
+                  @if (getCloseUrgency(deal.expectedCloseDate); as urgency) {
+                    <span class="urgency-badge"
+                          [class.urgency-overdue]="urgency === 'overdue'"
+                          [class.urgency-soon]="urgency === 'soon'"
+                          [class.urgency-approaching]="urgency === 'approaching'"
+                          [class.urgency-future]="urgency === 'future'">
+                      {{ getCloseLabel(deal.expectedCloseDate) }}
+                    </span>
                   }
                 </div>
 
@@ -106,7 +139,7 @@
               </div>
             }
             @if (stage.deals.length === 0) {
-              <div class="column-empty">No deals</div>
+              <div class="column-empty">No deals in this stage</div>
             }
           </div>
         </div>
@@ -116,6 +149,7 @@
     <div class="kanban-empty">
       <mat-icon class="empty-icon">view_kanban</mat-icon>
       <p>Select a pipeline to view the Kanban board</p>
+      <p class="empty-subtext">Choose a pipeline from the dropdown above</p>
     </div>
   }
 </div>

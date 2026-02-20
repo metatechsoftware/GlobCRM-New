@@ -20,6 +20,7 @@ import {
   TemplatePickerDialogComponent,
   TemplatePickerResult,
 } from './template-picker-dialog.component';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
 @Component({
   selector: 'app-step-item',
@@ -34,6 +35,7 @@ import {
     MatTooltipModule,
     MatDialogModule,
     CdkDragHandle,
+    SafeHtmlPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -286,7 +288,7 @@ import {
             </div>
             @if (templatePreviewHtml()) {
               <iframe class="step-item__template-preview"
-                      [srcdoc]="templatePreviewHtml()!"
+                      [srcdoc]="templatePreviewHtml()! | safeHtml"
                       sandbox
                       scrolling="no"
                       title="Template preview"></iframe>

@@ -1,6 +1,6 @@
 @use '../../../../styles/entity-list';
 
-// ─── Activity List: Enhanced Header + Actions ───────────
+// ─── Quote List: Enhanced Header ────────────────────────
 
 .list-header__title-group {
   display: flex;
@@ -50,10 +50,15 @@
   gap: var(--space-3);
 }
 
-.view-mode-toggle {
-  ::ng-deep .mat-button-toggle-label-content {
-    padding: 0 var(--space-2);
-  }
+// ─── Status Badge (for table rendering) ─────────────────
+.status-badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #fff;
+  line-height: 1.5;
 }
 
 // ─── Responsive: Mobile ─────────────────────────────────

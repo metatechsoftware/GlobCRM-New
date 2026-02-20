@@ -18,6 +18,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 import { EmailTemplateStore } from '../email-template.store';
 import { EmailTemplateListItem } from '../email-template.models';
 import {
@@ -47,6 +48,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatSnackBarModule,
     MatTooltipModule,
     HasPermissionDirective,
+    SafeHtmlPipe,
   ],
   providers: [EmailTemplateStore],
   templateUrl: './email-template-list.component.html',
@@ -61,6 +63,7 @@ export class EmailTemplateListComponent implements OnInit {
 
   readonly searchValue = signal('');
   readonly selectedCategoryId = signal<string | null>(null);
+  readonly fallbackHtml = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-family:sans-serif;"><p>No preview available</p></div>';
 
   ngOnInit(): void {
     this.store.loadTemplates();

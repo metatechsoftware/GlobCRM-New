@@ -1383,47 +1383,168 @@ public class TenantSeeder : ITenantSeeder
         AddStageHistory("Financial Analytics Platform", "Qualified", "Proposal", emily.Id, 4);
 
         // ══════════════════════════════════════════════════════════
-        // STEP 9: FeedItems + FeedComments
+        // STEP 9: FeedItems + FeedComments (20 items, ~23 comments)
         // ══════════════════════════════════════════════════════════
 
-        // Social Post 1: Deal closure celebration
+        // Helper to build mention strings with real entity IDs
+        string Mention(string name, string type, Guid? id) =>
+            id.HasValue ? $"@[{name}]({type}:{id.Value})" : name;
+
+        // ── Social Post 1: Deal win celebration (1d ago) ────────
         var feed1 = new FeedItem
         {
             TenantId = organizationId,
             Type = FeedItemType.SocialPost,
-            Content = "Just closed the Digital Marketing Suite deal with Alpine Digital Agency! Great teamwork from everyone involved. This brings our Q4 pipeline to a strong start.",
+            Content = $"Just closed the Digital Marketing Suite deal with {Mention("Alpine Digital Agency", "Company", companyMap.GetValueOrDefault("Alpine Digital Agency")?.Id)}! Huge thanks to {Mention("Nina Johansson", "Contact", contactMap.GetValueOrDefault("nina.johansson@example.com")?.Id)} for championing us internally.",
+            EntityType = "Deal",
+            EntityId = dealMap.GetValueOrDefault("Digital Marketing Suite")?.Id,
+            EntityName = "Digital Marketing Suite",
             AuthorId = olivia.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1)
         };
         _db.FeedItems.Add(feed1);
 
-        // Social Post 2: Pipeline review reminder
+        // ── Social Post 2: Pipeline review reminder (2d ago) ────
         var feed2 = new FeedItem
         {
             TenantId = organizationId,
             Type = FeedItemType.SocialPost,
-            Content = "Reminder: Q4 pipeline review meeting tomorrow at 2 PM. Please update your deal stages and forecasts before the meeting. Looking forward to hearing about your progress!",
+            Content = $"Reminder: Q4 pipeline review meeting tomorrow at 2 PM. {Mention("Jake Martinez", "User", jake.Id)} and {Mention("Priya Nair", "User", priya.Id)} — please have your deal stages updated before then. Let's aim for a strong finish!",
             AuthorId = emily.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-2)
         };
         _db.FeedItems.Add(feed2);
 
-        // Social Post 3: Intro call update
+        // ── Social Post 3: Discovery call recap (3d ago) ────────
         var feed3 = new FeedItem
         {
             TenantId = organizationId,
             Type = FeedItemType.SocialPost,
-            Content = "Had a fantastic intro call with Quantum Financial Services today. They're looking for a comprehensive analytics solution. Scheduling a deep-dive demo for next week.",
+            Content = $"Had an excellent discovery call with {Mention("Quantum Financial Services", "Company", companyMap.GetValueOrDefault("Quantum Financial Services")?.Id)} today. Met with {Mention("Priya Sharma", "Contact", contactMap.GetValueOrDefault("priya.sharma@example.com")?.Id)} (Head of Product) and {Mention("Robert Chang", "Contact", contactMap.GetValueOrDefault("robert.chang@example.com")?.Id)} (Risk Analyst). They need real-time market data feeds plus custom dashboards.\n\nKey takeaways:\n- Budget approved for Q2, decision in 30 days\n- Main competitor is Bloomberg Terminal (different league, but they want something lighter)\n- Next step: technical deep-dive with their engineering team\n\nLinked to the {Mention("Financial Analytics Platform", "Deal", dealMap.GetValueOrDefault("Financial Analytics Platform")?.Id)} opportunity.",
+            EntityType = "Company",
+            EntityId = companyMap.GetValueOrDefault("Quantum Financial Services")?.Id,
+            EntityName = "Quantum Financial Services",
             AuthorId = emily.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3)
         };
         _db.FeedItems.Add(feed3);
 
-        // System Event 1: Deal stage change
+        // ── Social Post 4: Proposal sent (5d ago) ───────────────
         var feed4 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Sent the proposal for {Mention("Enterprise CRM License", "Deal", dealMap.GetValueOrDefault("Enterprise CRM License")?.Id)} to {Mention("Sarah Chen", "Contact", contactMap.GetValueOrDefault("sarah.chen@example.com")?.Id)} at {Mention("TechVision Inc.", "Company", companyMap.GetValueOrDefault("TechVision Inc.")?.Id)}. Fingers crossed — this would be our biggest deal this quarter!",
+            EntityType = "Deal",
+            EntityId = dealMap.GetValueOrDefault("Enterprise CRM License")?.Id,
+            EntityName = "Enterprise CRM License",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5)
+        };
+        _db.FeedItems.Add(feed4);
+
+        // ── Social Post 5: Trade show lead (7d ago) ─────────────
+        var feed5 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Great conversation with {Mention("Wei Zhang", "Lead", leadMap.GetValueOrDefault("Wei Zhang")?.Id)} at SaaS Connect 2026. Hot lead — budget approved, follow-up call next week.",
+            EntityType = "Lead",
+            EntityId = leadMap.GetValueOrDefault("Wei Zhang")?.Id,
+            EntityName = "Wei Zhang",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-7),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-7)
+        };
+        _db.FeedItems.Add(feed5);
+
+        // ── Social Post 6: Weekly analytics summary (10d ago) ───
+        var feed6 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Weekly pipeline analytics update:\n\n{Mention("Enterprise CRM License", "Deal", dealMap.GetValueOrDefault("Enterprise CRM License")?.Id)} — moved to Proposal, $25K value. Demo went really well with the technical team.\n{Mention("Cloud Migration Project", "Deal", dealMap.GetValueOrDefault("Cloud Migration Project")?.Id)} — now in Negotiation at $42K. Legal review in progress on their side.\n\nOverall pipeline is up 18% week-over-week. Great momentum, team!",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-10),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-10)
+        };
+        _db.FeedItems.Add(feed6);
+
+        // ── Social Post 7: Quarterly review recap (14d ago) ─────
+        var feed7 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Wrapped up our quarterly business review with {Mention("CloudScale Solutions", "Company", companyMap.GetValueOrDefault("CloudScale Solutions")?.Id)}. {Mention("Aisha Patel", "Contact", contactMap.GetValueOrDefault("aisha.patel@example.com")?.Id)} and {Mention("James Thompson", "Contact", contactMap.GetValueOrDefault("james.t@example.com")?.Id)} are happy with the platform — usage is up 40% since onboarding. They're considering expanding to their London office next quarter.",
+            EntityType = "Company",
+            EntityId = companyMap.GetValueOrDefault("CloudScale Solutions")?.Id,
+            EntityName = "CloudScale Solutions",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-14),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-14)
+        };
+        _db.FeedItems.Add(feed7);
+
+        // ── Social Post 8: Welcome message (18d ago) ────────────
+        var feed8 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Welcome aboard, {Mention("Sophie Laurent", "Contact", contactMap.GetValueOrDefault("sophie.laurent@example.com")?.Id)}! Excited to have her as a freelance consultant on the team.",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-18),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-18)
+        };
+        _db.FeedItems.Add(feed8);
+
+        // ── Social Post 9: LinkedIn lead gen (22d ago) ──────────
+        var feed9 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"LinkedIn outreach is paying off! Two new leads this week: {Mention("Maria Gonzalez", "Lead", leadMap.GetValueOrDefault("Maria Gonzalez")?.Id)} from Bright Solutions and {Mention("Alex Turner", "Lead", leadMap.GetValueOrDefault("Alex Turner")?.Id)} from Horizon Tech. Both look promising.",
+            EntityType = "Lead",
+            EntityId = leadMap.GetValueOrDefault("Maria Gonzalez")?.Id,
+            EntityName = "Maria Gonzalez",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-22),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-22)
+        };
+        _db.FeedItems.Add(feed9);
+
+        // ── Social Post 10: Month-end team update (28d ago) ─────
+        var feed10 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SocialPost,
+            Content = $"Month-end update — what a great October! Highlights:\n\n- {Mention("GreenLeaf Organics", "Company", companyMap.GetValueOrDefault("GreenLeaf Organics")?.Id)} onboarded successfully, Farm-to-Table tracking deal moving forward\n- {Mention("Nova Robotics Ltd", "Company", companyMap.GetValueOrDefault("Nova Robotics Ltd")?.Id)} deal didn't go our way, but we learned a lot about the manufacturing vertical\n- {Mention("Meridian Healthcare", "Company", companyMap.GetValueOrDefault("Meridian Healthcare")?.Id)} is a huge opportunity — $55K pipeline and growing\n\nProud of everyone's effort this month. Let's keep the energy going!",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-28),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-28)
+        };
+        _db.FeedItems.Add(feed10);
+
+        // ── System Event 11: Deal won (1d ago) ──────────────────
+        var feed11 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Deal 'Digital Marketing Suite' closed as Won. Value: $8,500.",
+            EntityType = "Deal",
+            EntityId = dealMap.GetValueOrDefault("Digital Marketing Suite")?.Id,
+            EntityName = "Digital Marketing Suite",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(-2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(-2)
+        };
+        _db.FeedItems.Add(feed11);
+
+        // ── System Event 12: Deal stage change (4d ago) ─────────
+        var feed12 = new FeedItem
         {
             TenantId = organizationId,
             Type = FeedItemType.SystemEvent,
@@ -1432,13 +1553,13 @@ public class TenantSeeder : ITenantSeeder
             EntityId = dealMap.GetValueOrDefault("Cloud Migration Project")?.Id,
             EntityName = "Cloud Migration Project",
             AuthorId = emily.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-7),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-7)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-4),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-4)
         };
-        _db.FeedItems.Add(feed4);
+        _db.FeedItems.Add(feed12);
 
-        // System Event 2: New contact added
-        var feed5 = new FeedItem
+        // ── System Event 13: New contact added (6d ago) ─────────
+        var feed13 = new FeedItem
         {
             TenantId = organizationId,
             Type = FeedItemType.SystemEvent,
@@ -1447,59 +1568,320 @@ public class TenantSeeder : ITenantSeeder
             EntityId = contactMap.GetValueOrDefault("sophie.laurent@example.com")?.Id,
             EntityName = "Sophie Laurent",
             AuthorId = priya.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-6),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-6)
         };
-        _db.FeedItems.Add(feed5);
+        _db.FeedItems.Add(feed13);
 
-        // Feed Comments
+        // ── System Event 14: Company industry updated (8d ago) ──
+        var feed14 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Company 'TechVision Inc.' industry updated from 'Software' to 'Technology'.",
+            EntityType = "Company",
+            EntityId = companyMap.GetValueOrDefault("TechVision Inc.")?.Id,
+            EntityName = "TechVision Inc.",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-8),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-8)
+        };
+        _db.FeedItems.Add(feed14);
+
+        // ── System Event 15: Lead stage change (9d ago) ─────────
+        var feed15 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Lead 'Wei Zhang' moved from New to Contacted stage.",
+            EntityType = "Lead",
+            EntityId = leadMap.GetValueOrDefault("Wei Zhang")?.Id,
+            EntityName = "Wei Zhang",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-9),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-9)
+        };
+        _db.FeedItems.Add(feed15);
+
+        // ── System Event 16: Product price updated (11d ago) ────
+        var feed16 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Product 'Premium Support' price updated from $89.99 to $99.99.",
+            EntityType = "Product",
+            EntityId = productMap.GetValueOrDefault("Premium Support")?.Id,
+            EntityName = "Premium Support",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-11),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-11)
+        };
+        _db.FeedItems.Add(feed16);
+
+        // ── System Event 17: Activity completed (13d ago) ───────
+        var feed17 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Activity 'Prepare training materials for GreenLeaf' marked as completed.",
+            EntityType = "Activity",
+            EntityId = activityList.Count > 2 ? activityList[2].Id : null,
+            EntityName = activityList.Count > 2 ? activityList[2].Subject : "Activity",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-13),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-13)
+        };
+        _db.FeedItems.Add(feed17);
+
+        // ── System Event 18: New company added (16d ago) ────────
+        var feed18 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "New company 'GreenLeaf Organics' added to the system.",
+            EntityType = "Company",
+            EntityId = companyMap.GetValueOrDefault("GreenLeaf Organics")?.Id,
+            EntityName = "GreenLeaf Organics",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-16),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-16)
+        };
+        _db.FeedItems.Add(feed18);
+
+        // ── System Event 19: Deal lost (20d ago) ────────────────
+        var feed19 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Deal 'Robotics Fleet Management' closed as Lost. Competitor won on pricing.",
+            EntityType = "Deal",
+            EntityId = dealMap.GetValueOrDefault("Robotics Fleet Management")?.Id,
+            EntityName = "Robotics Fleet Management",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-20),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-20)
+        };
+        _db.FeedItems.Add(feed19);
+
+        // ── System Event 20: Lead qualified (25d ago) ───────────
+        var feed20 = new FeedItem
+        {
+            TenantId = organizationId,
+            Type = FeedItemType.SystemEvent,
+            Content = "Lead 'James O'Brien' qualified. Budget: $40K/yr, decision in 30 days.",
+            EntityType = "Lead",
+            EntityId = leadMap.GetValueOrDefault("James O'Brien")?.Id,
+            EntityName = "James O'Brien",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-25),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-25)
+        };
+        _db.FeedItems.Add(feed20);
+
+        // ── Feed Comments (23 total) ────────────────────────────
+
+        // Post 1 (deal win) — 4 comments
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed1.Id,
-            Content = "Congrats Olivia! Great work on that deal.",
+            Content = "Congrats Olivia! Amazing work closing that deal.",
             AuthorId = emily.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(1),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(1)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(1),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(1)
         });
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed1.Id,
             Content = "Well deserved! The demo you gave was excellent.",
             AuthorId = jake.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(2),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(2)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(2)
         });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed1.Id,
+            Content = "Nina was such a great champion on their side. Let's send her a thank-you note!",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(4),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(4)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed1.Id,
+            Content = "This puts us at 112% of Q4 target. Incredible momentum!",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(6),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(6)
+        });
+
+        // Post 2 (pipeline review) — 2 comments
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed2.Id,
             Content = "Updated all my deals. Looking good for Q4!",
             AuthorId = jake.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(4),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(4)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-2).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-2).AddHours(3)
         });
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed2.Id,
             Content = "I have two deals moving to Proposal this week. Will update before the meeting.",
             AuthorId = priya.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(5),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(5)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-2).AddHours(5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-2).AddHours(5)
         });
+
+        // Post 3 (discovery call) — 3 comments
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed3.Id,
-            Content = "I worked with their risk team before - happy to join the demo if helpful.",
+            Content = "I worked with their risk team before — happy to join the demo if helpful.",
             AuthorId = daniel.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(3),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(3)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(2)
         });
         _db.FeedComments.Add(new FeedComment
         {
             FeedItemId = feed3.Id,
             Content = "Great initiative! Let me know if you need the analytics pitch deck.",
             AuthorId = olivia.Id,
-            CreatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(5),
-            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-1).AddHours(5)
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(4),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(4)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed3.Id,
+            Content = "Bloomberg Terminal as a competitor is interesting positioning. We should highlight our cost advantage.",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(7),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-3).AddHours(7)
+        });
+
+        // Post 4 (proposal sent) — 2 comments
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed4.Id,
+            Content = "Good luck! Sarah seemed very engaged during the last call.",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(3)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed4.Id,
+            Content = "Let me know if they have questions about the integration timeline.",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-5).AddHours(5)
+        });
+
+        // Post 5 (trade show lead) — 1 comment
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed5.Id,
+            Content = "Nice find! I'll add them to the nurture sequence.",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-7).AddHours(4),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-7).AddHours(4)
+        });
+
+        // Post 6 (weekly analytics) — 3 comments
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed6.Id,
+            Content = "18% week-over-week growth is fantastic. What's driving it?",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(2)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed6.Id,
+            Content = "Mostly the TechVision and CloudScale deals moving forward. Plus two new leads from LinkedIn.",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(3)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed6.Id,
+            Content = "Love these weekly summaries, Daniel. Super helpful for the team.",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-10).AddHours(5)
+        });
+
+        // Post 7 (quarterly review) — 1 comment
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed7.Id,
+            Content = "Great news about the London expansion. I can help with the onboarding plan.",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-14).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-14).AddHours(3)
+        });
+
+        // Post 8 (welcome) — 3 comments
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed8.Id,
+            Content = "Welcome Sophie! Looking forward to working together.",
+            AuthorId = emily.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(1),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(1)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed8.Id,
+            Content = "Great addition to the team!",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(3)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed8.Id,
+            Content = "Welcome aboard! Let me know if you need help getting set up.",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-18).AddHours(5)
+        });
+
+        // Post 9 (LinkedIn leads) — 2 comments
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed9.Id,
+            Content = "Horizon Tech looks especially promising — VP Engineering with budget authority.",
+            AuthorId = jake.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-22).AddHours(2),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-22).AddHours(2)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed9.Id,
+            Content = "Social selling is really working for us. Can you share your outreach template?",
+            AuthorId = olivia.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-22).AddHours(6),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-22).AddHours(6)
+        });
+
+        // Post 10 (month-end) — 2 comments
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed10.Id,
+            Content = "Tough break on Nova Robotics, but the learnings will pay off. Manufacturing is a growing vertical for us.",
+            AuthorId = daniel.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-28).AddHours(3),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-28).AddHours(3)
+        });
+        _db.FeedComments.Add(new FeedComment
+        {
+            FeedItemId = feed10.Id,
+            Content = "Meridian Healthcare could be our biggest deal ever. Let's make sure we nail the compliance requirements.",
+            AuthorId = priya.Id,
+            CreatedAt = DateTimeOffset.UtcNow.AddDays(-28).AddHours(5),
+            UpdatedAt = DateTimeOffset.UtcNow.AddDays(-28).AddHours(5)
         });
 
         // ══════════════════════════════════════════════════════════

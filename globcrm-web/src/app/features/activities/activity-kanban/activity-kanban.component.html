@@ -34,8 +34,10 @@
   <!-- Kanban board -->
   <div class="kanban-board" cdkDropListGroup>
     @for (column of columns(); track column.status) {
-      <div class="kanban-column">
-        <div class="column-header" [style.border-top-color]="column.color">
+      <div class="kanban-column"
+           [style.--stage-color]="column.color"
+           [class.terminal-column]="column.status === 'Done'">
+        <div class="column-header">
           <div class="column-header-left">
             <span class="column-title">{{ column.label }}</span>
             <span class="column-count">{{ column.activities.length }}</span>
@@ -48,39 +50,43 @@
              class="column-body">
           @for (activity of column.activities; track activity.id) {
             <div cdkDrag class="activity-card"
-                 [style.border-left-color]="getPriorityColor(activity.priority)"
                  (click)="openActivity(activity.id)">
               <div class="card-top-row">
-                <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                <span class="type-icon-circle">
+                  <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                </span>
                 <span class="card-subject">{{ truncate(activity.subject) }}</span>
               </div>
 
               <div class="card-meta">
-                <span class="priority-chip"
-                      [style.background-color]="getPriorityColor(activity.priority)"
-                      [style.color]="'var(--color-primary-fg)'">
+                <span [class]="'priority-badge ' + getPriorityClass(activity.priority)">
                   {{ activity.priority }}
                 </span>
+                <span class="type-label">{{ activity.type }}</span>
+              </div>
 
+              <div class="activity-card-footer">
+                @if (activity.assignedToName) {
+                  <span class="assignee-avatar" [title]="activity.assignedToName">{{ getAssigneeInitials(activity.assignedToName) }}</span>
+                  <span class="assignee-name">{{ activity.assignedToName }}</span>
+                }
                 @if (activity.dueDate) {
-                  <span class="card-due-date" [class.overdue]="isOverdue(activity.dueDate)">
+                  <span [class]="'due-date-badge ' + getDueDateClass(activity.dueDate)">
                     <mat-icon class="meta-icon">event</mat-icon>
                     {{ activity.dueDate | date:'MMM d' }}
                   </span>
                 }
               </div>
 
-              @if (activity.assignedToName) {
-                <div class="card-assignee">
-                  <mat-icon class="meta-icon">person</mat-icon>
-                  {{ activity.assignedToName }}
-                </div>
-              }
-
               <!-- Drag preview -->
               <div *cdkDragPreview class="activity-card-preview">
-                <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                <span class="preview-icon-circle">
+                  <mat-icon class="type-icon">{{ getTypeIcon(activity.type) }}</mat-icon>
+                </span>
                 <span class="card-subject">{{ truncate(activity.subject, 40) }}</span>
+                <span [class]="'priority-badge ' + getPriorityClass(activity.priority)">
+                  {{ activity.priority }}
+                </span>
               </div>
 
               <!-- Drag placeholder -->

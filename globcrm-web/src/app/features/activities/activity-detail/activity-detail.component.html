@@ -4,74 +4,131 @@
   </div>
 } @else if (activity()) {
   <div class="detail-page">
-    <!-- Header -->
-    <div class="detail-header">
-      <div class="header-left">
+    <!-- Hero Card -->
+    <div class="activity-hero">
+      <div class="hero-accent"></div>
+
+      <!-- Navigation bar -->
+      <div class="hero-nav">
         <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
           <mat-icon>arrow_back</mat-icon>
         </a>
-        <h1>{{ activity()!.subject }}</h1>
-        @if (typeConfig(); as tc) {
-          <mat-chip-set>
-            <mat-chip>
-              <mat-icon matChipAvatar>{{ tc.icon }}</mat-icon>
-              {{ tc.label }}
-            </mat-chip>
-          </mat-chip-set>
-        }
-        @if (priorityConfig(); as pc) {
-          <mat-chip-set>
-            <mat-chip [style.--mdc-chip-elevated-container-color]="pc.color + '22'"
-                      [style.color]="pc.color">
-              {{ pc.label }}
-            </mat-chip>
-          </mat-chip-set>
-        }
-        @if (getStatusConfig(activity()!.status); as sc) {
-          <mat-chip-set>
-            <mat-chip [style.--mdc-chip-elevated-container-color]="sc.color + '22'"
-                      [style.color]="sc.color">
-              {{ sc.label }}
-            </mat-chip>
-          </mat-chip-set>
-        }
+        <div class="hero-actions">
+          <button mat-stroked-button (click)="toggleFollow()"
+                  [class.following]="isFollowing()">
+            <mat-icon>{{ isFollowing() ? 'visibility' : 'visibility_off' }}</mat-icon>
+            {{ isFollowing() ? 'Following' : 'Follow' }}
+          </button>
+          <button mat-stroked-button
+                  *appHasPermission="'Activity:Edit'"
+                  [routerLink]="['/activities', activity()!.id, 'edit']">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-stroked-button color="warn"
+                  *appHasPermission="'Activity:Delete'"
+                  (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
       </div>
-      <div class="header-actions">
-        <!-- Follow/Unfollow -->
-        <button mat-stroked-button (click)="toggleFollow()"
-                [class.following]="isFollowing()">
-          <mat-icon>{{ isFollowing() ? 'visibility' : 'visibility_off' }}</mat-icon>
-          {{ isFollowing() ? 'Following' : 'Follow' }}
-        </button>
-        <button mat-stroked-button
-                *appHasPermission="'Activity:Edit'"
-                [routerLink]="['/activities', activity()!.id, 'edit']">
-          <mat-icon>edit</mat-icon> Edit
-        </button>
-        <button mat-stroked-button color="warn"
-                *appHasPermission="'Activity:Delete'"
-                (click)="onDelete()">
-          <mat-icon>delete</mat-icon> Delete
-        </button>
-      </div>
-    </div>
 
-    <!-- Status workflow transitions -->
-    @if (allowedTransitions().length > 0) {
-      <div class="status-transitions">
-        <span class="transition-label">Move to:</span>
-        @for (status of allowedTransitions(); track status) {
-          @if (getStatusConfig(status); as sc) {
-            <button mat-stroked-button class="transition-btn"
-                    [style.--mdc-outlined-button-outline-color]="sc.color"
-                    [style.color]="sc.color"
-                    (click)="transitionStatus(status)">
-              {{ sc.label }}
-            </button>
+      <!-- Profile section -->
+      <div class="hero-profile">
+        <div class="hero-avatar">
+          @if (typeConfig(); as tc) {
+            <mat-icon>{{ tc.icon }}</mat-icon>
+          } @else {
+            <mat-icon>task_alt</mat-icon>
           }
+        </div>
+        <div class="hero-info">
+          <h1 class="hero-name">{{ activity()!.subject }}</h1>
+          <div class="hero-badges">
+            @if (typeConfig(); as tc) {
+              <span class="badge badge--primary">
+                <mat-icon>{{ tc.icon }}</mat-icon>
+                {{ tc.label }}
+              </span>
+            }
+            @if (priorityConfig(); as pc) {
+              <span class="badge"
+                    [style.background-color]="pc.color + '22'"
+                    [style.color]="pc.color">
+                {{ pc.label }}
+              </span>
+            }
+            @if (getStatusConfig(activity()!.status); as sc) {
+              <span class="badge"
+                    [style.background-color]="sc.color + '22'"
+                    [style.color]="sc.color">
+                {{ sc.label }}
+              </span>
+            }
+            @if (isOverdue()) {
+              <span class="badge badge--danger">
+                <mat-icon>warning</mat-icon>
+                Overdue
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta info pills -->
+      <hr class="hero-divider">
+      <div class="hero-meta">
+        @if (activity()!.dueDate) {
+          <span class="meta-item" [class.meta-item--overdue]="isOverdue()">
+            <mat-icon>event</mat-icon>
+            {{ activity()!.dueDate | date:'mediumDate' }}
+          </span>
+          <span class="meta-separator"></span>
+        }
+        @if (activity()!.ownerName) {
+          <span class="meta-item">
+            <mat-icon>person</mat-icon>
+            {{ activity()!.ownerName }}
+          </span>
+          <span class="meta-separator"></span>
+        }
+        @if (activity()!.assignedToName) {
+          <span class="meta-item">
+            <mat-icon>assignment_ind</mat-icon>
+            {{ activity()!.assignedToName }}
+          </span>
+          <span class="meta-separator"></span>
+        }
+        <span class="meta-item">
+          <mat-icon>timer</mat-icon>
+          {{ formatTime(activity()!.totalTimeMinutes) }}
+        </span>
+        @if (activity()!.followers?.length) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>group</mat-icon>
+            {{ activity()!.followers!.length }} follower{{ activity()!.followers!.length !== 1 ? 's' : '' }}
+          </span>
         }
       </div>
-    }
+
+      <!-- Status workflow transitions -->
+      @if (allowedTransitions().length > 0) {
+        <hr class="hero-divider">
+        <div class="status-transitions">
+          <span class="transition-label">Move to:</span>
+          @for (status of allowedTransitions(); track status) {
+            @if (getStatusConfig(status); as sc) {
+              <button mat-stroked-button class="transition-btn"
+                      [style.--mdc-outlined-button-outline-color]="sc.color"
+                      [style.color]="sc.color"
+                      (click)="transitionStatus(status)">
+                {{ sc.label }}
+              </button>
+            }
+          }
+        </div>
+      }
+    </div>
 
     <!-- Main content: Tabs left, Info sidebar right -->
     <div class="detail-content">
@@ -83,62 +140,85 @@
               <span class="tab-label"><mat-icon>info</mat-icon> Details</span>
             </ng-template>
             <div class="tab-body">
-              <div class="details-grid">
-                <div class="detail-field full-width">
-                  <span class="field-label">Description</span>
-                  <span class="field-value description-text">{{ activity()!.description || 'No description provided.' }}</span>
+              <!-- Activity Info section -->
+              <div class="detail-section">
+                <div class="detail-section__header">
+                  <mat-icon>task_alt</mat-icon>
+                  <h3>Activity Info</h3>
                 </div>
-                <div class="detail-field">
-                  <span class="field-label">Type</span>
-                  <span class="field-value">{{ typeConfig()?.label || activity()!.type }}</span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Priority</span>
-                  <span class="field-value">
-                    @if (priorityConfig(); as pc) {
-                      <span class="priority-badge" [style.color]="pc.color">{{ pc.label }}</span>
-                    }
-                  </span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Status</span>
-                  <span class="field-value">
-                    @if (getStatusConfig(activity()!.status); as sc) {
-                      <span class="status-badge" [style.color]="sc.color">{{ sc.label }}</span>
-                    }
-                  </span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Due Date</span>
-                  <span class="field-value" [class.overdue]="isOverdue()">
-                    {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : '-' }}
-                    @if (isOverdue()) {
-                      <mat-icon class="overdue-icon">warning</mat-icon>
-                    }
-                  </span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Owner</span>
-                  <span class="field-value">{{ activity()!.ownerName || '-' }}</span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Assigned To</span>
-                  <span class="field-value">{{ activity()!.assignedToName || '-' }}</span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Created</span>
-                  <span class="field-value">{{ activity()!.createdAt | date:'medium' }}</span>
-                </div>
-                <div class="detail-field">
-                  <span class="field-label">Last Updated</span>
-                  <span class="field-value">{{ activity()!.updatedAt | date:'medium' }}</span>
-                </div>
-                @if (activity()!.completedAt) {
-                  <div class="detail-field">
-                    <span class="field-label">Completed At</span>
-                    <span class="field-value">{{ activity()!.completedAt | date:'medium' }}</span>
+                <div class="details-grid">
+                  <div class="detail-field full-width">
+                    <span class="field-label">Description</span>
+                    <span class="field-value description-text" [class.field-value--empty]="!activity()!.description">
+                      {{ activity()!.description || 'No description provided.' }}
+                    </span>
                   </div>
-                }
+                  <div class="detail-field">
+                    <span class="field-label">Type</span>
+                    <span class="field-value">{{ typeConfig()?.label || activity()!.type }}</span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Priority</span>
+                    <span class="field-value">
+                      @if (priorityConfig(); as pc) {
+                        <span class="priority-badge" [style.color]="pc.color">{{ pc.label }}</span>
+                      }
+                    </span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Status</span>
+                    <span class="field-value">
+                      @if (getStatusConfig(activity()!.status); as sc) {
+                        <span class="status-badge" [style.color]="sc.color">{{ sc.label }}</span>
+                      }
+                    </span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Due Date</span>
+                    <span class="field-value" [class.overdue]="isOverdue()">
+                      {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : '-' }}
+                      @if (isOverdue()) {
+                        <mat-icon class="overdue-icon">warning</mat-icon>
+                      }
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dates & Assignment section -->
+              <div class="detail-section">
+                <div class="detail-section__header">
+                  <mat-icon>calendar_today</mat-icon>
+                  <h3>Dates & Assignment</h3>
+                </div>
+                <div class="details-grid">
+                  <div class="detail-field">
+                    <span class="field-label">Owner</span>
+                    <span class="field-value" [class.field-value--empty]="!activity()!.ownerName">
+                      {{ activity()!.ownerName || 'Unassigned' }}
+                    </span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Assigned To</span>
+                    <span class="field-value" [class.field-value--empty]="!activity()!.assignedToName">
+                      {{ activity()!.assignedToName || 'Unassigned' }}
+                    </span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Created</span>
+                    <span class="field-value">{{ activity()!.createdAt | date:'medium' }}</span>
+                  </div>
+                  <div class="detail-field">
+                    <span class="field-label">Last Updated</span>
+                    <span class="field-value">{{ activity()!.updatedAt | date:'medium' }}</span>
+                  </div>
+                  @if (activity()!.completedAt) {
+                    <div class="detail-field">
+                      <span class="field-label">Completed At</span>
+                      <span class="field-value">{{ activity()!.completedAt | date:'medium' }}</span>
+                    </div>
+                  }
+                </div>
               </div>
             </div>
           </mat-tab>
@@ -462,7 +542,7 @@
             </ng-template>
             <div class="tab-body">
               @if (timelineLoading()) {
-                <div class="timeline-loading">
+                <div class="tab-loading">
                   <mat-spinner diameter="32"></mat-spinner>
                 </div>
               } @else if (sortedTimeline().length === 0) {
@@ -507,13 +587,13 @@
             </ng-template>
             <div class="tab-body">
               @if (notesLoading()) {
-                <div style="display: flex; justify-content: center; padding: 32px;">
+                <div class="tab-loading">
                   <mat-spinner diameter="32"></mat-spinner>
                 </div>
               } @else if (activityNotes().length === 0) {
-                <div style="text-align: center; padding: 48px 24px; color: var(--color-text-muted);">
-                  No notes for this activity.
-                  <br /><br />
+                <div class="tab-empty">
+                  <mat-icon>note</mat-icon>
+                  <span>No notes for this activity.</span>
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Activity', entityId: activity()?.id, entityName: activity()?.subject }">
@@ -521,24 +601,26 @@
                   </a>
                 </div>
               } @else {
-                <div style="margin-bottom: 12px; text-align: right;">
+                <div class="tab-actions">
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Activity', entityId: activity()?.id, entityName: activity()?.subject }">
-                    Add Note
+                    <mat-icon>add</mat-icon> Add Note
                   </a>
                 </div>
-                @for (note of activityNotes(); track note.id) {
-                  <div style="display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.08);">
-                    <div style="flex: 1; min-width: 0;">
-                      <a [routerLink]="['/notes', note.id]" style="font-weight: 500; color: var(--color-primary); text-decoration: none;">{{ note.title }}</a>
-                      <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">{{ note.plainTextBody }}</div>
+                <div class="notes-list">
+                  @for (note of activityNotes(); track note.id) {
+                    <div class="note-item">
+                      <div class="note-content">
+                        <a [routerLink]="['/notes', note.id]" class="note-title">{{ note.title }}</a>
+                        <div class="note-preview">{{ note.plainTextBody }}</div>
+                      </div>
+                      <div class="note-meta">
+                        {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
+                      </div>
                     </div>
-                    <div style="font-size: 12px; color: var(--color-text-muted); white-space: nowrap;">
-                      {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
-                    </div>
-                  </div>
-                }
+                  }
+                </div>
               }
             </div>
           </mat-tab>
@@ -548,59 +630,63 @@
       <!-- Info Sidebar -->
       <div class="detail-sidebar">
         <div class="sidebar-card">
-          <h3 class="sidebar-title">Activity Info</h3>
-
-          <div class="sidebar-field">
-            <span class="sidebar-label">Owner</span>
-            <div class="sidebar-value user-value">
-              <div class="avatar-initials">{{ (activity()!.ownerName || '?')[0] }}</div>
-              <span>{{ activity()!.ownerName || 'Unassigned' }}</span>
-            </div>
+          <div class="sidebar-card__header">
+            <mat-icon>info</mat-icon>
+            <h3>Activity Info</h3>
           </div>
-
-          <div class="sidebar-field">
-            <span class="sidebar-label">Assigned To</span>
-            <div class="sidebar-value user-value">
-              <div class="avatar-initials">{{ (activity()!.assignedToName || '?')[0] }}</div>
-              <span>{{ activity()!.assignedToName || 'Unassigned' }}</span>
-            </div>
-          </div>
-
-          <div class="sidebar-field">
-            <span class="sidebar-label">Due Date</span>
-            <span class="sidebar-value" [class.overdue]="isOverdue()">
-              {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : 'Not set' }}
-              @if (isOverdue()) {
-                <span class="overdue-badge">Overdue</span>
-              }
-            </span>
-          </div>
-
-          <div class="sidebar-field">
-            <span class="sidebar-label">Created</span>
-            <span class="sidebar-value">{{ activity()!.createdAt | date:'mediumDate' }}</span>
-          </div>
-
-          <div class="sidebar-field">
-            <span class="sidebar-label">Updated</span>
-            <span class="sidebar-value">{{ activity()!.updatedAt | date:'mediumDate' }}</span>
-          </div>
-
-          @if (activity()!.completedAt) {
+          <div class="sidebar-card__body">
             <div class="sidebar-field">
-              <span class="sidebar-label">Completed</span>
-              <span class="sidebar-value">{{ activity()!.completedAt | date:'mediumDate' }}</span>
+              <span class="sidebar-label">Owner</span>
+              <div class="sidebar-value user-value">
+                <div class="avatar-initials">{{ (activity()!.ownerName || '?')[0] }}</div>
+                <span>{{ activity()!.ownerName || 'Unassigned' }}</span>
+              </div>
             </div>
-          }
 
-          <div class="sidebar-field">
-            <span class="sidebar-label">Total Time</span>
-            <span class="sidebar-value">{{ formatTime(activity()!.totalTimeMinutes) }}</span>
-          </div>
+            <div class="sidebar-field">
+              <span class="sidebar-label">Assigned To</span>
+              <div class="sidebar-value user-value">
+                <div class="avatar-initials">{{ (activity()!.assignedToName || '?')[0] }}</div>
+                <span>{{ activity()!.assignedToName || 'Unassigned' }}</span>
+              </div>
+            </div>
 
-          <div class="sidebar-field">
-            <span class="sidebar-label">Followers</span>
-            <span class="sidebar-value">{{ activity()!.followers?.length || 0 }}</span>
+            <div class="sidebar-field">
+              <span class="sidebar-label">Due Date</span>
+              <span class="sidebar-value" [class.overdue]="isOverdue()">
+                {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : 'Not set' }}
+                @if (isOverdue()) {
+                  <span class="overdue-badge">Overdue</span>
+                }
+              </span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Created</span>
+              <span class="sidebar-value">{{ activity()!.createdAt | date:'mediumDate' }}</span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Updated</span>
+              <span class="sidebar-value">{{ activity()!.updatedAt | date:'mediumDate' }}</span>
+            </div>
+
+            @if (activity()!.completedAt) {
+              <div class="sidebar-field">
+                <span class="sidebar-label">Completed</span>
+                <span class="sidebar-value">{{ activity()!.completedAt | date:'mediumDate' }}</span>
+              </div>
+            }
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Total Time</span>
+              <span class="sidebar-value">{{ formatTime(activity()!.totalTimeMinutes) }}</span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Followers</span>
+              <span class="sidebar-value">{{ activity()!.followers?.length || 0 }}</span>
+            </div>
           </div>
         </div>
       </div>

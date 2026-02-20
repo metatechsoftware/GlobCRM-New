@@ -1,0 +1,403 @@
+@if (isLoading()) {
+  <div class="detail-loading">
+    <mat-spinner diameter="48"></mat-spinner>
+  </div>
+} @else if (quote()) {
+  <div class="detail-page">
+    <!-- Hero Card -->
+    <div class="quote-hero">
+      <div class="hero-accent"></div>
+
+      <!-- Navigation bar -->
+      <div class="hero-nav">
+        <a mat-icon-button routerLink="/quotes" aria-label="Back to quotes">
+          <mat-icon>arrow_back</mat-icon>
+        </a>
+        <div class="hero-actions">
+          <button mat-stroked-button
+                  routerLink="/quotes/{{ quote()!.id }}/edit"
+                  *appHasPermission="'Quote:Update'">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-stroked-button color="warn"
+                  *appHasPermission="'Quote:Delete'"
+                  (click)="onDelete()">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+          <button mat-stroked-button (click)="onGeneratePdf()"
+                  [disabled]="pdfGenerating()">
+            @if (pdfGenerating()) {
+              <mat-spinner diameter="18"></mat-spinner>
+            } @else {
+              <mat-icon>picture_as_pdf</mat-icon>
+            }
+            Generate PDF
+          </button>
+          <button mat-stroked-button (click)="onCreateNewVersion()"
+                  *appHasPermission="'Quote:Create'">
+            <mat-icon>content_copy</mat-icon> New Version
+          </button>
+        </div>
+      </div>
+
+      <!-- Profile section -->
+      <div class="hero-profile">
+        <div class="hero-avatar">
+          <mat-icon>request_quote</mat-icon>
+        </div>
+        <div class="hero-info">
+          <div class="quote-number">
+            {{ quote()!.quoteNumber }}
+            <span class="badge badge--secondary">v{{ quote()!.versionNumber }}</span>
+          </div>
+          <h1 class="hero-name">{{ quote()!.title }}</h1>
+          <div class="hero-badges">
+            <span class="badge"
+                  [style.background-color]="getStatusColor(quote()!.status)"
+                  [style.color]="'#fff'">
+              {{ getStatusLabel(quote()!.status) }}
+            </span>
+            <span class="badge badge--success">
+              <mat-icon>payments</mat-icon>
+              {{ quote()!.grandTotal | currency:'USD':'symbol':'1.2-2' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meta info pills -->
+      <hr class="hero-divider">
+      <div class="hero-meta">
+        <span class="meta-item">
+          <mat-icon>event</mat-icon>
+          {{ quote()!.issueDate | date:'mediumDate' }}
+        </span>
+        @if (quote()!.expiryDate) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>event_busy</mat-icon>
+            Expires {{ quote()!.expiryDate | date:'mediumDate' }}
+          </span>
+        }
+        @if (quote()!.contactName) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>person</mat-icon>
+            {{ quote()!.contactName }}
+          </span>
+        }
+        @if (quote()!.companyName) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>business</mat-icon>
+            {{ quote()!.companyName }}
+          </span>
+        }
+        @if (quote()!.dealTitle) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>handshake</mat-icon>
+            {{ quote()!.dealTitle }}
+          </span>
+        }
+        @if (quote()!.ownerName) {
+          <span class="meta-separator"></span>
+          <span class="meta-item">
+            <mat-icon>assignment_ind</mat-icon>
+            {{ quote()!.ownerName }}
+          </span>
+        }
+      </div>
+
+      <!-- Status workflow transitions -->
+      @if (allowedTransitions().length > 0) {
+        <hr class="hero-divider">
+        <div class="status-transitions">
+          <span class="transition-label">Move to:</span>
+          @for (transition of allowedTransitions(); track transition) {
+            <button mat-stroked-button class="transition-btn"
+                    color="primary"
+                    (click)="onTransitionStatus(transition)">
+              {{ getTransitionLabel(transition) }}
+            </button>
+          }
+        </div>
+      }
+    </div>
+
+    <!-- Main content: Tabs left, Info sidebar right -->
+    <div class="detail-content">
+      <div class="detail-main">
+        <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onTabSelected($event)">
+          <!-- Line Items Tab -->
+          <mat-tab label="Line Items">
+            <div class="tab-body">
+              @if (quote()!.lineItems.length === 0) {
+                <div class="tab-empty">
+                  <mat-icon>receipt_long</mat-icon>
+                  <span>No line items</span>
+                </div>
+              } @else {
+                <table class="line-items-table">
+                  <thead>
+                    <tr>
+                      <th>#</th>
+                      <th>Description</th>
+                      <th class="num-col">Qty</th>
+                      <th class="num-col">Unit Price</th>
+                      <th class="num-col">Discount %</th>
+                      <th class="num-col">Tax %</th>
+                      <th class="num-col">Line Total</th>
+                      <th class="num-col">Net Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of quote()!.lineItems; track item.id; let i = $index) {
+                      <tr>
+                        <td>{{ i + 1 }}</td>
+                        <td>{{ item.description }}</td>
+                        <td class="num-col">{{ item.quantity | number:'1.0-2' }}</td>
+                        <td class="num-col">{{ item.unitPrice | currency:'USD':'symbol':'1.2-2' }}</td>
+                        <td class="num-col">{{ item.discountPercent | number:'1.0-2' }}%</td>
+                        <td class="num-col">{{ item.taxPercent | number:'1.0-2' }}%</td>
+                        <td class="num-col">{{ item.lineTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+                        <td class="num-col">{{ item.netTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+
+                <div class="totals-summary">
+                  <div class="totals-grid">
+                    <span class="total-label">Subtotal</span>
+                    <span class="total-value">{{ subtotal() | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="total-label">Discount Total</span>
+                    <span class="total-value">-{{ discountTotal() | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <span class="total-label">Tax Total</span>
+                    <span class="total-value">{{ taxTotal() | currency:'USD':'symbol':'1.2-2' }}</span>
+                    <div class="grand-total">
+                      <span class="total-label">Grand Total</span>
+                    </div>
+                    <div class="grand-total">
+                      <span class="total-value">{{ quote()!.grandTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Details Tab -->
+          <mat-tab label="Details">
+            <div class="tab-body">
+              @if (!quote()!.description && !quote()!.notes) {
+                <div class="tab-empty">
+                  <mat-icon>description</mat-icon>
+                  <span>No additional details</span>
+                </div>
+              } @else {
+                @if (quote()!.description) {
+                  <div class="detail-section">
+                    <div class="detail-section__header">
+                      <mat-icon>description</mat-icon>
+                      <h3>Description</h3>
+                    </div>
+                    <p class="detail-section__text">{{ quote()!.description }}</p>
+                  </div>
+                }
+                @if (quote()!.notes) {
+                  <div class="detail-section">
+                    <div class="detail-section__header">
+                      <mat-icon>note</mat-icon>
+                      <h3>Terms & Notes</h3>
+                    </div>
+                    <p class="detail-section__text">{{ quote()!.notes }}</p>
+                  </div>
+                }
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Versions Tab -->
+          <mat-tab label="Versions ({{ quote()!.versions.length }})">
+            <div class="tab-body">
+              @if (quote()!.versions.length === 0) {
+                <div class="tab-empty">
+                  <mat-icon>history</mat-icon>
+                  <span>No version history available</span>
+                </div>
+              } @else {
+                <ul class="versions-list">
+                  @for (version of quote()!.versions; track version.id) {
+                    <li class="version-item">
+                      <span class="version-num"
+                            [class.current]="version.id === quote()!.id">
+                        v{{ version.versionNumber }}
+                      </span>
+                      <div class="version-info">
+                        <span class="badge"
+                              [style.background-color]="getStatusColor(version.status)"
+                              [style.color]="'#fff'"
+                              style="font-size: 11px; padding: 2px 8px;">
+                          {{ getStatusLabel(version.status) }}
+                        </span>
+                        <span class="version-date">{{ version.createdAt | date:'medium' }}</span>
+                      </div>
+                      @if (version.id !== quote()!.id) {
+                        <a mat-stroked-button [routerLink]="['/quotes', version.id]">
+                          View
+                        </a>
+                      } @else {
+                        <span class="version-current-label">Current</span>
+                      }
+                    </li>
+                  }
+                </ul>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Timeline Tab -->
+          <mat-tab label="Timeline">
+            <div class="tab-body">
+              @if (timelineLoading()) {
+                <div class="tab-loading">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else {
+                <app-entity-timeline [entries]="timelineEntries()" />
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Notes Tab -->
+          <mat-tab label="Notes">
+            <div class="tab-body">
+              @if (notesLoading()) {
+                <div class="tab-loading">
+                  <mat-spinner diameter="32"></mat-spinner>
+                </div>
+              } @else if (quoteNotes().length === 0) {
+                <div class="tab-empty">
+                  <mat-icon>note</mat-icon>
+                  <span>No notes for this quote.</span>
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Quote', entityId: quote()?.id, entityName: quote()?.title }">
+                    Add Note
+                  </a>
+                </div>
+              } @else {
+                <div class="tab-actions">
+                  <a mat-stroked-button
+                     [routerLink]="['/notes/new']"
+                     [queryParams]="{ entityType: 'Quote', entityId: quote()?.id, entityName: quote()?.title }">
+                    <mat-icon>add</mat-icon> Add Note
+                  </a>
+                </div>
+                <div class="notes-list">
+                  @for (note of quoteNotes(); track note.id) {
+                    <div class="note-item">
+                      <div class="note-content">
+                        <a [routerLink]="['/notes', note.id]" class="note-title">{{ note.title }}</a>
+                        <div class="note-preview">{{ note.plainTextBody }}</div>
+                      </div>
+                      <div class="note-meta">
+                        {{ note.authorName }} &middot; {{ formatNoteDate(note.createdAt) }}
+                      </div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-tab>
+
+          <!-- Attachments Tab -->
+          <mat-tab label="Attachments">
+            <div class="tab-body">
+              <app-entity-attachments [entityType]="'quote'" [entityId]="quote()?.id ?? ''" />
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+
+      <!-- Info Sidebar -->
+      <div class="detail-sidebar">
+        <div class="sidebar-card">
+          <div class="sidebar-card__header">
+            <mat-icon>info</mat-icon>
+            <h3>Quote Info</h3>
+          </div>
+          <div class="sidebar-card__body">
+            <div class="sidebar-field sidebar-field--prominent">
+              <span class="sidebar-label">Grand Total</span>
+              <span class="sidebar-value sidebar-value--grand-total">
+                {{ quote()!.grandTotal | currency:'USD':'symbol':'1.2-2' }}
+              </span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Status</span>
+              <span class="badge"
+                    [style.background-color]="getStatusColor(quote()!.status)"
+                    [style.color]="'#fff'">
+                {{ getStatusLabel(quote()!.status) }}
+              </span>
+            </div>
+
+            @if (quote()!.contactName) {
+              <div class="sidebar-field">
+                <span class="sidebar-label">Contact</span>
+                <span class="sidebar-value">
+                  <span class="sidebar-value">{{ quote()!.contactName }}</span>
+                </span>
+              </div>
+            }
+
+            @if (quote()!.companyName) {
+              <div class="sidebar-field">
+                <span class="sidebar-label">Company</span>
+                <span class="sidebar-value">{{ quote()!.companyName }}</span>
+              </div>
+            }
+
+            @if (quote()!.dealTitle) {
+              <div class="sidebar-field">
+                <span class="sidebar-label">Deal</span>
+                <span class="sidebar-value">{{ quote()!.dealTitle }}</span>
+              </div>
+            }
+
+            @if (quote()!.ownerName) {
+              <div class="sidebar-field">
+                <span class="sidebar-label">Owner</span>
+                <span class="sidebar-value">{{ quote()!.ownerName }}</span>
+              </div>
+            }
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Issue Date</span>
+              <span class="sidebar-value">{{ quote()!.issueDate | date:'mediumDate' }}</span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Expiry Date</span>
+              <span class="sidebar-value">{{ quote()!.expiryDate ? (quote()!.expiryDate | date:'mediumDate') : 'Not set' }}</span>
+            </div>
+
+            <div class="sidebar-field">
+              <span class="sidebar-label">Version</span>
+              <span class="sidebar-value">v{{ quote()!.versionNumber }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="detail-not-found">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Quote not found</h2>
+    <a mat-stroked-button routerLink="/quotes">Back to Quotes</a>
+  </div>
+}

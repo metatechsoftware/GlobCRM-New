@@ -21,12 +21,25 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
 .preview-header-right {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+}
+
+.close-btn {
+  background-color: var(--color-surface-variant, rgba(0, 0, 0, 0.04));
+  border: 1px solid var(--color-border);
+  border-radius: 50%;
+
+  &:hover {
+    background-color: var(--color-hover, rgba(0, 0, 0, 0.08));
+  }
 }
 
 .entity-type-badge {
@@ -67,6 +80,13 @@
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
+}
+
+.owner-avatar-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: var(--color-text-muted);
 }
 
 .preview-body {
@@ -129,4 +149,41 @@
   font-size: 13px;
   text-align: right;
   color: var(--color-text);
+}
+
+// Tab overrides
+.preview-tabs {
+  ::ng-deep {
+    .mat-mdc-tab-header {
+      border-bottom: 1px solid var(--color-border);
+      margin: 0 -16px;
+      padding: 0 16px;
+    }
+
+    .mat-mdc-tab {
+      min-width: 0;
+      padding: 0 12px;
+    }
+
+    .mat-mdc-tab-body-wrapper {
+      flex: 1;
+    }
+  }
+}
+
+.tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.tab-content {
+  padding-top: 16px;
 }

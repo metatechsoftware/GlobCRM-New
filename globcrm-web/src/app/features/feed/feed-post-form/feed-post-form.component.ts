@@ -1,22 +1,27 @@
 import {
   Component,
   ChangeDetectionStrategy,
-  EventEmitter,
-  Output,
   inject,
+  signal,
+  viewChild,
+  ElementRef,
+  output,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthStore } from '../../../core/auth/auth.store';
+import { AttachmentService } from '../../../shared/services/attachment.service';
+import { MentionTypeaheadComponent } from '../mention-typeahead/mention-typeahead.component';
+import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
+import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
+import { CreateFeedPostPayload } from '../feed.models';
 
 /**
- * Social post creation form.
- * Displays user avatar initials on the left, textarea on the right, and a Post button.
- * Emits postCreated event with the content text on submit.
+ * Social post creation form with toolbar for attachments, @mentions, and emoji.
+ * Emits postCreated event with content and pending files on submit.
  */
 @Component({
   selector: 'app-feed-post-form',
@@ -24,36 +29,41 @@ import { AuthStore } from '../../../core/auth/auth.store';
   imports: [
     CommonModule,
     FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
     MatIconModule,
+    MatTooltipModule,
+    MentionTypeaheadComponent,
+    EmojiPickerComponent,
+    AvatarComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
+    @keyframes fileChipIn {
+      from {
+        opacity: 0;
+        transform: scale(0.85);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
     .post-form-card {
       display: flex;
       gap: 12px;
       padding: 16px;
       background: var(--color-surface, #fff);
-      border: 1px solid var(--color-border-subtle, #e0e0e0);
-      border-radius: 12px;
+      border: 1px solid var(--color-border-subtle, #F0F0EE);
+      border-radius: var(--radius-lg, 12px);
       margin-bottom: 16px;
+      transition:
+        border-color var(--duration-normal, 200ms) var(--ease-default),
+        box-shadow var(--duration-normal, 200ms) var(--ease-default);
     }
 
-    .author-avatar {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--color-primary-soft, #fff3e0) 0%, var(--color-secondary-soft, #e8f5e9) 100%);
-      color: var(--color-primary-text, #e65100);
-      font-size: 14px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
+    .post-form-card--focused {
+      border-color: var(--color-border-focus, #F97316);
+      box-shadow: var(--shadow-focus);
     }
 
     .post-form-body {
@@ -63,57 +73,274 @@ import { AuthStore } from '../../../core/auth/auth.store';
       gap: 8px;
     }
 
-    .post-form-body mat-form-field {
+    /* ── Textarea ── */
+    .textarea-wrap {
       width: 100%;
     }
 
+    .post-textarea {
+      display: block;
+      width: 100%;
+      min-height: 56px;
+      padding: 10px 12px;
+      border: 1px solid var(--color-border, #E8E8E6);
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-surface, #fff);
+      font-family: inherit;
+      font-size: var(--text-base, 0.875rem);
+      color: var(--color-text, #1a1a1a);
+      resize: vertical;
+      outline: none;
+      transition:
+        border-color var(--duration-fast, 100ms),
+        box-shadow var(--duration-fast, 100ms);
+
+      &::placeholder {
+        color: var(--color-text-muted, #9CA3AF);
+      }
+
+      &:focus {
+        border-color: var(--color-border-focus, #F97316);
+        box-shadow: var(--shadow-focus);
+      }
+    }
+
+    /* ── Pending Files ── */
+    .pending-files {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .file-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      background: var(--color-primary-soft, #FFF7ED);
+      color: var(--color-primary-text, #C2410C);
+      border-radius: var(--radius-full, 9999px);
+      font-size: var(--text-xs, 0.75rem);
+      font-weight: var(--font-medium, 500);
+      animation: fileChipIn var(--duration-normal, 200ms) var(--ease-spring) both;
+
+      mat-icon {
+        font-size: 14px;
+        width: 14px;
+        height: 14px;
+      }
+
+      .remove-file {
+        cursor: pointer;
+        color: var(--color-text-muted, #9CA3AF);
+        transition: color var(--duration-fast, 100ms);
+        &:hover {
+          color: var(--color-danger, #EF4444);
+        }
+      }
+    }
+
+    /* ── Actions Row ── */
     .post-form-actions {
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .post-form-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .toolbar-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border: none;
+      background: none;
+      border-radius: var(--radius-md, 8px);
+      color: var(--color-text-secondary, #6B7280);
+      cursor: pointer;
+      transition:
+        background var(--duration-fast, 100ms),
+        color var(--duration-fast, 100ms),
+        transform var(--duration-fast, 100ms) var(--ease-spring);
+
+      &:hover {
+        background: var(--color-highlight, rgba(249, 115, 22, 0.06));
+        color: var(--color-primary, #F97316);
+        transform: scale(1.08);
+      }
+
+      &:active {
+        transform: scale(0.94);
+      }
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+
+    /* ── Submit Button ── */
+    .post-submit-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 20px;
+      border-radius: var(--radius-full, 9999px);
+      border: none;
+      background: var(--color-primary, #F97316);
+      color: var(--color-primary-fg, #fff);
+      font-size: var(--text-sm, 0.8125rem);
+      font-weight: var(--font-semibold, 600);
+      cursor: pointer;
+      transition:
+        transform var(--duration-fast, 100ms) var(--ease-spring),
+        box-shadow var(--duration-fast, 100ms);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0) scale(0.97);
+      }
+
+      &:disabled {
+        opacity: 0.45;
+        cursor: default;
+      }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .typeahead-container {
+      position: relative;
+    }
+
+    .emoji-container {
+      position: relative;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .file-chip {
+        animation: none;
+      }
     }
   `,
   template: `
-    <div class="post-form-card">
-      <div class="author-avatar">{{ userInitials }}</div>
+    <div class="post-form-card" [class.post-form-card--focused]="isFocused()">
+      <app-avatar
+        [firstName]="userFirstName"
+        [lastName]="userLastName"
+        size="sm" />
       <div class="post-form-body">
-        <mat-form-field appearance="outline">
-          <mat-label>Share something with your team...</mat-label>
-          <textarea matInput
+        <div class="textarea-wrap">
+          <textarea class="post-textarea"
+                    #textareaRef
                     [(ngModel)]="postContent"
                     rows="2"
+                    placeholder="Share something with your team..."
+                    (focus)="isFocused.set(true)"
+                    (blur)="isFocused.set(false)"
+                    (input)="onTextareaInput()"
                     (keydown.enter)="onSubmit($event)"></textarea>
-        </mat-form-field>
+        </div>
+
+        @if (pendingFiles().length) {
+          <div class="pending-files">
+            @for (file of pendingFiles(); track $index) {
+              <span class="file-chip">
+                <mat-icon>attach_file</mat-icon>
+                {{ file.name }}
+                <mat-icon class="remove-file" (click)="removeFile($index)">close</mat-icon>
+              </span>
+            }
+          </div>
+        }
+
         <div class="post-form-actions">
-          <button mat-raised-button
-                  color="primary"
-                  [disabled]="!postContent.trim()"
+          <div class="post-form-toolbar">
+            <button class="toolbar-btn" matTooltip="Attach file" type="button" (click)="fileInput.click()">
+              <mat-icon>attach_file</mat-icon>
+            </button>
+            <input #fileInput type="file" hidden multiple (change)="onFileSelected($event)" />
+            <button class="toolbar-btn" matTooltip="Mention @" type="button" (click)="insertAtSymbol()">
+              <mat-icon>alternate_email</mat-icon>
+            </button>
+            <div class="emoji-container">
+              <button class="toolbar-btn" matTooltip="Emoji" type="button" (click)="toggleEmojiPicker($event)">
+                <mat-icon>sentiment_satisfied_alt</mat-icon>
+              </button>
+              @if (showEmojiPicker()) {
+                <app-emoji-picker (emojiSelected)="onEmojiSelected($event)" />
+              }
+            </div>
+          </div>
+          <button class="post-submit-btn"
+                  [disabled]="!postContent.trim() && !pendingFiles().length"
                   (click)="onSubmit()">
             <mat-icon>send</mat-icon>
             Post
           </button>
+        </div>
+
+        <div class="typeahead-container">
+          <app-mention-typeahead
+            [textareaEl]="textareaElement()"
+            (mentionSelected)="onMentionSelected($event)" />
         </div>
       </div>
     </div>
   `,
 })
 export class FeedPostFormComponent {
-  @Output() postCreated = new EventEmitter<string>();
+  readonly postCreated = output<CreateFeedPostPayload>();
 
   private readonly authStore = inject(AuthStore);
+  private readonly attachmentService = inject(AttachmentService);
+
+  private readonly textareaRef = viewChild<ElementRef<HTMLTextAreaElement>>('textareaRef');
+  private readonly mentionTypeahead = viewChild(MentionTypeaheadComponent);
 
   postContent = '';
+  readonly pendingFiles = signal<File[]>([]);
+  readonly showEmojiPicker = signal(false);
+  readonly isFocused = signal(false);
 
-  get userInitials(): string {
-    const user = this.authStore.user();
-    if (!user) return '';
-    const first = user.firstName?.charAt(0) ?? '';
-    const last = user.lastName?.charAt(0) ?? '';
-    return (first + last).toUpperCase();
+  textareaElement(): HTMLTextAreaElement | undefined {
+    return this.textareaRef()?.nativeElement;
+  }
+
+  get userFirstName(): string {
+    return this.authStore.user()?.firstName ?? '';
+  }
+
+  get userLastName(): string {
+    return this.authStore.user()?.lastName ?? '';
+  }
+
+  @HostListener('document:click')
+  onDocumentClick(): void {
+    this.showEmojiPicker.set(false);
+  }
+
+  onTextareaInput(): void {
+    this.mentionTypeahead()?.onTextInput();
   }
 
   onSubmit(event?: Event): void {
     if (event) {
-      // Prevent Enter from adding newline; use Shift+Enter for newline
       const keyEvent = event as KeyboardEvent;
       if (!keyEvent.shiftKey) {
         event.preventDefault();
@@ -123,9 +350,113 @@ export class FeedPostFormComponent {
     }
 
     const content = this.postContent.trim();
-    if (!content) return;
+    if (!content && !this.pendingFiles().length) return;
 
-    this.postCreated.emit(content);
+    this.postCreated.emit({ content, files: [...this.pendingFiles()] });
     this.postContent = '';
+    this.pendingFiles.set([]);
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files) return;
+
+    const newFiles: File[] = [];
+    for (let i = 0; i < input.files.length; i++) {
+      const file = input.files[i];
+      const validation = this.attachmentService.validateFile(file);
+      if (validation.valid) {
+        newFiles.push(file);
+      }
+    }
+
+    if (newFiles.length) {
+      this.pendingFiles.set([...this.pendingFiles(), ...newFiles]);
+    }
+
+    // Reset input so the same file can be re-selected
+    input.value = '';
+  }
+
+  removeFile(index: number): void {
+    const files = [...this.pendingFiles()];
+    files.splice(index, 1);
+    this.pendingFiles.set(files);
+  }
+
+  insertAtSymbol(): void {
+    const textarea = this.textareaElement();
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.postContent.substring(0, start);
+    const after = this.postContent.substring(end);
+
+    this.postContent = before + '@' + after;
+    textarea.focus();
+
+    // Set cursor after the @
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = start + 1;
+    });
+  }
+
+  toggleEmojiPicker(event: Event): void {
+    event.stopPropagation();
+    this.showEmojiPicker.update((v) => !v);
+  }
+
+  onEmojiSelected(emoji: string): void {
+    const textarea = this.textareaElement();
+    if (!textarea) {
+      this.postContent += emoji;
+      return;
+    }
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const before = this.postContent.substring(0, start);
+    const after = this.postContent.substring(end);
+
+    this.postContent = before + emoji + after;
+    this.showEmojiPicker.set(false);
+
+    textarea.focus();
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = start + emoji.length;
+    });
+  }
+
+  onMentionSelected(mention: { id: string; name: string; type: string }): void {
+    const textarea = this.textareaElement();
+    if (!textarea) return;
+
+    const cursorPos = textarea.selectionStart;
+    const text = this.postContent;
+
+    // Find the @ that triggered this mention (search backward from cursor)
+    let atIndex = -1;
+    for (let i = cursorPos - 1; i >= 0; i--) {
+      if (text[i] === '@') {
+        atIndex = i;
+        break;
+      }
+      if (text[i] === ' ' || text[i] === '\n') break;
+    }
+
+    if (atIndex === -1) return;
+
+    const before = text.substring(0, atIndex);
+    const after = text.substring(cursorPos);
+    const mentionText = `@[${mention.name}](${mention.type}:${mention.id}) `;
+
+    this.postContent = before + mentionText + after;
+
+    textarea.focus();
+    const newPos = before.length + mentionText.length;
+    setTimeout(() => {
+      textarea.selectionStart = textarea.selectionEnd = newPos;
+    });
   }
 }

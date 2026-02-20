@@ -45,8 +45,20 @@ export const PreviewSidebarStore = signalStore(
 
     function loadPreview(entry: PreviewEntry): void {
       previewService.getPreview(entry.entityType, entry.entityId).subscribe({
-        next: (data) =>
-          patchState(store, { currentData: data, isLoading: false, error: null }),
+        next: (data) => {
+          // Backfill entityName on the top-of-stack entry if missing
+          const stack = store.stack();
+          if (stack.length > 0 && !stack[stack.length - 1].entityName && data.name) {
+            const updatedStack = [...stack];
+            updatedStack[updatedStack.length - 1] = {
+              ...updatedStack[updatedStack.length - 1],
+              entityName: data.name,
+            };
+            patchState(store, { stack: updatedStack, currentData: data, isLoading: false, error: null });
+          } else {
+            patchState(store, { currentData: data, isLoading: false, error: null });
+          }
+        },
         error: (err) => {
           const message =
             err.status === 404
@@ -95,6 +107,19 @@ export const PreviewSidebarStore = signalStore(
           currentData: null,
         });
         loadPreview(prevEntry);
+      },
+      navigateTo(index: number): void {
+        const stack = store.stack();
+        if (index < 0 || index >= stack.length - 1) return; // Can't navigate to current or invalid
+        const newStack = stack.slice(0, index + 1);
+        const targetEntry = newStack[newStack.length - 1];
+        patchState(store, {
+          stack: newStack,
+          isLoading: true,
+          error: null,
+          currentData: null,
+        });
+        loadPreview(targetEntry);
       },
       close(): void {
         patchState(store, {

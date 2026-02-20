@@ -53,67 +53,8 @@ import { QuoteListDto, QUOTE_STATUSES } from '../quote.models';
   ],
   providers: [ViewStore, QuoteStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  styles: `
-    @use '../../../../styles/entity-list';
-
-    .status-badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 12px;
-      font-size: 12px;
-      font-weight: 500;
-      color: #fff;
-      line-height: 1.5;
-    }
-  `,
-  template: `
-    <div class="entity-list-layout">
-      <app-view-sidebar
-        [entityType]="'Quote'"
-        (viewSelected)="onViewSelected($event)" />
-      <div class="entity-list-content">
-        <div class="list-header">
-          <h1>Quotes</h1>
-
-          <div class="list-header-actions">
-            <button mat-raised-button color="primary"
-                    *appHasPermission="'Quote:Create'"
-                    routerLink="new">
-              <mat-icon>add</mat-icon> New Quote
-            </button>
-          </div>
-        </div>
-
-        <app-filter-chips
-          [filters]="quoteStore.filters()"
-          [columnDefinitions]="columnDefs()"
-          (filterRemoved)="onFilterRemoved($event)"
-          (filtersCleared)="onFiltersCleared()" />
-
-        <app-filter-panel
-          [columnDefinitions]="columnDefs()"
-          [activeFilters]="quoteStore.filters()"
-          (filtersChanged)="onFilterApplied($event)" />
-
-        <app-dynamic-table
-          entityType="Quote"
-          [data]="displayData()"
-          [columns]="activeViewColumns()"
-          [columnDefinitions]="columnDefs()"
-          [totalCount]="quoteStore.totalCount()"
-          [pageSize]="quoteStore.pageSize()"
-          [loading]="quoteStore.isLoading()"
-          (columnsVisibilityChanged)="onColumnsVisibilityChanged($event)"
-          (sortChanged)="onSortChanged($event)"
-          (pageChanged)="onPageChanged($event)"
-          (rowEditClicked)="onRowEditClicked($event)"
-          (rowViewClicked)="onRowClicked($event)"
-          (rowDeleteClicked)="onDeleteQuote($event)"
-          (searchChanged)="onSearchChanged($event)"
-          (customFieldCreated)="onCustomFieldCreated($event)" />
-      </div>
-    </div>
-  `,
+  styleUrl: './quote-list.component.scss',
+  templateUrl: './quote-list.component.html',
 })
 export class QuoteListComponent implements OnInit {
   readonly quoteStore = inject(QuoteStore);

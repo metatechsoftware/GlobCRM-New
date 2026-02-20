@@ -20,6 +20,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { EmailTemplateService } from '../../email-templates/email-template.service';
 import { EmailTemplateListItem } from '../../email-templates/email-template.models';
+import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
 export interface TemplatePickerData {
   selectedTemplateId?: string;
@@ -43,6 +44,7 @@ export interface TemplatePickerResult {
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    SafeHtmlPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -184,7 +186,7 @@ export interface TemplatePickerResult {
                 }
                 @if (template.htmlBody) {
                   <iframe class="template-card__preview"
-                          [srcdoc]="template.htmlBody"
+                          [srcdoc]="template.htmlBody | safeHtml"
                           sandbox
                           scrolling="no"
                           title="Template preview"></iframe>

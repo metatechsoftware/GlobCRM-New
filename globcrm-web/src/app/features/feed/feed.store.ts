@@ -5,8 +5,10 @@ import {
   withMethods,
   patchState,
 } from '@ngrx/signals';
+import { forkJoin } from 'rxjs';
 import { FeedService } from './feed.service';
-import { FeedItemDto, FeedCommentDto } from './feed.models';
+import { AttachmentService } from '../../shared/services/attachment.service';
+import { FeedItemDto, FeedCommentDto, CreateFeedPostPayload } from './feed.models';
 
 interface FeedState {
   items: FeedItemDto[];
@@ -37,6 +39,7 @@ export const FeedStore = signalStore(
   withState(initialState),
   withMethods((store) => {
     const feedService = inject(FeedService);
+    const attachmentService = inject(AttachmentService);
 
     return {
       /** Load feed items (first page). */
@@ -76,14 +79,33 @@ export const FeedStore = signalStore(
         });
       },
 
-      /** Create a social post and prepend to items. */
-      createPost(content: string): void {
-        feedService.createPost({ content }).subscribe({
+      /** Create a social post with optional file attachments (two-step). */
+      createPost(payload: CreateFeedPostPayload): void {
+        feedService.createPost({ content: payload.content }).subscribe({
           next: (item) => {
+            // Prepend item immediately (optimistic)
             patchState(store, {
               items: [item, ...store.items()],
               total: store.total() + 1,
             });
+
+            // If files exist, upload them and update attachment count
+            if (payload.files.length > 0) {
+              forkJoin(
+                payload.files.map((f) =>
+                  attachmentService.upload('feeditem', item.id, f),
+                ),
+              ).subscribe({
+                next: (attachments) => {
+                  const updatedItems = store.items().map((i) =>
+                    i.id === item.id
+                      ? { ...i, attachmentCount: attachments.length }
+                      : i,
+                  );
+                  patchState(store, { items: updatedItems });
+                },
+              });
+            }
           },
         });
       },

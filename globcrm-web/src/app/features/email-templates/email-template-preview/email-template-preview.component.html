@@ -133,7 +133,7 @@
         }
         <iframe
           class="preview-iframe"
-          [srcdoc]="iframeSrcdoc()"
+          [srcdoc]="iframeSrcdoc() | safeHtml"
           sandbox
           [class.hidden]="previewLoading()"
         ></iframe>

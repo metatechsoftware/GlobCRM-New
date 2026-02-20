@@ -19,7 +19,7 @@ namespace GlobCRM.Api.Controllers;
 public class AttachmentsController : ControllerBase
 {
     private static readonly string[] AllowedEntityTypes =
-        { "company", "contact", "deal", "quote", "activity", "request", "note" };
+        { "company", "contact", "deal", "quote", "activity", "request", "note", "feeditem" };
 
     private static readonly string[] DangerousExtensions =
         { ".exe", ".bat", ".cmd", ".ps1", ".sh" };

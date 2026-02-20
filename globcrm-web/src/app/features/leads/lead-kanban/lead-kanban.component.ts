@@ -202,20 +202,6 @@ export class LeadKanbanComponent implements OnInit {
     });
   }
 
-  /** Get temperature badge color. */
-  getTemperatureColor(temperature: string): string {
-    switch (temperature) {
-      case 'hot':
-        return '#f44336';
-      case 'warm':
-        return '#ff9800';
-      case 'cold':
-        return '#2196f3';
-      default:
-        return '#9e9e9e';
-    }
-  }
-
   /** Check if a stage is terminal (drag disabled from terminal stages). */
   isTerminalStage(stageId: string): boolean {
     const stage = this.stageMap().get(stageId);

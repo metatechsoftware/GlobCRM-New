@@ -4,9 +4,10 @@ import {
   OnInit,
   inject,
   signal,
+  computed,
 } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -44,6 +45,7 @@ import {
   standalone: true,
   imports: [
     CurrencyPipe,
+    DatePipe,
     RouterLink,
     MatCardModule,
     MatButtonModule,
@@ -83,6 +85,13 @@ export class DealKanbanComponent implements OnInit {
 
   /** Toggle to show/hide terminal stages (Closed Won/Lost). */
   includeTerminal = signal<boolean>(false);
+
+  /** Stage lookup for forward-only enforcement. */
+  private stageMap = computed(() => {
+    const data = this.kanbanData();
+    if (!data) return new Map<string, KanbanStageDto>();
+    return new Map(data.stages.map((s) => [s.id, s]));
+  });
 
   ngOnInit(): void {
     this.loadPipelines();
@@ -144,8 +153,8 @@ export class DealKanbanComponent implements OnInit {
 
   /**
    * Handle CDK drag-drop events for stage transitions.
-   * Performs optimistic UI update, then calls API.
-   * On failure, reverts the card to its original column.
+   * Enforces forward-only: target stage sortOrder must be > source stage sortOrder.
+   * Performs optimistic UI update, then calls API. On failure, reverts.
    */
   onDrop(event: CdkDragDrop<DealKanbanCardDto[]>, targetStageId: string): void {
     if (event.previousContainer === event.container) {
@@ -160,6 +169,24 @@ export class DealKanbanComponent implements OnInit {
 
     // Cross-column transfer (stage change)
     const deal = event.previousContainer.data[event.previousIndex];
+
+    // Extract source stage ID from container id (format: "stage-{uuid}")
+    const sourceStageId = event.previousContainer.id.replace('stage-', '');
+    const stages = this.stageMap();
+    const sourceStage = stages.get(sourceStageId);
+    const targetStage = stages.get(targetStageId);
+
+    if (!sourceStage || !targetStage) return;
+
+    // Forward-only enforcement
+    if (targetStage.sortOrder <= sourceStage.sortOrder) {
+      this.snackBar.open(
+        'Deals can only move forward in the pipeline.',
+        'Dismiss',
+        { duration: 4000 },
+      );
+      return;
+    }
 
     // Optimistic update: move card immediately
     transferArrayItem(
@@ -189,6 +216,48 @@ export class DealKanbanComponent implements OnInit {
   /** Calculate total deal value for a stage column. */
   getColumnTotal(stage: KanbanStageDto): number {
     return stage.deals.reduce((sum, deal) => sum + (deal.value ?? 0), 0);
+  }
+
+  /** Check if a stage is terminal (Won or Lost). */
+  isTerminalStage(stageId: string): boolean {
+    const stage = this.stageMap().get(stageId);
+    return stage ? stage.isWon || stage.isLost : false;
+  }
+
+  /** Get 2-letter uppercase initials from a name. */
+  getOwnerInitials(name: string | null): string {
+    if (!name) return '';
+    const parts = name.trim().split(/\s+/);
+    return parts.map((p) => p.charAt(0)).join('').substring(0, 2).toUpperCase();
+  }
+
+  /** Get days until close date (negative = overdue). */
+  getDaysToClose(date: string | null): number | null {
+    if (!date) return null;
+    const close = new Date(date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    close.setHours(0, 0, 0, 0);
+    return Math.ceil((close.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+  }
+
+  /** Get urgency classification based on close date. */
+  getCloseUrgency(date: string | null): 'overdue' | 'soon' | 'approaching' | 'future' | null {
+    const days = this.getDaysToClose(date);
+    if (days === null) return null;
+    if (days < 0) return 'overdue';
+    if (days <= 7) return 'soon';
+    if (days <= 30) return 'approaching';
+    return 'future';
+  }
+
+  /** Get human-readable close label. */
+  getCloseLabel(date: string | null): string {
+    const days = this.getDaysToClose(date);
+    if (days === null) return '';
+    if (days < 0) return `${Math.abs(days)}d overdue`;
+    if (days === 0) return 'Due today';
+    return `${days}d left`;
   }
 
   /** Navigate to deal detail page. */

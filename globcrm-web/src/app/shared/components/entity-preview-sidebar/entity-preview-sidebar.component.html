@@ -2,16 +2,17 @@
   <!-- Header -->
   <div class="preview-header">
     <div class="preview-header-left">
-      @if (store.canGoBack()) {
-        <button mat-icon-button (click)="store.goBack()" matTooltip="Back">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
-      }
-      @if (entityConfig(); as config) {
-        <span class="entity-type-badge" [style.background-color]="config.color">
-          <mat-icon>{{ config.icon }}</mat-icon>
-          {{ config.label }}
-        </span>
+      @if (store.stack().length > 1) {
+        <app-preview-breadcrumbs
+          [stack]="store.stack()"
+          (navigate)="onBreadcrumbNavigate($event)" />
+      } @else {
+        @if (entityConfig(); as config) {
+          <span class="entity-type-badge" [style.background-color]="config.color">
+            <mat-icon>{{ config.icon }}</mat-icon>
+            {{ config.label }}
+          </span>
+        }
       }
     </div>
     <div class="preview-header-right">
@@ -19,7 +20,7 @@
         <mat-icon>open_in_new</mat-icon>
         Open full record
       </button>
-      <button mat-icon-button (click)="store.close()" matTooltip="Close">
+      <button mat-icon-button class="close-btn" (click)="store.close()" matTooltip="Close preview (Esc)">
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -30,8 +31,11 @@
     <div class="preview-entity-name">{{ data.name }}</div>
     @if (data.ownerName) {
       <div class="preview-owner">
-        <img [src]="data.ownerAvatarUrl || '/assets/default-avatar.svg'"
-             class="owner-avatar" alt="Owner" />
+        @if (data.ownerAvatarUrl) {
+          <img [src]="data.ownerAvatarUrl" class="owner-avatar" alt="Owner" />
+        } @else {
+          <mat-icon class="owner-avatar-icon">account_circle</mat-icon>
+        }
         <span>{{ data.ownerName }}</span>
       </div>
     }
@@ -48,43 +52,96 @@
         <button mat-stroked-button (click)="store.close()">Close</button>
       </div>
     } @else if (store.currentData()) {
-      @switch (store.currentData()!.entityType) {
-        @case ('Contact') { <app-contact-preview [data]="store.currentData()!" /> }
-        @case ('Company') { <app-company-preview [data]="store.currentData()!" /> }
-        @case ('Deal') { <app-deal-preview [data]="store.currentData()!" /> }
-        @case ('Lead') { <app-lead-preview [data]="store.currentData()!" /> }
-        @case ('Activity') { <app-activity-preview [data]="store.currentData()!" /> }
-        @case ('Product') { <app-product-preview [data]="store.currentData()!" /> }
-      }
+      @if (availableTabs().length > 1) {
+        <mat-tab-group
+          [selectedIndex]="activeTabIndex()"
+          (selectedIndexChange)="activeTabIndex.set($event)"
+          class="preview-tabs"
+          animationDuration="150ms">
+          @for (tab of availableTabs(); track tab.key) {
+            <mat-tab>
+              <ng-template mat-tab-label>
+                <span class="tab-label">
+                  <mat-icon>{{ tab.icon }}</mat-icon>
+                  {{ tab.label }}
+                </span>
+              </ng-template>
 
-      <!-- Associations section -->
-      @if (store.currentData()!.associations.length > 0) {
-        <app-association-chips
-          [associations]="store.currentData()!.associations"
-          (chipClick)="onAssociationClick($event)" />
-      }
-
-      <!-- Recent Activities section -->
-      @if (store.currentData()!.recentActivities.length > 0) {
-        <app-mini-timeline
-          [activities]="store.currentData()!.recentActivities"
-          [entityType]="store.currentData()!.entityType"
-          [entityId]="store.currentData()!.id"
-          (viewAllClick)="onViewAllActivities()" />
-      }
-
-      <!-- Pinned Custom Fields -->
-      @if (store.currentData()!.pinnedCustomFields.length > 0) {
-        <div class="preview-section">
-          <div class="section-title">Custom Fields</div>
-          @for (field of store.currentData()!.pinnedCustomFields; track field.label) {
-            <div class="field-row">
-              <span class="field-label">{{ field.label }}</span>
-              <span class="field-value">{{ field.value ?? '-' }}</span>
-            </div>
+              @if (tab.key === 'overview') {
+                <div class="tab-content">
+                  <ng-container *ngTemplateOutlet="overviewContent" />
+                </div>
+              } @else {
+                <ng-template matTabContent>
+                  <div class="tab-content">
+                    @switch (tab.key) {
+                      @case ('notes') {
+                        <app-preview-notes-tab
+                          [entityType]="store.currentData()!.entityType"
+                          [entityId]="store.currentData()!.id" />
+                      }
+                      @case ('activities') {
+                        <app-preview-activities-tab
+                          [entityType]="store.currentData()!.entityType"
+                          [entityId]="store.currentData()!.id" />
+                      }
+                      @case ('timeline') {
+                        <app-preview-timeline-tab
+                          [entityType]="store.currentData()!.entityType"
+                          [entityId]="store.currentData()!.id" />
+                      }
+                    }
+                  </div>
+                </ng-template>
+              }
+            </mat-tab>
           }
-        </div>
+        </mat-tab-group>
+      } @else {
+        <!-- Single tab (Product) — no tab group -->
+        <ng-container *ngTemplateOutlet="overviewContent" />
       }
     }
   </div>
 </div>
+
+<!-- Overview content template -->
+<ng-template #overviewContent>
+  @switch (store.currentData()!.entityType) {
+    @case ('Contact') { <app-contact-preview [data]="store.currentData()!" /> }
+    @case ('Company') { <app-company-preview [data]="store.currentData()!" /> }
+    @case ('Deal') { <app-deal-preview [data]="store.currentData()!" /> }
+    @case ('Lead') { <app-lead-preview [data]="store.currentData()!" /> }
+    @case ('Activity') { <app-activity-preview [data]="store.currentData()!" /> }
+    @case ('Product') { <app-product-preview [data]="store.currentData()!" /> }
+  }
+
+  <!-- Associations section -->
+  @if (store.currentData()!.associations.length > 0) {
+    <app-association-chips
+      [associations]="store.currentData()!.associations"
+      (chipClick)="onAssociationClick($event)" />
+  }
+
+  <!-- Recent Activities section -->
+  @if (store.currentData()!.recentActivities.length > 0) {
+    <app-mini-timeline
+      [activities]="store.currentData()!.recentActivities"
+      [entityType]="store.currentData()!.entityType"
+      [entityId]="store.currentData()!.id"
+      (viewAllClick)="onViewAllActivities()" />
+  }
+
+  <!-- Pinned Custom Fields -->
+  @if (store.currentData()!.pinnedCustomFields.length > 0) {
+    <div class="preview-section">
+      <div class="section-title">Custom Fields</div>
+      @for (field of store.currentData()!.pinnedCustomFields; track field.label) {
+        <div class="field-row">
+          <span class="field-label">{{ field.label }}</span>
+          <span class="field-value">{{ field.value ?? '-' }}</span>
+        </div>
+      }
+    </div>
+  }
+</ng-template>

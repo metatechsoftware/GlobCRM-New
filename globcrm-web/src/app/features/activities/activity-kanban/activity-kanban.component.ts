@@ -207,4 +207,34 @@ export class ActivityKanbanComponent implements OnInit {
     if (text.length <= maxLength) return text;
     return text.substring(0, maxLength) + '...';
   }
+
+  /** Map priority level to a CSS class for soft-bg badge styling. */
+  getPriorityClass(priority: string): string {
+    switch (priority?.toLowerCase()) {
+      case 'low': return 'priority-low';
+      case 'medium': return 'priority-medium';
+      case 'high': return 'priority-high';
+      case 'urgent': return 'priority-urgent';
+      default: return 'priority-medium';
+    }
+  }
+
+  /** Extract up to 2 uppercase initials from a full name. */
+  getAssigneeInitials(name: string | null): string {
+    if (!name) return '';
+    const parts = name.trim().split(/\s+/);
+    if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? '';
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+
+  /** Return a CSS class based on due date urgency. */
+  getDueDateClass(dueDate: string | null): string {
+    if (!dueDate) return '';
+    const now = new Date();
+    const due = new Date(dueDate);
+    if (due < now) return 'due-overdue';
+    const twoDays = 2 * 24 * 60 * 60 * 1000;
+    if (due.getTime() - now.getTime() <= twoDays) return 'due-approaching';
+    return '';
+  }
 }

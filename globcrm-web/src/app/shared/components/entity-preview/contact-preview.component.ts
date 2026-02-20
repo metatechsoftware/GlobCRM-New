@@ -1,9 +1,11 @@
-import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
 import { EntityPreviewDto } from '../../models/entity-preview.models';
+import { PreviewEntityLinkComponent } from './preview-entity-link.component';
 
 @Component({
   selector: 'app-contact-preview',
   standalone: true,
+  imports: [PreviewEntityLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-fields">
@@ -28,7 +30,16 @@ import { EntityPreviewDto } from '../../models/entity-preview.models';
       @if (data().fields['companyName']; as companyName) {
         <div class="field-row">
           <span class="field-label">Company</span>
-          <span class="field-value">{{ companyName }}</span>
+          <span class="field-value">
+            @if (companyAssociation(); as ca) {
+              <app-preview-entity-link
+                entityType="Company"
+                [entityId]="ca.id"
+                [entityName]="ca.name" />
+            } @else {
+              {{ companyName }}
+            }
+          </span>
         </div>
       }
       @if (data().fields['city']; as city) {
@@ -50,4 +61,9 @@ import { EntityPreviewDto } from '../../models/entity-preview.models';
 })
 export class ContactPreviewComponent {
   readonly data = input.required<EntityPreviewDto>();
+
+  readonly companyAssociation = computed(() => {
+    const companyAssoc = this.data().associations.find((a) => a.entityType === 'Company');
+    return companyAssoc?.items[0] ?? null;
+  });
 }
