@@ -67,7 +67,7 @@ Each task was committed atomically:
 
 1. **Task 1: Fix lastContacted field name mismatch and wire dirty-flag to all mutation handlers** - `45f63cd` (fix)
 
-**Plan metadata:** [pending] (docs: complete plan)
+**Plan metadata:** `4b77809` (docs: complete plan)
 
 ## Files Created/Modified
 - `globcrm-web/src/app/shared/components/summary-tab/summary.models.ts` - Renamed BaseSummaryFields.lastContactedAt to lastContacted

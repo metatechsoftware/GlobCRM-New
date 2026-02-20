@@ -48,3 +48,30 @@
 
 ---
 
+
+## v1.2 Connected Experience (Shipped: 2026-02-20)
+
+**Phases completed:** 5 phases (22-26), 19 plans
+**Commits:** 81
+**Lines of code:** ~275,300 total (~40,700 new in v1.2)
+**Timeline:** 1 day (2026-02-20)
+
+**Key accomplishments:**
+- Entity Preview Sidebar: click entity names in feed, search, or My Day to open a slide-in preview with key properties, associations, recent activities, and quick actions — without navigating away
+- Summary Tabs: rich at-a-glance overview as default first tab on all 6 entity detail pages (Company, Contact, Deal, Lead, Quote, Request) with batched aggregation endpoints, deal pipeline charts, email engagement, and dirty-flag invalidation
+- My Day Personal Dashboard: personal daily workspace replacing generic home page with tasks, overdue urgency, upcoming events, pipeline summary, recent records, email summary, feed preview, notification digest, and quick actions
+- Preview Sidebar Polish: quick actions from preview, preview-first global search, user profile popover from feed authors, full-width mobile responsive with swipe-to-close
+- Cross-Feature Integration: EntityTypeRegistry for consistent entity metadata, SlideInPanelService for reusable slide-in panels, context-aware mutual exclusion, CDK Overlay patterns for popovers and panels
+
+**Delivered:** A connected CRM experience where every entity is one click away — feed items, search results, and dashboard widgets all open entity previews, detail pages start with rich summary tabs, and users land on a personal My Day dashboard. All 37 requirements satisfied across 5 phases with 6 non-blocking tech debt items.
+
+### Known Tech Debt
+- `any[]` signal types in preview-notes-tab and preview-activities-tab components
+- PREVIEW-02 uses push-content (side mode, 480px) instead of overlay per user design override
+- TODO placeholder: company linking UI in slide-in follow-up (Phase 24)
+- Unreachable email placeholder in slide-in @switch (Phase 24)
+- EntityPreviewController missing Quote/Request backend handlers (returns 400 for these types)
+- ENTITY_TABS missing Quote/Request entries (falls to default ['overview'])
+
+---
+
