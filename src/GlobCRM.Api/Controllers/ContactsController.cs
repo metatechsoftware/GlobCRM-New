@@ -387,6 +387,234 @@ public class ContactsController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Summary ----
+
+    /// <summary>
+    /// Returns aggregated summary data for a contact including key properties,
+    /// association counts, recent/upcoming activities, notes preview, attachment count,
+    /// last contacted date, deal pipeline summary, and email engagement data.
+    /// </summary>
+    [HttpGet("{id:guid}/summary")]
+    [Authorize(Policy = "Permission:Contact:View")]
+    [ProducesResponseType(typeof(ContactSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(Guid id)
+    {
+        var contact = await _contactRepository.GetByIdAsync(id);
+        if (contact is null)
+            return NotFound(new { error = "Contact not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Contact", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(contact.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var now = DateTimeOffset.UtcNow;
+
+        // Parallel queries via Task.WhenAll
+        var recentActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Contact" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(5)
+            .Select(a => new ContactSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var upcomingActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Contact" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
+            .OrderBy(a => a.DueDate)
+            .Take(5)
+            .Select(a => new ContactSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var recentNotesTask = _db.Notes
+            .Where(n => n.EntityType == "Contact" && n.EntityId == id)
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(3)
+            .Select(n => new ContactSummaryNoteDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Preview = n.PlainTextBody != null
+                    ? n.PlainTextBody.Substring(0, Math.Min(n.PlainTextBody.Length, 100))
+                    : null,
+                AuthorName = n.Author != null
+                    ? (n.Author.FirstName + " " + n.Author.LastName).Trim()
+                    : null,
+                CreatedAt = n.CreatedAt
+            })
+            .ToListAsync();
+
+        var companyCountTask = Task.FromResult(contact.CompanyId.HasValue ? 1 : 0);
+        var dealCountTask = _db.DealContacts.CountAsync(dc => dc.ContactId == id);
+        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Contact" && al.EntityId == id);
+        var quoteCountTask = _db.Quotes.CountAsync(q => q.ContactId == id);
+        var requestCountTask = _db.Requests.CountAsync(r => r.ContactId == id);
+        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Contact" && a.EntityId == id);
+
+        var lastActivityDateTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Contact" && al.EntityId == id)
+            .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => (DateTimeOffset?)a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        var lastEmailDateTask = _db.EmailMessages
+            .Where(e => e.LinkedContactId == id)
+            .OrderByDescending(e => e.SentAt)
+            .Select(e => (DateTimeOffset?)e.SentAt)
+            .FirstOrDefaultAsync();
+
+        // Deal pipeline (via DealContacts join)
+        var dealPipelineTask = _db.DealContacts
+            .Where(dc => dc.ContactId == id)
+            .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
+            .GroupBy(d => new { d.PipelineStageId, d.Stage!.Name, d.Stage.Color })
+            .Select(g => new ContactDealStageSummaryDto
+            {
+                StageName = g.Key.Name,
+                Color = g.Key.Color,
+                Count = g.Count(),
+                Value = g.Sum(d => d.Value ?? 0)
+            })
+            .ToListAsync();
+
+        var totalDealsForWinRateTask = _db.DealContacts
+            .Where(dc => dc.ContactId == id)
+            .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
+            .Select(d => new { d.Stage!.IsWon, d.Stage.IsLost, d.Value })
+            .ToListAsync();
+
+        // Email engagement
+        var emailStatsTask = _db.EmailMessages
+            .Where(e => e.LinkedContactId == id)
+            .GroupBy(e => 1)
+            .Select(g => new
+            {
+                TotalEmails = g.Count(),
+                SentCount = g.Count(e => !e.IsInbound),
+                ReceivedCount = g.Count(e => e.IsInbound),
+                LastSentAt = g.Where(e => !e.IsInbound).Max(e => (DateTimeOffset?)e.SentAt),
+                LastReceivedAt = g.Where(e => e.IsInbound).Max(e => (DateTimeOffset?)e.SentAt)
+            })
+            .FirstOrDefaultAsync();
+
+        var activeEnrollmentTask = _db.SequenceEnrollments
+            .Where(se => se.ContactId == id && se.Status == EnrollmentStatus.Active)
+            .Select(se => new { se.Sequence!.Name })
+            .FirstOrDefaultAsync();
+
+        await Task.WhenAll(
+            recentActivitiesTask, upcomingActivitiesTask, recentNotesTask,
+            companyCountTask, dealCountTask, activityCountTask, quoteCountTask, requestCountTask,
+            attachmentCountTask, lastActivityDateTask, lastEmailDateTask,
+            dealPipelineTask, totalDealsForWinRateTask, emailStatsTask, activeEnrollmentTask);
+
+        // Compute last contacted date
+        var lastActivity = lastActivityDateTask.Result;
+        var lastEmail = lastEmailDateTask.Result;
+        DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
+        {
+            (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
+            (not null, null) => lastActivity,
+            (null, not null) => lastEmail,
+            _ => null
+        };
+
+        // Compute win rate
+        var winRateDeals = totalDealsForWinRateTask.Result;
+        var wonCount = winRateDeals.Count(d => d.IsWon);
+        var closedCount = winRateDeals.Count(d => d.IsWon || d.IsLost);
+        var winRate = closedCount > 0 ? (decimal)wonCount / closedCount : 0m;
+        var totalValue = winRateDeals.Sum(d => d.Value ?? 0);
+
+        var associations = new List<ContactSummaryAssociationDto>
+        {
+            new() { EntityType = "Company", Label = "Companies", Icon = "business", Count = companyCountTask.Result },
+            new() { EntityType = "Deal", Label = "Deals", Icon = "handshake", Count = dealCountTask.Result },
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+            new() { EntityType = "Quote", Label = "Quotes", Icon = "request_quote", Count = quoteCountTask.Result },
+            new() { EntityType = "Request", Label = "Requests", Icon = "support_agent", Count = requestCountTask.Result },
+        };
+
+        // Build email engagement
+        var emailStats = emailStatsTask.Result;
+        var enrollment = activeEnrollmentTask.Result;
+        ContactEmailEngagementDto? emailEngagement = null;
+        if (emailStats != null)
+        {
+            emailEngagement = new ContactEmailEngagementDto
+            {
+                TotalEmails = emailStats.TotalEmails,
+                SentCount = emailStats.SentCount,
+                ReceivedCount = emailStats.ReceivedCount,
+                LastSentAt = emailStats.LastSentAt,
+                LastReceivedAt = emailStats.LastReceivedAt,
+                IsEnrolledInSequence = enrollment != null,
+                SequenceName = enrollment?.Name
+            };
+        }
+        else
+        {
+            emailEngagement = new ContactEmailEngagementDto
+            {
+                IsEnrolledInSequence = enrollment != null,
+                SequenceName = enrollment?.Name
+            };
+        }
+
+        var dto = new ContactSummaryDto
+        {
+            Id = contact.Id,
+            FullName = contact.FullName,
+            Email = contact.Email,
+            Phone = contact.Phone,
+            JobTitle = contact.JobTitle,
+            CompanyName = contact.Company?.Name,
+            OwnerName = contact.Owner != null
+                ? $"{contact.Owner.FirstName} {contact.Owner.LastName}".Trim()
+                : null,
+            Department = contact.Department,
+            Associations = associations,
+            RecentActivities = recentActivitiesTask.Result,
+            UpcomingActivities = upcomingActivitiesTask.Result,
+            RecentNotes = recentNotesTask.Result,
+            AttachmentCount = attachmentCountTask.Result,
+            LastContacted = lastContacted,
+            DealPipeline = new ContactDealPipelineSummaryDto
+            {
+                TotalValue = totalValue,
+                TotalDeals = winRateDeals.Count,
+                WinRate = winRate,
+                DealsByStage = dealPipelineTask.Result
+            },
+            EmailEngagement = emailEngagement
+        };
+
+        return Ok(dto);
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -615,4 +843,83 @@ public class CreateContactRequestValidator : AbstractValidator<CreateContactRequ
             .NotEmpty().WithMessage("Last name is required.")
             .MaximumLength(100).WithMessage("Last name must be at most 100 characters.");
     }
+}
+
+// ---- Summary DTOs ----
+
+/// <summary>
+/// Aggregated summary DTO for the contact detail summary tab.
+/// </summary>
+public record ContactSummaryDto
+{
+    public Guid Id { get; init; }
+    public string FullName { get; init; } = string.Empty;
+    public string? Email { get; init; }
+    public string? Phone { get; init; }
+    public string? JobTitle { get; init; }
+    public string? CompanyName { get; init; }
+    public string? OwnerName { get; init; }
+    public string? Department { get; init; }
+    public List<ContactSummaryAssociationDto> Associations { get; init; } = new();
+    public List<ContactSummaryActivityDto> RecentActivities { get; init; } = new();
+    public List<ContactSummaryActivityDto> UpcomingActivities { get; init; } = new();
+    public List<ContactSummaryNoteDto> RecentNotes { get; init; } = new();
+    public int AttachmentCount { get; init; }
+    public DateTimeOffset? LastContacted { get; init; }
+    public ContactDealPipelineSummaryDto? DealPipeline { get; init; }
+    public ContactEmailEngagementDto? EmailEngagement { get; init; }
+}
+
+public record ContactSummaryActivityDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTimeOffset? DueDate { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record ContactSummaryNoteDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public string? Preview { get; init; }
+    public string? AuthorName { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record ContactSummaryAssociationDto
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public int Count { get; init; }
+}
+
+public record ContactDealPipelineSummaryDto
+{
+    public decimal TotalValue { get; init; }
+    public int TotalDeals { get; init; }
+    public decimal WinRate { get; init; }
+    public List<ContactDealStageSummaryDto> DealsByStage { get; init; } = new();
+}
+
+public record ContactDealStageSummaryDto
+{
+    public string StageName { get; init; } = string.Empty;
+    public string Color { get; init; } = string.Empty;
+    public int Count { get; init; }
+    public decimal Value { get; init; }
+}
+
+public record ContactEmailEngagementDto
+{
+    public int TotalEmails { get; init; }
+    public int SentCount { get; init; }
+    public int ReceivedCount { get; init; }
+    public DateTimeOffset? LastSentAt { get; init; }
+    public DateTimeOffset? LastReceivedAt { get; init; }
+    public bool IsEnrolledInSequence { get; init; }
+    public string? SequenceName { get; init; }
 }

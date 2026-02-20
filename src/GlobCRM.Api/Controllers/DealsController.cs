@@ -851,6 +851,167 @@ public class DealsController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Summary ----
+
+    /// <summary>
+    /// Returns aggregated summary data for a deal including key properties,
+    /// stage progress info, association counts, recent/upcoming activities,
+    /// notes preview, attachment count, and last contacted date.
+    /// </summary>
+    [HttpGet("{id:guid}/summary")]
+    [Authorize(Policy = "Permission:Deal:View")]
+    [ProducesResponseType(typeof(DealSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(Guid id)
+    {
+        var deal = await _dealRepository.GetByIdWithLinksAsync(id);
+        if (deal is null)
+            return NotFound(new { error = "Deal not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Deal", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(deal.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var now = DateTimeOffset.UtcNow;
+
+        // Parallel queries via Task.WhenAll
+        var recentActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Deal" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(5)
+            .Select(a => new DealSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var upcomingActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Deal" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
+            .OrderBy(a => a.DueDate)
+            .Take(5)
+            .Select(a => new DealSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var recentNotesTask = _db.Notes
+            .Where(n => n.EntityType == "Deal" && n.EntityId == id)
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(3)
+            .Select(n => new DealSummaryNoteDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Preview = n.PlainTextBody != null
+                    ? n.PlainTextBody.Substring(0, Math.Min(n.PlainTextBody.Length, 100))
+                    : null,
+                AuthorName = n.Author != null
+                    ? (n.Author.FirstName + " " + n.Author.LastName).Trim()
+                    : null,
+                CreatedAt = n.CreatedAt
+            })
+            .ToListAsync();
+
+        var contactCountTask = _db.DealContacts.CountAsync(dc => dc.DealId == id);
+        var productCountTask = _db.DealProducts.CountAsync(dp => dp.DealId == id);
+        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Deal" && al.EntityId == id);
+        var quoteCountTask = _db.Quotes.CountAsync(q => q.DealId == id);
+        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Deal" && a.EntityId == id);
+
+        var lastActivityDateTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Deal" && al.EntityId == id)
+            .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => (DateTimeOffset?)a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        var lastEmailDateTask = _db.EmailMessages
+            .Where(e => e.LinkedCompanyId == deal.CompanyId && deal.CompanyId != null)
+            .OrderByDescending(e => e.SentAt)
+            .Select(e => (DateTimeOffset?)e.SentAt)
+            .FirstOrDefaultAsync();
+
+        // Stage progress info
+        var stageInfoTask = _db.PipelineStages
+            .Where(s => s.PipelineId == deal.PipelineId)
+            .OrderBy(s => s.SortOrder)
+            .Select(s => new DealStageInfoDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Color = s.Color,
+                SortOrder = s.SortOrder,
+                IsCurrent = s.Id == deal.PipelineStageId
+            })
+            .ToListAsync();
+
+        await Task.WhenAll(
+            recentActivitiesTask, upcomingActivitiesTask, recentNotesTask,
+            contactCountTask, productCountTask, activityCountTask, quoteCountTask,
+            attachmentCountTask, lastActivityDateTask, lastEmailDateTask, stageInfoTask);
+
+        // Compute last contacted date
+        var lastActivity = lastActivityDateTask.Result;
+        var lastEmail = lastEmailDateTask.Result;
+        DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
+        {
+            (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
+            (not null, null) => lastActivity,
+            (null, not null) => lastEmail,
+            _ => null
+        };
+
+        var associations = new List<DealSummaryAssociationDto>
+        {
+            new() { EntityType = "Contact", Label = "Contacts", Icon = "people", Count = contactCountTask.Result },
+            new() { EntityType = "Product", Label = "Products", Icon = "inventory_2", Count = productCountTask.Result },
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+            new() { EntityType = "Quote", Label = "Quotes", Icon = "request_quote", Count = quoteCountTask.Result },
+        };
+
+        var dto = new DealSummaryDto
+        {
+            Id = deal.Id,
+            Title = deal.Title,
+            Value = deal.Value,
+            Probability = deal.Probability,
+            ExpectedCloseDate = deal.ExpectedCloseDate,
+            PipelineName = deal.Pipeline?.Name ?? string.Empty,
+            StageName = deal.Stage?.Name ?? string.Empty,
+            CompanyName = deal.Company?.Name,
+            OwnerName = deal.Owner != null
+                ? $"{deal.Owner.FirstName} {deal.Owner.LastName}".Trim()
+                : null,
+            Stages = stageInfoTask.Result,
+            Associations = associations,
+            RecentActivities = recentActivitiesTask.Result,
+            UpcomingActivities = upcomingActivitiesTask.Result,
+            RecentNotes = recentNotesTask.Result,
+            AttachmentCount = attachmentCountTask.Result,
+            LastContacted = lastContacted
+        };
+
+        return Ok(dto);
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -1154,4 +1315,65 @@ public class CreateDealRequestValidator : AbstractValidator<CreateDealRequest>
         RuleFor(x => x.PipelineId)
             .NotEmpty().WithMessage("Pipeline is required.");
     }
+}
+
+// ---- Summary DTOs ----
+
+/// <summary>
+/// Aggregated summary DTO for the deal detail summary tab.
+/// </summary>
+public record DealSummaryDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public decimal? Value { get; init; }
+    public decimal? Probability { get; init; }
+    public DateOnly? ExpectedCloseDate { get; init; }
+    public string PipelineName { get; init; } = string.Empty;
+    public string StageName { get; init; } = string.Empty;
+    public string? CompanyName { get; init; }
+    public string? OwnerName { get; init; }
+    public List<DealStageInfoDto> Stages { get; init; } = new();
+    public List<DealSummaryAssociationDto> Associations { get; init; } = new();
+    public List<DealSummaryActivityDto> RecentActivities { get; init; } = new();
+    public List<DealSummaryActivityDto> UpcomingActivities { get; init; } = new();
+    public List<DealSummaryNoteDto> RecentNotes { get; init; } = new();
+    public int AttachmentCount { get; init; }
+    public DateTimeOffset? LastContacted { get; init; }
+}
+
+public record DealStageInfoDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Color { get; init; } = string.Empty;
+    public int SortOrder { get; init; }
+    public bool IsCurrent { get; init; }
+}
+
+public record DealSummaryActivityDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTimeOffset? DueDate { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record DealSummaryNoteDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public string? Preview { get; init; }
+    public string? AuthorName { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record DealSummaryAssociationDto
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public int Count { get; init; }
 }
