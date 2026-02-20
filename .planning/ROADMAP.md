@@ -53,7 +53,7 @@
 - [x] **Phase 23: Summary Tabs on Detail Pages** - Aggregated summary tab as default first tab on all 6 major entity detail pages with batched backend endpoints (completed 2026-02-20)
 - [x] **Phase 24: My Day Personal Dashboard** - Personal daily workspace replacing home page with fixed-layout widgets, plus org dashboard relocation (completed 2026-02-20)
 - [x] **Phase 25: Preview Sidebar Polish + Cross-Feature Integration** - Quick actions in preview, global search preview, user profile preview, responsive mobile behavior, and performance indexes (completed 2026-02-20)
-- [ ] **Phase 26: Integration Fix — Preview Sidebar + My Day Wiring** - Fix pushPreview() isOpen bug, wire trackView() calls, fix GlobalSearchComponent icon map
+- [x] **Phase 26: Integration Fix — Preview Sidebar + My Day Wiring** - Fix pushPreview() isOpen bug, wire trackView() calls, fix GlobalSearchComponent icon map (completed 2026-02-20)
 
 ## Phase Details
 
@@ -174,6 +174,6 @@ Phases execute in numeric order: 22 → 23 → 24 → 25
 | 23. Summary Tabs on Detail Pages | 5/5 | Complete    | 2026-02-20 | - |
 | 24. My Day Personal Dashboard | 5/5 | Complete    | 2026-02-20 | - |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | 3/3 | Complete    | 2026-02-20 | - |
-| 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
+| 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | Complete    | 2026-02-20 | 2026-02-20 |
 
 **Totals:** 26 phases, 158 plans (158 complete), ~234,600 LOC
