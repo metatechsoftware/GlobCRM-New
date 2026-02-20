@@ -4,7 +4,7 @@
 
 - ✅ **v1.0 MVP** — Phases 1-12 (shipped 2026-02-18)
 - ✅ **v1.1 Automation & Intelligence** — Phases 13-21 (shipped 2026-02-20)
-- 🚧 **v1.2 Connected Experience** — Phases 22-25 (in progress)
+- 🚧 **v1.2 Connected Experience** — Phases 22-26 (in progress)
 
 ## Phases
 
@@ -53,6 +53,7 @@
 - [x] **Phase 23: Summary Tabs on Detail Pages** - Aggregated summary tab as default first tab on all 6 major entity detail pages with batched backend endpoints (completed 2026-02-20)
 - [x] **Phase 24: My Day Personal Dashboard** - Personal daily workspace replacing home page with fixed-layout widgets, plus org dashboard relocation (completed 2026-02-20)
 - [x] **Phase 25: Preview Sidebar Polish + Cross-Feature Integration** - Quick actions in preview, global search preview, user profile preview, responsive mobile behavior, and performance indexes (completed 2026-02-20)
+- [ ] **Phase 26: Integration Fix — Preview Sidebar + My Day Wiring** - Fix pushPreview() isOpen bug, wire trackView() calls, fix GlobalSearchComponent icon map
 
 ## Phase Details
 
@@ -127,6 +128,20 @@ Plans:
 - [ ] 25-02-PLAN.md — User profile preview (backend activity-stats endpoint, CDK Overlay popover, feed author name clickable)
 - [ ] 25-03-PLAN.md — Search preview-first + mobile responsive (preview-first search results, recently previewed entities, full-width mobile sidebar, swipe-right-to-close)
 
+### Phase 26: Integration Fix — Preview Sidebar + My Day Wiring
+**Goal**: Fix cross-phase wiring so entity links from My Day widgets correctly open the preview sidebar, recently viewed entities are tracked to populate the Recent Records widget, and GlobalSearchComponent uses EntityTypeRegistry for consistent icons
+**Depends on**: Phase 25 (all features functional)
+**Requirements**: MYDAY-08, MYDAY-11
+**Gap Closure**: Closes gaps from v1.2 milestone audit
+**Success Criteria** (what must be TRUE):
+  1. Clicking an entity name in any My Day widget (Feed Preview, Recent Records, Tasks, etc.) opens the preview sidebar — pushPreview() sets isOpen:true when called from closed-sidebar context
+  2. Opening an entity preview from any context (feed, search, My Day) calls trackView() to populate recently_viewed_entities, making the Recent Records widget show real data
+  3. GlobalSearchComponent uses EntityTypeRegistry for entity icons, correctly showing Lead icon ('trending_up') instead of generic 'search'
+**Plans**: 1 plan
+
+Plans:
+- [ ] 26-01-PLAN.md — Fix pushPreview() isOpen, wire trackView() to preview open, replace GlobalSearchComponent icon map with EntityTypeRegistry
+
 ## Progress
 
 **Execution Order:**
@@ -159,5 +174,6 @@ Phases execute in numeric order: 22 → 23 → 24 → 25
 | 23. Summary Tabs on Detail Pages | 5/5 | Complete    | 2026-02-20 | - |
 | 24. My Day Personal Dashboard | 5/5 | Complete    | 2026-02-20 | - |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | 3/3 | Complete    | 2026-02-20 | - |
+| 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 0/1 | Planned | - |
 
-**Totals:** 25 phases, 153 plans (139 complete + 14 planned), ~234,600 LOC
+**Totals:** 26 phases, 154 plans (153 complete + 1 planned), ~234,600 LOC
