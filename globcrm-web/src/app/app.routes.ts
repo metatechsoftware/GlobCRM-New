@@ -17,7 +17,15 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'dashboard',
+    path: 'my-day',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/my-day/my-day.routes').then(
+        (m) => m.MY_DAY_ROUTES
+      ),
+  },
+  {
+    path: 'analytics',
     canActivate: [authGuard],
     loadChildren: () =>
       import('./features/dashboard/dashboard.routes').then(
@@ -193,12 +201,17 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'dashboard',
+    redirectTo: 'analytics',
+    pathMatch: 'full',
+  },
+  {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'my-day',
     pathMatch: 'full',
   },
   {
     path: '**',
-    redirectTo: 'dashboard',
+    redirectTo: 'my-day',
   },
 ];

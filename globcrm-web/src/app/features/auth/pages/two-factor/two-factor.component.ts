@@ -199,6 +199,6 @@ export class TwoFactorComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/my-day']);
   }
 }

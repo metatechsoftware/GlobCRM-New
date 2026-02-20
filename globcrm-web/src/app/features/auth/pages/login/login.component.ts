@@ -43,10 +43,10 @@ export class LoginComponent implements OnInit {
   showTwoFactor = signal(false);
   errorMessage = signal<string | null>(null);
   isLoading = signal(false);
-  private returnUrl = '/dashboard';
+  private returnUrl = '/my-day';
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/dashboard';
+    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/my-day';
 
     this.loginForm = this.fb.group({
       email: ['cevikcinar@gmail.com', [Validators.required, Validators.email]],
