@@ -1,4 +1,4 @@
-import { Component, inject, computed, effect, HostListener } from '@angular/core';
+import { Component, inject, computed, effect, untracked, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { toSignal } from '@angular/core/rxjs-interop';
@@ -56,7 +56,8 @@ import { EntityPreviewSidebarComponent } from './shared/components/entity-previe
 
       .app-sidenav-container.has-nav-sidebar {
         margin-left: 240px;
-        padding-top: 56px;
+        height: calc(100vh - 56px);
+        margin-top: 56px;
         transition: margin-left 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
 
@@ -79,7 +80,10 @@ import { EntityPreviewSidebarComponent } from './shared/components/entity-previe
       }
 
       ::ng-deep .preview-drawer .mat-drawer-inner-container {
-        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        overflow-y: hidden;
       }
 
       ::ng-deep .mat-drawer.preview-drawer {
@@ -107,6 +111,16 @@ export class AppComponent {
     } else {
       this.signalRService.stop();
     }
+  });
+
+  /** Close the preview sidebar whenever the route changes. */
+  private readonly closePreviewOnNav = effect(() => {
+    this.currentUrl(); // only track navigation changes
+    untracked(() => {
+      if (this.previewStore.isOpen()) {
+        this.previewStore.close();
+      }
+    });
   });
 
   private readonly currentUrl = toSignal(
