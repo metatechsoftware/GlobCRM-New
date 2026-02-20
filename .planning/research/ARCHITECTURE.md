@@ -1,686 +1,593 @@
-# Architecture Patterns: v1.2 Connected Experience
+# Architecture Patterns: v1.3 Platform & Polish
 
-**Domain:** Entity-linked feed, entity preview sidebars, summary tabs on detail pages, personal "My Day" dashboard
+**Domain:** Integration marketplace, free-form Kanban boards, Unlayer document-mode PDF templates, localization (EN + TR)
 **Researched:** 2026-02-20
-**Confidence:** HIGH (based on exhaustive codebase analysis of existing patterns)
+**Confidence:** HIGH (codebase-verified integration points, MEDIUM for Unlayer document mode specifics)
 
 ## Executive Summary
 
-The v1.2 "Connected Experience" milestone weaves together three features that transform GlobCRM from a record-keeping system into a navigable information network. Unlike v1.1's event-driven automation, v1.2 is primarily a **frontend UX milestone** with targeted backend data aggregation endpoints. The existing architecture handles 90% of the requirements -- the key challenge is designing new **shared components** and **lightweight backend summaries** that integrate cleanly with the established patterns without duplicating existing functionality.
+The v1.3 "Platform & Polish" milestone adds four distinct capabilities that span different architectural layers. Unlike v1.2's frontend-heavy UX improvements, v1.3 introduces **new domain entities** (boards, integration configs, quote templates), a **cross-cutting concern** (localization), and **significant backend infrastructure** (integration marketplace OAuth flows, HTML-to-PDF rendering pipeline). Each feature has clear integration points with the existing architecture but minimal overlap with each other, making them parallelizable after a shared foundation phase.
 
-The three features share a common architectural thread: **contextual data surfacing**. Entity preview sidebars show entity snapshots without navigation. Summary tabs aggregate relationship counts and recent activity. "My Day" personalizes the existing dashboard with user-scoped daily views. All three consume existing entity data through new aggregation endpoints, and all three are rendered by new shared Angular components that slot into the established component hierarchy.
+The key architectural challenge is that these four features touch different layers of the stack:
 
-**Critical architectural decision:** The entity preview sidebar must be a **global overlay component** hosted at the `AppComponent` level (alongside the navbar), managed by a root-level `PreviewSidebarStore`, and triggered from anywhere in the app. It cannot live inside individual feature modules because feed items, search results, and related entity links all need to open previews from different contexts.
+- **Integration Marketplace** introduces a new backend subsystem (`Infrastructure/Integrations/`) with OAuth credential storage, third-party API adapters, a Hangfire sync queue, and a new settings UI section. It extends the existing webhook/domain-event pattern but adds bidirectional data flow.
+- **Free-form Kanban Boards** is primarily a frontend feature that creates a new top-level entity (`Board`) with JSONB column/card storage. It reuses Angular CDK drag-drop patterns from existing Kanban views but replaces the entity-bound column model with user-defined columns.
+- **Unlayer PDF Templates** extends the existing Unlayer email template editor (already integrated as `angular-email-editor`) by switching `displayMode` from `'email'` to `'document'`, creating a new `QuoteTemplate` entity, and replacing the hardcoded `QuotePdfDocument` with an HTML-to-PDF pipeline using PuppeteerSharp on the backend.
+- **Localization** is a cross-cutting concern that touches every Angular component's template text. It uses `@ngx-translate/core` for runtime language switching (user's `Language` preference already exists on `ApplicationUser`), with JSON translation files for English and Turkish.
+
+**Critical dependency:** Localization should be wired first as a foundation because it affects every component built in the other three features. Building features without i18n and then retrofitting translations is significantly more work than building with `translate` pipes from day one.
 
 ## Recommended Architecture
 
-### System-Level View: v1.2 Components
+### System-Level View: v1.3 Components
 
 ```
-EXISTING (unchanged)                    NEW (v1.2)
+EXISTING (unchanged)                    NEW (v1.3)
 ============================           ============================
 
-AppComponent                            + EntityPreviewSidebarComponent
-  - NavbarComponent                       (global overlay, lives here)
-  - <router-outlet>                     + PreviewSidebarService (root)
-                                        + PreviewSidebarStore (root)
-Feature Detail Pages                        |
-  - RelatedEntityTabsComponent          + EntitySummaryTabComponent (new tab)
-  - EntityTimelineComponent               (added as Summary tab to tab consts)
-  - tab content templates                   |
-                                        + EntitySummaryService (new)
-Feed Feature                            + Entity-linked feed filtering
-  - FeedListComponent                     (add entityType/entityId params)
-  - FeedStore                           + EntityFeedTabComponent (new)
-  - FeedService                             |
-                                        + "My Day" dashboard tab
-Dashboard Feature                         (new tab in DashboardComponent)
-  - DashboardComponent                  + MyDayStore (new per-page store)
-  - DashboardStore                      + MyDayApiService (new)
-  - angular-gridster2                   + MyDayComponent (new)
-                                            |
-.NET 10 Backend                         + EntityPreviewController (new)
-  - Entity Controllers                  + EntitySummaryController (new)
-  - FeedController                      + FeedController: add entity filter
-  - DashboardsController                + MyDayController (new)
+Backend Layers:
+  Domain/Entities/                     + Board, BoardColumn, BoardCard
+  Domain/Entities/                     + IntegrationConfig, IntegrationSyncLog
+  Domain/Entities/                     + QuoteTemplate
+  Domain/Interfaces/                   + IBoardRepository, IIntegrationRepository
+  Domain/Interfaces/                   + IQuoteTemplateRepository
+  Infrastructure/Webhooks/             + Infrastructure/Integrations/
+  Infrastructure/Pdf/QuotePdfDocument    Infrastructure/Pdf/HtmlToPdfService (NEW)
+  Infrastructure/Pdf/                  + Infrastructure/Pdf/QuoteTemplateRenderer
+  Infrastructure/EmailTemplates/         (reuse TemplateRenderService for merge fields)
+  Api/Controllers/QuotesController     + Api/Controllers/BoardsController
+  Api/Controllers/                     + Api/Controllers/IntegrationsController
+  Api/Controllers/                     + Api/Controllers/QuoteTemplatesController
+
+Frontend Layers:
+  angular-email-editor (existing)        (reused with displayMode: 'document')
+  features/email-templates/              (pattern cloned for quote-templates/)
+  features/deals/deal-kanban/            (pattern reference for boards/)
+  features/settings/                   + features/settings/integrations/
+  features/                            + features/boards/
+  features/                            + features/quote-templates/
+  core/                                + core/i18n/ (TranslateModule config)
+  shared/components/navbar/              (modified: language switcher)
+  core/auth/auth.store.ts                (modified: expose user.language)
 ```
 
 ### Component Boundaries
 
 | Component | Responsibility | Communicates With |
 |-----------|---------------|-------------------|
-| **EntityPreviewSidebarComponent** | Renders a slide-over panel showing entity snapshot data. Hosts entity-type-specific preview templates. | PreviewSidebarStore (state), EntityPreviewService (data fetch) |
-| **PreviewSidebarStore** | Root signal store managing sidebar open/close state, current entity type + ID, loaded preview data. | EntityPreviewService for API calls |
-| **EntityPreviewService** | Calls `GET /api/entities/{type}/{id}/preview` to fetch lightweight entity preview data. | ApiService (HTTP layer) |
-| **EntitySummaryTabComponent** | Shared component that renders aggregated counts + recent items for an entity's relationships. Designed to slot into RelatedEntityTabsComponent as a new tab. | EntitySummaryService for data |
-| **EntitySummaryService** | Calls `GET /api/{entityType}/{id}/summary` for aggregated relationship data. | ApiService |
-| **EntityFeedTabComponent** | Renders entity-scoped feed items inside a detail page tab. Reuses feed card markup from FeedListComponent. | FeedService (extended with entity filter params) |
-| **MyDayComponent** | Personal daily dashboard showing today's activities, recent deals, pending items. Lives as a new tab in DashboardComponent. | MyDayStore, MyDayApiService |
-| **MyDayStore** | Per-page signal store for My Day data (today's activities, overdue items, recent feed). | MyDayApiService |
-| **MyDayApiService** | Calls `GET /api/my-day` for aggregated personal daily snapshot. | ApiService |
+| `IntegrationsController` | CRUD for integration configs, OAuth callback handler, manual sync trigger | `IntegrationRepository`, `IntegrationSyncService`, Hangfire |
+| `IntegrationSyncService` | Bidirectional data sync with third-party APIs (Google Contacts, Outlook, etc.) | `ApplicationDbContext`, third-party HTTP clients |
+| `IntegrationOAuthService` | OAuth 2.0 flow management, token storage/refresh | `IntegrationConfig` entity, external OAuth providers |
+| `BoardsController` | CRUD for boards, columns, cards; drag-drop reorder | `BoardRepository`, `PermissionService` |
+| `QuoteTemplatesController` | CRUD for Unlayer document templates, PDF preview generation | `QuoteTemplateRepository`, `QuoteTemplateRenderer`, `HtmlToPdfService` |
+| `HtmlToPdfService` | Converts rendered HTML to PDF bytes using PuppeteerSharp | PuppeteerSharp (headless Chromium) |
+| `QuoteTemplateRenderer` | Merges quote data into Unlayer HTML using Fluid templates | `TemplateRenderService` (existing), `MergeFieldService` (extended) |
+| `TranslateModule` (FE) | Runtime i18n with lazy-loaded JSON translation files | `HttpClient` (loads JSON), `AuthStore` (user language) |
+| `BoardFeature` (FE) | Board list, board detail with Kanban UI, card dialogs | `BoardService`, Angular CDK drag-drop |
+| `IntegrationFeature` (FE) | Integration marketplace grid, config forms, OAuth redirect | `IntegrationService`, settings routes |
+| `QuoteTemplateFeature` (FE) | Template list, Unlayer document editor, PDF preview | `QuoteTemplateService`, `angular-email-editor` |
 
 ### Data Flow
 
-#### 1. Entity Preview Sidebar
+#### 1. Integration Marketplace
 
 ```
-User clicks entity link/name anywhere in app
-  |
-  v
-Component calls PreviewSidebarStore.open(entityType, entityId)
-  |
-  v
-PreviewSidebarStore patches state: { isOpen: true, entityType, entityId, isLoading: true }
-  |
-  v
-EntityPreviewService.getPreview(entityType, entityId)
-  --> GET /api/entities/{type}/{id}/preview
-  |
-  v
-Backend: EntityPreviewController
-  - Resolves entity type to repository
-  - Loads entity with minimal includes (no deep graph)
-  - Returns EntityPreviewDto (type-specific fields)
-  |
-  v
-PreviewSidebarStore patches: { data: EntityPreviewDto, isLoading: false }
-  |
-  v
-EntityPreviewSidebarComponent renders overlay panel
-  - CSS: fixed position, right: 0, z-index above content but below dialogs
-  - Width: 400px, slide-in animation
-  - Content: type-specific template using @switch(entityType)
-  - Actions: "View Full Record" button navigates to detail page
-  - Close: click outside, Escape key, X button
+                       OAuth Flow
+User clicks "Connect" ──────────────> External Provider (Google, etc.)
+                                           |
+                      OAuth callback  <────┘
+                           |
+                    IntegrationsController
+                           |
+                   IntegrationConfig entity
+                   (encrypted tokens in JSONB)
+                           |
+           ┌───────────────┴───────────────┐
+     Hangfire recurring job            Manual sync trigger
+           |                                |
+     IntegrationSyncService ───────────────>┘
+           |
+    ┌──────┴──────┐
+    │ Pull data   │ Push data
+    │ from 3rd    │ to 3rd party
+    │ party API   │ (future)
+    └──────┬──────┘
+           |
+    ApplicationDbContext
+    (Contact/Company creates via domain events)
 ```
 
-#### 2. Summary Tab on Detail Pages
+#### 2. Free-form Kanban Boards
 
 ```
-Detail page loads entity (existing flow, unchanged)
-  |
-  v
-RelatedEntityTabsComponent renders tabs from ENTITY_TABS constant
-  (NEW: "Summary" tab added at index 0, before "Details")
-  |
-  v
-User clicks "Summary" tab (or it's the default landing tab)
-  |
-  v
-EntitySummaryTabComponent receives entityType + entityId as inputs
-  |
-  v
-EntitySummaryService.getSummary(entityType, entityId)
-  --> GET /api/{entityType}/{id}/summary
-  |
-  v
-Backend: Aggregation query per entity type
-  For a Contact:
-    - Deal count + total pipeline value (from DealContacts)
-    - Activity count (open + overdue)
-    - Quote count + total value
-    - Request count (open)
-    - Email count
-    - Note count
-    - Last activity timestamp
-    - Recent feed items (limit 5, filtered by EntityType='Contact' + EntityId)
-  |
-  v
-Returns EntitySummaryDto with counts, totals, and recent items
-  |
-  v
-EntitySummaryTabComponent renders:
-  - KPI cards row (deal value, open activities, etc.)
-  - Recent activity mini-timeline (last 5 feed items)
-  - Quick-action buttons (log activity, send email, add note)
+Board Entity (JSONB structure)
+┌─────────────────────────────┐
+│ Board                       │
+│  ├─ id, name, tenantId      │
+│  ├─ ownerId                 │
+│  └─ isShared                │
+├─────────────────────────────┤
+│ BoardColumn[]               │
+│  ├─ id, title, color        │
+│  ├─ sortOrder               │
+│  └─ boardId (FK)            │
+├─────────────────────────────┤
+│ BoardCard[]                 │
+│  ├─ id, title, description  │
+│  ├─ columnId (FK)           │
+│  ├─ sortOrder               │
+│  ├─ color, dueDate          │
+│  ├─ assigneeId              │
+│  ├─ labels (JSONB)          │
+│  └─ linkedEntityType/Id     │
+└─────────────────────────────┘
+
+Frontend CDK drag-drop:
+- Column reorder: PATCH /api/boards/{id}/columns/reorder
+- Card move:      PATCH /api/boards/{id}/cards/{cardId}/move
+                  (body: { columnId, sortOrder })
 ```
 
-#### 3. Entity-Linked Feed Tab
+#### 3. Quote PDF Templates (Unlayer Document Mode)
 
 ```
-Detail page: user clicks "Feed" tab
-  |
-  v
-EntityFeedTabComponent receives entityType + entityId
-  |
-  v
-FeedService.getEntityFeed(entityType, entityId, page, pageSize)
-  --> GET /api/feed?entityType={type}&entityId={id}&page=1&pageSize=20
-  |
-  v
-Backend: FeedController.GetList extended
-  - Adds optional [FromQuery] string? entityType, Guid? entityId
-  - Filters FeedItems where EntityType == type AND EntityId == id
-  - Returns same FeedPagedResponse shape
-  |
-  v
-EntityFeedTabComponent renders feed items
-  - Reuses feed item card styling from FeedListComponent
-  - Includes inline comment toggle (same pattern)
-  - Includes post form for entity-scoped social posts
-  - SignalR FeedUpdate events filtered client-side by entity match
+Unlayer Editor (displayMode: 'document')
+           |
+    exportHtml() callback
+           |
+    ┌──────┴──────┐
+    │ designJson  │  htmlBody
+    │ (for re-    │  (for PDF
+    │  editing)   │   rendering)
+    └──────┬──────┘
+           |
+    QuoteTemplate entity
+    (same pattern as EmailTemplate)
+           |
+    POST /api/quote-templates/{id}/preview
+           |
+    QuoteTemplateRenderer
+    (extends MergeFieldService with quote-specific merge fields)
+           |
+    TemplateRenderService (existing Fluid engine)
+           |
+    Rendered HTML with resolved merge fields
+           |
+    HtmlToPdfService (PuppeteerSharp)
+           |
+    PDF bytes → FileContentResult
+
+Integration with existing QuotesController:
+    GET /api/quotes/{id}/pdf?templateId={templateId}
+    (Modified: if templateId provided, use template pipeline;
+     if omitted, fall back to existing QuotePdfDocument)
 ```
 
-#### 4. "My Day" Personal Dashboard
+#### 4. Localization
 
 ```
-Dashboard page loads (existing flow)
-  |
-  v
-DashboardComponent renders mat-tab-group
-  (NEW: "My Day" tab added before "Dashboard" tab)
-  |
-  v
-MyDayComponent initializes, calls MyDayStore.loadMyDay()
-  |
-  v
-MyDayApiService.getMyDay()
-  --> GET /api/my-day
-  |
-  v
-Backend: MyDayController
-  - Queries current user's data only (no team-wide):
-    - Today's activities (due today or overdue, assigned to user)
-    - Recent deals (user-owned, updated in last 7 days)
-    - Pending items (activities overdue, requests awaiting response)
-    - Today's feed items (limit 10, authored by user or @mentioning user)
-    - Quick stats (activities completed today, deals progressed today)
-  |
-  v
-Returns MyDayDto with sections
-  |
-  v
-MyDayComponent renders:
-  - Greeting header (reuses existing DashboardComponent greeting pattern)
-  - "Today's Tasks" checklist (activities, with status toggle)
-  - "Recent Deals" mini cards
-  - "Your Feed" compact feed list
-  - Quick-action buttons (new activity, new deal, compose email)
+User Language Preference
+(ApplicationUser.Language / Preferences.Language)
+           |
+    AuthStore.language signal (frontend)
+           |
+    TranslateService.use(lang) on login/preference change
+           |
+    HTTP GET /assets/i18n/{lang}.json
+           |
+    All components: {{ 'key' | translate }}
+    or translate.instant('key')
+           |
+    Backend: Accept-Language header for
+    error messages / email subjects (future)
 ```
 
-## Integration Points: New vs Modified
+## Detailed Component Architecture
 
-### NEW Components (to create from scratch)
+### Feature 1: Integration Marketplace
 
-| Component | Location | Type |
-|-----------|----------|------|
-| `EntityPreviewSidebarComponent` | `shared/components/entity-preview-sidebar/` | Shared component, imported in AppComponent |
-| `PreviewSidebarStore` | `shared/components/entity-preview-sidebar/preview-sidebar.store.ts` | Root signal store (providedIn: 'root') |
-| `EntityPreviewService` | `shared/components/entity-preview-sidebar/entity-preview.service.ts` | Root service |
-| `EntitySummaryTabComponent` | `shared/components/entity-summary-tab/` | Shared component, used in detail pages |
-| `EntitySummaryService` | `shared/components/entity-summary-tab/entity-summary.service.ts` | Root service |
-| `EntityFeedTabComponent` | `shared/components/entity-feed-tab/` | Shared component, used in detail pages |
-| `MyDayComponent` | `features/dashboard/pages/my-day/` | Feature component |
-| `MyDayStore` | `features/dashboard/stores/my-day.store.ts` | Per-page signal store |
-| `MyDayApiService` | `features/dashboard/services/my-day-api.service.ts` | Root service |
-| `EntityPreviewController` | `Controllers/EntityPreviewController.cs` | API controller |
-| `EntitySummaryController` | `Controllers/EntitySummaryController.cs` | API controller |
-| `MyDayController` | `Controllers/MyDayController.cs` | API controller |
+**New backend components:**
 
-### MODIFIED Components (add to existing)
+| Layer | File | Purpose |
+|-------|------|---------|
+| Domain | `Entities/IntegrationConfig.cs` | Tenant-scoped entity: provider type, encrypted OAuth tokens, sync settings, status |
+| Domain | `Entities/IntegrationSyncLog.cs` | Audit log per sync run: records synced, errors, duration |
+| Domain | `Enums/IntegrationProvider.cs` | `GoogleContacts`, `OutlookContacts`, `Slack`, `Zapier` (initial set) |
+| Domain | `Interfaces/IIntegrationRepository.cs` | CRUD + GetByProvider |
+| Infrastructure | `Integrations/IntegrationRepository.cs` | EF Core implementation |
+| Infrastructure | `Integrations/IntegrationOAuthService.cs` | OAuth 2.0 authorization code flow, token exchange, refresh |
+| Infrastructure | `Integrations/IntegrationSyncService.cs` | Orchestrates pull/push sync per provider |
+| Infrastructure | `Integrations/Providers/GoogleContactsAdapter.cs` | Google People API adapter |
+| Infrastructure | `Integrations/IntegrationServiceExtensions.cs` | `AddIntegrationServices()` DI registration |
+| Infrastructure | `Integrations/IntegrationEncryptionService.cs` | AES-256 encrypt/decrypt OAuth tokens at rest |
+| Api | `Controllers/IntegrationsController.cs` | CRUD, OAuth initiate/callback, manual sync trigger |
 
-| Component | What Changes | Why |
-|-----------|-------------|-----|
-| `AppComponent` | Add `EntityPreviewSidebarComponent` to template, after `<router-outlet>` | Preview sidebar is a global overlay |
-| `FeedController.GetList` | Add optional `entityType` + `entityId` query params for filtering | Entity-scoped feed |
-| `FeedService` | Add `getEntityFeed(entityType, entityId, page, pageSize)` method | Frontend entity-scoped feed calls |
-| `FeedRepository.GetFeedAsync` | Add optional entity filter params, or add new `GetEntityFeedAsync` method | Backend entity-scoped feed query |
-| `IFeedRepository` | Add `GetEntityFeedAsync(entityType, entityId, page, pageSize)` interface method | Interface contract |
-| `COMPANY_TABS` | Add `{ label: 'Summary', icon: 'summarize', enabled: true }` at index 0, add `{ label: 'Feed', icon: 'dynamic_feed', enabled: true }` | New tabs on detail pages |
-| `CONTACT_TABS` | Same: add Summary + Feed tabs | New tabs on detail pages |
-| `DEAL_TABS` | Same: add Summary + Feed tabs | New tabs on detail pages |
-| `CompanyDetailComponent` | Add Summary tab content + Feed tab content using shared components | Wire new tabs |
-| `ContactDetailComponent` | Same | Wire new tabs |
-| `DealDetailComponent` | Same | Wire new tabs |
-| `LeadDetailComponent` | Same | Wire new tabs |
-| `DashboardComponent` | Add "My Day" tab to mat-tab-group, lazy-load MyDayComponent | Personal dashboard |
-| `FeedListComponent` | Entity links trigger `PreviewSidebarStore.open()` instead of `router.navigate` | Preview on hover/click |
-| `GlobalSearchComponent` | Search hits trigger `PreviewSidebarStore.open()` as secondary action | Preview from search |
-| `SignalRService` | No changes needed -- existing FeedUpdate/FeedCommentAdded events suffice | Real-time already works |
+**RBAC integration:** New permission entity `Integration` with `View`, `Create`, `Update`, `Delete` actions. Admin-only by default (integration config affects entire tenant). Add to `RoleTemplateSeeder`.
+
+**Hangfire integration:** Add `"integrations"` queue to `HangfireServiceExtensions`. Register recurring sync jobs per active integration. Use existing `TenantJobFilter` for tenant context propagation.
+
+**New frontend components:**
+
+| Path | Component | Purpose |
+|------|-----------|---------|
+| `features/settings/integrations/` | `integration-marketplace.component.ts` | Grid of available integrations with connect/disconnect |
+| `features/settings/integrations/` | `integration-config.component.ts` | Config form per integration (sync interval, field mapping) |
+| `features/settings/integrations/` | `integration-sync-log.component.ts` | Sync history with status, records, errors |
+| `features/settings/integrations/` | `integration.service.ts` | API service |
+| `features/settings/integrations/` | `integration.models.ts` | TypeScript interfaces |
+
+**Settings hub integration:** Add new card to the "Organization" section in `SettingsHubComponent.sections`.
+
+**Settings routes integration:** Add routes under `settings.routes.ts` with `adminGuard`.
+
+### Feature 2: Free-form Kanban Boards
+
+**New backend components:**
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Domain | `Entities/Board.cs` | Tenant-scoped board: name, description, ownerId, isShared |
+| Domain | `Entities/BoardColumn.cs` | Column: title, color, sortOrder, boardId FK |
+| Domain | `Entities/BoardCard.cs` | Card: title, description, color, dueDate, assigneeId, labels (JSONB), sortOrder, columnId FK, optional linkedEntityType/Id |
+| Domain | `Interfaces/IBoardRepository.cs` | CRUD + GetWithColumnsAndCards |
+| Infrastructure | `Boards/BoardRepository.cs` | EF Core implementation with eager loading |
+| Infrastructure | `Boards/BoardServiceExtensions.cs` | `AddBoardServices()` DI registration |
+| Api | `Controllers/BoardsController.cs` | Full CRUD + column/card reorder endpoints |
+
+**Why separate entities vs JSONB:** Columns and cards are separate database tables (not JSONB) because:
+1. Cards can be linked to CRM entities via `LinkedEntityType`/`LinkedEntityId` (FK integrity)
+2. Cards can be assigned to users via `AssigneeId` (FK integrity)
+3. Individual card CRUD without full board replacement
+4. Future: card comments, attachments, history
+
+**RBAC integration:** New permission entity `Board` with `View`, `Create`, `Update`, `Delete`. Scope-based: users see their own boards + shared boards. Board owners can manage columns/cards; other users with `Update` permission can move cards.
+
+**Existing Kanban pattern reuse:** The deal/lead/activity Kanban components all follow the same CDK drag-drop pattern. The free-form board differs:
+- Columns are user-defined (not pipeline stages or fixed statuses)
+- No forward-only constraint
+- Cards are generic (not entity-specific DTOs)
+- Column reorder is supported (not supported in existing Kanbans)
+
+**New frontend components:**
+
+| Path | Component | Purpose |
+|------|-----------|---------|
+| `features/boards/board-list/` | `board-list.component.ts` | Grid/list of boards with create/edit/delete |
+| `features/boards/board-detail/` | `board-detail.component.ts` | Kanban view with CDK drag-drop |
+| `features/boards/board-detail/` | `card-dialog.component.ts` | Card create/edit dialog with fields |
+| `features/boards/board-detail/` | `column-dialog.component.ts` | Column create/edit dialog |
+| `features/boards/` | `board.service.ts` | API service |
+| `features/boards/` | `board.store.ts` | Signal store for board state |
+| `features/boards/` | `board.models.ts` | TypeScript interfaces |
+| `features/boards/` | `boards.routes.ts` | Feature routes |
+
+**Navbar integration:** Add "Boards" to the navbar CRM section with `view_kanban` icon.
+
+**App routes integration:** Add lazy-loaded route with `permissionGuard('Board', 'View')`.
+
+### Feature 3: Unlayer PDF Templates
+
+**Key insight:** The existing `angular-email-editor` package already wraps Unlayer and is installed at version 15.2.0. Unlayer supports `displayMode: 'email' | 'web' | 'document'` in its options. Switching to `'document'` gives a page-oriented editor suitable for PDF documents (A4/Letter sizing, page breaks, no email-specific features like preheader).
+
+**New backend components:**
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| Domain | `Entities/QuoteTemplate.cs` | Tenant-scoped template: name, designJson, htmlBody, isDefault, ownerId |
+| Domain | `Interfaces/IQuoteTemplateRepository.cs` | CRUD + GetDefaultForTenant |
+| Infrastructure | `Pdf/QuoteTemplateRepository.cs` | EF Core implementation |
+| Infrastructure | `Pdf/QuoteTemplateRenderer.cs` | Combines Fluid merge fields with quote data for template rendering |
+| Infrastructure | `Pdf/HtmlToPdfService.cs` | PuppeteerSharp-based HTML-to-PDF conversion |
+| Infrastructure | `Pdf/PdfServiceExtensions.cs` | **Modified:** add HtmlToPdfService and QuoteTemplateRenderer registrations |
+| Api | `Controllers/QuoteTemplatesController.cs` | CRUD + preview endpoint |
+| Api | `Controllers/QuotesController.cs` | **Modified:** add `templateId` query param to PDF endpoint |
+
+**MergeFieldService extension:** Add `quote` entity type to the existing `MergeFieldService.GetAvailableFieldsAsync()` with fields: `quote.number`, `quote.title`, `quote.status`, `quote.issue_date`, `quote.expiry_date`, `quote.subtotal`, `quote.discount_total`, `quote.tax_total`, `quote.grand_total`, `quote.notes`, `quote.contact.*`, `quote.company.*`, `quote.line_items[]` (array merge field for Fluid `{% for item in quote.line_items %}` loops).
+
+**PuppeteerSharp integration:**
+- Add `PuppeteerSharp` NuGet package to `GlobCRM.Infrastructure`
+- `HtmlToPdfService` launches headless Chromium, sets HTML content, generates PDF
+- Configuration: page size (A4/Letter), margins, landscape/portrait
+- Browser instance management: singleton `BrowserLauncher` that reuses a single Chromium process
+- First-use: auto-downloads Chromium binary via `BrowserFetcher` (configure path in `appsettings.json`)
+
+**Backward compatibility:** The existing `QuotePdfDocument` (QuestPDF) remains as the default. When `GET /api/quotes/{id}/pdf` is called without `?templateId=`, the existing QuestPDF path runs. When `?templateId={guid}` is provided, the new template pipeline runs.
+
+**New frontend components:**
+
+| Path | Component | Purpose |
+|------|-----------|---------|
+| `features/quote-templates/` | `quote-template-list.component.ts` | List of templates with create/edit/delete |
+| `features/quote-templates/` | `quote-template-editor.component.ts` | Unlayer editor with `displayMode: 'document'` |
+| `features/quote-templates/` | `quote-template-preview.component.ts` | PDF preview dialog (iframe or embedded viewer) |
+| `features/quote-templates/` | `quote-template.service.ts` | API service |
+| `features/quote-templates/` | `quote-template.store.ts` | Signal store |
+| `features/quote-templates/` | `quote-template.models.ts` | TypeScript interfaces |
+| `features/quote-templates/` | `quote-templates.routes.ts` | Feature routes |
+| `features/quotes/` | **Modified:** quote detail add template selector before PDF download | Template picker dropdown |
+
+**Pattern clone from email templates:** The quote template editor follows the same architecture as `EmailTemplateEditorComponent`:
+- Same `EmailEditorModule` import (it IS the Unlayer Angular wrapper regardless of mode)
+- Same `exportHtml()` save pattern (designJson + htmlBody)
+- Same merge tag builder (extended with quote fields)
+- Different `editorOptions.displayMode`: `'document'` instead of `'email'`
+- Additional document options: `pageSize`, `pageOrientation`, `pageMargins`
+
+### Feature 4: Localization (EN + TR)
+
+**Library choice: `@ngx-translate/core`** over Angular's built-in `@angular/localize` because:
+1. Runtime language switching without app reload (user changes language in profile, immediate effect)
+2. The app already uses standalone components; ngx-translate's `TranslateModule` is easy to add to imports
+3. JSON translation files are simpler to manage than Angular's XLIFF format
+4. The user's `Language` preference already exists on `ApplicationUser` (defaults to "en")
+
+**Why not Transloco:** While Transloco is the newer alternative, ngx-translate has broader ecosystem support, simpler API for a project of this size, and the team already has `angular-email-editor` and other third-party integrations working. Transloco's plugin system adds complexity without proportional benefit for a 2-language implementation.
+
+**New backend components:**
+
+| Layer | File | Purpose |
+|-------|------|---------|
+| None | N/A | Backend remains English-only for v1.3. Error messages stay in English. |
+
+Backend localization is deferred because: (1) API error messages are developer-facing and rarely shown verbatim to users, (2) the frontend already handles user-visible strings, (3) email template content is user-authored. Future: localize system email templates (verification, password reset) via Razor view localization.
+
+**New frontend components:**
+
+| Path | File | Purpose |
+|------|------|---------|
+| `core/i18n/` | `translate-config.ts` | `TranslateModule.forRoot()` with `HttpTranslateLoader` |
+| `assets/i18n/` | `en.json` | English translation keys (source of truth) |
+| `assets/i18n/` | `tr.json` | Turkish translations |
+| `core/auth/` | **Modified:** `auth.store.ts` | Expose `language` signal, call `TranslateService.use()` on auth |
+| `shared/components/navbar/` | **Modified:** `navbar.component.ts` | Add language switcher dropdown |
+| `features/profile/` | **Modified:** profile settings | Language preference selector |
+
+**Translation key structure:**
+
+```json
+{
+  "nav": {
+    "myDay": "My Day",
+    "analytics": "Analytics",
+    "companies": "Companies",
+    "contacts": "Contacts"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "loading": "Loading...",
+    "noData": "No data available"
+  },
+  "contacts": {
+    "title": "Contacts",
+    "newContact": "New Contact",
+    "firstName": "First Name",
+    "lastName": "Last Name"
+  }
+}
+```
+
+**Component modification pattern:** Every component template that has hardcoded English text needs updating:
+- `<h1>Contacts</h1>` becomes `<h1>{{ 'contacts.title' | translate }}</h1>`
+- `placeholder="Search..."` becomes `[placeholder]="'common.search' | translate"`
+- Material button text: `New Deal` becomes `{{ 'deals.newDeal' | translate }}`
+- Snackbar messages: `this.snackBar.open('Failed to load')` becomes `this.snackBar.open(this.translate.instant('errors.loadFailed'))`
+
+**Scope of modification:** Every existing component template (~80+ components across 25 feature areas) needs translation key replacement. This is the highest-volume change in v1.3 but low complexity per component.
 
 ## Patterns to Follow
 
-### Pattern 1: Global Overlay Component (Preview Sidebar)
+### Pattern 1: Feature Module Registration (Backend)
 
-**What:** A component that lives at the AppComponent level, managed by a root signal store, rendered as a fixed-position overlay.
-
-**When:** When a UI element needs to be accessible from any route without navigating away.
-
-**Why this over MatSidenav:** The existing app uses a CSS-only sidebar for navigation (no MatSidenav). Adding MatSidenav for the preview panel would conflict. A custom overlay is simpler, more controllable, and consistent with the existing nav pattern.
-
+**What:** Each new feature follows the `Add{Feature}Services()` extension method pattern.
+**When:** Every new backend feature.
 **Example:**
-
-```typescript
-// preview-sidebar.store.ts
-export const PreviewSidebarStore = signalStore(
-  { providedIn: 'root' },
-  withState({
-    isOpen: false,
-    entityType: null as string | null,
-    entityId: null as string | null,
-    data: null as EntityPreviewDto | null,
-    isLoading: false,
-  }),
-  withMethods((store) => {
-    const previewService = inject(EntityPreviewService);
-    return {
-      open(entityType: string, entityId: string): void {
-        patchState(store, {
-          isOpen: true,
-          entityType,
-          entityId,
-          isLoading: true,
-          data: null,
-        });
-        previewService.getPreview(entityType, entityId).subscribe({
-          next: (data) => patchState(store, { data, isLoading: false }),
-          error: () => patchState(store, { isLoading: false }),
-        });
-      },
-      close(): void {
-        patchState(store, { isOpen: false, entityType: null, entityId: null, data: null });
-      },
-    };
-  }),
-);
-```
-
-```typescript
-// entity-preview-sidebar.component.ts
-@Component({
-  selector: 'app-entity-preview-sidebar',
-  standalone: true,
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  // Renders as fixed overlay, 400px wide, slides from right
-  host: {
-    '[class.open]': 'store.isOpen()',
-  },
-  template: `
-    @if (store.isOpen()) {
-      <div class="preview-backdrop" (click)="store.close()"></div>
-      <aside class="preview-panel">
-        <!-- header with close button -->
-        <!-- loading state -->
-        <!-- entity-type-specific content via @switch -->
-        <!-- "View Full Record" footer link -->
-      </aside>
-    }
-  `,
-})
-export class EntityPreviewSidebarComponent {
-  readonly store = inject(PreviewSidebarStore);
-}
-```
-
-```typescript
-// In AppComponent template, add after <router-outlet>:
-// <app-entity-preview-sidebar />
-```
-
-### Pattern 2: Aggregation Endpoint (Summary + My Day)
-
-**What:** A single backend endpoint that runs multiple targeted queries and returns a composite DTO, avoiding N+1 API calls from the frontend.
-
-**When:** When a UI component needs to display counts/totals from multiple entity types simultaneously.
-
-**Why not reuse existing list endpoints:** Existing list endpoints (`GET /api/contacts?page=1&pageSize=1`) return full DTOs with pagination overhead. Summary data needs only counts and totals, which are much cheaper as `COUNT(*)` and `SUM()` aggregate queries.
-
-**Example:**
-
 ```csharp
-// EntitySummaryController.cs
-[HttpGet("api/contacts/{id:guid}/summary")]
-[Authorize(Policy = "Permission:Contact:View")]
-public async Task<IActionResult> GetContactSummary(Guid id)
+// Infrastructure/Integrations/IntegrationServiceExtensions.cs
+public static class IntegrationServiceExtensions
 {
-    var userId = GetCurrentUserId();
-    var tenantId = GetTenantId();
-
-    // All queries run against tenant-scoped DbContext (global filter active)
-    var dealCount = await _db.DealContacts
-        .Where(dc => dc.ContactId == id)
-        .CountAsync();
-
-    var dealTotalValue = await _db.DealContacts
-        .Where(dc => dc.ContactId == id)
-        .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
-        .SumAsync(d => d.Value ?? 0);
-
-    var openActivityCount = await _db.Activities
-        .Where(a => a.LinkedEntityType == "Contact" && a.LinkedEntityId == id)
-        .Where(a => a.Status != "Completed" && a.Status != "Cancelled")
-        .CountAsync();
-
-    var noteCount = await _db.Notes
-        .Where(n => n.EntityType == "Contact" && n.EntityId == id)
-        .CountAsync();
-
-    var recentFeed = await _db.FeedItems
-        .Where(f => f.EntityType == "Contact" && f.EntityId == id)
-        .OrderByDescending(f => f.CreatedAt)
-        .Take(5)
-        .Include(f => f.Author)
-        .Select(f => FeedItemDto.FromEntity(f))
-        .ToListAsync();
-
-    return Ok(new ContactSummaryDto
+    public static IServiceCollection AddIntegrationServices(
+        this IServiceCollection services, IConfiguration configuration)
     {
-        DealCount = dealCount,
-        DealTotalValue = dealTotalValue,
-        OpenActivityCount = openActivityCount,
-        NoteCount = noteCount,
-        RecentFeedItems = recentFeed,
-        // ... more counts
-    });
+        services.AddScoped<IIntegrationRepository, IntegrationRepository>();
+        services.AddScoped<IntegrationOAuthService>();
+        services.AddScoped<IntegrationSyncService>();
+        services.AddScoped<IntegrationEncryptionService>();
+
+        // Named HttpClient for third-party API calls
+        services.AddHttpClient("IntegrationApi", client =>
+        {
+            client.Timeout = TimeSpan.FromSeconds(60);
+        });
+
+        return services;
+    }
 }
 ```
-
-### Pattern 3: Tab Constant Extension
-
-**What:** Adding new tabs to existing `ENTITY_TABS` arrays with shared tab content components.
-
-**When:** Adding Summary and Feed tabs to all entity detail pages.
-
-**Important:** Tab order matters because existing `onTabChanged(index)` handlers use hardcoded index numbers. New tabs should be inserted carefully, and all existing index references must be updated.
-
-**Example:**
-
-```typescript
-// Before (existing):
-export const CONTACT_TABS: EntityTab[] = [
-  { label: 'Details', icon: 'info', enabled: true },        // 0
-  { label: 'Company', icon: 'business', enabled: true },     // 1
-  { label: 'Deals', icon: 'handshake', enabled: true },      // 2
-  // ...
-];
-
-// After (v1.2):
-export const CONTACT_TABS: EntityTab[] = [
-  { label: 'Summary', icon: 'summarize', enabled: true },    // 0 (NEW)
-  { label: 'Details', icon: 'info', enabled: true },          // 1 (was 0)
-  { label: 'Company', icon: 'business', enabled: true },      // 2 (was 1)
-  { label: 'Deals', icon: 'handshake', enabled: true },       // 3 (was 2)
-  // ...
-  { label: 'Feed', icon: 'dynamic_feed', enabled: true },     // N (NEW, last)
-];
+Then in `Program.cs`:
+```csharp
+builder.Services.AddIntegrationServices(builder.Configuration);
 ```
 
-**CRITICAL:** All `onTabChanged(index)` handlers in detail components use hardcoded numbers:
+### Pattern 2: Lazy-Loaded Feature Routes (Frontend)
+
+**What:** Every new feature area follows the lazy-loaded route pattern.
+**When:** Boards, Quote Templates, Integration settings.
+**Example:**
 ```typescript
-// ContactDetailComponent.onTabChanged -- ALL indices shift by +1
-if (index === 3) { this.loadLinkedActivities(); }  // was 3, becomes 4
+// app.routes.ts (add to routes array)
+{
+  path: 'boards',
+  canActivate: [authGuard, permissionGuard('Board', 'View')],
+  loadChildren: () =>
+    import('./features/boards/boards.routes').then(m => m.BOARD_ROUTES),
+},
 ```
 
-This is a mechanical but error-prone change. Each detail component's index mapping must be updated.
+### Pattern 3: Controller + DTOs Co-location
 
-### Pattern 4: Entity-Type-Specific Content Switching
+**What:** DTOs, request records, validators are co-located in the same controller file.
+**When:** Every new controller.
+**Example:** Follow the exact pattern of `QuotesController.cs` -- entity DTOs with static `FromEntity()` factory methods, FluentValidation validators, request records all in one file.
 
-**What:** A single shared component that renders different content based on entity type, using Angular's `@switch` control flow.
+### Pattern 4: Signal Store Per Feature
 
-**When:** The preview sidebar and summary tab need to show different fields for contacts vs deals vs companies.
-
+**What:** Per-page signal stores listed in component `providers: []`, root stores for cross-cutting state.
+**When:** Board detail gets per-page store; i18n language state goes in AuthStore (root).
 **Example:**
-
 ```typescript
-// Inside EntityPreviewSidebarComponent template:
-@switch (store.entityType()) {
-  @case ('Contact') {
-    <div class="preview-contact">
-      <div class="preview-avatar">{{ data.initials }}</div>
-      <h3>{{ data.fullName }}</h3>
-      <span class="preview-subtitle">{{ data.jobTitle }} at {{ data.companyName }}</span>
-      <div class="preview-fields">
-        <!-- email, phone, company link -->
-      </div>
-    </div>
-  }
-  @case ('Deal') {
-    <div class="preview-deal">
-      <h3>{{ data.title }}</h3>
-      <div class="preview-stage-badge">{{ data.stageName }}</div>
-      <span class="preview-value">{{ data.value | currency }}</span>
-      <!-- probability, expected close, company -->
-    </div>
-  }
-  @case ('Company') {
-    <!-- company-specific preview -->
-  }
-}
+// board.store.ts
+export const BoardStore = signalStore(
+  { providedIn: undefined }, // per-page, not root
+  withState({ board: null, loading: false }),
+  // ... withMethods, withComputed
+);
+
+// board-detail.component.ts
+@Component({
+  providers: [BoardStore],
+  // ...
+})
+```
+
+### Pattern 5: Unlayer Editor Reuse
+
+**What:** Reuse the same `angular-email-editor` package for both email and document modes.
+**When:** Quote template editor.
+**Example:**
+```typescript
+readonly editorOptions = computed(() => ({
+  displayMode: 'document' as const, // KEY DIFFERENCE from email templates
+  features: {
+    textEditor: { spellChecker: true },
+  },
+  appearance: { theme: 'light' },
+  // Document-specific options
+  document: {
+    page: {
+      width: '210mm',  // A4
+      height: '297mm',
+    },
+  },
+  mergeTags: this.buildMergeTags(this.store.mergeFields()),
+}));
 ```
 
 ## Anti-Patterns to Avoid
 
-### Anti-Pattern 1: Preview Sidebar Inside Feature Modules
+### Anti-Pattern 1: Shared JSONB Columns for Board State
 
-**What:** Placing the preview sidebar component inside `features/feed/` or `features/contacts/` and trying to import it cross-module.
+**What:** Storing all columns and cards as a single JSONB blob on the Board entity.
+**Why bad:** Prevents individual card CRUD, breaks FK integrity for linked entities and assignees, makes concurrent edits destructive (last-write-wins on entire board), prevents efficient queries like "find all cards assigned to me across boards."
+**Instead:** Use separate `BoardColumn` and `BoardCard` tables with proper FKs. JSONB is only for card-level metadata (labels, custom attributes).
 
-**Why bad:** The preview needs to be triggered from feed, search, detail page links, and potentially future contexts. Placing it in a feature module creates circular dependency chains and breaks lazy-loading boundaries.
+### Anti-Pattern 2: Storing OAuth Tokens in Plaintext
 
-**Instead:** Put it in `shared/components/entity-preview-sidebar/` with a root-provided store and service. Import the component in `AppComponent` only. Other components interact solely through `PreviewSidebarStore.open()`.
+**What:** Saving integration OAuth access/refresh tokens as plain strings in the database.
+**Why bad:** Database breach exposes all connected third-party accounts. Tokens grant access to customer data in external systems.
+**Instead:** Use `IntegrationEncryptionService` with AES-256-GCM encryption. Store encrypted blob + nonce. Encryption key in `appsettings.json` secrets (or Azure Key Vault in production).
 
-### Anti-Pattern 2: Reusing Full Detail DTOs for Preview
+### Anti-Pattern 3: Loading Chromium Per PDF Request
 
-**What:** Calling the existing `GET /api/contacts/{id}` endpoint to populate the preview sidebar.
+**What:** Launching a new Chromium browser instance for every PDF generation request.
+**Why bad:** Chromium startup takes 2-5 seconds per launch; memory leaks from abandoned processes; concurrent requests exhaust system resources.
+**Instead:** Use a singleton `BrowserLauncher` service that maintains a warm browser instance. Create new pages (tabs) per request, dispose pages after rendering. Configure max concurrent pages.
 
-**Why bad:** Detail DTOs include deep navigation properties (linked contacts, products, timeline, custom fields) that the preview sidebar does not need. This wastes bandwidth and database joins for a 400px sidebar that shows 5-8 fields.
+### Anti-Pattern 4: Hardcoding Translation Strings
 
-**Instead:** Create a dedicated `GET /api/entities/{type}/{id}/preview` endpoint that returns a slim DTO with only the fields shown in the preview panel. Example: for a contact, return `fullName`, `jobTitle`, `companyName`, `email`, `phone`, `avatarUrl`, `ownerName`, `createdAt`. No linked entities, no custom fields, no timeline.
+**What:** Using `translate.instant()` with string literals scattered throughout component code instead of constants.
+**Why bad:** No compile-time verification of key existence, hard to find missing translations, easy to introduce typos.
+**Instead:** Define translation key constants per feature module and reference them. The JSON files are the source of truth; the constants file mirrors the structure for IDE autocomplete.
 
-### Anti-Pattern 3: Duplicating Feed Logic
+### Anti-Pattern 5: Retroactive i18n
 
-**What:** Creating a separate feed component and store for entity-scoped feed tabs, duplicating the paging, comment, and real-time logic from `FeedListComponent`.
+**What:** Building all v1.3 features with hardcoded English strings, then doing a translation pass at the end.
+**Why bad:** Double work (write strings, then replace them); easy to miss strings in snackbars, tooltips, and dynamic text; template structure changes during replacement introduce bugs.
+**Instead:** Wire up `TranslateModule` first, then build all new features with `{{ 'key' | translate }}` from the start.
 
-**Why bad:** The feed card rendering, comment toggle, comment submission, relative time formatting, and SignalR subscription logic are non-trivial. Duplicating them creates maintenance burden and divergence.
+## Integration Points: New vs Modified Components
 
-**Instead:** Extract a `FeedCardComponent` from `FeedListComponent` that renders a single feed item with comments. Both `FeedListComponent` and `EntityFeedTabComponent` compose this card component. The entity feed tab uses a lightweight local signal store that delegates to `FeedService` with entity filter params.
+### New Components (create from scratch)
 
-### Anti-Pattern 4: Making Summary Tab Hit Multiple Existing Endpoints
+| Layer | Component | Notes |
+|-------|-----------|-------|
+| Backend | `Board`, `BoardColumn`, `BoardCard` entities | New domain entities with TenantId |
+| Backend | `IntegrationConfig`, `IntegrationSyncLog` entities | New domain entities with TenantId |
+| Backend | `QuoteTemplate` entity | Pattern: clone `EmailTemplate` entity structure |
+| Backend | `BoardsController` | Full CRUD + reorder endpoints |
+| Backend | `IntegrationsController` | CRUD + OAuth flow + sync trigger |
+| Backend | `QuoteTemplatesController` | Pattern: clone `EmailTemplatesController` |
+| Backend | `HtmlToPdfService` | PuppeteerSharp wrapper |
+| Backend | `QuoteTemplateRenderer` | Fluid template merge for quote data |
+| Backend | `IntegrationOAuthService` | OAuth 2.0 code flow |
+| Backend | `IntegrationSyncService` | Provider-specific sync adapters |
+| Backend | `IntegrationEncryptionService` | AES-256 token encryption |
+| Frontend | `features/boards/*` | Entire new feature area (7+ components) |
+| Frontend | `features/quote-templates/*` | Entire new feature area (6+ components) |
+| Frontend | `features/settings/integrations/*` | Settings sub-feature (4+ components) |
+| Frontend | `core/i18n/translate-config.ts` | TranslateModule configuration |
+| Frontend | `assets/i18n/en.json`, `tr.json` | Translation files |
 
-**What:** Having the summary tab's frontend component call `GET /api/activities?contactId=X&page=1&pageSize=1` (for count), `GET /api/deals?contactId=X&page=1&pageSize=1` (for count), etc., stitching together N API calls client-side.
+### Modified Components (touch existing code)
 
-**Why bad:** N+1 HTTP requests per summary tab load. Each existing list endpoint runs full query pipelines (RBAC scope check, filter parsing, pagination, DTO mapping) when all we need is `COUNT(*)`.
+| Layer | Component | Modification |
+|-------|-----------|-------------|
+| Backend | `Program.cs` | Add `AddIntegrationServices()`, `AddBoardServices()`, `AddQuoteTemplateServices()` |
+| Backend | `PdfServiceExtensions.cs` | Register `HtmlToPdfService`, `QuoteTemplateRenderer` |
+| Backend | `MergeFieldService.cs` | Add `quote` entity type to merge field definitions |
+| Backend | `QuotesController.cs` | Add `templateId` query param to `GeneratePdf` endpoint |
+| Backend | `HangfireServiceExtensions.cs` | Add `"integrations"` queue |
+| Backend | `appsettings.json` | Add integration OAuth client IDs, Chromium path |
+| Backend | EF Core migrations | New tables for Board*, IntegrationConfig, QuoteTemplate |
+| Backend | `RoleTemplateSeeder` | Add `Board`, `Integration`, `QuoteTemplate` permission entities |
+| Backend | `scripts/rls-setup.sql` | Add RLS policies for new tenant-scoped tables |
+| Frontend | `app.routes.ts` | Add `boards` and `quote-templates` lazy routes |
+| Frontend | `settings.routes.ts` | Add integration settings routes |
+| Frontend | `settings-hub.component.ts` | Add "Integrations" card to Organization section |
+| Frontend | `navbar.component.ts` | Add "Boards" nav item, add language switcher |
+| Frontend | `auth.store.ts` | Expose `language` signal, init TranslateService |
+| Frontend | `app.component.ts` | Import `TranslateModule`, init default language |
+| Frontend | `package.json` | Add `@ngx-translate/core`, `@ngx-translate/http-loader`, `puppeteer` dev dep |
+| Frontend | `environment.ts` / `environment.development.ts` | Add `defaultLang: 'en'` |
+| Frontend | **All ~80+ component templates** | Replace hardcoded strings with translate pipe |
+| Frontend | Quote detail component | Add template selector for PDF download |
 
-**Instead:** Single `GET /api/contacts/{id}/summary` endpoint that runs optimized aggregate queries in one database round-trip and returns all counts/totals in one response.
+## Suggested Build Order (Dependency-Driven)
 
-### Anti-Pattern 5: Hardcoded Index Shifts Without Constants
+### Phase 1: Localization Foundation
+**Rationale:** Cross-cutting concern that affects all other features. Must be first so features 2-4 build with i18n from day one.
+1. Install `@ngx-translate/core` + `@ngx-translate/http-loader`
+2. Create `core/i18n/translate-config.ts`
+3. Wire into `app.component.ts` and `app.config.ts`
+4. Create `en.json` skeleton with all existing component strings
+5. Create `tr.json` with Turkish translations
+6. Add language switcher to navbar
+7. Migrate existing components to use translate pipe (can be parallelized by feature area)
 
-**What:** Updating `onTabChanged(index)` handlers by manually incrementing all numbers by 1 (or 2) to account for new tabs.
+### Phase 2: Free-form Kanban Boards
+**Rationale:** Self-contained feature with no external dependencies. Backend entities, controller, frontend feature -- all new code with clear patterns to follow from deal Kanban.
 
-**Why bad:** Index-based tab switching is fragile. If tabs are reordered or conditionally shown, all indices break silently.
+### Phase 3: Unlayer PDF Templates
+**Rationale:** Depends on understanding the Unlayer editor integration (already validated via email templates). Extends existing PDF and merge field infrastructure. PuppeteerSharp is the only new backend dependency.
 
-**Mitigation (not full fix):** Use named constants for tab indices in each detail component:
-
-```typescript
-const TAB = { SUMMARY: 0, DETAILS: 1, COMPANY: 2, DEALS: 3, ACTIVITIES: 4, /* ... */ FEED: 10 };
-
-onTabChanged(index: number): void {
-  if (index === TAB.ACTIVITIES) { this.loadLinkedActivities(); }
-  if (index === TAB.QUOTES) { this.loadLinkedQuotes(); }
-}
-```
-
-This does not change the RelatedEntityTabsComponent API (which is index-based), but makes the consuming code self-documenting and less error-prone.
-
-## New Backend Endpoints Specification
-
-### GET /api/entities/{entityType}/{entityId}/preview
-
-**Purpose:** Lightweight entity snapshot for preview sidebar.
-
-**Response:** `EntityPreviewDto` (polymorphic by type)
-
-```json
-{
-  "entityType": "Contact",
-  "entityId": "guid",
-  "title": "Jane Smith",
-  "subtitle": "VP Sales at Acme Corp",
-  "avatarUrl": null,
-  "fields": [
-    { "label": "Email", "value": "jane@acme.com", "icon": "email" },
-    { "label": "Phone", "value": "+1 555-1234", "icon": "phone" },
-    { "label": "Company", "value": "Acme Corp", "icon": "business", "linkType": "Company", "linkId": "guid" },
-    { "label": "Owner", "value": "John Doe", "icon": "person" }
-  ],
-  "createdAt": "2026-01-15T10:00:00Z",
-  "updatedAt": "2026-02-20T14:30:00Z"
-}
-```
-
-**Design rationale:** A generic field-list DTO rather than type-specific DTOs allows the frontend to render any entity type with the same component structure. The `linkType`/`linkId` on individual fields enables chained preview navigation (click company name in contact preview to preview the company).
-
-### GET /api/{entityType}/{id}/summary
-
-**Purpose:** Aggregated relationship counts and recent activity for summary tab.
-
-**Response shape varies by entity type.** Example for Contact:
-
-```json
-{
-  "entityType": "Contact",
-  "stats": [
-    { "label": "Open Deals", "value": 3, "icon": "handshake" },
-    { "label": "Pipeline Value", "value": 125000, "format": "currency", "icon": "attach_money" },
-    { "label": "Open Activities", "value": 5, "icon": "task_alt" },
-    { "label": "Overdue", "value": 1, "icon": "warning", "color": "danger" },
-    { "label": "Quotes", "value": 2, "icon": "request_quote" },
-    { "label": "Emails", "value": 15, "icon": "email" },
-    { "label": "Notes", "value": 4, "icon": "note" }
-  ],
-  "recentActivity": [
-    { "id": "guid", "type": "SystemEvent", "content": "Deal 'Enterprise License' moved to Negotiation", "createdAt": "..." },
-    { "id": "guid", "type": "SystemEvent", "content": "Email sent: Follow-up proposal", "createdAt": "..." }
-  ],
-  "lastActivityAt": "2026-02-20T14:30:00Z"
-}
-```
-
-**Implementation:** Per-entity-type method in a new `EntitySummaryService` in Infrastructure layer. Each method runs optimized aggregate queries using the existing `ApplicationDbContext`. RBAC scope checking should be applied (user can only see summary data they have permission to view).
-
-### GET /api/feed (extended)
-
-**Existing:** `GET /api/feed?page=1&pageSize=20`
-
-**Extended with:** `?entityType=Contact&entityId={guid}`
-
-When `entityType` and `entityId` are provided, filter `FeedItems` to only those with matching `EntityType` and `EntityId`. This reuses the existing paged response shape and all existing DTO mapping.
-
-### GET /api/my-day
-
-**Purpose:** Personal daily dashboard data for current user.
-
-**Response:**
-
-```json
-{
-  "greeting": "Good morning",
-  "todayActivities": [
-    { "id": "guid", "subject": "Follow up with Jane", "type": "Call", "status": "Planned", "dueDate": "2026-02-20", "linkedEntityType": "Contact", "linkedEntityId": "guid", "linkedEntityName": "Jane Smith" }
-  ],
-  "overdueActivities": [
-    { "id": "guid", "subject": "Send proposal", "dueDate": "2026-02-18", "linkedEntityName": "Acme Deal" }
-  ],
-  "recentDeals": [
-    { "id": "guid", "title": "Enterprise License", "value": 50000, "stageName": "Negotiation", "stageColor": "#f59e0b", "updatedAt": "2026-02-20T..." }
-  ],
-  "stats": {
-    "activitiesCompletedToday": 3,
-    "activitiesDueToday": 5,
-    "dealsUpdatedToday": 2,
-    "unreadNotifications": 4
-  },
-  "recentFeed": [
-    { "id": "guid", "type": "SocialPost", "content": "...", "authorName": "...", "createdAt": "..." }
-  ]
-}
-```
-
-**Queries:** All scoped to current user (by `OwnerId` or `AssignedToId`). Activities filtered by `DueDate` for today + overdue. Deals filtered by `OwnerId` + `UpdatedAt >= 7 days ago`. Feed filtered by `AuthorId == currentUser OR content contains @mention of user`.
+### Phase 4: Integration Marketplace
+**Rationale:** Most complex feature with OAuth flows, encrypted credential storage, background sync jobs, and third-party API adapters. Benefits from having the other features stable so debugging focuses on integration-specific issues.
 
 ## Scalability Considerations
 
 | Concern | At 100 users | At 10K users | At 1M users |
 |---------|--------------|--------------|-------------|
-| Preview sidebar API | Direct DB query, <50ms | Same, tenant isolation limits data set | Add response caching (5-10s TTL) |
-| Summary tab aggregation | Single DB round-trip, OK | Add composite index on (EntityType, EntityId) for FeedItems | Consider materialized view or cache layer for counts |
-| Entity-scoped feed queries | Simple WHERE clause, fast | Index on (TenantId, EntityType, EntityId, CreatedAt) already exists via global filter | Partition FeedItems by TenantId if table exceeds 10M rows |
-| My Day endpoint | 4-5 queries per request | Same -- all queries scoped to single user | Cache per-user with 60s TTL, invalidate on write |
-| Preview sidebar concurrent opens | N/A (one at a time) | Same | Same (single sidebar instance) |
-
-## Database Index Recommendations
-
-The existing indexes should suffice for most v1.2 queries. Verify the following exist or add:
-
-```sql
--- For entity-scoped feed queries (may already exist via global filter)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_feed_items_entity
-  ON feed_items (tenant_id, entity_type, entity_id, created_at DESC)
-  WHERE entity_type IS NOT NULL;
-
--- For My Day: activities due today for a user
-CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_activities_user_due
-  ON activities (tenant_id, assigned_to_id, due_date, status)
-  WHERE status NOT IN ('Completed', 'Cancelled');
-
--- For summary: deal-contact junction count queries
--- (likely already indexed as FK)
-CREATE INDEX CONCURRENTLY IF NOT EXISTS ix_deal_contacts_contact
-  ON deal_contacts (contact_id, deal_id);
-```
-
-## Suggested Build Order
-
-Build order is driven by dependency chains:
-
-```
-Phase A: Foundation Components (no dependencies between each other)
-  A1: EntityPreviewService + backend endpoint
-  A2: Preview sidebar store + component shell
-  A3: EntitySummaryService + backend endpoint
-  A4: FeedController entity filter extension
-
-Phase B: Integration (depends on A)
-  B1: Wire preview sidebar into AppComponent (depends on A1, A2)
-  B2: EntitySummaryTabComponent (depends on A3)
-  B3: EntityFeedTabComponent + FeedCardComponent extraction (depends on A4)
-  B4: MyDayController + MyDayApiService (independent backend work)
-
-Phase C: Wiring into Existing Pages (depends on B)
-  C1: Add Summary + Feed tabs to all detail pages (depends on B2, B3)
-  C2: Update tab index constants and onTabChanged handlers
-  C3: Wire preview triggers into feed, search, entity links
-  C4: MyDayComponent + MyDayStore (depends on B4)
-  C5: Add My Day tab to DashboardComponent (depends on C4)
-
-Phase D: Polish (depends on C)
-  D1: Animations (slide-in/out for preview sidebar)
-  D2: Keyboard navigation (Escape closes preview, arrow keys in search open preview)
-  D3: Responsive behavior (preview as full-screen on mobile)
-  D4: Loading skeletons for summary tab and My Day
-```
-
-**Rationale for this order:**
-1. Backend endpoints and services first (A) because they have no frontend dependencies and can be tested independently.
-2. Component shells second (B) because they need working services to function.
-3. Integration into existing pages third (C) because this is where the tab index shift risk lives -- doing it after components are working means you can test each integration immediately.
-4. Polish last (D) because animations and edge cases should not block core functionality.
-
-**Parallelism opportunities:**
-- A1+A2 can parallel with A3+A4 (preview sidebar vs summary/feed backend work)
-- B1+B4 can parallel with B2+B3
-- C1+C2 should be sequential (tab constants then handlers)
-- C3 can parallel with C4+C5
+| Board cards per board | In-memory fine (< 500 cards) | Paginate cards per column (50 per page) | Archive columns, virtual scroll |
+| PDF generation | On-demand, single Chromium instance | Queue via Hangfire, pool of 4 Chromium instances | Dedicated PDF worker service, pre-render cache |
+| Integration sync | Per-tenant cron jobs | Rate-limit per provider, stagger schedules | Separate integration worker service, event-driven sync |
+| Translation files | Single JSON loaded at startup (~50KB) | Same (cached in memory) | CDN for translation files, lazy per-feature loading |
+| OAuth tokens | AES-256 in DB, fine for 100 | Same, add token rotation | Move to dedicated secrets manager (Vault/KMS) |
 
 ## Sources
 
-- Codebase analysis: `FeedController.cs`, `FeedRepository.cs`, `FeedItem.cs` (feed architecture)
-- Codebase analysis: `related-entity-tabs.component.ts`, tab constants pattern
-- Codebase analysis: `contact-detail.component.ts/html/scss` (detail page layout pattern)
-- Codebase analysis: `dashboard.component.ts/html`, `dashboard.store.ts` (dashboard architecture)
-- Codebase analysis: `app.component.ts` (global layout, sidebar integration point)
-- Codebase analysis: `sidebar-state.service.ts` (existing sidebar state management pattern)
-- Codebase analysis: `global-search.component.ts` (overlay panel pattern reference)
-- Codebase analysis: `signalr.service.ts` (real-time event patterns)
-- Codebase analysis: `feed.store.ts`, `feed-list.component.ts` (feed store pattern)
-- Codebase analysis: `entity-timeline.component.ts` (shared component pattern for timeline)
-- Angular 19 signal store patterns: existing codebase conventions (HIGH confidence)
+- Codebase analysis: `QuotesController.cs`, `EmailTemplatesController.cs`, `EmailTemplateEditorComponent`, `DealKanbanComponent`, `LeadKanbanComponent`, `ActivityKanbanComponent`, `SignalRService`, `MergeFieldService`, `TemplateRenderService`, `QuotePdfDocument`, `WebhookServiceExtensions`, `HangfireServiceExtensions`, `ApplicationUser` entity, `UserPreferencesData` entity
+- [ngx-translate GitHub](https://github.com/ngx-translate/core) - Angular i18n library (MEDIUM confidence - training data verified by search results)
+- [angular-email-editor npm](https://www.npmjs.com/package/angular-email-editor) - Unlayer Angular wrapper, v15.2.0 installed (HIGH confidence - verified in package.json)
+- [PuppeteerSharp](https://pdfbolt.com/blog/top-csharp-pdf-generation-libraries) - .NET HTML-to-PDF via headless Chromium (MEDIUM confidence - WebSearch)
+- Unlayer displayMode options: `'email'`, `'web'`, `'document'` (LOW confidence - from GitHub issues and training data, not verified against official docs)

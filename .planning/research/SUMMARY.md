@@ -1,272 +1,209 @@
 # Project Research Summary
 
-**Project:** GlobCRM v1.2 — Connected Experience
-**Domain:** CRM entity connectivity, preview panels, summary dashboards, personal workspace
+**Project:** GlobCRM v1.3 — Platform & Polish
+**Domain:** Integration marketplace, free-form Kanban boards, Quote PDF template builder (Unlayer), Localization (EN + TR)
 **Researched:** 2026-02-20
-**Confidence:** HIGH
+**Confidence:** MEDIUM-HIGH (HIGH for Kanban and Localization patterns; MEDIUM for PDF rendering pipeline; LOW-MEDIUM for Unlayer document mode specifics)
 
 ## Executive Summary
 
-GlobCRM v1.2 is a frontend-dominant UX milestone that transforms the product from a collection of isolated record screens into an interconnected information network. Three features accomplish this: an entity preview sidebar (peek at any entity from the feed or search without leaving context), summary tabs on all major detail pages (aggregated KPIs and recent activity as the first tab on each record), and a personal "My Day" dashboard that replaces the current home page with a user-scoped daily workspace. The defining characteristic of this milestone is that it requires **zero new library installations** — every feature maps directly to Angular Material (`MatDrawer`), `angular-gridster2`, Chart.js, and NgRx Signals already installed in the stack. The primary engineering challenge is architectural design, not technology acquisition.
+GlobCRM v1.3 adds four distinct platform capabilities to an existing 275K LOC multi-tenant SaaS CRM. Unlike v1.2, which was frontend-heavy UX work with zero new dependencies, v1.3 introduces new domain entities, a cross-cutting i18n concern, and significant backend infrastructure including an HTML-to-PDF rendering pipeline and an encrypted credential store. The key strategic insight across all four features is that each builds heavily on existing codebase patterns: CDK drag-drop (already proven in 3 Kanban views), the Unlayer editor (already integrated for email templates), the Fluid/Liquid template engine (already used for email rendering), and Hangfire (already used for background jobs). This dramatically reduces unknown risk — only 3 new packages are required across the entire milestone, and the primary uncertainties are Unlayer document mode HTML export behavior and Playwright/Chromium production deployment.
 
-The recommended implementation approach follows the pattern established by HubSpot, Salesforce, and Pipedrive — all of which ship these exact three capabilities as the core of their "modern CRM" experience. The preview sidebar must be a global overlay component hosted at the `AppComponent` level, not inside any feature module, managed by a root-provided `PreviewSidebarStore` that any component in the app can call with `open(entityType, entityId)`. Summary tabs require a single batched backend aggregation endpoint per entity type rather than multiple individual API calls. "My Day" reuses the full existing gridster widget infrastructure with new per-user scoping semantics and new widget types — no new layout library, no new charting library.
+The recommended approach is to execute features in dependency order: Localization infrastructure first (because it affects every component built after it), then Integration Marketplace (smallest scope, highest business visibility, establishes security patterns), then Kanban Boards (proven CDK patterns, medium scope), then Quote PDF Templates last (highest technical risk due to the HTML-to-PDF pipeline). The single most consequential architectural decision in v1.3 is how to convert Unlayer-designed templates to PDF — using Playwright with print-specific CSS injection is the recommended path, but this needs early proof-of-concept validation before the phase begins.
 
-The top risks are security (preview sidebar must enforce RBAC scope checks — not just "can view" but "can view this specific record"), performance (summary tabs must use a single aggregated query endpoint, not N+1 calls per metric), and data integrity (feed links to deleted/merged entities must fail gracefully with denormalized names). All four critical pitfalls have clear, well-defined prevention strategies that must be designed in from the start, not retrofitted. Tab index shifting when inserting the Summary tab at position 0 across 6+ entity detail pages is the most widespread mechanical change and must be addressed by refactoring to label-based tab matching before any new tabs are added.
+The top risks are all security-related: integration credential storage without proper tenant isolation could cause cross-tenant OAuth token leakage (a GDPR/SOC2 violation), and Kanban board entities missing TenantId would bypass the triple-layer tenant defense. Both risks are fully preventable by following existing patterns (TenantId on all entities, RLS policies in `scripts/rls-setup.sql`, EF Core global query filters). The localization effort carries a different risk: the codebase has 415+ hardcoded English strings across 59 files with zero i18n infrastructure. Setting up Transloco before building any other v1.3 feature prevents the string-extraction backlog from growing.
 
 ## Key Findings
 
 ### Recommended Stack
 
-v1.2 needs no new npm packages. The entire feature set is buildable with the existing installed stack. See [STACK.md](.planning/research/STACK.md) for the full analysis.
+v1.3 requires **2 new frontend packages and 1 new backend package** — a remarkably minimal dependency footprint for four major features. All other functionality reuses existing libraries already proven in the codebase.
 
-**Core technologies (existing, repurposed for v1.2):**
-- `@angular/material` MatDrawer: entity preview sidebar — purpose-built Angular component for right-side overlay panels; provides slide animation, backdrop, Esc handling, and focus trapping out of the box; no CDK Overlay custom implementation needed
-- `angular-gridster2` v19: "My Day" personal dashboard layout — already powering the org dashboard with full drag/resize/persist widget infrastructure; "My Day" reuses `DashboardGridComponent` entirely with new widget types
-- `Chart.js 4.5.1` + `ng2-charts 8.0.0`: mini sparkline charts on summary tabs — same library with minimal config (hidden axes, no legend, no tooltips, fill area only); no separate sparkline library needed
-- `@ngrx/signals`: new root-level `PreviewSidebarStore`, `MyDayStore`, and per-component summary stores — same signal store patterns as all existing stores
-- `MatTabsModule`: summary tabs slot into existing `RelatedEntityTabsComponent` tab arrays (`COMPANY_TABS`, `CONTACT_TABS`, etc.) — no new tab infrastructure needed
-- `@microsoft/signalr`: existing real-time feed updates work unchanged; summary tab counts can debounce-refresh on `FeedUpdate` events
+**Core technology additions:**
+- `@jsverse/transloco` ^8.2.1: Runtime i18n with Signal API, lazy-loaded JSON files, standalone-first design. Chosen over ngx-translate (maintenance mode, no Signal API) and Angular built-in i18n (compile-time only, no runtime language switching). Required because users must toggle EN/TR at runtime without a page reload.
+- `@jsverse/transloco-locale` ^8.2.1: Companion for locale-aware date/number/currency formatting via native `Intl` APIs. Required because Turkish uses comma as decimal separator and different date formats (20.02.2026 vs 02/20/2026).
+- `Microsoft.Playwright` ^1.58.0: HTML-to-PDF conversion for Unlayer-designed quote templates. Official Microsoft package with headless Chromium and well-documented .NET PDF API. Preferred over PuppeteerSharp (less .NET-native), DinkToPdf (dead project), and IronPDF (commercial license required).
 
-The one optional addition: `@fullcalendar/list` plugin for a native agenda view. Research recommends against it — a custom `TodayAgendaWidgetComponent` calling `ActivityService` with `dueDate=today` filter is simpler, more CRM-specific, and avoids FullCalendar's opinionated styling in a widget context.
+**Reused existing packages (zero additions needed):**
+- `@angular/cdk/drag-drop`: Already proven in DealKanban, ActivityKanban, LeadKanban — same directives, same patterns for free-form Kanban.
+- `angular-email-editor` (Unlayer): Already integrated for email templates. Quote PDF templates reuse the same component with `displayMode: 'web'` or `'document'` instead of `'email'`.
+- `Fluid.Core` + `TemplateRenderService`: Already handles Liquid merge field resolution for email templates. Reused identically for PDF template merge field rendering.
+- `@ngrx/signals`, `@angular/material`, SignalR, Hangfire, QuestPDF: All reused for new features with existing patterns.
+
+See `.planning/research/STACK.md` for full version matrix, installation commands, and feature-by-feature stack mapping.
 
 ### Expected Features
 
-See [FEATURES.md](.planning/research/FEATURES.md) for full feature tables with CRM benchmark comparisons.
-
-**Must have (table stakes — users expect these from a modern CRM):**
-- Clickable entity names in feed that open a slide-in preview panel (not navigate away)
-- Preview panel: key fields, status, owner, "Open full record" link, close on Esc/backdrop click, loading skeleton
-- Scroll-position preservation when closing preview (feed stays in place)
-- Summary tab as the first/default tab on Companies, Contacts, Deals, Leads, Quotes, Requests
-- Summary tab contents: key properties card, association counts with tab-jump links, recent activities (3-5 items), stage/status indicator, quick action bar (Add Note, Log Activity, Send Email)
-- "My Day" as new home page: today's tasks/activities, overdue items, my pipeline widget, greeting with time-of-day context
-- Org dashboard relocated to its own navbar item (not deleted — it serves a different audience: team-level KPIs vs. personal daily view)
-- Responsive behavior: preview sidebar full-width on mobile (<768px), side panel on desktop
+**Must have (table stakes — cannot ship v1.3 without):**
+- Integration Marketplace: card grid layout with status badges, category filtering, connect/disconnect with API key credential entry and masking, connection status display, admin-only write access, integration detail panel
+- Kanban Boards: full board/column/card CRUD, drag-and-drop between columns and within columns (with sort order persistence), card detail dialog, labels with colors, assignees, due dates with urgency indicators, board visibility controls (Private/Team/Public)
+- Quote PDF Templates: Unlayer document-mode editor (WYSIWYG), merge field insertion panel, template CRUD with default selection, line items table support, PDF preview with real data, PDF download from quote detail
+- Localization: Transloco translation pipe/directive in all component templates, EN/TR JSON files, runtime language switcher in navbar, user language preference persistence, locale-aware date/number/currency formatting, Material component label localization (paginator, sort, date picker)
 
 **Should have (differentiators):**
-- Quick actions in preview sidebar (Add Note, Log Call, Send Email) — reuses the same `QuickActionBarComponent` as summary tabs
-- Association chips in preview (linked company on a contact, contacts on a deal)
-- Mini deal/pipeline summary on Company and Contact summary tabs (Chart.js bar chart, aggregated deal stats endpoint)
-- "My Day" configurable widget layout via gridster — genuine differentiator; HubSpot Sales Workspace is not user-configurable in layout
-- User preference persistence for widget layout (user-scoped dashboard entity)
-- Entity preview from global search results (secondary action alongside navigate)
+- Integration: connection health check/test button, integration activity log, popular/featured badges
+- Kanban: entity-linked cards (the CRM-unique differentiator linking cards to Contacts/Deals/Companies with preview sidebar integration), WIP column limits, board templates (3 seed templates), card checklists, card comments, client-side card filtering by label/assignee/due date
+- PDF Templates: multiple templates per tenant, template cloning, page size/orientation configuration, thumbnail preview in template list
+- Localization: scoped lazy-loading of translation files per feature, admin-configurable tenant default locale, CI translation coverage check script
 
-**Defer to v1.3+:**
-- Inline entity @mention system in feed content (requires structured mention parsing backend)
-- AI-generated record summaries (requires AI infrastructure and token budget)
-- Admin-customizable Summary tab layout per entity type
-- Smart nudges / guided actions (rule engine is standalone work)
-- Sparkline trend charts on summary tabs (needs time-series aggregation endpoints)
-- Cross-entity relationship map visualization
+**Defer to v1.4+:**
+- Real third-party API integrations (Mailchimp, Slack, QuickBooks) — each is its own project; v1.3 is infrastructure only
+- Card file attachments on Kanban (heavyweight per-card storage)
+- Board automations (trigger actions on card moves)
+- Conditional sections in PDF templates (Fluid supports it; user-friendly UI in Unlayer is complex)
+- Full backend error message localization (frontend-first approach covers 90% of user-visible strings)
+- E-signature on quote PDFs (future integration marketplace item)
 
-**Entity coverage in v1.2:**
-
-| Entity | Preview Sidebar | Summary Tab |
-|--------|----------------|-------------|
-| Company | Yes | Yes — rich (contacts, deals, activities, emails, quotes, requests) |
-| Contact | Yes | Yes — rich (company link, deals, activities, emails) |
-| Deal | Yes | Yes — rich (pipeline progress, contacts, products, activities, quotes) |
-| Lead | Yes | Yes — moderate (stage progress, temperature, source, activities) |
-| Quote | Yes | Yes — moderate (status badge, line item summary, linked deal/company/contact) |
-| Request | Yes | Yes — moderate (status + priority badges, linked contact/company) |
-| Product | Yes (basic) | No — insufficient connected data |
-| User/Team Member | Yes (feed only) | No |
+See `.planning/research/FEATURES.md` for full feature tables with complexity ratings, MVP recommendations, and dependency maps.
 
 ### Architecture Approach
 
-v1.2 is a **frontend UX milestone with targeted backend aggregation endpoints**. The existing architecture handles 90% of requirements. The critical architectural decision is placing the entity preview sidebar as a global overlay at `AppComponent` level, managed by a root-provided store, triggerable from anywhere in the app. See [ARCHITECTURE.md](.planning/research/ARCHITECTURE.md) for full component specs, data flow diagrams, code patterns, and the A/B/C/D build order.
+All four features follow existing Clean Architecture patterns without exception: new entities in Domain, repositories and services in Infrastructure with `Add{Feature}Services()` extension methods, controllers in Api with co-located DTOs, and standalone Signal-based Angular components with lazy-loaded routes. The architecture research confirmed clear component boundaries with minimal cross-feature coupling — each feature area can be built in parallel after the localization foundation is in place. The most architecturally complex new subsystem is the Integration Marketplace (OAuth credential management, AES-256 encrypted storage, Hangfire sync jobs). The simplest is free-form Kanban, which is pattern-identical to existing deal/activity Kanban views with user-defined columns instead of pipeline-stage columns.
 
 **Major new components:**
+1. `IntegrationsController` + `IntegrationOAuthService` + `IntegrationEncryptionService` — credential storage with AES-256 encryption using tenant-scoped DataProtection purpose strings (`GlobCRM.Integrations.{tenantId}`) and full RLS coverage
+2. `BoardsController` + `BoardRepository` — Board/BoardColumn/BoardCard entities in separate normalized tables (not JSONB) to enable FK integrity for entity links and assignees; labels stored as JSONB array on card
+3. `QuoteTemplatesController` + `HtmlToPdfService` (Playwright singleton browser) + `QuoteTemplateRenderer` (Fluid merge fields) — PDF pipeline extending existing TemplateRenderService; QuestPDF preserved as fallback
+4. Transloco providers in `app.config.ts` + `assets/i18n/en.json` + `tr.json` + Material intl provider overrides — cross-cutting i18n layer touching all ~80+ component templates
 
-1. `EntityPreviewSidebarComponent` (shared) — global overlay hosted in `AppComponent` template; managed by root `PreviewSidebarStore`; `@switch(entityType)` for type-specific field templates; CSS fixed position, ~400px wide, slides from right with MatDrawer animation
-2. `EntityPreviewService` (root) — single generic service calling `GET /api/entities/{type}/{id}/preview`; no per-entity services in sidebar (prevents coupling and bundle bloat)
-3. `EntitySummaryTabComponent` (shared) — slots into `RelatedEntityTabsComponent` as index 0 on all entity detail pages; calls single `GET /api/{entityType}/{id}/summary` aggregation endpoint
-4. `EntityFeedTabComponent` (shared) — entity-scoped feed reusing a new `FeedCardComponent` extracted from `FeedListComponent`; added as the last tab on all detail pages
-5. `MyDayComponent` + `MyDayStore` (feature) — personal dashboard reusing existing gridster widget infrastructure; new widget types: `TodayAgendaWidget`, `MyDealsWidget`, `RecentFeedWidget`, `QuickActionsWidget`
-6. Backend: `EntityPreviewController`, `EntitySummaryController`, `MyDayController` — three new controllers; no new NuGet packages
+**Key patterns that must be followed:**
+- Every new tenant-scoped entity requires `TenantId`, EF Core `HasQueryFilter`, and an RLS policy in `scripts/rls-setup.sql` — no exceptions, including junction tables like `BoardCardEntityLink`
+- New backend features use `Add{Feature}Services()` extension methods registered in `Program.cs`
+- New frontend features follow `features/{name}/` structure: `feature.routes.ts`, `feature.store.ts`, `feature.service.ts`, `feature.models.ts`
+- Per-page Signal stores provided in component `providers: []`, root stores for cross-cutting state (language preference lives in AuthStore)
+- Kanban drag-drop IDs must be namespaced as `board-{boardId}-list-{listId}` to avoid collisions with existing `stage-{uuid}` IDs
 
-**New backend endpoints:**
-
-| Endpoint | Purpose | Key Design Requirement |
-|----------|---------|----------------------|
-| `GET /api/entities/{type}/{id}/preview` | Generic slim DTO for preview sidebar | RBAC scope-checked (Own/Team/All); generic field-list DTO shape |
-| `GET /api/{entityType}/{id}/summary` | Aggregated counts + recent activity | Single DB round-trip via `Task.WhenAll()`; scope-filtered counts |
-| `GET /api/feed?entityType=X&entityId=Y` | Entity-scoped feed (extension) | Optional params added to existing endpoint; same paged response shape |
-| `GET /api/my-day` | Personal daily snapshot | User-scoped only; activities, deals, stats, recent feed in one response |
-
-**Build order (A → B → C → D):** Backend endpoints and services first (parallelizable by feature), component shells second, integration into existing pages third (highest risk — tab index shifts), polish and animations last.
+See `.planning/research/ARCHITECTURE.md` for full data flow diagrams, component boundary tables, and the suggested build order.
 
 ### Critical Pitfalls
 
-See [PITFALLS.md](.planning/research/PITFALLS.md) for all 13 pitfalls with full prevention strategies and detection methods.
+1. **Cross-tenant credential leakage (Integration Marketplace)** — The existing `TokenEncryptionService` uses tenant-agnostic DataProtection. New `IntegrationCredential` entity must have `TenantId`, its own RLS policy, AND use `_dataProtectionProvider.CreateProtector($"GlobCRM.Integrations.{tenantId}")` for tenant-scoped encryption. A shared encryption key means one tenant's encrypted blob could theoretically be decrypted in another tenant's request context. Integration test is mandatory: authenticate as Tenant B, attempt to read Tenant A credentials — must return 403 or empty.
 
-**Critical (must be designed in from the start — not retroactively fixable):**
+2. **Unlayer HTML export is not print-ready PDF HTML** — Unlayer's `exportHtml()` always produces email-optimized table-based HTML with inline styles, regardless of `displayMode`. Converting this directly to PDF via Playwright produces wrong margins, broken layouts, and no page break control. The correct architecture: inject a print-specific CSS stylesheet server-side (`@page { size: A4; margin: 20mm; }`, `table { page-break-inside: avoid; }`, `body { width: 100% !important; }`) before passing HTML to Playwright. Keep QuestPDF as fallback for non-templated quotes — do not remove the existing `QuotePdfDocument`.
 
-1. **Preview sidebar bypasses RBAC scope checks** (P1) — Feed shows entity links visible to all tenant users. A user with `Contact:View:Own` scope should not see another user's contact in the preview. Prevention: the preview endpoint must call `_permissionService.GetEffectivePermissionAsync()` and validate Own/Team/All scope before returning data. Return 403 on scope violation. Frontend pre-checks `permissionStore.hasPermission()` before opening the sidebar to avoid a wasted API call.
+3. **Localization retrofit creates 1000+ untranslated string regressions** — 415+ hardcoded English strings confirmed across 59 files with zero i18n infrastructure currently in the codebase. Prevention: set up Transloco infrastructure FIRST, mandate translation keys in ALL new code, complete a full string extraction sprint, and add a CI key-count comparison script that fails the build if `en.json` and `tr.json` have different key sets.
 
-2. **N+1 queries in summary tab aggregation** (P2) — Calling separate list endpoints for 8 different counts means 8 database round-trips per summary load. Under 50 concurrent users, that is 400+ queries per page-load cycle. Prevention: single `GET /api/{entityType}/{id}/summary` endpoint using EF Core `Task.WhenAll()` with `AsNoTracking()` `COUNT(*)` and `SUM()` queries. Never load collections to count in memory. Summary counts must also respect the user's View scope per entity type.
+4. **Kanban entities missing tenant isolation on junction tables** — All new entities (Board, BoardColumn, BoardCard, BoardCardEntityLink) need explicit `TenantId`. Junction tables are NOT exempted — querying `board_card_entity_links` directly (e.g., "all boards that reference this Contact") bypasses the parent entity's EF Core query filter. Add RLS for all four tables in `scripts/rls-setup.sql`.
 
-3. **Feed links to deleted/merged entities cause broken UX** (P3) — FeedItems use logical references (`EntityType` + `EntityId`) with no FK constraint by design. Deleting a Deal leaves a dead link in the feed. Prevention: (a) add `EntityName` column to `FeedItem` at creation time (denormalization migration) so feed cards still show a meaningful name after deletion; (b) graceful 404 handling in preview sidebar ("This Deal has been deleted" message, not an error); (c) merge-redirect resolution generalized from the existing `company-detail.component.ts` pattern.
+5. **Unlayer merge tags do not support repeating blocks (line items)** — Unlayer merge tags are flat key-value substitutions only. Quote line items require a dynamic table with variable row count. Use hybrid approach: Unlayer handles static layout design, Fluid's `{% for item in quote.line_items %}` loop generates the HTML table server-side, and the result is injected as the value of a single `{{quote.line_items_table}}` merge field.
 
-4. **Route migration breaks existing org dashboard bookmarks** (P4) — Moving `/dashboard` to make way for "My Day" breaks existing bookmarks and the catch-all redirect in `app.routes.ts`. Prevention: define the complete new route map before writing any code — `/` and `/dashboard` both redirect to `/my-day`; org dashboard moves to `/analytics` with backward-compat redirect from old path. The route restructuring must be the very first task in the personal dashboard phase.
+Additional moderate pitfalls: CDK drag-drop ID namespace collisions with existing Kanbans (namespace all IDs), fractional SortOrder for concurrent card position updates (use float values, not integers), Material intl provider localization independent of Transloco (configure `MatPaginatorIntl`, `MatDatepickerIntl`, etc.), and `any[]` type tech debt in preview components (fix before adding new entity preview types to prevent runtime TypeErrors).
 
-**Moderate (significant bugs but recoverable):**
-
-5. **Summary tab stale data after mutations on sibling tabs** (P5) — Existing `loaded` boolean guards prevent re-fetch. Creating a Deal on the Deals tab does not update the Summary tab's deal count. Prevention: dirty-flag signal pattern — each tab's mutation handler sets `summaryDirty = signal(true)`; Summary re-fetches on tab-switch when dirty. The batched endpoint is fast enough for this pattern.
-
-6. **Preview sidebar z-index and scroll conflicts** (P6) — Conflicts with existing Material dialogs, menus, and datepickers. Prevention: CDK Overlay with explicit z-index stacking layer constants; `BlockScrollStrategy` to prevent body scroll when sidebar is open; close sidebar on `NavigationStart` router events to prevent stale previews across routes.
-
-7. **Tab index shift when inserting Summary at position 0** (P8) — All existing `onTabChanged(index)` handlers use hardcoded numeric indices (`if (index === 3)`). Inserting Summary at index 0 silently breaks all lazy loading across every detail page. Prevention: **refactor to label-based tab matching before adding any new tabs** — replace `if (index === 3)` with `if (tabLabel === 'Contacts')` in all 6+ detail components. This is the first task of the Summary Tabs phase.
-
-8. **"My Day" widget loading waterfall** (P7) — 6-8 concurrent HTTP requests on every app load (the new home page). Prevention: extend the existing batched `POST /api/dashboards/{id}/widget-data` endpoint to support new "My Day" widget types; use two-tier loading (fast KPIs first, slow entity lists second with skeleton loaders).
+See `.planning/research/PITFALLS.md` for all 15 pitfalls with full prevention strategies, detection methods, and phase-specific warning table.
 
 ## Implications for Roadmap
 
-Based on the combined research, the feature dependency graph and pitfall resolution order dictate a 4-phase structure within the v1.2 milestone. Phase ordering follows architectural dependencies (global components before per-page integrations) and pitfall mitigation requirements (refactoring before inserting new tabs; route planning before component building).
+Based on combined research, the dependency graph is clear: Localization is a foundation layer that must precede all feature development, Integration Marketplace and Kanban Boards can run in parallel after that foundation, and Quote PDF Templates should come last due to the highest technical risk and the requirement for a Playwright proof-of-concept spike. The research supports 5 phases: a pre-work cleanup phase, then the four features in priority order.
 
-### Phase 1: Foundation — Shared Infrastructure + Entity Preview Sidebar
+### Phase 1: Foundation — Pre-work and Tech Debt Cleanup
 
-**Rationale:** All three v1.2 features depend on shared infrastructure: the `EntityTypeRegistry` utility, the tab index refactor, the generic `EntityPreviewService`, and the preview sidebar overlay itself. Building these first means Phases 2 and 3 are integration work against a stable foundation, not architecture decisions under time pressure. The preview sidebar is also the most novel UX paradigm — shipping it first gives the team time to iterate before users see it on summary tabs and search.
+**Rationale:** Two mandatory pre-requisites block all subsequent feature development. First, Transloco i18n infrastructure must be wired before any new UI code is written so no new hardcoded English strings are introduced. Second, the `any[]` type tech debt in preview components (`preview-notes-tab.component.ts` line 120, `preview-activities-tab.component.ts` line 141) causes runtime TypeErrors when adding new entity preview types — this must be fixed before any v1.3 entity types are added to the preview sidebar.
+**Delivers:** Transloco configured with EN/TR skeleton JSON files, language switcher in navbar, Material intl providers wired (paginator, sort, date picker), preview component `any[]` types replaced with typed interfaces (`NotePreviewDto[]`, `ActivityPreviewDto[]`), missing `EntityPreviewController` handlers for Quote and Request entities added.
+**Addresses:** Pitfalls P3 (localization regression prevention), P10 (preview type errors)
+**Avoids:** Building any of the 4 features with hardcoded English strings that must later be extracted.
+**Research flag:** Standard patterns — no phase research needed. Transloco docs are comprehensive (HIGH confidence). `any[]` fix is internal refactor.
 
-**Delivers:**
-- Shared `EntityTypeRegistry` utility (maps entity type strings to routes, icons, labels) — eliminates 3+ divergent mapping implementations across feed, notifications, and activities
-- Tab handler refactor across all 6 entity detail components: index-based to label-based `onTabChanged` — unblocks safe tab insertion in Phase 2 without silent regressions
-- `EntityName` denormalization: migration adding `entity_name` column to `feed_items` — prevents dead-link UX from Phase 2 onward
-- `EntityPreviewController` backend endpoint (`GET /api/entities/{type}/{id}/preview`) with RBAC scope checking built in
-- `EntityPreviewService` (Angular, root) + `PreviewSidebarStore` (root signal store)
-- `EntityPreviewSidebarComponent` hosted in `AppComponent` + feed entity link integration (replace `navigateToEntity()` with `previewSidebarStore.open()`)
-- Graceful 404/deleted-entity handling in preview sidebar
+### Phase 2: Localization — Complete String Extraction (EN + TR)
 
-**Addresses features from FEATURES.md:** All preview sidebar table stakes (clickable entity names, slide-in panel, key properties, close behavior, loading skeleton, deleted entity graceful handling, scroll-position preservation)
+**Rationale:** Once the infrastructure is wired, the string extraction across all 59 files with 415+ hardcoded strings must happen before new features add more strings. This is the highest-volume but lowest-complexity task in v1.3. Doing it now means all subsequent phases build on a clean, fully-translated foundation. The research strongly recommends NOT deferring this — each week of delay adds more strings to extract.
+**Delivers:** Complete `en.json` and `tr.json` coverage of all existing v1.0-v1.2 UI strings, all new v1.3 feature strings added to JSON files as each feature is built, Turkish locale registration for Angular date/number/currency pipes (`registerLocaleData(localeTr)`), CI translation coverage check (script comparing JSON key sets, fails build on mismatch), pseudo-localization test pass to find any remaining hardcoded strings.
+**Addresses:** Transloco pipe in all ~80+ component templates, locale-aware Material date pickers and paginator labels in Turkish.
+**Avoids:** Pitfall P3 (mixed-language UI during rollout), Pitfall P9 (Material labels remaining in English).
+**Research flag:** Standard patterns — Transloco documentation is thorough (HIGH confidence) and Angular locale registration is well-documented.
 
-**Avoids pitfalls:** P1 (RBAC bypass — scope-checked endpoint), P3 (deleted entities — denormalization + graceful 404), P9 (duplicate service instances — generic service), P10 (entity type mapping inconsistency — registry utility)
+### Phase 3: Integration Marketplace
 
-**Research flag:** Standard patterns — skip research-phase. MatDrawer implementation is official Angular Material. RBAC pattern matches existing `_permissionService` usage in other controllers.
+**Rationale:** Smallest technical scope among the four features (API Key credential type only — no OAuth in v1.3), uses all existing infrastructure patterns, and delivers high business visibility. This is the "quick win" phase that demonstrates v1.3 progress. Building it before Kanban and PDF Templates also establishes the `IntegrationEncryptionService` and granular RBAC permission patterns that other features can reference.
+**Delivers:** Settings page at `/settings/integrations` with card grid of 10-15 seed integrations (placeholder implementations), connect/disconnect with API Key credential storage (AES-256 encrypted, tenant-isolated via DataProtection purpose strings), connection status badges, admin RBAC via `Permission:Integration:*` (NOT role-based — must use policy-based authorization), integration detail panel via existing `SlideInPanelService`, connection health test button, integration activity log, settings hub card entry added to `settings-hub.component.ts`.
+**Uses:** Existing `@angular/material` card grid, `SlideInPanelService`, RBAC permission system, webhook infrastructure, Hangfire (optional: background health checks).
+**Avoids:** Pitfall P1 (credential leakage — tenant-scoped encryption + RLS), Pitfall P7 (RBAC bypass — policy-based not role-based), Pitfall P14 (missing settings hub card — added in same PR as route).
+**Research flag:** No phase research needed for infrastructure-only scope. Real OAuth integration implementation is deferred to v1.4 and will need research at that time.
 
-### Phase 2: Summary Tabs on All Detail Pages
+### Phase 4: Free-Form Kanban Boards
 
-**Rationale:** Summary tabs add high value to the most-visited pages in the app with low new-paradigm risk — they build on the tab infrastructure stabilized in Phase 1 (label-based handlers, Summary safely insertable at index 0). The aggregation endpoint pattern established here (single batched query, RBAC-scope-filtered counts) becomes the template for the My Day endpoint in Phase 3. The `QuickActionBarComponent` built here is reused in the Phase 4 preview sidebar polish.
+**Rationale:** CDK drag-drop patterns are fully proven in 3 existing Kanban implementations — implementation risk is low. The new entity model is well-defined with clear FK relationships. Building after Integration Marketplace means tenant isolation and RBAC patterns are already fresh in the team's mind. The unique CRM differentiator — entity-linked cards — leverages the `EntityTypeRegistry` from v1.2 without additional infrastructure.
+**Delivers:** New `/boards` route with board list page (grid of boards with create/edit/delete), board detail with free-form Kanban (CDK drag-drop with namespaced IDs), card detail dialog (rich text descriptions via existing `RichTextEditorComponent`), entity-linked cards with preview sidebar integration, board labels, assignees, due dates with overdue indicators, board visibility (Private/Team/Public), board templates (3 seed templates: Sprint, Content Calendar, Sales Follow-up), WIP column limits (visual-only enforcement), SignalR real-time sync for concurrent edits via `board_{boardId}` group, fractional SortOrder for concurrent position updates.
+**Uses:** `@angular/cdk/drag-drop` (existing), `@ngrx/signals` BoardStore (per-page), `@microsoft/signalr` for board sync, `EntityTypeRegistry` from v1.2, `RichTextEditorComponent` (existing).
+**Avoids:** Pitfall P4 (TenantId on ALL entities including junction tables, all with RLS), Pitfall P5 (CDK ID namespace as `board-{boardId}-list-{listId}`), Pitfall P6 (fractional SortOrder not integers), Pitfall P12 (denormalize EntityName in link model), Pitfall P15 (curated color palette as CSS custom properties, store key not hex value).
+**Research flag:** No phase research needed. CDK patterns are exhaustively documented in existing Kanban components within the codebase. Fractional sort ordering is a well-known algorithmic pattern.
 
-**Delivers:**
-- `EntitySummaryController` with per-entity `GET /api/{entityType}/{id}/summary` endpoints (Companies, Contacts, Deals, Leads, Quotes, Requests) using `Task.WhenAll()` batching — no N+1 queries
-- `EntitySummaryService` (Angular root) + `EntitySummaryTabComponent` (shared): KPI cards, association count chips with tab-jump links, recent activity mini-timeline, stage/status indicator
-- `QuickActionBarComponent` (shared) — Add Note, Log Activity, Send Email; reused across summary tabs and (in Phase 4) preview sidebar
-- `FeedCardComponent` extracted from `FeedListComponent` (reduces duplication, enables entity feed tab)
-- `EntityFeedTabComponent` (shared) — entity-scoped feed using `FeedCardComponent`
-- `FeedController` extended with optional `?entityType=X&entityId=Y` filter params (additive change, backward compatible)
-- Summary tab added at index 0 on all 6 entity detail pages; Feed tab added as last tab
-- Dirty-flag invalidation: summary re-fetches when sibling tabs perform mutations
+### Phase 5: Quote PDF Template Builder
 
-**Addresses features from FEATURES.md:** All summary tab table stakes; entity-scoped feed tab; association count chips (also feeds preview sidebar in Phase 4)
-
-**Avoids pitfalls:** P2 (N+1 queries — batched endpoint design), P5 (stale summary data — dirty-flag invalidation), P8 (tab index shift — resolved in Phase 1 refactor)
-
-**Research flag:** Standard patterns — skip research-phase. EF Core aggregate queries are well-documented. Chart.js sparkline config is established. Tab integration is mechanical after Phase 1 refactor.
-
-### Phase 3: Personal "My Day" Dashboard + Org Dashboard Relocation
-
-**Rationale:** "My Day" is the highest-complexity feature — new page, new widget types, route restructuring, navbar changes, user preference persistence, and coordination with the existing org dashboard. It ships after Phases 1-2 because it reuses the aggregation endpoint pattern (Phase 2) and the `QuickActionBarComponent` (Phase 2). The route restructuring must be the very first task within this phase, executed atomically, to avoid breaking existing users mid-phase.
-
-**Delivers:**
-- Route restructuring (first task, atomic): `/` → `/my-day`, `/dashboard` → `/my-day` (redirect), org dashboard moves to `/analytics` — with backward-compat redirects for existing bookmarks
-- Navbar update: "My Day" entry (home icon, default landing) + renamed "Analytics" entry (grid_view icon)
-- Auto-creation of default personal dashboard on first login (lazy creation: `GET /api/dashboards?scope=personal` creates default if none exists)
-- `MyDayController` (`GET /api/my-day`) — user-scoped activities, deals, stats, recent feed in one batched response
-- `MyDayComponent` + `MyDayStore` (per-page signal store, follows existing `DashboardStore` pattern)
-- New widget types: `TodayAgendaWidget` (custom component, not FullCalendar), `MyDealsWidget`, `RecentFeedWidget`, `QuickActionsWidget`
-- Widget layout persistence with user scope (`OwnerId = currentUserId`, separate `isDefault` semantics from org dashboard)
-- `DashboardScope` enum added to schema (Personal / Organization) with migration
-
-**Addresses features from FEATURES.md:** All "My Day" table stakes; org dashboard relocation; user-configurable layout (genuine differentiator); greeting/date context reuse from existing `DashboardComponent`
-
-**Avoids pitfalls:** P4 (route migration — backward-compat redirects, route plan first), P7 (widget loading waterfall — extend batched endpoint), P11 (gridster layout config — same 12-column config, widget-level sizing differences only)
-
-**Research flag:** Needs schema design session during planning. The `DashboardScope` enum addition and the "create on first access" strategy for default personal dashboards need explicit decisions before any code is written. Also confirm the migration strategy for existing users (all existing users get a default "My Day" created).
-
-### Phase 4: Preview Sidebar Polish + Quick Actions Integration
-
-**Rationale:** Cross-feature integration and polish ship last because they depend on all three features being functional and user-tested. Quick actions in the preview sidebar reuse the `QuickActionBarComponent` built in Phase 2 — the integration (opening dialogs from within the sidebar context, ensuring z-index is correct) needs all the pieces in place first. Responsive behavior, animations, and global search preview are refinement, not core functionality.
-
-**Delivers:**
-- `QuickActionBarComponent` wired into preview sidebar (reuse from Phase 2)
-- Preview sidebar responsive behavior: full-screen sheet on mobile (<768px), side panel on desktop
-- Global search preview integration: secondary "preview" action on search hits alongside existing "navigate" action
-- Animation polish: slide-in/out timing calibrated to existing CSS motion tokens (`--duration-normal`, `--ease-default`)
-- Preview sidebar closes on `NavigationStart` router events (prevents stale entity data across routes)
-- User preview for feed author names (lightweight `GET /api/users/{id}/preview` endpoint)
-- Database indexes verified/added: `ix_feed_items_entity`, `ix_activities_user_due`, `ix_deal_contacts_contact`
-- Association chips in preview sidebar (linked company on a contact, contacts on a deal)
-
-**Addresses features from FEATURES.md:** Preview sidebar differentiators (quick actions, user preview, associations, global search integration); responsive/mobile behavior; animation polish
-
-**Avoids pitfalls:** P6 (z-index conflicts — explicit stacking layers, `BlockScrollStrategy`), P12 (accidental sidebar open on mobile scroll — fallback to `router.navigate` on mobile viewports), P13 (SignalR counter flicker — event-scoped refresh with `debounceTime(3000)`)
-
-**Research flag:** Standard patterns — skip research-phase. CDK overlay z-index stacking is well-documented. Mobile breakpoint handling reuses existing `BreakpointObserver` pattern from `app.component.ts` and `navbar.component.ts`.
+**Rationale:** Highest technical risk phase due to Unlayer document mode behavior uncertainty and Playwright production deployment requirements. Placed last so prior phases validate the v1.3 delivery cadence before committing to this complex work, and so the team has time to run the mandatory Playwright proof-of-concept spike before formal phase planning. The `TemplateRenderService` and `MergeFieldService` patterns are already established by email templates and confirmed working.
+**Delivers:** `QuoteTemplateEditorComponent` (separate from `EmailTemplateEditorComponent`, Unlayer `displayMode: 'document'`, document-specific merge tags), quote template CRUD with thumbnail preview, merge field panel (extended with quote-specific fields: number, title, dates, subtotal, totals), line items table via Fluid `{% for item in quote.line_items %}` loop injected as pre-rendered merge field value, Playwright-based `HtmlToPdfService` with singleton browser and page pooling (print CSS injected server-side), PDF preview endpoint returning actual rendered PDF, template picker on quote detail page, QuestPDF fallback preserved for quotes without custom templates.
+**Uses:** `Microsoft.Playwright` (new), `angular-email-editor` (existing, different mode config), `Fluid.Core`/`TemplateRenderService` (existing), `MergeFieldService` (extended with quote fields), QuestPDF (existing, kept as fallback).
+**Avoids:** Pitfall P2 (inject print CSS before Playwright, do not use Unlayer HTML as-is), Pitfall P8 (Fluid loop for line items, not Unlayer merge tags), Pitfall P11 (separate QuoteTemplateEditorComponent with separate config), Pitfall P13 (embed Noto Sans font for Turkish glyph support in QuestPDF fallback).
+**Research flag:** THIS PHASE REQUIRES RESEARCH before planning. Two specific uncertainties must be resolved via proof-of-concept spikes: (1) Unlayer `displayMode: 'document'` behavior in the existing `angular-email-editor` v15.2.0 wrapper — does it produce a page-oriented editor, and does the HTML export differ from email mode? (2) Playwright Chromium production deployment — memory requirements, system library dependencies, Docker image strategy. Run `/gsd:research-phase` when planning this phase. Do not begin planning until both spikes are completed.
 
 ### Phase Ordering Rationale
 
-- **Foundation infrastructure before features:** `EntityTypeRegistry` and the tab index refactor are cross-cutting changes that will cause merge conflicts and silent bugs if done mid-development alongside feature work. They block safe tab insertion and safe entity link changes everywhere.
-- **Summary tabs before "My Day":** The `GET /api/{entityType}/{id}/summary` aggregation endpoint pattern and `QuickActionBarComponent` built in Phase 2 are directly reused in Phase 3. Building them first avoids duplication and ensures the pattern is proven before scaling it.
-- **Route restructuring as the first commit within Phase 3:** Route changes have the widest blast radius (bookmarks, catch-all redirects, navbar). Doing this before building widget components means the new routing is validated before new UI is added on top of it.
-- **Polish last:** Responsive behavior, animations, and global search integration have zero architectural dependencies — they ship last to avoid blocking core feature delivery while remaining valuable additions.
+- Localization infrastructure (Phase 1) must precede all feature phases to prevent growing the string-extraction backlog — every component built in Phases 3-5 adds new UI strings, and building them with translation keys from the start avoids a second extraction pass.
+- String extraction (Phase 2) before feature development so all subsequent phases build on a fully-translated foundation. The high volume of this work (415+ strings, 59 files) means it will consume a full sprint; front-loading it avoids blocking features later.
+- Integration Marketplace (Phase 3) before Kanban and PDF Templates because it establishes shared security patterns (tenant-scoped credential encryption, policy-based RBAC for settings-area features) at the smallest scope where mistakes are cheapest to fix, and delivers a visible "quick win."
+- Kanban (Phase 4) before PDF Templates because Kanban patterns are fully validated by existing codebase implementations while PDF Templates have unvalidated technical assumptions that require proof-of-concept work.
+- Tech debt pre-work (Phase 1) before everything else because the `any[]` types in preview components will cause runtime TypeErrors the first time any new entity type is previewed, and Transloco setup enables the subsequent string extraction phase.
 
 ### Research Flags
 
-Phases needing deeper research or design decisions during planning:
-- **Phase 3 (Personal Dashboard):** `DashboardScope` enum migration design, "create on first access" strategy for existing users, and widget persistence scope semantics. Need a schema design session before planning begins.
+**Requires `/gsd:research-phase` when planning:**
+- Phase 5 (Quote PDF Templates): Unlayer `displayMode: 'document'` behavior in v15.2.0 wrapper needs proof-of-concept validation (30-min spike). Playwright Chromium production deployment needs environment-specific verification. Do not plan this phase until both spikes are complete.
 
-Phases with well-established patterns (skip research-phase):
-- **Phase 1 (Foundation):** MatDrawer is official Angular Material; RBAC pattern matches existing codebase implementation; tab refactor is mechanical.
-- **Phase 2 (Summary Tabs):** EF Core aggregate queries are standard; Chart.js sparklines are documented; tab integration is mechanical after Phase 1 refactor.
-- **Phase 4 (Polish):** CDK overlay, `BreakpointObserver`, and router events are all standard Angular patterns with existing usage in the codebase.
+**Standard patterns — skip research-phase:**
+- Phase 1 (Foundation pre-work): Transloco setup is well-documented (official docs), `any[]` fix is internal refactor with no external dependencies.
+- Phase 2 (Localization string extraction): Mechanical extraction work with established tooling (grep + JSON, Transloco CLI tools).
+- Phase 3 (Integration Marketplace): Infrastructure-only scope. All patterns established in existing codebase (`TokenEncryptionService`, RBAC system, Hangfire, `SlideInPanelService`).
+- Phase 4 (Kanban Boards): CDK drag-drop patterns exhaustively documented in 3 existing Kanban implementations within the codebase. Zero external unknowns.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | All technologies confirmed installed in `package.json`. No new packages needed — verified by direct codebase analysis. Gridster, Chart.js, MatDrawer, NgRx Signals all proven working in existing production features. |
-| Features | MEDIUM-HIGH | CRM benchmark patterns validated against HubSpot, Salesforce, Pipedrive, Dynamics 365 documentation. Existing codebase confirmed all required data models exist. Some source confidence is MEDIUM (third-party HubSpot blog posts, not official APIs). Feature scope is well-defined with clear must-have/should-have/defer distinctions. |
-| Architecture | HIGH | Based on exhaustive direct codebase analysis of existing patterns (`feed-list.component.ts`, `company-detail.component.ts`, `dashboard.store.ts`, `related-entity-tabs.component.ts`, `app.component.ts`, etc.). Pattern recommendations are extensions of established existing patterns, not new paradigms. |
-| Pitfalls | HIGH | All critical pitfalls identified through direct code inspection with specific file and line references. RBAC scope gap, N+1 query risk, FeedItem no-FK design, hardcoded tab indices, and route catch-all all confirmed by reading actual source files. Confidence is HIGH because the pitfalls are code-evidence-based, not speculative. |
+| Stack | HIGH | `@jsverse/transloco` v8.2.1 verified on npm (published 1 month ago). `Microsoft.Playwright` v1.58.0 verified on NuGet. CDK drag-drop and Unlayer reuse are codebase-verified. Only Unlayer `displayMode: 'document'` in the specific v15.2.0 Angular wrapper is unverified (MEDIUM for that item alone). |
+| Features | HIGH | Integration Marketplace patterns benchmarked against HubSpot Marketplace and Pipedrive Marketplace. Kanban patterns benchmarked against Trello, WeKan, monday.com (well-established domain). Localization patterns from official Transloco docs (HIGH). PDF template patterns from S-Docs/PandaDoc conceptual research (MEDIUM). MVP scope recommendations are defensible with clear rationale. |
+| Architecture | HIGH | All patterns derived from direct codebase inspection of specific files with specific line numbers cited. Component boundaries, data flows, and integration points verified against existing implementations. No speculative architecture. |
+| Pitfalls | HIGH | 4 of 5 critical pitfalls confirmed via direct codebase inspection with specific file and line references (`TokenEncryptionService.cs`, `WebhookSubscription.cs`, `email-template-editor.component.ts`, `preview-notes-tab.component.ts`). Security pitfalls are verified by reading actual source. CDK nested list issues confirmed via GitHub issue numbers (#16671, #18503, #25333). |
 
-**Overall confidence:** HIGH
+**Overall confidence:** HIGH for implementation patterns. MEDIUM for Unlayer document mode HTML export behavior and Playwright production deployment specifics.
 
 ### Gaps to Address
 
-- **`DashboardScope` schema design:** The existing `Dashboard` entity has `OwnerId` (personal vs. null for team) but no `DashboardScope` enum and no separate `isDefault` per scope. Decide whether to add a `DashboardScope` enum column (with migration) or handle in application logic. Resolve during Phase 3 planning before any schema work begins.
-- **`entity_name` migration on `feed_items`:** Adding a new column to a potentially large table. Verify the migration strategy — nullable column first, then backfill via background job, then enforce not-null — against existing seed data patterns. Address in Phase 1 planning.
-- **Summary tab coverage for Leads, Quotes, Requests:** These were built in v1.1. Confirm their tab constant patterns (`LEAD_TABS`, `QUOTE_TABS`, `REQUEST_TABS`) match the `COMPANY_TABS`/`CONTACT_TABS` pattern before assuming the Phase 1 tab refactor applies uniformly.
-- **"My Day" default widget set:** Research provides the full widget type catalog. The specific default layout (which widgets, what positions, what sizes) is a UX design decision. Requires a design decision before Phase 3 planning.
-- **`@fullcalendar/list` final decision:** If the Phase 3 widget design review prefers native FullCalendar list rendering over a custom component, this is the only potential new dependency. Make the call explicitly during Phase 3 planning (recommendation: skip, build custom `TodayAgendaWidget`).
+- **Unlayer `displayMode: 'document'` in v15.2.0 wrapper:** The Angular wrapper is built for Angular 15, running on Angular 19 via compatibility. Changing `displayMode` is a single config property change, but its effect on the HTML export format is unverified. Resolution: run a 30-minute spike before Phase 5 planning — create a test component with `displayMode: 'document'`, call `exportHtml()`, examine the output structure and compare to `displayMode: 'email'` output.
+
+- **Playwright Chromium production deployment:** Running headless Chromium requires 200MB+ memory, specific system font and library dependencies, and a singleton browser lifecycle strategy. The official `mcr.microsoft.com/playwright/dotnet` Docker image includes everything, but the actual target production environment needs verification. Resolution: spike before Phase 5 planning — build `HtmlToPdfService` minimally, call `Page.PdfAsync()` in a local Docker container, confirm PDF output and memory usage.
+
+- **Translation coverage scope vs. sprint capacity:** Full extraction of 415+ strings across 59 files is a significant sprint. If this proves too large for Phase 2, the fallback strategy is: extract shared/common strings first (nav, buttons, snackbars), then extract per feature as each area is touched during normal development. New features (Phases 3-5) must always use translation keys from the start regardless — this is non-negotiable.
+
+- **Kanban card fractional ordering implementation:** Float arithmetic (e.g., midpoint between 2.0 and 3.0 = 2.5) is recommended for typical CRM usage patterns. LexoRank (string-based ordering used by Jira) is unnecessary at this scale. The specific implementation detail (double vs. decimal precision, normalization trigger threshold) should be decided at Phase 4 planning time.
+
+- **Line items table CSS styling in PDF templates:** The Fluid-rendered `{{quote.line_items_table}}` HTML table must visually match the Unlayer template's design (fonts, colors, borders). A default CSS stylesheet for the line items table must be defined and injected at PDF generation time. This is a design-implementation collaboration decision for Phase 5.
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- Angular Material Sidenav/Drawer API — https://material.angular.dev/components/sidenav/api
-- Angular CDK Overlay documentation — https://material.angular.dev/cdk/overlay/overview
-- FullCalendar Angular documentation — https://fullcalendar.io/docs/angular
-- EF Core Efficient Querying — https://learn.microsoft.com/en-us/ef/core/performance/efficient-querying
-- Existing codebase: `package.json`, `feed-list.component.ts`, `FeedController.cs`, `company-detail.component.ts`, `related-entity-tabs.component.ts`, `dashboard.component.ts`, `dashboard.store.ts`, `app.component.ts`, `app.routes.ts`, `FeedItem.cs`, `permission.store.ts`, `signalr.service.ts`, `sidebar-state.service.ts`, `global-search.component.ts`, `entity-timeline.component.ts`
+- Codebase direct inspection: `deal-kanban.component.ts`, `activity-kanban.component.ts`, `email-template-editor.component.ts`, `QuotePdfDocument.cs`, `TemplateRenderService.cs`, `MergeFieldService.cs`, `TokenEncryptionService.cs`, `WebhookSubscription.cs`, `settings-hub.component.ts`, `settings.routes.ts`, `entity-preview.models.ts`, `preview-notes-tab.component.ts`, `preview-activities-tab.component.ts`, `package.json`, `GlobCRM.Infrastructure.csproj`
+- Transloco documentation: https://jsverse.gitbook.io/transloco
+- Transloco npm: https://www.npmjs.com/package/@jsverse/transloco (v8.2.1 verified)
+- Transloco locale plugin docs: https://jsverse.gitbook.io/transloco/plugins-and-extensions/locale-l10n
+- Microsoft.Playwright NuGet: https://www.nuget.org/packages/microsoft.playwright (v1.58.0 verified)
+- Angular CDK Drag Drop official docs: https://angular.dev/guide/drag-drop
+- Angular i18n Guide: https://angular.dev/guide/i18n
 
 ### Secondary (MEDIUM confidence)
-- HubSpot: Preview a record — https://knowledge.hubspot.com/records/preview-a-record
-- HubSpot: View and customize record overviews — https://knowledge.hubspot.com/crm-setup/view-and-customize-record-overviews
-- HubSpot: Sales Workspace activities — https://knowledge.hubspot.com/prospecting/review-sales-activity-in-the-sales-workspace
-- HubSpot: Customize preview sidebar in workspace — https://knowledge.hubspot.com/customize-the-record-preview-sidebar-in-the-customer-success-workspace
-- HubSpot Spring 2025 Spotlight: Workspaces — https://www.hubspot.com/company-news/spring-2025-spotlight-workspaces
-- Salesforce: Custom Lightning Home Page — Trailhead module
-- Salesforce: Compact Layouts — Trailhead module
-- Salesforce: Today's Tasks in Lightning — https://help.salesforce.com/s/articleView?id=000382898
-- Pipedrive: Detail view sidebar — https://support.pipedrive.com/en/article/detail-view-sidebar
-- Dynamics 365: Quick view forms — https://learn.microsoft.com/en-us/dynamics365/customerengagement
-- Chart.js sparkline pattern — https://www.ethangunderson.com/sparklines-in-chartjs/
-- angular-gridster2 — https://github.com/tiberiuzuld/angular-gridster2
-- Angular CDK Overlay tutorial — https://briantree.se/angular-cdk-overlay-tutorial-learn-the-basics/
-- N+1 Problem in EF Core — https://www.jocheojeda.com/2025/06/26/understanding-the-n1-database-problem-using-entity-framework-core/
+- HubSpot App Marketplace — integration card grid and category filter patterns
+- Pipedrive Marketplace — integration tile and connection status patterns
+- Trello Feature Overview — Kanban board table stakes (create/edit columns, drag-and-drop, labels, assignees)
+- WeKan Open Source Kanban — feature benchmark
+- Phrase: Best Angular i18n Libraries — Transloco vs ngx-translate comparison
+- Playwright .NET PDF guide: https://pdfnoodle.com/blog/how-to-generate-pdf-from-html-with-playwright-in-c-sharp
+- Playwright .NET PDF blog: https://blog.hompus.nl/2025/08/18/playwright-pdf-generation-in-dotnet/
+- .NET PDF library comparison: https://pdfbolt.com/blog/top-csharp-pdf-generation-libraries
+- AWS Multi-Tenant Security Practices: https://aws.amazon.com/blogs/security/security-practices-in-aws-multi-tenant-saas-environments/
+- SaaS Security Vulnerabilities 2025: https://www.appsecure.security/blog/saas-security-vulnerabilities-2025
+- Angular CDK Drag Drop nested list GitHub issues: #16671, #18503, #25333
 
-### Tertiary (LOW confidence)
-- Everything About CRM Record Overview Tab in HubSpot — third-party blog post (https://www.mergeyourdata.com/blog/everything-about-the-crm-record-overview-tab-in-hubspot)
-- Angular 21 CDK Overlay Issues — third-party Medium article (behavior may differ in Angular 19)
+### Tertiary (LOW confidence — needs validation)
+- Unlayer `displayMode: 'document'` specifics: https://github.com/unlayer/react-email-editor/issues/79 — only informal GitHub discussion, not official Unlayer documentation; the exact behavior in the `angular-email-editor` v15.2.0 wrapper is unverified and requires a proof-of-concept spike
+- Unlayer HTML export behavior in document vs email mode: inference from general Unlayer architecture knowledge plus email HTML structure analysis; not tested against the specific wrapper version in this project
 
 ---
 *Research completed: 2026-02-20*
