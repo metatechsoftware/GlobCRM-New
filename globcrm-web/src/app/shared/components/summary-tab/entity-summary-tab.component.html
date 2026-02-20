@@ -1,0 +1,366 @@
+<div class="summary-container">
+  <!-- Quick Action Bar - pinned at top per user decision -->
+  <app-quick-action-bar
+    [showSendEmail]="showSendEmail()"
+    (addNote)="addNote.emit()"
+    (logActivity)="logActivity.emit()"
+    (sendEmail)="sendEmail.emit()" />
+
+  @if (loading()) {
+    <div class="summary-skeleton">
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card"></div>
+      <div class="skeleton-card skeleton-wide"></div>
+    </div>
+  } @else {
+    <div class="summary-grid">
+      <!-- ROW 1: Key Properties Card -->
+      <div class="summary-card key-properties-card">
+        <h3 class="card-title">
+          <mat-icon>info</mat-icon>
+          Key Properties
+        </h3>
+        <div class="properties-grid">
+          @switch (entityType()) {
+            @case ('Company') {
+              @if (companyData(); as d) {
+                <div class="property">
+                  <span class="property-label">Name</span>
+                  <span class="property-value">{{ d.name }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Industry</span>
+                  <span class="property-value">{{ d.industry || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Phone</span>
+                  <span class="property-value">{{ d.phone || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Email</span>
+                  <span class="property-value">{{ d.email || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Website</span>
+                  <span class="property-value">{{ d.website || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Owner</span>
+                  <span class="property-value">{{ d.ownerName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Location</span>
+                  <span class="property-value">{{ d.location || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Size</span>
+                  <span class="property-value">{{ d.size || '---' }}</span>
+                </div>
+              }
+            }
+            @case ('Contact') {
+              @if (contactData(); as d) {
+                <div class="property">
+                  <span class="property-label">Full Name</span>
+                  <span class="property-value">{{ d.fullName }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Email</span>
+                  <span class="property-value">{{ d.email || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Phone</span>
+                  <span class="property-value">{{ d.phone || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Job Title</span>
+                  <span class="property-value">{{ d.jobTitle || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Company</span>
+                  <span class="property-value">{{ d.companyName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Owner</span>
+                  <span class="property-value">{{ d.ownerName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Department</span>
+                  <span class="property-value">{{ d.department || '---' }}</span>
+                </div>
+              }
+            }
+            @case ('Deal') {
+              @if (dealData(); as d) {
+                <div class="property">
+                  <span class="property-label">Title</span>
+                  <span class="property-value">{{ d.title }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Value</span>
+                  <span class="property-value">{{ d.value | currency:'USD':'symbol':'1.0-0' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Probability</span>
+                  <span class="property-value">{{ d.probability !== null ? (d.probability | percent:'1.0-0') : '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Expected Close</span>
+                  <span class="property-value">{{ d.expectedCloseDate ? (d.expectedCloseDate | date:'mediumDate') : '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Pipeline</span>
+                  <span class="property-value">{{ d.pipelineName }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Stage</span>
+                  <span class="property-value">{{ d.stageName }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Company</span>
+                  <span class="property-value">{{ d.companyName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Owner</span>
+                  <span class="property-value">{{ d.ownerName || '---' }}</span>
+                </div>
+              }
+            }
+            @case ('Lead') {
+              @if (leadData(); as d) {
+                <div class="property">
+                  <span class="property-label">Full Name</span>
+                  <span class="property-value">{{ d.fullName }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Email</span>
+                  <span class="property-value">{{ d.email || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Phone</span>
+                  <span class="property-value">{{ d.phone || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Company</span>
+                  <span class="property-value">{{ d.companyName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Source</span>
+                  <span class="property-value">{{ d.sourceName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Temperature</span>
+                  <span class="property-value temperature" [attr.data-temp]="d.temperature">{{ d.temperature }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Owner</span>
+                  <span class="property-value">{{ d.ownerName || '---' }}</span>
+                </div>
+              }
+            }
+            @case ('Quote') {
+              @if (quoteData(); as d) {
+                <div class="property">
+                  <span class="property-label">Quote Number</span>
+                  <span class="property-value">{{ d.quoteNumber }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Title</span>
+                  <span class="property-value">{{ d.title }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Status</span>
+                  <span class="property-value">{{ d.status }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Grand Total</span>
+                  <span class="property-value">{{ d.grandTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Contact</span>
+                  <span class="property-value">{{ d.contactName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Company</span>
+                  <span class="property-value">{{ d.companyName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Issue Date</span>
+                  <span class="property-value">{{ d.issueDate | date:'mediumDate' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Expiry Date</span>
+                  <span class="property-value">{{ d.expiryDate ? (d.expiryDate | date:'mediumDate') : '---' }}</span>
+                </div>
+              }
+            }
+            @case ('Request') {
+              @if (requestData(); as d) {
+                <div class="property">
+                  <span class="property-label">Subject</span>
+                  <span class="property-value">{{ d.subject }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Status</span>
+                  <span class="property-value">{{ d.status }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Priority</span>
+                  <span class="property-value">{{ d.priority }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Category</span>
+                  <span class="property-value">{{ d.category || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Contact</span>
+                  <span class="property-value">{{ d.contactName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Company</span>
+                  <span class="property-value">{{ d.companyName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Owner</span>
+                  <span class="property-value">{{ d.ownerName || '---' }}</span>
+                </div>
+                <div class="property">
+                  <span class="property-label">Assigned To</span>
+                  <span class="property-value">{{ d.assignedToName || '---' }}</span>
+                </div>
+              }
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Stage/Status Card (entity-specific) -->
+      @switch (entityType()) {
+        @case ('Deal') {
+          <div class="summary-card stage-card">
+            <h3 class="card-title">
+              <mat-icon>linear_scale</mat-icon>
+              Pipeline Progress
+            </h3>
+            @if (dealData(); as d) {
+              <div class="stage-label">{{ d.pipelineName }} &mdash; {{ d.stageName }}</div>
+              <app-mini-stage-bar
+                [stages]="dealStages()"
+                [currentStageId]="dealCurrentStage().id"
+                [currentSortOrder]="dealCurrentStage().sortOrder" />
+              <div class="stage-legend">
+                @for (stage of d.stages; track stage.id) {
+                  <span class="legend-item" [class.active]="stage.isCurrent">
+                    <span class="legend-dot" [style.background-color]="stage.color"></span>
+                    {{ stage.name }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+        @case ('Lead') {
+          <div class="summary-card stage-card">
+            <h3 class="card-title">
+              <mat-icon>trending_up</mat-icon>
+              Lead Progress
+            </h3>
+            @if (leadData(); as d) {
+              @if (leadTerminalStage(); as terminal) {
+                <div class="stage-label terminal-stage">
+                  <mat-icon>{{ terminal.name === 'Converted' ? 'check_circle' : 'cancel' }}</mat-icon>
+                  {{ terminal.name }}
+                </div>
+              } @else {
+                <div class="stage-label">Current Stage</div>
+              }
+              <app-mini-stage-bar
+                [stages]="leadStages()"
+                [currentStageId]="leadCurrentStage().id"
+                [currentSortOrder]="leadCurrentStage().sortOrder" />
+              <div class="stage-legend">
+                @for (stage of d.stages; track stage.id) {
+                  <span class="legend-item" [class.active]="stage.isCurrent" [class.terminal]="stage.isTerminal">
+                    <span class="legend-dot" [style.background-color]="stage.color"></span>
+                    {{ stage.name }}
+                  </span>
+                }
+              </div>
+            }
+          </div>
+        }
+        @case ('Quote') {
+          <div class="summary-card status-card">
+            <h3 class="card-title">
+              <mat-icon>receipt_long</mat-icon>
+              Status
+            </h3>
+            @if (quoteData(); as d) {
+              <div class="status-chips">
+                <mat-chip-set>
+                  <mat-chip [highlighted]="true">
+                    <mat-icon matChipAvatar>receipt_long</mat-icon>
+                    {{ d.status }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            }
+          </div>
+        }
+        @case ('Request') {
+          <div class="summary-card status-card">
+            <h3 class="card-title">
+              <mat-icon>support_agent</mat-icon>
+              Status
+            </h3>
+            @if (requestData(); as d) {
+              <div class="status-chips">
+                <mat-chip-set>
+                  <mat-chip [highlighted]="true">
+                    <mat-icon matChipAvatar>info</mat-icon>
+                    {{ d.status }}
+                  </mat-chip>
+                  <mat-chip>
+                    <mat-icon matChipAvatar>priority_high</mat-icon>
+                    {{ d.priority }}
+                  </mat-chip>
+                </mat-chip-set>
+              </div>
+            }
+          </div>
+        }
+      }
+
+      <!-- ROW 2: Activities Card (hero content - added in 23-03) -->
+      <!-- Activities card (23-03) -->
+
+      <!-- ROW 3: Associations + Notes + Meta -->
+
+      <!-- Associations Card -->
+      @if (data().associations.length > 0) {
+        <div class="summary-card associations-card">
+          <h3 class="card-title">
+            <mat-icon>link</mat-icon>
+            Associations
+          </h3>
+          <mat-chip-set>
+            @for (assoc of data().associations; track assoc.entityType) {
+              <mat-chip (click)="onAssociationClick(assoc)">
+                <mat-icon matChipAvatar>{{ assoc.icon }}</mat-icon>
+                {{ assoc.count }} {{ assoc.label }}
+              </mat-chip>
+            }
+          </mat-chip-set>
+        </div>
+      }
+
+      <!-- Notes preview card (23-03) -->
+
+      <!-- Deal pipeline chart card for Company/Contact (23-03) -->
+
+      <!-- Email engagement card for Contact (23-03) -->
+
+      <!-- Last contacted + Attachments count card (23-03) -->
+    </div>
+  }
+</div>
