@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 24 of 25 (My Day Personal Dashboard)
-Plan: 3 of 5 in current phase -- COMPLETE
+Plan: 4 of 5 in current phase -- COMPLETE
 Status: Executing phase 24
-Last activity: 2026-02-20 — Completed 24-03 (My Day Core Widgets)
+Last activity: 2026-02-20 — Completed 24-04 (My Day Secondary Widgets)
 
-Progress: [███████████████████████████████████████████████████████████████████████████████████████████████████████░░] 98% (152/155 plans)
+Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████████░] 99% (153/155 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 152
+- Total plans completed: 153
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 13 plans (5 in phase 22, 5 in phase 23, 3 in phase 24)
+- v1.2 (in progress): 14 plans (5 in phase 22, 5 in phase 23, 4 in phase 24)
 
 ## Accumulated Context
 
@@ -74,6 +74,7 @@ Recent decisions for v1.2:
 - RecentlyViewedEntity upsert via unique index on (tenant_id, user_id, entity_type, entity_id)
 - PreviewEntityLinkComponent enhanced globally for Ctrl/Cmd+click — benefits all entity links app-wide
 - Widget components use PreviewEntityLinkComponent directly for entity links rather than emitting events to parent
+- Pipeline stacked bar uses CSS flex with proportional flex values per stage dealCount (zero-dependency, matching conic-gradient donut pattern)
 
 ### Pending Todos
 
@@ -87,6 +88,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 24-03-PLAN.md
-Resume file: .planning/phases/24-my-day-personal-dashboard/24-03-SUMMARY.md
-Next step: Execute 24-04-PLAN.md (My Day remaining widgets)
+Stopped at: Completed 24-04-PLAN.md
+Resume file: .planning/phases/24-my-day-personal-dashboard/24-04-SUMMARY.md
+Next step: Execute 24-05-PLAN.md (My Day quick actions and polish)
