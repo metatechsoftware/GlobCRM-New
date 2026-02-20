@@ -103,13 +103,14 @@ Plans:
   3. My Day shows a personal pipeline summary (user's deals grouped by stage with values), a recent records widget (last 5-8 recently viewed entities), and an email summary widget (unread count, recent emails)
   4. My Day includes a quick actions row (New Contact, New Deal, Log Activity, New Note, Send Email), a feed preview widget (last 5 feed items), and a notification digest widget (today's notifications grouped by type)
   5. Route restructuring works correctly: "/" and "/dashboard" both redirect to "/my-day", org dashboard lives at "/analytics" with backward-compatible redirects preserving existing bookmarks
-**Plans**: TBD
+**Plans**: 5 plans
 
 Plans:
-- [ ] 24-01: Route restructuring + org dashboard relocation (atomic route changes: /my-day as default, /analytics for org dashboard, backward-compat redirects, navbar updates with My Day home icon and Analytics menu item)
-- [ ] 24-02: Backend My Day endpoint (GET /api/my-day with user-scoped batched response: today's activities, overdue items, upcoming events, personal deal stats, recent emails, recent feed, notification digest)
-- [ ] 24-03: My Day page + core widgets (MyDayComponent with fixed grid layout, MyDayStore, greeting widget, today's tasks widget with overdue urgency, upcoming events agenda widget, personal pipeline summary widget)
-- [ ] 24-04: My Day secondary widgets + polish (quick actions row, recent records widget, email summary widget, feed preview widget, notification digest widget, two-tier loading with skeletons)
+- [ ] 24-01-PLAN.md — Route restructuring + org dashboard relocation to /analytics, navbar updates with My Day home icon, login redirect to /my-day
+- [ ] 24-02-PLAN.md — Backend MyDay aggregation endpoint (GET /api/my-day), RecentlyViewedEntity domain model + migration, track-view and task-complete endpoints
+- [ ] 24-03-PLAN.md — My Day page shell with CSS Grid, MyDayStore + MyDayService, greeting banner with stats + quick actions, tasks widget with overdue urgency + inline completion, upcoming events widget
+- [ ] 24-04-PLAN.md — Secondary widgets: pipeline summary (stacked bar), email summary, feed preview, notification digest, recent records — completing the full grid layout
+- [ ] 24-05-PLAN.md — Slide-in panel infrastructure (CDK Overlay), quick action wiring to greeting banner, post-creation refresh with highlight animation
 
 ### Phase 25: Preview Sidebar Polish + Cross-Feature Integration
 **Goal**: The preview sidebar becomes a power-user tool — quick actions, global search integration, user profile previews, and polished responsive behavior across all viewport sizes
