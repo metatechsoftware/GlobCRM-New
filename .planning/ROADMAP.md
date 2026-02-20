@@ -120,11 +120,12 @@ Plans:
   1. User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) directly from the preview sidebar without closing it
   2. User can open entity preview from global search results (secondary action alongside navigate) and preview user profiles (name, role, email, avatar) by clicking author names in feed
   3. Preview sidebar displays full-width on mobile screens (< 768px) and closes automatically on route navigation to prevent stale data
-**Plans**: TBD
+**Plans**: 3 plans
 
 Plans:
-- [ ] 25-01: Quick actions + user preview (wire QuickActionBarComponent into preview sidebar, user preview endpoint GET /api/users/{id}/preview, feed author name click opens user preview)
-- [ ] 25-02: Global search integration + responsive polish + performance (preview action on global search results, full-width mobile behavior via BreakpointObserver, close on NavigationStart, database indexes for preview/summary/my-day queries)
+- [ ] 25-01-PLAN.md — Quick actions in preview sidebar (SlideInPanelService refactor to shared, context-aware mutual exclusion, QuickActionBarComponent wiring, silent refreshCurrent)
+- [ ] 25-02-PLAN.md — User profile preview (backend activity-stats endpoint, CDK Overlay popover, feed author name clickable)
+- [ ] 25-03-PLAN.md — Search preview-first + mobile responsive (preview-first search results, recently previewed entities, full-width mobile sidebar, swipe-right-to-close)
 
 ## Progress
 
