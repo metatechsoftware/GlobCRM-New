@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: resolved
 phase: 22-shared-foundation-entity-preview-sidebar
 source: 22-01-SUMMARY.md, 22-02-SUMMARY.md, 22-03-SUMMARY.md, 22-04-SUMMARY.md
 started: 2026-02-20T12:00:00Z
-updated: 2026-02-20T13:15:00Z
+updated: 2026-02-20T18:00:00Z
 ---
 
 ## Current Test
@@ -75,7 +75,7 @@ skipped: 2
 ## Gaps
 
 - truth: "Clicking entity name in feed opens preview sidebar sliding in from the right"
-  status: failed
+  status: resolved
   reason: "User reported: When I click a link I get [Error] Failed to load resource: the server responded with a status of 404 (Not Found) (default-avatar.svg, line 0) so no sidebar opens"
   severity: major
   test: 1
@@ -90,7 +90,7 @@ skipped: 2
   debug_session: ".planning/debug/feed-entity-link-404-avatar.md"
 
 - truth: "Association chips show hover state indicating they are clickable"
-  status: failed
+  status: resolved
   reason: "User reported: related fields on hover dont show up as if clickable it should be obvious to the user"
   severity: minor
   test: 3
@@ -105,7 +105,7 @@ skipped: 2
   debug_session: ".planning/debug/association-chips-hover.md"
 
 - truth: "Preview sidebar starts below the topbar, not overlapping it"
-  status: failed
+  status: resolved
   reason: "User reported: the sidebar should start with respect to topbar since header is invisible right now"
   severity: minor
   test: 6
