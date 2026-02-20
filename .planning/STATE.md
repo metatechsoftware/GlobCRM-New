@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 23 COMPLETE (with gap closure), ready for Phase 24
+**Current focus:** v1.2 Connected Experience — Phase 24 in progress
 
 ## Current Position
 
-Phase: 23 of 25 (Summary Tabs on Detail Pages) -- COMPLETE
-Plan: 5 of 5 in current phase
-Status: Phase complete
-Last activity: 2026-02-20 — Completed 23-05 (Gap Closure: lastContacted mismatch + dirty-flag wiring)
+Phase: 24 of 25 (My Day Personal Dashboard)
+Plan: 1 of 5 in current phase -- COMPLETE
+Status: Executing phase 24
+Last activity: 2026-02-20 — Completed 24-01 (Route Restructuring)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 97% (149/155 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 97% (150/155 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 149
+- Total plans completed: 150
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 10 plans (5 in phase 22, 5 in phase 23)
+- v1.2 (in progress): 11 plans (5 in phase 22, 5 in phase 23, 1 in phase 24)
 
 ## Accumulated Context
 
@@ -67,6 +67,8 @@ Recent decisions for v1.2:
 - Quote and Request keep raw mat-tab-group with selectedIndex binding (not refactored to RelatedEntityTabsComponent)
 - Summary dirty-flag set on status transitions for Quote and Request
 - No Company detail changes needed for dirty-flag -- no inline sibling-tab mutations exist
+- Route ordering: auth, onboarding, my-day, analytics, settings, entity routes, redirects
+- Backward compat: /dashboard redirects to /analytics (not removed)
 
 ### Pending Todos
 
@@ -80,6 +82,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 24 context gathered
-Resume file: .planning/phases/24-my-day-personal-dashboard/24-CONTEXT.md
-Next step: Plan Phase 24 (My Day Dashboard) — /gsd:plan-phase 24
+Stopped at: Completed 24-01-PLAN.md
+Resume file: .planning/phases/24-my-day-personal-dashboard/24-01-SUMMARY.md
+Next step: Execute 24-02-PLAN.md (My Day backend API)
