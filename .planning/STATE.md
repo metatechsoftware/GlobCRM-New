@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 23 (Summary Tabs on Detail Pages)
+**Current focus:** v1.2 Connected Experience — Phase 23 COMPLETE, ready for Phase 24
 
 ## Current Position
 
-Phase: 23 of 25 (Summary Tabs on Detail Pages) -- IN PROGRESS
-Plan: 3 of 4 in current phase
-Status: Executing
-Last activity: 2026-02-20 — Completed 23-03 (Summary Tab Content Widgets)
+Phase: 23 of 25 (Summary Tabs on Detail Pages) -- COMPLETE
+Plan: 4 of 4 in current phase
+Status: Phase complete
+Last activity: 2026-02-20 — Completed 23-04 (Detail Page Integration)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 95% (147/154 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 96% (148/154 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 146
+- Total plans completed: 148
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 8 plans (5 in phase 22, 3 in phase 23)
+- v1.2 (in progress): 9 plans (5 in phase 22, 4 in phase 23)
 
 ## Accumulated Context
 
@@ -62,6 +62,10 @@ Recent decisions for v1.2:
 - CSS conic-gradient donut chart with radial-gradient mask for donut hole (zero-dependency chart visualization)
 - Activities as hero content with full-width card and two distinct sections (Recent + Upcoming with accent border)
 - Deal count for donut segment proportions (not value) for clearer visual pipeline distribution
+- NoteFormComponent uses MAT_DIALOG_DATA with optional injection for dual-mode operation (standalone route and dialog)
+- Quick actions call loadSummary() directly in afterClosed handler for immediate user feedback
+- Quote and Request keep raw mat-tab-group with selectedIndex binding (not refactored to RelatedEntityTabsComponent)
+- Summary dirty-flag set on status transitions for Quote and Request
 
 ### Pending Todos
 
@@ -75,6 +79,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 23-03-PLAN.md (Summary Tab Content Widgets)
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-03-SUMMARY.md
-Next step: Execute 23-04-PLAN.md
+Stopped at: Completed 23-04-PLAN.md (Detail Page Integration) -- Phase 23 COMPLETE
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-04-SUMMARY.md
+Next step: Plan or execute Phase 24 (My Day Dashboard)

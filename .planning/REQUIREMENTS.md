@@ -25,7 +25,7 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 
 ### Summary Tabs on Detail Pages
 
-- [ ] **SUMMARY-01**: Summary tab appears as the first (default) tab on Company, Contact, Deal, Lead, Quote, and Request detail pages
+- [x] **SUMMARY-01**: Summary tab appears as the first (default) tab on Company, Contact, Deal, Lead, Quote, and Request detail pages
 - [x] **SUMMARY-02**: Summary tab displays a key properties card with 4-8 highlighted fields per entity type (read-only)
 - [x] **SUMMARY-03**: Summary tab shows association counts (e.g., "5 Contacts, 3 Deals") that link to respective tabs
 - [x] **SUMMARY-04**: Summary tab displays last 3-5 recent activities in condensed format
@@ -112,7 +112,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREVIEW-11 | Phase 25 | Pending |
 | PREVIEW-12 | Phase 22 | Complete |
 | PREVIEW-13 | Phase 22 | Complete |
-| SUMMARY-01 | Phase 23 | Pending |
+| SUMMARY-01 | Phase 23 | Complete |
 | SUMMARY-02 | Phase 23 | Complete |
 | SUMMARY-03 | Phase 23 | Complete |
 | SUMMARY-04 | Phase 23 | Complete |
