@@ -41,7 +41,7 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 ### My Day Personal Dashboard
 
 - [x] **MYDAY-01**: User sees "My Day" as the default landing page after login
-- [ ] **MYDAY-02**: My Day displays a personalized greeting with date/time context
+- [x] **MYDAY-02**: My Day displays a personalized greeting with date/time context
 - [x] **MYDAY-03**: My Day shows today's tasks/activities widget (assigned to user, due today, not done)
 - [x] **MYDAY-04**: My Day highlights overdue tasks with urgency indicators
 - [x] **MYDAY-05**: My Day shows an upcoming events/calendar widget (today + next 2 days, compact agenda)
@@ -125,7 +125,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUMMARY-11 | Phase 23 | Complete |
 | SUMMARY-12 | Phase 23 | Complete |
 | MYDAY-01 | Phase 24 | Complete |
-| MYDAY-02 | Phase 24 | Pending |
+| MYDAY-02 | Phase 24 | Complete |
 | MYDAY-03 | Phase 24 | Complete |
 | MYDAY-04 | Phase 24 | Complete |
 | MYDAY-05 | Phase 24 | Complete |
