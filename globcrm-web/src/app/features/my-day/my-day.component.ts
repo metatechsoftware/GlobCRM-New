@@ -4,6 +4,8 @@ import { AuthStore } from '../../core/auth/auth.store';
 import { PreviewSidebarStore } from '../../shared/stores/preview-sidebar.store';
 import { MyDayStore } from './my-day.store';
 import { MyDayService } from './my-day.service';
+import { SlideInPanelService } from './slide-in-panel/slide-in-panel.service';
+import { SlideInEntityType, FollowUpStep } from './slide-in-panel/slide-in-panel.models';
 import { GreetingBannerComponent } from './widgets/greeting-banner/greeting-banner.component';
 import { TasksWidgetComponent } from './widgets/tasks-widget/tasks-widget.component';
 import { UpcomingEventsWidgetComponent } from './widgets/upcoming-events-widget/upcoming-events-widget.component';
@@ -35,7 +37,22 @@ export class MyDayComponent {
   readonly store = inject(MyDayStore);
   private readonly authStore = inject(AuthStore);
   private readonly previewSidebarStore = inject(PreviewSidebarStore);
+  private readonly slideInPanelService = inject(SlideInPanelService);
   private readonly router = inject(Router);
+
+  /** Follow-up steps per entity type (single-step form first, then optional follow-up). */
+  private readonly followUpStepMap: Record<string, FollowUpStep[]> = {
+    Contact: [
+      { label: 'Link to a company', icon: 'business', action: 'link-to-company' },
+      { label: 'Schedule a follow-up', icon: 'event', action: 'schedule-follow-up' },
+    ],
+    Deal: [
+      { label: 'Add a note', icon: 'note_add', action: 'add-note' },
+      { label: 'Schedule a follow-up', icon: 'event', action: 'schedule-follow-up' },
+    ],
+    Activity: [], // No follow-up for activities
+    Note: [], // No follow-up for notes
+  };
 
   /** Extract first name from full user name. */
   readonly firstName = computed(() => {
@@ -69,7 +86,41 @@ export class MyDayComponent {
   }
 
   onQuickAction(type: string): void {
-    // Placeholder: will be wired in 24-05
-    console.log('Quick action:', type);
+    // Email is special — route to email feature instead of slide-in
+    if (type === 'Email') {
+      this.router.navigate(['/emails'], { queryParams: { compose: true } });
+      return;
+    }
+
+    const entityType = type as SlideInEntityType;
+    const title = `New ${type}`;
+    const followUpSteps = this.followUpStepMap[type] ?? [];
+
+    const panelRef = this.slideInPanelService.open({
+      entityType,
+      title,
+      followUpSteps: followUpSteps.length > 0 ? followUpSteps : undefined,
+    });
+
+    panelRef.afterClosed.subscribe((result) => {
+      if (result) {
+        // Entity was created — refresh all widget data
+        this.store.refreshData();
+
+        // Set highlight on the new entity so user sees where it landed
+        if (result.entity?.id) {
+          this.store.setHighlight(result.entity.id);
+        }
+
+        // Handle follow-up action if user chose one
+        if (result.followUpAction === 'schedule-follow-up') {
+          // Open slide-in again with Activity type for follow-up scheduling
+          this.slideInPanelService.open({ entityType: 'Activity', title: 'Schedule Follow-up' });
+        } else if (result.followUpAction === 'add-note') {
+          this.slideInPanelService.open({ entityType: 'Note', title: 'Add Note' });
+        }
+        // 'link-to-company' — TODO: Open company linking UI in a future iteration
+      }
+    });
   }
 }

@@ -132,9 +132,12 @@ export const MyDayStore = signalStore(
         });
       },
 
-      /** Refresh all dashboard data (used after quick actions). */
+      /** Refresh all dashboard data silently (no loading skeleton flash). */
       refreshData(): void {
-        this.loadMyDay();
+        service.getMyDay().subscribe({
+          next: (data) => patchState(store, { data }),
+          error: () => {}, // silent refresh failure
+        });
       },
 
       /** Briefly highlight an item (pulse animation for 2 seconds). */

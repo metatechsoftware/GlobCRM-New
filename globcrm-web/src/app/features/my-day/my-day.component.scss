@@ -45,3 +45,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+// ─── Highlight Animation (post-creation pulse) ──────────────
+:host ::ng-deep .widget-item--highlighted {
+  animation: pulse-highlight 2s ease-out;
+}
+
+@keyframes pulse-highlight {
+  0% { background-color: rgba(249, 115, 22, 0.2); }
+  100% { background-color: transparent; }
+}
