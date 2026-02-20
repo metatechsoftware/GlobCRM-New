@@ -39,6 +39,17 @@
         <span>{{ data.ownerName }}</span>
       </div>
     }
+
+    <!-- Quick Actions -->
+    @if (showQuickActions()) {
+      <div class="preview-quick-actions">
+        <app-quick-action-bar
+          [showSendEmail]="showSendEmail()"
+          (addNote)="onQuickAction('Note')"
+          (logActivity)="onQuickAction('Activity')"
+          (sendEmail)="onSendEmail()" />
+      </div>
+    }
   }
 
   <!-- Content -->
