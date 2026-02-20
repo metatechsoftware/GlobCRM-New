@@ -414,11 +414,11 @@ public class ContactsController : ControllerBase
 
         var now = DateTimeOffset.UtcNow;
 
-        // Parallel queries via Task.WhenAll
+        // Sequential queries — DbContext does not support concurrent async operations.
         // Note: Activity Type/Status are enums with HasConversion<string>().
         // EF Core cannot translate .ToString() on value-converted enums in server-side
         // LINQ projections, so we select raw enum values first, then map to DTOs in memory.
-        var recentActivitiesRawTask = _db.ActivityLinks
+        var recentActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Contact" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
@@ -426,7 +426,7 @@ public class ContactsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var upcomingActivitiesRawTask = _db.ActivityLinks
+        var upcomingActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Contact" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
@@ -435,7 +435,7 @@ public class ContactsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var recentNotesTask = _db.Notes
+        var recentNotes = await _db.Notes
             .Where(n => n.EntityType == "Contact" && n.EntityId == id)
             .OrderByDescending(n => n.CreatedAt)
             .Take(3)
@@ -453,30 +453,30 @@ public class ContactsController : ControllerBase
             })
             .ToListAsync();
 
-        var companyCountTask = Task.FromResult(contact.CompanyId.HasValue ? 1 : 0);
-        var dealCountTask = _db.DealContacts.CountAsync(dc => dc.ContactId == id);
-        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Contact" && al.EntityId == id);
-        var quoteCountTask = _db.Quotes.CountAsync(q => q.ContactId == id);
-        var requestCountTask = _db.Requests.CountAsync(r => r.ContactId == id);
-        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Contact" && a.EntityId == id);
+        var companyCount = contact.CompanyId.HasValue ? 1 : 0;
+        var dealCount = await _db.DealContacts.CountAsync(dc => dc.ContactId == id);
+        var activityCount = await _db.ActivityLinks.CountAsync(al => al.EntityType == "Contact" && al.EntityId == id);
+        var quoteCount = await _db.Quotes.CountAsync(q => q.ContactId == id);
+        var requestCount = await _db.Requests.CountAsync(r => r.ContactId == id);
+        var attachmentCount = await _db.Attachments.CountAsync(a => a.EntityType == "Contact" && a.EntityId == id);
 
-        var lastActivityDateTask = _db.ActivityLinks
+        var lastActivity = await _db.ActivityLinks
             .Where(al => al.EntityType == "Contact" && al.EntityId == id)
             .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
             .Select(a => (DateTimeOffset?)a.CreatedAt)
             .FirstOrDefaultAsync();
 
-        var lastEmailDateTask = _db.EmailMessages
+        var lastEmail = await _db.EmailMessages
             .Where(e => e.LinkedContactId == id)
             .OrderByDescending(e => e.SentAt)
             .Select(e => (DateTimeOffset?)e.SentAt)
             .FirstOrDefaultAsync();
 
         // Deal pipeline (via DealContacts join)
-        var dealPipelineTask = _db.DealContacts
+        var dealPipeline = await _db.DealContacts
             .Where(dc => dc.ContactId == id)
-            .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
+            .Join(_db.Deals.Where(d => d.Stage != null), dc => dc.DealId, d => d.Id, (dc, d) => d)
             .GroupBy(d => new { d.PipelineStageId, d.Stage!.Name, d.Stage.Color })
             .Select(g => new ContactDealStageSummaryDto
             {
@@ -487,14 +487,14 @@ public class ContactsController : ControllerBase
             })
             .ToListAsync();
 
-        var totalDealsForWinRateTask = _db.DealContacts
+        var winRateDeals = await _db.DealContacts
             .Where(dc => dc.ContactId == id)
-            .Join(_db.Deals, dc => dc.DealId, d => d.Id, (dc, d) => d)
+            .Join(_db.Deals.Where(d => d.Stage != null), dc => dc.DealId, d => d.Id, (dc, d) => d)
             .Select(d => new { d.Stage!.IsWon, d.Stage.IsLost, d.Value })
             .ToListAsync();
 
         // Email engagement
-        var emailStatsTask = _db.EmailMessages
+        var emailStats = await _db.EmailMessages
             .Where(e => e.LinkedContactId == id)
             .GroupBy(e => 1)
             .Select(g => new
@@ -507,26 +507,20 @@ public class ContactsController : ControllerBase
             })
             .FirstOrDefaultAsync();
 
-        var activeEnrollmentTask = _db.SequenceEnrollments
+        var enrollment = await _db.SequenceEnrollments
             .Where(se => se.ContactId == id && se.Status == EnrollmentStatus.Active)
             .Select(se => new { se.Sequence!.Name })
             .FirstOrDefaultAsync();
 
-        await Task.WhenAll(
-            recentActivitiesRawTask, upcomingActivitiesRawTask, recentNotesTask,
-            companyCountTask, dealCountTask, activityCountTask, quoteCountTask, requestCountTask,
-            attachmentCountTask, lastActivityDateTask, lastEmailDateTask,
-            dealPipelineTask, totalDealsForWinRateTask, emailStatsTask, activeEnrollmentTask);
-
         // Map raw activity data to DTOs (ToString() on enums must happen in memory)
-        var recentActivities = recentActivitiesRawTask.Result
+        var recentActivities = recentActivitiesRaw
             .Select(a => new ContactSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
                 Status = a.Status.ToString(), DueDate = a.DueDate, CreatedAt = a.CreatedAt
             }).ToList();
 
-        var upcomingActivities = upcomingActivitiesRawTask.Result
+        var upcomingActivities = upcomingActivitiesRaw
             .Select(a => new ContactSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
@@ -534,8 +528,6 @@ public class ContactsController : ControllerBase
             }).ToList();
 
         // Compute last contacted date
-        var lastActivity = lastActivityDateTask.Result;
-        var lastEmail = lastEmailDateTask.Result;
         DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
         {
             (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
@@ -545,7 +537,6 @@ public class ContactsController : ControllerBase
         };
 
         // Compute win rate
-        var winRateDeals = totalDealsForWinRateTask.Result;
         var wonCount = winRateDeals.Count(d => d.IsWon);
         var closedCount = winRateDeals.Count(d => d.IsWon || d.IsLost);
         var winRate = closedCount > 0 ? (decimal)wonCount / closedCount : 0m;
@@ -553,16 +544,14 @@ public class ContactsController : ControllerBase
 
         var associations = new List<ContactSummaryAssociationDto>
         {
-            new() { EntityType = "Company", Label = "Companies", Icon = "business", Count = companyCountTask.Result },
-            new() { EntityType = "Deal", Label = "Deals", Icon = "handshake", Count = dealCountTask.Result },
-            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
-            new() { EntityType = "Quote", Label = "Quotes", Icon = "request_quote", Count = quoteCountTask.Result },
-            new() { EntityType = "Request", Label = "Requests", Icon = "support_agent", Count = requestCountTask.Result },
+            new() { EntityType = "Company", Label = "Companies", Icon = "business", Count = companyCount },
+            new() { EntityType = "Deal", Label = "Deals", Icon = "handshake", Count = dealCount },
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCount },
+            new() { EntityType = "Quote", Label = "Quotes", Icon = "request_quote", Count = quoteCount },
+            new() { EntityType = "Request", Label = "Requests", Icon = "support_agent", Count = requestCount },
         };
 
         // Build email engagement
-        var emailStats = emailStatsTask.Result;
-        var enrollment = activeEnrollmentTask.Result;
         ContactEmailEngagementDto? emailEngagement = null;
         if (emailStats != null)
         {
@@ -601,15 +590,15 @@ public class ContactsController : ControllerBase
             Associations = associations,
             RecentActivities = recentActivities,
             UpcomingActivities = upcomingActivities,
-            RecentNotes = recentNotesTask.Result,
-            AttachmentCount = attachmentCountTask.Result,
+            RecentNotes = recentNotes,
+            AttachmentCount = attachmentCount,
             LastContacted = lastContacted,
             DealPipeline = new ContactDealPipelineSummaryDto
             {
                 TotalValue = totalValue,
                 TotalDeals = winRateDeals.Count,
                 WinRate = winRate,
-                DealsByStage = dealPipelineTask.Result
+                DealsByStage = dealPipeline
             },
             EmailEngagement = emailEngagement
         };

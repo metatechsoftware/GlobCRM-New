@@ -18,44 +18,46 @@ import { EmailEngagementDto } from './summary.models';
       <div class="engagement-stats">
         <div class="engagement-row">
           <div class="engagement-stat">
-            <mat-icon class="stat-icon">send</mat-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ engagement().sentCount }}</span>
-              <span class="stat-label">Sent</span>
-            </div>
+            <span class="stat-icon-circle icon-sent">
+              <mat-icon>send</mat-icon>
+            </span>
+            <span class="stat-value">{{ engagement().sentCount }}</span>
+            <span class="stat-label">Sent</span>
           </div>
           <div class="engagement-stat">
-            <mat-icon class="stat-icon">inbox</mat-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ engagement().receivedCount }}</span>
-              <span class="stat-label">Received</span>
-            </div>
+            <span class="stat-icon-circle icon-received">
+              <mat-icon>inbox</mat-icon>
+            </span>
+            <span class="stat-value">{{ engagement().receivedCount }}</span>
+            <span class="stat-label">Received</span>
           </div>
           <div class="engagement-stat">
-            <mat-icon class="stat-icon">email</mat-icon>
-            <div class="stat-content">
-              <span class="stat-value">{{ engagement().totalEmails }}</span>
-              <span class="stat-label">Total</span>
-            </div>
+            <span class="stat-icon-circle icon-total">
+              <mat-icon>email</mat-icon>
+            </span>
+            <span class="stat-value">{{ engagement().totalEmails }}</span>
+            <span class="stat-label">Total</span>
           </div>
         </div>
         <div class="engagement-timestamps">
           @if (engagement().lastSentAt) {
             <div class="timestamp-row">
-              <span class="timestamp-label">Last sent:</span>
+              <mat-icon class="timestamp-icon">schedule</mat-icon>
+              <span class="timestamp-label">Last sent</span>
               <span class="timestamp-value">{{ engagement().lastSentAt | date:'mediumDate' }}</span>
             </div>
           }
           @if (engagement().lastReceivedAt) {
             <div class="timestamp-row">
-              <span class="timestamp-label">Last received:</span>
+              <mat-icon class="timestamp-icon">schedule</mat-icon>
+              <span class="timestamp-label">Last received</span>
               <span class="timestamp-value">{{ engagement().lastReceivedAt | date:'mediumDate' }}</span>
             </div>
           }
         </div>
         @if (engagement().isEnrolledInSequence) {
           <div class="sequence-badge">
-            <mat-icon>playlist_play</mat-icon>
+            <mat-icon class="sequence-icon">playlist_play</mat-icon>
             <span>Enrolled in: {{ engagement().sequenceName }}</span>
           </div>
         }
@@ -68,94 +70,130 @@ import { EmailEngagementDto } from './summary.models';
     }
   `,
   styles: [`
+    @keyframes pulse-subtle {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+
     .engagement-stats {
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: var(--space-4, 16px);
     }
 
     .engagement-row {
-      display: flex;
-      gap: 24px;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4, 16px);
     }
 
     .engagement-stat {
       display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .stat-icon {
-      color: var(--text-secondary, #666);
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
-    }
-
-    .stat-content {
-      display: flex;
       flex-direction: column;
-    }
-
-    .stat-value {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary, #212121);
-    }
-
-    .stat-label {
-      font-size: 12px;
-      color: var(--text-secondary, #666);
-      text-transform: uppercase;
-    }
-
-    .engagement-timestamps {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .timestamp-row {
-      display: flex;
       align-items: center;
-      gap: 6px;
+      text-align: center;
+      gap: var(--space-1, 4px);
     }
 
-    .timestamp-label {
-      font-size: 12px;
-      color: var(--text-secondary, #666);
-    }
-
-    .timestamp-value {
-      font-size: 14px;
-      color: var(--text-primary, #212121);
-    }
-
-    .sequence-badge {
+    .stat-icon-circle {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      background: var(--primary-50, #fff3e0);
-      color: var(--primary-700, #e65100);
-      padding: 4px 12px;
-      border-radius: 16px;
-      font-size: 13px;
-      width: fit-content;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-full, 9999px);
+      margin-bottom: var(--space-1, 4px);
 
       mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
       }
+
+      &.icon-sent {
+        background: var(--color-primary-soft, #FFF7ED);
+        mat-icon { color: var(--color-primary, #F97316); }
+      }
+
+      &.icon-received {
+        background: var(--color-info-soft, #EFF6FF);
+        mat-icon { color: var(--color-info, #3B82F6); }
+      }
+
+      &.icon-total {
+        background: var(--color-secondary-soft, #F5F3FF);
+        mat-icon { color: var(--color-secondary, #8B5CF6); }
+      }
+    }
+
+    .stat-value {
+      font-size: var(--text-xl, 20px);
+      font-weight: var(--font-bold, 700);
+      color: var(--color-text, #1A1A1A);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-muted, #9CA3AF);
+    }
+
+    .engagement-timestamps {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-1-5, 6px);
+    }
+
+    .timestamp-row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-1-5, 6px);
+    }
+
+    .timestamp-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      color: var(--color-text-muted, #9CA3AF);
+    }
+
+    .timestamp-label {
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-secondary, #6B7280);
+    }
+
+    .timestamp-value {
+      font-size: var(--text-sm, 13px);
+      font-weight: var(--font-medium, 500);
+      color: var(--color-text, #1A1A1A);
+    }
+
+    .sequence-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-1, 4px);
+      background: var(--color-primary-soft, #FFF7ED);
+      color: var(--color-primary-text, #C2410C);
+      padding: var(--space-1, 4px) var(--space-3, 12px);
+      border-radius: var(--radius-full, 9999px);
+      font-size: var(--text-sm, 13px);
+      font-weight: var(--font-medium, 500);
+      width: fit-content;
+
+      .sequence-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+        animation: pulse-subtle 2s ease-in-out infinite;
+      }
     }
 
     .engagement-empty {
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: var(--text-secondary, #666);
-      padding: 16px 0;
+      gap: var(--space-2, 8px);
+      color: var(--color-text-muted, #9CA3AF);
+      padding: var(--space-4, 16px) 0;
     }
   `],
 })

@@ -738,11 +738,11 @@ public class LeadsController : ControllerBase
 
         var now = DateTimeOffset.UtcNow;
 
-        // Parallel queries via Task.WhenAll
+        // Sequential queries — DbContext does not support concurrent async operations.
         // Note: Activity Type/Status are enums with HasConversion<string>().
         // EF Core cannot translate .ToString() on value-converted enums in server-side
         // LINQ projections, so we select raw enum values first, then map to DTOs in memory.
-        var recentActivitiesRawTask = _db.ActivityLinks
+        var recentActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Lead" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
@@ -750,7 +750,7 @@ public class LeadsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var upcomingActivitiesRawTask = _db.ActivityLinks
+        var upcomingActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Lead" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
@@ -759,7 +759,7 @@ public class LeadsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var recentNotesTask = _db.Notes
+        var recentNotes = await _db.Notes
             .Where(n => n.EntityType == "Lead" && n.EntityId == id)
             .OrderByDescending(n => n.CreatedAt)
             .Take(3)
@@ -777,11 +777,11 @@ public class LeadsController : ControllerBase
             })
             .ToListAsync();
 
-        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Lead" && al.EntityId == id);
-        var noteCountTask = _db.Notes.CountAsync(n => n.EntityType == "Lead" && n.EntityId == id);
-        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Lead" && a.EntityId == id);
+        var activityCount = await _db.ActivityLinks.CountAsync(al => al.EntityType == "Lead" && al.EntityId == id);
+        var noteCount = await _db.Notes.CountAsync(n => n.EntityType == "Lead" && n.EntityId == id);
+        var attachmentCount = await _db.Attachments.CountAsync(a => a.EntityType == "Lead" && a.EntityId == id);
 
-        var lastActivityDateTask = _db.ActivityLinks
+        var lastActivity = await _db.ActivityLinks
             .Where(al => al.EntityType == "Lead" && al.EntityId == id)
             .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
@@ -789,16 +789,16 @@ public class LeadsController : ControllerBase
             .FirstOrDefaultAsync();
 
         // Last email to lead's email address
-        var lastEmailDateTask = !string.IsNullOrWhiteSpace(lead.Email)
-            ? _db.EmailMessages
+        var lastEmail = !string.IsNullOrWhiteSpace(lead.Email)
+            ? await _db.EmailMessages
                 .Where(e => e.LinkedContactId == null) // lead emails won't be linked to a contact
                 .OrderByDescending(e => e.SentAt)
                 .Select(e => (DateTimeOffset?)e.SentAt)
                 .FirstOrDefaultAsync()
-            : Task.FromResult<DateTimeOffset?>(null);
+            : (DateTimeOffset?)null;
 
         // Stage progress info for all lead stages
-        var stageInfoTask = _db.LeadStages
+        var stageInfo = await _db.LeadStages
             .OrderBy(s => s.SortOrder)
             .Select(s => new LeadStageInfoDto
             {
@@ -811,20 +811,15 @@ public class LeadsController : ControllerBase
             })
             .ToListAsync();
 
-        await Task.WhenAll(
-            recentActivitiesRawTask, upcomingActivitiesRawTask, recentNotesTask,
-            activityCountTask, noteCountTask, attachmentCountTask,
-            lastActivityDateTask, lastEmailDateTask, stageInfoTask);
-
         // Map raw activity data to DTOs (ToString() on enums must happen in memory)
-        var recentActivities = recentActivitiesRawTask.Result
+        var recentActivities = recentActivitiesRaw
             .Select(a => new LeadSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
                 Status = a.Status.ToString(), DueDate = a.DueDate, CreatedAt = a.CreatedAt
             }).ToList();
 
-        var upcomingActivities = upcomingActivitiesRawTask.Result
+        var upcomingActivities = upcomingActivitiesRaw
             .Select(a => new LeadSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
@@ -832,8 +827,6 @@ public class LeadsController : ControllerBase
             }).ToList();
 
         // Compute last contacted date
-        var lastActivity = lastActivityDateTask.Result;
-        var lastEmail = lastEmailDateTask.Result;
         DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
         {
             (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
@@ -844,8 +837,8 @@ public class LeadsController : ControllerBase
 
         var associations = new List<LeadSummaryAssociationDto>
         {
-            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
-            new() { EntityType = "Note", Label = "Notes", Icon = "note", Count = noteCountTask.Result },
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCount },
+            new() { EntityType = "Note", Label = "Notes", Icon = "note", Count = noteCount },
         };
 
         var dto = new LeadSummaryDto
@@ -860,12 +853,12 @@ public class LeadsController : ControllerBase
             OwnerName = lead.Owner != null
                 ? $"{lead.Owner.FirstName} {lead.Owner.LastName}".Trim()
                 : null,
-            Stages = stageInfoTask.Result,
+            Stages = stageInfo,
             Associations = associations,
             RecentActivities = recentActivities,
             UpcomingActivities = upcomingActivities,
-            RecentNotes = recentNotesTask.Result,
-            AttachmentCount = attachmentCountTask.Result,
+            RecentNotes = recentNotes,
+            AttachmentCount = attachmentCount,
             LastContacted = lastContacted
         };
 

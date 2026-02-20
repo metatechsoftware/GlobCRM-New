@@ -473,11 +473,11 @@ public class RequestsController : ControllerBase
 
         var now = DateTimeOffset.UtcNow;
 
-        // Parallel queries via Task.WhenAll
+        // Sequential queries — DbContext does not support concurrent async operations.
         // Note: Activity Type/Status are enums with HasConversion<string>().
         // EF Core cannot translate .ToString() on value-converted enums in server-side
         // LINQ projections, so we select raw enum values first, then map to DTOs in memory.
-        var recentActivitiesRawTask = _db.ActivityLinks
+        var recentActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Request" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
@@ -485,7 +485,7 @@ public class RequestsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var upcomingActivitiesRawTask = _db.ActivityLinks
+        var upcomingActivitiesRaw = await _db.ActivityLinks
             .Where(al => al.EntityType == "Request" && al.EntityId == id)
             .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
             .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
@@ -494,7 +494,7 @@ public class RequestsController : ControllerBase
             .Select(a => new { a.Id, a.Subject, a.Type, a.Status, a.DueDate, a.CreatedAt })
             .ToListAsync();
 
-        var recentNotesTask = _db.Notes
+        var recentNotes = await _db.Notes
             .Where(n => n.EntityType == "Request" && n.EntityId == id)
             .OrderByDescending(n => n.CreatedAt)
             .Take(3)
@@ -512,10 +512,10 @@ public class RequestsController : ControllerBase
             })
             .ToListAsync();
 
-        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Request" && al.EntityId == id);
-        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Request" && a.EntityId == id);
+        var activityCount = await _db.ActivityLinks.CountAsync(al => al.EntityType == "Request" && al.EntityId == id);
+        var attachmentCount = await _db.Attachments.CountAsync(a => a.EntityType == "Request" && a.EntityId == id);
 
-        var lastActivityDateTask = _db.ActivityLinks
+        var lastActivity = await _db.ActivityLinks
             .Where(al => al.EntityType == "Request" && al.EntityId == id)
             .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
             .OrderByDescending(a => a.CreatedAt)
@@ -523,28 +523,23 @@ public class RequestsController : ControllerBase
             .FirstOrDefaultAsync();
 
         // Last email related to the request's contact
-        var lastEmailDateTask = entity.ContactId.HasValue
-            ? _db.EmailMessages
+        var lastEmail = entity.ContactId.HasValue
+            ? await _db.EmailMessages
                 .Where(e => e.LinkedContactId == entity.ContactId)
                 .OrderByDescending(e => e.SentAt)
                 .Select(e => (DateTimeOffset?)e.SentAt)
                 .FirstOrDefaultAsync()
-            : Task.FromResult<DateTimeOffset?>(null);
-
-        await Task.WhenAll(
-            recentActivitiesRawTask, upcomingActivitiesRawTask, recentNotesTask,
-            activityCountTask, attachmentCountTask,
-            lastActivityDateTask, lastEmailDateTask);
+            : (DateTimeOffset?)null;
 
         // Map raw activity data to DTOs (ToString() on enums must happen in memory)
-        var recentActivities = recentActivitiesRawTask.Result
+        var recentActivities = recentActivitiesRaw
             .Select(a => new RequestSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
                 Status = a.Status.ToString(), DueDate = a.DueDate, CreatedAt = a.CreatedAt
             }).ToList();
 
-        var upcomingActivities = upcomingActivitiesRawTask.Result
+        var upcomingActivities = upcomingActivitiesRaw
             .Select(a => new RequestSummaryActivityDto
             {
                 Id = a.Id, Subject = a.Subject, Type = a.Type.ToString(),
@@ -552,8 +547,6 @@ public class RequestsController : ControllerBase
             }).ToList();
 
         // Compute last contacted date
-        var lastActivity = lastActivityDateTask.Result;
-        var lastEmail = lastEmailDateTask.Result;
         DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
         {
             (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
@@ -564,7 +557,7 @@ public class RequestsController : ControllerBase
 
         var associations = new List<RequestSummaryAssociationDto>
         {
-            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCount },
         };
 
         var dto = new RequestSummaryDto
@@ -585,8 +578,8 @@ public class RequestsController : ControllerBase
             Associations = associations,
             RecentActivities = recentActivities,
             UpcomingActivities = upcomingActivities,
-            RecentNotes = recentNotesTask.Result,
-            AttachmentCount = attachmentCountTask.Result,
+            RecentNotes = recentNotes,
+            AttachmentCount = attachmentCount,
             LastContacted = lastContacted
         };
 

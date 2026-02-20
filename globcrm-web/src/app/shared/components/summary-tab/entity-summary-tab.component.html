@@ -8,16 +8,29 @@
 
   @if (loading()) {
     <div class="summary-skeleton">
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card"></div>
-      <div class="skeleton-card skeleton-wide"></div>
+      <div class="skeleton-card skeleton-wide">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
+      <div class="skeleton-card">
+        <div class="skeleton-title"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
     </div>
   } @else if (data()) {
     <div class="summary-grid">
       <!-- ROW 1: Key Properties Card -->
       <div class="summary-card key-properties-card">
         <h3 class="card-title">
-          <mat-icon>info</mat-icon>
+          <span class="card-title-icon"><mat-icon>info</mat-icon></span>
           Key Properties
         </h3>
         <div class="properties-grid">
@@ -239,11 +252,14 @@
         @case ('Deal') {
           <div class="summary-card stage-card">
             <h3 class="card-title">
-              <mat-icon>linear_scale</mat-icon>
+              <span class="card-title-icon"><mat-icon>linear_scale</mat-icon></span>
               Pipeline Progress
             </h3>
             @if (dealData(); as d) {
-              <div class="stage-label">{{ d.pipelineName }} &mdash; {{ d.stageName }}</div>
+              <div class="stage-label">
+                {{ d.pipelineName }}
+                <span class="current-stage-badge">{{ d.stageName }}</span>
+              </div>
               <app-mini-stage-bar
                 [stages]="dealStages()"
                 [currentStageId]="dealCurrentStage().id"
@@ -262,7 +278,7 @@
         @case ('Lead') {
           <div class="summary-card stage-card">
             <h3 class="card-title">
-              <mat-icon>trending_up</mat-icon>
+              <span class="card-title-icon"><mat-icon>trending_up</mat-icon></span>
               Lead Progress
             </h3>
             @if (leadData(); as d) {
@@ -292,7 +308,7 @@
         @case ('Quote') {
           <div class="summary-card status-card">
             <h3 class="card-title">
-              <mat-icon>receipt_long</mat-icon>
+              <span class="card-title-icon"><mat-icon>receipt_long</mat-icon></span>
               Status
             </h3>
             @if (quoteData(); as d) {
@@ -310,7 +326,7 @@
         @case ('Request') {
           <div class="summary-card status-card">
             <h3 class="card-title">
-              <mat-icon>support_agent</mat-icon>
+              <span class="card-title-icon"><mat-icon>support_agent</mat-icon></span>
               Status
             </h3>
             @if (requestData(); as d) {
@@ -333,7 +349,10 @@
 
       <!-- Activities Card (hero content, full-width per user decision) -->
       <div class="summary-card activities-card full-width">
-        <h3 class="card-title"><mat-icon>task_alt</mat-icon> Activities</h3>
+        <h3 class="card-title">
+          <span class="card-title-icon"><mat-icon>task_alt</mat-icon></span>
+          Activities
+        </h3>
 
         <!-- Recent Activities Section -->
         @if (data()!.recentActivities.length > 0) {
@@ -342,8 +361,11 @@
             @for (activity of data()!.recentActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
-                  <span class="activity-subject">{{ activity.subject }}</span>
-                  <span class="activity-meta">{{ activity.type }} &middot; {{ activity.status }}</span>
+                  <span class="activity-type-dot" [ngClass]="'type-' + getActivityTypeClass(activity.type)"></span>
+                  <div class="activity-text">
+                    <span class="activity-subject">{{ activity.subject }}</span>
+                    <span class="activity-meta">{{ activity.type }} &middot; {{ activity.status }}</span>
+                  </div>
                 </div>
                 <span class="activity-time">{{ getRelativeTime(activity.createdAt) }}</span>
               </div>
@@ -358,8 +380,11 @@
             @for (activity of data()!.upcomingActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
-                  <span class="activity-subject">{{ activity.subject }}</span>
-                  <span class="activity-meta">{{ activity.type }} &middot; Due {{ activity.dueDate | date:'mediumDate' }}</span>
+                  <span class="activity-type-dot" [ngClass]="'type-' + getActivityTypeClass(activity.type)"></span>
+                  <div class="activity-text">
+                    <span class="activity-subject">{{ activity.subject }}</span>
+                    <span class="activity-meta">{{ activity.type }} &middot; Due {{ activity.dueDate | date:'mediumDate' }}</span>
+                  </div>
                 </div>
               </div>
             }
@@ -375,26 +400,30 @@
       @if (data()!.associations.length > 0) {
         <div class="summary-card associations-card">
           <h3 class="card-title">
-            <mat-icon>link</mat-icon>
+            <span class="card-title-icon"><mat-icon>link</mat-icon></span>
             Associations
           </h3>
-          <mat-chip-set>
+          <div class="associations-grid">
             @for (assoc of data()!.associations; track assoc.entityType) {
-              <mat-chip (click)="onAssociationClick(assoc)">
-                <mat-icon matChipAvatar>{{ assoc.icon }}</mat-icon>
-                {{ assoc.count }} {{ assoc.label }}
-              </mat-chip>
+              <div class="association-item" (click)="onAssociationClick(assoc)">
+                <span class="association-icon"><mat-icon>{{ assoc.icon }}</mat-icon></span>
+                <span class="association-count">{{ assoc.count }}</span>
+                <span class="association-label">{{ assoc.label }}</span>
+              </div>
             }
-          </mat-chip-set>
+          </div>
         </div>
       }
 
       <!-- Notes Preview Card -->
       <div class="summary-card notes-card">
-        <h3 class="card-title"><mat-icon>note</mat-icon> Recent Notes</h3>
+        <h3 class="card-title">
+          <span class="card-title-icon"><mat-icon>note</mat-icon></span>
+          Recent Notes
+        </h3>
         @if (data()!.recentNotes.length > 0) {
           @for (note of data()!.recentNotes; track note.id) {
-            <div class="note-row">
+            <div class="note-item">
               <span class="note-title">{{ note.title }}</span>
               @if (note.preview) {
                 <span class="note-preview">{{ note.preview }}</span>
@@ -409,22 +438,28 @@
 
       <!-- Meta Card (Last Contacted + Attachments Count) -->
       <div class="summary-card meta-card">
-        <div class="meta-item">
-          <mat-icon>schedule</mat-icon>
-          <div class="meta-content">
-            <span class="meta-label">Last Contacted</span>
+        <h3 class="card-title">
+          <span class="card-title-icon"><mat-icon>insights</mat-icon></span>
+          Overview
+        </h3>
+        <div class="meta-stats-row">
+          <div class="meta-stat-block">
+            <span class="meta-stat-icon">
+              <mat-icon>schedule</mat-icon>
+            </span>
             @if (data()!.lastContacted) {
-              <span class="meta-value">{{ data()!.lastContacted | date:'mediumDate' }}</span>
+              <span class="meta-stat-value" [title]="data()!.lastContacted | date:'full'">{{ getRelativeTime(data()!.lastContacted!) }}</span>
             } @else {
-              <span class="meta-value empty">Never</span>
+              <span class="meta-stat-value empty">Never</span>
             }
+            <span class="meta-stat-label">Last Contacted</span>
           </div>
-        </div>
-        <div class="meta-item">
-          <mat-icon>attach_file</mat-icon>
-          <div class="meta-content">
-            <span class="meta-label">Attachments</span>
-            <span class="meta-value">{{ data()!.attachmentCount }}</span>
+          <div class="meta-stat-block">
+            <span class="meta-stat-icon icon-attachment">
+              <mat-icon>attach_file</mat-icon>
+            </span>
+            <span class="meta-stat-value">{{ data()!.attachmentCount }}</span>
+            <span class="meta-stat-label">Attachments</span>
           </div>
         </div>
       </div>
@@ -432,7 +467,10 @@
       <!-- Deal Pipeline Card (Company and Contact only) -->
       @if (isCompanyOrContact() && dealPipeline()) {
         <div class="summary-card pipeline-card">
-          <h3 class="card-title"><mat-icon>trending_up</mat-icon> Deal Pipeline</h3>
+          <h3 class="card-title">
+            <span class="card-title-icon"><mat-icon>trending_up</mat-icon></span>
+            Deal Pipeline
+          </h3>
           <app-deal-pipeline-chart [pipeline]="dealPipeline()!" />
         </div>
       }
@@ -440,7 +478,10 @@
       <!-- Email Engagement Card (Contact only) -->
       @if (isContact() && emailEngagement()) {
         <div class="summary-card email-card">
-          <h3 class="card-title"><mat-icon>email</mat-icon> Email Engagement</h3>
+          <h3 class="card-title">
+            <span class="card-title-icon"><mat-icon>email</mat-icon></span>
+            Email Engagement
+          </h3>
           <app-email-engagement-card [engagement]="emailEngagement()!" />
         </div>
       }

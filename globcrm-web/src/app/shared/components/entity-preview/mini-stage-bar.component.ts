@@ -12,6 +12,7 @@ import { StageInfoDto } from '../../models/entity-preview.models';
       @for (stage of stages(); track stage.id) {
         <div class="stage-segment"
              [matTooltip]="stage.name"
+             [class.current]="stage.id === currentStageId()"
              [style.background-color]="getSegmentColor(stage)"
              [style.opacity]="getSegmentOpacity(stage)">
         </div>
@@ -23,14 +24,19 @@ import { StageInfoDto } from '../../models/entity-preview.models';
       display: flex;
       gap: 2px;
       width: 100%;
-      height: 6px;
-      margin: 8px 0;
+      height: 8px;
+      margin: var(--space-2, 8px) 0;
     }
 
     .stage-segment {
       flex: 1;
-      border-radius: 3px;
+      border-radius: var(--radius-full, 9999px);
       cursor: default;
+      transition: box-shadow var(--duration-normal, 200ms) var(--ease-default);
+
+      &.current {
+        box-shadow: 0 0 8px currentColor;
+      }
     }
   `],
 })

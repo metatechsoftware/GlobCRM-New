@@ -23,11 +23,11 @@ import { DealPipelineSummaryDto } from './summary.models';
           </div>
         </div>
         <div class="chart-stats">
-          <div class="stat">
+          <div class="stat stat-value-pill">
             <span class="stat-value">{{ formattedTotalValue() }}</span>
             <span class="stat-label">Total Value</span>
           </div>
-          <div class="stat">
+          <div class="stat stat-rate-pill">
             <span class="stat-value">{{ formattedWinRate() }}</span>
             <span class="stat-label">Win Rate</span>
           </div>
@@ -52,25 +52,26 @@ import { DealPipelineSummaryDto } from './summary.models';
   styles: [`
     .pipeline-chart-container {
       display: flex;
-      gap: 24px;
+      gap: var(--space-6, 24px);
       align-items: center;
       flex-wrap: wrap;
     }
 
     .chart-section {
       position: relative;
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       flex-shrink: 0;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.08));
     }
 
     .donut-chart {
-      width: 120px;
-      height: 120px;
+      width: 140px;
+      height: 140px;
       border-radius: 50%;
       position: relative;
-      mask: radial-gradient(circle at center, transparent 38px, black 38px);
-      -webkit-mask: radial-gradient(circle at center, transparent 38px, black 38px);
+      mask: radial-gradient(circle at center, transparent 44px, black 44px);
+      -webkit-mask: radial-gradient(circle at center, transparent 44px, black 44px);
     }
 
     .chart-center {
@@ -83,78 +84,93 @@ import { DealPipelineSummaryDto } from './summary.models';
     }
 
     .chart-center-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: var(--text-primary, #212121);
+      font-size: 28px;
+      font-weight: var(--font-bold, 700);
+      color: var(--color-text, #212121);
       line-height: 1;
     }
 
     .chart-center-label {
-      font-size: 11px;
-      color: var(--text-secondary, #666);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-muted, #9CA3AF);
+      margin-top: 2px;
     }
 
     .chart-stats {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: var(--space-3, 12px);
     }
 
     .stat {
       display: flex;
       flex-direction: column;
+      padding: var(--space-2, 8px) var(--space-3, 12px);
+      border-radius: var(--radius-md, 8px);
+    }
+
+    .stat-value-pill {
+      background: var(--color-success-soft, #F0FDF4);
+
+      .stat-value {
+        color: var(--color-success-text, #15803D);
+      }
+    }
+
+    .stat-rate-pill {
+      background: var(--color-info-soft, #EFF6FF);
+
+      .stat-value {
+        color: var(--color-info-text, #1D4ED8);
+      }
     }
 
     .stat-value {
-      font-size: 20px;
-      font-weight: 600;
-      color: var(--text-primary, #212121);
+      font-size: var(--text-xl, 20px);
+      font-weight: var(--font-semibold, 600);
     }
 
     .stat-label {
-      font-size: 12px;
-      color: var(--text-secondary, #666);
-      text-transform: uppercase;
+      font-size: var(--text-xs, 12px);
+      color: var(--color-text-secondary, #6B7280);
     }
 
     .chart-legend {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px 16px;
+      gap: var(--space-2, 8px) var(--space-4, 16px);
       width: 100%;
     }
 
     .legend-item {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      font-size: 13px;
-      color: var(--text-primary, #212121);
+      gap: var(--space-1-5, 6px);
+      font-size: var(--text-sm, 13px);
+      color: var(--color-text, #212121);
     }
 
     .legend-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
+      width: 12px;
+      height: 12px;
+      border-radius: var(--radius-sm, 4px);
       flex-shrink: 0;
     }
 
     .legend-label {
-      color: var(--text-secondary, #666);
+      color: var(--color-text-secondary, #6B7280);
     }
 
     .legend-count {
-      font-weight: 600;
+      font-weight: var(--font-semibold, 600);
     }
 
     .pipeline-empty {
       display: flex;
       align-items: center;
-      gap: 8px;
-      color: var(--text-secondary, #666);
-      padding: 16px 0;
+      gap: var(--space-2, 8px);
+      color: var(--color-text-muted, #9CA3AF);
+      padding: var(--space-4, 16px) 0;
     }
   `],
 })

@@ -5,7 +5,7 @@ import {
   output,
   computed,
 } from '@angular/core';
-import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { CurrencyPipe, DatePipe, DecimalPipe, NgClass, PercentPipe } from '@angular/common';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -35,6 +35,7 @@ import {
     CurrencyPipe,
     DatePipe,
     DecimalPipe,
+    NgClass,
     PercentPipe,
     MatChipsModule,
     MatIconModule,
@@ -154,6 +155,15 @@ export class EntitySummaryTabComponent {
 
   onAssociationClick(association: SummaryAssociationDto): void {
     this.associationClicked.emit(association.label);
+  }
+
+  getActivityTypeClass(type: string): string {
+    const t = type.toLowerCase();
+    if (t.includes('call')) return 'call';
+    if (t.includes('email')) return 'email';
+    if (t.includes('meeting')) return 'meeting';
+    if (t.includes('task')) return 'task';
+    return 'default';
   }
 
   getRelativeTime(dateStr: string): string {
