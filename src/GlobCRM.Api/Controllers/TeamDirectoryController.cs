@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using GlobCRM.Domain.Entities;
+using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.Persistence;
 using GlobCRM.Infrastructure.Storage;
@@ -96,6 +97,16 @@ public record TeamMemberDetailDto
             CreatedAt = user.CreatedAt
         };
     }
+}
+
+/// <summary>
+/// Activity stats DTO for user preview popover.
+/// </summary>
+public record UserActivityStatsDto
+{
+    public int DealsAssigned { get; init; }
+    public int TasksCompletedToday { get; init; }
+    public DateTimeOffset? LastActive { get; init; }
 }
 
 /// <summary>
@@ -252,6 +263,49 @@ public class TeamDirectoryController : ControllerBase
         }
 
         return Ok(TeamMemberDetailDto.FromUser(user, manager));
+    }
+
+    /// <summary>
+    /// Gets activity stats for a team member: deals assigned, tasks completed today, last active time.
+    /// All queries run sequentially (DbContext is not thread-safe).
+    /// </summary>
+    [HttpGet("{userId:guid}/activity-stats")]
+    [ProducesResponseType(typeof(UserActivityStatsDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetActivityStats(Guid userId, CancellationToken ct)
+    {
+        // Verify user exists in tenant
+        var userExists = await _dbContext.Users
+            .AsNoTracking()
+            .AnyAsync(u => u.Id == userId, ct);
+
+        if (!userExists)
+            return NotFound(new { error = "User not found." });
+
+        var today = DateTimeOffset.UtcNow.Date;
+
+        // Run all stat queries sequentially (DbContext is not thread-safe)
+        var dealsAssigned = await _dbContext.Deals
+            .CountAsync(d => d.OwnerId == userId, ct);
+
+        var tasksCompletedToday = await _dbContext.Activities
+            .CountAsync(a => a.AssignedToId == userId
+                          && a.Status == ActivityStatus.Done
+                          && a.CompletedAt.HasValue
+                          && a.CompletedAt.Value >= today, ct);
+
+        var lastActive = await _dbContext.FeedItems
+            .Where(f => f.AuthorId == userId)
+            .OrderByDescending(f => f.CreatedAt)
+            .Select(f => (DateTimeOffset?)f.CreatedAt)
+            .FirstOrDefaultAsync(ct);
+
+        return Ok(new UserActivityStatsDto
+        {
+            DealsAssigned = dealsAssigned,
+            TasksCompletedToday = tasksCompletedToday,
+            LastActive = lastActive
+        });
     }
 
     /// <summary>
