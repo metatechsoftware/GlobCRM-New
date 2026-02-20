@@ -5,30 +5,30 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience -- Phase 25 complete
+**Current focus:** v1.2 Connected Experience -- Phase 26 complete (gap closure)
 
 ## Current Position
 
-Phase: 25 of 25 (Preview Sidebar Polish & Cross-Feature Integration)
-Plan: 3 of 3 in current phase
-Status: Phase 25 complete
-Last activity: 2026-02-20 -- Completed 25-03 (Search-to-Preview Integration & Mobile Responsive)
+Phase: 26 of 26 (Integration Fix -- Preview Sidebar + My Day Wiring)
+Plan: 1 of 1 in current phase
+Status: Phase 26 complete -- v1.2 gap closure finished
+Last activity: 2026-02-20 -- Completed 26-01 (Preview Sidebar + My Day Wiring Fixes)
 
-Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████████████] 100% (157/157 plans)
+Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████████████] 100% (158/158 plans)
 
 ## Milestones
 
 - ✅ v1.0 MVP — 12 phases, 96 plans (2026-02-18)
 - ✅ v1.1 Automation & Intelligence — 9 phases, 43 plans (2026-02-20)
-- 🚧 v1.2 Connected Experience -- 4 phases, 18 plans (in progress)
+- 🚧 v1.2 Connected Experience -- 5 phases, 19 plans (in progress)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 157
+- Total plans completed: 158
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 18 plans (5 in phase 22, 5 in phase 23, 5 in phase 24, 3 in phase 25)
+- v1.2 (in progress): 19 plans (5 in phase 22, 5 in phase 23, 5 in phase 24, 3 in phase 25, 1 in phase 26)
 
 ## Accumulated Context
 
@@ -89,6 +89,9 @@ Recent decisions for v1.2:
 - Recently previewed takes priority over recent searches in empty search focus dropdown
 - Mobile preview sidebar uses overlay mode (not side) to prevent content push-off on full-width
 - Native touch events for swipe gesture (no library) with 80px horizontal threshold and 50px max vertical drift
+- trackView uses EntityPreviewService (root-scoped) not MyDayService (component-scoped) to avoid NullInjectorError
+- Fire-and-forget pattern for trackView matches backend feed/notification dispatch pattern
+- data.name as primary entityName source with entry.entityName fallback for trackView call
 
 ### Pending Todos
 
@@ -102,6 +105,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 25-03-PLAN.md (Phase 25 complete)
-Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-03-SUMMARY.md
-Next step: All v1.2 phases complete
+Stopped at: Completed 26-01-PLAN.md (Phase 26 complete -- v1.2 gap closure)
+Resume file: .planning/phases/26-integration-fix-preview-sidebar-myday-wiring/26-01-SUMMARY.md
+Next step: v1.2 Connected Experience milestone finalization

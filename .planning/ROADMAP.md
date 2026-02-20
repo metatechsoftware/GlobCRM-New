@@ -140,7 +140,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 26-01-PLAN.md — Fix pushPreview() isOpen, wire trackView() to preview open, replace GlobalSearchComponent icon map with EntityTypeRegistry
+- [x] 26-01-PLAN.md — Fix pushPreview() isOpen, wire trackView() to preview open, replace GlobalSearchComponent icon map with EntityTypeRegistry
 
 ## Progress
 
@@ -174,6 +174,6 @@ Phases execute in numeric order: 22 → 23 → 24 → 25
 | 23. Summary Tabs on Detail Pages | 5/5 | Complete    | 2026-02-20 | - |
 | 24. My Day Personal Dashboard | 5/5 | Complete    | 2026-02-20 | - |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | 3/3 | Complete    | 2026-02-20 | - |
-| 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 0/1 | Planned | - |
+| 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 
-**Totals:** 26 phases, 154 plans (153 complete + 1 planned), ~234,600 LOC
+**Totals:** 26 phases, 158 plans (158 complete), ~234,600 LOC
