@@ -34,10 +34,11 @@ import { EntityPreviewSidebarComponent } from './shared/components/entity-previe
       @if (showNavbar()) {
         <mat-sidenav #previewDrawer
                      position="end"
-                     mode="side"
+                     [mode]="isMobile() ? 'over' : 'side'"
                      [opened]="previewStore.isOpen()"
                      disableClose
-                     class="preview-drawer">
+                     class="preview-drawer"
+                     [class.preview-drawer--mobile]="isMobile()">
           <app-entity-preview-sidebar />
         </mat-sidenav>
       }
@@ -77,6 +78,10 @@ import { EntityPreviewSidebarComponent } from './shared/components/entity-previe
       .preview-drawer {
         width: 480px;
         border-left: 1px solid var(--color-border);
+      }
+
+      .preview-drawer--mobile {
+        width: 100vw !important;
       }
 
       ::ng-deep .preview-drawer .mat-drawer-inner-container {

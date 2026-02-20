@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, inject, computed, signal, effect } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, signal, effect, HostListener } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -81,6 +81,29 @@ export class EntityPreviewSidebarComponent {
   private readonly router = inject(Router);
 
   readonly activeTabIndex = signal(0);
+
+  // Swipe-right-to-close gesture handling
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private readonly SWIPE_THRESHOLD = 80;    // px minimum swipe distance
+  private readonly SWIPE_MAX_Y_DRIFT = 50;  // px maximum vertical drift
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent): void {
+    this.touchStartX = event.touches[0].clientX;
+    this.touchStartY = event.touches[0].clientY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent): void {
+    const deltaX = event.changedTouches[0].clientX - this.touchStartX;
+    const deltaY = Math.abs(event.changedTouches[0].clientY - this.touchStartY);
+
+    // Swipe right (positive deltaX) with limited vertical drift
+    if (deltaX > this.SWIPE_THRESHOLD && deltaY < this.SWIPE_MAX_Y_DRIFT) {
+      this.store.close();
+    }
+  }
 
   readonly entityConfig = computed<EntityTypeConfig | null>(() => {
     const entry = this.store.currentEntry();

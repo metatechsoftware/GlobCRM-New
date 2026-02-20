@@ -211,3 +211,31 @@
 .tab-content {
   padding-top: 16px;
 }
+
+// Mobile responsive adjustments
+@media (max-width: 768px) {
+  .preview-sidebar {
+    // Slightly reduce padding for mobile
+    .preview-header {
+      padding: 10px 12px;
+    }
+
+    .preview-entity-name {
+      padding: 12px 12px 4px;
+      font-size: 16px;
+    }
+
+    .preview-owner {
+      padding: 0 12px 12px;
+      font-size: 13px;
+    }
+
+    .preview-body {
+      padding: 0 12px 12px;
+    }
+
+    .preview-quick-actions {
+      padding: 0 12px;
+    }
+  }
+}
