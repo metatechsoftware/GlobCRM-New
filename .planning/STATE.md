@@ -66,5 +66,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 22-05-PLAN.md (Phase 22 UAT gap closure complete)
-Next step: Plan or execute Phase 23
+Stopped at: Phase 23 context gathered
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-CONTEXT.md
+Next step: /gsd:plan-phase 23
