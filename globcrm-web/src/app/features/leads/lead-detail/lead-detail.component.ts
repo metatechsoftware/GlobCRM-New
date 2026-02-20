@@ -350,6 +350,7 @@ export class LeadDetailComponent implements OnInit {
             this.stageChangeInProgress.set(false);
             this.snackBar.open(`Lead moved to ${stage.name}`, 'OK', { duration: 3000 });
             this.loadTimeline();
+            this.markSummaryDirty();
           },
           error: () => {
             this.stageChangeInProgress.set(false);
@@ -379,6 +380,7 @@ export class LeadDetailComponent implements OnInit {
             this.lead.set(updated);
             this.snackBar.open(`Lead reopened to ${firstActive.name}`, 'OK', { duration: 3000 });
             this.loadTimeline();
+            this.markSummaryDirty();
           },
           error: () => {
             this.snackBar.open('Failed to reopen lead', 'Close', { duration: 5000 });
@@ -405,6 +407,7 @@ export class LeadDetailComponent implements OnInit {
           // Reload lead to show converted state
           this.loadLead();
           this.loadTimeline();
+          this.markSummaryDirty();
           this.snackBar.open('Lead converted successfully', 'OK', { duration: 3000 });
         }
       });

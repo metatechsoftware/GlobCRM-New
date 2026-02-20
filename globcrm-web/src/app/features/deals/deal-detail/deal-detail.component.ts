@@ -476,6 +476,7 @@ export class DealDetailComponent implements OnInit {
         this.contactSearchResults.set([]);
         this.loadDeal(); // Refresh to get updated linked contacts
         this.loadTimeline();
+        this.markSummaryDirty();
       },
       error: () => {
         this.snackBar.open('Failed to link contact', 'OK', { duration: 3000 });
@@ -497,6 +498,7 @@ export class DealDetailComponent implements OnInit {
             this.snackBar.open(`Unlinked ${contact.name}`, 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
+            this.markSummaryDirty();
           },
           error: () => {
             this.snackBar.open('Failed to unlink contact', 'OK', { duration: 3000 });
@@ -577,6 +579,7 @@ export class DealDetailComponent implements OnInit {
           this.linkProductUnitPrice.set(null);
           this.loadDeal();
           this.loadTimeline();
+          this.markSummaryDirty();
         },
         error: () => {
           this.snackBar.open('Failed to link product', 'OK', { duration: 3000 });
@@ -598,6 +601,7 @@ export class DealDetailComponent implements OnInit {
             this.snackBar.open(`Unlinked ${product.name}`, 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
+            this.markSummaryDirty();
           },
           error: () => {
             this.snackBar.open('Failed to unlink product', 'OK', { duration: 3000 });

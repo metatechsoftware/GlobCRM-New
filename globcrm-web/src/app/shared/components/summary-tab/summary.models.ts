@@ -89,7 +89,7 @@ export interface BaseSummaryFields {
   recentNotes: SummaryNoteDto[];
   associations: SummaryAssociationDto[];
   attachmentCount: number;
-  lastContactedAt: string | null;
+  lastContacted: string | null;
 }
 
 // --- Entity-specific summary DTOs ---

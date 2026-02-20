@@ -466,6 +466,7 @@ export class ContactDetailComponent implements OnInit {
                   'Close',
                   { duration: 3000 },
                 );
+                this.markSummaryDirty();
               },
               error: (err) => {
                 this.snackBar.open(

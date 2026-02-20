@@ -413,8 +413,8 @@
           <mat-icon>schedule</mat-icon>
           <div class="meta-content">
             <span class="meta-label">Last Contacted</span>
-            @if (data().lastContactedAt) {
-              <span class="meta-value">{{ data().lastContactedAt | date:'mediumDate' }}</span>
+            @if (data().lastContacted) {
+              <span class="meta-value">{{ data().lastContacted | date:'mediumDate' }}</span>
             } @else {
               <span class="meta-value empty">Never</span>
             }
