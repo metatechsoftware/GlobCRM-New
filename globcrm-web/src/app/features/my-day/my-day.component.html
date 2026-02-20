@@ -17,13 +17,39 @@
       (taskCompleted)="onTaskCompleted($event)"
       (entityClicked)="onEntityClicked($event)" />
 
-    <!-- Row 2: upcoming events (half-width) -->
+    <!-- Row 2: events + pipeline + email (three half-width cards) -->
     <app-upcoming-events-widget
       [events]="store.data()?.upcomingEvents ?? []"
       [isLoading]="store.isLoading()"
       (eventClicked)="onEventClicked($event)" />
 
-    <!-- Placeholders for pipeline and email widgets (built in 24-04) -->
-    <!-- Row 3: placeholders for feed, notifications, recent records (built in 24-04) -->
+    <app-pipeline-widget
+      [stages]="store.data()?.pipelineStages ?? []"
+      [totalValue]="store.data()?.pipelineTotalValue ?? 0"
+      [dealCount]="store.data()?.pipelineDealCount ?? 0"
+      [isLoading]="store.isLoading()" />
+
+    <app-email-summary-widget
+      [unreadCount]="store.data()?.unreadEmailCount ?? 0"
+      [recentEmails]="store.data()?.recentEmails ?? []"
+      [isLoading]="store.isLoading()"
+      (emailClicked)="onEmailClicked($event)" />
+
+    <!-- Row 3: feed + notifications + recent records (three half-width cards) -->
+    <app-feed-preview-widget
+      [feedItems]="store.data()?.recentFeedItems ?? []"
+      [isLoading]="store.isLoading()"
+      (entityClicked)="onEntityClicked($event)" />
+
+    <app-notification-digest-widget
+      [notificationGroups]="store.data()?.notificationGroups ?? []"
+      [totalCount]="store.data()?.todayNotificationCount ?? 0"
+      [isLoading]="store.isLoading()"
+      (notificationClicked)="onEntityClicked($event)" />
+
+    <app-recent-records-widget
+      [records]="store.data()?.recentRecords ?? []"
+      [isLoading]="store.isLoading()"
+      (recordClicked)="onEntityClicked($event)" />
   </div>
 </div>

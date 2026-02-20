@@ -7,6 +7,11 @@ import { MyDayService } from './my-day.service';
 import { GreetingBannerComponent } from './widgets/greeting-banner/greeting-banner.component';
 import { TasksWidgetComponent } from './widgets/tasks-widget/tasks-widget.component';
 import { UpcomingEventsWidgetComponent } from './widgets/upcoming-events-widget/upcoming-events-widget.component';
+import { PipelineWidgetComponent } from './widgets/pipeline-widget/pipeline-widget.component';
+import { EmailSummaryWidgetComponent } from './widgets/email-summary-widget/email-summary-widget.component';
+import { FeedPreviewWidgetComponent } from './widgets/feed-preview-widget/feed-preview-widget.component';
+import { NotificationDigestWidgetComponent } from './widgets/notification-digest-widget/notification-digest-widget.component';
+import { RecentRecordsWidgetComponent } from './widgets/recent-records-widget/recent-records-widget.component';
 
 @Component({
   selector: 'app-my-day',
@@ -15,6 +20,11 @@ import { UpcomingEventsWidgetComponent } from './widgets/upcoming-events-widget/
     GreetingBannerComponent,
     TasksWidgetComponent,
     UpcomingEventsWidgetComponent,
+    PipelineWidgetComponent,
+    EmailSummaryWidgetComponent,
+    FeedPreviewWidgetComponent,
+    NotificationDigestWidgetComponent,
+    RecentRecordsWidgetComponent,
   ],
   providers: [MyDayStore, MyDayService],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,6 +58,10 @@ export class MyDayComponent {
       entityType: event.type,
       entityId: event.id,
     });
+  }
+
+  onEmailClicked(emailId: string): void {
+    this.router.navigate([`/emails/${emailId}`]);
   }
 
   onEventClicked(eventId: string): void {
