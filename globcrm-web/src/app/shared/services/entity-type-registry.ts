@@ -23,6 +23,8 @@ export const ENTITY_TYPE_REGISTRY: Record<string, EntityTypeConfig> = {
   Lead:     { icon: 'trending_up', label: 'Lead',     labelPlural: 'Leads',      routePrefix: '/leads',      color: 'var(--color-success)' },
   Activity: { icon: 'task_alt',    label: 'Activity', labelPlural: 'Activities', routePrefix: '/activities', color: 'var(--color-accent)' },
   Product:  { icon: 'inventory_2', label: 'Product',  labelPlural: 'Products',   routePrefix: '/products',   color: 'var(--color-primary)' },
+  Quote:    { icon: 'request_quote', label: 'Quote',    labelPlural: 'Quotes',    routePrefix: '/quotes',    color: 'var(--color-warning)' },
+  Request:  { icon: 'support_agent', label: 'Request',  labelPlural: 'Requests',  routePrefix: '/requests',  color: 'var(--color-danger)' },
 };
 
 /**

@@ -88,6 +88,7 @@ export const PreviewSidebarStore = signalStore(
           newStack = newStack.slice(newStack.length - MAX_STACK_DEPTH);
         }
         patchState(store, {
+          isOpen: true,
           stack: newStack,
           isLoading: true,
           error: null,
