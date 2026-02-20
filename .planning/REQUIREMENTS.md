@@ -42,16 +42,16 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 
 - [x] **MYDAY-01**: User sees "My Day" as the default landing page after login
 - [ ] **MYDAY-02**: My Day displays a personalized greeting with date/time context
-- [ ] **MYDAY-03**: My Day shows today's tasks/activities widget (assigned to user, due today, not done)
-- [ ] **MYDAY-04**: My Day highlights overdue tasks with urgency indicators
-- [ ] **MYDAY-05**: My Day shows an upcoming events/calendar widget (today + next 2 days, compact agenda)
-- [ ] **MYDAY-06**: My Day shows a personal pipeline summary widget (user's deals grouped by stage with values)
+- [x] **MYDAY-03**: My Day shows today's tasks/activities widget (assigned to user, due today, not done)
+- [x] **MYDAY-04**: My Day highlights overdue tasks with urgency indicators
+- [x] **MYDAY-05**: My Day shows an upcoming events/calendar widget (today + next 2 days, compact agenda)
+- [x] **MYDAY-06**: My Day shows a personal pipeline summary widget (user's deals grouped by stage with values)
 - [ ] **MYDAY-07**: My Day includes a quick actions row (New Contact, New Deal, Log Activity, New Note, Send Email)
-- [ ] **MYDAY-08**: My Day shows a recent records widget (last 5-8 recently viewed entities)
+- [x] **MYDAY-08**: My Day shows a recent records widget (last 5-8 recently viewed entities)
 - [x] **MYDAY-09**: Org dashboard relocated to its own menu item, accessible via sidebar navigation
-- [ ] **MYDAY-10**: My Day includes an email summary widget (unread count, recent emails)
-- [ ] **MYDAY-11**: My Day includes a feed preview widget (last 5 feed items, compact format)
-- [ ] **MYDAY-12**: My Day includes a notification digest widget (today's notifications grouped by type)
+- [x] **MYDAY-10**: My Day includes an email summary widget (unread count, recent emails)
+- [x] **MYDAY-11**: My Day includes a feed preview widget (last 5 feed items, compact format)
+- [x] **MYDAY-12**: My Day includes a notification digest widget (today's notifications grouped by type)
 
 ## Future Requirements
 
@@ -126,16 +126,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUMMARY-12 | Phase 23 | Complete |
 | MYDAY-01 | Phase 24 | Complete |
 | MYDAY-02 | Phase 24 | Pending |
-| MYDAY-03 | Phase 24 | Pending |
-| MYDAY-04 | Phase 24 | Pending |
-| MYDAY-05 | Phase 24 | Pending |
-| MYDAY-06 | Phase 24 | Pending |
+| MYDAY-03 | Phase 24 | Complete |
+| MYDAY-04 | Phase 24 | Complete |
+| MYDAY-05 | Phase 24 | Complete |
+| MYDAY-06 | Phase 24 | Complete |
 | MYDAY-07 | Phase 24 | Pending |
-| MYDAY-08 | Phase 24 | Pending |
+| MYDAY-08 | Phase 24 | Complete |
 | MYDAY-09 | Phase 24 | Complete |
-| MYDAY-10 | Phase 24 | Pending |
-| MYDAY-11 | Phase 24 | Pending |
-| MYDAY-12 | Phase 24 | Pending |
+| MYDAY-10 | Phase 24 | Complete |
+| MYDAY-11 | Phase 24 | Complete |
+| MYDAY-12 | Phase 24 | Complete |
 
 **Coverage:**
 - v1 requirements: 37 total

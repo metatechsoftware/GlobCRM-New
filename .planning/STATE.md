@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 24 of 25 (My Day Personal Dashboard)
-Plan: 1 of 5 in current phase -- COMPLETE
+Plan: 2 of 5 in current phase -- COMPLETE
 Status: Executing phase 24
-Last activity: 2026-02-20 — Completed 24-01 (Route Restructuring)
+Last activity: 2026-02-20 — Completed 24-02 (My Day Backend API)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 97% (150/155 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 97% (151/155 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 150
+- Total plans completed: 151
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 11 plans (5 in phase 22, 5 in phase 23, 1 in phase 24)
+- v1.2 (in progress): 12 plans (5 in phase 22, 5 in phase 23, 2 in phase 24)
 
 ## Accumulated Context
 
@@ -69,6 +69,9 @@ Recent decisions for v1.2:
 - No Company detail changes needed for dirty-flag -- no inline sibling-tab mutations exist
 - Route ordering: auth, onboarding, my-day, analytics, settings, entity routes, redirects
 - Backward compat: /dashboard redirects to /analytics (not removed)
+- Sequential await for all My Day EF Core queries (DbContext not thread-safe)
+- Pipeline grouping in memory after Include(d => d.Stage) to avoid EF GroupBy translation issues
+- RecentlyViewedEntity upsert via unique index on (tenant_id, user_id, entity_type, entity_id)
 
 ### Pending Todos
 
@@ -82,6 +85,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 24-01-PLAN.md
-Resume file: .planning/phases/24-my-day-personal-dashboard/24-01-SUMMARY.md
-Next step: Execute 24-02-PLAN.md (My Day backend API)
+Stopped at: Completed 24-02-PLAN.md
+Resume file: .planning/phases/24-my-day-personal-dashboard/24-02-SUMMARY.md
+Next step: Execute 24-03-PLAN.md (My Day Angular service + store)
