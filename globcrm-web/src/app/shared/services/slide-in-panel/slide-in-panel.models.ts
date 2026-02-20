@@ -16,6 +16,9 @@ export interface SlideInConfig {
   entityType: SlideInEntityType;
   title?: string;
   followUpSteps?: FollowUpStep[];
+  context?: 'standalone' | 'preview-sidebar';
+  parentEntityType?: string;
+  parentEntityId?: string;
 }
 
 /** Returned when opening a slide-in panel. Emits after both creation and follow-up are resolved. */

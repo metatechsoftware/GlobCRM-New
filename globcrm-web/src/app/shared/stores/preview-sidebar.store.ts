@@ -130,6 +130,19 @@ export const PreviewSidebarStore = signalStore(
           isLoading: false,
         });
       },
+      refreshCurrent(): void {
+        const entry = store.currentEntry();
+        if (!entry) return;
+        // Do NOT set isLoading or clear currentData -- silent refresh
+        previewService.getPreview(entry.entityType, entry.entityId).subscribe({
+          next: (data) => {
+            patchState(store, { currentData: data, error: null });
+          },
+          error: () => {
+            // Silently ignore refresh errors -- keep existing data
+          },
+        });
+      },
       openFullRecord(): void {
         const stack = store.stack();
         const entry = stack.length > 0 ? stack[stack.length - 1] : null;

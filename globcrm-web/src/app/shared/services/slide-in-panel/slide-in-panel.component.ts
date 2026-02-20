@@ -10,11 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
-import { ContactFormComponent } from '../../contacts/contact-form/contact-form.component';
-import { CompanyFormComponent } from '../../companies/company-form/company-form.component';
-import { DealFormComponent } from '../../deals/deal-form/deal-form.component';
-import { ActivityFormComponent } from '../../activities/activity-form/activity-form.component';
-import { NoteFormComponent } from '../../notes/note-form/note-form.component';
+import { ContactFormComponent } from '../../../features/contacts/contact-form/contact-form.component';
+import { CompanyFormComponent } from '../../../features/companies/company-form/company-form.component';
+import { DealFormComponent } from '../../../features/deals/deal-form/deal-form.component';
+import { ActivityFormComponent } from '../../../features/activities/activity-form/activity-form.component';
+import { NoteFormComponent } from '../../../features/notes/note-form/note-form.component';
 
 import { SlideInConfig, SlideInStep } from './slide-in-panel.models';
 import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
@@ -237,7 +237,7 @@ export class SlideInPanelComponent {
     if (this.config.followUpSteps && this.config.followUpSteps.length > 0) {
       this.currentStep.set('follow-up');
     } else {
-      // No follow-up steps — close immediately with result
+      // No follow-up steps -- close immediately with result
       this.slideInPanelService.close({
         entity,
         entityType: this.config.entityType,
@@ -254,7 +254,7 @@ export class SlideInPanelComponent {
     });
   }
 
-  /** Skip follow-up — close with result but no follow-up action. */
+  /** Skip follow-up -- close with result but no follow-up action. */
   onSkipFollowUp(): void {
     this.slideInPanelService.close({
       entity: this.createdEntity(),

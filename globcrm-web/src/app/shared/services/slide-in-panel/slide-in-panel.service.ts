@@ -6,7 +6,7 @@ import { take } from 'rxjs/operators';
 
 import { SlideInConfig, SlideInPanelRef, SlideInResult } from './slide-in-panel.models';
 import { SlideInPanelComponent } from './slide-in-panel.component';
-import { PreviewSidebarStore } from '../../../shared/stores/preview-sidebar.store';
+import { PreviewSidebarStore } from '../../stores/preview-sidebar.store';
 
 /** Injection token used to pass config to the slide-in panel component. */
 export const SLIDE_IN_CONFIG = new InjectionToken<SlideInConfig>('SLIDE_IN_CONFIG');
@@ -30,11 +30,15 @@ export class SlideInPanelService {
   /** Whether a slide-in panel is currently open. */
   readonly isOpen = signal(false);
 
+  /** Current context (standalone or preview-sidebar). */
+  readonly currentContext = signal<string | undefined>(undefined);
+
   constructor() {
     // Mutual exclusion: when preview sidebar opens, close slide-in panel
+    // Only close if the current context is NOT 'preview-sidebar' (panel opened from sidebar stays open)
     effect(() => {
       const previewOpen = this.previewSidebarStore.isOpen();
-      if (previewOpen && this.isOpen()) {
+      if (previewOpen && this.isOpen() && this.currentContext() !== 'preview-sidebar') {
         this.close(null);
       }
     });
@@ -42,11 +46,11 @@ export class SlideInPanelService {
 
   /**
    * Open a slide-in panel with the given configuration.
-   * First closes the preview sidebar and any existing panel.
+   * Closes preview sidebar only when NOT opening from preview context.
    */
   open(config: SlideInConfig): SlideInPanelRef {
-    // Close preview sidebar if open (mutual exclusion)
-    if (this.previewSidebarStore.isOpen()) {
+    // Only close preview sidebar if NOT opening from preview context
+    if (config.context !== 'preview-sidebar' && this.previewSidebarStore.isOpen()) {
       this.previewSidebarStore.close();
     }
 
@@ -54,6 +58,9 @@ export class SlideInPanelService {
     if (this.overlayRef) {
       this.close(null);
     }
+
+    // Store the current context
+    this.currentContext.set(config.context);
 
     // Create the afterClosed subject for this panel instance
     this.afterClosedSubject = new Subject<SlideInResult | null>();
@@ -82,12 +89,12 @@ export class SlideInPanelService {
     const portal = new ComponentPortal(SlideInPanelComponent, null, portalInjector);
     this.overlayRef.attach(portal);
 
-    // Subscribe to backdrop click → close
+    // Subscribe to backdrop click -> close
     this.overlayRef.backdropClick().subscribe(() => {
       this.close(null);
     });
 
-    // Subscribe to escape key → close
+    // Subscribe to escape key -> close
     this.overlayRef.keydownEvents().subscribe((event) => {
       if (event.key === 'Escape') {
         this.close(null);
@@ -115,5 +122,6 @@ export class SlideInPanelService {
     }
 
     this.isOpen.set(false);
+    this.currentContext.set(undefined);
   }
 }
