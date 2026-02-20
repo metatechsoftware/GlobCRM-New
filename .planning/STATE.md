@@ -82,6 +82,9 @@ Recent decisions for v1.2:
 - Context-aware mutual exclusion: slide-in panel with context 'preview-sidebar' stays open alongside sidebar
 - Silent refresh via refreshCurrent() skips isLoading to avoid skeleton flash after quick action in sidebar
 - Quick actions excluded for Product entities in preview sidebar (read-only)
+- CDK Overlay FlexibleConnectedPositionStrategy for user preview popover anchoring (matches SlideInPanelService pattern)
+- forkJoin for parallel profile + stats HTTP calls in popover (independent requests, not EF Core)
+- Sequential EF Core queries in activity-stats endpoint (locked DbContext pattern)
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 25-01-PLAN.md
-Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-01-SUMMARY.md
-Next step: Execute 25-02-PLAN.md
+Stopped at: Completed 25-02-PLAN.md
+Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-02-SUMMARY.md
+Next step: Execute 25-03-PLAN.md
