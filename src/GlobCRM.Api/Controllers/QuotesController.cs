@@ -618,6 +618,149 @@ public class QuotesController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Summary ----
+
+    /// <summary>
+    /// Returns aggregated summary data for a quote including key properties,
+    /// recent/upcoming activities, notes preview, attachment count, last contacted date,
+    /// and line item count.
+    /// </summary>
+    [HttpGet("{id:guid}/summary")]
+    [Authorize(Policy = "Permission:Quote:View")]
+    [ProducesResponseType(typeof(QuoteSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(Guid id)
+    {
+        var quote = await _quoteRepository.GetByIdWithLineItemsAsync(id);
+        if (quote is null)
+            return NotFound(new { error = "Quote not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Quote", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(quote.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var now = DateTimeOffset.UtcNow;
+
+        // Parallel queries via Task.WhenAll
+        var recentActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Quote" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(5)
+            .Select(a => new QuoteSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var upcomingActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Quote" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
+            .OrderBy(a => a.DueDate)
+            .Take(5)
+            .Select(a => new QuoteSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var recentNotesTask = _db.Notes
+            .Where(n => n.EntityType == "Quote" && n.EntityId == id)
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(3)
+            .Select(n => new QuoteSummaryNoteDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Preview = n.PlainTextBody != null
+                    ? n.PlainTextBody.Substring(0, Math.Min(n.PlainTextBody.Length, 100))
+                    : null,
+                AuthorName = n.Author != null
+                    ? (n.Author.FirstName + " " + n.Author.LastName).Trim()
+                    : null,
+                CreatedAt = n.CreatedAt
+            })
+            .ToListAsync();
+
+        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Quote" && al.EntityId == id);
+        var lineItemCountTask = _db.QuoteLineItems.CountAsync(li => li.QuoteId == id);
+        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Quote" && a.EntityId == id);
+
+        var lastActivityDateTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Quote" && al.EntityId == id)
+            .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => (DateTimeOffset?)a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        // Last email related to the quote's contact
+        var lastEmailDateTask = quote.ContactId.HasValue
+            ? _db.EmailMessages
+                .Where(e => e.LinkedContactId == quote.ContactId)
+                .OrderByDescending(e => e.SentAt)
+                .Select(e => (DateTimeOffset?)e.SentAt)
+                .FirstOrDefaultAsync()
+            : Task.FromResult<DateTimeOffset?>(null);
+
+        await Task.WhenAll(
+            recentActivitiesTask, upcomingActivitiesTask, recentNotesTask,
+            activityCountTask, lineItemCountTask, attachmentCountTask,
+            lastActivityDateTask, lastEmailDateTask);
+
+        // Compute last contacted date
+        var lastActivity = lastActivityDateTask.Result;
+        var lastEmail = lastEmailDateTask.Result;
+        DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
+        {
+            (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
+            (not null, null) => lastActivity,
+            (null, not null) => lastEmail,
+            _ => null
+        };
+
+        var associations = new List<QuoteSummaryAssociationDto>
+        {
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+            new() { EntityType = "LineItem", Label = "Line Items", Icon = "receipt_long", Count = lineItemCountTask.Result },
+        };
+
+        var dto = new QuoteSummaryDto
+        {
+            Id = quote.Id,
+            QuoteNumber = quote.QuoteNumber,
+            Title = quote.Title,
+            Status = quote.Status.ToString(),
+            GrandTotal = quote.GrandTotal,
+            ContactName = quote.Contact?.FullName,
+            CompanyName = quote.Company?.Name,
+            IssueDate = quote.IssueDate,
+            ExpiryDate = quote.ExpiryDate,
+            Associations = associations,
+            RecentActivities = recentActivitiesTask.Result,
+            UpcomingActivities = upcomingActivitiesTask.Result,
+            RecentNotes = recentNotesTask.Result,
+            AttachmentCount = attachmentCountTask.Result,
+            LastContacted = lastContacted
+        };
+
+        return Ok(dto);
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -1044,4 +1187,55 @@ public class CreateQuoteRequestValidator : AbstractValidator<CreateQuoteRequest>
                 .InclusiveBetween(0, 100).WithMessage("Tax percent must be between 0 and 100.");
         });
     }
+}
+
+// ---- Summary DTOs ----
+
+/// <summary>
+/// Aggregated summary DTO for the quote detail summary tab.
+/// </summary>
+public record QuoteSummaryDto
+{
+    public Guid Id { get; init; }
+    public string QuoteNumber { get; init; } = string.Empty;
+    public string Title { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public decimal GrandTotal { get; init; }
+    public string? ContactName { get; init; }
+    public string? CompanyName { get; init; }
+    public DateOnly IssueDate { get; init; }
+    public DateOnly? ExpiryDate { get; init; }
+    public List<QuoteSummaryAssociationDto> Associations { get; init; } = new();
+    public List<QuoteSummaryActivityDto> RecentActivities { get; init; } = new();
+    public List<QuoteSummaryActivityDto> UpcomingActivities { get; init; } = new();
+    public List<QuoteSummaryNoteDto> RecentNotes { get; init; } = new();
+    public int AttachmentCount { get; init; }
+    public DateTimeOffset? LastContacted { get; init; }
+}
+
+public record QuoteSummaryActivityDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTimeOffset? DueDate { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record QuoteSummaryNoteDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public string? Preview { get; init; }
+    public string? AuthorName { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record QuoteSummaryAssociationDto
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public int Count { get; init; }
 }

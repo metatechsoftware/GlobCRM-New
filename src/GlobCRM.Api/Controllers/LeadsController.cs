@@ -711,6 +711,165 @@ public class LeadsController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Summary ----
+
+    /// <summary>
+    /// Returns aggregated summary data for a lead including key properties,
+    /// stage progress info, association counts, recent/upcoming activities,
+    /// notes preview, attachment count, and last contacted date.
+    /// </summary>
+    [HttpGet("{id:guid}/summary")]
+    [Authorize(Policy = "Permission:Lead:View")]
+    [ProducesResponseType(typeof(LeadSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(Guid id)
+    {
+        var lead = await _leadRepository.GetByIdWithDetailsAsync(id);
+        if (lead is null)
+            return NotFound(new { error = "Lead not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Lead", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(lead.OwnerId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var now = DateTimeOffset.UtcNow;
+
+        // Parallel queries via Task.WhenAll
+        var recentActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Lead" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(5)
+            .Select(a => new LeadSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var upcomingActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Lead" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
+            .OrderBy(a => a.DueDate)
+            .Take(5)
+            .Select(a => new LeadSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var recentNotesTask = _db.Notes
+            .Where(n => n.EntityType == "Lead" && n.EntityId == id)
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(3)
+            .Select(n => new LeadSummaryNoteDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Preview = n.PlainTextBody != null
+                    ? n.PlainTextBody.Substring(0, Math.Min(n.PlainTextBody.Length, 100))
+                    : null,
+                AuthorName = n.Author != null
+                    ? (n.Author.FirstName + " " + n.Author.LastName).Trim()
+                    : null,
+                CreatedAt = n.CreatedAt
+            })
+            .ToListAsync();
+
+        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Lead" && al.EntityId == id);
+        var noteCountTask = _db.Notes.CountAsync(n => n.EntityType == "Lead" && n.EntityId == id);
+        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Lead" && a.EntityId == id);
+
+        var lastActivityDateTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Lead" && al.EntityId == id)
+            .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => (DateTimeOffset?)a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        // Last email to lead's email address
+        var lastEmailDateTask = !string.IsNullOrWhiteSpace(lead.Email)
+            ? _db.EmailMessages
+                .Where(e => e.LinkedContactId == null) // lead emails won't be linked to a contact
+                .OrderByDescending(e => e.SentAt)
+                .Select(e => (DateTimeOffset?)e.SentAt)
+                .FirstOrDefaultAsync()
+            : Task.FromResult<DateTimeOffset?>(null);
+
+        // Stage progress info for all lead stages
+        var stageInfoTask = _db.LeadStages
+            .OrderBy(s => s.SortOrder)
+            .Select(s => new LeadStageInfoDto
+            {
+                Id = s.Id,
+                Name = s.Name,
+                Color = s.Color,
+                SortOrder = s.SortOrder,
+                IsCurrent = s.Id == lead.LeadStageId,
+                IsTerminal = s.IsConverted || s.IsLost
+            })
+            .ToListAsync();
+
+        await Task.WhenAll(
+            recentActivitiesTask, upcomingActivitiesTask, recentNotesTask,
+            activityCountTask, noteCountTask, attachmentCountTask,
+            lastActivityDateTask, lastEmailDateTask, stageInfoTask);
+
+        // Compute last contacted date
+        var lastActivity = lastActivityDateTask.Result;
+        var lastEmail = lastEmailDateTask.Result;
+        DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
+        {
+            (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
+            (not null, null) => lastActivity,
+            (null, not null) => lastEmail,
+            _ => null
+        };
+
+        var associations = new List<LeadSummaryAssociationDto>
+        {
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+            new() { EntityType = "Note", Label = "Notes", Icon = "note", Count = noteCountTask.Result },
+        };
+
+        var dto = new LeadSummaryDto
+        {
+            Id = lead.Id,
+            FullName = lead.FullName,
+            Email = lead.Email,
+            Phone = lead.Phone,
+            CompanyName = lead.CompanyName,
+            SourceName = lead.Source?.Name,
+            Temperature = lead.Temperature.ToString(),
+            OwnerName = lead.Owner != null
+                ? $"{lead.Owner.FirstName} {lead.Owner.LastName}".Trim()
+                : null,
+            Stages = stageInfoTask.Result,
+            Associations = associations,
+            RecentActivities = recentActivitiesTask.Result,
+            UpcomingActivities = upcomingActivitiesTask.Result,
+            RecentNotes = recentNotesTask.Result,
+            AttachmentCount = attachmentCountTask.Result,
+            LastContacted = lastContacted
+        };
+
+        return Ok(dto);
+    }
+
     // ---- Conversion Endpoints ----
 
     /// <summary>
@@ -1488,4 +1647,65 @@ public class ConvertLeadValidator : AbstractValidator<ConvertLeadRequest>
             .NotEmpty().WithMessage("Pipeline is required when creating a deal.")
             .When(x => x.CreateDeal);
     }
+}
+
+// ---- Summary DTOs ----
+
+/// <summary>
+/// Aggregated summary DTO for the lead detail summary tab.
+/// </summary>
+public record LeadSummaryDto
+{
+    public Guid Id { get; init; }
+    public string FullName { get; init; } = string.Empty;
+    public string? Email { get; init; }
+    public string? Phone { get; init; }
+    public string? CompanyName { get; init; }
+    public string? SourceName { get; init; }
+    public string Temperature { get; init; } = string.Empty;
+    public string? OwnerName { get; init; }
+    public List<LeadStageInfoDto> Stages { get; init; } = new();
+    public List<LeadSummaryAssociationDto> Associations { get; init; } = new();
+    public List<LeadSummaryActivityDto> RecentActivities { get; init; } = new();
+    public List<LeadSummaryActivityDto> UpcomingActivities { get; init; } = new();
+    public List<LeadSummaryNoteDto> RecentNotes { get; init; } = new();
+    public int AttachmentCount { get; init; }
+    public DateTimeOffset? LastContacted { get; init; }
+}
+
+public record LeadStageInfoDto
+{
+    public Guid Id { get; init; }
+    public string Name { get; init; } = string.Empty;
+    public string Color { get; init; } = string.Empty;
+    public int SortOrder { get; init; }
+    public bool IsCurrent { get; init; }
+    public bool IsTerminal { get; init; }
+}
+
+public record LeadSummaryActivityDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTimeOffset? DueDate { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record LeadSummaryNoteDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public string? Preview { get; init; }
+    public string? AuthorName { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record LeadSummaryAssociationDto
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public int Count { get; init; }
 }

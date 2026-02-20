@@ -447,6 +447,150 @@ public class RequestsController : ControllerBase
         return Ok(sorted);
     }
 
+    // ---- Summary ----
+
+    /// <summary>
+    /// Returns aggregated summary data for a request including key properties,
+    /// recent/upcoming activities, notes preview, attachment count, and last contacted date.
+    /// </summary>
+    [HttpGet("{id:guid}/summary")]
+    [Authorize(Policy = "Permission:Request:View")]
+    [ProducesResponseType(typeof(RequestSummaryDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public async Task<IActionResult> GetSummary(Guid id)
+    {
+        var entity = await _requestRepository.GetByIdAsync(id);
+        if (entity is null)
+            return NotFound(new { error = "Request not found." });
+
+        var userId = GetCurrentUserId();
+        var permission = await _permissionService.GetEffectivePermissionAsync(userId, "Request", "View");
+        var teamMemberIds = await GetTeamMemberIds(userId, permission.Scope);
+
+        if (!IsWithinScope(entity.OwnerId, entity.AssignedToId, permission.Scope, userId, teamMemberIds))
+            return Forbid();
+
+        var now = DateTimeOffset.UtcNow;
+
+        // Parallel queries via Task.WhenAll
+        var recentActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Request" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Take(5)
+            .Select(a => new RequestSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var upcomingActivitiesTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Request" && al.EntityId == id)
+            .Join(_db.Activities, al => al.ActivityId, a => a.Id, (al, a) => a)
+            .Where(a => a.Status != ActivityStatus.Done && a.DueDate != null && a.DueDate >= now)
+            .OrderBy(a => a.DueDate)
+            .Take(5)
+            .Select(a => new RequestSummaryActivityDto
+            {
+                Id = a.Id,
+                Subject = a.Subject,
+                Type = a.Type.ToString(),
+                Status = a.Status.ToString(),
+                DueDate = a.DueDate,
+                CreatedAt = a.CreatedAt
+            })
+            .ToListAsync();
+
+        var recentNotesTask = _db.Notes
+            .Where(n => n.EntityType == "Request" && n.EntityId == id)
+            .OrderByDescending(n => n.CreatedAt)
+            .Take(3)
+            .Select(n => new RequestSummaryNoteDto
+            {
+                Id = n.Id,
+                Title = n.Title,
+                Preview = n.PlainTextBody != null
+                    ? n.PlainTextBody.Substring(0, Math.Min(n.PlainTextBody.Length, 100))
+                    : null,
+                AuthorName = n.Author != null
+                    ? (n.Author.FirstName + " " + n.Author.LastName).Trim()
+                    : null,
+                CreatedAt = n.CreatedAt
+            })
+            .ToListAsync();
+
+        var activityCountTask = _db.ActivityLinks.CountAsync(al => al.EntityType == "Request" && al.EntityId == id);
+        var attachmentCountTask = _db.Attachments.CountAsync(a => a.EntityType == "Request" && a.EntityId == id);
+
+        var lastActivityDateTask = _db.ActivityLinks
+            .Where(al => al.EntityType == "Request" && al.EntityId == id)
+            .Join(_db.Activities.Where(a => a.Status == ActivityStatus.Done), al => al.ActivityId, a => a.Id, (al, a) => a)
+            .OrderByDescending(a => a.CreatedAt)
+            .Select(a => (DateTimeOffset?)a.CreatedAt)
+            .FirstOrDefaultAsync();
+
+        // Last email related to the request's contact
+        var lastEmailDateTask = entity.ContactId.HasValue
+            ? _db.EmailMessages
+                .Where(e => e.LinkedContactId == entity.ContactId)
+                .OrderByDescending(e => e.SentAt)
+                .Select(e => (DateTimeOffset?)e.SentAt)
+                .FirstOrDefaultAsync()
+            : Task.FromResult<DateTimeOffset?>(null);
+
+        await Task.WhenAll(
+            recentActivitiesTask, upcomingActivitiesTask, recentNotesTask,
+            activityCountTask, attachmentCountTask,
+            lastActivityDateTask, lastEmailDateTask);
+
+        // Compute last contacted date
+        var lastActivity = lastActivityDateTask.Result;
+        var lastEmail = lastEmailDateTask.Result;
+        DateTimeOffset? lastContacted = (lastActivity, lastEmail) switch
+        {
+            (not null, not null) => lastActivity > lastEmail ? lastActivity : lastEmail,
+            (not null, null) => lastActivity,
+            (null, not null) => lastEmail,
+            _ => null
+        };
+
+        var associations = new List<RequestSummaryAssociationDto>
+        {
+            new() { EntityType = "Activity", Label = "Activities", Icon = "event", Count = activityCountTask.Result },
+        };
+
+        var dto = new RequestSummaryDto
+        {
+            Id = entity.Id,
+            Subject = entity.Subject,
+            Status = entity.Status.ToString(),
+            Priority = entity.Priority.ToString(),
+            Category = entity.Category,
+            ContactName = entity.Contact?.FullName,
+            CompanyName = entity.Company?.Name,
+            OwnerName = entity.Owner != null
+                ? $"{entity.Owner.FirstName} {entity.Owner.LastName}".Trim()
+                : null,
+            AssignedToName = entity.AssignedTo != null
+                ? $"{entity.AssignedTo.FirstName} {entity.AssignedTo.LastName}".Trim()
+                : null,
+            Associations = associations,
+            RecentActivities = recentActivitiesTask.Result,
+            UpcomingActivities = upcomingActivitiesTask.Result,
+            RecentNotes = recentNotesTask.Result,
+            AttachmentCount = attachmentCountTask.Result,
+            LastContacted = lastContacted
+        };
+
+        return Ok(dto);
+    }
+
     // ---- Helper Methods ----
 
     private Guid GetCurrentUserId()
@@ -674,4 +818,55 @@ public class CreateRequestRequestValidator : AbstractValidator<CreateRequestRequ
             .Must(p => Enum.TryParse<RequestPriority>(p, true, out _))
             .WithMessage("Priority must be one of: Low, Medium, High, Urgent.");
     }
+}
+
+// ---- Summary DTOs ----
+
+/// <summary>
+/// Aggregated summary DTO for the request detail summary tab.
+/// </summary>
+public record RequestSummaryDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public string Priority { get; init; } = string.Empty;
+    public string? Category { get; init; }
+    public string? ContactName { get; init; }
+    public string? CompanyName { get; init; }
+    public string? OwnerName { get; init; }
+    public string? AssignedToName { get; init; }
+    public List<RequestSummaryAssociationDto> Associations { get; init; } = new();
+    public List<RequestSummaryActivityDto> RecentActivities { get; init; } = new();
+    public List<RequestSummaryActivityDto> UpcomingActivities { get; init; } = new();
+    public List<RequestSummaryNoteDto> RecentNotes { get; init; } = new();
+    public int AttachmentCount { get; init; }
+    public DateTimeOffset? LastContacted { get; init; }
+}
+
+public record RequestSummaryActivityDto
+{
+    public Guid Id { get; init; }
+    public string Subject { get; init; } = string.Empty;
+    public string Type { get; init; } = string.Empty;
+    public string Status { get; init; } = string.Empty;
+    public DateTimeOffset? DueDate { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record RequestSummaryNoteDto
+{
+    public Guid Id { get; init; }
+    public string Title { get; init; } = string.Empty;
+    public string? Preview { get; init; }
+    public string? AuthorName { get; init; }
+    public DateTimeOffset CreatedAt { get; init; }
+}
+
+public record RequestSummaryAssociationDto
+{
+    public string EntityType { get; init; } = string.Empty;
+    public string Label { get; init; } = string.Empty;
+    public string Icon { get; init; } = string.Empty;
+    public int Count { get; init; }
 }
