@@ -26,6 +26,7 @@ import { RecentSearchesService } from './recent-searches.service';
 import { RecentPreviewsService, RecentPreviewEntry } from './recent-previews.service';
 import { SearchHit, SearchResponse } from './search.models';
 import { PreviewSidebarStore } from '../../stores/preview-sidebar.store';
+import { getEntityConfig } from '../../services/entity-type-registry';
 
 @Component({
   selector: 'app-global-search',
@@ -591,24 +592,7 @@ export class GlobalSearchComponent implements OnDestroy {
   }
 
   getEntityIcon(type: string): string {
-    switch (type) {
-      case 'Company':
-        return 'business';
-      case 'Contact':
-        return 'person';
-      case 'Deal':
-        return 'handshake';
-      case 'Product':
-        return 'inventory_2';
-      case 'Activity':
-        return 'task_alt';
-      case 'Quote':
-        return 'request_quote';
-      case 'Request':
-        return 'support_agent';
-      default:
-        return 'search';
-    }
+    return getEntityConfig(type)?.icon ?? 'search';
   }
 
   /** Close overlay when clicking outside the component. */

@@ -12,4 +12,8 @@ export class EntityPreviewService {
       `/api/entities/${entityType.toLowerCase()}/${entityId}/preview`
     );
   }
+
+  trackView(entityType: string, entityId: string, entityName: string): Observable<void> {
+    return this.api.post<void>('/api/my-day/track-view', { entityType, entityId, entityName });
+  }
 }

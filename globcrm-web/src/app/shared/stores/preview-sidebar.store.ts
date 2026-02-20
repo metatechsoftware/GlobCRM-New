@@ -58,6 +58,13 @@ export const PreviewSidebarStore = signalStore(
           } else {
             patchState(store, { currentData: data, isLoading: false, error: null });
           }
+
+          // Track recently viewed entity for My Day Recent Records widget (fire-and-forget)
+          previewService.trackView(
+            entry.entityType,
+            entry.entityId,
+            data.name || entry.entityName || ''
+          ).subscribe();
         },
         error: (err) => {
           const message =
