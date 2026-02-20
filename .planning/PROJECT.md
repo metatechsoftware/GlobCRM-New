@@ -48,6 +48,16 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 
 ### Active
 
+#### Current Milestone: v1.3 Platform & Polish
+
+**Goal:** Add integration marketplace infrastructure, free-form Kanban boards, quote PDF template builder, and localization support (English + Turkish).
+
+**Target features:**
+- Integration marketplace settings page with card-based grid, categories, and connect buttons (backend infrastructure, no actual API integrations yet)
+- Dedicated Kanban page with system boards (existing deal/activity pipelines) and user-created boards with free-form + entity-linked cards
+- Quote PDF template builder using Unlayer document mode with CRM merge fields and preview
+- Localization infrastructure with translation pipe, JSON files per locale, and language selector (English + Turkish)
+
 #### Future
 
 - [ ] Native mobile apps (iOS/Android) via .NET MAUI
@@ -139,4 +149,4 @@ Every entity page is a dynamic, user-configurable table with rich custom fields,
 | Fire-and-forget trackView | Matches backend feed/notification dispatch pattern | ✓ Good — non-critical side effect, no UX blocking |
 
 ---
-*Last updated: 2026-02-20 after v1.2 milestone*
+*Last updated: 2026-02-20 after v1.3 milestone started*
