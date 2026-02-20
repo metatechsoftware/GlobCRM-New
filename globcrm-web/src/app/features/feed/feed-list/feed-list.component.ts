@@ -22,6 +22,7 @@ import { AuthStore } from '../../../core/auth/auth.store';
 import { PreviewSidebarStore } from '../../../shared/stores/preview-sidebar.store';
 import { getEntityConfig, getEntityRoute } from '../../../shared/services/entity-type-registry';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
+import { UserPreviewService } from '../../../shared/services/user-preview.service';
 
 /**
  * Feed list page combining activity stream and social posts.
@@ -641,6 +642,24 @@ import { AvatarComponent } from '../../../shared/components/avatar/avatar.compon
       }
     }
 
+    /* ── Clickable Author Names ── */
+    .feed-author-name--clickable {
+      cursor: pointer;
+      transition: color var(--duration-fast, 100ms);
+
+      &:hover {
+        color: var(--color-primary, #F97316);
+      }
+    }
+
+    .comment-author--clickable {
+      cursor: pointer;
+
+      &:hover {
+        color: var(--color-primary, #F97316);
+      }
+    }
+
     /* ── Reduced Motion ── */
     @media (prefers-reduced-motion: reduce) {
       .feed-item-card {
@@ -714,7 +733,8 @@ import { AvatarComponent } from '../../../shared/components/avatar/avatar.compon
                 [lastName]="getLastName(item.authorName)"
                 size="sm" />
               <div class="feed-author-info">
-                <span class="feed-author-name">{{ item.authorName }}</span>
+                <span class="feed-author-name feed-author-name--clickable"
+                      (click)="onAuthorClick($event, item)">{{ item.authorName }}</span>
                 <span class="feed-time">{{ getRelativeTime(item.createdAt) }}</span>
               </div>
               <span class="feed-type-badge"
@@ -774,7 +794,8 @@ import { AvatarComponent } from '../../../shared/components/avatar/avatar.compon
                         [lastName]="getLastName(comment.authorName)"
                         size="sm" />
                       <div class="comment-bubble">
-                        <span class="comment-author">{{ comment.authorName }}</span>
+                        <span class="comment-author comment-author--clickable"
+                              (click)="onAuthorClick($event, { authorId: comment.authorId, authorName: comment.authorName })">{{ comment.authorName }}</span>
                         <span class="comment-time">{{ getRelativeTime(comment.createdAt) }}</span>
                         <div class="comment-text">{{ comment.content }}</div>
                       </div>
@@ -828,6 +849,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
   private readonly signalRService = inject(SignalRService);
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
+  private readonly userPreviewService = inject(UserPreviewService);
 
   /** Track which items have expanded comment sections. */
   readonly expandedComments = signal(new Set<string>());
@@ -896,6 +918,18 @@ export class FeedListComponent implements OnInit, OnDestroy {
       entityType,
       entityId,
     });
+  }
+
+  /** Open user preview popover when clicking an author name. */
+  onAuthorClick(event: MouseEvent, item: { authorId?: string; authorName: string }): void {
+    event.stopPropagation();
+    if (!item.authorId) return;
+
+    const target = event.target as HTMLElement;
+    this.userPreviewService.open(
+      { userId: item.authorId, userName: item.authorName },
+      target
+    );
   }
 
   /** Toggle the inline comment section for a feed item. */
