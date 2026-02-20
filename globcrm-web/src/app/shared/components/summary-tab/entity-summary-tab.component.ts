@@ -11,6 +11,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { QuickActionBarComponent } from '../quick-action-bar/quick-action-bar.component';
 import { MiniStageBarComponent } from '../entity-preview/mini-stage-bar.component';
+import { DealPipelineChartComponent } from './deal-pipeline-chart.component';
+import { EmailEngagementCardComponent } from './email-engagement-card.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { StageInfoDto } from '../../models/entity-preview.models';
 import {
@@ -39,6 +41,8 @@ import {
     MatProgressSpinnerModule,
     QuickActionBarComponent,
     MiniStageBarComponent,
+    DealPipelineChartComponent,
+    EmailEngagementCardComponent,
     HasPermissionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -94,6 +98,16 @@ export class EntitySummaryTabComponent {
     this.entityType() === 'Request' ? this.data() as RequestSummaryDto : null
   );
 
+  /** Deal pipeline data for Company and Contact summary tabs */
+  readonly dealPipeline = computed(() =>
+    this.companyData()?.dealPipeline ?? this.contactData()?.dealPipeline ?? null
+  );
+
+  /** Email engagement data for Contact summary tab */
+  readonly emailEngagement = computed(() =>
+    this.contactData()?.emailEngagement ?? null
+  );
+
   /** Convert DealStageInfoDto[] to StageInfoDto[] for MiniStageBarComponent */
   readonly dealStages = computed((): StageInfoDto[] => {
     const deal = this.dealData();
@@ -140,5 +154,22 @@ export class EntitySummaryTabComponent {
 
   onAssociationClick(association: SummaryAssociationDto): void {
     this.associationClicked.emit(association.label);
+  }
+
+  getRelativeTime(dateStr: string): string {
+    const now = new Date();
+    const date = new Date(dateStr);
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks < 4) return `${diffWeeks}w ago`;
+    return date.toLocaleDateString();
   }
 }

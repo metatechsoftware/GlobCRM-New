@@ -131,6 +131,168 @@
   gap: 8px;
 }
 
+// Full-width card (activities hero)
+.full-width {
+  grid-column: 1 / -1;
+}
+
+// Activities Card
+.activities-card {
+  // Full width via .full-width class
+}
+
+.activities-section {
+  margin-bottom: 16px;
+
+  &:last-of-type {
+    margin-bottom: 0;
+  }
+}
+
+.upcoming-section {
+  border-left: 3px solid var(--primary-color, #ff9800);
+  padding-left: 12px;
+  background: var(--primary-50, #fff3e0);
+  border-radius: 0 8px 8px 0;
+  padding: 12px;
+}
+
+.section-subtitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--text-secondary, #666);
+  margin: 0 0 8px 0;
+  letter-spacing: 0.3px;
+}
+
+.activity-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.activity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.activity-subject {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #212121);
+}
+
+.activity-meta {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+}
+
+.activity-time {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  white-space: nowrap;
+  margin-left: 12px;
+}
+
+// Notes Card
+.note-row {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color, #f0f0f0);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.note-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary, #212121);
+}
+
+.note-preview {
+  font-size: 13px;
+  color: var(--text-secondary, #666);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.note-meta {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+}
+
+// Meta Card (Last Contacted + Attachments)
+.meta-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  > mat-icon {
+    color: var(--text-secondary, #666);
+  }
+}
+
+.meta-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.meta-label {
+  font-size: 12px;
+  color: var(--text-secondary, #666);
+  text-transform: uppercase;
+}
+
+.meta-value {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text-primary, #212121);
+
+  &.empty {
+    color: var(--text-secondary, #666);
+    font-style: italic;
+  }
+}
+
+// Empty state
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary, #666);
+  padding: 16px 0;
+  font-size: 14px;
+}
+
+// Pipeline and Email cards
+.pipeline-card,
+.email-card {
+  // Standard card styles, fits within auto-fill grid
+}
+
 // Associations Card
 .associations-card {
   mat-chip {

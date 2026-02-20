@@ -331,10 +331,45 @@
         }
       }
 
-      <!-- ROW 2: Activities Card (hero content - added in 23-03) -->
-      <!-- Activities card (23-03) -->
+      <!-- Activities Card (hero content, full-width per user decision) -->
+      <div class="summary-card activities-card full-width">
+        <h3 class="card-title"><mat-icon>task_alt</mat-icon> Activities</h3>
 
-      <!-- ROW 3: Associations + Notes + Meta -->
+        <!-- Recent Activities Section -->
+        @if (data().recentActivities.length > 0) {
+          <div class="activities-section">
+            <h4 class="section-subtitle">Recent</h4>
+            @for (activity of data().recentActivities; track activity.id) {
+              <div class="activity-row">
+                <div class="activity-info">
+                  <span class="activity-subject">{{ activity.subject }}</span>
+                  <span class="activity-meta">{{ activity.type }} &middot; {{ activity.status }}</span>
+                </div>
+                <span class="activity-time">{{ getRelativeTime(activity.createdAt) }}</span>
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Upcoming Activities Section (visually distinct with accent border) -->
+        @if (data().upcomingActivities.length > 0) {
+          <div class="activities-section upcoming-section">
+            <h4 class="section-subtitle">Upcoming</h4>
+            @for (activity of data().upcomingActivities; track activity.id) {
+              <div class="activity-row">
+                <div class="activity-info">
+                  <span class="activity-subject">{{ activity.subject }}</span>
+                  <span class="activity-meta">{{ activity.type }} &middot; Due {{ activity.dueDate | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            }
+          </div>
+        }
+
+        @if (data().recentActivities.length === 0 && data().upcomingActivities.length === 0) {
+          <div class="empty-state"><mat-icon>event_busy</mat-icon> No activities</div>
+        }
+      </div>
 
       <!-- Associations Card -->
       @if (data().associations.length > 0) {
@@ -354,13 +389,61 @@
         </div>
       }
 
-      <!-- Notes preview card (23-03) -->
+      <!-- Notes Preview Card -->
+      <div class="summary-card notes-card">
+        <h3 class="card-title"><mat-icon>note</mat-icon> Recent Notes</h3>
+        @if (data().recentNotes.length > 0) {
+          @for (note of data().recentNotes; track note.id) {
+            <div class="note-row">
+              <span class="note-title">{{ note.title }}</span>
+              @if (note.preview) {
+                <span class="note-preview">{{ note.preview }}</span>
+              }
+              <span class="note-meta">{{ note.authorName }} &middot; {{ getRelativeTime(note.createdAt) }}</span>
+            </div>
+          }
+        } @else {
+          <div class="empty-state"><mat-icon>note</mat-icon> No notes</div>
+        }
+      </div>
 
-      <!-- Deal pipeline chart card for Company/Contact (23-03) -->
+      <!-- Meta Card (Last Contacted + Attachments Count) -->
+      <div class="summary-card meta-card">
+        <div class="meta-item">
+          <mat-icon>schedule</mat-icon>
+          <div class="meta-content">
+            <span class="meta-label">Last Contacted</span>
+            @if (data().lastContactedAt) {
+              <span class="meta-value">{{ data().lastContactedAt | date:'mediumDate' }}</span>
+            } @else {
+              <span class="meta-value empty">Never</span>
+            }
+          </div>
+        </div>
+        <div class="meta-item">
+          <mat-icon>attach_file</mat-icon>
+          <div class="meta-content">
+            <span class="meta-label">Attachments</span>
+            <span class="meta-value">{{ data().attachmentCount }}</span>
+          </div>
+        </div>
+      </div>
 
-      <!-- Email engagement card for Contact (23-03) -->
+      <!-- Deal Pipeline Card (Company and Contact only) -->
+      @if (isCompanyOrContact() && dealPipeline()) {
+        <div class="summary-card pipeline-card">
+          <h3 class="card-title"><mat-icon>trending_up</mat-icon> Deal Pipeline</h3>
+          <app-deal-pipeline-chart [pipeline]="dealPipeline()!" />
+        </div>
+      }
 
-      <!-- Last contacted + Attachments count card (23-03) -->
+      <!-- Email Engagement Card (Contact only) -->
+      @if (isContact() && emailEngagement()) {
+        <div class="summary-card email-card">
+          <h3 class="card-title"><mat-icon>email</mat-icon> Email Engagement</h3>
+          <app-email-engagement-card [engagement]="emailEngagement()!" />
+        </div>
+      }
     </div>
   }
 </div>
