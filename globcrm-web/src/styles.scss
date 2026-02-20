@@ -322,3 +322,28 @@ small {
 html, body {
   overflow-x: hidden;
 }
+
+// ─── Slide-In Panel (CDK Overlay) ───────────────────────
+// These classes are applied to the CDK overlay pane element,
+// which is OUTSIDE Angular component scope — must be global.
+.slide-in-backdrop {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.slide-in-panel {
+  height: 100%;
+  animation: slideInFromRight 250ms ease-out;
+}
+
+.slide-in-panel--animate-in {
+  transform: translateX(0);
+}
+
+@keyframes slideInFromRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
