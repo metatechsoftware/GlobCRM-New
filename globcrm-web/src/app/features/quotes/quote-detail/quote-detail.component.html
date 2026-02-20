@@ -128,7 +128,26 @@
     <!-- Main content: Tabs left, Info sidebar right -->
     <div class="detail-content">
       <div class="detail-main">
-        <mat-tab-group animationDuration="200ms" (selectedIndexChange)="onTabSelected($event)">
+        <mat-tab-group animationDuration="200ms" [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="onTabSelected($event)">
+          <!-- Summary Tab -->
+          <mat-tab>
+            <ng-template mat-tab-label>
+              <mat-icon class="tab-icon">dashboard</mat-icon>
+              Summary
+            </ng-template>
+            @if (summaryData() || summaryLoading()) {
+              <div class="tab-body">
+                <app-entity-summary-tab
+                  entityType="Quote"
+                  [data]="summaryData()!"
+                  [loading]="summaryLoading()"
+                  (associationClicked)="onAssociationClicked($event)"
+                  (addNote)="onSummaryAddNote()"
+                  (logActivity)="onSummaryLogActivity()" />
+              </div>
+            }
+          </mat-tab>
+
           <!-- Line Items Tab -->
           <mat-tab label="Line Items">
             <div class="tab-body">

@@ -31,6 +31,11 @@ import {
 } from '../request.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { RequestSummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Request detail page with status workflow, entity links, and timeline.
@@ -54,6 +59,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     EntityTimelineComponent,
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
+    EntitySummaryTabComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -317,7 +323,22 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         </div>
 
         <!-- Tabs -->
-        <mat-tab-group animationDuration="0ms" (selectedIndexChange)="onTabSelected($event)">
+        <mat-tab-group animationDuration="0ms" [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="onTabSelected($event)">
+          <!-- Summary Tab -->
+          <mat-tab label="Summary">
+            @if (summaryData() || summaryLoading()) {
+              <div style="padding: 16px 0;">
+                <app-entity-summary-tab
+                  entityType="Request"
+                  [data]="summaryData()!"
+                  [loading]="summaryLoading()"
+                  (associationClicked)="onAssociationClicked($event)"
+                  (addNote)="onSummaryAddNote()"
+                  (logActivity)="onSummaryLogActivity()" />
+              </div>
+            }
+          </mat-tab>
+
           <!-- Details Tab -->
           <mat-tab label="Details">
             <div class="details-section">
@@ -414,6 +435,7 @@ export class RequestDetailComponent implements OnInit {
   private readonly noteService = inject(NoteService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly summaryService = inject(SummaryService);
 
   /** Request detail data. */
   request = signal<RequestDetailDto | null>(null);
@@ -428,8 +450,17 @@ export class RequestDetailComponent implements OnInit {
   notesLoading = signal(false);
   notesLoaded = signal(false);
 
+  /** Summary tab data. */
+  summaryData = signal<RequestSummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  selectedTabIndex = signal(0);
+
   /** Current request ID from route. */
   private requestId = '';
+
+  /** Tab labels matching the mat-tab-group order (including Summary at index 0). */
+  private readonly tabLabels = ['Summary', 'Details', 'Timeline', 'Notes', 'Attachments'];
 
   /** Computed: allowed status transitions from the detail response. */
   allowedTransitions = computed(() => {
@@ -447,6 +478,25 @@ export class RequestDetailComponent implements OnInit {
 
     this.loadRequest();
     this.loadTimeline();
+    this.loadSummary();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getRequestSummary(this.requestId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load request detail data. */
@@ -496,9 +546,15 @@ export class RequestDetailComponent implements OnInit {
       });
   }
 
-  /** Handle tab selection for lazy loading notes. */
+  /** Handle tab selection for lazy loading and summary dirty-flag. */
   onTabSelected(index: number): void {
-    if (index === 2) {
+    this.selectedTabIndex.set(index);
+    // Summary at index 0
+    if (index === 0 && this.summaryDirty()) {
+      this.loadSummary();
+    }
+    // Notes at index 3 (shifted +1 for Summary insertion)
+    if (index === 3) {
       this.loadRequestNotes();
     }
   }
@@ -549,6 +605,54 @@ export class RequestDetailComponent implements OnInit {
     }
   }
 
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(tabLabel: string): void {
+    const index = this.tabLabels.indexOf(tabLabel);
+    if (index >= 0) {
+      this.selectedTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Request',
+          entityId: this.requestId,
+          entityName: this.request()?.subject,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Request',
+          entityId: this.requestId,
+          entityName: this.request()?.subject,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
   /** Transition request to a new status. */
   onTransitionStatus(newStatus: string): void {
     this.requestService
@@ -561,6 +665,7 @@ export class RequestDetailComponent implements OnInit {
           });
           this.loadRequest();
           this.loadTimeline();
+          this.markSummaryDirty();
         },
         error: () => {
           this.snackBar.open('Failed to update status', 'OK', {

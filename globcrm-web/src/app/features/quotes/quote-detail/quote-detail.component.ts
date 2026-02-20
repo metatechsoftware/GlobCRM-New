@@ -31,6 +31,11 @@ import {
 } from '../quote.models';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { QuoteSummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Quote detail page with line items table, PDF download, versioning, and status management.
@@ -55,6 +60,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     HasPermissionDirective,
     EntityTimelineComponent,
     EntityAttachmentsComponent,
+    EntitySummaryTabComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './quote-detail.component.scss',
@@ -67,6 +73,7 @@ export class QuoteDetailComponent implements OnInit {
   private readonly noteService = inject(NoteService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly summaryService = inject(SummaryService);
 
   /** Quote detail data. */
   quote = signal<QuoteDetailDto | null>(null);
@@ -84,8 +91,17 @@ export class QuoteDetailComponent implements OnInit {
   notesLoading = signal(false);
   notesLoaded = signal(false);
 
+  /** Summary tab data. */
+  summaryData = signal<QuoteSummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  selectedTabIndex = signal(0);
+
   /** Current quote ID from route. */
   private quoteId = '';
+
+  /** Tab labels matching the mat-tab-group order (including Summary at index 0). */
+  private readonly tabLabels = ['Summary', 'Line Items', 'Details', 'Versions', 'Timeline', 'Notes', 'Attachments'];
 
   /** Computed: allowed status transitions from current status. */
   allowedTransitions = computed(() => {
@@ -124,6 +140,25 @@ export class QuoteDetailComponent implements OnInit {
 
     this.loadQuote();
     this.loadTimeline();
+    this.loadSummary();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getQuoteSummary(this.quoteId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load quote detail data. */
@@ -173,9 +208,15 @@ export class QuoteDetailComponent implements OnInit {
       });
   }
 
-  /** Handle tab selection for lazy loading notes. */
+  /** Handle tab selection for lazy loading and summary dirty-flag. */
   onTabSelected(index: number): void {
-    if (index === 4) {
+    this.selectedTabIndex.set(index);
+    // Summary at index 0
+    if (index === 0 && this.summaryDirty()) {
+      this.loadSummary();
+    }
+    // Notes at index 5 (shifted +1 for Summary insertion)
+    if (index === 5) {
       this.loadQuoteNotes();
     }
   }
@@ -271,6 +312,54 @@ export class QuoteDetailComponent implements OnInit {
     });
   }
 
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(tabLabel: string): void {
+    const index = this.tabLabels.indexOf(tabLabel);
+    if (index >= 0) {
+      this.selectedTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Quote',
+          entityId: this.quoteId,
+          entityName: this.quote()?.title,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Quote',
+          entityId: this.quoteId,
+          entityName: this.quote()?.title,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
   /** Transition quote to a new status. */
   onTransitionStatus(newStatus: QuoteStatus): void {
     this.quoteService
@@ -283,6 +372,7 @@ export class QuoteDetailComponent implements OnInit {
           });
           this.loadQuote();
           this.loadTimeline();
+          this.markSummaryDirty();
         },
         error: () => {
           this.snackBar.open('Failed to update status', 'OK', {
