@@ -226,16 +226,14 @@
 
           <!-- Tab 0: Summary -->
           <ng-template>
-            @if (summaryData() || summaryLoading()) {
-              <app-entity-summary-tab
-                entityType="Lead"
-                [data]="summaryData()!"
-                [loading]="summaryLoading()"
-                (associationClicked)="onAssociationClicked($event)"
-                (addNote)="onSummaryAddNote()"
-                (logActivity)="onSummaryLogActivity()"
-                (sendEmail)="onSummarySendEmail()" />
-            }
+            <app-entity-summary-tab
+              entityType="Lead"
+              [data]="summaryData()"
+              [loading]="summaryLoading()"
+              (associationClicked)="onAssociationClicked($event)"
+              (addNote)="onSummaryAddNote()"
+              (logActivity)="onSummaryLogActivity()"
+              (sendEmail)="onSummarySendEmail()" />
           </ng-template>
 
           <!-- Tab 1: Overview -->

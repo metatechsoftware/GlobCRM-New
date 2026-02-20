@@ -108,15 +108,13 @@
 
           <!-- Tab 0: Summary -->
           <ng-template>
-            @if (summaryData() || summaryLoading()) {
-              <app-entity-summary-tab
-                entityType="Deal"
-                [data]="summaryData()!"
-                [loading]="summaryLoading()"
-                (associationClicked)="onAssociationClicked($event)"
-                (addNote)="onSummaryAddNote()"
-                (logActivity)="onSummaryLogActivity()" />
-            }
+            <app-entity-summary-tab
+              entityType="Deal"
+              [data]="summaryData()"
+              [loading]="summaryLoading()"
+              (associationClicked)="onAssociationClicked($event)"
+              (addNote)="onSummaryAddNote()"
+              (logActivity)="onSummaryLogActivity()" />
           </ng-template>
 
           <!-- Tab 1: Details -->

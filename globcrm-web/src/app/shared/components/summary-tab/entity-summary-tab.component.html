@@ -12,7 +12,7 @@
       <div class="skeleton-card"></div>
       <div class="skeleton-card skeleton-wide"></div>
     </div>
-  } @else {
+  } @else if (data()) {
     <div class="summary-grid">
       <!-- ROW 1: Key Properties Card -->
       <div class="summary-card key-properties-card">
@@ -336,10 +336,10 @@
         <h3 class="card-title"><mat-icon>task_alt</mat-icon> Activities</h3>
 
         <!-- Recent Activities Section -->
-        @if (data().recentActivities.length > 0) {
+        @if (data()!.recentActivities.length > 0) {
           <div class="activities-section">
             <h4 class="section-subtitle">Recent</h4>
-            @for (activity of data().recentActivities; track activity.id) {
+            @for (activity of data()!.recentActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
                   <span class="activity-subject">{{ activity.subject }}</span>
@@ -352,10 +352,10 @@
         }
 
         <!-- Upcoming Activities Section (visually distinct with accent border) -->
-        @if (data().upcomingActivities.length > 0) {
+        @if (data()!.upcomingActivities.length > 0) {
           <div class="activities-section upcoming-section">
             <h4 class="section-subtitle">Upcoming</h4>
-            @for (activity of data().upcomingActivities; track activity.id) {
+            @for (activity of data()!.upcomingActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
                   <span class="activity-subject">{{ activity.subject }}</span>
@@ -366,20 +366,20 @@
           </div>
         }
 
-        @if (data().recentActivities.length === 0 && data().upcomingActivities.length === 0) {
+        @if (data()!.recentActivities.length === 0 && data()!.upcomingActivities.length === 0) {
           <div class="empty-state"><mat-icon>event_busy</mat-icon> No activities</div>
         }
       </div>
 
       <!-- Associations Card -->
-      @if (data().associations.length > 0) {
+      @if (data()!.associations.length > 0) {
         <div class="summary-card associations-card">
           <h3 class="card-title">
             <mat-icon>link</mat-icon>
             Associations
           </h3>
           <mat-chip-set>
-            @for (assoc of data().associations; track assoc.entityType) {
+            @for (assoc of data()!.associations; track assoc.entityType) {
               <mat-chip (click)="onAssociationClick(assoc)">
                 <mat-icon matChipAvatar>{{ assoc.icon }}</mat-icon>
                 {{ assoc.count }} {{ assoc.label }}
@@ -392,8 +392,8 @@
       <!-- Notes Preview Card -->
       <div class="summary-card notes-card">
         <h3 class="card-title"><mat-icon>note</mat-icon> Recent Notes</h3>
-        @if (data().recentNotes.length > 0) {
-          @for (note of data().recentNotes; track note.id) {
+        @if (data()!.recentNotes.length > 0) {
+          @for (note of data()!.recentNotes; track note.id) {
             <div class="note-row">
               <span class="note-title">{{ note.title }}</span>
               @if (note.preview) {
@@ -413,8 +413,8 @@
           <mat-icon>schedule</mat-icon>
           <div class="meta-content">
             <span class="meta-label">Last Contacted</span>
-            @if (data().lastContacted) {
-              <span class="meta-value">{{ data().lastContacted | date:'mediumDate' }}</span>
+            @if (data()!.lastContacted) {
+              <span class="meta-value">{{ data()!.lastContacted | date:'mediumDate' }}</span>
             } @else {
               <span class="meta-value empty">Never</span>
             }
@@ -424,7 +424,7 @@
           <mat-icon>attach_file</mat-icon>
           <div class="meta-content">
             <span class="meta-label">Attachments</span>
-            <span class="meta-value">{{ data().attachmentCount }}</span>
+            <span class="meta-value">{{ data()!.attachmentCount }}</span>
           </div>
         </div>
       </div>
@@ -444,6 +444,11 @@
           <app-email-engagement-card [engagement]="emailEngagement()!" />
         </div>
       }
+    </div>
+  } @else {
+    <div class="summary-error">
+      <mat-icon>error_outline</mat-icon>
+      <span>Unable to load summary data.</span>
     </div>
   }
 </div>

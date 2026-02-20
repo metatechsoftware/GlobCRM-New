@@ -51,7 +51,7 @@ import {
 })
 export class EntitySummaryTabComponent {
   readonly entityType = input.required<string>();
-  readonly data = input.required<EntitySummaryData>();
+  readonly data = input.required<EntitySummaryData | null>();
   readonly loading = input(false);
 
   readonly associationClicked = output<string>();
@@ -75,27 +75,27 @@ export class EntitySummaryTabComponent {
 
   /** Type-narrowed accessors for template use */
   readonly companyData = computed(() =>
-    this.entityType() === 'Company' ? this.data() as CompanySummaryDto : null
+    this.entityType() === 'Company' && this.data() ? this.data() as CompanySummaryDto : null
   );
 
   readonly contactData = computed(() =>
-    this.entityType() === 'Contact' ? this.data() as ContactSummaryDto : null
+    this.entityType() === 'Contact' && this.data() ? this.data() as ContactSummaryDto : null
   );
 
   readonly dealData = computed(() =>
-    this.entityType() === 'Deal' ? this.data() as DealSummaryDto : null
+    this.entityType() === 'Deal' && this.data() ? this.data() as DealSummaryDto : null
   );
 
   readonly leadData = computed(() =>
-    this.entityType() === 'Lead' ? this.data() as LeadSummaryDto : null
+    this.entityType() === 'Lead' && this.data() ? this.data() as LeadSummaryDto : null
   );
 
   readonly quoteData = computed(() =>
-    this.entityType() === 'Quote' ? this.data() as QuoteSummaryDto : null
+    this.entityType() === 'Quote' && this.data() ? this.data() as QuoteSummaryDto : null
   );
 
   readonly requestData = computed(() =>
-    this.entityType() === 'Request' ? this.data() as RequestSummaryDto : null
+    this.entityType() === 'Request' && this.data() ? this.data() as RequestSummaryDto : null
   );
 
   /** Deal pipeline data for Company and Contact summary tabs */

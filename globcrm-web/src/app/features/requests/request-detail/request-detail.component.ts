@@ -326,17 +326,15 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
         <mat-tab-group animationDuration="0ms" [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="onTabSelected($event)">
           <!-- Summary Tab -->
           <mat-tab label="Summary">
-            @if (summaryData() || summaryLoading()) {
-              <div style="padding: 16px 0;">
-                <app-entity-summary-tab
-                  entityType="Request"
-                  [data]="summaryData()!"
-                  [loading]="summaryLoading()"
-                  (associationClicked)="onAssociationClicked($event)"
-                  (addNote)="onSummaryAddNote()"
-                  (logActivity)="onSummaryLogActivity()" />
-              </div>
-            }
+            <div style="padding: 16px 0;">
+              <app-entity-summary-tab
+                entityType="Request"
+                [data]="summaryData()"
+                [loading]="summaryLoading()"
+                (associationClicked)="onAssociationClicked($event)"
+                (addNote)="onSummaryAddNote()"
+                (logActivity)="onSummaryLogActivity()" />
+            </div>
           </mat-tab>
 
           <!-- Details Tab -->

@@ -96,16 +96,14 @@
         <app-related-entity-tabs [tabs]="tabs" [activeTabIndex]="activeTabIndex()" (tabChanged)="onTabChanged($event)">
           <!-- Summary tab content (index 0) -->
           <ng-template>
-            @if (summaryData() || summaryLoading()) {
-              <app-entity-summary-tab
-                entityType="Company"
-                [data]="summaryData()!"
-                [loading]="summaryLoading()"
-                (associationClicked)="onAssociationClicked($event)"
-                (addNote)="onSummaryAddNote()"
-                (logActivity)="onSummaryLogActivity()"
-                (sendEmail)="onSummarySendEmail()" />
-            }
+            <app-entity-summary-tab
+              entityType="Company"
+              [data]="summaryData()"
+              [loading]="summaryLoading()"
+              (associationClicked)="onAssociationClicked($event)"
+              (addNote)="onSummaryAddNote()"
+              (logActivity)="onSummaryLogActivity()"
+              (sendEmail)="onSummarySendEmail()" />
           </ng-template>
 
           <!-- Details tab content (index 1) -->

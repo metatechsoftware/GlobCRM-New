@@ -135,17 +135,15 @@
               <mat-icon class="tab-icon">dashboard</mat-icon>
               Summary
             </ng-template>
-            @if (summaryData() || summaryLoading()) {
-              <div class="tab-body">
-                <app-entity-summary-tab
-                  entityType="Quote"
-                  [data]="summaryData()!"
-                  [loading]="summaryLoading()"
-                  (associationClicked)="onAssociationClicked($event)"
-                  (addNote)="onSummaryAddNote()"
-                  (logActivity)="onSummaryLogActivity()" />
-              </div>
-            }
+            <div class="tab-body">
+              <app-entity-summary-tab
+                entityType="Quote"
+                [data]="summaryData()"
+                [loading]="summaryLoading()"
+                (associationClicked)="onAssociationClicked($event)"
+                (addNote)="onSummaryAddNote()"
+                (logActivity)="onSummaryLogActivity()" />
+            </div>
           </mat-tab>
 
           <!-- Line Items Tab -->

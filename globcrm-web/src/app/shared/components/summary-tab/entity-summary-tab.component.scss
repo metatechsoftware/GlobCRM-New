@@ -340,6 +340,16 @@
   }
 }
 
+.summary-error {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  color: var(--text-secondary, #666);
+  padding: 48px 16px;
+  font-size: 14px;
+}
+
 // Responsive: on small screens, all cards go full width
 @media (max-width: 720px) {
   .summary-grid {
