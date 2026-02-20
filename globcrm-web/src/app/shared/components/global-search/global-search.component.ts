@@ -23,14 +23,16 @@ import {
 } from 'rxjs/operators';
 import { SearchService } from './search.service';
 import { RecentSearchesService } from './recent-searches.service';
+import { RecentPreviewsService, RecentPreviewEntry } from './recent-previews.service';
 import { SearchHit, SearchResponse } from './search.models';
+import { PreviewSidebarStore } from '../../stores/preview-sidebar.store';
 
 @Component({
   selector: 'app-global-search',
   standalone: true,
   imports: [CommonModule, FormsModule, MatIconModule],
   template: `
-    <div class="global-search" [class.active]="isOpen() || showRecent()">
+    <div class="global-search" [class.active]="isOpen() || showRecent() || showRecentPreviews()">
       <mat-icon class="search-icon">search</mat-icon>
       <input
         #searchInput
@@ -62,7 +64,7 @@ import { SearchHit, SearchResponse } from './search.models';
                 <a
                   class="search-hit"
                   [class.active]="flatIndex(group, i) === activeIndex()"
-                  (click)="selectResult(hit)"
+                  (click)="selectResult(hit, $event)"
                   (mouseenter)="activeIndex.set(flatIndex(group, i))">
                   <mat-icon class="entity-icon">{{ getEntityIcon(hit.entityType) }}</mat-icon>
                   <div class="hit-content">
@@ -108,6 +110,27 @@ import { SearchHit, SearchResponse } from './search.models';
             <a class="recent-item" (click)="selectRecent(term)">
               <mat-icon>history</mat-icon>
               <span>{{ term }}</span>
+            </a>
+          }
+        </div>
+      }
+
+      <!-- Recently Previewed Entities -->
+      @if (showRecentPreviews() && !isOpen() && recentPreviews().length > 0) {
+        <div class="search-overlay">
+          <div class="recent-header">
+            <span>Recently Viewed</span>
+            <button class="recent-clear-btn" (click)="clearRecentPreviews()">
+              <mat-icon>delete_outline</mat-icon>
+            </button>
+          </div>
+          @for (entry of recentPreviews(); track entry.entityId) {
+            <a class="search-hit" (click)="selectRecentPreview(entry)">
+              <mat-icon class="entity-icon">{{ getEntityIcon(entry.entityType) }}</mat-icon>
+              <div class="hit-content">
+                <span class="hit-title">{{ entry.entityName }}</span>
+                <span class="hit-subtitle">{{ entry.entityType }}</span>
+              </div>
             </a>
           }
         </div>
@@ -361,6 +384,8 @@ import { SearchHit, SearchResponse } from './search.models';
 export class GlobalSearchComponent implements OnDestroy {
   private readonly searchService = inject(SearchService);
   private readonly recentSearchesService = inject(RecentSearchesService);
+  private readonly recentPreviewsService = inject(RecentPreviewsService);
+  private readonly previewStore = inject(PreviewSidebarStore);
   private readonly router = inject(Router);
   private readonly elementRef = inject(ElementRef);
 
@@ -371,7 +396,9 @@ export class GlobalSearchComponent implements OnDestroy {
   readonly isOpen = signal(false);
   readonly isLoading = signal(false);
   readonly recentSearches = signal<string[]>([]);
+  readonly recentPreviews = signal<RecentPreviewEntry[]>([]);
   readonly showRecent = signal(false);
+  readonly showRecentPreviews = signal(false);
   readonly searchError = signal(false);
   readonly activeIndex = signal(-1);
 
@@ -436,18 +463,42 @@ export class GlobalSearchComponent implements OnDestroy {
 
   onFocus(): void {
     this.recentSearches.set(this.recentSearchesService.getRecent());
+    this.recentPreviews.set(this.recentPreviewsService.getRecent());
     if (!this.isOpen() && !this.results()) {
-      this.showRecent.set(true);
+      // Show recently previewed if available, otherwise recent searches
+      if (this.recentPreviews().length > 0) {
+        this.showRecentPreviews.set(true);
+        this.showRecent.set(false);
+      } else {
+        this.showRecentPreviews.set(false);
+        this.showRecent.set(true);
+      }
     }
   }
 
-  selectResult(hit: SearchHit): void {
+  selectResult(hit: SearchHit, event?: MouseEvent): void {
     const term = this.searchTerm();
     if (term.trim()) {
       this.recentSearchesService.addRecent(term.trim());
     }
     this.close();
-    this.router.navigateByUrl(hit.url);
+
+    if (event?.ctrlKey || event?.metaKey) {
+      // Ctrl/Cmd+click: navigate to detail page (existing behavior)
+      this.router.navigateByUrl(hit.url);
+    } else {
+      // Default: open preview sidebar
+      this.recentPreviewsService.addRecent({
+        entityType: hit.entityType,
+        entityId: hit.id,
+        entityName: hit.title,
+      });
+      this.previewStore.open({
+        entityType: hit.entityType,
+        entityId: hit.id,
+        entityName: hit.title,
+      });
+    }
   }
 
   selectRecent(term: string): void {
@@ -462,9 +513,25 @@ export class GlobalSearchComponent implements OnDestroy {
     this.showRecent.set(false);
   }
 
+  selectRecentPreview(entry: RecentPreviewEntry): void {
+    this.close();
+    this.previewStore.open({
+      entityType: entry.entityType,
+      entityId: entry.entityId,
+      entityName: entry.entityName,
+    });
+  }
+
+  clearRecentPreviews(): void {
+    this.recentPreviewsService.clearRecent();
+    this.recentPreviews.set([]);
+    this.showRecentPreviews.set(false);
+  }
+
   close(): void {
     this.isOpen.set(false);
     this.showRecent.set(false);
+    this.showRecentPreviews.set(false);
     this.activeIndex.set(-1);
   }
 
@@ -489,7 +556,24 @@ export class GlobalSearchComponent implements OnDestroy {
       const idx = this.activeIndex();
       if (idx >= 0 && idx < hits.length) {
         event.preventDefault();
-        this.selectResult(hits[idx]);
+        if (event.ctrlKey || event.metaKey) {
+          // Ctrl/Cmd+Enter: navigate to detail page
+          this.close();
+          this.router.navigateByUrl(hits[idx].url);
+        } else {
+          // Enter: open preview
+          this.recentPreviewsService.addRecent({
+            entityType: hits[idx].entityType,
+            entityId: hits[idx].id,
+            entityName: hits[idx].title,
+          });
+          this.previewStore.open({
+            entityType: hits[idx].entityType,
+            entityId: hits[idx].id,
+            entityName: hits[idx].title,
+          });
+          this.close();
+        }
       }
     }
   }
@@ -531,7 +615,7 @@ export class GlobalSearchComponent implements OnDestroy {
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
     if (
-      (this.isOpen() || this.showRecent()) &&
+      (this.isOpen() || this.showRecent() || this.showRecentPreviews()) &&
       !this.elementRef.nativeElement.contains(event.target)
     ) {
       this.close();
