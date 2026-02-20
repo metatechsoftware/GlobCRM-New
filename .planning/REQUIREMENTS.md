@@ -30,8 +30,8 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 - [x] **SUMMARY-03**: Summary tab shows association counts (e.g., "5 Contacts, 3 Deals") that link to respective tabs
 - [x] **SUMMARY-04**: Summary tab displays last 3-5 recent activities in condensed format
 - [x] **SUMMARY-05**: Summary tab displays upcoming activities (not done, due today or later) in condensed format
-- [ ] **SUMMARY-06**: Summary tab shows stage/status indicator: pipeline stepper for Deals, stage+temperature for Leads, status badges for Quotes/Requests
-- [ ] **SUMMARY-07**: Summary tab includes a quick action bar (Add Note, Log Activity, Send Email) with entity-type-specific actions
+- [x] **SUMMARY-06**: Summary tab shows stage/status indicator: pipeline stepper for Deals, stage+temperature for Leads, status badges for Quotes/Requests
+- [x] **SUMMARY-07**: Summary tab includes a quick action bar (Add Note, Log Activity, Send Email) with entity-type-specific actions
 - [x] **SUMMARY-08**: Company and Contact summary tabs show mini deal/pipeline summary (total value, deals by stage chart, win rate)
 - [x] **SUMMARY-09**: Contact summary tab shows email engagement summary (last sent/received, total exchanged)
 - [x] **SUMMARY-10**: Summary tab shows last 2-3 notes preview (truncated to ~100 chars)
@@ -117,8 +117,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SUMMARY-03 | Phase 23 | Complete |
 | SUMMARY-04 | Phase 23 | Complete |
 | SUMMARY-05 | Phase 23 | Complete |
-| SUMMARY-06 | Phase 23 | Pending |
-| SUMMARY-07 | Phase 23 | Pending |
+| SUMMARY-06 | Phase 23 | Complete |
+| SUMMARY-07 | Phase 23 | Complete |
 | SUMMARY-08 | Phase 23 | Complete |
 | SUMMARY-09 | Phase 23 | Complete |
 | SUMMARY-10 | Phase 23 | Complete |

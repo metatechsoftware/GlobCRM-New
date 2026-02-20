@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 23 of 25 (Summary Tabs on Detail Pages) -- IN PROGRESS
-Plan: 1 of 4 in current phase
+Plan: 2 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-20 — Completed 23-01 (Backend Summary Endpoints)
+Last activity: 2026-02-20 — Completed 23-02 (Frontend Summary Tab Components)
 
-Progress: [█████████████████████████████████████████████████████████████████████████████████████████████████████░░░] 95% (145/154 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 95% (146/154 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 145
+- Total plans completed: 146
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 6 plans (5 in phase 22, 1 in phase 23)
+- v1.2 (in progress): 7 plans (5 in phase 22, 2 in phase 23)
 
 ## Accumulated Context
 
@@ -56,6 +56,9 @@ Recent decisions for v1.2:
 - Entity-prefixed DTO names for summary endpoints to avoid namespace collisions (co-located per controller file)
 - Win rate computed from materialized deal data, not separate SQL query
 - Request summary uses dual-ownership RBAC (OwnerId + AssignedToId)
+- Shared frontend summary interfaces (SummaryActivityDto etc.) instead of entity-prefixed since shapes are identical
+- Computed signals for type narrowing in EntitySummaryTabComponent @switch blocks
+- StageInfoDto adapter pattern for MiniStageBarComponent reuse in summary tabs
 
 ### Pending Todos
 
@@ -69,6 +72,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 23-01-PLAN.md (Backend Summary Endpoints)
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-01-SUMMARY.md
-Next step: Execute 23-02-PLAN.md
+Stopped at: Completed 23-02-PLAN.md (Frontend Summary Tab Components)
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-02-SUMMARY.md
+Next step: Execute 23-03-PLAN.md
