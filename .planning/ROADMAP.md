@@ -84,13 +84,14 @@ Plans:
   3. Company and Contact summary tabs show a mini deal/pipeline summary (total value, deals by stage, win rate); Contact summary also shows email engagement summary (last sent/received, total exchanged)
   4. User can perform quick actions (Add Note, Log Activity, Send Email) directly from the summary tab via a shared QuickActionBarComponent
   5. Summary tab data refreshes automatically when the user performs mutations on sibling tabs (dirty-flag invalidation pattern)
-**Plans**: 4 plans
+**Plans**: 5 plans
 
 Plans:
 - [ ] 23-01-PLAN.md — Backend summary aggregation endpoints (GET /api/{entityType}/{id}/summary for all 6 entities using Task.WhenAll batching, RBAC-scope-filtered counts, deal/pipeline stats for Company/Contact, email stats for Contact)
 - [ ] 23-02-PLAN.md — QuickActionBarComponent + EntitySummaryTabComponent shell (shared quick action bar with Add Note/Log Activity/Send Email, summary tab component with key properties card, association count chips, stage/status indicators)
 - [ ] 23-03-PLAN.md — Summary tab content widgets (activities card, notes preview, last-contacted, attachments count, deal pipeline donut chart for Company/Contact, email engagement card for Contact)
 - [ ] 23-04-PLAN.md — Detail page integration (insert Summary tab at index 0 on all 6 entity detail pages, dirty-flag invalidation wiring, quick action dialog handlers)
+- [ ] 23-05-PLAN.md — Gap closure: fix lastContacted field name mismatch (SUMMARY-11) and wire markSummaryDirty() to mutation handlers on Company/Contact/Deal/Lead detail pages
 
 ### Phase 24: My Day Personal Dashboard
 **Goal**: Users land on a personal daily workspace after login that shows their tasks, overdue items, upcoming events, pipeline, recent activity, and quick access to common actions — replacing the generic home page with a focused "what do I need to do today" view
