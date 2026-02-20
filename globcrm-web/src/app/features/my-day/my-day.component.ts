@@ -1,35 +1,61 @@
-import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, computed, afterNextRender } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthStore } from '../../core/auth/auth.store';
+import { PreviewSidebarStore } from '../../shared/stores/preview-sidebar.store';
+import { MyDayStore } from './my-day.store';
+import { MyDayService } from './my-day.service';
+import { GreetingBannerComponent } from './widgets/greeting-banner/greeting-banner.component';
+import { TasksWidgetComponent } from './widgets/tasks-widget/tasks-widget.component';
+import { UpcomingEventsWidgetComponent } from './widgets/upcoming-events-widget/upcoming-events-widget.component';
 
 @Component({
   selector: 'app-my-day',
   standalone: true,
+  imports: [
+    GreetingBannerComponent,
+    TasksWidgetComponent,
+    UpcomingEventsWidgetComponent,
+  ],
+  providers: [MyDayStore, MyDayService],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  template: `
-    <div class="my-day-placeholder">
-      <h1>My Day</h1>
-      <p>Coming Soon</p>
-    </div>
-  `,
-  styles: [`
-    .my-day-placeholder {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 60vh;
-      color: var(--mat-sys-on-surface-variant, #666);
-    }
-
-    h1 {
-      font-size: 2rem;
-      font-weight: 500;
-      margin-bottom: 0.5rem;
-    }
-
-    p {
-      font-size: 1.125rem;
-      opacity: 0.7;
-    }
-  `],
+  templateUrl: './my-day.component.html',
+  styleUrl: './my-day.component.scss',
 })
-export class MyDayComponent {}
+export class MyDayComponent {
+  readonly store = inject(MyDayStore);
+  private readonly authStore = inject(AuthStore);
+  private readonly previewSidebarStore = inject(PreviewSidebarStore);
+  private readonly router = inject(Router);
+
+  /** Extract first name from full user name. */
+  readonly firstName = computed(() => {
+    const name = this.authStore.userName();
+    return name?.split(' ')[0] ?? '';
+  });
+
+  constructor() {
+    afterNextRender(() => {
+      this.store.loadMyDay();
+    });
+  }
+
+  onTaskCompleted(taskId: string): void {
+    this.store.completeTask(taskId);
+  }
+
+  onEntityClicked(event: { type: string; id: string }): void {
+    this.previewSidebarStore.open({
+      entityType: event.type,
+      entityId: event.id,
+    });
+  }
+
+  onEventClicked(eventId: string): void {
+    this.router.navigate([`/activities/${eventId}`]);
+  }
+
+  onQuickAction(type: string): void {
+    // Placeholder: will be wired in 24-05
+    console.log('Quick action:', type);
+  }
+}

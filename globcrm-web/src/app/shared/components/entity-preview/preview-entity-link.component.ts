@@ -1,7 +1,8 @@
 import { Component, ChangeDetectionStrategy, input, inject } from '@angular/core';
+import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { PreviewSidebarStore } from '../../stores/preview-sidebar.store';
-import { getEntityConfig } from '../../services/entity-type-registry';
+import { getEntityConfig, getEntityRoute } from '../../services/entity-type-registry';
 
 @Component({
   selector: 'app-preview-entity-link',
@@ -9,7 +10,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
   imports: [MatIconModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button class="entity-link" (click)="onClick()">
+    <button class="entity-link" (click)="onClick($event)">
       <mat-icon class="entity-link-icon" [style.color]="iconColor">{{ icon }}</mat-icon>
       <span>{{ entityName() }}</span>
     </button>
@@ -52,6 +53,7 @@ export class PreviewEntityLinkComponent {
   readonly entityName = input.required<string>();
 
   private readonly store = inject(PreviewSidebarStore);
+  private readonly router = inject(Router);
 
   get icon(): string {
     return getEntityConfig(this.entityType())?.icon ?? 'link';
@@ -61,11 +63,19 @@ export class PreviewEntityLinkComponent {
     return getEntityConfig(this.entityType())?.color ?? 'var(--color-text-muted)';
   }
 
-  onClick(): void {
-    this.store.pushPreview({
-      entityType: this.entityType(),
-      entityId: this.entityId(),
-      entityName: this.entityName(),
-    });
+  onClick(event: MouseEvent): void {
+    if (event.ctrlKey || event.metaKey) {
+      // Ctrl/Cmd+click: navigate to entity detail page
+      event.preventDefault();
+      const route = getEntityRoute(this.entityType(), this.entityId());
+      this.router.navigate([route]);
+    } else {
+      // Normal click: open preview sidebar
+      this.store.pushPreview({
+        entityType: this.entityType(),
+        entityId: this.entityId(),
+        entityName: this.entityName(),
+      });
+    }
   }
 }

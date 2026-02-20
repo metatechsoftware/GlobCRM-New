@@ -1,0 +1,29 @@
+<div class="my-day">
+  <div class="my-day__grid">
+    <!-- Full-width greeting banner -->
+    <app-greeting-banner class="my-day__widget--full"
+      [firstName]="firstName()"
+      [stats]="store.greetingStats()"
+      [isLoading]="store.isLoading()"
+      (quickAction)="onQuickAction($event)" />
+
+    <!-- Full-width tasks widget -->
+    <app-tasks-widget class="my-day__widget--full"
+      [overdueTasks]="store.overdueTasks()"
+      [todayTasks]="store.todayTasks()"
+      [isLoading]="store.isLoading()"
+      [completingTaskIds]="store.completingTaskIds()"
+      [highlightedItemId]="store.highlightedItemId()"
+      (taskCompleted)="onTaskCompleted($event)"
+      (entityClicked)="onEntityClicked($event)" />
+
+    <!-- Row 2: upcoming events (half-width) -->
+    <app-upcoming-events-widget
+      [events]="store.data()?.upcomingEvents ?? []"
+      [isLoading]="store.isLoading()"
+      (eventClicked)="onEventClicked($event)" />
+
+    <!-- Placeholders for pipeline and email widgets (built in 24-04) -->
+    <!-- Row 3: placeholders for feed, notifications, recent records (built in 24-04) -->
+  </div>
+</div>
