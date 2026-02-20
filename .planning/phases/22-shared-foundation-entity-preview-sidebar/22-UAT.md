@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 22-shared-foundation-entity-preview-sidebar
 source: 22-01-SUMMARY.md, 22-02-SUMMARY.md, 22-03-SUMMARY.md, 22-04-SUMMARY.md
 started: 2026-02-20T12:00:00Z
@@ -79,27 +79,42 @@ skipped: 2
   reason: "User reported: When I click a link I get [Error] Failed to load resource: the server responded with a status of 404 (Not Found) (default-avatar.svg, line 0) so no sidebar opens"
   severity: major
   test: 1
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Stale Angular build cache (.angular/cache/) serving compiled template from intermediate dev state that referenced default-avatar.svg. Current source code correctly uses @if guard with mat-icon fallback. No code bug — cache issue only. Test 2 passing confirms sidebar works."
+  artifacts:
+    - path: "globcrm-web/src/app/shared/components/entity-preview-sidebar/entity-preview-sidebar.component.html"
+      issue: "Lines 34-38 are correct — uses @if guard, NOT the source of the 404"
+    - path: "globcrm-web/.angular/cache/"
+      issue: "37MB stale cache may contain old compiled templates"
+  missing:
+    - "Clear .angular/cache and restart dev server — no code changes needed"
+  debug_session: ".planning/debug/feed-entity-link-404-avatar.md"
 
 - truth: "Association chips show hover state indicating they are clickable"
   status: failed
   reason: "User reported: related fields on hover dont show up as if clickable it should be obvious to the user"
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Three compounding issues: (1) Material's mat-chip in presentational mode sets cursor:auto via .mdc-evolution-chip__action--presentational, (2) host-level :hover background is hidden by Material's internal chip surface elements, (3) default ViewEncapsulation.Emulated cannot target Material's internal DOM"
+  artifacts:
+    - path: "globcrm-web/src/app/shared/components/entity-preview/association-chips.component.ts"
+      issue: "Lines 54-62: hover styles exist but are architecturally ineffective due to encapsulation and Material internal DOM"
+  missing:
+    - "Override Material CSS custom properties: --mdc-chip-hover-state-layer-opacity: 0.12"
+    - "Add cursor: pointer and box-shadow on hover"
+    - "Use ::ng-deep for .mdc-evolution-chip__action--presentational cursor override"
+  debug_session: ".planning/debug/association-chips-hover.md"
 
 - truth: "Preview sidebar starts below the topbar, not overlapping it"
   status: failed
   reason: "User reported: the sidebar should start with respect to topbar since header is invisible right now"
   severity: minor
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "mat-sidenav-container uses height:100vh + padding-top:56px. Padding pushes mat-sidenav-content down but mat-sidenav panel is absolutely positioned filling entire container height from y=0. Top 56px hidden behind fixed content-header (z-index 1029)."
+  artifacts:
+    - path: "globcrm-web/src/app/app.component.ts"
+      issue: "Lines 53-61: .app-sidenav-container has height:100vh + padding-top:56px — padding doesn't offset the sidenav panel"
+    - path: "globcrm-web/src/app/shared/components/navbar/navbar.component.scss"
+      issue: "Lines 330-359: .content-header is position:fixed top:0 height:56px z-index:1029"
+  missing:
+    - "Change .app-sidenav-container.has-nav-sidebar from height:100vh + padding-top:56px to height:calc(100vh - 56px) + margin-top:56px"
+  debug_session: ".planning/debug/sidebar-overlaps-topbar.md"
