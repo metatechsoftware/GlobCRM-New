@@ -46,7 +46,7 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 - [x] **MYDAY-04**: My Day highlights overdue tasks with urgency indicators
 - [x] **MYDAY-05**: My Day shows an upcoming events/calendar widget (today + next 2 days, compact agenda)
 - [x] **MYDAY-06**: My Day shows a personal pipeline summary widget (user's deals grouped by stage with values)
-- [ ] **MYDAY-07**: My Day includes a quick actions row (New Contact, New Deal, Log Activity, New Note, Send Email)
+- [x] **MYDAY-07**: My Day includes a quick actions row (New Contact, New Deal, Log Activity, New Note, Send Email)
 - [x] **MYDAY-08**: My Day shows a recent records widget (last 5-8 recently viewed entities)
 - [x] **MYDAY-09**: Org dashboard relocated to its own menu item, accessible via sidebar navigation
 - [x] **MYDAY-10**: My Day includes an email summary widget (unread count, recent emails)
@@ -130,7 +130,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | MYDAY-04 | Phase 24 | Complete |
 | MYDAY-05 | Phase 24 | Complete |
 | MYDAY-06 | Phase 24 | Complete |
-| MYDAY-07 | Phase 24 | Pending |
+| MYDAY-07 | Phase 24 | Complete |
 | MYDAY-08 | Phase 24 | Complete |
 | MYDAY-09 | Phase 24 | Complete |
 | MYDAY-10 | Phase 24 | Complete |

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 24 of 25 (My Day Personal Dashboard)
-Plan: 4 of 5 in current phase -- COMPLETE
-Status: Executing phase 24
-Last activity: 2026-02-20 — Completed 24-04 (My Day Secondary Widgets)
+Plan: 5 of 5 in current phase -- COMPLETE
+Status: Phase 24 complete
+Last activity: 2026-02-20 — Completed 24-05 (Slide-In Quick Actions)
 
-Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████████░] 99% (153/155 plans)
+Progress: [█████████████████████████████████████████████████████████████████████████████████████████████████████████░] 99% (154/155 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 153
+- Total plans completed: 154
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 14 plans (5 in phase 22, 5 in phase 23, 4 in phase 24)
+- v1.2 (in progress): 15 plans (5 in phase 22, 5 in phase 23, 5 in phase 24)
 
 ## Accumulated Context
 
@@ -75,6 +75,10 @@ Recent decisions for v1.2:
 - PreviewEntityLinkComponent enhanced globally for Ctrl/Cmd+click — benefits all entity links app-wide
 - Widget components use PreviewEntityLinkComponent directly for entity links rather than emitting events to parent
 - Pipeline stacked bar uses CSS flex with proportional flex values per stage dealCount (zero-dependency, matching conic-gradient donut pattern)
+- CDK Overlay with InjectionToken for slide-in panel config passing (not MatDialog) for full positioning control
+- Global CSS for CDK overlay panel classes (outside Angular component scope)
+- Silent refreshData() skips isLoading to avoid skeleton flash on post-action refresh
+- Email quick action navigates to /emails?compose=true instead of opening slide-in (pragmatic for complex compose UX)
 
 ### Pending Todos
 
@@ -88,6 +92,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 24-04-PLAN.md
-Resume file: .planning/phases/24-my-day-personal-dashboard/24-04-SUMMARY.md
-Next step: Execute 24-05-PLAN.md (My Day quick actions and polish)
+Stopped at: Completed 24-05-PLAN.md (Phase 24 complete)
+Resume file: .planning/phases/24-my-day-personal-dashboard/24-05-SUMMARY.md
+Next step: Plan or execute phase 25
