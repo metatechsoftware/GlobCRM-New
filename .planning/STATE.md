@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 23 COMPLETE, ready for Phase 24
+**Current focus:** v1.2 Connected Experience — Phase 23 COMPLETE (with gap closure), ready for Phase 24
 
 ## Current Position
 
 Phase: 23 of 25 (Summary Tabs on Detail Pages) -- COMPLETE
-Plan: 4 of 4 in current phase
+Plan: 5 of 5 in current phase
 Status: Phase complete
-Last activity: 2026-02-20 — Completed 23-04 (Detail Page Integration)
+Last activity: 2026-02-20 — Completed 23-05 (Gap Closure: lastContacted mismatch + dirty-flag wiring)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 96% (148/154 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 97% (149/155 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 148
+- Total plans completed: 149
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 9 plans (5 in phase 22, 4 in phase 23)
+- v1.2 (in progress): 10 plans (5 in phase 22, 5 in phase 23)
 
 ## Accumulated Context
 
@@ -66,6 +66,7 @@ Recent decisions for v1.2:
 - Quick actions call loadSummary() directly in afterClosed handler for immediate user feedback
 - Quote and Request keep raw mat-tab-group with selectedIndex binding (not refactored to RelatedEntityTabsComponent)
 - Summary dirty-flag set on status transitions for Quote and Request
+- No Company detail changes needed for dirty-flag -- no inline sibling-tab mutations exist
 
 ### Pending Todos
 
@@ -79,6 +80,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 23-04-PLAN.md (Detail Page Integration) -- Phase 23 COMPLETE
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-04-SUMMARY.md
+Stopped at: Completed 23-05-PLAN.md (Gap Closure) -- Phase 23 COMPLETE with all verification gaps closed
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-05-SUMMARY.md
 Next step: Plan or execute Phase 24 (My Day Dashboard)
