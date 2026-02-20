@@ -222,9 +222,23 @@
     <!-- Main content: Tabs -->
     <div class="detail-content">
       <div class="detail-main">
-        <app-related-entity-tabs [tabs]="tabs()" (tabChanged)="onTabChanged($event)">
+        <app-related-entity-tabs [tabs]="tabs()" [activeTabIndex]="activeTabIndex()" (tabChanged)="onTabChanged($event)">
 
-          <!-- Tab 0: Overview -->
+          <!-- Tab 0: Summary -->
+          <ng-template>
+            @if (summaryData() || summaryLoading()) {
+              <app-entity-summary-tab
+                entityType="Lead"
+                [data]="summaryData()!"
+                [loading]="summaryLoading()"
+                (associationClicked)="onAssociationClicked($event)"
+                (addNote)="onSummaryAddNote()"
+                (logActivity)="onSummaryLogActivity()"
+                (sendEmail)="onSummarySendEmail()" />
+            }
+          </ng-template>
+
+          <!-- Tab 1: Overview -->
           <ng-template>
             <!-- Contact Info Section -->
             <div class="detail-section">

@@ -38,6 +38,11 @@ import { NoteListDto } from '../../notes/note.models';
 import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { CompanySummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Company detail page with tabs (Details, Contacts, and disabled future tabs)
@@ -61,6 +66,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     EntityTimelineComponent,
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
+    EntitySummaryTabComponent,
   ],
   templateUrl: './company-detail.component.html',
   styleUrl: './company-detail.component.scss',
@@ -78,6 +84,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly permissionStore = inject(PermissionStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly summaryService = inject(SummaryService);
 
   /** Company detail data. */
   company = signal<CompanyDetailDto | null>(null);
@@ -116,6 +123,12 @@ export class CompanyDetailComponent implements OnInit {
   timelineEntries = signal<TimelineEntry[]>([]);
   timelineLoading = signal(false);
 
+  /** Summary tab data. */
+  summaryData = signal<CompanySummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  activeTabIndex = signal(0);
+
   /** Tab configuration for company detail. */
   readonly tabs = COMPANY_TABS;
 
@@ -131,6 +144,25 @@ export class CompanyDetailComponent implements OnInit {
 
     this.loadCompany();
     this.loadTimeline();
+    this.loadSummary();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getCompanySummary(this.companyId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale so it refreshes when the Summary tab is re-selected. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load company detail data. Handles merged-record redirects. */
@@ -191,6 +223,12 @@ export class CompanyDetailComponent implements OnInit {
 
   /** Handle tab change -- lazy load contacts/activities/quotes/requests/emails when tab is selected. */
   onTabChanged(label: string): void {
+    if (label === 'Summary') {
+      if (!this.summaryData() || this.summaryDirty()) {
+        this.loadSummary();
+      }
+      return;
+    }
     if (label === 'Contacts') {
       this.loadContacts();
     }
@@ -371,6 +409,59 @@ export class CompanyDetailComponent implements OnInit {
       return (words[0][0] + words[1][0]).toUpperCase();
     }
     return name.substring(0, 2).toUpperCase();
+  }
+
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(label: string): void {
+    const index = COMPANY_TABS.findIndex(t => t.label === label);
+    if (index >= 0) {
+      this.activeTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Company',
+          entityId: this.companyId,
+          entityName: this.company()?.name,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Company',
+          entityId: this.companyId,
+          entityName: this.company()?.name,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Send Email (not applicable for Company). */
+  onSummarySendEmail(): void {
+    // Company does not have a direct email target; no-op
   }
 
   /** Handle delete with confirmation dialog. */

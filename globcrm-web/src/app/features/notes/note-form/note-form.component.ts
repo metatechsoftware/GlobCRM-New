@@ -5,7 +5,10 @@ import {
   OnDestroy,
   inject,
   signal,
+  input,
+  output,
 } from '@angular/core';
+import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -176,12 +179,14 @@ import { RequestListDto } from '../../requests/request.models';
   `,
   template: `
     <div class="entity-form-container">
-      <div class="form-header">
-        <a mat-icon-button routerLink="/notes" aria-label="Back to notes">
-          <mat-icon>arrow_back</mat-icon>
-        </a>
-        <h1>{{ isEditMode ? 'Edit Note' : 'Create Note' }}</h1>
-      </div>
+      @if (!dialogMode()) {
+        <div class="form-header">
+          <a mat-icon-button routerLink="/notes" aria-label="Back to notes">
+            <mat-icon>arrow_back</mat-icon>
+          </a>
+          <h1>{{ isEditMode ? 'Edit Note' : 'Create Note' }}</h1>
+        </div>
+      }
 
       @if (isLoadingDetail()) {
         <div class="form-loading">
@@ -265,16 +270,18 @@ import { RequestListDto } from '../../requests/request.models';
           </div>
 
           <!-- Form actions -->
-          <div class="form-actions">
-            <button mat-button type="button" routerLink="/notes">Cancel</button>
-            <button mat-raised-button color="primary" type="submit"
-                    [disabled]="noteForm.invalid || isSaving()">
-              @if (isSaving()) {
-                <mat-spinner diameter="20"></mat-spinner>
-              }
-              {{ isEditMode ? 'Save Changes' : 'Create Note' }}
-            </button>
-          </div>
+          @if (!dialogMode()) {
+            <div class="form-actions">
+              <button mat-button type="button" routerLink="/notes">Cancel</button>
+              <button mat-raised-button color="primary" type="submit"
+                      [disabled]="noteForm.invalid || isSaving()">
+                @if (isSaving()) {
+                  <mat-spinner diameter="20"></mat-spinner>
+                }
+                {{ isEditMode ? 'Save Changes' : 'Create Note' }}
+              </button>
+            </div>
+          }
         </form>
       }
     </div>
@@ -291,6 +298,18 @@ export class NoteFormComponent implements OnInit, OnDestroy {
   private readonly quoteService = inject(QuoteService);
   private readonly requestService = inject(RequestService);
   private readonly snackBar = inject(MatSnackBar);
+
+  /** Optional dialog data injected when used inside EntityFormDialogComponent. */
+  private readonly dialogData = inject(MAT_DIALOG_DATA, { optional: true }) as { prefill?: { entityType?: string; entityId?: string; entityName?: string } } | null;
+
+  /** When true, hides form header/actions -- parent dialog provides those. */
+  dialogMode = input(false);
+
+  /** Emitted when entity is created in dialog mode. */
+  entityCreated = output<any>();
+
+  /** Emitted when entity creation fails in dialog mode. */
+  entityCreateError = output<void>();
 
   /** Entity type options for the select dropdown. */
   readonly entityTypes = NOTE_ENTITY_TYPES;
@@ -335,6 +354,9 @@ export class NoteFormComponent implements OnInit, OnDestroy {
 
     if (this.isEditMode) {
       this.loadNoteForEdit();
+    } else if (this.dialogMode() && this.dialogData?.prefill) {
+      // Pre-fill from dialog data when used inside EntityFormDialogComponent
+      this.prefillFromDialogData();
     } else {
       // QueryParam pre-fill for create mode
       this.prefillFromQueryParams();
@@ -344,6 +366,34 @@ export class NoteFormComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /** Called by parent EntityFormDialogComponent to trigger form submission. */
+  triggerSubmit(): void {
+    this.onSubmit();
+  }
+
+  // ─── Dialog Pre-fill ──────────────────────────────────────────────────
+
+  /**
+   * Pre-fill form from dialog data when used inside EntityFormDialogComponent.
+   */
+  private prefillFromDialogData(): void {
+    const prefill = this.dialogData?.prefill;
+    if (!prefill) return;
+
+    if (prefill.entityType) {
+      this.noteForm.patchValue({ entityType: prefill.entityType });
+    }
+    if (prefill.entityId) {
+      this.noteForm.patchValue({ entityId: prefill.entityId });
+    }
+    if (prefill.entityName) {
+      this.noteForm.patchValue({ entityName: prefill.entityName });
+      this.entitySearchControl.setValue(
+        { id: prefill.entityId, name: prefill.entityName } as any,
+      );
+    }
   }
 
   // ─── QueryParam Pre-fill ───────────────────────────────────────────────
@@ -615,13 +665,20 @@ export class NoteFormComponent implements OnInit, OnDestroy {
           this.snackBar.open('Note created successfully', 'Close', {
             duration: 3000,
           });
-          this.router.navigate(['/notes', created.id]);
+          if (this.dialogMode()) {
+            this.entityCreated.emit(created);
+          } else {
+            this.router.navigate(['/notes', created.id]);
+          }
         },
         error: () => {
           this.isSaving.set(false);
           this.snackBar.open('Failed to create note', 'Close', {
             duration: 5000,
           });
+          if (this.dialogMode()) {
+            this.entityCreateError.emit();
+          }
         },
       });
     }

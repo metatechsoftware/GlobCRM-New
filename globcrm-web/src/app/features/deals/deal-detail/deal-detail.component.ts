@@ -42,6 +42,11 @@ import { NoteListDto } from '../../notes/note.models';
 import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
 import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { DealSummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Deal detail page with 5 tabs: Details, Contacts, Products, Activities (disabled), Timeline.
@@ -71,6 +76,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     EntityTimelineComponent,
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
+    EntitySummaryTabComponent,
   ],
   templateUrl: './deal-detail.component.html',
   styleUrl: './deal-detail.component.scss',
@@ -88,6 +94,7 @@ export class DealDetailComponent implements OnInit {
   private readonly permissionStore = inject(PermissionStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly summaryService = inject(SummaryService);
 
   /** Deal detail data. */
   deal = signal<DealDetailDto | null>(null);
@@ -111,6 +118,12 @@ export class DealDetailComponent implements OnInit {
   dealNotes = signal<NoteListDto[]>([]);
   notesLoading = signal(false);
   notesLoaded = signal(false);
+
+  /** Summary tab data. */
+  summaryData = signal<DealSummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  activeTabIndex = signal(0);
 
   /** Tab configuration for deal detail. */
   readonly tabs = DEAL_TABS;
@@ -143,8 +156,27 @@ export class DealDetailComponent implements OnInit {
 
     this.loadDeal();
     this.loadTimeline();
+    this.loadSummary();
     this.setupContactSearch();
     this.setupProductSearch();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getDealSummary(this.dealId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load deal detail data. */
@@ -177,6 +209,12 @@ export class DealDetailComponent implements OnInit {
 
   /** Handle tab change -- lazy load activities/quotes/notes when tab is selected. */
   onTabChanged(label: string): void {
+    if (label === 'Summary') {
+      if (!this.summaryData() || this.summaryDirty()) {
+        this.loadSummary();
+      }
+      return;
+    }
     if (label === 'Activities') {
       this.loadLinkedActivities();
     }
@@ -279,6 +317,54 @@ export class DealDetailComponent implements OnInit {
           this.quotesLoading.set(false);
         },
       });
+  }
+
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(label: string): void {
+    const index = DEAL_TABS.findIndex(t => t.label === label);
+    if (index >= 0) {
+      this.activeTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Deal',
+          entityId: this.dealId,
+          entityName: this.deal()?.title,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Deal',
+          entityId: this.dealId,
+          entityName: this.deal()?.title,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
   }
 
   /** Handle delete with confirmation dialog. */

@@ -24,6 +24,7 @@ export interface EntityTab {
  * Enabled tabs have content available now; disabled tabs show "coming soon".
  */
 export const COMPANY_TABS: EntityTab[] = [
+  { label: 'Summary', icon: 'dashboard', enabled: true },
   { label: 'Details', icon: 'info', enabled: true },
   { label: 'Contacts', icon: 'people', enabled: true },
   { label: 'Deals', icon: 'handshake', enabled: true },
@@ -36,6 +37,7 @@ export const COMPANY_TABS: EntityTab[] = [
 ];
 
 export const CONTACT_TABS: EntityTab[] = [
+  { label: 'Summary', icon: 'dashboard', enabled: true },
   { label: 'Details', icon: 'info', enabled: true },
   { label: 'Company', icon: 'business', enabled: true },
   { label: 'Deals', icon: 'handshake', enabled: true },
@@ -53,6 +55,7 @@ export const PRODUCT_TABS: EntityTab[] = [
 ];
 
 export const DEAL_TABS: EntityTab[] = [
+  { label: 'Summary', icon: 'dashboard', enabled: true },
   { label: 'Details', icon: 'info', enabled: true },
   { label: 'Contacts', icon: 'people', enabled: true },
   { label: 'Products', icon: 'inventory_2', enabled: true },

@@ -21,6 +21,7 @@ import { DealFormComponent } from '../../../features/deals/deal-form/deal-form.c
 import { ActivityFormComponent } from '../../../features/activities/activity-form/activity-form.component';
 import { ProductFormComponent } from '../../../features/products/product-form/product-form.component';
 import { LeadFormComponent } from '../../../features/leads/lead-form/lead-form.component';
+import { NoteFormComponent } from '../../../features/notes/note-form/note-form.component';
 import {
   EntityFormDialogData,
   EntityFormDialogResult,
@@ -42,6 +43,7 @@ import {
     ActivityFormComponent,
     ProductFormComponent,
     LeadFormComponent,
+    NoteFormComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -98,6 +100,12 @@ import {
             (entityCreated)="onEntityCreated($event)"
             (entityCreateError)="onCreateError()" />
         }
+        @case ('Note') {
+          <app-note-form
+            [dialogMode]="true"
+            (entityCreated)="onEntityCreated($event)"
+            (entityCreateError)="onCreateError()" />
+        }
       }
     </mat-dialog-content>
 
@@ -134,6 +142,7 @@ export class EntityFormDialogComponent {
   private readonly activityForm = viewChild(ActivityFormComponent);
   private readonly productForm = viewChild(ProductFormComponent);
   private readonly leadForm = viewChild(LeadFormComponent);
+  private readonly noteForm = viewChild(NoteFormComponent);
 
   /** Track saving state and which action button was clicked. */
   isSaving = signal(false);
@@ -151,6 +160,7 @@ export class EntityFormDialogComponent {
       case 'Activity': return this.activityForm();
       case 'Product': return this.productForm();
       case 'Lead': return this.leadForm();
+      case 'Note': return this.noteForm();
     }
   }
 

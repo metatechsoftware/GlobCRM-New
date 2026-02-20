@@ -35,6 +35,11 @@ import { NoteService } from '../../notes/note.service';
 import { NoteListDto } from '../../notes/note.models';
 import { ActivityService } from '../../activities/activity.service';
 import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../activities/activity.models';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { LeadSummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Lead detail page with interactive stage stepper, temperature badge, source tag,
@@ -60,6 +65,7 @@ import { ActivityListDto, ACTIVITY_STATUSES, ACTIVITY_PRIORITIES } from '../../a
     EntityTimelineComponent,
     EntityAttachmentsComponent,
     CustomFieldFormComponent,
+    EntitySummaryTabComponent,
   ],
   templateUrl: './lead-detail.component.html',
   styleUrl: './lead-detail.component.scss',
@@ -73,6 +79,7 @@ export class LeadDetailComponent implements OnInit {
   private readonly activityService = inject(ActivityService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly summaryService = inject(SummaryService);
 
   /** Lead detail data. */
   lead = signal<LeadDetailDto | null>(null);
@@ -94,6 +101,12 @@ export class LeadDetailComponent implements OnInit {
   linkedActivities = signal<ActivityListDto[]>([]);
   activitiesLoading = signal(false);
   activitiesLoaded = signal(false);
+
+  /** Summary tab data. */
+  summaryData = signal<LeadSummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  activeTabIndex = signal(0);
 
   /** Current lead ID from route. */
   private leadId = '';
@@ -133,6 +146,7 @@ export class LeadDetailComponent implements OnInit {
   /** Tab configuration -- dynamically includes Conversion tab when converted. */
   tabs = computed<EntityTab[]>(() => {
     const baseTabs: EntityTab[] = [
+      { label: 'Summary', icon: 'dashboard', enabled: true },
       { label: 'Overview', icon: 'info', enabled: true },
       { label: 'Activities', icon: 'task_alt', enabled: true },
       { label: 'Notes', icon: 'note', enabled: true },
@@ -154,6 +168,25 @@ export class LeadDetailComponent implements OnInit {
     this.loadLead();
     this.loadStages();
     this.loadTimeline();
+    this.loadSummary();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getLeadSummary(this.leadId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load lead detail data. */
@@ -207,6 +240,12 @@ export class LeadDetailComponent implements OnInit {
 
   /** Handle tab change -- lazy load data for certain tabs. */
   onTabChanged(label: string): void {
+    if (label === 'Summary') {
+      if (!this.summaryData() || this.summaryDirty()) {
+        this.loadSummary();
+      }
+      return;
+    }
     if (label === 'Activities') {
       this.loadLinkedActivities();
     }
@@ -369,6 +408,64 @@ export class LeadDetailComponent implements OnInit {
           this.snackBar.open('Lead converted successfully', 'OK', { duration: 3000 });
         }
       });
+    });
+  }
+
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(label: string): void {
+    const index = this.tabs().findIndex(t => t.label === label);
+    if (index >= 0) {
+      this.activeTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Lead',
+          entityId: this.leadId,
+          entityName: this.lead()?.fullName,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Lead',
+          entityId: this.leadId,
+          entityName: this.lead()?.fullName,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Send Email for this lead. */
+  onSummarySendEmail(): void {
+    this.router.navigate(['/emails/compose'], {
+      queryParams: {
+        contactName: this.lead()?.fullName,
+        email: this.lead()?.email,
+      },
     });
   }
 

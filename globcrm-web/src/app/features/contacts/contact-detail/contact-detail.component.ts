@@ -39,6 +39,11 @@ import { TimelineEntry } from '../../../shared/models/query.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SequenceService } from '../../sequences/sequence.service';
 import { SequenceListItem } from '../../sequences/sequence.models';
+import { EntitySummaryTabComponent } from '../../../shared/components/summary-tab/entity-summary-tab.component';
+import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
+import { EntityFormDialogData, EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
+import { SummaryService } from '../../../shared/components/summary-tab/summary.service';
+import { ContactSummaryDto } from '../../../shared/components/summary-tab/summary.models';
 
 /**
  * Contact detail page with tabs (Details, Company, and disabled future tabs)
@@ -62,6 +67,7 @@ import { SequenceListItem } from '../../sequences/sequence.models';
     EntityTimelineComponent,
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
+    EntitySummaryTabComponent,
   ],
   templateUrl: './contact-detail.component.html',
   styleUrl: './contact-detail.component.scss',
@@ -80,6 +86,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly permissionStore = inject(PermissionStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly summaryService = inject(SummaryService);
 
   /** Contact detail data. */
   contact = signal<ContactDetailDto | null>(null);
@@ -114,6 +121,12 @@ export class ContactDetailComponent implements OnInit {
   notesLoading = signal(false);
   notesLoaded = signal(false);
 
+  /** Summary tab data. */
+  summaryData = signal<ContactSummaryDto | null>(null);
+  summaryLoading = signal(false);
+  summaryDirty = signal(false);
+  activeTabIndex = signal(0);
+
   /** Tab configuration for contact detail. */
   readonly tabs = CONTACT_TABS;
 
@@ -129,6 +142,25 @@ export class ContactDetailComponent implements OnInit {
 
     this.loadContact();
     this.loadTimeline();
+    this.loadSummary();
+  }
+
+  /** Load summary data for the Summary tab. */
+  private loadSummary(): void {
+    this.summaryLoading.set(true);
+    this.summaryDirty.set(false);
+    this.summaryService.getContactSummary(this.contactId).subscribe({
+      next: (data) => {
+        this.summaryData.set(data);
+        this.summaryLoading.set(false);
+      },
+      error: () => this.summaryLoading.set(false),
+    });
+  }
+
+  /** Mark summary data as stale. */
+  markSummaryDirty(): void {
+    this.summaryDirty.set(true);
   }
 
   /** Load contact detail data. Handles merged-record redirects. */
@@ -173,6 +205,12 @@ export class ContactDetailComponent implements OnInit {
 
   /** Handle tab change -- lazy load activities/quotes/requests/emails when tab is selected. */
   onTabChanged(label: string): void {
+    if (label === 'Summary') {
+      if (!this.summaryData() || this.summaryDirty()) {
+        this.loadSummary();
+      }
+      return;
+    }
     // Company tab data comes from the contact detail DTO itself.
     if (label === 'Activities') {
       this.loadLinkedActivities();
@@ -341,6 +379,67 @@ export class ContactDetailComponent implements OnInit {
       hour: 'numeric',
       minute: '2-digit',
     }).format(new Date(dateStr));
+  }
+
+  /** Handle association chip click -- switch to the corresponding tab. */
+  onAssociationClicked(label: string): void {
+    const index = CONTACT_TABS.findIndex(t => t.label === label);
+    if (index >= 0) {
+      this.activeTabIndex.set(index);
+    }
+  }
+
+  /** Quick action: Add Note via dialog. */
+  onSummaryAddNote(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Note',
+        prefill: {
+          entityType: 'Contact',
+          entityId: this.contactId,
+          entityName: this.contact()?.fullName,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Log Activity via dialog. */
+  onSummaryLogActivity(): void {
+    const dialogRef = this.dialog.open(EntityFormDialogComponent, {
+      width: '700px',
+      data: {
+        entityType: 'Activity',
+        prefill: {
+          entityType: 'Contact',
+          entityId: this.contactId,
+          entityName: this.contact()?.fullName,
+        },
+      } as EntityFormDialogData,
+    });
+    dialogRef.afterClosed().subscribe((result: EntityFormDialogResult | undefined) => {
+      if (result?.entity) {
+        this.loadSummary();
+      }
+    });
+  }
+
+  /** Quick action: Send Email for this contact. */
+  onSummarySendEmail(): void {
+    // Navigate to email compose with contact pre-filled
+    // For now, this opens the email compose route
+    this.router.navigate(['/emails/compose'], {
+      queryParams: {
+        contactId: this.contactId,
+        contactName: this.contact()?.fullName,
+        email: this.contact()?.email,
+      },
+    });
   }
 
   /** Open sequence picker and enroll this contact in the selected sequence. */

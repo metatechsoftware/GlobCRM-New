@@ -104,9 +104,22 @@
     <!-- Main content: Tabs + Timeline sidebar -->
     <div class="detail-content">
       <div class="detail-main">
-        <app-related-entity-tabs [tabs]="tabs" (tabChanged)="onTabChanged($event)">
+        <app-related-entity-tabs [tabs]="tabs" [activeTabIndex]="activeTabIndex()" (tabChanged)="onTabChanged($event)">
 
-          <!-- Tab 0: Details -->
+          <!-- Tab 0: Summary -->
+          <ng-template>
+            @if (summaryData() || summaryLoading()) {
+              <app-entity-summary-tab
+                entityType="Deal"
+                [data]="summaryData()!"
+                [loading]="summaryLoading()"
+                (associationClicked)="onAssociationClicked($event)"
+                (addNote)="onSummaryAddNote()"
+                (logActivity)="onSummaryLogActivity()" />
+            }
+          </ng-template>
+
+          <!-- Tab 1: Details -->
           <ng-template>
             <!-- Deal Info section -->
             <div class="detail-section">
