@@ -65,7 +65,8 @@ export class NavbarComponent {
     {
       label: '',
       items: [
-        { route: '/dashboard', icon: 'grid_view', label: 'Dashboard' },
+        { route: '/my-day', icon: 'home', label: 'My Day' },
+        { route: '/analytics', icon: 'grid_view', label: 'Analytics' },
         { route: '/reports', icon: 'bar_chart', label: 'Reports' },
       ]
     },
