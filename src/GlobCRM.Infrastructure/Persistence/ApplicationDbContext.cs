@@ -150,6 +150,9 @@ public class ApplicationDbContext
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<ReportCategory> ReportCategories => Set<ReportCategory>();
 
+    // My Day DbSets
+    public DbSet<RecentlyViewedEntity> RecentlyViewedEntities => Set<RecentlyViewedEntity>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -262,6 +265,9 @@ public class ApplicationDbContext
         // Reporting entity configurations
         modelBuilder.ApplyConfiguration(new ReportConfiguration());
         modelBuilder.ApplyConfiguration(new ReportCategoryConfiguration());
+
+        // My Day entity configurations
+        modelBuilder.ApplyConfiguration(new RecentlyViewedEntityConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -469,5 +475,9 @@ public class ApplicationDbContext
         // Global query filter: filter ReportCategories by TenantId (tenant-scoped)
         modelBuilder.Entity<ReportCategory>().HasQueryFilter(
             rc => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rc.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter RecentlyViewedEntities by TenantId (tenant-scoped)
+        modelBuilder.Entity<RecentlyViewedEntity>().HasQueryFilter(
+            rv => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rv.TenantId == _tenantProvider.GetTenantId());
     }
 }
