@@ -53,6 +53,18 @@ import { getEntityConfig } from '../../services/entity-type-registry';
 
     mat-chip {
       cursor: pointer;
+      transition: all 0.15s ease;
+      --mdc-chip-elevated-container-color: var(--color-surface, #fff);
+      --mdc-chip-hover-state-layer-opacity: 0.12;
+
+      &:hover {
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+        --mdc-chip-elevated-container-color: var(--color-highlight, rgba(0, 0, 0, 0.06));
+      }
+    }
+
+    ::ng-deep .mdc-evolution-chip__action--presentational {
+      cursor: pointer !important;
     }
   `],
 })
