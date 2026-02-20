@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 23 of 25 (Summary Tabs on Detail Pages) -- IN PROGRESS
-Plan: 2 of 4 in current phase
+Plan: 3 of 4 in current phase
 Status: Executing
-Last activity: 2026-02-20 — Completed 23-02 (Frontend Summary Tab Components)
+Last activity: 2026-02-20 — Completed 23-03 (Summary Tab Content Widgets)
 
-Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 95% (146/154 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████░░] 95% (147/154 plans)
 
 ## Milestones
 
@@ -28,7 +28,7 @@ Progress: [███████████████████████
 - Total plans completed: 146
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 7 plans (5 in phase 22, 2 in phase 23)
+- v1.2 (in progress): 8 plans (5 in phase 22, 3 in phase 23)
 
 ## Accumulated Context
 
@@ -59,6 +59,9 @@ Recent decisions for v1.2:
 - Shared frontend summary interfaces (SummaryActivityDto etc.) instead of entity-prefixed since shapes are identical
 - Computed signals for type narrowing in EntitySummaryTabComponent @switch blocks
 - StageInfoDto adapter pattern for MiniStageBarComponent reuse in summary tabs
+- CSS conic-gradient donut chart with radial-gradient mask for donut hole (zero-dependency chart visualization)
+- Activities as hero content with full-width card and two distinct sections (Recent + Upcoming with accent border)
+- Deal count for donut segment proportions (not value) for clearer visual pipeline distribution
 
 ### Pending Todos
 
@@ -72,6 +75,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 23-02-PLAN.md (Frontend Summary Tab Components)
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-02-SUMMARY.md
-Next step: Execute 23-03-PLAN.md
+Stopped at: Completed 23-03-PLAN.md (Summary Tab Content Widgets)
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-03-SUMMARY.md
+Next step: Execute 23-04-PLAN.md
