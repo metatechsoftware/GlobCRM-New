@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 23 (next phase)
+**Current focus:** v1.2 Connected Experience — Phase 23 (Summary Tabs on Detail Pages)
 
 ## Current Position
 
-Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar) -- COMPLETE
-Plan: 5 of 5 in current phase
-Status: Phase Complete
-Last activity: 2026-02-20 — Completed 22-05 (UAT Gap Closure)
+Phase: 23 of 25 (Summary Tabs on Detail Pages) -- IN PROGRESS
+Plan: 1 of 4 in current phase
+Status: Executing
+Last activity: 2026-02-20 — Completed 23-01 (Backend Summary Endpoints)
 
-Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████░░░░] 94% (144/154 plans)
+Progress: [█████████████████████████████████████████████████████████████████████████████████████████████████████░░░] 95% (145/154 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 144
+- Total plans completed: 145
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 5 plans in phase 22
+- v1.2 (in progress): 6 plans (5 in phase 22, 1 in phase 23)
 
 ## Accumulated Context
 
@@ -53,6 +53,9 @@ Recent decisions for v1.2:
 - Feed tooltips use denormalized entityName (no API call on hover)
 - Material chip hover uses CSS custom properties (--mdc-chip-elevated-container-color) not direct background
 - Sidebar container below fixed header uses margin-top + calc height, not padding-top
+- Entity-prefixed DTO names for summary endpoints to avoid namespace collisions (co-located per controller file)
+- Win rate computed from materialized deal data, not separate SQL query
+- Request summary uses dual-ownership RBAC (OwnerId + AssignedToId)
 
 ### Pending Todos
 
@@ -66,6 +69,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 23 context gathered
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-CONTEXT.md
-Next step: /gsd:plan-phase 23
+Stopped at: Completed 23-01-PLAN.md (Backend Summary Endpoints)
+Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-01-SUMMARY.md
+Next step: Execute 23-02-PLAN.md

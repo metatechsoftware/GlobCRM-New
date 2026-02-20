@@ -26,17 +26,17 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 ### Summary Tabs on Detail Pages
 
 - [ ] **SUMMARY-01**: Summary tab appears as the first (default) tab on Company, Contact, Deal, Lead, Quote, and Request detail pages
-- [ ] **SUMMARY-02**: Summary tab displays a key properties card with 4-8 highlighted fields per entity type (read-only)
-- [ ] **SUMMARY-03**: Summary tab shows association counts (e.g., "5 Contacts, 3 Deals") that link to respective tabs
-- [ ] **SUMMARY-04**: Summary tab displays last 3-5 recent activities in condensed format
-- [ ] **SUMMARY-05**: Summary tab displays upcoming activities (not done, due today or later) in condensed format
+- [x] **SUMMARY-02**: Summary tab displays a key properties card with 4-8 highlighted fields per entity type (read-only)
+- [x] **SUMMARY-03**: Summary tab shows association counts (e.g., "5 Contacts, 3 Deals") that link to respective tabs
+- [x] **SUMMARY-04**: Summary tab displays last 3-5 recent activities in condensed format
+- [x] **SUMMARY-05**: Summary tab displays upcoming activities (not done, due today or later) in condensed format
 - [ ] **SUMMARY-06**: Summary tab shows stage/status indicator: pipeline stepper for Deals, stage+temperature for Leads, status badges for Quotes/Requests
 - [ ] **SUMMARY-07**: Summary tab includes a quick action bar (Add Note, Log Activity, Send Email) with entity-type-specific actions
-- [ ] **SUMMARY-08**: Company and Contact summary tabs show mini deal/pipeline summary (total value, deals by stage chart, win rate)
-- [ ] **SUMMARY-09**: Contact summary tab shows email engagement summary (last sent/received, total exchanged)
-- [ ] **SUMMARY-10**: Summary tab shows last 2-3 notes preview (truncated to ~100 chars)
-- [ ] **SUMMARY-11**: Summary tab displays "Last contacted" timestamp prominently
-- [ ] **SUMMARY-12**: Summary tab shows attachments count badge
+- [x] **SUMMARY-08**: Company and Contact summary tabs show mini deal/pipeline summary (total value, deals by stage chart, win rate)
+- [x] **SUMMARY-09**: Contact summary tab shows email engagement summary (last sent/received, total exchanged)
+- [x] **SUMMARY-10**: Summary tab shows last 2-3 notes preview (truncated to ~100 chars)
+- [x] **SUMMARY-11**: Summary tab displays "Last contacted" timestamp prominently
+- [x] **SUMMARY-12**: Summary tab shows attachments count badge
 
 ### My Day Personal Dashboard
 
@@ -113,17 +113,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREVIEW-12 | Phase 22 | Complete |
 | PREVIEW-13 | Phase 22 | Complete |
 | SUMMARY-01 | Phase 23 | Pending |
-| SUMMARY-02 | Phase 23 | Pending |
-| SUMMARY-03 | Phase 23 | Pending |
-| SUMMARY-04 | Phase 23 | Pending |
-| SUMMARY-05 | Phase 23 | Pending |
+| SUMMARY-02 | Phase 23 | Complete |
+| SUMMARY-03 | Phase 23 | Complete |
+| SUMMARY-04 | Phase 23 | Complete |
+| SUMMARY-05 | Phase 23 | Complete |
 | SUMMARY-06 | Phase 23 | Pending |
 | SUMMARY-07 | Phase 23 | Pending |
-| SUMMARY-08 | Phase 23 | Pending |
-| SUMMARY-09 | Phase 23 | Pending |
-| SUMMARY-10 | Phase 23 | Pending |
-| SUMMARY-11 | Phase 23 | Pending |
-| SUMMARY-12 | Phase 23 | Pending |
+| SUMMARY-08 | Phase 23 | Complete |
+| SUMMARY-09 | Phase 23 | Complete |
+| SUMMARY-10 | Phase 23 | Complete |
+| SUMMARY-11 | Phase 23 | Complete |
+| SUMMARY-12 | Phase 23 | Complete |
 | MYDAY-01 | Phase 24 | Pending |
 | MYDAY-02 | Phase 24 | Pending |
 | MYDAY-03 | Phase 24 | Pending |
