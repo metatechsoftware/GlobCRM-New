@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 22 of 25 (Shared Foundation + Entity Preview Sidebar) -- COMPLETE
-Plan: 4 of 4 in current phase
+Plan: 5 of 5 in current phase
 Status: Phase Complete
-Last activity: 2026-02-20 — Completed 22-04 (Feed Entity Link Preview Integration)
+Last activity: 2026-02-20 — Completed 22-05 (UAT Gap Closure)
 
-Progress: [███████████████████████████████████████████████████████████████████████████████████████████████████░░░░] 93% (143/153 plans)
+Progress: [████████████████████████████████████████████████████████████████████████████████████████████████████░░░░] 94% (144/154 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 143
+- Total plans completed: 144
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 4 plans in phase 22
+- v1.2 (in progress): 5 plans in phase 22
 
 ## Accumulated Context
 
@@ -51,6 +51,8 @@ Recent decisions for v1.2:
 - Preview sidebar store uses navigation stack with max depth 10 and cap-and-trim strategy
 - Feed entity links: normal click opens preview sidebar, Ctrl/Cmd+click navigates to detail page
 - Feed tooltips use denormalized entityName (no API call on hover)
+- Material chip hover uses CSS custom properties (--mdc-chip-elevated-container-color) not direct background
+- Sidebar container below fixed header uses margin-top + calc height, not padding-top
 
 ### Pending Todos
 
@@ -64,5 +66,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 22-04-PLAN.md (Phase 22 complete)
+Stopped at: Completed 22-05-PLAN.md (Phase 22 UAT gap closure complete)
 Next step: Plan or execute Phase 23
