@@ -80,6 +80,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 23-05-PLAN.md (Gap Closure) -- Phase 23 COMPLETE with all verification gaps closed
-Resume file: .planning/phases/23-summary-tabs-on-detail-pages/23-05-SUMMARY.md
-Next step: Plan or execute Phase 24 (My Day Dashboard)
+Stopped at: Phase 24 context gathered
+Resume file: .planning/phases/24-my-day-personal-dashboard/24-CONTEXT.md
+Next step: Plan Phase 24 (My Day Dashboard) — /gsd:plan-phase 24
