@@ -92,6 +92,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Completed 24-05-PLAN.md (Phase 24 complete)
-Resume file: .planning/phases/24-my-day-personal-dashboard/24-05-SUMMARY.md
-Next step: Plan or execute phase 25
+Stopped at: Phase 25 context gathered
+Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-CONTEXT.md
+Next step: /gsd:plan-phase 25
