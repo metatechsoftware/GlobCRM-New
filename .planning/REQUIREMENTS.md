@@ -18,7 +18,7 @@ Requirements for v1.2 Connected Experience. Each maps to roadmap phases.
 - [x] **PREVIEW-07**: Feed scroll position is preserved when opening and closing the preview sidebar
 - [ ] **PREVIEW-08**: Preview sidebar displays full-width on mobile screens (< 768px)
 - [ ] **PREVIEW-09**: User can open entity preview from global search results
-- [ ] **PREVIEW-10**: User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) from the preview sidebar
+- [x] **PREVIEW-10**: User can perform quick actions (Add Note, Log Call, Send Email, Create Activity) from the preview sidebar
 - [ ] **PREVIEW-11**: User can click author names in feed to preview user profiles (name, role, email, avatar)
 - [x] **PREVIEW-12**: Preview sidebar displays association chips (related records) linking to their detail pages
 - [x] **PREVIEW-13**: Preview sidebar shows last 3 recent activities in condensed timeline
@@ -108,7 +108,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | PREVIEW-07 | Phase 22 | Complete |
 | PREVIEW-08 | Phase 25 | Pending |
 | PREVIEW-09 | Phase 25 | Pending |
-| PREVIEW-10 | Phase 25 | Pending |
+| PREVIEW-10 | Phase 25 | Complete |
 | PREVIEW-11 | Phase 25 | Pending |
 | PREVIEW-12 | Phase 22 | Complete |
 | PREVIEW-13 | Phase 22 | Complete |

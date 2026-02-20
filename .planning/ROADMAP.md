@@ -158,6 +158,6 @@ Phases execute in numeric order: 22 → 23 → 24 → 25
 | 22. Shared Foundation + Entity Preview Sidebar | 5/5 | Complete    | 2026-02-20 | - |
 | 23. Summary Tabs on Detail Pages | 5/5 | Complete    | 2026-02-20 | - |
 | 24. My Day Personal Dashboard | 5/5 | Complete    | 2026-02-20 | - |
-| 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 0/2 | Not started | - |
+| 25. Preview Sidebar Polish + Cross-Feature Integration | 2/3 | In Progress|  | - |
 
 **Totals:** 25 phases, 153 plans (139 complete + 14 planned), ~234,600 LOC

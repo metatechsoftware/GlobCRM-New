@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.2 Connected Experience — Phase 24 in progress
+**Current focus:** v1.2 Connected Experience — Phase 25 in progress
 
 ## Current Position
 
-Phase: 24 of 25 (My Day Personal Dashboard)
-Plan: 5 of 5 in current phase -- COMPLETE
-Status: Phase 24 complete
-Last activity: 2026-02-20 — Completed 24-05 (Slide-In Quick Actions)
+Phase: 25 of 25 (Preview Sidebar Polish & Cross-Feature Integration)
+Plan: 2 of 3 in current phase
+Status: Executing phase 25
+Last activity: 2026-02-20 — Completed 25-02 (User Preview Popover)
 
-Progress: [█████████████████████████████████████████████████████████████████████████████████████████████████████████░] 99% (154/155 plans)
+Progress: [██████████████████████████████████████████████████████████████████████████████████████████████████████████░] 100% (156/157 plans)
 
 ## Milestones
 
@@ -25,10 +25,10 @@ Progress: [███████████████████████
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 154
+- Total plans completed: 156
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
-- v1.2 (in progress): 15 plans (5 in phase 22, 5 in phase 23, 5 in phase 24)
+- v1.2 (in progress): 17 plans (5 in phase 22, 5 in phase 23, 5 in phase 24, 2 in phase 25)
 
 ## Accumulated Context
 
@@ -79,6 +79,9 @@ Recent decisions for v1.2:
 - Global CSS for CDK overlay panel classes (outside Angular component scope)
 - Silent refreshData() skips isLoading to avoid skeleton flash on post-action refresh
 - Email quick action navigates to /emails?compose=true instead of opening slide-in (pragmatic for complex compose UX)
+- Context-aware mutual exclusion: slide-in panel with context 'preview-sidebar' stays open alongside sidebar
+- Silent refresh via refreshCurrent() skips isLoading to avoid skeleton flash after quick action in sidebar
+- Quick actions excluded for Product entities in preview sidebar (read-only)
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-20
-Stopped at: Phase 25 context gathered
-Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-CONTEXT.md
-Next step: /gsd:plan-phase 25
+Stopped at: Completed 25-01-PLAN.md
+Resume file: .planning/phases/25-preview-sidebar-polish-cross-feature-integration/25-01-SUMMARY.md
+Next step: Execute 25-02-PLAN.md
