@@ -7,9 +7,9 @@ import { TranslocoService } from '@jsverse/transloco';
  * Custom MatPaginatorIntl that reactively updates paginator labels
  * when the active Transloco language changes.
  *
- * Subscribes to `langChanges$` and translates all paginator labels,
- * including the range label function, then notifies subscribers
- * via `this.changes.next()`.
+ * Uses selectTranslateObject() which waits for the translation file
+ * to be loaded before emitting, avoiding the race condition where
+ * langChanges$ fires before HTTP translation fetch completes.
  */
 @Injectable()
 export class TranslatedPaginatorIntl extends MatPaginatorIntl {
@@ -19,17 +19,17 @@ export class TranslatedPaginatorIntl extends MatPaginatorIntl {
   constructor() {
     super();
 
-    this.translocoService.langChanges$
+    this.translocoService.selectTranslateObject('common.paginator')
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
-        this.itemsPerPageLabel = this.translocoService.translate('common.paginator.itemsPerPage');
-        this.nextPageLabel = this.translocoService.translate('common.paginator.nextPage');
-        this.previousPageLabel = this.translocoService.translate('common.paginator.previousPage');
-        this.firstPageLabel = this.translocoService.translate('common.paginator.firstPage');
-        this.lastPageLabel = this.translocoService.translate('common.paginator.lastPage');
+      .subscribe((labels: Record<string, string>) => {
+        this.itemsPerPageLabel = labels['itemsPerPage'] || 'Items per page';
+        this.nextPageLabel = labels['nextPage'] || 'Next page';
+        this.previousPageLabel = labels['previousPage'] || 'Previous page';
+        this.firstPageLabel = labels['firstPage'] || 'First page';
+        this.lastPageLabel = labels['lastPage'] || 'Last page';
 
+        const ofLabel = labels['of'] || 'of';
         this.getRangeLabel = (page: number, pageSize: number, length: number) => {
-          const ofLabel = this.translocoService.translate('common.paginator.of');
           if (length === 0 || pageSize === 0) {
             return `0 ${ofLabel} ${length}`;
           }
