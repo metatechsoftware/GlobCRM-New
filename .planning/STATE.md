@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 28 of 31 (Localization String Extraction)
-Plan: 2 of 7 complete
+Plan: 3 of 7 complete
 Status: Executing Phase 28
-Last activity: 2026-02-21 — Completed 28-02 (Core Entity Features i18n)
+Last activity: 2026-02-21 — Completed 28-03 (Activities/Products/Quotes/Requests i18n)
 
-Progress: [██████████████████░░] 88% (166/~188 plans estimated)
+Progress: [██████████████████░░] 89% (168/~188 plans estimated)
 
 ## Milestones
 
@@ -30,7 +30,7 @@ Progress: [██████████████████░░] 88% (16
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 8 plans across 2 phases (Phase 27-28)
+- v1.3: 9 plans across 2 phases (Phase 27-28)
 
 ## Accumulated Context
 
@@ -61,6 +61,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-02: Lead conversion dialog uses scoped leads keys (convert.*) since opened within leads route scope
 - 28-02: Temperature values translated in form but kanban card values from model kept as-is
 - 28-02: Stage/source/pipeline names are API-provided data, not translated in scope JSON
+- 28-03: TranslocoService.translate() used for snackBar messages and getTransitionLabel methods (programmatic TS calls)
+- 28-03: mat-tab labels use [label] property binding with transloco pipe for dynamic translation
 
 ### Pending Todos
 
@@ -75,6 +77,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-02-PLAN.md (Core Entity Features i18n)
-Resume file: .planning/phases/28-localization-string-extraction/28-02-SUMMARY.md
-Next step: Execute 28-03-PLAN.md
+Stopped at: Completed 28-03-PLAN.md (Activities/Products/Quotes/Requests i18n)
+Resume file: .planning/phases/28-localization-string-extraction/28-03-SUMMARY.md
+Next step: Execute 28-04-PLAN.md
