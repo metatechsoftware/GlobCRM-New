@@ -115,21 +115,21 @@ interface EntityRuleConfig {
       width: 56px;
       height: 56px;
       border-radius: var(--radius-xl);
-      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-text) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
       box-shadow:
-        0 4px 16px rgba(139, 92, 246, 0.25),
-        0 0 0 4px rgba(139, 92, 246, 0.08);
+        0 4px 16px rgba(96, 165, 250, 0.25),
+        0 0 0 4px rgba(96, 165, 250, 0.08);
     }
 
     .dr-header__icon-wrap mat-icon {
       font-size: 28px;
       width: 28px;
       height: 28px;
-      color: var(--color-secondary-fg);
+      color: #fff;
     }
 
     .dr-header__text {

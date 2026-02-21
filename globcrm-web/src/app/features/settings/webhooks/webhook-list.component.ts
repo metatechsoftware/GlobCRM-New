@@ -118,16 +118,16 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       width: 48px;
       height: 48px;
       border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-hover));
+      background: linear-gradient(135deg, var(--color-info), var(--color-info-text));
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+      box-shadow: 0 4px 12px rgba(96, 165, 250, 0.3);
       flex-shrink: 0;
     }
 
     .wl-icon-wrap mat-icon {
-      color: var(--color-secondary-fg);
+      color: #fff;
       font-size: 24px;
       width: 24px;
       height: 24px;
@@ -210,8 +210,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .wl-circle--1 {
       width: 40px;
       height: 40px;
-      background: var(--color-secondary-soft);
-      border: 2px solid var(--color-secondary);
+      background: var(--color-info-soft);
+      border: 2px solid var(--color-info);
       top: 0;
       left: 10px;
       animation-delay: 0s;
@@ -230,8 +230,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .wl-circle--3 {
       width: 28px;
       height: 28px;
-      background: var(--color-accent-soft);
-      border: 2px solid var(--color-accent);
+      background: var(--color-primary-soft);
+      border: 2px solid var(--color-primary);
       bottom: 10px;
       left: 22px;
       animation-delay: 1s;
@@ -290,7 +290,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     .wl-card:hover,
     .wl-card:focus-visible {
       transform: translateY(-2px);
-      border-color: var(--color-secondary);
+      border-color: var(--color-info);
       box-shadow: var(--shadow-lg);
     }
 

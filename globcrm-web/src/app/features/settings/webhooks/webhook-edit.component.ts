@@ -42,13 +42,13 @@ import {
 /** Entity icon + color mapping for the event matrix */
 const ENTITY_META: Record<string, { icon: string; color: string; soft: string }> = {
   Contact:  { icon: 'person',         color: 'var(--color-info)',      soft: 'var(--color-info-soft)' },
-  Company:  { icon: 'business',       color: 'var(--color-secondary)', soft: 'var(--color-secondary-soft)' },
+  Company:  { icon: 'business',       color: 'var(--color-info)',      soft: 'var(--color-info-soft)' },
   Deal:     { icon: 'handshake',      color: 'var(--color-success)',   soft: 'var(--color-success-soft)' },
   Lead:     { icon: 'person_search',  color: 'var(--color-primary)',   soft: 'var(--color-primary-soft)' },
-  Activity: { icon: 'event',          color: 'var(--color-accent)',    soft: 'var(--color-accent-soft)' },
+  Activity: { icon: 'event',          color: 'var(--color-primary)',   soft: 'var(--color-primary-soft)' },
   Quote:    { icon: 'request_quote',  color: 'var(--color-warning)',   soft: 'var(--color-warning-soft)' },
   Request:  { icon: 'support_agent',  color: 'var(--color-danger)',    soft: 'var(--color-danger-soft)' },
-  Product:  { icon: 'inventory_2',    color: 'var(--color-accent)',    soft: 'var(--color-accent-soft)' },
+  Product:  { icon: 'inventory_2',    color: 'var(--color-primary)',   soft: 'var(--color-primary-soft)' },
 };
 
 @Component({
@@ -80,8 +80,8 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
     }
 
     @keyframes iconGlow {
-      0%, 100% { box-shadow: 0 4px 16px rgba(139,92,246,0.25), 0 0 0 4px rgba(139,92,246,0.08); }
-      50%      { box-shadow: 0 6px 24px rgba(139,92,246,0.35), 0 0 0 6px rgba(139,92,246,0.12); }
+      0%, 100% { box-shadow: 0 4px 16px rgba(96,165,250,0.25), 0 0 0 4px rgba(96,165,250,0.08); }
+      50%      { box-shadow: 0 6px 24px rgba(96,165,250,0.35), 0 0 0 6px rgba(96,165,250,0.12); }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -123,8 +123,8 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
     }
 
     .we-breadcrumb:hover {
-      color: var(--color-secondary);
-      background: var(--color-secondary-soft);
+      color: var(--color-info);
+      background: var(--color-info-soft);
     }
 
     .we-breadcrumb mat-icon {
@@ -147,7 +147,7 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
       width: 56px;
       height: 56px;
       border-radius: var(--radius-xl);
-      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-text) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -159,7 +159,7 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
       font-size: 28px;
       width: 28px;
       height: 28px;
-      color: var(--color-secondary-fg);
+      color: #fff;
     }
 
     .we-header__text {
@@ -230,13 +230,13 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
     }
 
     .we-section__icon--details {
-      background: var(--color-secondary-soft);
-      color: var(--color-secondary);
+      background: var(--color-info-soft);
+      color: var(--color-info);
     }
 
     .we-section__icon--events {
-      background: var(--color-accent-soft);
-      color: var(--color-accent);
+      background: var(--color-primary-soft);
+      color: var(--color-primary);
     }
 
     .we-section__icon mat-icon {
