@@ -13,7 +13,9 @@ import { MyDayFeedItemDto } from '../../my-day.models';
   template: `
     <mat-card class="feed-widget">
       <mat-card-header>
-        <mat-icon class="feed-widget__header-icon">dynamic_feed</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>dynamic_feed</mat-icon>
+        </div>
         <mat-card-title>Activity Feed</mat-card-title>
       </mat-card-header>
 
@@ -59,32 +61,66 @@ import { MyDayFeedItemDto } from '../../my-day.models';
             }
           </div>
 
-          <a class="feed-widget__view-all" routerLink="/feed">View all activity</a>
+          <a class="feed-widget__view-all" routerLink="/feed">
+            View all activity
+            <mat-icon class="feed-widget__view-all-icon">arrow_forward</mat-icon>
+          </a>
         }
       </mat-card-content>
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     .feed-widget {
       width: 100%;
       height: fit-content;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .feed-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     /* Feed list */
@@ -95,7 +131,7 @@ import { MyDayFeedItemDto } from '../../my-day.models';
 
     .feed-widget__row {
       display: flex;
-      gap: var(--space-2, 8px);
+      gap: var(--space-3, 12px);
       padding: var(--space-2, 8px) 0;
       border-bottom: 1px solid var(--color-border-subtle);
 
@@ -106,16 +142,16 @@ import { MyDayFeedItemDto } from '../../my-day.models';
 
     .feed-widget__avatar {
       flex-shrink: 0;
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: var(--color-primary-soft);
-      color: var(--color-primary);
+      background: linear-gradient(135deg, var(--color-primary-soft) 0%, rgba(249, 115, 22, 0.15) 100%);
+      color: #F97316;
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: var(--text-xs, 0.75rem);
-      font-weight: var(--font-semibold, 600);
+      font-weight: var(--font-bold, 700);
       text-transform: uppercase;
     }
 
@@ -124,13 +160,13 @@ import { MyDayFeedItemDto } from '../../my-day.models';
       min-width: 0;
       display: flex;
       flex-direction: column;
-      gap: 2px;
+      gap: 3px;
     }
 
     .feed-widget__text {
       font-size: var(--text-sm, 0.875rem);
       color: var(--color-text-secondary);
-      line-height: 1.4;
+      line-height: 1.45;
       word-break: break-word;
     }
 
@@ -146,18 +182,32 @@ import { MyDayFeedItemDto } from '../../my-day.models';
 
     /* View all link */
     .feed-widget__view-all {
-      display: block;
-      text-align: center;
-      padding: var(--space-2, 8px) 0;
-      margin-top: var(--space-2, 8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      padding: var(--space-3, 12px) 0 var(--space-1, 4px);
+      margin-top: var(--space-1, 4px);
       font-size: var(--text-sm, 0.875rem);
       font-weight: var(--font-medium, 500);
-      color: var(--color-primary);
+      color: #F97316;
       text-decoration: none;
       border-top: 1px solid var(--color-border-subtle);
+      transition: color 150ms ease;
 
       &:hover {
-        text-decoration: underline;
+        color: #EA580C;
+      }
+    }
+
+    .feed-widget__view-all-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      transition: transform 150ms ease;
+
+      .feed-widget__view-all:hover & {
+        transform: translateX(2px);
       }
     }
 
@@ -166,16 +216,16 @@ import { MyDayFeedItemDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .feed-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-text-muted);
-      opacity: 0.5;
+      opacity: 0.4;
     }
 
     .feed-widget__empty-text {
@@ -192,13 +242,13 @@ import { MyDayFeedItemDto } from '../../my-day.models';
 
     .feed-widget__shimmer-row {
       display: flex;
-      gap: var(--space-2, 8px);
+      gap: var(--space-3, 12px);
       padding: var(--space-2, 8px) 0;
     }
 
     .feed-widget__shimmer-avatar {
-      width: 28px;
-      height: 28px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
       flex-shrink: 0;
       background: linear-gradient(
@@ -236,9 +286,14 @@ import { MyDayFeedItemDto } from '../../my-day.models';
       width: 50%;
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .feed-widget {
+        transition: none;
+      }
+
+      .feed-widget__view-all-icon {
+        transition: none;
+      }
     }
   `],
 })

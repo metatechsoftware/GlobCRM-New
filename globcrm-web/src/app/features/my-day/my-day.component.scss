@@ -1,9 +1,12 @@
-// ─── My Day Personal Dashboard ──────────────────────────────
+// ─── My Day: Warm Cinematic Editorial Dashboard ────────────
+// Premium dashboard with staggered entrance, elevated card surfaces,
+// and warm off-white atmosphere matching the auth pages.
 
+// ─── Keyframes ─────────────────────────────────────────────
 @keyframes fadeSlideUp {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
@@ -11,25 +14,45 @@
   }
 }
 
+// ─── Page Container ────────────────────────────────────────
 .my-day {
-  max-width: 1120px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: var(--space-4, 16px) var(--space-6, 24px) var(--space-6, 24px);
-  animation: fadeSlideUp var(--duration-slower, 500ms) var(--ease-out) both;
+  padding: var(--space-6, 24px) var(--space-6, 24px) var(--space-8, 32px);
 }
 
-// ─── CSS Grid Layout ─────────────────────────────────────────
+// ─── CSS Grid Layout ───────────────────────────────────────
 .my-day__grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-4, 16px);
+  gap: var(--space-5, 20px);
 }
 
 .my-day__widget--full {
   grid-column: 1 / -1;
 }
 
-// ─── Responsive Breakpoints ──────────────────────────────────
+// ─── Staggered Entrance Animations ─────────────────────────
+.my-day__stagger--1 { animation: fadeSlideUp 450ms var(--ease-out) 100ms both; }
+.my-day__stagger--2 { animation: fadeSlideUp 450ms var(--ease-out) 200ms both; }
+.my-day__stagger--3 { animation: fadeSlideUp 450ms var(--ease-out) 300ms both; }
+.my-day__stagger--4 { animation: fadeSlideUp 450ms var(--ease-out) 380ms both; }
+.my-day__stagger--5 { animation: fadeSlideUp 450ms var(--ease-out) 460ms both; }
+.my-day__stagger--6 { animation: fadeSlideUp 450ms var(--ease-out) 540ms both; }
+.my-day__stagger--7 { animation: fadeSlideUp 450ms var(--ease-out) 620ms both; }
+.my-day__stagger--8 { animation: fadeSlideUp 450ms var(--ease-out) 700ms both; }
+
+// ─── Highlight Animation (post-creation pulse) ─────────────
+:host ::ng-deep .widget-item--highlighted {
+  animation: pulse-highlight 2s ease-out;
+}
+
+@keyframes pulse-highlight {
+  0% { background-color: rgba(249, 115, 22, 0.2); }
+  100% { background-color: transparent; }
+}
+
+// ─── Responsive Breakpoints ────────────────────────────────
 @media (max-width: 1024px) {
   .my-day__grid {
     grid-template-columns: repeat(2, 1fr);
@@ -43,15 +66,22 @@
 
   .my-day__grid {
     grid-template-columns: 1fr;
+    gap: var(--space-4, 16px);
   }
 }
 
-// ─── Highlight Animation (post-creation pulse) ──────────────
-:host ::ng-deep .widget-item--highlighted {
-  animation: pulse-highlight 2s ease-out;
-}
-
-@keyframes pulse-highlight {
-  0% { background-color: rgba(249, 115, 22, 0.2); }
-  100% { background-color: transparent; }
+// ─── Accessibility: Reduced Motion ─────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .my-day__stagger--1,
+  .my-day__stagger--2,
+  .my-day__stagger--3,
+  .my-day__stagger--4,
+  .my-day__stagger--5,
+  .my-day__stagger--6,
+  .my-day__stagger--7,
+  .my-day__stagger--8 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }

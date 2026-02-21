@@ -1,14 +1,14 @@
 <div class="my-day">
   <div class="my-day__grid">
     <!-- Full-width greeting banner -->
-    <app-greeting-banner class="my-day__widget--full"
+    <app-greeting-banner class="my-day__widget--full my-day__stagger--1"
       [firstName]="firstName()"
       [stats]="store.greetingStats()"
       [isLoading]="store.isLoading()"
       (quickAction)="onQuickAction($event)" />
 
     <!-- Full-width tasks widget -->
-    <app-tasks-widget class="my-day__widget--full"
+    <app-tasks-widget class="my-day__widget--full my-day__stagger--2"
       [overdueTasks]="store.overdueTasks()"
       [todayTasks]="store.todayTasks()"
       [isLoading]="store.isLoading()"
@@ -18,36 +18,36 @@
       (entityClicked)="onEntityClicked($event)" />
 
     <!-- Row 2: events + pipeline + email (three half-width cards) -->
-    <app-upcoming-events-widget
+    <app-upcoming-events-widget class="my-day__stagger--3"
       [events]="store.data()?.upcomingEvents ?? []"
       [isLoading]="store.isLoading()"
       (eventClicked)="onEventClicked($event)" />
 
-    <app-pipeline-widget
+    <app-pipeline-widget class="my-day__stagger--4"
       [stages]="store.data()?.pipelineStages ?? []"
       [totalValue]="store.data()?.pipelineTotalValue ?? 0"
       [dealCount]="store.data()?.pipelineDealCount ?? 0"
       [isLoading]="store.isLoading()" />
 
-    <app-email-summary-widget
+    <app-email-summary-widget class="my-day__stagger--5"
       [unreadCount]="store.data()?.unreadEmailCount ?? 0"
       [recentEmails]="store.data()?.recentEmails ?? []"
       [isLoading]="store.isLoading()"
       (emailClicked)="onEmailClicked($event)" />
 
     <!-- Row 3: feed + notifications + recent records (three half-width cards) -->
-    <app-feed-preview-widget
+    <app-feed-preview-widget class="my-day__stagger--6"
       [feedItems]="store.data()?.recentFeedItems ?? []"
       [isLoading]="store.isLoading()"
       (entityClicked)="onEntityClicked($event)" />
 
-    <app-notification-digest-widget
+    <app-notification-digest-widget class="my-day__stagger--7"
       [notificationGroups]="store.data()?.notificationGroups ?? []"
       [totalCount]="store.data()?.todayNotificationCount ?? 0"
       [isLoading]="store.isLoading()"
       (notificationClicked)="onEntityClicked($event)" />
 
-    <app-recent-records-widget
+    <app-recent-records-widget class="my-day__stagger--8"
       [records]="store.data()?.recentRecords ?? []"
       [isLoading]="store.isLoading()"
       (recordClicked)="onEntityClicked($event)" />

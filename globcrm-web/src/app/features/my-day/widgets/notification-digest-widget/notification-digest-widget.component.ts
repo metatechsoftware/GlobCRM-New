@@ -12,7 +12,9 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
   template: `
     <mat-card class="notif-widget">
       <mat-card-header>
-        <mat-icon class="notif-widget__header-icon">notifications</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>notifications</mat-icon>
+        </div>
         <mat-card-title>Notifications</mat-card-title>
         @if (!isLoading() && totalCount() > 0) {
           <span class="notif-widget__badge">{{ totalCount() }} today</span>
@@ -36,7 +38,9 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
             @for (group of notificationGroups(); track group.type) {
               <div class="notif-widget__group">
                 <div class="notif-widget__group-header">
-                  <mat-icon class="notif-widget__group-icon">{{ typeIcon(group.type) }}</mat-icon>
+                  <div class="notif-widget__group-icon-wrap">
+                    <mat-icon class="notif-widget__group-icon">{{ typeIcon(group.type) }}</mat-icon>
+                  </div>
                   <span class="notif-widget__group-label">{{ typeLabel(group.type) }}</span>
                   <span class="notif-widget__group-count">{{ group.count }}</span>
                 </div>
@@ -65,38 +69,70 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     .notif-widget {
       width: 100%;
       height: fit-content;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .notif-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     .notif-widget__badge {
       display: inline-flex;
       align-items: center;
       margin-left: auto;
-      padding: 2px 10px;
+      padding: 3px 10px;
       border-radius: var(--radius-full, 9999px);
       font-size: var(--text-xs, 0.75rem);
       font-weight: var(--font-semibold, 600);
-      background: var(--color-primary);
-      color: var(--color-primary-fg);
+      background: #F97316;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
     }
 
     /* Groups */
@@ -108,7 +144,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
 
     .notif-widget__group {
       border-bottom: 1px solid var(--color-border-subtle);
-      padding-bottom: var(--space-2, 8px);
+      padding-bottom: var(--space-3, 12px);
 
       &:last-child {
         border-bottom: none;
@@ -123,17 +159,27 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
       margin-bottom: var(--space-2, 8px);
     }
 
+    .notif-widget__group-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: var(--radius-sm, 4px);
+      background: var(--color-surface-hover);
+    }
+
     .notif-widget__group-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
       color: var(--color-text-muted);
     }
 
     .notif-widget__group-label {
       font-size: var(--text-sm, 0.875rem);
       font-weight: var(--font-semibold, 600);
-      color: var(--color-text-secondary);
+      color: var(--color-text);
     }
 
     .notif-widget__group-count {
@@ -154,7 +200,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       gap: var(--space-1, 4px);
-      padding-left: 26px;
+      padding-left: 34px;
     }
 
     .notif-widget__item {
@@ -178,12 +224,13 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
       flex-shrink: 0;
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     .notif-widget__more {
       font-size: var(--text-xs, 0.75rem);
-      color: var(--color-text-muted);
-      font-style: italic;
+      color: #F97316;
+      font-weight: var(--font-medium, 500);
       padding: var(--space-1, 4px) 0;
     }
 
@@ -192,16 +239,16 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .notif-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-success, #22C55E);
-      opacity: 0.6;
+      opacity: 0.5;
     }
 
     .notif-widget__empty-text {
@@ -232,9 +279,10 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
       &:nth-child(3) { animation-delay: 240ms; }
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .notif-widget {
+        transition: none;
+      }
     }
   `],
 })

@@ -13,7 +13,9 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
   template: `
     <mat-card class="records-widget">
       <mat-card-header>
-        <mat-icon class="records-widget__header-icon">history</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>history</mat-icon>
+        </div>
         <mat-card-title>Recent Records</mat-card-title>
       </mat-card-header>
 
@@ -36,10 +38,12 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
           <div class="records-widget__list">
             @for (record of records(); track record.entityId) {
               <div class="records-widget__row">
-                <mat-icon class="records-widget__type-icon"
-                          [style.color]="getColor(record.entityType)">
-                  {{ getIcon(record.entityType) }}
-                </mat-icon>
+                <div class="records-widget__type-icon-wrap" [style.background]="getColorSoft(record.entityType)">
+                  <mat-icon class="records-widget__type-icon"
+                            [style.color]="getColor(record.entityType)">
+                    {{ getIcon(record.entityType) }}
+                  </mat-icon>
+                </div>
                 <div class="records-widget__content">
                   <app-preview-entity-link
                     [entityType]="record.entityType"
@@ -56,26 +60,57 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     .records-widget {
       width: 100%;
       height: fit-content;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .records-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     /* Records list */
@@ -87,21 +122,30 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
     .records-widget__row {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-2, 8px) var(--space-1, 4px);
+      gap: var(--space-3, 12px);
+      padding: var(--space-2, 8px);
       border-radius: var(--radius-md, 8px);
-      transition: background-color 0.15s ease;
+      transition: background-color 150ms ease;
 
       &:hover {
-        background: var(--color-surface-hover);
+        background: rgba(249, 115, 22, 0.04);
       }
     }
 
-    .records-widget__type-icon {
+    .records-widget__type-icon-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md, 8px);
       flex-shrink: 0;
-      font-size: 20px;
-      width: 20px;
-      height: 20px;
+    }
+
+    .records-widget__type-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
     }
 
     .records-widget__content {
@@ -121,6 +165,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
       flex-shrink: 0;
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     /* Empty state */
@@ -128,16 +173,16 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .records-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-text-muted);
-      opacity: 0.5;
+      opacity: 0.4;
     }
 
     .records-widget__empty-text {
@@ -155,14 +200,14 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
     .records-widget__shimmer-row {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
+      gap: var(--space-3, 12px);
       padding: var(--space-2, 8px) 0;
     }
 
     .records-widget__shimmer-icon {
-      width: 20px;
-      height: 20px;
-      border-radius: var(--radius-sm, 4px);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-md, 8px);
       flex-shrink: 0;
       background: linear-gradient(
         90deg,
@@ -188,9 +233,10 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
       animation: shimmer 1.8s ease-in-out infinite;
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .records-widget {
+        transition: none;
+      }
     }
   `],
 })
@@ -205,6 +251,15 @@ export class RecentRecordsWidgetComponent {
 
   getColor(entityType: string): string {
     return ENTITY_TYPE_REGISTRY[entityType]?.color ?? 'var(--color-text-muted)';
+  }
+
+  getColorSoft(entityType: string): string {
+    const color = this.getColor(entityType);
+    // Use a soft tinted background based on the entity color
+    if (color.startsWith('#')) {
+      return `${color}15`;
+    }
+    return 'var(--color-surface-hover)';
   }
 
   getLabel(entityType: string): string {

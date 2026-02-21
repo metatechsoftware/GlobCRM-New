@@ -13,7 +13,9 @@ import { MyDayTaskDto } from '../../my-day.models';
   template: `
     <mat-card class="tasks-widget">
       <mat-card-header>
-        <mat-icon class="tasks-widget__header-icon">checklist</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>checklist</mat-icon>
+        </div>
         <mat-card-title>Today's Tasks</mat-card-title>
       </mat-card-header>
 
@@ -103,25 +105,62 @@ import { MyDayTaskDto } from '../../my-day.models';
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
+    @keyframes pulse-highlight {
+      0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+    }
+
     .tasks-widget {
       width: 100%;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .tasks-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     .tasks-widget__section {
@@ -133,7 +172,7 @@ import { MyDayTaskDto } from '../../my-day.models';
     }
 
     .tasks-widget__section--overdue {
-      border-left: 4px solid var(--color-danger, #EF4444);
+      border-left: 3px solid var(--color-danger, #EF4444);
       padding-left: var(--space-3, 12px);
       margin-left: calc(-1 * var(--space-1, 4px));
     }
@@ -142,23 +181,25 @@ import { MyDayTaskDto } from '../../my-day.models';
       display: flex;
       align-items: center;
       gap: var(--space-1, 4px);
-      font-size: var(--text-sm, 0.875rem);
+      font-size: var(--text-xs, 0.75rem);
       font-weight: var(--font-semibold, 600);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
       color: var(--color-text-secondary);
       margin-bottom: var(--space-2, 8px);
       padding-bottom: var(--space-1, 4px);
       border-bottom: 1px solid var(--color-border-subtle);
 
       mat-icon {
-        font-size: 18px;
-        width: 18px;
-        height: 18px;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
       }
     }
 
     .tasks-widget__section-header--overdue {
       color: var(--color-danger-text, #B91C1C);
-      border-bottom-color: var(--color-danger, #EF4444);
+      border-bottom-color: rgba(239, 68, 68, 0.2);
 
       mat-icon {
         color: var(--color-danger, #EF4444);
@@ -169,12 +210,12 @@ import { MyDayTaskDto } from '../../my-day.models';
       display: flex;
       align-items: center;
       gap: var(--space-2, 8px);
-      padding: var(--space-2, 8px) var(--space-1, 4px);
+      padding: var(--space-2, 8px) var(--space-2, 8px);
       border-radius: var(--radius-md, 8px);
-      transition: background-color 0.15s ease, opacity 0.3s ease;
+      transition: background-color 150ms ease, opacity 300ms ease;
 
       &:hover {
-        background: var(--color-surface-hover);
+        background: rgba(249, 115, 22, 0.04);
       }
     }
 
@@ -187,7 +228,7 @@ import { MyDayTaskDto } from '../../my-day.models';
     }
 
     .tasks-widget__row--completing {
-      opacity: 0.5;
+      opacity: 0.4;
       text-decoration: line-through;
       pointer-events: none;
     }
@@ -224,9 +265,10 @@ import { MyDayTaskDto } from '../../my-day.models';
       background: var(--color-danger, #EF4444);
       color: white;
       border-radius: var(--radius-full, 9999px);
-      font-size: var(--text-xs, 0.75rem);
+      font-size: 0.7rem;
       font-weight: var(--font-semibold, 600);
       line-height: 1.4;
+      letter-spacing: 0.02em;
     }
 
     .tasks-widget__priority-badge {
@@ -237,7 +279,7 @@ import { MyDayTaskDto } from '../../my-day.models';
       background: var(--color-warning-soft, #FFFBEB);
       color: var(--color-warning-text, #B45309);
       border-radius: var(--radius-full, 9999px);
-      font-size: var(--text-xs, 0.75rem);
+      font-size: 0.7rem;
       font-weight: var(--font-semibold, 600);
       line-height: 1.4;
     }
@@ -251,16 +293,16 @@ import { MyDayTaskDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .tasks-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-success, #22C55E);
-      opacity: 0.6;
+      opacity: 0.5;
     }
 
     .tasks-widget__empty-text {
@@ -292,15 +334,10 @@ import { MyDayTaskDto } from '../../my-day.models';
       &:nth-child(5) { animation-delay: 400ms; }
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
-    }
-
-    @keyframes pulse-highlight {
-      0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
-      50% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0); }
+    @media (prefers-reduced-motion: reduce) {
+      .tasks-widget {
+        transition: none;
+      }
     }
   `],
 })

@@ -12,7 +12,9 @@ import { MyDayEmailDto } from '../../my-day.models';
   template: `
     <mat-card class="email-widget">
       <mat-card-header>
-        <mat-icon class="email-widget__header-icon">email</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>email</mat-icon>
+        </div>
         <mat-card-title>Email</mat-card-title>
         @if (!isLoading()) {
           <span class="email-widget__badge"
@@ -45,9 +47,8 @@ import { MyDayEmailDto } from '../../my-day.models';
               <button class="email-widget__row"
                       [class.email-widget__row--unread]="!email.isRead"
                       (click)="emailClicked.emit(email.id)">
-                <mat-icon class="email-widget__direction-icon">
-                  {{ email.isInbound ? 'call_received' : 'send' }}
-                </mat-icon>
+                <div class="email-widget__direction-dot"
+                     [class.email-widget__direction-dot--outbound]="!email.isInbound"></div>
                 <div class="email-widget__content">
                   <span class="email-widget__subject">{{ truncate(email.subject, 40) }}</span>
                   <span class="email-widget__from">{{ email.fromName }}</span>
@@ -61,33 +62,64 @@ import { MyDayEmailDto } from '../../my-day.models';
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     .email-widget {
       width: 100%;
       height: fit-content;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .email-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     .email-widget__badge {
       display: inline-flex;
       align-items: center;
       margin-left: auto;
-      padding: 2px 10px;
+      padding: 3px 10px;
       border-radius: var(--radius-full, 9999px);
       font-size: var(--text-xs, 0.75rem);
       font-weight: var(--font-semibold, 600);
@@ -96,8 +128,9 @@ import { MyDayEmailDto } from '../../my-day.models';
     }
 
     .email-widget__badge--active {
-      background: var(--color-primary);
-      color: var(--color-primary-fg);
+      background: #F97316;
+      color: #fff;
+      box-shadow: 0 2px 6px rgba(249, 115, 22, 0.3);
     }
 
     /* Email list */
@@ -110,7 +143,7 @@ import { MyDayEmailDto } from '../../my-day.models';
       display: flex;
       align-items: center;
       gap: var(--space-2, 8px);
-      padding: var(--space-2, 8px) var(--space-1, 4px);
+      padding: var(--space-2, 8px);
       border-radius: var(--radius-md, 8px);
       width: 100%;
       background: none;
@@ -118,10 +151,10 @@ import { MyDayEmailDto } from '../../my-day.models';
       cursor: pointer;
       font-family: inherit;
       text-align: left;
-      transition: background-color 0.15s ease;
+      transition: background-color 150ms ease;
 
       &:hover {
-        background: var(--color-surface-hover);
+        background: rgba(249, 115, 22, 0.04);
       }
     }
 
@@ -136,12 +169,16 @@ import { MyDayEmailDto } from '../../my-day.models';
       }
     }
 
-    .email-widget__direction-icon {
+    .email-widget__direction-dot {
       flex-shrink: 0;
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-      color: var(--color-text-muted);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--color-accent, #14B8A6);
+    }
+
+    .email-widget__direction-dot--outbound {
+      background: #F97316;
     }
 
     .email-widget__content {
@@ -169,6 +206,7 @@ import { MyDayEmailDto } from '../../my-day.models';
       flex-shrink: 0;
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted);
+      font-variant-numeric: tabular-nums;
     }
 
     /* Empty state */
@@ -176,16 +214,16 @@ import { MyDayEmailDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .email-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-text-muted);
-      opacity: 0.5;
+      opacity: 0.4;
     }
 
     .email-widget__empty-text {
@@ -195,12 +233,13 @@ import { MyDayEmailDto } from '../../my-day.models';
 
     .email-widget__setup-link {
       font-size: var(--text-sm, 0.875rem);
-      color: var(--color-primary);
+      color: #F97316;
       text-decoration: none;
       font-weight: var(--font-medium, 500);
+      transition: color 150ms ease;
 
       &:hover {
-        text-decoration: underline;
+        color: #EA580C;
       }
     }
 
@@ -229,9 +268,10 @@ import { MyDayEmailDto } from '../../my-day.models';
       &:nth-child(5) { animation-delay: 320ms; }
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .email-widget {
+        transition: none;
+      }
     }
   `],
 })

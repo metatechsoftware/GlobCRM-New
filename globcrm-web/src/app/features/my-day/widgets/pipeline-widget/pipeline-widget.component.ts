@@ -12,7 +12,9 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
   template: `
     <mat-card class="pipeline-widget">
       <mat-card-header>
-        <mat-icon class="pipeline-widget__header-icon">handshake</mat-icon>
+        <div class="widget-header-icon">
+          <mat-icon>handshake</mat-icon>
+        </div>
         <mat-card-title>My Pipeline</mat-card-title>
       </mat-card-header>
 
@@ -56,51 +58,98 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
 
           <!-- Summary -->
           <div class="pipeline-widget__summary">
-            {{ dealCount() }} deals &middot; {{ formattedTotalValue() }} total value
+            <span class="pipeline-widget__summary-deals">{{ dealCount() }} deals</span>
+            <span class="pipeline-widget__summary-sep">&middot;</span>
+            <span class="pipeline-widget__summary-value">{{ formattedTotalValue() }}</span>
           </div>
         }
       </mat-card-content>
     </mat-card>
   `,
   styles: [`
+    @keyframes shimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+
     .pipeline-widget {
       width: 100%;
       height: fit-content;
+      border: none;
+      border-radius: var(--radius-xl, 16px);
+      box-shadow:
+        0 1px 3px rgba(0, 0, 0, 0.04),
+        0 6px 20px rgba(0, 0, 0, 0.05);
+      transition: box-shadow 250ms ease;
+
+      &:hover {
+        box-shadow:
+          0 1px 3px rgba(0, 0, 0, 0.04),
+          0 8px 28px rgba(0, 0, 0, 0.07);
+      }
     }
 
     mat-card-header {
       display: flex;
       align-items: center;
-      gap: var(--space-2, 8px);
-      margin-bottom: var(--space-3, 12px);
+      gap: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
     }
 
-    .pipeline-widget__header-icon {
-      color: var(--color-primary);
+    .widget-header-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border-radius: var(--radius-md, 8px);
+      background: var(--color-primary-soft);
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+        color: #F97316;
+      }
     }
 
     mat-card-title {
       margin: 0;
       font-size: var(--text-lg, 1.125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: -0.01em;
     }
 
     /* Stacked bar chart */
     .pipeline-widget__bar-container {
       display: flex;
-      height: 24px;
-      border-radius: 12px;
+      height: 28px;
+      border-radius: 14px;
       overflow: hidden;
-      margin-bottom: var(--space-3, 12px);
+      margin-bottom: var(--space-4, 16px);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
     }
 
     .pipeline-widget__bar-segment {
       min-width: 4px;
-      transition: opacity 0.2s ease;
+      transition: opacity 200ms ease, filter 200ms ease;
       cursor: default;
 
       &:hover {
-        opacity: 0.8;
+        opacity: 0.85;
+        filter: brightness(1.05);
+      }
+
+      &:first-child {
+        border-radius: 14px 0 0 14px;
+      }
+
+      &:last-child {
+        border-radius: 0 14px 14px 0;
+      }
+
+      &:only-child {
+        border-radius: 14px;
       }
     }
 
@@ -124,6 +173,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
       height: 8px;
       border-radius: 50%;
       flex-shrink: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
     .pipeline-widget__legend-name {
@@ -137,11 +187,26 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
 
     /* Summary */
     .pipeline-widget__summary {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2, 8px);
       font-size: var(--text-sm, 0.875rem);
-      font-weight: var(--font-medium, 500);
       color: var(--color-text-secondary);
-      padding-top: var(--space-2, 8px);
+      padding-top: var(--space-3, 12px);
       border-top: 1px solid var(--color-border-subtle);
+    }
+
+    .pipeline-widget__summary-deals {
+      font-weight: var(--font-medium, 500);
+    }
+
+    .pipeline-widget__summary-sep {
+      opacity: 0.4;
+    }
+
+    .pipeline-widget__summary-value {
+      font-weight: var(--font-semibold, 600);
+      color: var(--color-text);
     }
 
     /* Empty state */
@@ -149,16 +214,16 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--space-2, 8px);
-      padding: var(--space-8, 32px) 0;
+      gap: var(--space-3, 12px);
+      padding: var(--space-10, 40px) 0;
     }
 
     .pipeline-widget__empty-icon {
-      font-size: 40px;
-      width: 40px;
-      height: 40px;
+      font-size: 44px;
+      width: 44px;
+      height: 44px;
       color: var(--color-text-muted);
-      opacity: 0.5;
+      opacity: 0.4;
     }
 
     .pipeline-widget__empty-text {
@@ -174,8 +239,8 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
     }
 
     .pipeline-widget__shimmer-bar {
-      height: 24px;
-      border-radius: 12px;
+      height: 28px;
+      border-radius: 14px;
       background: linear-gradient(
         90deg,
         var(--color-border-subtle) 25%,
@@ -209,9 +274,14 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
       &:nth-child(3) { width: 45%; animation-delay: 200ms; }
     }
 
-    @keyframes shimmer {
-      0% { background-position: -200% 0; }
-      100% { background-position: 200% 0; }
+    @media (prefers-reduced-motion: reduce) {
+      .pipeline-widget {
+        transition: none;
+      }
+
+      .pipeline-widget__bar-segment {
+        transition: none;
+      }
     }
   `],
 })
