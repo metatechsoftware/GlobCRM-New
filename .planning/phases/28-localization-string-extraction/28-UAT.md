@@ -1,9 +1,9 @@
 ---
-status: complete
+status: diagnosed
 phase: 28-localization-string-extraction
 source: 28-01-SUMMARY.md, 28-02-SUMMARY.md, 28-03-SUMMARY.md, 28-04-SUMMARY.md, 28-05-SUMMARY.md, 28-06-SUMMARY.md, 28-07-SUMMARY.md, 28-08-SUMMARY.md, 28-09-SUMMARY.md, 28-10-SUMMARY.md
 started: 2026-02-21T17:00:00Z
-updated: 2026-02-21T17:45:00Z
+updated: 2026-02-21T18:00:00Z
 ---
 
 ## Current Test
@@ -95,9 +95,12 @@ skipped: 2
   reason: "User reported: The language switcher under profile works immediately but Settings > Language doesnt respond immediately but gives successfully updated db"
   severity: minor
   test: 3
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Settings language page only persists preference to DB but does not call LanguageService.setActiveLang() to trigger immediate Transloco language switch"
+  artifacts:
+    - path: "globcrm-web/src/app/features/settings/language/language-settings.component.ts"
+      issue: "Save handler updates DB but does not call LanguageService.setActiveLang() for immediate UI switch"
+  missing:
+    - "After successful DB save, call LanguageService.setActiveLang(selectedLang) to trigger immediate Transloco language switch"
   debug_session: ""
 
 - truth: "DynamicTable column headers should display in Turkish when language is switched"
@@ -105,9 +108,21 @@ skipped: 2
   reason: "User reported: column headers dont but the rest works"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Column definitions use hardcoded English label strings in TS (label: 'Name'), and DynamicTable renders them via getColumnLabel() without transloco pipe"
+  artifacts:
+    - path: "globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.ts"
+      issue: "getColumnLabel() returns raw label string without translation"
+    - path: "globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.html"
+      issue: "{{ getColumnLabel(col.fieldId) }} rendered without transloco pipe"
+    - path: "globcrm-web/src/app/shared/components/dynamic-table/column-picker.component.ts"
+      issue: "{{ col.label }} rendered without transloco pipe"
+    - path: "globcrm-web/src/app/features/contacts/contact-list/contact-list.component.ts"
+      issue: "coreColumnDefs uses hardcoded English labels: label: 'Name', label: 'Email'"
+  missing:
+    - "Convert column label strings to translation keys in all entity list components"
+    - "Update DynamicTable getColumnLabel() to translate keys via TranslocoService"
+    - "Update column-picker to translate column labels"
+    - "Add column label translation keys to each feature scope JSON"
   debug_session: ""
 
 - truth: "Feature-scoped translation keys (list.title, form labels) should resolve to translated values, not show raw keys"
@@ -115,9 +130,12 @@ skipped: 2
   reason: "User reported: page title is list.title and the form is similar and the column headers dont work"
   severity: major
   test: 5
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "TranslocoHttpLoader only implements getTranslation(lang) for root files — missing scope parameter handling, so scoped JSON files (contacts/en.json, deals/en.json) are never loaded"
+  artifacts:
+    - path: "globcrm-web/src/app/core/i18n/transloco-loader.ts"
+      issue: "getTranslation(lang) only loads ./assets/i18n/${lang}.json — does not handle scope parameter for ./assets/i18n/{scope}/{lang}.json"
+  missing:
+    - "Update TranslocoHttpLoader.getTranslation() to accept scope parameter and load scoped files from ./assets/i18n/{scope}/{lang}.json"
   debug_session: ""
 
 - truth: "Deals pages should display Turkish translations for all labels, not raw keys"
@@ -125,9 +143,12 @@ skipped: 2
   reason: "User reported: same issue, raw keys showing and column headers not translating"
   severity: major
   test: 6
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Same as Test 5 — TranslocoHttpLoader missing scope support, deals/en.json never loaded"
+  artifacts:
+    - path: "globcrm-web/src/app/core/i18n/transloco-loader.ts"
+      issue: "Missing scope parameter handling in getTranslation()"
+  missing:
+    - "Fix TranslocoHttpLoader scope support (same fix as Test 5)"
   debug_session: ""
 
 - truth: "Dashboard widgets should display in Turkish when language is switched"
@@ -135,9 +156,12 @@ skipped: 2
   reason: "User reported: widgets have plain english"
   severity: major
   test: 7
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Same as Test 5 — TranslocoHttpLoader missing scope support, dashboard/en.json never loaded. Widget components correctly use TranslocoPipe but scoped files not fetched."
+  artifacts:
+    - path: "globcrm-web/src/app/core/i18n/transloco-loader.ts"
+      issue: "Missing scope parameter handling in getTranslation()"
+  missing:
+    - "Fix TranslocoHttpLoader scope support (same fix as Test 5)"
   debug_session: ""
 
 - truth: "Settings sub-pages (duplicates, webhooks, language) should show Turkish translations, not raw keys"
@@ -145,9 +169,16 @@ skipped: 2
   reason: "User reported: raw key on duplicates, webhooks, language"
   severity: major
   test: 8
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Key prefix mismatch — templates use 'webhooks.list.title' but JSON keys are under settings scope requiring 'settings.webhooks.list.title'. Three components omit the 'settings.' prefix in template pipe references."
+  artifacts:
+    - path: "globcrm-web/src/app/features/settings/webhooks/webhook-list.component.ts"
+      issue: "Template uses 'webhooks.X' keys instead of 'settings.webhooks.X'"
+    - path: "globcrm-web/src/app/features/settings/language/language-settings.component.ts"
+      issue: "Template uses 'language.X' keys instead of 'settings.language.X'"
+    - path: "globcrm-web/src/app/features/settings/duplicate-rules/duplicate-rules.component.ts"
+      issue: "Template uses 'duplicateRules.X' keys instead of 'settings.duplicateRules.X'"
+  missing:
+    - "Add 'settings.' prefix to all template transloco pipe keys in webhook-list, language-settings, and duplicate-rules components"
   debug_session: ""
 
 - truth: "Notification category names should display in Turkish with correct casing"
@@ -155,7 +186,16 @@ skipped: 2
   reason: "User reported: category names english with big i"
   severity: minor
   test: 10
-  root_cause: ""
-  artifacts: []
-  missing: []
+  root_cause: "Notification type labels are hardcoded English strings with toUpperCase() fallback that breaks Turkish locale I/i rules. Translation keys in my-day scope don't match actual NotificationType enum values."
+  artifacts:
+    - path: "globcrm-web/src/app/features/my-day/widgets/notification-digest-widget/notification-digest-widget.component.ts"
+      issue: "typeLabel() uses toUpperCase() without locale awareness, and translation keys don't match enum values"
+    - path: "globcrm-web/src/app/features/settings/notification-preferences/notification-preferences.component.ts"
+      issue: "NOTIFICATION_TYPE_LABELS and NOTIFICATION_TYPE_DESCRIPTIONS are hardcoded English strings"
+    - path: "globcrm-web/src/assets/i18n/my-day/en.json"
+      issue: "Notification type keys (assignment, mention) don't match enum values (ActivityAssigned, Mention)"
+  missing:
+    - "Add translation keys matching actual NotificationType enum values to my-day and settings scope JSON files"
+    - "Replace hardcoded NOTIFICATION_TYPE_LABELS/DESCRIPTIONS with TranslocoService.translate() calls"
+    - "Replace toUpperCase() with toLocaleUpperCase() or use translation keys directly"
   debug_session: ""
