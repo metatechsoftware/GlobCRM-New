@@ -27,11 +27,11 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [ ] **INTG-03**: User can search integrations by name
 - [ ] **INTG-04**: Admin can connect an integration by entering API key credentials via a dialog
 - [ ] **INTG-05**: Admin can disconnect an integration with confirmation
-- [ ] **INTG-06**: Stored credentials are AES-256 encrypted with tenant-scoped isolation
+- [x] **INTG-06**: Stored credentials are AES-256 encrypted with tenant-scoped isolation
 - [ ] **INTG-07**: API never returns full credentials — only masked values (last 4 chars)
 - [ ] **INTG-08**: User can view integration details in a slide-in panel (description, status, credential info, activity log)
 - [ ] **INTG-09**: Admin can test an integration connection (validates stored credentials)
-- [ ] **INTG-10**: Integration activity log records connect/disconnect/test events with user and timestamp
+- [x] **INTG-10**: Integration activity log records connect/disconnect/test events with user and timestamp
 - [ ] **INTG-11**: Popular/featured integrations display a badge on their cards
 - [ ] **INTG-12**: Non-admin users can view integration status (read-only) but cannot connect/disconnect
 
@@ -146,11 +146,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-03 | Phase 29 | Pending |
 | INTG-04 | Phase 29 | Pending |
 | INTG-05 | Phase 29 | Pending |
-| INTG-06 | Phase 29 | Pending |
+| INTG-06 | Phase 29 | Complete |
 | INTG-07 | Phase 29 | Pending |
 | INTG-08 | Phase 29 | Pending |
 | INTG-09 | Phase 29 | Pending |
-| INTG-10 | Phase 29 | Pending |
+| INTG-10 | Phase 29 | Complete |
 | INTG-11 | Phase 29 | Pending |
 | INTG-12 | Phase 29 | Pending |
 | KANB-01 | Phase 30 | Pending |

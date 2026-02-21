@@ -185,7 +185,7 @@ Plans:
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
 | 28. Localization String Extraction | v1.3 | 10/10 | Complete | 2026-02-21 |
-| 29. Integration Marketplace | v1.3 | 0/5 | Not started | - |
+| 29. Integration Marketplace | 2/5 | In Progress|  | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 

@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.3 Platform & Polish — Phase 28 (Localization String Extraction)
+**Current focus:** v1.3 Platform & Polish — Phase 29 (Integration Marketplace)
 
 ## Current Position
 
-Phase: 28 of 31 (Localization String Extraction)
-Plan: 10 of 10 complete
-Status: Phase 28 Complete
-Last activity: 2026-02-21 — Completed 28-10 (Remaining Feature Template String Extraction)
+Phase: 29 of 31 (Integration Marketplace)
+Plan: 1 of 5 complete
+Status: Executing Phase 29
+Last activity: 2026-02-21 — Completed 29-01 (Domain Model & Infrastructure)
 
-Progress: [███████████████████░] 95% (178/~188 plans estimated)
+Progress: [███████████████████░] 95% (179/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 95% (17
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 177
+- Total plans completed: 178
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 16 plans across 2 phases (Phase 27-28)
+- v1.3: 17 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -78,6 +78,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-08: window.confirm() disconnect prompt uses transloco.translate() for runtime i18n of browser native dialog
 - 28-10: workflow-canvas getTriggerBadge/getActionBadge refactored to use existing nodes.* translation keys via transloco.translate()
 - 28-10: i18n baseline reduced from 347 to 2 false-positive entries (numeric threshold expressions, not translatable strings)
+- 29-01: CredentialEncryptionService uses DataProtection with purpose string 'GlobCRM.Integration.Credentials' (same pattern as Gmail TokenEncryptionService)
+- 29-01: IntegrationActivityLog has its own TenantId and global query filter for direct query capability
+- 29-01: Unique composite index on (tenant_id, integration_key) enforces one connection per integration per tenant
 
 ### Pending Todos
 
@@ -92,6 +95,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-10-PLAN.md (Remaining Feature Template String Extraction) -- Phase 28 complete
-Resume file: .planning/phases/28-localization-string-extraction/28-10-SUMMARY.md
-Next step: Plan Phase 29 or continue to next phase
+Stopped at: Completed 29-01-PLAN.md (Domain Model & Infrastructure)
+Resume file: .planning/phases/29-integration-marketplace/29-01-SUMMARY.md
+Next step: Execute 29-02-PLAN.md (Integration API Controller & Endpoints)
