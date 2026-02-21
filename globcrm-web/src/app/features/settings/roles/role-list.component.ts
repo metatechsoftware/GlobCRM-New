@@ -19,6 +19,7 @@ import { PermissionService } from '../../../core/permissions/permission.service'
 import { RoleDto } from '../../../core/permissions/permission.models';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-role-list',
@@ -33,6 +34,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatDialogModule,
     MatTooltipModule,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './role-list.component.html',
   styleUrl: './role-list.component.scss',
@@ -42,6 +44,7 @@ export class RoleListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   roles = signal<RoleDto[]>([]);
   isLoading = signal(true);
@@ -68,9 +71,9 @@ export class RoleListComponent implements OnInit {
   }
 
   getRoleTypeLabel(role: RoleDto): string {
-    if (role.isSystem) return 'System';
-    if (role.isTemplate) return 'Template';
-    return 'Custom';
+    if (role.isSystem) return this.transloco.translate('settings.roles.system');
+    if (role.isTemplate) return this.transloco.translate('settings.roles.template');
+    return this.transloco.translate('settings.roles.custom');
   }
 
   getRoleIcon(role: RoleDto): string {
@@ -103,7 +106,7 @@ export class RoleListComponent implements OnInit {
       this.permissionService.cloneRole(role.id, newName).subscribe({
         next: (cloned) => {
           this.snackBar.open(
-            `Role "${cloned.name}" cloned successfully.`,
+            this.transloco.translate('settings.roles.cloneSuccess', { name: cloned.name }),
             'Close',
             { duration: 3000 }
           );
@@ -111,7 +114,7 @@ export class RoleListComponent implements OnInit {
         },
         error: (err) => {
           this.snackBar.open(
-            err.message || 'Failed to clone role.',
+            err.message || this.transloco.translate('settings.roles.cloneFailed'),
             'Close',
             { duration: 5000 }
           );
@@ -132,7 +135,7 @@ export class RoleListComponent implements OnInit {
       this.permissionService.deleteRole(role.id).subscribe({
         next: () => {
           this.snackBar.open(
-            `Role "${role.name}" deleted.`,
+            this.transloco.translate('settings.roles.deleteSuccess', { name: role.name }),
             'Close',
             { duration: 3000 }
           );
@@ -140,7 +143,7 @@ export class RoleListComponent implements OnInit {
         },
         error: (err) => {
           this.snackBar.open(
-            err.message || 'Failed to delete role.',
+            err.message || this.transloco.translate('settings.roles.deleteFailed'),
             'Close',
             { duration: 5000 }
           );
@@ -166,25 +169,26 @@ export class RoleListComponent implements OnInit {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>Clone Role</h2>
+    <h2 mat-dialog-title>{{ 'settings.roles.cloneDialog.title' | transloco }}</h2>
     <mat-dialog-content>
-      <p>Create a new role based on "{{ data.roleName }}".</p>
+      <p>{{ 'settings.roles.cloneDialog.message' | transloco: { roleName: data.roleName } }}</p>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>New Role Name</mat-label>
-        <input matInput [(ngModel)]="newName" placeholder="Enter role name" maxlength="100" />
+        <mat-label>{{ 'settings.roles.cloneDialog.newName' | transloco }}</mat-label>
+        <input matInput [(ngModel)]="newName" [placeholder]="'settings.roles.cloneDialog.newNamePlaceholder' | transloco" maxlength="100" />
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'settings.roles.cloneDialog.cancel' | transloco }}</button>
       <button
         mat-flat-button
         color="primary"
         [disabled]="!newName.trim()"
         (click)="dialogRef.close(newName.trim())"
       >
-        Clone
+        {{ 'settings.roles.cloneDialog.clone' | transloco }}
       </button>
     </mat-dialog-actions>
   `,

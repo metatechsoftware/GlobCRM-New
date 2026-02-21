@@ -23,6 +23,7 @@ import {
 import { CustomFieldEditDialogComponent } from './custom-field-edit-dialog.component';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 interface FieldGroup {
   sectionId: string | null;
@@ -61,6 +62,7 @@ const ENTITY_TYPES = [
     MatTooltipModule,
     MatSnackBarModule,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './custom-field-list.component.html',
   styleUrl: './custom-field-list.component.scss',

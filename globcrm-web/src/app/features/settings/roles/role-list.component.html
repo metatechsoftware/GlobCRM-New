@@ -4,15 +4,15 @@
     <div class="rl-header__left">
       <a routerLink="/settings" class="rl-back">
         <mat-icon>arrow_back</mat-icon>
-        <span>Settings</span>
+        <span>{{ 'settings.common.backToSettings' | transloco }}</span>
       </a>
       <div class="rl-title-row">
         <div class="rl-icon-wrap">
           <mat-icon>shield</mat-icon>
         </div>
         <div>
-          <h1 class="rl-title">Roles</h1>
-          <p class="rl-subtitle">Manage permissions and access control for your team</p>
+          <h1 class="rl-title">{{ 'settings.roles.title' | transloco }}</h1>
+          <p class="rl-subtitle">{{ 'settings.roles.subtitle' | transloco }}</p>
         </div>
       </div>
     </div>
@@ -24,25 +24,25 @@
       class="rl-create-btn"
     >
       <mat-icon>add</mat-icon>
-      Create Role
+      {{ 'settings.roles.createRole' | transloco }}
     </button>
   </div>
 
   @if (isLoading()) {
     <div class="rl-loading">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading roles...</p>
+      <p>{{ 'settings.roles.loadingRoles' | transloco }}</p>
     </div>
   } @else if (errorMessage()) {
     <div class="rl-error">
       <div class="rl-error__icon-wrap">
         <mat-icon>wifi_off</mat-icon>
       </div>
-      <h3>Something went wrong</h3>
+      <h3>{{ 'settings.common.somethingWentWrong' | transloco }}</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" (click)="loadRoles()">
         <mat-icon>refresh</mat-icon>
-        Try Again
+        {{ 'settings.common.tryAgain' | transloco }}
       </button>
     </div>
   } @else if (roles().length === 0) {
@@ -55,8 +55,8 @@
         </div>
         <mat-icon class="rl-empty__icon">shield</mat-icon>
       </div>
-      <h3>No roles yet</h3>
-      <p>Create your first role to define permissions and control access across your organization.</p>
+      <h3>{{ 'settings.roles.noRolesYet' | transloco }}</h3>
+      <p>{{ 'settings.roles.noRolesDescription' | transloco }}</p>
       <button
         *appHasPermission="'Contact:Create'"
         mat-flat-button
@@ -64,7 +64,7 @@
         routerLink="/settings/roles/new"
       >
         <mat-icon>add</mat-icon>
-        Create First Role
+        {{ 'settings.roles.createFirstRole' | transloco }}
       </button>
     </div>
   } @else {
@@ -95,7 +95,7 @@
                     *appHasPermission="'Contact:Create'"
                     mat-icon-button
                     (click)="onClone(role)"
-                    matTooltip="Clone role"
+                    [matTooltip]="'settings.roles.cloneRole' | transloco"
                     class="rl-action-btn"
                   >
                     <mat-icon>content_copy</mat-icon>
@@ -106,7 +106,7 @@
                   mat-icon-button
                   (click)="onEdit(role)"
                   [disabled]="role.isSystem"
-                  matTooltip="Edit role"
+                  [matTooltip]="'settings.roles.editRole' | transloco"
                   class="rl-action-btn"
                 >
                   <mat-icon>edit</mat-icon>
@@ -116,7 +116,7 @@
                   mat-icon-button
                   (click)="onDelete(role)"
                   [disabled]="role.isSystem"
-                  matTooltip="Delete role"
+                  [matTooltip]="'settings.roles.deleteRole' | transloco"
                   class="rl-action-btn rl-action-btn--danger"
                 >
                   <mat-icon>delete</mat-icon>
@@ -136,19 +136,19 @@
                   {{ getRoleTypeLabel(role) }}
                 </span>
               </div>
-              <p class="rl-card__desc">{{ role.description || 'No description' }}</p>
+              <p class="rl-card__desc">{{ role.description || ('settings.common.noDescription' | transloco) }}</p>
             </div>
 
             <div class="rl-card__footer">
               <div class="rl-metric">
                 <mat-icon class="rl-metric__icon">lock</mat-icon>
                 <span class="rl-metric__value">{{ role.permissionCount }}</span>
-                <span class="rl-metric__label">{{ role.permissionCount === 1 ? 'permission' : 'permissions' }}</span>
+                <span class="rl-metric__label">{{ role.permissionCount === 1 ? ('settings.roles.permission' | transloco) : ('settings.roles.permissions' | transloco) }}</span>
               </div>
               <div class="rl-metric">
                 <mat-icon class="rl-metric__icon">people</mat-icon>
                 <span class="rl-metric__value">{{ role.assignedUserCount }}</span>
-                <span class="rl-metric__label">{{ role.assignedUserCount === 1 ? 'user' : 'users' }}</span>
+                <span class="rl-metric__label">{{ role.assignedUserCount === 1 ? ('settings.roles.user' | transloco) : ('settings.roles.users' | transloco) }}</span>
               </div>
             </div>
           </div>

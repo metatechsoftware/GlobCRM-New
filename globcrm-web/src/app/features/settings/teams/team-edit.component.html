@@ -3,7 +3,7 @@
   <div class="edit-header">
     <a routerLink="/settings/teams" class="back-link">
       <mat-icon>arrow_back</mat-icon>
-      <span>Teams</span>
+      <span>{{ 'settings.teams.title' | transloco }}</span>
     </a>
     <h1>{{ pageTitle }}</h1>
   </div>
@@ -11,17 +11,17 @@
   @if (isLoading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading team...</p>
+      <p>{{ 'settings.teamEdit.loadingTeam' | transloco }}</p>
     </div>
   } @else if (errorMessage() && mode() === 'edit' && !teamForm.dirty) {
     <div class="error-state">
       <div class="error-icon-wrap">
         <mat-icon>error_outline</mat-icon>
       </div>
-      <h3>Couldn't load team</h3>
+      <h3>{{ 'settings.teamEdit.couldntLoad' | transloco }}</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" routerLink="/settings/teams">
-        Back to Teams
+        {{ 'settings.teamEdit.backToTeams' | transloco }}
       </button>
     </div>
   } @else {
@@ -31,45 +31,45 @@
         <div class="section-card">
           <div class="section-header">
             <mat-icon class="section-icon">tune</mat-icon>
-            <h2>Team Details</h2>
+            <h2>{{ 'settings.teamEdit.detailsSection' | transloco }}</h2>
           </div>
 
           <form [formGroup]="teamForm" class="team-form">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Team Name</mat-label>
+              <mat-label>{{ 'settings.teamEdit.teamName' | transloco }}</mat-label>
               <input
                 matInput
                 formControlName="name"
-                placeholder="e.g. Sales, Engineering, Support"
+                [placeholder]="'settings.teamEdit.teamNamePlaceholder' | transloco"
                 maxlength="100"
               />
               @if (teamForm.get('name')?.hasError('required') && teamForm.get('name')?.touched) {
-                <mat-error>Team name is required.</mat-error>
+                <mat-error>{{ 'settings.teamEdit.teamNameRequired' | transloco }}</mat-error>
               }
               @if (teamForm.get('name')?.hasError('maxlength')) {
-                <mat-error>Team name must be 100 characters or less.</mat-error>
+                <mat-error>{{ 'settings.teamEdit.teamNameMaxLength' | transloco }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Description</mat-label>
+              <mat-label>{{ 'settings.teamEdit.description' | transloco }}</mat-label>
               <textarea
                 matInput
                 formControlName="description"
-                placeholder="What does this team do?"
+                [placeholder]="'settings.teamEdit.descriptionPlaceholder' | transloco"
                 rows="3"
               ></textarea>
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Default Role</mat-label>
+              <mat-label>{{ 'settings.teamEdit.defaultRole' | transloco }}</mat-label>
               <mat-select formControlName="defaultRoleId">
-                <mat-option [value]="null">None</mat-option>
+                <mat-option [value]="null">{{ 'settings.teamEdit.defaultRoleNone' | transloco }}</mat-option>
                 @for (role of roles(); track role.id) {
                   <mat-option [value]="role.id">{{ role.name }}</mat-option>
                 }
               </mat-select>
-              <mat-hint>New members will inherit this role's permissions</mat-hint>
+              <mat-hint>{{ 'settings.teamEdit.defaultRoleHint' | transloco }}</mat-hint>
             </mat-form-field>
           </form>
 
@@ -81,7 +81,7 @@
           }
 
           <div class="form-actions">
-            <button mat-button routerLink="/settings/teams" class="cancel-btn">Cancel</button>
+            <button mat-button routerLink="/settings/teams" class="cancel-btn">{{ 'settings.teamEdit.cancel' | transloco }}</button>
             <button
               mat-flat-button
               color="primary"
@@ -93,7 +93,7 @@
                 <mat-spinner diameter="18" class="button-spinner"></mat-spinner>
               } @else {
                 <mat-icon>{{ mode() === 'create' ? 'add' : 'check' }}</mat-icon>
-                {{ mode() === 'create' ? 'Create Team' : 'Save Changes' }}
+                {{ mode() === 'create' ? ('settings.teamEdit.createTeam' | transloco) : ('settings.teamEdit.saveChanges' | transloco) }}
               }
             </button>
           </div>
@@ -106,7 +106,7 @@
           <div class="section-card" style="animation-delay: 80ms">
             <div class="section-header">
               <mat-icon class="section-icon">people</mat-icon>
-              <h2>Members</h2>
+              <h2>{{ 'settings.teamEdit.membersSection' | transloco }}</h2>
               <span class="member-count">{{ members().length }}</span>
               <button
                 mat-flat-button
@@ -115,7 +115,7 @@
                 class="add-member-btn"
               >
                 <mat-icon>person_add</mat-icon>
-                Add
+                {{ 'settings.teamEdit.addMember' | transloco }}
               </button>
             </div>
 
@@ -124,8 +124,8 @@
                 <div class="empty-members-visual">
                   <mat-icon>person_add</mat-icon>
                 </div>
-                <p>No members yet</p>
-                <span class="empty-hint">Add team members to start collaborating</span>
+                <p>{{ 'settings.teamEdit.noMembersYet' | transloco }}</p>
+                <span class="empty-hint">{{ 'settings.teamEdit.addMembersHint' | transloco }}</span>
               </div>
             } @else {
               <div class="members-list">
@@ -147,7 +147,7 @@
                       mat-icon-button
                       (click)="onRemoveMember(member)"
                       class="remove-btn"
-                      matTooltip="Remove from team"
+                      [matTooltip]="'settings.teamEdit.removeFromTeam' | transloco"
                     >
                       <mat-icon>close</mat-icon>
                     </button>

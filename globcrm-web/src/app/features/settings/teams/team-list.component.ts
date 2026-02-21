@@ -11,6 +11,7 @@ import { PermissionService } from '../../../core/permissions/permission.service'
 import { TeamDto } from '../../../core/permissions/permission.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-team-list',
@@ -25,6 +26,7 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
     MatDialogModule,
     MatTooltipModule,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './team-list.component.html',
   styleUrl: './team-list.component.scss',
@@ -34,6 +36,7 @@ export class TeamListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   teams = signal<TeamDto[]>([]);
   isLoading = signal(true);
@@ -84,7 +87,7 @@ export class TeamListComponent implements OnInit {
       this.permissionService.deleteTeam(team.id).subscribe({
         next: () => {
           this.snackBar.open(
-            `Team "${team.name}" deleted.`,
+            this.transloco.translate('settings.teams.deleteSuccess', { name: team.name }),
             'Close',
             { duration: 3000 }
           );
@@ -92,7 +95,7 @@ export class TeamListComponent implements OnInit {
         },
         error: (err) => {
           this.snackBar.open(
-            err.message || 'Failed to delete team.',
+            err.message || this.transloco.translate('settings.teams.deleteFailed'),
             'Close',
             { duration: 5000 }
           );

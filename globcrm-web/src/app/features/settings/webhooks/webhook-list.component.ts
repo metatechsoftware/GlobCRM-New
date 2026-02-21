@@ -17,6 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { WebhookStore } from './webhook.store';
 import { WebhookSubscription } from './webhook.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-webhook-list',
@@ -33,6 +34,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,

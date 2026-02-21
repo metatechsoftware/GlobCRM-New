@@ -14,6 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EmailService } from '../../emails/email.service';
 import { EmailAccountStatusDto } from '../../emails/email.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Email account settings page for connecting/disconnecting Gmail.
@@ -33,6 +34,7 @@ import { EmailAccountStatusDto } from '../../emails/email.models';
     MatIconModule,
     MatCardModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `

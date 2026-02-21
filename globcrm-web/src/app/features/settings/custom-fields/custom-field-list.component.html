@@ -4,15 +4,15 @@
     <div class="cf-header__left">
       <a routerLink="/settings" class="cf-back">
         <mat-icon>arrow_back</mat-icon>
-        <span>Settings</span>
+        <span>{{ 'settings.common.backToSettings' | transloco }}</span>
       </a>
       <div class="cf-title-row">
         <div class="cf-icon-wrap">
           <mat-icon>tune</mat-icon>
         </div>
         <div>
-          <h1 class="cf-title">Custom Fields</h1>
-          <p class="cf-subtitle">Define and manage custom data fields for your CRM entities</p>
+          <h1 class="cf-title">{{ 'settings.customFields.title' | transloco }}</h1>
+          <p class="cf-subtitle">{{ 'settings.customFields.subtitle' | transloco }}</p>
         </div>
       </div>
     </div>
@@ -22,12 +22,12 @@
           [checked]="showDeleted()"
           (change)="toggleShowDeleted()"
           color="primary">
-          Show Deleted
+          {{ 'settings.customFields.showDeleted' | transloco }}
         </mat-slide-toggle>
       </div>
       <button mat-stroked-button (click)="toggleSectionManager()">
         <mat-icon>folder_open</mat-icon>
-        Manage Sections
+        {{ 'settings.customFields.manageSections' | transloco }}
       </button>
       <button
         *appHasPermission="'Contact:Create'"
@@ -37,7 +37,7 @@
         class="cf-create-btn"
       >
         <mat-icon>add</mat-icon>
-        Add Field
+        {{ 'settings.customFields.addField' | transloco }}
       </button>
     </div>
   </div>
@@ -52,24 +52,24 @@
         <div class="cf-tab-content">
           @if (showSectionManager()) {
             <div class="cf-section-manager">
-              <h3>Sections for {{ selectedEntityType() }}</h3>
+              <h3>{{ 'settings.customFields.sectionsFor' | transloco }} {{ selectedEntityType() }}</h3>
               <div class="cf-section-manager__list">
                 @for (section of sections(); track section.id) {
                   <div class="cf-section-item">
                     <span class="cf-section-item__name">{{ section.name }}</span>
-                    <span class="cf-section-item__order">Order: {{ section.sortOrder }}</span>
+                    <span class="cf-section-item__order">{{ 'settings.customFields.order' | transloco }}: {{ section.sortOrder }}</span>
                   </div>
                 }
               </div>
               @if (sections().length === 0) {
-                <p class="cf-section-manager__empty">No sections defined. Fields will appear under "General".</p>
+                <p class="cf-section-manager__empty">{{ 'settings.customFields.noSections' | transloco }}</p>
               }
             </div>
           }
 
           @if (loading()) {
             <div class="cf-loading">
-              <p>Loading fields...</p>
+              <p>{{ 'settings.customFields.loadingFields' | transloco }}</p>
             </div>
           } @else if (fieldGroups().length === 0) {
             <div class="cf-empty">
@@ -81,8 +81,8 @@
                 </div>
                 <mat-icon class="cf-empty__icon">playlist_add</mat-icon>
               </div>
-              <h3>No custom fields defined</h3>
-              <p>Add custom fields to extend {{ selectedEntityType() }} records with additional data.</p>
+              <h3>{{ 'settings.customFields.noFieldsDefined' | transloco }}</h3>
+              <p>{{ 'settings.customFields.noFieldsDescription' | transloco: { entity: selectedEntityType() } }}</p>
               <button
                 *appHasPermission="'Contact:Create'"
                 mat-flat-button
@@ -90,7 +90,7 @@
                 (click)="openAddDialog()"
               >
                 <mat-icon>add</mat-icon>
-                Add First Field
+                {{ 'settings.customFields.addFirstField' | transloco }}
               </button>
             </div>
           } @else {
@@ -105,28 +105,28 @@
                     <span class="cf-section__title">
                       <mat-icon class="cf-section__icon">folder_open</mat-icon>
                       {{ group.sectionName }}
-                      <span class="cf-section__count">{{ group.fields.length }} {{ group.fields.length === 1 ? 'field' : 'fields' }}</span>
+                      <span class="cf-section__count">{{ group.fields.length }} {{ group.fields.length === 1 ? ('settings.customFields.field' | transloco) : ('settings.customFields.fields' | transloco) }}</span>
                     </span>
                   </mat-panel-title>
                 </mat-expansion-panel-header>
 
                 <table mat-table [dataSource]="group.fields" class="cf-table">
                   <ng-container matColumnDef="label">
-                    <th mat-header-cell *matHeaderCellDef>Label</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'settings.customFields.label' | transloco }}</th>
                     <td mat-cell *matCellDef="let field">
                       <span class="cf-field-label">{{ field.label }}</span>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="name">
-                    <th mat-header-cell *matHeaderCellDef>Name</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'settings.customFields.name' | transloco }}</th>
                     <td mat-cell *matCellDef="let field">
                       <code class="cf-field-name">{{ field.name }}</code>
                     </td>
                   </ng-container>
 
                   <ng-container matColumnDef="fieldType">
-                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'settings.customFields.type' | transloco }}</th>
                     <td mat-cell *matCellDef="let field">
                       <span class="cf-type-badge" [attr.data-type]="field.fieldType">
                         <mat-icon>{{ getFieldTypeIcon(field.fieldType) }}</mat-icon>
@@ -136,7 +136,7 @@
                   </ng-container>
 
                   <ng-container matColumnDef="required">
-                    <th mat-header-cell *matHeaderCellDef>Required</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'settings.customFields.required' | transloco }}</th>
                     <td mat-cell *matCellDef="let field">
                       @if (field.validation?.required) {
                         <mat-icon class="cf-required-icon">check_circle</mat-icon>
@@ -147,18 +147,18 @@
                   </ng-container>
 
                   <ng-container matColumnDef="sortOrder">
-                    <th mat-header-cell *matHeaderCellDef class="cf-col-order">Order</th>
+                    <th mat-header-cell *matHeaderCellDef class="cf-col-order">{{ 'settings.customFields.order' | transloco }}</th>
                     <td mat-cell *matCellDef="let field" class="cf-col-order">{{ field.sortOrder }}</td>
                   </ng-container>
 
                   <ng-container matColumnDef="actions">
-                    <th mat-header-cell *matHeaderCellDef>Actions</th>
+                    <th mat-header-cell *matHeaderCellDef>{{ 'settings.customFields.actions' | transloco }}</th>
                     <td mat-cell *matCellDef="let field">
                       <div class="cf-actions-cell">
                         <button
                           *appHasPermission="'Contact:Edit'"
                           mat-icon-button
-                          matTooltip="Edit"
+                          [matTooltip]="'settings.common.edit' | transloco"
                           (click)="openEditDialog(field)"
                           class="cf-action-btn"
                         >
@@ -167,7 +167,7 @@
                         <button
                           *appHasPermission="'Contact:Delete'"
                           mat-icon-button
-                          matTooltip="Delete"
+                          [matTooltip]="'settings.common.delete' | transloco"
                           color="warn"
                           (click)="deleteField(field)"
                           class="cf-action-btn cf-action-btn--danger"

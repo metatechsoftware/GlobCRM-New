@@ -38,6 +38,7 @@ import {
   WEBHOOK_ENTITIES,
   WEBHOOK_EVENTS,
 } from './webhook.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Entity icon + color mapping for the event matrix */
 const ENTITY_META: Record<string, { icon: string; color: string; soft: string }> = {
@@ -69,6 +70,7 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
     MatSnackBarModule,
     MatDialogModule,
     ClipboardModule,
+    TranslocoPipe,
   ],
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,

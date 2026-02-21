@@ -33,6 +33,7 @@ import {
   TeamMemberDto,
   RoleDto,
 } from '../../../core/permissions/permission.models';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface DirectoryUser {
   id: string;
@@ -66,6 +67,7 @@ interface DirectoryResponse {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
+    TranslocoPipe,
   ],
   templateUrl: './team-edit.component.html',
   styleUrl: './team-edit.component.scss',
@@ -77,6 +79,7 @@ export class TeamEditComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   mode = signal<'create' | 'edit'>('create');
   teamId = signal<string | null>(null);
@@ -151,7 +154,7 @@ export class TeamEditComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.snackBar.open('Team created successfully.', 'Close', {
+            this.snackBar.open(this.transloco.translate('settings.teamEdit.createSuccess'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/settings/teams']);
@@ -172,7 +175,7 @@ export class TeamEditComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.snackBar.open('Team updated successfully.', 'Close', {
+            this.snackBar.open(this.transloco.translate('settings.teamEdit.saveSuccess'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/settings/teams']);
@@ -229,7 +232,9 @@ export class TeamEditComponent implements OnInit {
   }
 
   get pageTitle(): string {
-    return this.mode() === 'create' ? 'Create Team' : 'Edit Team';
+    return this.mode() === 'create'
+      ? this.transloco.translate('settings.teamEdit.createTitle')
+      : this.transloco.translate('settings.teamEdit.editTitle');
   }
 }
 

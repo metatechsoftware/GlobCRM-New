@@ -12,6 +12,7 @@ import {
   NotificationPreferenceDto,
   NotificationType,
 } from '../../notifications/notification.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 interface PreferenceRow {
   type: string;
@@ -48,6 +49,7 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
     MatSnackBarModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   template: `
     <!-- Page container -->

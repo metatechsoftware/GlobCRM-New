@@ -22,6 +22,7 @@ import {
   WebhookSubscription,
 } from './webhook.models';
 import { WebhookService } from './webhook.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-webhook-delivery-log',
@@ -39,6 +40,7 @@ import { WebhookService } from './webhook.service';
     MatSelectModule,
     MatSnackBarModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,

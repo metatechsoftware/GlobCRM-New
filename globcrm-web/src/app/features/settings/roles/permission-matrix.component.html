@@ -1,7 +1,10 @@
 <div class="pm-matrix">
   <p class="pm-hint">
-    Set access levels for each entity type. Scopes: <strong>None</strong> (no access), <strong>Own</strong> (created by user),
-    <strong>Team</strong> (same team), or <strong>All</strong> (full access).
+    {{ 'settings.permissionMatrix.hint' | transloco }}
+    <strong>{{ 'settings.permissionMatrix.none' | transloco }}</strong> ({{ 'settings.permissionMatrix.noneDesc' | transloco }}),
+    <strong>{{ 'settings.permissionMatrix.own' | transloco }}</strong> ({{ 'settings.permissionMatrix.ownDesc' | transloco }}),
+    <strong>{{ 'settings.permissionMatrix.team' | transloco }}</strong> ({{ 'settings.permissionMatrix.teamDesc' | transloco }}),
+    {{ 'settings.permissionMatrix.all' | transloco }} ({{ 'settings.permissionMatrix.allDesc' | transloco }}).
   </p>
 
   <div class="pm-container">
@@ -10,7 +13,7 @@
         <tr>
           <th class="pm-entity-header">
             <mat-icon class="pm-entity-header__icon">category</mat-icon>
-            Entity
+            {{ 'settings.permissionMatrix.entity' | transloco }}
           </th>
           @for (op of operations; track op) {
             <th class="pm-op-header">
@@ -18,7 +21,7 @@
                 <mat-icon class="pm-op-header__icon">{{ getOperationIcon(op) }}</mat-icon>
                 <span>{{ op }}</span>
                 <mat-form-field appearance="outline" class="pm-quick-set">
-                  <mat-label>Set all</mat-label>
+                  <mat-label>{{ 'settings.permissionMatrix.setAll' | transloco }}</mat-label>
                   <mat-select
                     [value]="getQuickSetValue(op)"
                     (selectionChange)="onQuickSet(op, $event.value)"

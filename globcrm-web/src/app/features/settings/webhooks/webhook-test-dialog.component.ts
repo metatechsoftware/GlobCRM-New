@@ -11,6 +11,7 @@ import { MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { WebhookService } from './webhook.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Two-step test webhook dialog:
@@ -26,6 +27,7 @@ import { WebhookService } from './webhook.service';
     MatDialogModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `

@@ -15,6 +15,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RolePermissionDto } from '../../../core/permissions/permission.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** All entity types in the CRM system */
 const ENTITY_TYPES = [
@@ -68,6 +69,7 @@ interface MatrixCell {
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   templateUrl: './permission-matrix.component.html',
   styleUrl: './permission-matrix.component.scss',

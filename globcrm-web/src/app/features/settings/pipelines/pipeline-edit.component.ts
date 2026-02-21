@@ -31,6 +31,7 @@ import {
   UpdatePipelineRequest,
   CreateStageRequest,
 } from '../../deals/deal.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-pipeline-edit',
@@ -51,6 +52,7 @@ import {
     MatTooltipModule,
     CdkDrag,
     CdkDropList,
+    TranslocoPipe,
   ],
   template: `
     <div class="pe-page">

@@ -17,6 +17,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { DuplicateService } from '../../duplicates/duplicate.service';
 import { DuplicateSettings } from '../../duplicates/duplicate.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /** Local editable state per entity type */
 interface EntityRuleConfig {
@@ -46,6 +47,7 @@ interface EntityRuleConfig {
     MatSlideToggleModule,
     MatSliderModule,
     MatSnackBarModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `

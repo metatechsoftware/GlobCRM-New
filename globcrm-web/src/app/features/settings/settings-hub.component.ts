@@ -5,19 +5,20 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { AuthStore } from '../../core/auth/auth.store';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type SectionTheme = 'orange' | 'blue' | 'violet';
 
 interface SettingsSection {
-  title: string;
+  titleKey: string;
   theme: SectionTheme;
   items: SettingsItem[];
 }
 
 interface SettingsItem {
   icon: string;
-  label: string;
-  description: string;
+  labelKey: string;
+  descriptionKey: string;
   route: string;
   adminOnly?: boolean;
 }
@@ -25,7 +26,7 @@ interface SettingsItem {
 @Component({
   selector: 'app-settings-hub',
   standalone: true,
-  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, RouterLink, FormsModule, MatIconModule, MatButtonModule, TranslocoPipe],
   template: `
     <!-- Hero Header -->
     <div class="sh-hero">
@@ -35,8 +36,8 @@ interface SettingsItem {
           <mat-icon class="sh-hero__icon">settings</mat-icon>
         </div>
         <div class="sh-hero__text">
-          <h1 class="sh-hero__title">Settings</h1>
-          <p class="sh-hero__subtitle">Configure your workspace, permissions, and integrations</p>
+          <h1 class="sh-hero__title">{{ 'settings.title' | transloco }}</h1>
+          <p class="sh-hero__subtitle">{{ 'settings.subtitle' | transloco }}</p>
         </div>
       </div>
       <div class="sh-hero__search">
@@ -44,7 +45,7 @@ interface SettingsItem {
         <input
           type="text"
           class="sh-hero__search-input"
-          placeholder="Search settings..."
+          [placeholder]="'settings.search' | transloco"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
         />
@@ -58,7 +59,7 @@ interface SettingsItem {
 
     <!-- Sections -->
     <div class="sh-body">
-      @for (section of filteredSections(); track section.title; let si = $index) {
+      @for (section of filteredSections(); track section.titleKey; let si = $index) {
         <section
           class="sh-section"
           [class.sh-section--orange]="section.theme === 'orange'"
@@ -68,7 +69,7 @@ interface SettingsItem {
         >
           <div class="sh-section__header">
             <div class="sh-section__accent"></div>
-            <h2 class="sh-section__title">{{ section.title }}</h2>
+            <h2 class="sh-section__title">{{ section.titleKey | transloco }}</h2>
             <span class="sh-section__count">{{ visibleItemCount(section) }}</span>
           </div>
 
@@ -84,12 +85,12 @@ interface SettingsItem {
                 </div>
                 <div class="sh-card__body">
                   <div class="sh-card__title-row">
-                    <h3 class="sh-card__label">{{ item.label }}</h3>
+                    <h3 class="sh-card__label">{{ item.labelKey | transloco }}</h3>
                     @if (item.adminOnly) {
-                      <span class="sh-card__badge">Admin</span>
+                      <span class="sh-card__badge">{{ 'settings.common.admin' | transloco }}</span>
                     }
                   </div>
-                  <p class="sh-card__desc">{{ item.description }}</p>
+                  <p class="sh-card__desc">{{ item.descriptionKey | transloco }}</p>
                 </div>
                 <mat-icon class="sh-card__arrow">arrow_forward</mat-icon>
               </a>
@@ -101,8 +102,8 @@ interface SettingsItem {
       @if (filteredSections().length === 0) {
         <div class="sh-empty">
           <mat-icon class="sh-empty__icon">search_off</mat-icon>
-          <p class="sh-empty__text">No settings match "<strong>{{ searchQuery() }}</strong>"</p>
-          <button class="sh-empty__reset" (click)="searchQuery.set('')">Clear search</button>
+          <p class="sh-empty__text">{{ 'settings.noResults' | transloco }} "<strong>{{ searchQuery() }}</strong>"</p>
+          <button class="sh-empty__reset" (click)="searchQuery.set('')">{{ 'settings.clearSearch' | transloco }}</button>
         </div>
       }
     </div>
@@ -583,97 +584,98 @@ interface SettingsItem {
 })
 export class SettingsHubComponent {
   private readonly authStore = inject(AuthStore);
+  private readonly transloco = inject(TranslocoService);
 
   readonly searchQuery = signal('');
 
   readonly sections: SettingsSection[] = [
     {
-      title: 'Organization',
+      titleKey: 'settings.sections.organization',
       theme: 'orange',
       items: [
         {
           icon: 'shield',
-          label: 'Roles & Permissions',
-          description: 'Define user roles, access levels, and field visibility rules',
+          labelKey: 'settings.items.roles',
+          descriptionKey: 'settings.items.rolesDesc',
           route: '/settings/roles',
           adminOnly: true,
         },
         {
           icon: 'groups',
-          label: 'Teams',
-          description: 'Create teams and assign members for collaborative workflows',
+          labelKey: 'settings.items.teams',
+          descriptionKey: 'settings.items.teamsDesc',
           route: '/settings/teams',
           adminOnly: true,
         },
         {
           icon: 'tune',
-          label: 'Custom Fields',
-          description: 'Add and manage custom data fields across all entities',
+          labelKey: 'settings.items.customFields',
+          descriptionKey: 'settings.items.customFieldsDesc',
           route: '/settings/custom-fields',
           adminOnly: true,
         },
         {
           icon: 'linear_scale',
-          label: 'Pipelines',
-          description: 'Design deal pipeline stages and win/loss workflows',
+          labelKey: 'settings.items.pipelines',
+          descriptionKey: 'settings.items.pipelinesDesc',
           route: '/settings/pipelines',
           adminOnly: true,
         },
         {
           icon: 'compare_arrows',
-          label: 'Duplicate Detection',
-          description: 'Configure matching rules, thresholds, and merge strategies',
+          labelKey: 'settings.items.duplicateDetection',
+          descriptionKey: 'settings.items.duplicateDetectionDesc',
           route: '/settings/duplicate-rules',
           adminOnly: true,
         },
         {
           icon: 'webhook',
-          label: 'Webhooks',
-          description: 'Manage event subscriptions for external integrations',
+          labelKey: 'settings.items.webhooks',
+          descriptionKey: 'settings.items.webhooksDesc',
           route: '/settings/webhooks',
           adminOnly: true,
         },
         {
           icon: 'language',
-          label: 'Language',
-          description: 'Set the default language for your organization',
+          labelKey: 'settings.language.title',
+          descriptionKey: 'settings.language.description',
           route: '/settings/language',
           adminOnly: true,
         },
       ],
     },
     {
-      title: 'Data Operations',
+      titleKey: 'settings.sections.dataOperations',
       theme: 'blue',
       items: [
         {
           icon: 'upload_file',
-          label: 'Import Data',
-          description: 'Import contacts, companies, or deals from CSV files',
+          labelKey: 'settings.items.importData',
+          descriptionKey: 'settings.items.importDataDesc',
           route: '/import',
         },
         {
           icon: 'history',
-          label: 'Import History',
-          description: 'Review past import jobs, results, and error logs',
+          labelKey: 'settings.items.importHistory',
+          descriptionKey: 'settings.items.importHistoryDesc',
           route: '/import/history',
         },
       ],
     },
     {
-      title: 'Personal',
+      titleKey: 'settings.sections.personal',
       theme: 'violet',
       items: [
         {
           icon: 'mail',
-          label: 'Email Accounts',
-          description: 'Connect email accounts for sending and tracking messages',
+          labelKey: 'settings.items.emailAccounts',
+          descriptionKey: 'settings.items.emailAccountsDesc',
           route: '/settings/email-accounts',
         },
         {
           icon: 'notifications_active',
-          label: 'Notifications',
-          description: 'Customize which events trigger alerts and how they are delivered',
+          labelKey: 'settings.items.notifications',
+          descriptionKey: 'settings.items.notificationsDesc',
           route: '/settings/notification-preferences',
         },
       ],
@@ -693,10 +695,9 @@ export class SettingsHubComponent {
         ...section,
         items: section.items.filter(item => {
           if (item.adminOnly && !this.isAdmin()) return false;
-          return (
-            item.label.toLowerCase().includes(q) ||
-            item.description.toLowerCase().includes(q)
-          );
+          const label = this.transloco.translate(item.labelKey).toLowerCase();
+          const desc = this.transloco.translate(item.descriptionKey).toLowerCase();
+          return label.includes(q) || desc.includes(q);
         }),
       }))
       .filter(s => s.items.length > 0);

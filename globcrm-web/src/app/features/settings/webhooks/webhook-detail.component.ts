@@ -22,6 +22,7 @@ import { WebhookDeliveryLog } from './webhook.models';
 import { WebhookTestDialogComponent } from './webhook-test-dialog.component';
 import { WebhookSecretDialogComponent } from './webhook-edit.component';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-webhook-detail',
@@ -39,6 +40,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   providers: [WebhookStore],
   changeDetection: ChangeDetectionStrategy.OnPush,

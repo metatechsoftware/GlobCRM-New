@@ -31,6 +31,7 @@ import {
   UpdateCustomFieldRequest,
 } from '../../../core/custom-fields/custom-field.models';
 import { FormulaEditorComponent } from './formula-editor/formula-editor.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface CustomFieldEditDialogData {
   mode: 'create' | 'edit';
@@ -66,6 +67,7 @@ const ENTITY_TYPES = [
     MatDividerModule,
     MatTooltipModule,
     FormulaEditorComponent,
+    TranslocoPipe,
   ],
   templateUrl: './custom-field-edit-dialog.component.html',
 })

@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PipelineService } from '../../deals/pipeline.service';
 import { PipelineDto } from '../../deals/deal.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-pipeline-list',
@@ -23,6 +24,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="pl-page">
@@ -31,15 +33,15 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         <div class="pl-header__left">
           <a routerLink="/settings" class="pl-back">
             <mat-icon>arrow_back</mat-icon>
-            <span>Settings</span>
+            <span>{{ 'settings.common.backToSettings' | transloco }}</span>
           </a>
           <div class="pl-title-row">
             <div class="pl-icon-wrap">
               <mat-icon>linear_scale</mat-icon>
             </div>
             <div>
-              <h1 class="pl-title">Pipelines</h1>
-              <p class="pl-subtitle">Configure deal flow stages and progression</p>
+              <h1 class="pl-title">{{ 'settings.pipelines.title' | transloco }}</h1>
+              <p class="pl-subtitle">{{ 'settings.pipelines.subtitle' | transloco }}</p>
             </div>
           </div>
         </div>
@@ -50,25 +52,25 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
           class="pl-create-btn"
         >
           <mat-icon>add</mat-icon>
-          New Pipeline
+          {{ 'settings.pipelines.newPipeline' | transloco }}
         </button>
       </div>
 
       @if (isLoading()) {
         <div class="pl-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading pipelines...</p>
+          <p>{{ 'settings.pipelines.loadingPipelines' | transloco }}</p>
         </div>
       } @else if (errorMessage()) {
         <div class="pl-error">
           <div class="pl-error__icon-wrap">
             <mat-icon>wifi_off</mat-icon>
           </div>
-          <h3>Something went wrong</h3>
+          <h3>{{ 'settings.common.somethingWentWrong' | transloco }}</h3>
           <p>{{ errorMessage() }}</p>
           <button mat-flat-button color="primary" (click)="loadPipelines()">
             <mat-icon>refresh</mat-icon>
-            Try Again
+            {{ 'settings.common.tryAgain' | transloco }}
           </button>
         </div>
       } @else if (pipelines().length === 0) {
@@ -81,11 +83,11 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
             </div>
             <mat-icon class="pl-empty__icon">linear_scale</mat-icon>
           </div>
-          <h3>No pipelines yet</h3>
-          <p>Create your first pipeline to define deal stages and track progression through your sales process.</p>
+          <h3>{{ 'settings.pipelines.noPipelinesYet' | transloco }}</h3>
+          <p>{{ 'settings.pipelines.noPipelinesDescription' | transloco }}</p>
           <button mat-flat-button color="primary" routerLink="/settings/pipelines/new">
             <mat-icon>add</mat-icon>
-            Create First Pipeline
+            {{ 'settings.pipelines.createFirstPipeline' | transloco }}
           </button>
         </div>
       } @else {
@@ -113,7 +115,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                     <button
                       mat-icon-button
                       (click)="onEdit(pipeline)"
-                      matTooltip="Edit pipeline"
+                      [matTooltip]="'settings.pipelines.editPipeline' | transloco"
                       class="pl-action-btn"
                     >
                       <mat-icon>edit</mat-icon>
@@ -122,7 +124,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                       mat-icon-button
                       (click)="onDelete(pipeline)"
                       [disabled]="pipeline.dealCount > 0"
-                      [matTooltip]="pipeline.dealCount > 0 ? 'Cannot delete with active deals' : 'Delete pipeline'"
+                      [matTooltip]="'settings.pipelines.deletePipeline' | transloco"
                       class="pl-action-btn pl-action-btn--danger"
                     >
                       <mat-icon>delete</mat-icon>
@@ -134,10 +136,10 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                   <div class="pl-card__name-row">
                     <h3 class="pl-card__name">{{ pipeline.name }}</h3>
                     @if (pipeline.isDefault) {
-                      <span class="pl-default-badge">Default</span>
+                      <span class="pl-default-badge">{{ 'settings.pipelines.defaultBadge' | transloco }}</span>
                     }
                   </div>
-                  <p class="pl-card__desc">{{ pipeline.description || 'No description' }}</p>
+                  <p class="pl-card__desc">{{ pipeline.description || ('settings.common.noDescription' | transloco) }}</p>
                 </div>
 
                 <!-- Stage Preview -->
@@ -158,12 +160,12 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
                   <div class="pl-metric">
                     <mat-icon class="pl-metric__icon">layers</mat-icon>
                     <span class="pl-metric__value">{{ pipeline.stageCount }}</span>
-                    <span class="pl-metric__label">{{ pipeline.stageCount === 1 ? 'stage' : 'stages' }}</span>
+                    <span class="pl-metric__label">{{ pipeline.stageCount === 1 ? ('settings.pipelines.stage' | transloco) : ('settings.pipelines.stages' | transloco) }}</span>
                   </div>
                   <div class="pl-metric">
                     <mat-icon class="pl-metric__icon">handshake</mat-icon>
                     <span class="pl-metric__value">{{ pipeline.dealCount }}</span>
-                    <span class="pl-metric__label">{{ pipeline.dealCount === 1 ? 'deal' : 'deals' }}</span>
+                    <span class="pl-metric__label">{{ pipeline.dealCount === 1 ? ('settings.pipelines.deal' | transloco) : ('settings.pipelines.deals' | transloco) }}</span>
                   </div>
                   @if (pipeline.teamName) {
                     <div class="pl-team-badge">
@@ -702,6 +704,7 @@ export class PipelineListComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   pipelines = signal<PipelineDto[]>([]);
   isLoading = signal(true);
@@ -752,7 +755,7 @@ export class PipelineListComponent implements OnInit {
       this.pipelineService.delete(pipeline.id).subscribe({
         next: () => {
           this.snackBar.open(
-            `Pipeline "${pipeline.name}" deleted.`,
+            this.transloco.translate('settings.pipelines.deleteSuccess', { name: pipeline.name }),
             'Close',
             { duration: 3000 }
           );
@@ -760,7 +763,7 @@ export class PipelineListComponent implements OnInit {
         },
         error: (err) => {
           this.snackBar.open(
-            err.message || 'Failed to delete pipeline.',
+            err.message || this.transloco.translate('settings.pipelines.deleteFailed'),
             'Close',
             { duration: 5000 }
           );

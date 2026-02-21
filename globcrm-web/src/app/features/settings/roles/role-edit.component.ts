@@ -19,6 +19,7 @@ import {
   RolePermissionDto,
 } from '../../../core/permissions/permission.models';
 import { PermissionMatrixComponent } from './permission-matrix.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-role-edit',
@@ -34,6 +35,7 @@ import { PermissionMatrixComponent } from './permission-matrix.component';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     PermissionMatrixComponent,
+    TranslocoPipe,
   ],
   templateUrl: './role-edit.component.html',
   styleUrl: './role-edit.component.scss',
@@ -44,6 +46,7 @@ export class RoleEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly permissionService = inject(PermissionService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   mode = signal<'create' | 'edit'>('create');
   roleId = signal<string | null>(null);
@@ -112,7 +115,7 @@ export class RoleEditComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.snackBar.open('Role created successfully.', 'Close', {
+            this.snackBar.open(this.transloco.translate('settings.roleEdit.createSuccess'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/settings/roles']);
@@ -133,7 +136,7 @@ export class RoleEditComponent implements OnInit {
         .subscribe({
           next: () => {
             this.isSaving.set(false);
-            this.snackBar.open('Role updated successfully.', 'Close', {
+            this.snackBar.open(this.transloco.translate('settings.roleEdit.saveSuccess'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/settings/roles']);
@@ -147,6 +150,8 @@ export class RoleEditComponent implements OnInit {
   }
 
   get pageTitle(): string {
-    return this.mode() === 'create' ? 'Create Role' : 'Edit Role';
+    return this.mode() === 'create'
+      ? this.transloco.translate('settings.roleEdit.createTitle')
+      : this.transloco.translate('settings.roleEdit.editTitle');
   }
 }

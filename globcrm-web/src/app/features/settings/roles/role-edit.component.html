@@ -3,7 +3,7 @@
   <div class="re-header">
     <a routerLink="/settings/roles" class="re-back">
       <mat-icon>arrow_back</mat-icon>
-      <span>Roles</span>
+      <span>{{ 'settings.roles.title' | transloco }}</span>
     </a>
     <div class="re-title-row">
       <div class="re-icon-wrap">
@@ -11,7 +11,7 @@
       </div>
       <div>
         <h1 class="re-title">{{ pageTitle }}</h1>
-        <p class="re-subtitle">{{ mode() === 'create' ? 'Define a new role with permissions' : 'Update role details and permissions' }}</p>
+        <p class="re-subtitle">{{ mode() === 'create' ? ('settings.roleEdit.createSubtitle' | transloco) : ('settings.roleEdit.editSubtitle' | transloco) }}</p>
       </div>
     </div>
   </div>
@@ -19,17 +19,17 @@
   @if (isLoading()) {
     <div class="re-loading">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>Loading role...</p>
+      <p>{{ 'settings.roleEdit.loadingRole' | transloco }}</p>
     </div>
   } @else if (errorMessage() && mode() === 'edit' && !roleForm.dirty) {
     <div class="re-error">
       <div class="re-error__icon-wrap">
         <mat-icon>error_outline</mat-icon>
       </div>
-      <h3>Couldn't load role</h3>
+      <h3>{{ 'settings.roleEdit.couldntLoad' | transloco }}</h3>
       <p>{{ errorMessage() }}</p>
       <button mat-flat-button color="primary" routerLink="/settings/roles">
-        Back to Roles
+        {{ 'settings.roleEdit.backToRoles' | transloco }}
       </button>
     </div>
   } @else {
@@ -37,32 +37,32 @@
     <div class="re-section" style="animation-delay: 0ms">
       <div class="re-section__header">
         <mat-icon class="re-section__icon">tune</mat-icon>
-        <h2>Role Details</h2>
+        <h2>{{ 'settings.roleEdit.detailsSection' | transloco }}</h2>
       </div>
 
       <form [formGroup]="roleForm" class="re-form">
         <mat-form-field appearance="outline" class="re-full-width">
-          <mat-label>Role Name</mat-label>
+          <mat-label>{{ 'settings.roleEdit.roleName' | transloco }}</mat-label>
           <input
             matInput
             formControlName="name"
-            placeholder="e.g. Sales Manager, Viewer, Editor"
+            [placeholder]="'settings.roleEdit.roleNamePlaceholder' | transloco"
             maxlength="100"
           />
           @if (roleForm.get('name')?.hasError('required') && roleForm.get('name')?.touched) {
-            <mat-error>Role name is required.</mat-error>
+            <mat-error>{{ 'settings.roleEdit.roleNameRequired' | transloco }}</mat-error>
           }
           @if (roleForm.get('name')?.hasError('maxlength')) {
-            <mat-error>Role name must be 100 characters or less.</mat-error>
+            <mat-error>{{ 'settings.roleEdit.roleNameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="re-full-width">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'settings.roleEdit.description' | transloco }}</mat-label>
           <textarea
             matInput
             formControlName="description"
-            placeholder="What can users with this role do?"
+            [placeholder]="'settings.roleEdit.descriptionPlaceholder' | transloco"
             rows="3"
           ></textarea>
         </mat-form-field>
@@ -73,7 +73,7 @@
     <div class="re-section" style="animation-delay: 80ms">
       <div class="re-section__header">
         <mat-icon class="re-section__icon">lock</mat-icon>
-        <h2>Permissions</h2>
+        <h2>{{ 'settings.roleEdit.permissionsSection' | transloco }}</h2>
       </div>
 
       <app-permission-matrix
@@ -91,7 +91,7 @@
 
     <!-- Actions -->
     <div class="re-actions">
-      <button mat-button routerLink="/settings/roles" class="re-cancel-btn">Cancel</button>
+      <button mat-button routerLink="/settings/roles" class="re-cancel-btn">{{ 'settings.roleEdit.cancel' | transloco }}</button>
       <button
         mat-flat-button
         color="primary"
@@ -103,7 +103,7 @@
           <mat-spinner diameter="18" class="re-btn-spinner"></mat-spinner>
         } @else {
           <mat-icon>{{ mode() === 'create' ? 'add' : 'check' }}</mat-icon>
-          {{ mode() === 'create' ? 'Create Role' : 'Save Changes' }}
+          {{ mode() === 'create' ? ('settings.roleEdit.createRole' | transloco) : ('settings.roleEdit.saveChanges' | transloco) }}
         }
       </button>
     </div>
