@@ -261,6 +261,28 @@
   &--4 { animation: fadeSlideUp 400ms var(--ease-out) 750ms both; }
 }
 
+// ─── Success Banner ─────────────────────────────────────
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-success-soft, rgba(34, 197, 94, 0.1));
+  border: 1px solid rgba(34, 197, 94, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
+  color: var(--color-success-text, #15803d);
+  font-size: var(--text-sm);
+  animation: fadeSlideUp 300ms var(--ease-out) both;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+}
+
 // ─── Error Banner ────────────────────────────────────────
 .error-banner {
   display: flex;
@@ -454,7 +476,8 @@ mat-form-field {
   .stagger--2,
   .stagger--3,
   .stagger--4,
-  .error-banner {
+  .error-banner,
+  .success-banner {
     animation: none;
     opacity: 1;
     transform: none;

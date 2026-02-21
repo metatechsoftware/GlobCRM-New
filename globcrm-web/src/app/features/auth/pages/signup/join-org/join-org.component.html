@@ -8,7 +8,7 @@
 @if (invitationInfo()) {
   <div class="invitation-banner">
     <mat-icon>group_add</mat-icon>
-    <span>You've been invited to join <strong>{{ invitationInfo()!.orgName }}</strong> as <strong>{{ invitationInfo()!.role }}</strong></span>
+    <span>{{ 'auth.joinOrg.invitedBanner' | transloco }} <strong>{{ invitationInfo()!.orgName }}</strong> {{ 'auth.joinOrg.invitedAs' | transloco }} <strong>{{ invitationInfo()!.role }}</strong></span>
   </div>
 }
 
@@ -16,11 +16,11 @@
   <div class="stagger stagger--1">
     @if (!hasTokenFromRoute()) {
       <mat-form-field appearance="outline">
-        <mat-label>Invitation Code</mat-label>
-        <input matInput formControlName="token" placeholder="Paste your invitation code">
+        <mat-label>{{ 'auth.joinOrg.invitationCode' | transloco }}</mat-label>
+        <input matInput formControlName="token" [placeholder]="'auth.joinOrg.invitationCodePlaceholder' | transloco">
         <mat-icon matPrefix>vpn_key</mat-icon>
         @if (joinForm.get('token')?.hasError('required') && joinForm.get('token')?.touched) {
-          <mat-error>Invitation code is required</mat-error>
+          <mat-error>{{ 'auth.joinOrg.invitationCodeRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
     }
@@ -29,63 +29,63 @@
   <div class="stagger stagger--2">
     <div class="form-row">
       <mat-form-field appearance="outline">
-        <mat-label>First Name</mat-label>
-        <input matInput formControlName="firstName" placeholder="Jane">
+        <mat-label>{{ 'auth.joinOrg.firstName' | transloco }}</mat-label>
+        <input matInput formControlName="firstName" [placeholder]="'auth.joinOrg.firstNamePlaceholder' | transloco">
         @if (joinForm.get('firstName')?.hasError('required') && joinForm.get('firstName')?.touched) {
-          <mat-error>First name is required</mat-error>
+          <mat-error>{{ 'auth.joinOrg.firstNameRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Last Name</mat-label>
-        <input matInput formControlName="lastName" placeholder="Doe">
+        <mat-label>{{ 'auth.joinOrg.lastName' | transloco }}</mat-label>
+        <input matInput formControlName="lastName" [placeholder]="'auth.joinOrg.lastNamePlaceholder' | transloco">
         @if (joinForm.get('lastName')?.hasError('required') && joinForm.get('lastName')?.touched) {
-          <mat-error>Last name is required</mat-error>
+          <mat-error>{{ 'auth.joinOrg.lastNameRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
     </div>
 
     <mat-form-field appearance="outline">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" type="email" placeholder="jane@company.com" autocomplete="email" [readonly]="invitationInfo() !== null">
+      <mat-label>{{ 'auth.joinOrg.email' | transloco }}</mat-label>
+      <input matInput formControlName="email" type="email" [placeholder]="'auth.joinOrg.emailPlaceholder' | transloco" autocomplete="email" [readonly]="invitationInfo() !== null">
       <mat-icon matPrefix>email</mat-icon>
       @if (joinForm.get('email')?.hasError('required') && joinForm.get('email')?.touched) {
-        <mat-error>Email is required</mat-error>
+        <mat-error>{{ 'auth.joinOrg.emailRequired' | transloco }}</mat-error>
       }
       @if (joinForm.get('email')?.hasError('email') && joinForm.get('email')?.touched) {
-        <mat-error>Please enter a valid email address</mat-error>
+        <mat-error>{{ 'auth.joinOrg.emailInvalid' | transloco }}</mat-error>
       }
     </mat-form-field>
   </div>
 
   <div class="stagger stagger--3">
     <mat-form-field appearance="outline">
-      <mat-label>Password</mat-label>
-      <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Minimum 8 characters" autocomplete="new-password">
+      <mat-label>{{ 'auth.joinOrg.password' | transloco }}</mat-label>
+      <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" [placeholder]="'auth.joinOrg.passwordPlaceholder' | transloco" autocomplete="new-password">
       <mat-icon matPrefix>lock</mat-icon>
-      <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+      <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? ('auth.login.showPassword' | transloco) : ('auth.login.hidePassword' | transloco)">
         <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
       @if (joinForm.get('password')?.hasError('required') && joinForm.get('password')?.touched) {
-        <mat-error>Password is required</mat-error>
+        <mat-error>{{ 'auth.joinOrg.passwordRequired' | transloco }}</mat-error>
       }
       @if (joinForm.get('password')?.hasError('minlength') && joinForm.get('password')?.touched) {
-        <mat-error>Password must be at least 8 characters</mat-error>
+        <mat-error>{{ 'auth.joinOrg.passwordMinLength' | transloco }}</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Confirm Password</mat-label>
-      <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword() ? 'password' : 'text'" placeholder="Repeat your password" autocomplete="new-password">
+      <mat-label>{{ 'auth.joinOrg.confirmPassword' | transloco }}</mat-label>
+      <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword() ? 'password' : 'text'" [placeholder]="'auth.joinOrg.confirmPasswordPlaceholder' | transloco" autocomplete="new-password">
       <mat-icon matPrefix>lock_outline</mat-icon>
-      <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="hideConfirmPassword() ? 'Show password' : 'Hide password'">
+      <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="hideConfirmPassword() ? ('auth.login.showPassword' | transloco) : ('auth.login.hidePassword' | transloco)">
         <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
       @if (joinForm.get('confirmPassword')?.hasError('required') && joinForm.get('confirmPassword')?.touched) {
-        <mat-error>Please confirm your password</mat-error>
+        <mat-error>{{ 'auth.joinOrg.confirmPasswordRequired' | transloco }}</mat-error>
       }
       @if (joinForm.get('confirmPassword')?.hasError('passwordMismatch') && joinForm.get('confirmPassword')?.touched) {
-        <mat-error>Passwords do not match</mat-error>
+        <mat-error>{{ 'auth.joinOrg.passwordMismatch' | transloco }}</mat-error>
       }
     </mat-form-field>
   </div>
@@ -95,7 +95,7 @@
       @if (isLoading()) {
         <mat-spinner diameter="20" color="accent"></mat-spinner>
       } @else {
-        Join Organization
+        {{ 'auth.joinOrg.joinOrg' | transloco }}
       }
     </button>
   </div>

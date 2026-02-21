@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-verify',
@@ -17,6 +18,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   templateUrl: './verify.component.html',
   styleUrl: './verify.component.scss',
@@ -24,6 +26,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
 export class VerifyComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly authService = inject(AuthService);
+  private readonly transloco = inject(TranslocoService);
 
   /** 'pending' = after signup, 'confirming' = processing link, 'confirmed' = success, 'error' = failure */
   state = signal<'pending' | 'confirming' | 'confirmed' | 'error'>('pending');
@@ -82,7 +85,7 @@ export class VerifyComponent implements OnInit, OnDestroy {
       error: () => {
         this.state.set('error');
         this.errorMessage.set(
-          'This verification link has expired or is invalid.'
+          this.transloco.translate('auth.messages.verificationLinkExpired')
         );
       },
     });

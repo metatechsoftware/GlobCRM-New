@@ -7,30 +7,28 @@
     </mat-card-header>
 
     <mat-card-content>
-      <!-- Confirming state (loading) -->
       @if (state() === 'confirming') {
         <div class="state-content">
           <mat-spinner diameter="48"></mat-spinner>
-          <h2>Verifying your email...</h2>
-          <p class="state-subtitle">Please wait while we confirm your email address.</p>
+          <h2>{{ 'auth.verify.verifying' | transloco }}</h2>
+          <p class="state-subtitle">{{ 'auth.verify.verifyingSubtitle' | transloco }}</p>
         </div>
       }
 
-      <!-- Pending state (after signup) -->
       @if (state() === 'pending') {
         <div class="state-content">
           <mat-icon class="state-icon pending-icon">mark_email_unread</mat-icon>
-          <h2>Check your email</h2>
+          <h2>{{ 'auth.verify.checkEmail' | transloco }}</h2>
           <p class="state-subtitle">
             @if (email()) {
-              We sent a verification link to <strong>{{ email() }}</strong>. Click the link to verify your account.
+              {{ 'auth.verify.sentTo' | transloco }} <strong>{{ email() }}</strong>. {{ 'auth.verify.clickLink' | transloco }}
             } @else {
-              We sent a verification link to your email address. Click the link to verify your account.
+              {{ 'auth.verify.sentGeneric' | transloco }} {{ 'auth.verify.clickLink' | transloco }}
             }
           </p>
 
           <div class="resend-section">
-            <p class="resend-text">Didn't receive the email?</p>
+            <p class="resend-text">{{ 'auth.verify.didntReceive' | transloco }}</p>
             @if (email()) {
               <button
                 mat-stroked-button
@@ -40,9 +38,9 @@
                 @if (resendLoading()) {
                   <mat-spinner diameter="18"></mat-spinner>
                 } @else if (resendCooldown() > 0) {
-                  Resend in {{ resendCooldown() }}s
+                  {{ 'auth.verify.resendIn' | transloco }} {{ resendCooldown() }}s
                 } @else {
-                  Resend verification email
+                  {{ 'auth.verify.resend' | transloco }}
                 }
               </button>
             }
@@ -50,23 +48,21 @@
         </div>
       }
 
-      <!-- Confirmed state (success) -->
       @if (state() === 'confirmed') {
         <div class="state-content">
           <mat-icon class="state-icon success-icon">check_circle</mat-icon>
-          <h2>Email verified!</h2>
-          <p class="state-subtitle">Your email has been verified successfully. You can now log in to your account.</p>
-          <a mat-flat-button color="primary" routerLink="/auth/login" class="action-button">
-            Go to Login
+          <h2>{{ 'auth.verify.verified' | transloco }}</h2>
+          <p class="state-subtitle">{{ 'auth.verify.verifiedMessage' | transloco }}</p>
+          <a mat-flat-button color="primary" routerLink="/auth/login" [queryParams]="{ email: email() }" class="action-button">
+            {{ 'auth.verify.goToLogin' | transloco }}
           </a>
         </div>
       }
 
-      <!-- Error state -->
       @if (state() === 'error') {
         <div class="state-content">
           <mat-icon class="state-icon error-icon">error</mat-icon>
-          <h2>Verification failed</h2>
+          <h2>{{ 'auth.verify.verificationFailed' | transloco }}</h2>
           <p class="state-subtitle">{{ errorMessage() }}</p>
 
           <div class="error-actions">
@@ -79,13 +75,13 @@
                 @if (resendLoading()) {
                   <mat-spinner diameter="18"></mat-spinner>
                 } @else if (resendCooldown() > 0) {
-                  Resend in {{ resendCooldown() }}s
+                  {{ 'auth.verify.resendIn' | transloco }} {{ resendCooldown() }}s
                 } @else {
-                  Resend verification email
+                  {{ 'auth.verify.resend' | transloco }}
                 }
               </button>
             }
-            <a mat-button routerLink="/auth/login">Back to Login</a>
+            <a mat-button routerLink="/auth/login" [queryParams]="{ email: email() }">{{ 'auth.verify.backToLogin' | transloco }}</a>
           </div>
         </div>
       }

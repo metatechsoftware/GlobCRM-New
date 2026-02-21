@@ -19,6 +19,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, takeUntil } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-create-org',
@@ -33,6 +34,7 @@ import { AuthService } from '../../../../../core/auth/auth.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    TranslocoPipe,
   ],
   templateUrl: './create-org.component.html',
   styleUrl: './create-org.component.scss',
@@ -42,6 +44,7 @@ export class CreateOrgComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly transloco = inject(TranslocoService);
 
   createOrgForm!: FormGroup;
   hidePassword = signal(true);
@@ -154,7 +157,7 @@ export class CreateOrgComponent implements OnInit {
     }
 
     if (this.subdomainAvailable() === false) {
-      this.errorMessage.set('The chosen subdomain is not available. Please pick another.');
+      this.errorMessage.set(this.transloco.translate('auth.messages.subdomainNotAvailable'));
       return;
     }
 
@@ -183,7 +186,7 @@ export class CreateOrgComponent implements OnInit {
         error: (error) => {
           this.isLoading.set(false);
           this.errorMessage.set(
-            error.message || 'Failed to create organization. Please try again.'
+            error.message || this.transloco.translate('auth.messages.createOrgFailed')
           );
         },
       });

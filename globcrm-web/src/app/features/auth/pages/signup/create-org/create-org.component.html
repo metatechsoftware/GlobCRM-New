@@ -8,23 +8,23 @@
 <form [formGroup]="createOrgForm" (ngSubmit)="onSubmit()">
   <!-- Organization Details -->
   <div class="stagger stagger--1">
-    <h3 class="section-title">Organization</h3>
+    <h3 class="section-title">{{ 'auth.createOrg.orgSection' | transloco }}</h3>
 
     <mat-form-field appearance="outline">
-      <mat-label>Organization Name</mat-label>
-      <input matInput formControlName="orgName" placeholder="Acme Inc.">
+      <mat-label>{{ 'auth.createOrg.orgName' | transloco }}</mat-label>
+      <input matInput formControlName="orgName" [placeholder]="'auth.createOrg.orgNamePlaceholder' | transloco">
       <mat-icon matPrefix>business</mat-icon>
       @if (createOrgForm.get('orgName')?.hasError('required') && createOrgForm.get('orgName')?.touched) {
-        <mat-error>Organization name is required</mat-error>
+        <mat-error>{{ 'auth.createOrg.orgNameRequired' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('orgName')?.hasError('minlength') && createOrgForm.get('orgName')?.touched) {
-        <mat-error>Must be at least 2 characters</mat-error>
+        <mat-error>{{ 'auth.createOrg.orgNameMinLength' | transloco }}</mat-error>
       }
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Subdomain</mat-label>
-      <input matInput formControlName="subdomain" placeholder="acme" (input)="onSubdomainInput($event)">
+      <mat-label>{{ 'auth.createOrg.subdomain' | transloco }}</mat-label>
+      <input matInput formControlName="subdomain" [placeholder]="'auth.createOrg.subdomainPlaceholder' | transloco" (input)="onSubdomainInput($event)">
       <mat-icon matPrefix>language</mat-icon>
       @if (checkingSubdomain()) {
         <mat-spinner matSuffix diameter="20"></mat-spinner>
@@ -37,25 +37,25 @@
         @if (createOrgForm.get('subdomain')?.value) {
           <span class="subdomain-preview">{{ createOrgForm.get('subdomain')?.value }}.globcrm.com</span>
         } @else {
-          Choose your workspace URL
+          {{ 'auth.createOrg.subdomainHint' | transloco }}
         }
       </mat-hint>
       @if (createOrgForm.get('subdomain')?.hasError('required') && createOrgForm.get('subdomain')?.touched) {
-        <mat-error>Subdomain is required</mat-error>
+        <mat-error>{{ 'auth.createOrg.subdomainRequired' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('subdomain')?.hasError('minlength') && createOrgForm.get('subdomain')?.touched) {
-        <mat-error>Must be at least 3 characters</mat-error>
+        <mat-error>{{ 'auth.createOrg.subdomainMinLength' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('subdomain')?.hasError('pattern') && createOrgForm.get('subdomain')?.touched) {
-        <mat-error>Only lowercase letters, numbers, and hyphens</mat-error>
+        <mat-error>{{ 'auth.createOrg.subdomainPattern' | transloco }}</mat-error>
       }
     </mat-form-field>
 
     <div class="form-row">
       <mat-form-field appearance="outline">
-        <mat-label>Industry</mat-label>
+        <mat-label>{{ 'auth.createOrg.industry' | transloco }}</mat-label>
         <mat-select formControlName="industry">
-          <mat-option value="">-- Select industry --</mat-option>
+          <mat-option value="">{{ 'auth.createOrg.industryPlaceholder' | transloco }}</mat-option>
           @for (industry of industries; track industry) {
             <mat-option [value]="industry">{{ industry }}</mat-option>
           }
@@ -63,9 +63,9 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Company Size</mat-label>
+        <mat-label>{{ 'auth.createOrg.companySize' | transloco }}</mat-label>
         <mat-select formControlName="companySize">
-          <mat-option value="">-- Select size --</mat-option>
+          <mat-option value="">{{ 'auth.createOrg.companySizePlaceholder' | transloco }}</mat-option>
           @for (size of companySizes; track size.value) {
             <mat-option [value]="size.value">{{ size.label }}</mat-option>
           }
@@ -76,35 +76,35 @@
 
   <!-- Admin Account -->
   <div class="stagger stagger--2">
-    <h3 class="section-title">Admin Account</h3>
+    <h3 class="section-title">{{ 'auth.createOrg.adminSection' | transloco }}</h3>
 
     <div class="form-row">
       <mat-form-field appearance="outline">
-        <mat-label>First Name</mat-label>
-        <input matInput formControlName="firstName" placeholder="Jane">
+        <mat-label>{{ 'auth.createOrg.firstName' | transloco }}</mat-label>
+        <input matInput formControlName="firstName" [placeholder]="'auth.createOrg.firstNamePlaceholder' | transloco">
         @if (createOrgForm.get('firstName')?.hasError('required') && createOrgForm.get('firstName')?.touched) {
-          <mat-error>First name is required</mat-error>
+          <mat-error>{{ 'auth.createOrg.firstNameRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
-        <mat-label>Last Name</mat-label>
-        <input matInput formControlName="lastName" placeholder="Doe">
+        <mat-label>{{ 'auth.createOrg.lastName' | transloco }}</mat-label>
+        <input matInput formControlName="lastName" [placeholder]="'auth.createOrg.lastNamePlaceholder' | transloco">
         @if (createOrgForm.get('lastName')?.hasError('required') && createOrgForm.get('lastName')?.touched) {
-          <mat-error>Last name is required</mat-error>
+          <mat-error>{{ 'auth.createOrg.lastNameRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
     </div>
 
     <mat-form-field appearance="outline">
-      <mat-label>Email</mat-label>
-      <input matInput formControlName="email" type="email" placeholder="jane@acme.com" autocomplete="email">
+      <mat-label>{{ 'auth.createOrg.email' | transloco }}</mat-label>
+      <input matInput formControlName="email" type="email" [placeholder]="'auth.createOrg.emailPlaceholder' | transloco" autocomplete="email">
       <mat-icon matPrefix>email</mat-icon>
       @if (createOrgForm.get('email')?.hasError('required') && createOrgForm.get('email')?.touched) {
-        <mat-error>Email is required</mat-error>
+        <mat-error>{{ 'auth.createOrg.emailRequired' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('email')?.hasError('email') && createOrgForm.get('email')?.touched) {
-        <mat-error>Please enter a valid email address</mat-error>
+        <mat-error>{{ 'auth.createOrg.emailInvalid' | transloco }}</mat-error>
       }
     </mat-form-field>
   </div>
@@ -112,17 +112,17 @@
   <!-- Password -->
   <div class="stagger stagger--3">
     <mat-form-field appearance="outline">
-      <mat-label>Password</mat-label>
-      <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Minimum 8 characters" autocomplete="new-password">
+      <mat-label>{{ 'auth.createOrg.password' | transloco }}</mat-label>
+      <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" [placeholder]="'auth.createOrg.passwordPlaceholder' | transloco" autocomplete="new-password">
       <mat-icon matPrefix>lock</mat-icon>
-      <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+      <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? ('auth.login.showPassword' | transloco) : ('auth.login.hidePassword' | transloco)">
         <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
       @if (createOrgForm.get('password')?.hasError('required') && createOrgForm.get('password')?.touched) {
-        <mat-error>Password is required</mat-error>
+        <mat-error>{{ 'auth.createOrg.passwordRequired' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('password')?.hasError('minlength') && createOrgForm.get('password')?.touched) {
-        <mat-error>Password must be at least 8 characters</mat-error>
+        <mat-error>{{ 'auth.createOrg.passwordMinLength' | transloco }}</mat-error>
       }
     </mat-form-field>
 
@@ -134,17 +134,17 @@
     }
 
     <mat-form-field appearance="outline">
-      <mat-label>Confirm Password</mat-label>
-      <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword() ? 'password' : 'text'" placeholder="Repeat your password" autocomplete="new-password">
+      <mat-label>{{ 'auth.createOrg.confirmPassword' | transloco }}</mat-label>
+      <input matInput formControlName="confirmPassword" [type]="hideConfirmPassword() ? 'password' : 'text'" [placeholder]="'auth.createOrg.confirmPasswordPlaceholder' | transloco" autocomplete="new-password">
       <mat-icon matPrefix>lock_outline</mat-icon>
-      <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="hideConfirmPassword() ? 'Show password' : 'Hide password'">
+      <button mat-icon-button matSuffix type="button" (click)="toggleConfirmPasswordVisibility()" [attr.aria-label]="hideConfirmPassword() ? ('auth.login.showPassword' | transloco) : ('auth.login.hidePassword' | transloco)">
         <mat-icon>{{ hideConfirmPassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
       </button>
       @if (createOrgForm.get('confirmPassword')?.hasError('required') && createOrgForm.get('confirmPassword')?.touched) {
-        <mat-error>Please confirm your password</mat-error>
+        <mat-error>{{ 'auth.createOrg.confirmPasswordRequired' | transloco }}</mat-error>
       }
       @if (createOrgForm.get('confirmPassword')?.hasError('passwordMismatch') && createOrgForm.get('confirmPassword')?.touched) {
-        <mat-error>Passwords do not match</mat-error>
+        <mat-error>{{ 'auth.createOrg.passwordMismatch' | transloco }}</mat-error>
       }
     </mat-form-field>
   </div>
@@ -154,7 +154,7 @@
       @if (isLoading()) {
         <mat-spinner diameter="20" color="accent"></mat-spinner>
       } @else {
-        Create Organization
+        {{ 'auth.createOrg.createOrg' | transloco }}
       }
     </button>
   </div>

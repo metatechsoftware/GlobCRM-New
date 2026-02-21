@@ -18,6 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-reset-password',
@@ -33,6 +34,7 @@ import { AuthService } from '../../../../core/auth/auth.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatProgressBarModule,
+    TranslocoPipe,
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss',
@@ -42,6 +44,7 @@ export class ResetPasswordComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly transloco = inject(TranslocoService);
 
   resetForm!: FormGroup;
   hidePassword = signal(true);
@@ -82,7 +85,7 @@ export class ResetPasswordComponent implements OnInit {
     }
 
     if (!this.email || !this.resetCode) {
-      this.errorMessage.set('Invalid reset link. Please request a new password reset.');
+      this.errorMessage.set(this.transloco.translate('auth.messages.invalidResetLink'));
       return;
     }
 
@@ -104,9 +107,9 @@ export class ResetPasswordComponent implements OnInit {
         error: (error) => {
           this.isLoading.set(false);
           if (error.status === 400 || error.message?.includes('expired') || error.message?.includes('invalid')) {
-            this.errorMessage.set('This reset link has expired or is invalid. Please request a new one.');
+            this.errorMessage.set(this.transloco.translate('auth.messages.resetLinkExpired'));
           } else {
-            this.errorMessage.set(error.message || 'Failed to reset password. Please try again.');
+            this.errorMessage.set(error.message || this.transloco.translate('auth.messages.resetFailed'));
           }
         },
       });

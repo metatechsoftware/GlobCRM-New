@@ -11,8 +11,8 @@
         <span class="auth-page__mark">G</span>
         <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
       </div>
-      <h2 class="auth-page__tagline anim-2">Manage relationships,<br>grow your business.</h2>
-      <p class="auth-page__blurb anim-3">A modern CRM built for teams that care about their customers.</p>
+      <h2 class="auth-page__tagline anim-2">{{ 'auth.login.tagline' | transloco }}</h2>
+      <p class="auth-page__blurb anim-3">{{ 'auth.login.blurb' | transloco }}</p>
     </div>
   </div>
 
@@ -24,14 +24,20 @@
             <span class="auth-page__mark auth-page__mark--sm">G</span>
             <span class="brand-header__mobile-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
           </div>
-          <h1 class="brand-title">Welcome back</h1>
-          <p class="brand-subtitle">Sign in to your account</p>
+          <h1 class="brand-title">{{ 'auth.login.welcomeBack' | transloco }}</h1>
+          <p class="brand-subtitle">{{ 'auth.login.signInToAccount' | transloco }}</p>
         </div>
       </mat-card-header>
 
       <mat-card-content>
         <!-- Login Form -->
         @if (!showTwoFactor()) {
+          @if (successMessage()) {
+            <div class="success-banner">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ successMessage() }}</span>
+            </div>
+          }
           @if (errorMessage()) {
             <div class="error-banner">
               <mat-icon>error_outline</mat-icon>
@@ -42,39 +48,39 @@
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
             <div class="stagger stagger--1">
               <mat-form-field appearance="outline">
-                <mat-label>Email</mat-label>
-                <input matInput formControlName="email" type="email" placeholder="you@company.com" autocomplete="email">
+                <mat-label>{{ 'auth.login.email' | transloco }}</mat-label>
+                <input matInput formControlName="email" type="email" [placeholder]="'auth.login.emailPlaceholder' | transloco" autocomplete="email">
                 <mat-icon matPrefix>email</mat-icon>
                 @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
-                  <mat-error>Email is required</mat-error>
+                  <mat-error>{{ 'auth.login.emailRequired' | transloco }}</mat-error>
                 }
                 @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
-                  <mat-error>Please enter a valid email address</mat-error>
+                  <mat-error>{{ 'auth.login.emailInvalid' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
 
             <div class="stagger stagger--2">
               <mat-form-field appearance="outline">
-                <mat-label>Password</mat-label>
-                <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Enter your password" autocomplete="current-password">
+                <mat-label>{{ 'auth.login.password' | transloco }}</mat-label>
+                <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" [placeholder]="'auth.login.passwordPlaceholder' | transloco" autocomplete="current-password">
                 <mat-icon matPrefix>lock</mat-icon>
-                <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+                <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? ('auth.login.showPassword' | transloco) : ('auth.login.hidePassword' | transloco)">
                   <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
                 </button>
                 @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
-                  <mat-error>Password is required</mat-error>
+                  <mat-error>{{ 'auth.login.passwordRequired' | transloco }}</mat-error>
                 }
                 @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
-                  <mat-error>Password must be at least 8 characters</mat-error>
+                  <mat-error>{{ 'auth.login.passwordMinLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
 
             <div class="stagger stagger--3">
               <div class="form-options">
-                <mat-checkbox formControlName="rememberMe" color="primary">Remember me</mat-checkbox>
-                <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+                <mat-checkbox formControlName="rememberMe" color="primary">{{ 'auth.login.rememberMe' | transloco }}</mat-checkbox>
+                <a routerLink="/auth/forgot-password" class="forgot-link">{{ 'auth.login.forgotPassword' | transloco }}</a>
               </div>
             </div>
 
@@ -83,7 +89,7 @@
                 @if (isLoading()) {
                   <mat-spinner diameter="20" color="accent"></mat-spinner>
                 } @else {
-                  Sign In
+                  {{ 'auth.login.signIn' | transloco }}
                 }
               </button>
             </div>
@@ -101,19 +107,19 @@
 
           <div class="tfa-info">
             <mat-icon class="tfa-icon">shield</mat-icon>
-            <p>Enter the 6-digit code from your authenticator app.</p>
+            <p>{{ 'auth.twoFactor.info' | transloco }}</p>
           </div>
 
           <form [formGroup]="twoFactorForm" (ngSubmit)="onSubmitTwoFactor()">
             <mat-form-field appearance="outline">
-              <mat-label>Verification Code</mat-label>
-              <input matInput formControlName="twoFactorCode" type="text" placeholder="000000" maxlength="6" autocomplete="one-time-code">
+              <mat-label>{{ 'auth.twoFactor.codeLabel' | transloco }}</mat-label>
+              <input matInput formControlName="twoFactorCode" type="text" [placeholder]="'auth.twoFactor.codePlaceholder' | transloco" maxlength="6" autocomplete="one-time-code">
               <mat-icon matPrefix>pin</mat-icon>
               @if (twoFactorForm.get('twoFactorCode')?.hasError('required') && twoFactorForm.get('twoFactorCode')?.touched) {
-                <mat-error>Verification code is required</mat-error>
+                <mat-error>{{ 'auth.twoFactor.codeRequired' | transloco }}</mat-error>
               }
               @if (twoFactorForm.get('twoFactorCode')?.hasError('minlength') && twoFactorForm.get('twoFactorCode')?.touched) {
-                <mat-error>Code must be 6 digits</mat-error>
+                <mat-error>{{ 'auth.twoFactor.codeMinLength' | transloco }}</mat-error>
               }
             </mat-form-field>
 
@@ -121,13 +127,13 @@
               @if (isLoading()) {
                 <mat-spinner diameter="20" color="accent"></mat-spinner>
               } @else {
-                Verify
+                {{ 'auth.twoFactor.verify' | transloco }}
               }
             </button>
 
             <div class="tfa-back">
               <button mat-button type="button" (click)="backToLogin()">
-                <mat-icon>arrow_back</mat-icon> Back to login
+                <mat-icon>arrow_back</mat-icon> {{ 'auth.twoFactor.backToLogin' | transloco }}
               </button>
             </div>
           </form>
@@ -135,7 +141,7 @@
       </mat-card-content>
 
       <mat-card-actions class="auth-card-footer">
-        <p>Don't have an account? <a routerLink="/auth/signup" class="auth-link">Sign up</a></p>
+        <p>{{ 'auth.login.noAccount' | transloco }} <a routerLink="/auth/signup" class="auth-link">{{ 'auth.login.signUp' | transloco }}</a></p>
       </mat-card-actions>
     </mat-card>
   </div>

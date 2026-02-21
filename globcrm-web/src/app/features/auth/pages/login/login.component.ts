@@ -11,6 +11,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { AuthStore } from '../../../../core/auth/auth.store';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-login',
@@ -26,6 +27,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
     MatCheckboxModule,
     MatProgressSpinnerModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
@@ -36,22 +38,37 @@ export class LoginComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly transloco = inject(TranslocoService);
+
+  private static readonly REMEMBERED_EMAIL_KEY = 'globcrm_remembered_email';
 
   loginForm!: FormGroup;
   twoFactorForm!: FormGroup;
   hidePassword = signal(true);
   showTwoFactor = signal(false);
   errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
   isLoading = signal(false);
   private returnUrl = '/my-day';
 
   ngOnInit(): void {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/my-day';
+    const queryParams = this.route.snapshot.queryParams;
+    this.returnUrl = queryParams['returnUrl'] || '/my-day';
+
+    const emailFromQuery = queryParams['email'] || '';
+    const messageFromQuery = queryParams['message'] || '';
+    const rememberedEmail = localStorage.getItem(LoginComponent.REMEMBERED_EMAIL_KEY) || '';
+
+    const initialEmail = emailFromQuery || rememberedEmail;
+
+    if (messageFromQuery) {
+      this.successMessage.set(messageFromQuery);
+    }
 
     this.loginForm = this.fb.group({
-      email: ['cevikcinar@gmail.com', [Validators.required, Validators.email]],
-      password: ['Sienna@1998!', [Validators.required, Validators.minLength(8)]],
-      rememberMe: [false],
+      email: [initialEmail, [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8)]],
+      rememberMe: [!!rememberedEmail],
     });
 
     this.twoFactorForm = this.fb.group({
@@ -72,6 +89,11 @@ export class LoginComponent implements OnInit {
 
     this.authService.login({ email, password, rememberMe }).subscribe({
       next: () => {
+        if (rememberMe) {
+          localStorage.setItem(LoginComponent.REMEMBERED_EMAIL_KEY, email);
+        } else {
+          localStorage.removeItem(LoginComponent.REMEMBERED_EMAIL_KEY);
+        }
         this.isLoading.set(false);
         this.router.navigateByUrl(this.returnUrl);
       },
@@ -81,13 +103,13 @@ export class LoginComponent implements OnInit {
           this.showTwoFactor.set(true);
           this.authStore.setRequiresTwoFactor(true);
         } else if (error.status === 401) {
-          this.errorMessage.set('Invalid email or password.');
+          this.errorMessage.set(this.transloco.translate('auth.messages.invalidCredentials'));
         } else if (error.status === 403) {
-          this.errorMessage.set('Your account has been locked. Please try again later.');
+          this.errorMessage.set(this.transloco.translate('auth.messages.accountLocked'));
         } else if (error.message?.includes('email') && error.message?.includes('verified')) {
-          this.errorMessage.set('Please verify your email address before logging in.');
+          this.errorMessage.set(this.transloco.translate('auth.messages.verifyEmail'));
         } else {
-          this.errorMessage.set(error.message || 'An unexpected error occurred. Please try again.');
+          this.errorMessage.set(error.message || this.transloco.translate('auth.messages.unexpectedError'));
         }
       },
     });
@@ -115,7 +137,7 @@ export class LoginComponent implements OnInit {
         },
         error: (error) => {
           this.isLoading.set(false);
-          this.errorMessage.set('Invalid verification code. Please try again.');
+          this.errorMessage.set(this.transloco.translate('auth.messages.invalidVerificationCode'));
         },
       });
   }

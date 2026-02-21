@@ -12,6 +12,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { AuthService } from '../../../../core/auth/auth.service';
 import { TwoFactorInfo } from '../../../../core/auth/auth.models';
 import * as QRCode from 'qrcode';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 type TwoFactorState = 'loading' | 'setup' | 'verify' | 'recovery-codes' | 'enabled' | 'error';
 
@@ -28,6 +29,7 @@ type TwoFactorState = 'loading' | 'setup' | 'verify' | 'recovery-codes' | 'enabl
     MatIconModule,
     MatProgressSpinnerModule,
     MatDividerModule,
+    TranslocoPipe,
   ],
   templateUrl: './two-factor.component.html',
   styleUrl: './two-factor.component.scss',
@@ -36,6 +38,7 @@ export class TwoFactorComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   verifyForm!: FormGroup;
   disableForm!: FormGroup;
@@ -78,7 +81,7 @@ export class TwoFactorComponent implements OnInit {
         }
       },
       error: (err) => {
-        this.errorMessage.set(err.message || 'Failed to load 2FA information.');
+        this.errorMessage.set(err.message || this.transloco.translate('auth.messages.failed2faLoad'));
         this.state.set('error');
       },
     });
@@ -96,7 +99,7 @@ export class TwoFactorComponent implements OnInit {
       });
       this.qrCodeDataUrl.set(dataUrl);
     } catch {
-      this.errorMessage.set('Failed to generate QR code.');
+      this.errorMessage.set(this.transloco.translate('auth.messages.failedQrCode'));
     }
   }
 
@@ -126,7 +129,7 @@ export class TwoFactorComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.message || 'Invalid verification code. Please try again.');
+        this.errorMessage.set(err.message || this.transloco.translate('auth.messages.invalidCode'));
       },
     });
   }
@@ -148,7 +151,7 @@ export class TwoFactorComponent implements OnInit {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.message || 'Failed to disable 2FA.');
+        this.errorMessage.set(err.message || this.transloco.translate('auth.messages.failedDisable2fa'));
       },
     });
   }

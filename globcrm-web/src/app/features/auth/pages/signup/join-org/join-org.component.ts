@@ -8,6 +8,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-join-org',
@@ -20,6 +21,7 @@ import { AuthService } from '../../../../../core/auth/auth.service';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   templateUrl: './join-org.component.html',
   styleUrl: './join-org.component.scss',
@@ -29,6 +31,7 @@ export class JoinOrgComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly transloco = inject(TranslocoService);
 
   joinForm!: FormGroup;
   hidePassword = signal(true);
@@ -81,15 +84,18 @@ export class JoinOrgComponent implements OnInit {
         next: () => {
           this.isLoading.set(false);
           this.router.navigate(['/auth/login'], {
-            queryParams: { message: 'Account created successfully. Please sign in.' },
+            queryParams: {
+              message: this.transloco.translate('auth.messages.accountCreated'),
+              email: formValue.email,
+            },
           });
         },
         error: (error) => {
           this.isLoading.set(false);
           if (error.status === 404 || error.message?.includes('expired')) {
-            this.errorMessage.set('This invitation has expired or is invalid. Please ask your admin for a new invitation.');
+            this.errorMessage.set(this.transloco.translate('auth.messages.invitationExpired'));
           } else {
-            this.errorMessage.set(error.message || 'Failed to join organization. Please try again.');
+            this.errorMessage.set(error.message || this.transloco.translate('auth.messages.joinFailed'));
           }
         },
       });

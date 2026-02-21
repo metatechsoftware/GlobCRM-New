@@ -11,8 +11,8 @@
         <span class="auth-page__mark">G</span>
         <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
       </div>
-      <h2 class="auth-page__tagline anim-2">Start building<br>stronger connections.</h2>
-      <p class="auth-page__blurb anim-3">Set up your team workspace in under two minutes.</p>
+      <h2 class="auth-page__tagline anim-2">{{ 'auth.signup.tagline' | transloco }}</h2>
+      <p class="auth-page__blurb anim-3">{{ 'auth.signup.blurb' | transloco }}</p>
     </div>
   </div>
 
@@ -24,19 +24,19 @@
             <span class="auth-page__mark auth-page__mark--sm">G</span>
             <span class="brand-header__mobile-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
           </div>
-          <h1 class="brand-title">Create your account</h1>
-          <p class="brand-subtitle">Get started with GlobCRM today</p>
+          <h1 class="brand-title">{{ 'auth.signup.createAccount' | transloco }}</h1>
+          <p class="brand-subtitle">{{ 'auth.signup.getStarted' | transloco }}</p>
         </div>
       </mat-card-header>
 
       <mat-card-content>
         <mat-tab-group animationDuration="200ms" color="primary">
-          <mat-tab label="Create Organization">
+          <mat-tab [label]="'auth.signup.createOrgTab' | transloco">
             <div class="tab-content">
               <app-create-org></app-create-org>
             </div>
           </mat-tab>
-          <mat-tab label="Join Organization">
+          <mat-tab [label]="'auth.signup.joinOrgTab' | transloco">
             <div class="tab-content">
               <app-join-org></app-join-org>
             </div>
@@ -45,7 +45,7 @@
       </mat-card-content>
 
       <mat-card-actions class="auth-card-footer">
-        <p>Already have an account? <a routerLink="/auth/login" class="auth-link">Sign in</a></p>
+        <p>{{ 'auth.signup.hasAccount' | transloco }} <a routerLink="/auth/login" class="auth-link">{{ 'auth.signup.signIn' | transloco }}</a></p>
       </mat-card-actions>
     </mat-card>
   </div>

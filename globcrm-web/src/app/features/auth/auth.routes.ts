@@ -1,7 +1,12 @@
 import { Routes } from '@angular/router';
 import { authGuard } from '../../core/auth/auth.guard';
+import { provideTranslocoScope } from '@jsverse/transloco';
 
 export const AUTH_ROUTES: Routes = [
+  {
+    path: '',
+    providers: [provideTranslocoScope('auth')],
+    children: [
   {
     path: 'login',
     loadComponent: () =>
@@ -52,5 +57,7 @@ export const AUTH_ROUTES: Routes = [
     path: '',
     redirectTo: 'login',
     pathMatch: 'full',
+  },
+    ],
   },
 ];
