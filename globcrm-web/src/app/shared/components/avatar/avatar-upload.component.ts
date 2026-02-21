@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AvatarComponent } from './avatar.component';
 import { AvatarCropDialogComponent } from './avatar-crop-dialog.component';
 
@@ -23,6 +24,7 @@ import { AvatarCropDialogComponent } from './avatar-crop-dialog.component';
     MatDialogModule,
     MatProgressSpinnerModule,
     AvatarComponent,
+    TranslocoPipe,
   ],
   template: `
     <div class="avatar-upload-container">
@@ -34,7 +36,7 @@ import { AvatarCropDialogComponent } from './avatar-crop-dialog.component';
           size="lg" />
         <div class="overlay">
           <mat-icon>photo_camera</mat-icon>
-          <span>Change Photo</span>
+          <span>{{ 'common.avatar.changePhoto' | transloco }}</span>
         </div>
       </div>
 

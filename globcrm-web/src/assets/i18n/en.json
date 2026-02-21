@@ -86,6 +86,7 @@
       "active": "{{count}} active",
       "removeFilter": "Remove filter",
       "clearAllFilters": "Clear all filters",
+      "activeFiltersAria": "Active filters",
       "operators": {
         "equals": "Equals",
         "notEquals": "Not equals",
@@ -258,6 +259,29 @@
       "comingSoon": "(coming soon)",
       "comingSoonMessage": "{{tab}} will be available in a future update."
     },
+    "quickAddField": {
+      "title": "Quick Add Field",
+      "fieldLabel": "Field Label",
+      "fieldType": "Field Type",
+      "configureHint": "Configure options & validation in Settings",
+      "addButton": "Add custom field column"
+    },
+    "avatar": {
+      "cropTitle": "Crop Avatar",
+      "cancel": "Cancel",
+      "loadError": "Failed to load image. Please try a different file.",
+      "changePhoto": "Change Photo"
+    },
+    "customFieldForm": {
+      "fileUploadSoon": "File upload coming soon",
+      "relatedEntityPlaceholder": "Related entity ID"
+    },
+    "userPreview": {
+      "couldNotLoad": "Could not load profile",
+      "deals": "Deals",
+      "lastActive": "Last active",
+      "tasksToday": "Tasks today"
+    },
     "summaryTab": {
       "fields": {
         "name": "Name",
@@ -343,7 +367,11 @@
     "duplicates": "Duplicates",
     "import": "Import",
     "team": "Team",
-    "settings": "Settings"
+    "settings": "Settings",
+    "toggleMenu": "Toggle navigation menu",
+    "userMenu": "User menu",
+    "expandSidebar": "Expand sidebar",
+    "collapseSidebar": "Collapse sidebar"
   },
   "auth": {
     "login": "Login",

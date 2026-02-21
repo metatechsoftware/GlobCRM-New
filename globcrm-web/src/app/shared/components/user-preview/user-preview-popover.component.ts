@@ -8,6 +8,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { forkJoin } from 'rxjs';
 
 import { ApiService } from '../../../core/api/api.service';
@@ -44,7 +45,7 @@ interface UserActivityStats {
 @Component({
   selector: 'app-user-preview-popover',
   standalone: true,
-  imports: [CommonModule, MatIconModule, AvatarComponent],
+  imports: [CommonModule, MatIconModule, AvatarComponent, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .user-preview {
@@ -248,7 +249,7 @@ interface UserActivityStats {
       } @else if (hasError()) {
         <div class="user-preview__error">
           <mat-icon>person_off</mat-icon>
-          <span>Could not load profile</span>
+          <span>{{ 'common.userPreview.couldNotLoad' | transloco }}</span>
         </div>
       } @else if (profile()) {
         <div class="user-preview__header">
@@ -287,15 +288,15 @@ interface UserActivityStats {
           <div class="user-preview__stats">
             <div class="stat-item">
               <span class="stat-item__value">{{ stats()!.dealsAssigned }}</span>
-              <span class="stat-item__label">Deals</span>
+              <span class="stat-item__label">{{ 'common.userPreview.deals' | transloco }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-item__value">{{ stats()!.tasksCompletedToday }}</span>
-              <span class="stat-item__label">Tasks today</span>
+              <span class="stat-item__label">{{ 'common.userPreview.tasksToday' | transloco }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-item__value">{{ getRelativeTime(stats()!.lastActive) }}</span>
-              <span class="stat-item__label">Last active</span>
+              <span class="stat-item__label">{{ 'common.userPreview.lastActive' | transloco }}</span>
             </div>
           </div>
         }

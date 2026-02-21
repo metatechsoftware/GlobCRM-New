@@ -86,6 +86,7 @@
       "active": "{{count}} aktif",
       "removeFilter": "Filtreyi kaldır",
       "clearAllFilters": "Tüm filtreleri temizle",
+      "activeFiltersAria": "Aktif filtreler",
       "operators": {
         "equals": "Eşittir",
         "notEquals": "Eşit değildir",
@@ -258,6 +259,29 @@
       "comingSoon": "(yakında)",
       "comingSoonMessage": "{{tab}} gelecek bir güncellemede kullanılabilir olacak."
     },
+    "quickAddField": {
+      "title": "Hızlı Alan Ekle",
+      "fieldLabel": "Alan Etiketi",
+      "fieldType": "Alan Tipi",
+      "configureHint": "Ayarlarda seçenekleri ve doğrulamayı yapılandırın",
+      "addButton": "Özel alan sütunu ekle"
+    },
+    "avatar": {
+      "cropTitle": "Avatar Kırp",
+      "cancel": "İptal",
+      "loadError": "Görsel yüklenemedi. Lütfen farklı bir dosya deneyin.",
+      "changePhoto": "Fotoğraf Değiştir"
+    },
+    "customFieldForm": {
+      "fileUploadSoon": "Dosya yükleme yakında",
+      "relatedEntityPlaceholder": "İlişkili varlık kimlik numarası"
+    },
+    "userPreview": {
+      "couldNotLoad": "Profil yüklenemedi",
+      "deals": "Anlaşmalar",
+      "lastActive": "Son aktif",
+      "tasksToday": "Bugünün görevleri"
+    },
     "summaryTab": {
       "fields": {
         "name": "Ad",
@@ -343,7 +367,11 @@
     "duplicates": "Tekrarlar",
     "import": "İçeri Aktar",
     "team": "Ekip",
-    "settings": "Ayarlar"
+    "settings": "Ayarlar",
+    "toggleMenu": "Gezinme menüsünü aç/kapat",
+    "userMenu": "Kullanıcı menüsü",
+    "expandSidebar": "Kenar çubuğunu genişlet",
+    "collapseSidebar": "Kenar çubuğunu daralt"
   },
   "auth": {
     "login": "Giriş Yap",

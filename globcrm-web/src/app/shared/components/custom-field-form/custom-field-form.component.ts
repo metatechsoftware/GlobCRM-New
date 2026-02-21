@@ -20,6 +20,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Subscription } from 'rxjs';
 
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -72,6 +73,7 @@ interface FieldGroup {
     MatIconModule,
     MatProgressSpinnerModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -280,7 +282,7 @@ interface FieldGroup {
                       @case ('file') {
                         <div class="file-field">
                           <label>{{ field.label }}</label>
-                          <span class="file-field-placeholder">File upload coming soon</span>
+                          <span class="file-field-placeholder">{{ 'common.customFieldForm.fileUploadSoon' | transloco }}</span>
                         </div>
                       }
                       @case ('relation') {
@@ -288,7 +290,7 @@ interface FieldGroup {
                           <mat-label>{{ field.label }}</mat-label>
                           <input matInput
                                  [formControlName]="field.id"
-                                 placeholder="Related entity ID"
+                                 [placeholder]="'common.customFieldForm.relatedEntityPlaceholder' | transloco"
                                  [readonly]="isFieldReadonly(field.id)">
                           @if (form.controls[field.id]?.hasError('required')) {
                             <mat-error>{{ field.label }} is required</mat-error>

@@ -32,7 +32,7 @@
     @if (data.ownerName) {
       <div class="preview-owner">
         @if (data.ownerAvatarUrl) {
-          <img [src]="data.ownerAvatarUrl" class="owner-avatar" alt="Owner" />
+          <img [src]="data.ownerAvatarUrl" class="owner-avatar" [alt]="'common.preview.ownerAlt' | transloco" />
         } @else {
           <mat-icon class="owner-avatar-icon">account_circle</mat-icon>
         }

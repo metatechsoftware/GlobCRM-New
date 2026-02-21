@@ -16,6 +16,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
 import {
@@ -41,13 +42,14 @@ import {
     MatInputModule,
     MatSelectModule,
     MatSnackBarModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isAdmin()) {
       <button mat-icon-button
               [matMenuTriggerFor]="addFieldMenu"
-              aria-label="Add custom field column"
+              [attr.aria-label]="'common.quickAddField.addButton' | transloco"
               class="add-field-trigger">
         <mat-icon>add_circle_outline</mat-icon>
       </button>
@@ -55,10 +57,10 @@ import {
         <div class="quick-add-form"
              (click)="$event.stopPropagation()"
              (keydown)="$event.stopPropagation()">
-          <div class="quick-add-header">Quick Add Field</div>
+          <div class="quick-add-header">{{ 'common.quickAddField.title' | transloco }}</div>
 
           <mat-form-field appearance="outline" class="quick-add-input">
-            <mat-label>Field Label</mat-label>
+            <mat-label>{{ 'common.quickAddField.fieldLabel' | transloco }}</mat-label>
             <input matInput
                    [(ngModel)]="label"
                    placeholder="e.g. Revenue Tier"
@@ -66,7 +68,7 @@ import {
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="quick-add-input">
-            <mat-label>Field Type</mat-label>
+            <mat-label>{{ 'common.quickAddField.fieldType' | transloco }}</mat-label>
             <mat-select [(ngModel)]="selectedType">
               @for (type of availableTypes; track type) {
                 <mat-option [value]="type">{{ typeLabel(type) }}</mat-option>
@@ -82,7 +84,7 @@ import {
             {{ saving() ? 'Creating...' : 'Create' }}
           </button>
 
-          <div class="quick-add-hint">Configure options & validation in Settings</div>
+          <div class="quick-add-hint">{{ 'common.quickAddField.configureHint' | transloco }}</div>
         </div>
       </mat-menu>
     }

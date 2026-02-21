@@ -1,5 +1,5 @@
 @if (filters().length > 0) {
-  <div class="filter-chips" role="list" aria-label="Active filters">
+  <div class="filter-chips" role="list" [attr.aria-label]="'common.filters.activeFiltersAria' | transloco">
     @for (filter of filters(); track $index) {
       <span class="filter-chip badge" [ngClass]="getChipBadgeClass(filter)" role="listitem">
         <span class="filter-chip__label">{{ getChipLabel(filter) }}</span>

@@ -6,6 +6,7 @@ import {
   MatDialogRef,
 } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ImageCropperComponent, ImageCroppedEvent, LoadedImage } from 'ngx-image-cropper';
 
 export interface AvatarCropDialogData {
@@ -24,9 +25,10 @@ export interface AvatarCropDialogData {
     MatDialogModule,
     MatButtonModule,
     ImageCropperComponent,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>Crop Avatar</h2>
+    <h2 mat-dialog-title>{{ 'common.avatar.cropTitle' | transloco }}</h2>
     <mat-dialog-content>
       <div class="cropper-container">
         <image-cropper
@@ -41,11 +43,11 @@ export interface AvatarCropDialogData {
         ></image-cropper>
       </div>
       @if (loadError()) {
-        <p class="error-message">Failed to load image. Please try a different file.</p>
+        <p class="error-message">{{ 'common.avatar.loadError' | transloco }}</p>
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button (click)="cancel()">Cancel</button>
+      <button mat-button (click)="cancel()">{{ 'common.avatar.cancel' | transloco }}</button>
       <button
         mat-flat-button
         color="primary"

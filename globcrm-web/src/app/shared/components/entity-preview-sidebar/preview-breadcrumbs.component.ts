@@ -1,16 +1,17 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PreviewEntry } from '../../models/entity-preview.models';
 import { getEntityConfig } from '../../services/entity-type-registry';
 
 @Component({
   selector: 'app-preview-breadcrumbs',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (stack().length > 1) {
-      <nav class="breadcrumbs" aria-label="Preview navigation">
+      <nav class="breadcrumbs" [attr.aria-label]="'common.preview.breadcrumbsAria' | transloco">
         @if (stack().length <= 4) {
           @for (entry of stack(); track $index) {
             @if ($index > 0) {

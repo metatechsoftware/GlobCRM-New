@@ -41,7 +41,7 @@
     <!-- Footer -->
     <div class="sidebar__footer">
       <button class="sidebar__collapse-btn" (click)="toggleCollapse()"
-              [attr.aria-label]="sidebarState.isCollapsed() ? 'Expand sidebar' : 'Collapse sidebar'">
+              [attr.aria-label]="sidebarState.isCollapsed() ? ('nav.expandSidebar' | transloco) : ('nav.collapseSidebar' | transloco)">
         <mat-icon>{{ sidebarState.isCollapsed() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
       </button>
     </div>
@@ -60,7 +60,7 @@
 
     <!-- User Trigger -->
     <button class="content-header__user" [matMenuTriggerFor]="userMenu"
-            aria-label="User menu">
+            [attr.aria-label]="'nav.userMenu' | transloco">
       <span class="content-header__avatar">{{ userInitials }}</span>
       <div class="content-header__user-info">
         <span class="content-header__user-name">{{ authStore.userName() }}</span>
@@ -77,7 +77,7 @@
 @if (isMobile()) {
   <!-- Mobile Top Bar -->
   <header class="topbar">
-    <button class="topbar__hamburger" (click)="toggleMobile()" aria-label="Toggle navigation menu">
+    <button class="topbar__hamburger" (click)="toggleMobile()" [attr.aria-label]="'nav.toggleMenu' | transloco">
       <mat-icon>{{ mobileOpen() ? 'close' : 'menu' }}</mat-icon>
     </button>
     <a routerLink="/dashboard" class="topbar__brand">
@@ -92,7 +92,7 @@
     </button>
     <app-notification-center />
     <span class="topbar__lang-badge">{{ currentLang() | uppercase }}</span>
-    <button class="topbar__avatar" [matMenuTriggerFor]="userMenu" aria-label="User menu">
+    <button class="topbar__avatar" [matMenuTriggerFor]="userMenu" [attr.aria-label]="'nav.userMenu' | transloco">
       {{ userInitials }}
     </button>
   </header>
