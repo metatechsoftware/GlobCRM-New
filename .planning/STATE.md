@@ -14,7 +14,7 @@ Plan: 5 of 5 complete (Tasks 1-2 done; Task 3 checkpoint pending human verificat
 Status: Awaiting checkpoint verification for 29-05
 Last activity: 2026-02-21 — Completed 29-05 Tasks 1-2 (Detail Panel, Settings Hub, i18n)
 
-Progress: [████████████████████] 97% (183/~188 plans estimated)
+Progress: [████████████████████] 98% (185/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 97% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 183
+- Total plans completed: 185
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 22 plans across 3 phases (Phase 27-29)
+- v1.3: 24 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -97,6 +97,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-11: TranslocoLoaderData.scope used to construct scoped file path (assets/i18n/{scope}/{lang}.json)
 - 28-11: LanguageService.switchLanguage() called in settings success handler for immediate UI update
 - 28-11: labelKey checked before label in getColumnLabel/getLabel for backward-compatible translation
+- 28-12: Dual-key notification types (PascalCase enum + snake_case API) for universal resolution in my-day scope
+- 28-12: toLocaleUpperCase() replaces toUpperCase() in notification widget fallback for Turkish I/i safety
+- 28-12: Products uses module-level PRODUCT_CORE_COLUMNS const; emails skips labelKey for icon-only columns
+- 28-12: Settings notification prefs use transloco.translate() with typeLabels/typeDescriptions namespace replacing hardcoded consts
 
 ### Pending Todos
 
@@ -111,6 +115,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-11-PLAN.md (gap closure: foundational localization fixes)
-Resume file: .planning/phases/28-localization-string-extraction/28-11-SUMMARY.md
-Next step: Execute 28-12-PLAN.md (gap closure: entity column header translations)
+Stopped at: Completed 28-12-PLAN.md (gap closure: entity column header translations + notification key fixes)
+Resume file: .planning/phases/28-localization-string-extraction/28-12-SUMMARY.md
+Next step: Phase 28 gap closure complete. Continue with Phase 29-05 checkpoint verification or Phase 30 planning.

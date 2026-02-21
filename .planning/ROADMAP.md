@@ -64,7 +64,7 @@
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
-- [ ] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures
+- [x] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures (completed 2026-02-21)
 - [x] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n (completed 2026-02-21)
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
 - [ ] **Phase 31: Quote PDF Templates** — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
@@ -186,7 +186,7 @@ Plans:
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
-| 28. Localization String Extraction | 11/12 | In Progress|  | - |
+| 28. Localization String Extraction | 12/12 | Complete   | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
