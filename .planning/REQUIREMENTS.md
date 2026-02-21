@@ -131,64 +131,64 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOCL-01 | — | Pending |
-| LOCL-02 | — | Pending |
-| LOCL-03 | — | Pending |
-| LOCL-04 | — | Pending |
-| LOCL-05 | — | Pending |
-| LOCL-06 | — | Pending |
-| LOCL-07 | — | Pending |
-| LOCL-08 | — | Pending |
-| LOCL-09 | — | Pending |
-| LOCL-10 | — | Pending |
-| INTG-01 | — | Pending |
-| INTG-02 | — | Pending |
-| INTG-03 | — | Pending |
-| INTG-04 | — | Pending |
-| INTG-05 | — | Pending |
-| INTG-06 | — | Pending |
-| INTG-07 | — | Pending |
-| INTG-08 | — | Pending |
-| INTG-09 | — | Pending |
-| INTG-10 | — | Pending |
-| INTG-11 | — | Pending |
-| INTG-12 | — | Pending |
-| KANB-01 | — | Pending |
-| KANB-02 | — | Pending |
-| KANB-03 | — | Pending |
-| KANB-04 | — | Pending |
-| KANB-05 | — | Pending |
-| KANB-06 | — | Pending |
-| KANB-07 | — | Pending |
-| KANB-08 | — | Pending |
-| KANB-09 | — | Pending |
-| KANB-10 | — | Pending |
-| KANB-11 | — | Pending |
-| KANB-12 | — | Pending |
-| KANB-13 | — | Pending |
-| KANB-14 | — | Pending |
-| KANB-15 | — | Pending |
-| KANB-16 | — | Pending |
-| KANB-17 | — | Pending |
-| KANB-18 | — | Pending |
-| QTPL-01 | — | Pending |
-| QTPL-02 | — | Pending |
-| QTPL-03 | — | Pending |
-| QTPL-04 | — | Pending |
-| QTPL-05 | — | Pending |
-| QTPL-06 | — | Pending |
-| QTPL-07 | — | Pending |
-| QTPL-08 | — | Pending |
-| QTPL-09 | — | Pending |
-| QTPL-10 | — | Pending |
-| QTPL-11 | — | Pending |
-| QTPL-12 | — | Pending |
+| LOCL-01 | Phase 27 | Pending |
+| LOCL-02 | Phase 27 | Pending |
+| LOCL-03 | Phase 28 | Pending |
+| LOCL-04 | Phase 27 | Pending |
+| LOCL-05 | Phase 27 | Pending |
+| LOCL-06 | Phase 27 | Pending |
+| LOCL-07 | Phase 27 | Pending |
+| LOCL-08 | Phase 27 | Pending |
+| LOCL-09 | Phase 28 | Pending |
+| LOCL-10 | Phase 28 | Pending |
+| INTG-01 | Phase 29 | Pending |
+| INTG-02 | Phase 29 | Pending |
+| INTG-03 | Phase 29 | Pending |
+| INTG-04 | Phase 29 | Pending |
+| INTG-05 | Phase 29 | Pending |
+| INTG-06 | Phase 29 | Pending |
+| INTG-07 | Phase 29 | Pending |
+| INTG-08 | Phase 29 | Pending |
+| INTG-09 | Phase 29 | Pending |
+| INTG-10 | Phase 29 | Pending |
+| INTG-11 | Phase 29 | Pending |
+| INTG-12 | Phase 29 | Pending |
+| KANB-01 | Phase 30 | Pending |
+| KANB-02 | Phase 30 | Pending |
+| KANB-03 | Phase 30 | Pending |
+| KANB-04 | Phase 30 | Pending |
+| KANB-05 | Phase 30 | Pending |
+| KANB-06 | Phase 30 | Pending |
+| KANB-07 | Phase 30 | Pending |
+| KANB-08 | Phase 30 | Pending |
+| KANB-09 | Phase 30 | Pending |
+| KANB-10 | Phase 30 | Pending |
+| KANB-11 | Phase 30 | Pending |
+| KANB-12 | Phase 30 | Pending |
+| KANB-13 | Phase 30 | Pending |
+| KANB-14 | Phase 30 | Pending |
+| KANB-15 | Phase 30 | Pending |
+| KANB-16 | Phase 30 | Pending |
+| KANB-17 | Phase 30 | Pending |
+| KANB-18 | Phase 30 | Pending |
+| QTPL-01 | Phase 31 | Pending |
+| QTPL-02 | Phase 31 | Pending |
+| QTPL-03 | Phase 31 | Pending |
+| QTPL-04 | Phase 31 | Pending |
+| QTPL-05 | Phase 31 | Pending |
+| QTPL-06 | Phase 31 | Pending |
+| QTPL-07 | Phase 31 | Pending |
+| QTPL-08 | Phase 31 | Pending |
+| QTPL-09 | Phase 31 | Pending |
+| QTPL-10 | Phase 31 | Pending |
+| QTPL-11 | Phase 31 | Pending |
+| QTPL-12 | Phase 31 | Pending |
 
 **Coverage:**
-- v1.3 requirements: 46 total
-- Mapped to phases: 0
-- Unmapped: 46
+- v1.3 requirements: 52 total
+- Mapped to phases: 52
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-02-20*
-*Last updated: 2026-02-20 after initial definition*
+*Last updated: 2026-02-21 after roadmap creation (traceability populated)*
