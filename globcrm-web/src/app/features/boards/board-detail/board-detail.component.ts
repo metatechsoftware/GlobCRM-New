@@ -29,6 +29,7 @@ import {
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { BoardStore } from '../boards.store';
 import { BoardCardComponent } from '../board-card/board-card.component';
+import { CardDetailPanelComponent } from '../card-detail-panel/card-detail-panel.component';
 import { ColumnDto, CardDto } from '../boards.models';
 
 /**
@@ -54,6 +55,7 @@ import { ColumnDto, CardDto } from '../boards.models';
     CdkDragPlaceholder,
     TranslocoPipe,
     BoardCardComponent,
+    CardDetailPanelComponent,
   ],
   templateUrl: './board-detail.component.html',
   styleUrl: './board-detail.component.scss',

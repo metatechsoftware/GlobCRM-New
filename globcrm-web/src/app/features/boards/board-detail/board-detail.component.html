@@ -248,3 +248,13 @@
     <p>{{ 'boards.detail.notFound' | transloco }}</p>
   </div>
 }
+
+<!-- Card Detail Panel -->
+@if (board(); as boardForPanel) {
+  <app-card-detail-panel
+    [isOpen]="boardStore.isCardPanelOpen()"
+    [cardId]="boardStore.selectedCardId()"
+    [boardId]="boardForPanel.id"
+    (closed)="boardStore.closeCardPanel()">
+  </app-card-detail-panel>
+}

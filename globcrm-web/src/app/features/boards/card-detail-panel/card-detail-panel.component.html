@@ -1,0 +1,511 @@
+<!-- Card Detail Panel — Right-side slide panel -->
+
+<!-- Backdrop -->
+@if (isOpen()) {
+  <div class="cdp-backdrop" (click)="onBackdropClick()"></div>
+}
+
+<div class="cdp-panel" [class.cdp-panel--open]="isOpen()">
+  @if (card(); as card) {
+    <!-- Panel Header -->
+    <div class="cdp-header">
+      <div class="cdp-header-left">
+        @if (editingTitle()) {
+          <input class="cdp-title-input"
+                 [(ngModel)]="editTitleValue"
+                 (blur)="saveTitle()"
+                 (keydown.enter)="saveTitle()"
+                 (keydown.escape)="cancelEditTitle()"
+                 autofocus />
+        } @else {
+          <h2 class="cdp-title" (click)="startEditTitle()">{{ card.title }}</h2>
+        }
+      </div>
+      <div class="cdp-header-right">
+        <button mat-icon-button
+                (click)="archiveCard()"
+                [matTooltip]="'boards.cardDetail.archive' | transloco"
+                class="cdp-archive-btn">
+          <mat-icon>archive</mat-icon>
+        </button>
+        <button mat-icon-button (click)="closed.emit()" class="cdp-close-btn">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="cdp-content">
+
+      <!-- Metadata Section -->
+      <div class="cdp-section cdp-metadata">
+
+        <!-- Assignee -->
+        <div class="cdp-field">
+          <span class="cdp-field-label">
+            <mat-icon class="cdp-field-icon">person</mat-icon>
+            {{ 'boards.cardDetail.assignee' | transloco }}
+          </span>
+          @if (card.assigneeId) {
+            <div class="cdp-assignee">
+              <span class="cdp-assignee-avatar">
+                {{ getInitials(card.assigneeName) }}
+              </span>
+              <span class="cdp-assignee-name">{{ card.assigneeName }}</span>
+            </div>
+          } @else {
+            <span class="cdp-unassigned">{{ 'boards.cardDetail.unassigned' | transloco }}</span>
+          }
+        </div>
+
+        <!-- Due Date -->
+        <div class="cdp-field">
+          <span class="cdp-field-label">
+            <mat-icon class="cdp-field-icon">event</mat-icon>
+            {{ 'boards.cardDetail.dueDate' | transloco }}
+          </span>
+          <div class="cdp-due-date-row">
+            <mat-form-field appearance="outline" class="cdp-date-field">
+              <input matInput
+                     [matDatepicker]="duePicker"
+                     [value]="dueDateValue()"
+                     (dateChange)="onDueDateChange($event)"
+                     [placeholder]="'boards.cardDetail.selectDate' | transloco" />
+              <mat-datepicker-toggle matIconSuffix [for]="duePicker"></mat-datepicker-toggle>
+              <mat-datepicker #duePicker></mat-datepicker>
+            </mat-form-field>
+            @if (dueDateValue()) {
+              <button mat-icon-button
+                      (click)="clearDueDate()"
+                      [matTooltip]="'boards.cardDetail.clearDate' | transloco"
+                      class="cdp-clear-date">
+                <mat-icon>clear</mat-icon>
+              </button>
+            }
+            @if (getDueDateUrgency(); as urgency) {
+              @if (urgency !== 'normal') {
+                <span class="cdp-urgency-badge" [class]="'urgency-' + urgency">
+                  {{ 'boards.detail.' + (urgency === 'overdue' ? 'overdue' : urgency === 'today' ? 'dueToday' : 'dueSoon') | transloco }}
+                </span>
+              }
+            }
+          </div>
+        </div>
+
+        <!-- Labels -->
+        <div class="cdp-field">
+          <span class="cdp-field-label">
+            <mat-icon class="cdp-field-icon">label</mat-icon>
+            {{ 'boards.cardDetail.labels' | transloco }}
+          </span>
+          <div class="cdp-labels-row">
+            @for (label of card.labels; track label.labelId) {
+              <span class="cdp-label-chip"
+                    [style.--label-color]="label.color">
+                {{ label.name }}
+              </span>
+            }
+            <button class="cdp-add-label-btn" (click)="toggleLabelPicker()">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+
+          <!-- Label Picker Dropdown -->
+          @if (labelPickerOpen()) {
+            <div class="cdp-label-picker">
+              @if (!creatingLabel()) {
+                <div class="cdp-label-picker-list">
+                  @for (label of boardLabels(); track label.id) {
+                    <button class="cdp-label-option"
+                            [class.active]="isLabelOnCard(label.id)"
+                            (click)="toggleLabel(label)">
+                      <span class="cdp-label-dot" [style.background-color]="label.color"></span>
+                      <span class="cdp-label-option-name">{{ label.name }}</span>
+                      @if (isLabelOnCard(label.id)) {
+                        <mat-icon class="cdp-label-check">check</mat-icon>
+                      }
+                    </button>
+                  }
+                </div>
+                <button class="cdp-create-label-btn" (click)="startCreateLabel()">
+                  <mat-icon>add</mat-icon>
+                  {{ 'boards.cardDetail.createLabel' | transloco }}
+                </button>
+              } @else {
+                <!-- Create New Label Form -->
+                <div class="cdp-create-label-form">
+                  <input class="cdp-label-name-input"
+                         [(ngModel)]="newLabelName"
+                         [placeholder]="'boards.cardDetail.labelName' | transloco"
+                         (keydown.enter)="saveNewLabel()"
+                         autofocus />
+                  <div class="cdp-color-palette">
+                    @for (color of colorPresets; track color) {
+                      <button class="cdp-color-swatch"
+                              [style.background-color]="color"
+                              [class.selected]="newLabelColor() === color"
+                              (click)="selectLabelColor(color)">
+                        @if (newLabelColor() === color) {
+                          <mat-icon class="swatch-check">check</mat-icon>
+                        }
+                      </button>
+                    }
+                  </div>
+                  <div class="cdp-create-label-actions">
+                    <button mat-flat-button class="cdp-save-label" (click)="saveNewLabel()">
+                      {{ 'boards.cardDetail.save' | transloco }}
+                    </button>
+                    <button mat-button (click)="cancelCreateLabel()">
+                      {{ 'boards.cardDetail.cancel' | transloco }}
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <!-- Entity Link -->
+        <div class="cdp-field">
+          <span class="cdp-field-label">
+            <mat-icon class="cdp-field-icon">link</mat-icon>
+            {{ 'boards.cardDetail.entityLink' | transloco }}
+          </span>
+          @if (card.linkedEntityType) {
+            <div class="cdp-entity-link">
+              <button class="cdp-entity-badge" (click)="openEntityPreview()">
+                <mat-icon class="cdp-entity-icon">{{ getEntityIcon(card.linkedEntityType) }}</mat-icon>
+                <span class="cdp-entity-name">{{ card.linkedEntityName }}</span>
+                <span class="cdp-entity-type-label">{{ card.linkedEntityType }}</span>
+              </button>
+              <button mat-icon-button
+                      (click)="unlinkEntity()"
+                      [matTooltip]="'boards.cardDetail.unlinkEntity' | transloco"
+                      class="cdp-unlink-btn">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          } @else {
+            <button class="cdp-link-entity-btn" (click)="toggleEntityLink()">
+              <mat-icon>add_link</mat-icon>
+              {{ 'boards.cardDetail.linkEntity' | transloco }}
+            </button>
+          }
+
+          <!-- Entity Search Dropdown -->
+          @if (entityLinkOpen()) {
+            <div class="cdp-entity-search">
+              <div class="cdp-entity-type-selector">
+                @for (type of entityTypes; track type) {
+                  <button class="cdp-entity-type-btn"
+                          [class.active]="entityLinkType() === type"
+                          (click)="selectEntityType(type)">
+                    <mat-icon>{{ getEntityIcon(type) }}</mat-icon>
+                    <span>{{ type }}</span>
+                  </button>
+                }
+              </div>
+              <input class="cdp-entity-search-input"
+                     [(ngModel)]="entityLinkSearch"
+                     [placeholder]="'boards.cardDetail.searchEntity' | transloco"
+                     (input)="searchEntities()"
+                     autofocus />
+              @if (entitySearching()) {
+                <div class="cdp-entity-searching">{{ 'boards.cardDetail.searching' | transloco }}</div>
+              }
+              @if (entitySearchResults().length > 0) {
+                <div class="cdp-entity-results">
+                  @for (result of entitySearchResults(); track result.id) {
+                    <button class="cdp-entity-result" (click)="linkEntity(result)">
+                      <mat-icon>{{ getEntityIcon(entityLinkType()) }}</mat-icon>
+                      <span>{{ result.name }}</span>
+                    </button>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="cdp-divider"></div>
+
+      <!-- Description Section -->
+      <div class="cdp-section">
+        <div class="cdp-section-header">
+          <h3 class="cdp-section-title">
+            <mat-icon class="cdp-section-icon">description</mat-icon>
+            {{ 'boards.cardDetail.description' | transloco }}
+          </h3>
+          @if (!editingDescription()) {
+            <button mat-icon-button (click)="startEditDescription()" class="cdp-edit-btn">
+              <mat-icon>edit</mat-icon>
+            </button>
+          }
+        </div>
+
+        @if (editingDescription()) {
+          <div class="cdp-description-editor">
+            <app-rich-text-editor
+              [ngModel]="descriptionValue()"
+              (ngModelChange)="onDescriptionChange($event)"
+              height="160px"
+              [placeholder]="'boards.cardDetail.descriptionPlaceholder' | transloco">
+            </app-rich-text-editor>
+            <div class="cdp-description-actions">
+              <button mat-flat-button class="cdp-save-btn" (click)="saveDescription()">
+                {{ 'boards.cardDetail.save' | transloco }}
+              </button>
+              <button mat-button (click)="cancelEditDescription()">
+                {{ 'boards.cardDetail.cancel' | transloco }}
+              </button>
+            </div>
+          </div>
+        } @else {
+          @if (card.description) {
+            <div class="cdp-description-content"
+                 [innerHTML]="card.description"
+                 (click)="startEditDescription()">
+            </div>
+          } @else {
+            <p class="cdp-description-empty" (click)="startEditDescription()">
+              {{ 'boards.cardDetail.addDescription' | transloco }}
+            </p>
+          }
+        }
+      </div>
+
+      <div class="cdp-divider"></div>
+
+      <!-- Checklist Section -->
+      <div class="cdp-section">
+        <div class="cdp-section-header">
+          <h3 class="cdp-section-title">
+            <mat-icon class="cdp-section-icon">checklist</mat-icon>
+            {{ 'boards.cardDetail.checklist' | transloco }}
+          </h3>
+          @if (checklistItems().length > 0) {
+            <span class="cdp-checklist-counter">
+              {{ checklistCheckedCount() }}/{{ checklistItems().length }}
+            </span>
+          }
+        </div>
+
+        <!-- Progress bar -->
+        @if (checklistItems().length > 0) {
+          <div class="cdp-checklist-progress">
+            <div class="cdp-progress-track">
+              <div class="cdp-progress-fill"
+                   [style.width.%]="checklistProgress()">
+              </div>
+            </div>
+            <span class="cdp-progress-label">{{ checklistProgress() }}%</span>
+          </div>
+        }
+
+        <!-- Checklist items -->
+        <div class="cdp-checklist-items">
+          @for (item of checklistItems(); track item.id) {
+            <div class="cdp-checklist-item" [class.checked]="item.isChecked">
+              <mat-checkbox [checked]="item.isChecked"
+                            (change)="toggleChecklistItem(item)"
+                            color="primary">
+              </mat-checkbox>
+
+              @if (editingChecklistItemId() === item.id) {
+                <input class="cdp-checklist-edit-input"
+                       [(ngModel)]="editChecklistItemText"
+                       (blur)="saveChecklistItem(item)"
+                       (keydown.enter)="saveChecklistItem(item)"
+                       (keydown.escape)="cancelEditChecklistItem()"
+                       autofocus />
+              } @else {
+                <span class="cdp-checklist-text"
+                      [class.strikethrough]="item.isChecked"
+                      (click)="startEditChecklistItem(item)">
+                  {{ item.text }}
+                </span>
+              }
+
+              <button class="cdp-checklist-delete"
+                      (click)="deleteChecklistItem(item)"
+                      [matTooltip]="'boards.cardDetail.deleteItem' | transloco">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          }
+        </div>
+
+        <!-- Add checklist item -->
+        <div class="cdp-add-checklist">
+          <input class="cdp-add-checklist-input"
+                 [(ngModel)]="newChecklistText"
+                 [placeholder]="'boards.cardDetail.addItem' | transloco"
+                 (keydown.enter)="addChecklistItem()" />
+          @if (newChecklistText().trim()) {
+            <button mat-icon-button (click)="addChecklistItem()" class="cdp-add-item-btn">
+              <mat-icon>add</mat-icon>
+            </button>
+          }
+        </div>
+      </div>
+
+      <div class="cdp-divider"></div>
+
+      <!-- Comments Section -->
+      <div class="cdp-section">
+        <div class="cdp-section-header">
+          <h3 class="cdp-section-title">
+            <mat-icon class="cdp-section-icon">chat_bubble_outline</mat-icon>
+            {{ 'boards.cardDetail.comments' | transloco }}
+            @if (comments().length > 0) {
+              <span class="cdp-comment-count">({{ comments().length }})</span>
+            }
+          </h3>
+        </div>
+
+        <!-- New comment input -->
+        <div class="cdp-new-comment">
+          <textarea class="cdp-comment-textarea"
+                    [(ngModel)]="newCommentText"
+                    [placeholder]="'boards.cardDetail.addComment' | transloco"
+                    rows="2"></textarea>
+          @if (newCommentText().trim()) {
+            <button mat-flat-button class="cdp-submit-comment" (click)="addComment()">
+              {{ 'boards.cardDetail.submit' | transloco }}
+            </button>
+          }
+        </div>
+
+        <!-- Comments list -->
+        @if (commentsLoading()) {
+          <div class="cdp-comments-loading">{{ 'boards.cardDetail.loadingComments' | transloco }}</div>
+        }
+
+        <div class="cdp-comments-list">
+          @for (comment of comments(); track comment.id) {
+            <div class="cdp-comment">
+              <div class="cdp-comment-header">
+                <span class="cdp-comment-avatar">
+                  {{ getInitials(comment.authorName) }}
+                </span>
+                <div class="cdp-comment-meta">
+                  <span class="cdp-comment-author">{{ comment.authorName }}</span>
+                  <span class="cdp-comment-time">{{ getRelativeTime(comment.createdAt) }}</span>
+                </div>
+                <button class="cdp-comment-menu-btn" [matMenuTriggerFor]="commentMenu">
+                  <mat-icon>more_horiz</mat-icon>
+                </button>
+                <mat-menu #commentMenu="matMenu">
+                  <button mat-menu-item (click)="startEditComment(comment)">
+                    <mat-icon>edit</mat-icon>
+                    <span>{{ 'boards.cardDetail.editComment' | transloco }}</span>
+                  </button>
+                  <button mat-menu-item (click)="deleteComment(comment)" class="danger-action">
+                    <mat-icon>delete</mat-icon>
+                    <span>{{ 'boards.cardDetail.deleteComment' | transloco }}</span>
+                  </button>
+                </mat-menu>
+              </div>
+
+              @if (editingCommentId() === comment.id) {
+                <div class="cdp-comment-edit">
+                  <textarea class="cdp-comment-textarea"
+                            [(ngModel)]="editCommentText"
+                            rows="2"></textarea>
+                  <div class="cdp-comment-edit-actions">
+                    <button mat-flat-button class="cdp-save-btn" (click)="saveEditComment(comment)">
+                      {{ 'boards.cardDetail.save' | transloco }}
+                    </button>
+                    <button mat-button (click)="cancelEditComment()">
+                      {{ 'boards.cardDetail.cancel' | transloco }}
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <p class="cdp-comment-content">{{ comment.content }}</p>
+              }
+
+              <!-- Reply button -->
+              @if (!comment.parentCommentId) {
+                <button class="cdp-reply-btn" (click)="startReply(comment.id)">
+                  <mat-icon class="cdp-reply-icon">reply</mat-icon>
+                  {{ 'boards.cardDetail.reply' | transloco }}
+                </button>
+              }
+
+              <!-- Reply input -->
+              @if (replyingToId() === comment.id) {
+                <div class="cdp-reply-input">
+                  <textarea class="cdp-comment-textarea cdp-reply-textarea"
+                            [(ngModel)]="replyText"
+                            [placeholder]="'boards.cardDetail.replyPlaceholder' | transloco"
+                            rows="2"
+                            autofocus></textarea>
+                  <div class="cdp-reply-actions">
+                    <button mat-flat-button class="cdp-save-btn" (click)="submitReply(comment.id)">
+                      {{ 'boards.cardDetail.submit' | transloco }}
+                    </button>
+                    <button mat-button (click)="cancelReply()">
+                      {{ 'boards.cardDetail.cancel' | transloco }}
+                    </button>
+                  </div>
+                </div>
+              }
+
+              <!-- Replies (nested, max 2 levels) -->
+              @if (comment.replies && comment.replies.length > 0) {
+                <div class="cdp-replies">
+                  @for (reply of comment.replies; track reply.id) {
+                    <div class="cdp-comment cdp-reply">
+                      <div class="cdp-comment-header">
+                        <span class="cdp-comment-avatar cdp-reply-avatar">
+                          {{ getInitials(reply.authorName) }}
+                        </span>
+                        <div class="cdp-comment-meta">
+                          <span class="cdp-comment-author">{{ reply.authorName }}</span>
+                          <span class="cdp-comment-time">{{ getRelativeTime(reply.createdAt) }}</span>
+                        </div>
+                        <button class="cdp-comment-menu-btn" [matMenuTriggerFor]="replyMenu">
+                          <mat-icon>more_horiz</mat-icon>
+                        </button>
+                        <mat-menu #replyMenu="matMenu">
+                          <button mat-menu-item (click)="startEditComment(reply)">
+                            <mat-icon>edit</mat-icon>
+                            <span>{{ 'boards.cardDetail.editComment' | transloco }}</span>
+                          </button>
+                          <button mat-menu-item (click)="deleteComment(reply)" class="danger-action">
+                            <mat-icon>delete</mat-icon>
+                            <span>{{ 'boards.cardDetail.deleteComment' | transloco }}</span>
+                          </button>
+                        </mat-menu>
+                      </div>
+
+                      @if (editingCommentId() === reply.id) {
+                        <div class="cdp-comment-edit">
+                          <textarea class="cdp-comment-textarea"
+                                    [(ngModel)]="editCommentText"
+                                    rows="2"></textarea>
+                          <div class="cdp-comment-edit-actions">
+                            <button mat-flat-button class="cdp-save-btn" (click)="saveEditComment(reply)">
+                              {{ 'boards.cardDetail.save' | transloco }}
+                            </button>
+                            <button mat-button (click)="cancelEditComment()">
+                              {{ 'boards.cardDetail.cancel' | transloco }}
+                            </button>
+                          </div>
+                        </div>
+                      } @else {
+                        <p class="cdp-comment-content">{{ reply.content }}</p>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+</div>
