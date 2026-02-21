@@ -47,13 +47,13 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
 - [x] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
 - [x] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
-- [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
-- [ ] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
+- [x] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
+- [x] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
 - [x] **KANB-13**: Columns display WIP (work-in-progress) limit with visual warning when exceeded
 - [x] **KANB-14**: User can create a board from predefined templates (Sprint, Content Calendar, Sales Follow-up)
 - [x] **KANB-15**: User can add checklist items to a card with progress indicator on card face
 - [x] **KANB-16**: User can comment on cards with threaded discussion
-- [ ] **KANB-17**: User can filter visible cards by label, assignee, or due date
+- [x] **KANB-17**: User can filter visible cards by label, assignee, or due date
 - [x] **KANB-18**: Empty boards page shows a create prompt with template suggestions
 
 ### Quote PDF Templates
@@ -163,13 +163,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-08 | Phase 30 | Complete |
 | KANB-09 | Phase 30 | Complete |
 | KANB-10 | Phase 30 | Complete |
-| KANB-11 | Phase 30 | Pending |
-| KANB-12 | Phase 30 | Pending |
+| KANB-11 | Phase 30 | Complete |
+| KANB-12 | Phase 30 | Complete |
 | KANB-13 | Phase 30 | Complete |
 | KANB-14 | Phase 30 | Complete |
 | KANB-15 | Phase 30 | Complete |
 | KANB-16 | Phase 30 | Complete |
-| KANB-17 | Phase 30 | Pending |
+| KANB-17 | Phase 30 | Complete |
 | KANB-18 | Phase 30 | Complete |
 | QTPL-01 | Phase 31 | Pending |
 | QTPL-02 | Phase 31 | Pending |

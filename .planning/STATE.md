@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 30 of 31 (Free-form Kanban Boards)
-Plan: 4 of 6 complete
+Plan: 5 of 6 complete
 Status: In progress
-Last activity: 2026-02-21 — Completed 30-04-PLAN.md (Board detail kanban view with drag-and-drop)
+Last activity: 2026-02-21 — Completed 30-05-PLAN.md (Card detail panel, board filter panel)
 
-Progress: [████████████████████] 99% (189/~191 plans estimated)
+Progress: [████████████████████] 99% (190/~191 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 99% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 189
+- Total plans completed: 190
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 28 plans across 4 phases (Phase 27-30)
+- v1.3: 29 plans across 4 phases (Phase 27-30)
 
 ## Accumulated Context
 
@@ -112,6 +112,11 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 30-04: WIP limit check uses non-blocking snackbar warning (allows drop, shows warning after)
 - 30-04: Column collapse is local UI state synced to store for persistence readiness
 - 30-04: Entity link badge icon mapping uses Record lookup matching ENTITY_TYPE_REGISTRY pattern
+- 30-05: Card detail panel uses ApiService directly (not BoardsService private field) for checklist loading and entity search
+- 30-05: Client-side filtering uses CSS card-filtered-out class (opacity:0, height:0) to preserve CDK drag-and-drop data
+- 30-05: Label filter uses OR logic (show cards matching ANY selected label)
+- 30-05: Assignee options extracted dynamically from board cards rather than separate API endpoint
+- 30-05: Comment editing/deleting available for all comments (author check deferred to backend authorization)
 
 ### Pending Todos
 
@@ -126,6 +131,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 30-04-PLAN.md (Board detail kanban view with drag-and-drop)
-Resume file: .planning/phases/30-free-form-kanban-boards/30-04-SUMMARY.md
-Next step: Execute 30-05-PLAN.md (Card detail panel, label management, checklists, comments)
+Stopped at: Completed 30-05-PLAN.md (Card detail panel, board filter panel)
+Resume file: .planning/phases/30-free-form-kanban-boards/30-05-SUMMARY.md
+Next step: Execute 30-06-PLAN.md (Board settings, keyboard shortcuts, accessibility)
