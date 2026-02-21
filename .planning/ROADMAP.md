@@ -63,7 +63,7 @@
 
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
-- [x] **Phase 27: Localization Foundation** (5 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closure (completed 2026-02-21)
+- [ ] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures (in progress)
 - [ ] **Phase 28: Localization String Extraction** — Extract all 415+ hardcoded strings to EN/TR JSON files, CI coverage check, translation pipe in all templates
 - [ ] **Phase 29: Integration Marketplace** — Settings page with card grid, credential management, detail panel, activity log, RBAC
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
@@ -81,13 +81,14 @@
   3. Date, number, and currency values render in locale-appropriate format (Turkish: 20.02.2026, 1.234,56; English: 02/20/2026, 1,234.56)
   4. Angular Material components (paginator "of", sort headers, date picker) display labels in the selected language
   5. Translation files lazy-load per feature scope (navigating to contacts loads only contact translations), and missing keys fall back to English without showing raw keys
-**Plans**: 5 plans
+**Plans**: 6 plans
 Plans:
-- [ ] 27-01-PLAN.md — Transloco infrastructure setup (packages, loader, LanguageService, global EN/TR translations, app config)
-- [ ] 27-02-PLAN.md — Language switcher UI in navbar + persistence (toggle in user menu, lang badge, backend/localStorage sync)
-- [ ] 27-03-PLAN.md — Material intl + locale formatting (TranslatedPaginatorIntl, DateAdapter consolidation, DynamicTable locale-aware dates)
-- [ ] 27-04-PLAN.md — Scoped translations + org default language (contacts/settings scopes, Organization.DefaultLanguage, settings hub card)
-- [ ] 27-05-PLAN.md — Gap closure: wire syncFromProfile() into auth login flow (LOCL-02/LOCL-07 persistence read path)
+- [x] 27-01-PLAN.md — Transloco infrastructure setup (packages, loader, LanguageService, global EN/TR translations, app config)
+- [x] 27-02-PLAN.md — Language switcher UI in navbar + persistence (toggle in user menu, lang badge, backend/localStorage sync)
+- [x] 27-03-PLAN.md — Material intl + locale formatting (TranslatedPaginatorIntl, DateAdapter consolidation, DynamicTable locale-aware dates)
+- [x] 27-04-PLAN.md — Scoped translations + org default language (contacts/settings scopes, Organization.DefaultLanguage, settings hub card)
+- [x] 27-05-PLAN.md — Gap closure: wire syncFromProfile() into auth login flow (LOCL-02/LOCL-07 persistence read path)
+- [ ] 27-06-PLAN.md — Gap closure: reactive navbar translations + paginator race condition fix
 
 ### Phase 28: Localization String Extraction
 **Goal**: Every user-visible string in the application renders in the user's selected language via translation keys, with CI enforcement preventing regressions
@@ -165,7 +166,7 @@ Plans:
 | 24. My Day Personal Dashboard | v1.2 | 5/5 | Complete | 2026-02-20 |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
-| 27. Localization Foundation | 5/5 | Complete    | 2026-02-21 | - |
+| 27. Localization Foundation | v1.3 | 5/6 | In Progress | - |
 | 28. Localization String Extraction | v1.3 | 0/? | Not started | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
