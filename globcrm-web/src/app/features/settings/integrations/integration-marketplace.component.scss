@@ -1,0 +1,224 @@
+/* ─── Keyframes ──────────────────────────────────── */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── Page Header ────────────────────────────────── */
+.mp-header {
+  padding: 40px 32px 0;
+}
+
+.mp-header__title {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin: 0;
+  color: var(--color-text);
+}
+
+.mp-header__subtitle {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  margin: 4px 0 0;
+  line-height: 1.4;
+}
+
+/* ─── Filter Bar ─────────────────────────────────── */
+.mp-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 32px;
+  flex-wrap: wrap;
+}
+
+.mp-search {
+  position: relative;
+  min-width: 240px;
+  max-width: 320px;
+  flex-shrink: 0;
+}
+
+.mp-search__icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.mp-search__input {
+  width: 100%;
+  padding: 9px 14px 9px 44px;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  background: var(--color-bg-input);
+  color: var(--color-text);
+  font-size: 14px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.mp-search__input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.mp-search__input:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--orange-glow);
+}
+
+/* ─── Category Chips ─────────────────────────────── */
+.mp-categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+
+.mp-chip {
+  font-size: 12.5px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 100px;
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  transition:
+    background 0.2s var(--ease-default),
+    border-color 0.2s var(--ease-default),
+    color 0.2s var(--ease-default);
+}
+
+.mp-chip:hover {
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.mp-chip--active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-primary-fg);
+}
+
+.mp-chip--active:hover {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: var(--color-primary-fg);
+}
+
+/* ─── Integration Grid ───────────────────────────── */
+.mp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  padding: 0 32px 48px;
+}
+
+/* ─── Empty State ────────────────────────────────── */
+.mp-empty {
+  text-align: center;
+  padding: 64px 24px;
+  opacity: 0;
+  animation: fadeSlideUp 0.3s var(--ease-out) forwards;
+}
+
+.mp-empty__icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  color: var(--color-text-muted);
+  opacity: 0.5;
+  margin-bottom: 12px;
+}
+
+.mp-empty__text {
+  font-size: 15px;
+  color: var(--color-text-secondary);
+  margin: 0 0 16px;
+}
+
+.mp-empty__reset {
+  background: none;
+  border: 1.5px solid var(--color-border);
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mp-empty__reset:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-soft);
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+@media (max-width: 600px) {
+  .mp-header {
+    padding: 28px 16px 0;
+  }
+
+  .mp-header__title {
+    font-size: 22px;
+  }
+
+  .mp-filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 16px 16px;
+    gap: 12px;
+  }
+
+  .mp-search {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .mp-grid {
+    grid-template-columns: 1fr;
+    padding: 0 16px 32px;
+    gap: 12px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1024px) {
+  .mp-header {
+    padding: 32px 24px 0;
+  }
+
+  .mp-filter-bar {
+    padding: 16px 24px;
+  }
+
+  .mp-grid {
+    padding: 0 24px 40px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .mp-empty {
+    animation: none;
+    opacity: 1;
+  }
+}
