@@ -1,29 +1,52 @@
-<div class="auth-container">
-  <mat-card class="auth-card signup-card">
-    <mat-card-header class="auth-card-header">
-      <div class="brand-header">
-        <h1 class="brand-title">GlobCRM</h1>
-        <p class="brand-subtitle">Create your account</p>
+<div class="auth-page">
+  <div class="auth-page__side">
+    <!-- Decorative shapes -->
+    <div class="decor-circle decor-circle--lg"></div>
+    <div class="decor-circle decor-circle--sm"></div>
+    <div class="decor-line"></div>
+    <div class="decor-dots"></div>
+
+    <div class="auth-page__side-content">
+      <div class="auth-page__brand anim-1">
+        <span class="auth-page__mark">G</span>
+        <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
       </div>
-    </mat-card-header>
+      <h2 class="auth-page__tagline anim-2">Start building<br>stronger connections.</h2>
+      <p class="auth-page__blurb anim-3">Set up your team workspace in under two minutes.</p>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <mat-tab-group animationDuration="200ms" color="primary">
-        <mat-tab label="Create Organization">
-          <div class="tab-content">
-            <app-create-org></app-create-org>
+  <div class="auth-page__main">
+    <mat-card class="auth-card anim-card">
+      <mat-card-header class="auth-card-header">
+        <div class="brand-header">
+          <div class="brand-header__mobile-mark">
+            <span class="auth-page__mark auth-page__mark--sm">G</span>
+            <span class="brand-header__mobile-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
           </div>
-        </mat-tab>
-        <mat-tab label="Join Organization">
-          <div class="tab-content">
-            <app-join-org></app-join-org>
-          </div>
-        </mat-tab>
-      </mat-tab-group>
-    </mat-card-content>
+          <h1 class="brand-title">Create your account</h1>
+          <p class="brand-subtitle">Get started with GlobCRM today</p>
+        </div>
+      </mat-card-header>
 
-    <mat-card-actions class="auth-card-footer">
-      <p>Already have an account? <a routerLink="/auth/login" class="auth-link">Sign in</a></p>
-    </mat-card-actions>
-  </mat-card>
+      <mat-card-content>
+        <mat-tab-group animationDuration="200ms" color="primary">
+          <mat-tab label="Create Organization">
+            <div class="tab-content">
+              <app-create-org></app-create-org>
+            </div>
+          </mat-tab>
+          <mat-tab label="Join Organization">
+            <div class="tab-content">
+              <app-join-org></app-join-org>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+
+      <mat-card-actions class="auth-card-footer">
+        <p>Already have an account? <a routerLink="/auth/login" class="auth-link">Sign in</a></p>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>

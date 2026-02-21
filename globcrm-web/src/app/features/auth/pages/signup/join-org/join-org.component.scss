@@ -1,67 +1,162 @@
+// ─── Join Org: Warm Cinematic Editorial ─────────────────
+// Elevated form styling matching create-org's premium feel.
+
+// ─── Keyframes ───────────────────────────────────────────
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ─── Stagger Animation ──────────────────────────────────
+.stagger {
+  &--1 { animation: fadeSlideUp 400ms var(--ease-out) 450ms both; }
+  &--2 { animation: fadeSlideUp 400ms var(--ease-out) 550ms both; }
+  &--3 { animation: fadeSlideUp 400ms var(--ease-out) 650ms both; }
+  &--4 { animation: fadeSlideUp 400ms var(--ease-out) 750ms both; }
+}
+
+// ─── Error Banner ────────────────────────────────────────
 .error-banner {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-danger-soft);
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-danger-soft);
+  border: 1px solid rgba(204, 96, 96, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
   color: var(--color-danger-text);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
+  animation: fadeSlideUp 300ms var(--ease-out) both;
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
   }
 }
 
+// ─── Invitation Banner ──────────────────────────────────
 .invitation-banner {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-info-soft);
-  border-radius: 4px;
-  margin-bottom: 1rem;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-info-soft);
+  border: 1px solid rgba(96, 165, 204, 0.2);
+  border-radius: var(--radius-md);
+  margin-bottom: var(--space-4);
   color: var(--color-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
+  animation: fadeSlideUp 300ms var(--ease-out) both;
 
   mat-icon {
     font-size: 20px;
     width: 20px;
     height: 20px;
+    flex-shrink: 0;
+    color: #F97316;
   }
 }
 
+// ─── Form Fields (Material override) ─────────────────────
 mat-form-field {
   width: 100%;
-  margin-bottom: 0.25rem;
+  margin-bottom: var(--space-1);
+
+  .mdc-notched-outline {
+    transition: border-color 200ms var(--ease-default);
+  }
+
+  &.mat-focused {
+    .mdc-notched-outline__leading,
+    .mdc-notched-outline__notch,
+    .mdc-notched-outline__trailing {
+      border-color: #F97316 !important;
+    }
+  }
+
+  .mat-mdc-form-field-icon-prefix mat-icon {
+    transition: color 200ms var(--ease-default);
+  }
+
+  &.mat-focused .mat-mdc-form-field-icon-prefix mat-icon {
+    color: #F97316;
+  }
 }
 
+// Focus glow ring
+.mat-mdc-text-field-wrapper:has(input:focus) {
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+  border-radius: var(--radius-sm);
+  transition: box-shadow 200ms var(--ease-default);
+}
+
+// ─── Form Row ────────────────────────────────────────────
 .form-row {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
 
   mat-form-field {
     flex: 1;
   }
 }
 
+// ─── Submit Button (elevated) ────────────────────────────
 .submit-button {
   width: 100%;
-  height: 48px;
-  font-size: 1rem;
-  font-weight: 500;
-  margin-top: 0.5rem;
+  height: 52px;
+  font-size: var(--text-md);
+  font-weight: var(--font-semibold);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
+  margin-top: var(--space-2);
+  transition:
+    transform 200ms var(--ease-default),
+    box-shadow 200ms var(--ease-default);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
+    box-shadow: none;
+  }
 }
 
+// ─── Responsive ──────────────────────────────────────────
 @media (max-width: 480px) {
   .form-row {
     flex-direction: column;
     gap: 0;
+  }
+}
+
+// ─── Accessibility: Reduced Motion ───────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .stagger--1,
+  .stagger--2,
+  .stagger--3,
+  .stagger--4,
+  .error-banner,
+  .invitation-banner {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .submit-button {
+    transition: none;
   }
 }

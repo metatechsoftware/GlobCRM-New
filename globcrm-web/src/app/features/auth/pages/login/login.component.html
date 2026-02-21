@@ -1,15 +1,23 @@
 <div class="auth-page">
   <div class="auth-page__side">
-    <div class="auth-page__brand">
-      <span class="auth-page__mark">G</span>
-      <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
+    <!-- Decorative shapes -->
+    <div class="decor-circle decor-circle--lg"></div>
+    <div class="decor-circle decor-circle--sm"></div>
+    <div class="decor-line"></div>
+    <div class="decor-dots"></div>
+
+    <div class="auth-page__side-content">
+      <div class="auth-page__brand anim-1">
+        <span class="auth-page__mark">G</span>
+        <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
+      </div>
+      <h2 class="auth-page__tagline anim-2">Manage relationships,<br>grow your business.</h2>
+      <p class="auth-page__blurb anim-3">A modern CRM built for teams that care about their customers.</p>
     </div>
-    <h2 class="auth-page__tagline">Manage relationships,<br>grow your business.</h2>
-    <p class="auth-page__blurb">A modern CRM built for teams that care about their customers.</p>
   </div>
 
   <div class="auth-page__main">
-    <mat-card class="auth-card">
+    <mat-card class="auth-card anim-card">
       <mat-card-header class="auth-card-header">
         <div class="brand-header">
           <div class="brand-header__mobile-mark">
@@ -32,45 +40,53 @@
           }
 
           <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <mat-form-field appearance="outline">
-              <mat-label>Email</mat-label>
-              <input matInput formControlName="email" type="email" placeholder="you@company.com" autocomplete="email">
-              <mat-icon matPrefix>email</mat-icon>
-              @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
-                <mat-error>Email is required</mat-error>
-              }
-              @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
-                <mat-error>Please enter a valid email address</mat-error>
-              }
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Password</mat-label>
-              <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Enter your password" autocomplete="current-password">
-              <mat-icon matPrefix>lock</mat-icon>
-              <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
-                <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
-              </button>
-              @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
-                <mat-error>Password is required</mat-error>
-              }
-              @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
-                <mat-error>Password must be at least 8 characters</mat-error>
-              }
-            </mat-form-field>
-
-            <div class="form-options">
-              <mat-checkbox formControlName="rememberMe" color="primary">Remember me</mat-checkbox>
-              <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+            <div class="stagger stagger--1">
+              <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput formControlName="email" type="email" placeholder="you@company.com" autocomplete="email">
+                <mat-icon matPrefix>email</mat-icon>
+                @if (loginForm.get('email')?.hasError('required') && loginForm.get('email')?.touched) {
+                  <mat-error>Email is required</mat-error>
+                }
+                @if (loginForm.get('email')?.hasError('email') && loginForm.get('email')?.touched) {
+                  <mat-error>Please enter a valid email address</mat-error>
+                }
+              </mat-form-field>
             </div>
 
-            <button mat-flat-button color="primary" type="submit" class="submit-button" [disabled]="isLoading()">
-              @if (isLoading()) {
-                <mat-spinner diameter="20" color="accent"></mat-spinner>
-              } @else {
-                Sign In
-              }
-            </button>
+            <div class="stagger stagger--2">
+              <mat-form-field appearance="outline">
+                <mat-label>Password</mat-label>
+                <input matInput formControlName="password" [type]="hidePassword() ? 'password' : 'text'" placeholder="Enter your password" autocomplete="current-password">
+                <mat-icon matPrefix>lock</mat-icon>
+                <button mat-icon-button matSuffix type="button" (click)="togglePasswordVisibility()" [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'">
+                  <mat-icon>{{ hidePassword() ? 'visibility_off' : 'visibility' }}</mat-icon>
+                </button>
+                @if (loginForm.get('password')?.hasError('required') && loginForm.get('password')?.touched) {
+                  <mat-error>Password is required</mat-error>
+                }
+                @if (loginForm.get('password')?.hasError('minlength') && loginForm.get('password')?.touched) {
+                  <mat-error>Password must be at least 8 characters</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="stagger stagger--3">
+              <div class="form-options">
+                <mat-checkbox formControlName="rememberMe" color="primary">Remember me</mat-checkbox>
+                <a routerLink="/auth/forgot-password" class="forgot-link">Forgot password?</a>
+              </div>
+            </div>
+
+            <div class="stagger stagger--4">
+              <button mat-flat-button color="primary" type="submit" class="submit-button" [disabled]="isLoading()">
+                @if (isLoading()) {
+                  <mat-spinner diameter="20" color="accent"></mat-spinner>
+                } @else {
+                  Sign In
+                }
+              </button>
+            </div>
           </form>
         }
 
