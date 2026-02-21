@@ -2,6 +2,7 @@ import { inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { ProfileService } from '../../features/profile/profile.service';
 
 export type SupportedLang = 'en' | 'tr';
 
@@ -12,6 +13,7 @@ const SUPPORTED_LANGS: SupportedLang[] = ['en', 'tr'];
 export class LanguageService {
   private readonly translocoService = inject(TranslocoService);
   private readonly document = inject(DOCUMENT);
+  private readonly profileService = inject(ProfileService);
 
   readonly currentLang = toSignal(this.translocoService.langChanges$, {
     initialValue: 'en' as string,
@@ -21,6 +23,31 @@ export class LanguageService {
     this.translocoService.setActiveLang(lang);
     this.document.documentElement.lang = lang;
     localStorage.setItem(STORAGE_KEY, lang);
+
+    // Fire-and-forget backend persistence
+    try {
+      this.profileService.updatePreferences({ language: lang }).subscribe({
+        error: () => {
+          // Silently ignore — localStorage is the primary cache,
+          // backend sync is best-effort
+        },
+      });
+    } catch {
+      // Guard against injection errors during app bootstrap
+    }
+  }
+
+  /**
+   * Sync language from backend profile after login.
+   * Backend is the source of truth — overrides any stale localStorage value.
+   */
+  syncFromProfile(profileLanguage: string | null | undefined): void {
+    if (
+      profileLanguage &&
+      SUPPORTED_LANGS.includes(profileLanguage as SupportedLang)
+    ) {
+      this.switchLanguage(profileLanguage as SupportedLang);
+    }
   }
 
   detectLanguage(): SupportedLang {
