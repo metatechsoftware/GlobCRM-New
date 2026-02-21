@@ -22,9 +22,9 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 
 ### Integration Marketplace
 
-- [ ] **INTG-01**: User can browse available integrations as a card-based grid with logos, descriptions, and status badges
-- [ ] **INTG-02**: User can filter integrations by category (Communication, Accounting, Marketing, Storage, Calendar, Developer Tools)
-- [ ] **INTG-03**: User can search integrations by name
+- [x] **INTG-01**: User can browse available integrations as a card-based grid with logos, descriptions, and status badges
+- [x] **INTG-02**: User can filter integrations by category (Communication, Accounting, Marketing, Storage, Calendar, Developer Tools)
+- [x] **INTG-03**: User can search integrations by name
 - [ ] **INTG-04**: Admin can connect an integration by entering API key credentials via a dialog
 - [ ] **INTG-05**: Admin can disconnect an integration with confirmation
 - [x] **INTG-06**: Stored credentials are AES-256 encrypted with tenant-scoped isolation
@@ -32,7 +32,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [ ] **INTG-08**: User can view integration details in a slide-in panel (description, status, credential info, activity log)
 - [ ] **INTG-09**: Admin can test an integration connection (validates stored credentials)
 - [x] **INTG-10**: Integration activity log records connect/disconnect/test events with user and timestamp
-- [ ] **INTG-11**: Popular/featured integrations display a badge on their cards
+- [x] **INTG-11**: Popular/featured integrations display a badge on their cards
 - [ ] **INTG-12**: Non-admin users can view integration status (read-only) but cannot connect/disconnect
 
 ### Kanban Boards
@@ -141,9 +141,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOCL-08 | Phase 27 | Complete |
 | LOCL-09 | Phase 28 | Complete |
 | LOCL-10 | Phase 28 | Complete |
-| INTG-01 | Phase 29 | Pending |
-| INTG-02 | Phase 29 | Pending |
-| INTG-03 | Phase 29 | Pending |
+| INTG-01 | Phase 29 | Complete |
+| INTG-02 | Phase 29 | Complete |
+| INTG-03 | Phase 29 | Complete |
 | INTG-04 | Phase 29 | Pending |
 | INTG-05 | Phase 29 | Pending |
 | INTG-06 | Phase 29 | Complete |
@@ -151,7 +151,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-08 | Phase 29 | Pending |
 | INTG-09 | Phase 29 | Pending |
 | INTG-10 | Phase 29 | Complete |
-| INTG-11 | Phase 29 | Pending |
+| INTG-11 | Phase 29 | Complete |
 | INTG-12 | Phase 29 | Pending |
 | KANB-01 | Phase 30 | Pending |
 | KANB-02 | Phase 30 | Pending |

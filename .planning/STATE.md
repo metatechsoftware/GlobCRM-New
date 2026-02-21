@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 29 of 31 (Integration Marketplace)
-Plan: 1 of 5 complete
+Plan: 2 of 5 complete
 Status: Executing Phase 29
-Last activity: 2026-02-21 — Completed 29-01 (Domain Model & Infrastructure)
+Last activity: 2026-02-21 — Completed 29-03 (Integration Marketplace Frontend)
 
-Progress: [███████████████████░] 95% (179/~188 plans estimated)
+Progress: [███████████████████░] 96% (180/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 95% (17
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 178
+- Total plans completed: 180
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 17 plans across 3 phases (Phase 27-29)
+- v1.3: 19 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -81,6 +81,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 29-01: CredentialEncryptionService uses DataProtection with purpose string 'GlobCRM.Integration.Credentials' (same pattern as Gmail TokenEncryptionService)
 - 29-01: IntegrationActivityLog has its own TenantId and global query filter for direct query capability
 - 29-01: Unique composite index on (tenant_id, integration_key) enforces one connection per integration per tenant
+- 29-03: Card component uses custom CSS badges instead of Material chips for lighter weight and better brand-color control
+- 29-03: Category filter uses custom pill buttons instead of MatChipListbox for visual consistency with settings hub
+- 29-03: Placeholder methods for connect/viewDetails prepared for Plan 04 wiring
 
 ### Pending Todos
 
@@ -95,6 +98,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 29-01-PLAN.md (Domain Model & Infrastructure)
-Resume file: .planning/phases/29-integration-marketplace/29-01-SUMMARY.md
-Next step: Execute 29-02-PLAN.md (Integration API Controller & Endpoints)
+Stopped at: Completed 29-03-PLAN.md (Integration Marketplace Frontend)
+Resume file: .planning/phases/29-integration-marketplace/29-03-SUMMARY.md
+Next step: Execute remaining Phase 29 plans (02, 04, 05)
