@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.3 Platform & Polish — Phase 29 (Integration Marketplace)
+**Current focus:** v1.3 Platform & Polish — Phase 30 (Free-form Kanban Boards)
 
 ## Current Position
 
-Phase: 29 of 31 (Integration Marketplace)
-Plan: 5 of 5 complete (Tasks 1-2 done; Task 3 checkpoint pending human verification)
-Status: Awaiting checkpoint verification for 29-05
-Last activity: 2026-02-21 — Completed 29-05 Tasks 1-2 (Detail Panel, Settings Hub, i18n)
+Phase: 30 of 31 (Free-form Kanban Boards)
+Plan: 1 of 6 complete
+Status: In progress
+Last activity: 2026-02-21 — Completed 30-01-PLAN.md (Domain entities & migration)
 
-Progress: [████████████████████] 98% (185/~188 plans estimated)
+Progress: [████████████████████] 98% (186/~191 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 98% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 185
+- Total plans completed: 186
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 24 plans across 3 phases (Phase 27-29)
+- v1.3: 25 plans across 4 phases (Phase 27-30)
 
 ## Accumulated Context
 
@@ -101,6 +101,7 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-12: toLocaleUpperCase() replaces toUpperCase() in notification widget fallback for Turkish I/i safety
 - 28-12: Products uses module-level PRODUCT_CORE_COLUMNS const; emails skips labelKey for icon-only columns
 - 28-12: Settings notification prefs use transloco.translate() with typeLabels/typeDescriptions namespace replacing hardcoded consts
+- 30-01: CreatorId made nullable (Guid?) to support SetNull FK delete behavior when user is deleted
 
 ### Pending Todos
 
@@ -115,6 +116,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-12-PLAN.md (gap closure: entity column header translations + notification key fixes)
-Resume file: .planning/phases/28-localization-string-extraction/28-12-SUMMARY.md
-Next step: Phase 28 gap closure complete. Continue with Phase 29-05 checkpoint verification or Phase 30 planning.
+Stopped at: Completed 30-01-PLAN.md (Kanban domain entities & migration)
+Resume file: .planning/phases/30-free-form-kanban-boards/30-01-SUMMARY.md
+Next step: Execute 30-02-PLAN.md (Kanban API endpoints)

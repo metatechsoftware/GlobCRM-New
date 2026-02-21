@@ -37,22 +37,22 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 
 ### Kanban Boards
 
-- [ ] **KANB-01**: User can create, edit, and delete custom Kanban boards with name, description, and color
-- [ ] **KANB-02**: User can add, rename, reorder, and delete columns on a board
-- [ ] **KANB-03**: User can create, edit, and archive cards with title, description, due date, and assignee
+- [x] **KANB-01**: User can create, edit, and delete custom Kanban boards with name, description, and color
+- [x] **KANB-02**: User can add, rename, reorder, and delete columns on a board
+- [x] **KANB-03**: User can create, edit, and archive cards with title, description, due date, and assignee
 - [ ] **KANB-04**: User can drag-and-drop cards between columns and reorder within columns (optimistic UI)
-- [ ] **KANB-05**: User can set board visibility: Private (creator only), Team (team members), or Public (all tenant users)
-- [ ] **KANB-06**: User can assign colored labels to cards for categorization
-- [ ] **KANB-07**: User can assign a team member to a card (avatar displayed on card face)
+- [x] **KANB-05**: User can set board visibility: Private (creator only), Team (team members), or Public (all tenant users)
+- [x] **KANB-06**: User can assign colored labels to cards for categorization
+- [x] **KANB-07**: User can assign a team member to a card (avatar displayed on card face)
 - [ ] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
 - [ ] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
-- [ ] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
+- [x] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
 - [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
 - [ ] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
-- [ ] **KANB-13**: Columns display WIP (work-in-progress) limit with visual warning when exceeded
+- [x] **KANB-13**: Columns display WIP (work-in-progress) limit with visual warning when exceeded
 - [ ] **KANB-14**: User can create a board from predefined templates (Sprint, Content Calendar, Sales Follow-up)
-- [ ] **KANB-15**: User can add checklist items to a card with progress indicator on card face
-- [ ] **KANB-16**: User can comment on cards with threaded discussion
+- [x] **KANB-15**: User can add checklist items to a card with progress indicator on card face
+- [x] **KANB-16**: User can comment on cards with threaded discussion
 - [ ] **KANB-17**: User can filter visible cards by label, assignee, or due date
 - [ ] **KANB-18**: Empty boards page shows a create prompt with template suggestions
 
@@ -153,22 +153,22 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-10 | Phase 29 | Complete |
 | INTG-11 | Phase 29 | Complete |
 | INTG-12 | Phase 29 | Complete |
-| KANB-01 | Phase 30 | Pending |
-| KANB-02 | Phase 30 | Pending |
-| KANB-03 | Phase 30 | Pending |
+| KANB-01 | Phase 30 | Complete |
+| KANB-02 | Phase 30 | Complete |
+| KANB-03 | Phase 30 | Complete |
 | KANB-04 | Phase 30 | Pending |
-| KANB-05 | Phase 30 | Pending |
-| KANB-06 | Phase 30 | Pending |
-| KANB-07 | Phase 30 | Pending |
+| KANB-05 | Phase 30 | Complete |
+| KANB-06 | Phase 30 | Complete |
+| KANB-07 | Phase 30 | Complete |
 | KANB-08 | Phase 30 | Pending |
 | KANB-09 | Phase 30 | Pending |
-| KANB-10 | Phase 30 | Pending |
+| KANB-10 | Phase 30 | Complete |
 | KANB-11 | Phase 30 | Pending |
 | KANB-12 | Phase 30 | Pending |
-| KANB-13 | Phase 30 | Pending |
+| KANB-13 | Phase 30 | Complete |
 | KANB-14 | Phase 30 | Pending |
-| KANB-15 | Phase 30 | Pending |
-| KANB-16 | Phase 30 | Pending |
+| KANB-15 | Phase 30 | Complete |
+| KANB-16 | Phase 30 | Complete |
 | KANB-17 | Phase 30 | Pending |
 | KANB-18 | Phase 30 | Pending |
 | QTPL-01 | Phase 31 | Pending |
