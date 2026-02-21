@@ -103,16 +103,16 @@ export class DealListComponent implements OnInit {
 
   /** Core column definitions for Deal entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'title', label: 'Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'value', label: 'Value', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
-    { fieldId: 'probability', label: 'Probability', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
-    { fieldId: 'expectedCloseDate', label: 'Close Date', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'pipelineName', label: 'Pipeline', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'updatedAt', label: 'Updated', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'title', label: 'Title', labelKey: 'deals.columns.title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'value', label: 'Value', labelKey: 'deals.columns.value', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
+    { fieldId: 'probability', label: 'Probability', labelKey: 'deals.columns.probability', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
+    { fieldId: 'expectedCloseDate', label: 'Close Date', labelKey: 'deals.columns.expectedCloseDate', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'stageName', label: 'Stage', labelKey: 'deals.columns.stageName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'pipelineName', label: 'Pipeline', labelKey: 'deals.columns.pipelineName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'companyName', label: 'Company', labelKey: 'deals.columns.companyName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'deals.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'deals.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'updatedAt', label: 'Updated', labelKey: 'deals.columns.updatedAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */

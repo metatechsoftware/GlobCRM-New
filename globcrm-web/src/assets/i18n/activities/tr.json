@@ -146,6 +146,17 @@
     "title": "Aktiviteler",
     "newActivity": "Yeni Aktivite"
   },
+  "columns": {
+    "subject": "Konu",
+    "type": "T\u00fcr",
+    "status": "Durum",
+    "priority": "\u00d6ncelik",
+    "dueDate": "Biti\u015f Tarihi",
+    "assignedToName": "Atanan",
+    "ownerName": "Sahip",
+    "createdAt": "Olu\u015fturulma",
+    "updatedAt": "G\u00fcncelleme"
+  },
   "messages": {
     "statusUpdated": "Durum {{status}} olarak guncellendi",
     "statusUpdateFailed": "Durum guncellenemedi",

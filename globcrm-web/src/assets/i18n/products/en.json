@@ -70,6 +70,14 @@
       "backToProducts": "Back to products"
     }
   },
+  "columns": {
+    "name": "Product Name",
+    "sku": "SKU",
+    "category": "Category",
+    "unitPrice": "Unit Price",
+    "isActive": "Active",
+    "createdAt": "Created"
+  },
   "messages": {
     "productCreated": "Product created successfully",
     "productCreateFailed": "Failed to create product",

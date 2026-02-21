@@ -86,14 +86,14 @@ export class CompanyListComponent implements OnInit {
 
   /** Core column definitions for Company entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'name', label: 'Company Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
-    { fieldId: 'industry', label: 'Industry', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'city', label: 'City', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'country', label: 'Country', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'name', label: 'Company Name', labelKey: 'companies.columns.name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
+    { fieldId: 'industry', label: 'Industry', labelKey: 'companies.columns.industry', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'phone', label: 'Phone', labelKey: 'companies.columns.phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
+    { fieldId: 'email', label: 'Email', labelKey: 'companies.columns.email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'city', label: 'City', labelKey: 'companies.columns.city', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'country', label: 'Country', labelKey: 'companies.columns.country', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'companies.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'companies.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */

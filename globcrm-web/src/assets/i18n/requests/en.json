@@ -81,6 +81,18 @@
       "clearContact": "Clear contact"
     }
   },
+  "columns": {
+    "subject": "Subject",
+    "status": "Status",
+    "priority": "Priority",
+    "category": "Category",
+    "contactName": "Contact",
+    "companyName": "Company",
+    "ownerName": "Owner",
+    "assignedToName": "Assigned To",
+    "createdAt": "Created",
+    "resolvedAt": "Resolved"
+  },
   "messages": {
     "requestCreated": "Request created successfully",
     "requestCreateFailed": "Failed to create request",

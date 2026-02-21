@@ -100,17 +100,17 @@ export class QuoteListComponent implements OnInit {
 
   /** Core column definitions for Quote entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'quoteNumber', label: 'Quote #', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'title', label: 'Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'status', label: 'Status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'grandTotal', label: 'Total', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
-    { fieldId: 'contactName', label: 'Contact', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'dealTitle', label: 'Deal', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'versionNumber', label: 'Version', isCustomField: false, fieldType: 'number', sortable: true, filterable: false },
-    { fieldId: 'issueDate', label: 'Issue Date', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'quoteNumber', label: 'Quote #', labelKey: 'quotes.columns.quoteNumber', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'title', label: 'Title', labelKey: 'quotes.columns.title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'status', label: 'Status', labelKey: 'quotes.columns.status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'grandTotal', label: 'Total', labelKey: 'quotes.columns.grandTotal', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
+    { fieldId: 'contactName', label: 'Contact', labelKey: 'quotes.columns.contactName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'companyName', label: 'Company', labelKey: 'quotes.columns.companyName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'dealTitle', label: 'Deal', labelKey: 'quotes.columns.dealTitle', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'quotes.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'versionNumber', label: 'Version', labelKey: 'quotes.columns.versionNumber', isCustomField: false, fieldType: 'number', sortable: true, filterable: false },
+    { fieldId: 'issueDate', label: 'Issue Date', labelKey: 'quotes.columns.issueDate', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'quotes.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /**

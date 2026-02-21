@@ -138,6 +138,19 @@
       "descriptionPlaceholder": "Description"
     }
   },
+  "columns": {
+    "quoteNumber": "Quote #",
+    "title": "Title",
+    "status": "Status",
+    "grandTotal": "Total",
+    "contactName": "Contact",
+    "companyName": "Company",
+    "dealTitle": "Deal",
+    "ownerName": "Owner",
+    "versionNumber": "Version",
+    "issueDate": "Issue Date",
+    "createdAt": "Created"
+  },
   "messages": {
     "quoteCreated": "Quote created successfully",
     "quoteCreateFailed": "Failed to create quote",

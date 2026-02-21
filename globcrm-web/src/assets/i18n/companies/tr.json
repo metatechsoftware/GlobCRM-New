@@ -120,6 +120,16 @@
       "dismissWarning": "Uyariyi kapat"
     }
   },
+  "columns": {
+    "name": "\u015eirket Ad\u0131",
+    "industry": "Sekt\u00f6r",
+    "phone": "Telefon",
+    "email": "E-posta",
+    "city": "\u015eehir",
+    "country": "\u00dclke",
+    "ownerName": "Sahip",
+    "createdAt": "Olu\u015fturulma"
+  },
   "messages": {
     "companyCreated": "Sirket basariyla olusturuldu",
     "companyUpdated": "Sirket basariyla guncellendi",

@@ -81,6 +81,18 @@
       "clearContact": "Kisiyi temizle"
     }
   },
+  "columns": {
+    "subject": "Konu",
+    "status": "Durum",
+    "priority": "\u00d6ncelik",
+    "category": "Kategori",
+    "contactName": "Ki\u015fi",
+    "companyName": "\u015eirket",
+    "ownerName": "Sahip",
+    "assignedToName": "Atanan",
+    "createdAt": "Olu\u015fturulma",
+    "resolvedAt": "\u00c7\u00f6z\u00fclme"
+  },
   "messages": {
     "requestCreated": "Talep basariyla olusturuldu",
     "requestCreateFailed": "Talep olusturulamadi",

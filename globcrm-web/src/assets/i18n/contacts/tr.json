@@ -151,6 +151,17 @@
       "dismissWarning": "Uyariyi kapat"
     }
   },
+  "columns": {
+    "fullName": "Ad Soyad",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "jobTitle": "G\u00f6rev",
+    "companyName": "\u015eirket",
+    "ownerName": "Sahip",
+    "createdAt": "Olu\u015fturulma"
+  },
   "messages": {
     "contactCreated": "Kisi basariyla olusturuldu",
     "contactUpdated": "Kisi basariyla guncellendi",

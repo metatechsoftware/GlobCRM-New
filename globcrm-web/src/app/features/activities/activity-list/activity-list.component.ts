@@ -91,15 +91,15 @@ export class ActivityListComponent implements OnInit {
 
   /** Core column definitions for Activity entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'subject', label: 'Subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'type', label: 'Type', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'status', label: 'Status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'priority', label: 'Priority', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'dueDate', label: 'Due Date', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'assignedToName', label: 'Assigned To', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'updatedAt', label: 'Updated', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'subject', label: 'Subject', labelKey: 'activities.columns.subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'type', label: 'Type', labelKey: 'activities.columns.type', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'status', label: 'Status', labelKey: 'activities.columns.status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'priority', label: 'Priority', labelKey: 'activities.columns.priority', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'dueDate', label: 'Due Date', labelKey: 'activities.columns.dueDate', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'assignedToName', label: 'Assigned To', labelKey: 'activities.columns.assignedToName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'activities.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'activities.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'updatedAt', label: 'Updated', labelKey: 'activities.columns.updatedAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */

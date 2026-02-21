@@ -151,6 +151,17 @@
       "dismissWarning": "Dismiss warning"
     }
   },
+  "columns": {
+    "fullName": "Name",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "email": "Email",
+    "phone": "Phone",
+    "jobTitle": "Job Title",
+    "companyName": "Company",
+    "ownerName": "Owner",
+    "createdAt": "Created"
+  },
   "messages": {
     "contactCreated": "Contact created successfully",
     "contactUpdated": "Contact updated successfully",

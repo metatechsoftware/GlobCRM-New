@@ -38,12 +38,12 @@ import { EntityFormDialogResult } from '../../../shared/components/entity-form-d
  * Core product column definitions for the dynamic table.
  */
 const PRODUCT_CORE_COLUMNS: ColumnDefinition[] = [
-  { fieldId: 'name', label: 'Product Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-  { fieldId: 'sku', label: 'SKU', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-  { fieldId: 'category', label: 'Category', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-  { fieldId: 'unitPrice', label: 'Unit Price', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
-  { fieldId: 'isActive', label: 'Active', isCustomField: false, fieldType: 'checkbox', sortable: true, filterable: true, renderAs: 'badge' },
-  { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+  { fieldId: 'name', label: 'Product Name', labelKey: 'products.columns.name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+  { fieldId: 'sku', label: 'SKU', labelKey: 'products.columns.sku', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+  { fieldId: 'category', label: 'Category', labelKey: 'products.columns.category', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+  { fieldId: 'unitPrice', label: 'Unit Price', labelKey: 'products.columns.unitPrice', isCustomField: false, fieldType: 'number', sortable: true, filterable: true },
+  { fieldId: 'isActive', label: 'Active', labelKey: 'products.columns.isActive', isCustomField: false, fieldType: 'checkbox', sortable: true, filterable: true, renderAs: 'badge' },
+  { fieldId: 'createdAt', label: 'Created', labelKey: 'products.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
 ];
 
 /**

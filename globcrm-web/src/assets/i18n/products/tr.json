@@ -70,6 +70,14 @@
       "backToProducts": "Urunlere don"
     }
   },
+  "columns": {
+    "name": "\u00dcr\u00fcn Ad\u0131",
+    "sku": "SKU",
+    "category": "Kategori",
+    "unitPrice": "Birim Fiyat",
+    "isActive": "Aktif",
+    "createdAt": "Olu\u015fturulma"
+  },
   "messages": {
     "productCreated": "Urun basariyla olusturuldu",
     "productCreateFailed": "Urun olusturulamadi",

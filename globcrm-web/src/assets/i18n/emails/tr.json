@@ -42,6 +42,13 @@
     "sending": "Gonderiyor...",
     "cancel": "Iptal"
   },
+  "columns": {
+    "from": "G\u00f6nderen",
+    "subject": "Konu",
+    "bodyPreview": "\u00d6nizleme",
+    "sentAt": "Tarih",
+    "linkedContactName": "Ki\u015fi"
+  },
   "messages": {
     "sent": "E-posta gonderildi",
     "sendFailed": "E-posta gonderilemedi",

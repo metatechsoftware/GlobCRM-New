@@ -120,6 +120,16 @@
       "dismissWarning": "Dismiss warning"
     }
   },
+  "columns": {
+    "name": "Company Name",
+    "industry": "Industry",
+    "phone": "Phone",
+    "email": "Email",
+    "city": "City",
+    "country": "Country",
+    "ownerName": "Owner",
+    "createdAt": "Created"
+  },
   "messages": {
     "companyCreated": "Company created successfully",
     "companyUpdated": "Company updated successfully",

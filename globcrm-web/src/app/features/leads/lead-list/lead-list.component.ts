@@ -91,17 +91,17 @@ export class LeadListComponent implements OnInit {
 
   /** Core column definitions for Lead entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
-    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
-    { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'stageName', label: 'Stage', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'sourceName', label: 'Source', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'temperature', label: 'Temperature', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'isConverted', label: 'Converted', isCustomField: false, fieldType: 'boolean', sortable: true, filterable: true },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'updatedAt', label: 'Updated', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'fullName', label: 'Name', labelKey: 'leads.columns.fullName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
+    { fieldId: 'email', label: 'Email', labelKey: 'leads.columns.email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
+    { fieldId: 'phone', label: 'Phone', labelKey: 'leads.columns.phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
+    { fieldId: 'companyName', label: 'Company', labelKey: 'leads.columns.companyName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'stageName', label: 'Stage', labelKey: 'leads.columns.stageName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'sourceName', label: 'Source', labelKey: 'leads.columns.sourceName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'temperature', label: 'Temperature', labelKey: 'leads.columns.temperature', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'leads.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'isConverted', label: 'Converted', labelKey: 'leads.columns.isConverted', isCustomField: false, fieldType: 'boolean', sortable: true, filterable: true },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'leads.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'updatedAt', label: 'Updated', labelKey: 'leads.columns.updatedAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */

@@ -149,16 +149,16 @@ export class RequestListComponent implements OnInit {
 
   /** Core column definitions for Request entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'subject', label: 'Subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'status', label: 'Status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'priority', label: 'Priority', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'category', label: 'Category', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
-    { fieldId: 'contactName', label: 'Contact', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'assignedToName', label: 'Assigned To', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'resolvedAt', label: 'Resolved', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'subject', label: 'Subject', labelKey: 'requests.columns.subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'status', label: 'Status', labelKey: 'requests.columns.status', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'priority', label: 'Priority', labelKey: 'requests.columns.priority', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'category', label: 'Category', labelKey: 'requests.columns.category', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'badge' },
+    { fieldId: 'contactName', label: 'Contact', labelKey: 'requests.columns.contactName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'companyName', label: 'Company', labelKey: 'requests.columns.companyName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'requests.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'assignedToName', label: 'Assigned To', labelKey: 'requests.columns.assignedToName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'requests.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'resolvedAt', label: 'Resolved', labelKey: 'requests.columns.resolvedAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */

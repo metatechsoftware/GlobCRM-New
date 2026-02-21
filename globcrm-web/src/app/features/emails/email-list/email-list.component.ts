@@ -209,12 +209,12 @@ export class EmailListComponent implements OnInit {
   private readonly coreColumnDefs: ColumnDefinition[] = [
     { fieldId: 'isRead', label: '', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
     { fieldId: 'isStarred', label: '', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'from', label: 'From', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'subject', label: 'Subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'bodyPreview', label: 'Preview', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'sentAt', label: 'Date', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'from', label: 'From', labelKey: 'emails.columns.from', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'subject', label: 'Subject', labelKey: 'emails.columns.subject', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'bodyPreview', label: 'Preview', labelKey: 'emails.columns.bodyPreview', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
+    { fieldId: 'sentAt', label: 'Date', labelKey: 'emails.columns.sentAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
     { fieldId: 'hasAttachments', label: '', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'linkedContactName', label: 'Contact', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'linkedContactName', label: 'Contact', labelKey: 'emails.columns.linkedContactName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
   ];
 
   /** Date formatter for sentAt column. */

@@ -167,6 +167,19 @@
       "invalidEmail": "Invalid email format"
     }
   },
+  "columns": {
+    "fullName": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "companyName": "Company",
+    "stageName": "Stage",
+    "sourceName": "Source",
+    "temperature": "Temperature",
+    "ownerName": "Owner",
+    "isConverted": "Converted",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  },
   "messages": {
     "leadCreated": "Lead created successfully",
     "leadUpdated": "Lead updated successfully",

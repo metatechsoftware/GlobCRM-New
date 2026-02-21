@@ -146,6 +146,17 @@
     "title": "Activities",
     "newActivity": "New Activity"
   },
+  "columns": {
+    "subject": "Subject",
+    "type": "Type",
+    "status": "Status",
+    "priority": "Priority",
+    "dueDate": "Due Date",
+    "assignedToName": "Assigned To",
+    "ownerName": "Owner",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  },
   "messages": {
     "statusUpdated": "Status updated to {{status}}",
     "statusUpdateFailed": "Failed to update status",

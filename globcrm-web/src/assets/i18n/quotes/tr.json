@@ -138,6 +138,19 @@
       "descriptionPlaceholder": "Aciklama"
     }
   },
+  "columns": {
+    "quoteNumber": "Teklif No",
+    "title": "Ba\u015fl\u0131k",
+    "status": "Durum",
+    "grandTotal": "Toplam",
+    "contactName": "Ki\u015fi",
+    "companyName": "\u015eirket",
+    "dealTitle": "Anla\u015fma",
+    "ownerName": "Sahip",
+    "versionNumber": "Versiyon",
+    "issueDate": "D\u00fczenleme Tarihi",
+    "createdAt": "Olu\u015fturulma"
+  },
   "messages": {
     "quoteCreated": "Teklif basariyla olusturuldu",
     "quoteCreateFailed": "Teklif olusturulamadi",

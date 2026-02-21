@@ -167,6 +167,19 @@
       "invalidEmail": "Gecersiz e-posta formati"
     }
   },
+  "columns": {
+    "fullName": "Ad Soyad",
+    "email": "E-posta",
+    "phone": "Telefon",
+    "companyName": "\u015eirket",
+    "stageName": "A\u015fama",
+    "sourceName": "Kaynak",
+    "temperature": "S\u0131cakl\u0131k",
+    "ownerName": "Sahip",
+    "isConverted": "D\u00f6n\u00fc\u015ft\u00fcr\u00fcld\u00fc",
+    "createdAt": "Olu\u015fturulma",
+    "updatedAt": "G\u00fcncelleme"
+  },
   "messages": {
     "leadCreated": "Lead basariyla olusturuldu",
     "leadUpdated": "Lead basariyla guncellendi",

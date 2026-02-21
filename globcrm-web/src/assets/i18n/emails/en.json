@@ -42,6 +42,13 @@
     "sending": "Sending...",
     "cancel": "Cancel"
   },
+  "columns": {
+    "from": "From",
+    "subject": "Subject",
+    "bodyPreview": "Preview",
+    "sentAt": "Date",
+    "linkedContactName": "Contact"
+  },
   "messages": {
     "sent": "Email sent",
     "sendFailed": "Failed to send email",

@@ -140,6 +140,18 @@
     "title": "Deals",
     "allPipelines": "All Pipelines"
   },
+  "columns": {
+    "title": "Title",
+    "value": "Value",
+    "probability": "Probability",
+    "expectedCloseDate": "Close Date",
+    "stageName": "Stage",
+    "pipelineName": "Pipeline",
+    "companyName": "Company",
+    "ownerName": "Owner",
+    "createdAt": "Created",
+    "updatedAt": "Updated"
+  },
   "messages": {
     "dealCreated": "Deal created successfully",
     "dealUpdated": "Deal updated successfully",

@@ -140,6 +140,18 @@
     "title": "Anlasmalar",
     "allPipelines": "Tum Pipeline'lar"
   },
+  "columns": {
+    "title": "Ba\u015fl\u0131k",
+    "value": "De\u011fer",
+    "probability": "Olas\u0131l\u0131k",
+    "expectedCloseDate": "Kapanma Tarihi",
+    "stageName": "A\u015fama",
+    "pipelineName": "Hat",
+    "companyName": "\u015eirket",
+    "ownerName": "Sahip",
+    "createdAt": "Olu\u015fturulma",
+    "updatedAt": "G\u00fcncelleme"
+  },
   "messages": {
     "dealCreated": "Anlasma basariyla olusturuldu",
     "dealUpdated": "Anlasma basariyla guncellendi",

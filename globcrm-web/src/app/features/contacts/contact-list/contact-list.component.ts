@@ -96,15 +96,15 @@ export class ContactListComponent implements OnInit {
 
   /** Core column definitions for Contact entity. */
   private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'fullName', label: 'Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
-    { fieldId: 'firstName', label: 'First Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'lastName', label: 'Last Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'email', label: 'Email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
-    { fieldId: 'phone', label: 'Phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'jobTitle', label: 'Job Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'companyName', label: 'Company', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'ownerName', label: 'Owner', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    { fieldId: 'fullName', label: 'Name', labelKey: 'contacts.columns.fullName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'avatar' },
+    { fieldId: 'firstName', label: 'First Name', labelKey: 'contacts.columns.firstName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'lastName', label: 'Last Name', labelKey: 'contacts.columns.lastName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'email', label: 'Email', labelKey: 'contacts.columns.email', isCustomField: false, fieldType: 'text', sortable: true, filterable: true, renderAs: 'email' },
+    { fieldId: 'phone', label: 'Phone', labelKey: 'contacts.columns.phone', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
+    { fieldId: 'jobTitle', label: 'Job Title', labelKey: 'contacts.columns.jobTitle', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'companyName', label: 'Company', labelKey: 'contacts.columns.companyName', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+    { fieldId: 'ownerName', label: 'Owner', labelKey: 'contacts.columns.ownerName', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+    { fieldId: 'createdAt', label: 'Created', labelKey: 'contacts.columns.createdAt', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
   ];
 
   /** Computed: columns for the active view (or defaults). */
