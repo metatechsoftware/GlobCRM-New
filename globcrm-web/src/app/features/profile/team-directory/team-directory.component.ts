@@ -16,6 +16,7 @@ import {
   TeamMemberDto,
   PaginatedResult,
 } from '../profile.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-team-directory',
@@ -30,6 +31,7 @@ import {
     MatCardModule,
     MatPaginatorModule,
     AvatarComponent,
+    TranslocoPipe,
   ],
   templateUrl: './team-directory.component.html',
   styleUrl: './team-directory.component.scss',

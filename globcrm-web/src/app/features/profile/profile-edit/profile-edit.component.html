@@ -1,6 +1,6 @@
 @if (loading()) {
   <div class="loading-state">
-    <p>Loading profile...</p>
+    <p>{{ 'profile.edit.loading' | transloco }}</p>
   </div>
 } @else {
   <div class="profile-edit-page">
@@ -35,7 +35,7 @@
             (click)="save()"
             [disabled]="saving()">
             <mat-icon>save</mat-icon>
-            {{ saving() ? 'Saving...' : 'Save Changes' }}
+            {{ saving() ? ('profile.edit.saving' | transloco) : ('profile.edit.saveChanges' | transloco) }}
           </button>
         </div>
       </div>
@@ -45,39 +45,39 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>person</mat-icon>
-        <h2>Personal Information</h2>
+        <h2>{{ 'profile.edit.personalInfo' | transloco }}</h2>
       </div>
       <div class="section-body">
         <form [formGroup]="profileForm" class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>First Name</mat-label>
+            <mat-label>{{ 'profile.edit.firstName' | transloco }}</mat-label>
             <input matInput formControlName="firstName" />
             @if (profileForm.get('firstName')?.hasError('required') && profileForm.get('firstName')?.touched) {
-              <mat-error>First name is required</mat-error>
+              <mat-error>{{ 'profile.edit.firstNameRequired' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Last Name</mat-label>
+            <mat-label>{{ 'profile.edit.lastName' | transloco }}</mat-label>
             <input matInput formControlName="lastName" />
             @if (profileForm.get('lastName')?.hasError('required') && profileForm.get('lastName')?.touched) {
-              <mat-error>Last name is required</mat-error>
+              <mat-error>{{ 'profile.edit.lastNameRequired' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
+            <mat-label>{{ 'profile.edit.email' | transloco }}</mat-label>
             <input matInput formControlName="email" />
-            <mat-hint>Email cannot be changed</mat-hint>
+            <mat-hint>{{ 'profile.edit.emailHint' | transloco }}</mat-hint>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Phone</mat-label>
+            <mat-label>{{ 'profile.edit.phone' | transloco }}</mat-label>
             <input matInput formControlName="phone" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Bio</mat-label>
+            <mat-label>{{ 'profile.edit.bio' | transloco }}</mat-label>
             <textarea matInput formControlName="bio" rows="3"></textarea>
           </mat-form-field>
         </form>
@@ -88,29 +88,29 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>work</mat-icon>
-        <h2>Work Information</h2>
+        <h2>{{ 'profile.edit.workInfo' | transloco }}</h2>
       </div>
       <div class="section-body">
         <form [formGroup]="profileForm" class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>Job Title</mat-label>
+            <mat-label>{{ 'profile.edit.jobTitle' | transloco }}</mat-label>
             <input matInput formControlName="jobTitle" />
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Department</mat-label>
+            <mat-label>{{ 'profile.edit.department' | transloco }}</mat-label>
             <input matInput formControlName="department" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Reporting Manager</mat-label>
-            <input matInput formControlName="reportingManagerId" placeholder="Manager user ID" />
+            <mat-label>{{ 'profile.edit.reportingManager' | transloco }}</mat-label>
+            <input matInput formControlName="reportingManagerId" [placeholder]="'profile.edit.reportingManagerPlaceholder' | transloco" />
           </mat-form-field>
         </form>
 
         <!-- Skills -->
         <div class="skills-section">
-          <h4>Skills</h4>
+          <h4>{{ 'profile.edit.skills' | transloco }}</h4>
           <mat-chip-set>
             @for (skill of skills(); track skill) {
               <mat-chip (removed)="removeSkill(skill)">
@@ -123,7 +123,7 @@
           </mat-chip-set>
           <div class="add-skill">
             <mat-form-field appearance="outline">
-              <mat-label>Add Skill</mat-label>
+              <mat-label>{{ 'profile.edit.addSkill' | transloco }}</mat-label>
               <input
                 matInput
                 [value]="newSkill()"
@@ -142,24 +142,24 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>share</mat-icon>
-        <h2>Social Links</h2>
+        <h2>{{ 'profile.edit.socialLinks' | transloco }}</h2>
       </div>
       <div class="section-body">
         <form [formGroup]="profileForm" class="social-form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>LinkedIn</mat-label>
+            <mat-label>{{ 'profile.edit.linkedIn' | transloco }}</mat-label>
             <mat-icon matPrefix>link</mat-icon>
             <input matInput formControlName="linkedIn" placeholder="https://linkedin.com/in/username" />
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Twitter / X</mat-label>
+            <mat-label>{{ 'profile.edit.twitter' | transloco }}</mat-label>
             <mat-icon matPrefix>link</mat-icon>
             <input matInput formControlName="twitter" placeholder="https://twitter.com/username" />
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>GitHub</mat-label>
+            <mat-label>{{ 'profile.edit.gitHub' | transloco }}</mat-label>
             <mat-icon matPrefix>link</mat-icon>
             <input matInput formControlName="gitHub" placeholder="https://github.com/username" />
           </mat-form-field>
@@ -171,11 +171,11 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>schedule</mat-icon>
-        <h2>Work Schedule</h2>
+        <h2>{{ 'profile.edit.workSchedule' | transloco }}</h2>
       </div>
       <div class="section-body">
         <div class="work-days">
-          <h4>Work Days</h4>
+          <h4>{{ 'profile.edit.workDays' | transloco }}</h4>
           <div class="day-strip">
             @for (day of workDays; track day) {
               <span
@@ -191,12 +191,12 @@
         <form [formGroup]="profileForm">
           <div class="time-fields">
             <mat-form-field appearance="outline">
-              <mat-label>Start Time</mat-label>
+              <mat-label>{{ 'profile.edit.startTime' | transloco }}</mat-label>
               <input matInput type="time" formControlName="workStartTime" />
             </mat-form-field>
 
             <mat-form-field appearance="outline">
-              <mat-label>End Time</mat-label>
+              <mat-label>{{ 'profile.edit.endTime' | transloco }}</mat-label>
               <input matInput type="time" formControlName="workEndTime" />
             </mat-form-field>
           </div>
@@ -208,24 +208,24 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>tune</mat-icon>
-        <h2>Preferences</h2>
+        <h2>{{ 'profile.edit.preferences' | transloco }}</h2>
       </div>
       <div class="section-body">
         <form [formGroup]="preferencesForm">
           <div class="preferences-layout">
             <div class="pref-item">
-              <h4>Theme</h4>
+              <h4>{{ 'profile.edit.theme' | transloco }}</h4>
               <mat-radio-group formControlName="theme">
                 <div class="theme-options">
-                  <mat-radio-button value="light">Light</mat-radio-button>
-                  <mat-radio-button value="dark">Dark</mat-radio-button>
+                  <mat-radio-button value="light">{{ 'profile.edit.themeLight' | transloco }}</mat-radio-button>
+                  <mat-radio-button value="dark">{{ 'profile.edit.themeDark' | transloco }}</mat-radio-button>
                 </div>
               </mat-radio-group>
             </div>
 
             <div class="pref-item">
               <mat-form-field appearance="outline">
-                <mat-label>Language</mat-label>
+                <mat-label>{{ 'profile.edit.language' | transloco }}</mat-label>
                 <mat-select formControlName="language">
                   @for (lang of languages; track lang.value) {
                     <mat-option [value]="lang.value">{{ lang.label }}</mat-option>
@@ -236,7 +236,7 @@
 
             <div class="pref-item">
               <mat-form-field appearance="outline">
-                <mat-label>Timezone</mat-label>
+                <mat-label>{{ 'profile.edit.timezone' | transloco }}</mat-label>
                 <mat-select formControlName="timezone">
                   @for (tz of timezones; track tz) {
                     <mat-option [value]="tz">{{ tz }}</mat-option>
@@ -247,7 +247,7 @@
 
             <div class="pref-item">
               <mat-form-field appearance="outline">
-                <mat-label>Date Format</mat-label>
+                <mat-label>{{ 'profile.edit.dateFormat' | transloco }}</mat-label>
                 <mat-select formControlName="dateFormat">
                   @for (fmt of dateFormats; track fmt.value) {
                     <mat-option [value]="fmt.value">{{ fmt.label }}</mat-option>
@@ -264,39 +264,39 @@
     <div class="section-card">
       <div class="section-header">
         <mat-icon>notifications</mat-icon>
-        <h2>Email Notifications</h2>
+        <h2>{{ 'profile.edit.emailNotifications' | transloco }}</h2>
       </div>
       <div class="section-body">
         <form [formGroup]="preferencesForm">
           <div class="notification-list">
             <div class="notification-row">
               <div class="notification-info">
-                <span class="notification-label">Task Assigned</span>
-                <span class="notification-desc">Get notified when a task is assigned to you</span>
+                <span class="notification-label">{{ 'profile.edit.taskAssigned' | transloco }}</span>
+                <span class="notification-desc">{{ 'profile.edit.taskAssignedDesc' | transloco }}</span>
               </div>
               <mat-slide-toggle formControlName="taskAssigned" color="primary"></mat-slide-toggle>
             </div>
 
             <div class="notification-row">
               <div class="notification-info">
-                <span class="notification-label">Deal Updated</span>
-                <span class="notification-desc">Get notified when deals you follow are updated</span>
+                <span class="notification-label">{{ 'profile.edit.dealUpdated' | transloco }}</span>
+                <span class="notification-desc">{{ 'profile.edit.dealUpdatedDesc' | transloco }}</span>
               </div>
               <mat-slide-toggle formControlName="dealUpdated" color="primary"></mat-slide-toggle>
             </div>
 
             <div class="notification-row">
               <div class="notification-info">
-                <span class="notification-label">Mentions</span>
-                <span class="notification-desc">Get notified when someone mentions you</span>
+                <span class="notification-label">{{ 'profile.edit.mentions' | transloco }}</span>
+                <span class="notification-desc">{{ 'profile.edit.mentionsDesc' | transloco }}</span>
               </div>
               <mat-slide-toggle formControlName="mention" color="primary"></mat-slide-toggle>
             </div>
 
             <div class="notification-row">
               <div class="notification-info">
-                <span class="notification-label">Weekly Report</span>
-                <span class="notification-desc">Receive a weekly summary of your CRM activity</span>
+                <span class="notification-label">{{ 'profile.edit.weeklyReport' | transloco }}</span>
+                <span class="notification-desc">{{ 'profile.edit.weeklyReportDesc' | transloco }}</span>
               </div>
               <mat-slide-toggle formControlName="weeklyReport" color="primary"></mat-slide-toggle>
             </div>

@@ -9,6 +9,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
 import { InviteTeamStepComponent } from './invite-team-step/invite-team-step.component';
 import { ConfigureBasicsStepComponent } from './configure-basics-step/configure-basics-step.component';
 import { ExploreDataStepComponent } from './explore-data-step/explore-data-step.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-wizard',
@@ -21,6 +22,7 @@ import { ExploreDataStepComponent } from './explore-data-step/explore-data-step.
     InviteTeamStepComponent,
     ConfigureBasicsStepComponent,
     ExploreDataStepComponent,
+    TranslocoPipe,
   ],
   templateUrl: './wizard.component.html',
   styleUrl: './wizard.component.scss',

@@ -19,6 +19,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { AvatarUploadComponent } from '../../../shared/components/avatar/avatar-upload.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ProfileService,
   ProfileDto,
@@ -85,6 +86,7 @@ const DATE_FORMATS = [
     MatSnackBarModule,
     MatAutocompleteModule,
     AvatarUploadComponent,
+    TranslocoPipe,
   ],
   templateUrl: './profile-edit.component.html',
   styleUrl: './profile-edit.component.scss',
@@ -93,6 +95,7 @@ export class ProfileEditComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   readonly workDays = WORK_DAYS;
   readonly timezones = COMMON_TIMEZONES;
@@ -236,10 +239,10 @@ export class ProfileEditComponent implements OnInit {
           if (current) {
             this.profile.set({ ...current, avatarUrl: result.avatarUrl });
           }
-          this.snackBar.open('Avatar updated', 'Close', { duration: 3000 });
+          this.snackBar.open(this.translocoService.translate('profile.messages.avatarUpdated'), 'Close', { duration: 3000 });
         },
         error: () => {
-          this.snackBar.open('Failed to upload avatar', 'Close', { duration: 3000 });
+          this.snackBar.open(this.translocoService.translate('profile.messages.avatarUploadFailed'), 'Close', { duration: 3000 });
         },
       });
     }
@@ -252,10 +255,10 @@ export class ProfileEditComponent implements OnInit {
         if (current) {
           this.profile.set({ ...current, avatarUrl: null });
         }
-        this.snackBar.open('Avatar removed', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('profile.messages.avatarRemoved'), 'Close', { duration: 3000 });
       },
       error: () => {
-        this.snackBar.open('Failed to remove avatar', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('profile.messages.avatarRemoveFailed'), 'Close', { duration: 3000 });
       },
     });
   }
@@ -320,7 +323,7 @@ export class ProfileEditComponent implements OnInit {
     const checkComplete = (): void => {
       if (profileDone && prefsDone) {
         this.saving.set(false);
-        this.snackBar.open('Profile saved successfully', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('profile.messages.profileSaved'), 'Close', { duration: 3000 });
       }
     };
 
@@ -333,7 +336,7 @@ export class ProfileEditComponent implements OnInit {
       error: () => {
         profileDone = true;
         this.saving.set(false);
-        this.snackBar.open('Failed to save profile', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('profile.messages.profileFailed'), 'Close', { duration: 3000 });
       },
     });
 
@@ -346,7 +349,7 @@ export class ProfileEditComponent implements OnInit {
       error: () => {
         prefsDone = true;
         this.saving.set(false);
-        this.snackBar.open('Failed to save preferences', 'Close', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('profile.messages.preferencesFailed'), 'Close', { duration: 3000 });
       },
     });
   }

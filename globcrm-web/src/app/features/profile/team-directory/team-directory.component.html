@@ -1,24 +1,24 @@
 <div class="team-directory-page">
   <div class="directory-header">
-    <h1>Team Directory</h1>
-    <p>Find and connect with your team members</p>
+    <h1>{{ 'profile.teamDirectory.title' | transloco }}</h1>
+    <p>{{ 'profile.teamDirectory.subtitle' | transloco }}</p>
   </div>
 
   <div class="directory-filters">
     <mat-form-field appearance="outline" class="search-field">
-      <mat-label>Search members</mat-label>
+      <mat-label>{{ 'profile.teamDirectory.searchLabel' | transloco }}</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input
         matInput
         [value]="searchQuery()"
         (input)="onSearchInput($any($event.target).value)"
-        placeholder="Search by name, email, or title..." />
+        [placeholder]="'profile.teamDirectory.searchPlaceholder' | transloco" />
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="department-filter">
-      <mat-label>Department</mat-label>
+      <mat-label>{{ 'profile.teamDirectory.department' | transloco }}</mat-label>
       <mat-select [value]="selectedDepartment()" (selectionChange)="onDepartmentChange($event.value)">
-        <mat-option value="">All Departments</mat-option>
+        <mat-option value="">{{ 'profile.teamDirectory.allDepartments' | transloco }}</mat-option>
         @for (dept of departments(); track dept) {
           <mat-option [value]="dept">{{ dept }}</mat-option>
         }
@@ -28,16 +28,16 @@
 
   @if (loading()) {
     <div class="loading-state">
-      <p>Loading team members...</p>
+      <p>{{ 'profile.teamDirectory.loading' | transloco }}</p>
     </div>
   } @else if (members().length === 0) {
     <div class="directory-empty">
       <mat-icon class="empty-icon">people</mat-icon>
-      <h3>No team members found</h3>
+      <h3>{{ 'profile.teamDirectory.noMembers' | transloco }}</h3>
       @if (searchQuery() || selectedDepartment()) {
-        <p>Try adjusting your search or filter criteria.</p>
+        <p>{{ 'profile.teamDirectory.adjustSearch' | transloco }}</p>
       } @else {
-        <p>Team members will appear here once they join.</p>
+        <p>{{ 'profile.teamDirectory.willAppear' | transloco }}</p>
       }
     </div>
   } @else {

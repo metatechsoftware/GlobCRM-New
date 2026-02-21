@@ -1,28 +1,25 @@
 <div class="wizard-container">
   <div class="wizard-header">
-    <h1 class="wizard-title">Welcome to GlobCRM</h1>
-    <p class="wizard-subtitle">Let's get {{ organizationName }} set up in just a few steps.</p>
+    <h1 class="wizard-title">{{ 'onboarding.wizard.title' | transloco }}</h1>
+    <p class="wizard-subtitle">{{ 'onboarding.wizard.subtitle' | transloco: { orgName: organizationName } }}</p>
     <button mat-button class="skip-all-button" (click)="skipAll()" [disabled]="isCompleting()">
-      Skip All &amp; Go to Dashboard
+      {{ 'onboarding.wizard.skipAll' | transloco }}
       <mat-icon>arrow_forward</mat-icon>
     </button>
   </div>
 
   <mat-stepper #stepper [linear]="false" class="wizard-stepper">
-    <!-- Step 1: Invite Team -->
-    <mat-step [editable]="true" label="Invite Team">
+    <mat-step [editable]="true" [label]="'onboarding.wizard.inviteTeam' | transloco">
       <app-invite-team-step (stepComplete)="onStepComplete()" (skipStep)="onStepComplete()">
       </app-invite-team-step>
     </mat-step>
 
-    <!-- Step 2: Configure Basics -->
-    <mat-step [editable]="true" label="Configure Basics">
+    <mat-step [editable]="true" [label]="'onboarding.wizard.configureBasics' | transloco">
       <app-configure-basics-step (stepComplete)="onStepComplete()" (skipStep)="onStepComplete()">
       </app-configure-basics-step>
     </mat-step>
 
-    <!-- Step 3: Explore Data -->
-    <mat-step [editable]="true" label="Explore Data">
+    <mat-step [editable]="true" [label]="'onboarding.wizard.exploreData' | transloco">
       <app-explore-data-step (finish)="completeSetup()" (skipStep)="completeSetup()">
       </app-explore-data-step>
     </mat-step>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 interface SeedDataItem {
   icon: string;
@@ -19,6 +20,7 @@ interface SeedDataItem {
     MatButtonModule,
     MatIconModule,
     MatCardModule,
+    TranslocoPipe,
   ],
   templateUrl: './explore-data-step.component.html',
   styleUrl: './explore-data-step.component.scss',

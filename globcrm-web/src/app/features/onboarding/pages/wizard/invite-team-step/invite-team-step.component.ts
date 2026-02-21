@@ -10,6 +10,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-invite-team-step',
@@ -25,6 +26,7 @@ import { AuthService } from '../../../../../core/auth/auth.service';
     MatChipsModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    TranslocoPipe,
   ],
   templateUrl: './invite-team-step.component.html',
   styleUrl: './invite-team-step.component.scss',
@@ -32,6 +34,7 @@ import { AuthService } from '../../../../../core/auth/auth.service';
 export class InviteTeamStepComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly transloco = inject(TranslocoService);
 
   stepComplete = output<void>();
   skipStep = output<void>();
@@ -83,7 +86,7 @@ export class InviteTeamStepComponent {
   onSendInvitations(): void {
     const emailList = this.emails();
     if (emailList.length === 0) {
-      this.errorMessage.set('Please add at least one email address.');
+      this.errorMessage.set(this.transloco.translate('auth.messages.addEmailRequired'));
       return;
     }
 
@@ -108,7 +111,7 @@ export class InviteTeamStepComponent {
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.message || 'Failed to send invitations.');
+        this.errorMessage.set(err.message || this.transloco.translate('onboarding.messages.invitationsFailed'));
       },
     });
   }

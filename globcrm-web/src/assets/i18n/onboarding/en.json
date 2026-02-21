@@ -1,0 +1,58 @@
+{
+  "wizard": {
+    "title": "Welcome to GlobCRM",
+    "subtitle": "Let's get {{orgName}} set up in just a few steps.",
+    "skipAll": "Skip All & Go to Dashboard",
+    "inviteTeam": "Invite Team",
+    "configureBasics": "Configure Basics",
+    "exploreData": "Explore Data"
+  },
+  "inviteStep": {
+    "title": "Invite Your Team",
+    "description": "Add team members by typing or pasting email addresses below. You can always invite more people later from Settings.",
+    "emailLabel": "Email addresses",
+    "emailPlaceholder": "Enter emails separated by commas or new lines\ne.g., alice@company.com, bob@company.com",
+    "emailHint": "Press Enter or click outside to add emails",
+    "removeEmail": "Remove email",
+    "role": "Role",
+    "roleMember": "Member",
+    "roleAdmin": "Admin",
+    "roleHint": "Role assigned to all invited users",
+    "skip": "Skip",
+    "sendInvitations": "Send {{count}} Invitation",
+    "sendInvitationsPlural": "Send {{count}} Invitations",
+    "continue": "Continue",
+    "invitationsSent": "invitation sent",
+    "invitationsSentPlural": "invitations sent",
+    "skipped": "skipped"
+  },
+  "configureStep": {
+    "title": "Configure Basics",
+    "description": "Set your organization's default preferences. These can be changed anytime in Settings.",
+    "timezone": "Timezone",
+    "currency": "Currency",
+    "dateFormat": "Date Format",
+    "skip": "Skip",
+    "saveSettings": "Save Settings",
+    "continue": "Continue",
+    "settingsSaved": "Settings saved successfully."
+  },
+  "exploreStep": {
+    "title": "Explore Your Data",
+    "description": "We've added some sample data to help you explore GlobCRM. You can delete this sample data anytime from Settings.",
+    "sampleContacts": "5 sample contacts",
+    "sampleContactsDesc": "Pre-loaded contacts to explore contact management features.",
+    "sampleCompanies": "2 sample companies",
+    "sampleCompaniesDesc": "Example companies linked to contacts and deals.",
+    "demoDeal": "1 demo deal",
+    "demoDealDesc": "A deal in your pipeline to explore the sales workflow.",
+    "defaultPipeline": "Default sales pipeline",
+    "defaultPipelineDesc": "5 stages: Lead, Qualified, Proposal, Negotiation, Closed.",
+    "skip": "Skip",
+    "startUsing": "Start Using GlobCRM"
+  },
+  "messages": {
+    "settingsFailed": "Failed to save settings.",
+    "invitationsFailed": "Failed to send invitations."
+  }
+}

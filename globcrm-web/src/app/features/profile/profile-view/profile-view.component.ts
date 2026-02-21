@@ -8,6 +8,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { AvatarComponent } from '../../../shared/components/avatar/avatar.component';
 import { ProfileService, ProfileDto } from '../profile.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Read-only profile view for viewing another user's public profile.
@@ -24,6 +25,7 @@ import { ProfileService, ProfileDto } from '../profile.service';
     MatChipsModule,
     MatDividerModule,
     AvatarComponent,
+    TranslocoPipe,
   ],
   templateUrl: './profile-view.component.html',
   styleUrl: './profile-view.component.scss',

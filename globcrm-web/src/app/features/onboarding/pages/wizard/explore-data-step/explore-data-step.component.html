@@ -1,10 +1,9 @@
 <div class="step-container">
   <div class="step-header">
     <mat-icon class="step-icon">explore</mat-icon>
-    <h3>Explore Your Data</h3>
+    <h3>{{ 'onboarding.exploreStep.title' | transloco }}</h3>
     <p class="step-description">
-      We've added some sample data to help you explore GlobCRM.
-      You can delete this sample data anytime from Settings.
+      {{ 'onboarding.exploreStep.description' | transloco }}
     </p>
   </div>
 
@@ -22,11 +21,11 @@
 
   <div class="step-actions">
     <button mat-button (click)="onSkip()" class="skip-button">
-      Skip
+      {{ 'onboarding.exploreStep.skip' | transloco }}
     </button>
     <button mat-flat-button color="primary" (click)="onFinish()" class="finish-button">
       <mat-icon>rocket_launch</mat-icon>
-      Start Using GlobCRM
+      {{ 'onboarding.exploreStep.startUsing' | transloco }}
     </button>
   </div>
 </div>

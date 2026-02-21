@@ -1,12 +1,11 @@
 @if (loading()) {
   <div class="loading-state">
     <mat-icon>person</mat-icon>
-    <p>Loading profile...</p>
+    <p>{{ 'profile.view.loading' | transloco }}</p>
   </div>
 } @else {
   @if (profile(); as p) {
     <div class="profile-view-page">
-      <!-- Hero Card -->
       <div class="profile-hero">
         <div class="hero-accent"></div>
         <div class="hero-nav">
@@ -33,13 +32,11 @@
         </div>
       </div>
 
-      <!-- Content -->
       <div class="view-content">
-        <!-- Contact Info -->
         <div class="info-section">
           <div class="info-section__header">
             <mat-icon>mail</mat-icon>
-            <h3>Contact</h3>
+            <h3>{{ 'profile.view.contact' | transloco }}</h3>
           </div>
           <div class="info-rows">
             <div class="info-row">
@@ -55,23 +52,21 @@
           </div>
         </div>
 
-        <!-- Bio -->
         @if (p.bio) {
           <div class="info-section">
             <div class="info-section__header">
               <mat-icon>info</mat-icon>
-              <h3>About</h3>
+              <h3>{{ 'profile.view.about' | transloco }}</h3>
             </div>
             <p class="bio-text">{{ p.bio }}</p>
           </div>
         }
 
-        <!-- Skills -->
         @if (p.skills && p.skills.length > 0) {
           <div class="info-section">
             <div class="info-section__header">
               <mat-icon>star</mat-icon>
-              <h3>Skills</h3>
+              <h3>{{ 'profile.view.skills' | transloco }}</h3>
             </div>
             <mat-chip-set>
               @for (skill of p.skills; track skill; let i = $index) {
@@ -81,12 +76,11 @@
           </div>
         }
 
-        <!-- Social Links -->
         @if (p.socialLinks && hasSocialLinks(p.socialLinks)) {
           <div class="info-section">
             <div class="info-section__header">
               <mat-icon>language</mat-icon>
-              <h3>Social</h3>
+              <h3>{{ 'profile.view.social' | transloco }}</h3>
             </div>
             <div class="social-links">
               @if (p.socialLinks['linkedin']) {
@@ -118,11 +112,11 @@
   } @else {
     <div class="empty-state">
       <mat-icon>person_off</mat-icon>
-      <h3>Profile not found</h3>
-      <p>The user profile you're looking for doesn't exist.</p>
+      <h3>{{ 'profile.view.notFound' | transloco }}</h3>
+      <p>{{ 'profile.view.notFoundMessage' | transloco }}</p>
       <button mat-stroked-button (click)="goBack()">
         <mat-icon>arrow_back</mat-icon>
-        Go Back
+        {{ 'profile.view.goBack' | transloco }}
       </button>
     </div>
   }

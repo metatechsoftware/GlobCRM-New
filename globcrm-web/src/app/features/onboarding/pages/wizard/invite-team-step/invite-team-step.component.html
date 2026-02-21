@@ -1,10 +1,9 @@
 <div class="step-container">
   <div class="step-header">
     <mat-icon class="step-icon">group_add</mat-icon>
-    <h3>Invite Your Team</h3>
+    <h3>{{ 'onboarding.inviteStep.title' | transloco }}</h3>
     <p class="step-description">
-      Add team members by typing or pasting email addresses below.
-      You can always invite more people later from Settings.
+      {{ 'onboarding.inviteStep.description' | transloco }}
     </p>
   </div>
 
@@ -24,14 +23,14 @@
 
   <form [formGroup]="inviteForm">
     <mat-form-field appearance="outline">
-      <mat-label>Email addresses</mat-label>
+      <mat-label>{{ 'onboarding.inviteStep.emailLabel' | transloco }}</mat-label>
       <textarea matInput formControlName="emailInput"
-                placeholder="Enter emails separated by commas or new lines&#10;e.g., alice@company.com, bob@company.com"
+                [placeholder]="'onboarding.inviteStep.emailPlaceholder' | transloco"
                 rows="3"
                 (blur)="parseEmails()"
                 (keydown.enter)="$event.preventDefault(); parseEmails()">
       </textarea>
-      <mat-hint>Press Enter or click outside to add emails</mat-hint>
+      <mat-hint>{{ 'onboarding.inviteStep.emailHint' | transloco }}</mat-hint>
     </mat-form-field>
 
     @if (emails().length > 0) {
@@ -40,7 +39,7 @@
           @for (email of emails(); track email) {
             <mat-chip (removed)="removeEmail(email)">
               {{ email }}
-              <button matChipRemove aria-label="Remove email">
+              <button matChipRemove [attr.aria-label]="'onboarding.inviteStep.removeEmail' | transloco">
                 <mat-icon>cancel</mat-icon>
               </button>
             </mat-chip>
@@ -50,18 +49,18 @@
     }
 
     <mat-form-field appearance="outline" class="role-select">
-      <mat-label>Role</mat-label>
+      <mat-label>{{ 'onboarding.inviteStep.role' | transloco }}</mat-label>
       <mat-select formControlName="role">
-        <mat-option value="Member">Member</mat-option>
-        <mat-option value="Admin">Admin</mat-option>
+        <mat-option value="Member">{{ 'onboarding.inviteStep.roleMember' | transloco }}</mat-option>
+        <mat-option value="Admin">{{ 'onboarding.inviteStep.roleAdmin' | transloco }}</mat-option>
       </mat-select>
-      <mat-hint>Role assigned to all invited users</mat-hint>
+      <mat-hint>{{ 'onboarding.inviteStep.roleHint' | transloco }}</mat-hint>
     </mat-form-field>
   </form>
 
   <div class="step-actions">
     <button mat-button (click)="onSkip()" class="skip-button">
-      Skip
+      {{ 'onboarding.inviteStep.skip' | transloco }}
     </button>
     @if (emails().length > 0) {
       <button mat-flat-button color="primary" (click)="onSendInvitations()"
@@ -69,12 +68,12 @@
         @if (isLoading()) {
           <mat-spinner diameter="20" color="accent"></mat-spinner>
         } @else {
-          Send {{ emails().length }} Invitation{{ emails().length > 1 ? 's' : '' }}
+          {{ 'onboarding.inviteStep.sendInvitations' | transloco: { count: emails().length } }}
         }
       </button>
     }
     <button mat-stroked-button color="primary" (click)="onContinue()">
-      Continue
+      {{ 'onboarding.inviteStep.continue' | transloco }}
     </button>
   </div>
 </div>

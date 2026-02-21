@@ -1,0 +1,58 @@
+{
+  "wizard": {
+    "title": "GlobCRM'e Hoş Geldiniz",
+    "subtitle": "{{orgName}} için birkaç adımda kurulumu tamamlayalım.",
+    "skipAll": "Tümünü Atla ve Panoya Git",
+    "inviteTeam": "Takım Davet Et",
+    "configureBasics": "Temel Ayarlar",
+    "exploreData": "Verileri Keşfet"
+  },
+  "inviteStep": {
+    "title": "Takımınızı Davet Edin",
+    "description": "Aşağıya e-posta adreslerini yazarak veya yapıştırarak takım üyeleri ekleyin. Daha sonra Ayarlar'dan her zaman daha fazla kişi davet edebilirsiniz.",
+    "emailLabel": "E-posta adresleri",
+    "emailPlaceholder": "Virgülle veya yeni satırla ayrılmış e-postalar girin\nörn., ayse@sirket.com, ali@sirket.com",
+    "emailHint": "Eklemek için Enter'a basın veya dışarıya tıklayın",
+    "removeEmail": "E-postayı kaldır",
+    "role": "Rol",
+    "roleMember": "Üye",
+    "roleAdmin": "Yönetici",
+    "roleHint": "Davet edilen tüm kullanıcılara atanan rol",
+    "skip": "Atla",
+    "sendInvitations": "{{count}} Davet Gönder",
+    "sendInvitationsPlural": "{{count}} Davet Gönder",
+    "continue": "Devam Et",
+    "invitationsSent": "davet gönderildi",
+    "invitationsSentPlural": "davet gönderildi",
+    "skipped": "atlandı"
+  },
+  "configureStep": {
+    "title": "Temel Ayarları Yapılandırın",
+    "description": "Organizasyonunuzun varsayılan tercihlerini belirleyin. Bunlar Ayarlar'dan her zaman değiştirilebilir.",
+    "timezone": "Saat Dilimi",
+    "currency": "Para Birimi",
+    "dateFormat": "Tarih Formatı",
+    "skip": "Atla",
+    "saveSettings": "Ayarları Kaydet",
+    "continue": "Devam Et",
+    "settingsSaved": "Ayarlar başarıyla kaydedildi."
+  },
+  "exploreStep": {
+    "title": "Verilerinizi Keşfedin",
+    "description": "GlobCRM'i keşfetmenize yardımcı olmak için bazı örnek veriler ekledik. Bu örnek verileri Ayarlar'dan istediğiniz zaman silebilirsiniz.",
+    "sampleContacts": "5 örnek kişi",
+    "sampleContactsDesc": "Kişi yönetimi özelliklerini keşfetmek için önceden yüklenmiş kişiler.",
+    "sampleCompanies": "2 örnek şirket",
+    "sampleCompaniesDesc": "Kişilere ve fırsatlara bağlı örnek şirketler.",
+    "demoDeal": "1 demo fırsat",
+    "demoDealDesc": "Satış iş akışını keşfetmek için boru hattınızdaki bir fırsat.",
+    "defaultPipeline": "Varsayılan satış boru hattı",
+    "defaultPipelineDesc": "5 aşama: Potansiyel, Nitelikli, Teklif, Müzakere, Kapanış.",
+    "skip": "Atla",
+    "startUsing": "GlobCRM'i Kullanmaya Başla"
+  },
+  "messages": {
+    "settingsFailed": "Ayarlar kaydedilemedi.",
+    "invitationsFailed": "Davetiyeler gönderilemedi."
+  }
+}

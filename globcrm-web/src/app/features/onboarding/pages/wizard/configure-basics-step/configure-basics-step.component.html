@@ -1,9 +1,9 @@
 <div class="step-container">
   <div class="step-header">
     <mat-icon class="step-icon">settings</mat-icon>
-    <h3>Configure Basics</h3>
+    <h3>{{ 'onboarding.configureStep.title' | transloco }}</h3>
     <p class="step-description">
-      Set your organization's default preferences. These can be changed anytime in Settings.
+      {{ 'onboarding.configureStep.description' | transloco }}
     </p>
   </div>
 
@@ -23,7 +23,7 @@
 
   <form [formGroup]="settingsForm" class="settings-form">
     <mat-form-field appearance="outline">
-      <mat-label>Timezone</mat-label>
+      <mat-label>{{ 'onboarding.configureStep.timezone' | transloco }}</mat-label>
       <mat-select formControlName="timezone">
         @for (tz of timezones; track tz.value) {
           <mat-option [value]="tz.value">{{ tz.label }}</mat-option>
@@ -33,7 +33,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Currency</mat-label>
+      <mat-label>{{ 'onboarding.configureStep.currency' | transloco }}</mat-label>
       <mat-select formControlName="currency">
         @for (curr of currencies; track curr.value) {
           <mat-option [value]="curr.value">{{ curr.label }}</mat-option>
@@ -43,7 +43,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Date Format</mat-label>
+      <mat-label>{{ 'onboarding.configureStep.dateFormat' | transloco }}</mat-label>
       <mat-select formControlName="dateFormat">
         @for (fmt of dateFormats; track fmt.value) {
           <mat-option [value]="fmt.value">{{ fmt.label }}</mat-option>
@@ -55,17 +55,17 @@
 
   <div class="step-actions">
     <button mat-button (click)="onSkip()" class="skip-button">
-      Skip
+      {{ 'onboarding.configureStep.skip' | transloco }}
     </button>
     <button mat-stroked-button (click)="onSaveSettings()" [disabled]="isLoading()">
       @if (isLoading()) {
         <mat-spinner diameter="20"></mat-spinner>
       } @else {
-        Save Settings
+        {{ 'onboarding.configureStep.saveSettings' | transloco }}
       }
     </button>
     <button mat-flat-button color="primary" (click)="onContinue()">
-      Continue
+      {{ 'onboarding.configureStep.continue' | transloco }}
     </button>
   </div>
 </div>

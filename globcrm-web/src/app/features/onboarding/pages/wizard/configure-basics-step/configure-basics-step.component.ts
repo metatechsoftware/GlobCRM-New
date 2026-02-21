@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../../../core/auth/auth.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface TimezoneOption {
   value: string;
@@ -24,6 +25,7 @@ interface TimezoneOption {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   templateUrl: './configure-basics-step.component.html',
   styleUrl: './configure-basics-step.component.scss',
@@ -31,6 +33,7 @@ interface TimezoneOption {
 export class ConfigureBasicsStepComponent implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly transloco = inject(TranslocoService);
 
   stepComplete = output<void>();
   skipStep = output<void>();
@@ -109,11 +112,11 @@ export class ConfigureBasicsStepComponent implements OnInit {
     this.authService.updateOrganizationSettings({ timezone, currency, dateFormat }).subscribe({
       next: () => {
         this.isLoading.set(false);
-        this.successMessage.set('Settings saved successfully.');
+        this.successMessage.set(this.transloco.translate('onboarding.configureStep.settingsSaved'));
       },
       error: (err) => {
         this.isLoading.set(false);
-        this.errorMessage.set(err.message || 'Failed to save settings.');
+        this.errorMessage.set(err.message || this.transloco.translate('onboarding.messages.settingsFailed'));
       },
     });
   }
