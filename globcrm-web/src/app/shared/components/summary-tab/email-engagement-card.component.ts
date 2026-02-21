@@ -6,12 +6,13 @@ import {
 } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EmailEngagementDto } from './summary.models';
 
 @Component({
   selector: 'app-email-engagement-card',
   standalone: true,
-  imports: [DatePipe, MatIconModule],
+  imports: [DatePipe, MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (hasEmails()) {
@@ -22,35 +23,35 @@ import { EmailEngagementDto } from './summary.models';
               <mat-icon>send</mat-icon>
             </span>
             <span class="stat-value">{{ engagement().sentCount }}</span>
-            <span class="stat-label">Sent</span>
+            <span class="stat-label">{{ 'common.summaryTab.emailEngagement.sent' | transloco }}</span>
           </div>
           <div class="engagement-stat">
             <span class="stat-icon-circle icon-received">
               <mat-icon>inbox</mat-icon>
             </span>
             <span class="stat-value">{{ engagement().receivedCount }}</span>
-            <span class="stat-label">Received</span>
+            <span class="stat-label">{{ 'common.summaryTab.emailEngagement.received' | transloco }}</span>
           </div>
           <div class="engagement-stat">
             <span class="stat-icon-circle icon-total">
               <mat-icon>email</mat-icon>
             </span>
             <span class="stat-value">{{ engagement().totalEmails }}</span>
-            <span class="stat-label">Total</span>
+            <span class="stat-label">{{ 'common.summaryTab.emailEngagement.total' | transloco }}</span>
           </div>
         </div>
         <div class="engagement-timestamps">
           @if (engagement().lastSentAt) {
             <div class="timestamp-row">
               <mat-icon class="timestamp-icon">schedule</mat-icon>
-              <span class="timestamp-label">Last sent</span>
+              <span class="timestamp-label">{{ 'common.summaryTab.emailEngagement.lastSent' | transloco }}</span>
               <span class="timestamp-value">{{ engagement().lastSentAt | date:'mediumDate' }}</span>
             </div>
           }
           @if (engagement().lastReceivedAt) {
             <div class="timestamp-row">
               <mat-icon class="timestamp-icon">schedule</mat-icon>
-              <span class="timestamp-label">Last received</span>
+              <span class="timestamp-label">{{ 'common.summaryTab.emailEngagement.lastReceived' | transloco }}</span>
               <span class="timestamp-value">{{ engagement().lastReceivedAt | date:'mediumDate' }}</span>
             </div>
           }
@@ -65,7 +66,7 @@ import { EmailEngagementDto } from './summary.models';
     } @else {
       <div class="engagement-empty">
         <mat-icon>email</mat-icon>
-        <span>No email activity</span>
+        <span>{{ 'common.summaryTab.emailEngagement.noActivity' | transloco }}</span>
       </div>
     }
   `,

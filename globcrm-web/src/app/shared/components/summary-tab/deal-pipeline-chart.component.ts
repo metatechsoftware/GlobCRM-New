@@ -5,12 +5,13 @@ import {
   computed,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { DealPipelineSummaryDto } from './summary.models';
 
 @Component({
   selector: 'app-deal-pipeline-chart',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (hasDeals()) {
@@ -25,11 +26,11 @@ import { DealPipelineSummaryDto } from './summary.models';
         <div class="chart-stats">
           <div class="stat stat-value-pill">
             <span class="stat-value">{{ formattedTotalValue() }}</span>
-            <span class="stat-label">Total Value</span>
+            <span class="stat-label">{{ 'common.summaryTab.dealPipelineChart.totalValue' | transloco }}</span>
           </div>
           <div class="stat stat-rate-pill">
             <span class="stat-value">{{ formattedWinRate() }}</span>
-            <span class="stat-label">Win Rate</span>
+            <span class="stat-label">{{ 'common.summaryTab.dealPipelineChart.winRate' | transloco }}</span>
           </div>
         </div>
         <div class="chart-legend">
@@ -45,7 +46,7 @@ import { DealPipelineSummaryDto } from './summary.models';
     } @else {
       <div class="pipeline-empty">
         <mat-icon>trending_up</mat-icon>
-        <span>No deals yet</span>
+        <span>{{ 'common.summaryTab.dealPipelineChart.noDeals' | transloco }}</span>
       </div>
     }
   `,

@@ -38,35 +38,35 @@
             @case ('Company') {
               @if (companyData(); as d) {
                 <div class="property">
-                  <span class="property-label">Name</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.name' | transloco }}</span>
                   <span class="property-value">{{ d.name }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Industry</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.industry' | transloco }}</span>
                   <span class="property-value">{{ d.industry || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Phone</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.phone' | transloco }}</span>
                   <span class="property-value">{{ d.phone || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Email</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.email' | transloco }}</span>
                   <span class="property-value">{{ d.email || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Website</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.website' | transloco }}</span>
                   <span class="property-value">{{ d.website || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Owner</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.owner' | transloco }}</span>
                   <span class="property-value">{{ d.ownerName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Location</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.location' | transloco }}</span>
                   <span class="property-value">{{ d.location || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Size</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.size' | transloco }}</span>
                   <span class="property-value">{{ d.size || '---' }}</span>
                 </div>
               }
@@ -74,31 +74,31 @@
             @case ('Contact') {
               @if (contactData(); as d) {
                 <div class="property">
-                  <span class="property-label">Full Name</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.fullName' | transloco }}</span>
                   <span class="property-value">{{ d.fullName }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Email</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.email' | transloco }}</span>
                   <span class="property-value">{{ d.email || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Phone</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.phone' | transloco }}</span>
                   <span class="property-value">{{ d.phone || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Job Title</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.jobTitle' | transloco }}</span>
                   <span class="property-value">{{ d.jobTitle || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Company</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.company' | transloco }}</span>
                   <span class="property-value">{{ d.companyName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Owner</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.owner' | transloco }}</span>
                   <span class="property-value">{{ d.ownerName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Department</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.department' | transloco }}</span>
                   <span class="property-value">{{ d.department || '---' }}</span>
                 </div>
               }
@@ -106,35 +106,35 @@
             @case ('Deal') {
               @if (dealData(); as d) {
                 <div class="property">
-                  <span class="property-label">Title</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.title' | transloco }}</span>
                   <span class="property-value">{{ d.title }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Value</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.value' | transloco }}</span>
                   <span class="property-value">{{ d.value | currency:'USD':'symbol':'1.0-0' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Probability</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.probability' | transloco }}</span>
                   <span class="property-value">{{ d.probability !== null ? (d.probability | percent:'1.0-0') : '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Expected Close</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.expectedClose' | transloco }}</span>
                   <span class="property-value">{{ d.expectedCloseDate ? (d.expectedCloseDate | date:'mediumDate') : '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Pipeline</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.pipeline' | transloco }}</span>
                   <span class="property-value">{{ d.pipelineName }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Stage</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.stage' | transloco }}</span>
                   <span class="property-value">{{ d.stageName }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Company</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.company' | transloco }}</span>
                   <span class="property-value">{{ d.companyName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Owner</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.owner' | transloco }}</span>
                   <span class="property-value">{{ d.ownerName || '---' }}</span>
                 </div>
               }
@@ -142,31 +142,31 @@
             @case ('Lead') {
               @if (leadData(); as d) {
                 <div class="property">
-                  <span class="property-label">Full Name</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.fullName' | transloco }}</span>
                   <span class="property-value">{{ d.fullName }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Email</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.email' | transloco }}</span>
                   <span class="property-value">{{ d.email || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Phone</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.phone' | transloco }}</span>
                   <span class="property-value">{{ d.phone || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Company</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.company' | transloco }}</span>
                   <span class="property-value">{{ d.companyName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Source</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.source' | transloco }}</span>
                   <span class="property-value">{{ d.sourceName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Temperature</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.temperature' | transloco }}</span>
                   <span class="property-value temperature" [attr.data-temp]="d.temperature">{{ d.temperature }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Owner</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.owner' | transloco }}</span>
                   <span class="property-value">{{ d.ownerName || '---' }}</span>
                 </div>
               }
@@ -174,35 +174,35 @@
             @case ('Quote') {
               @if (quoteData(); as d) {
                 <div class="property">
-                  <span class="property-label">Quote Number</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.quoteNumber' | transloco }}</span>
                   <span class="property-value">{{ d.quoteNumber }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Title</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.title' | transloco }}</span>
                   <span class="property-value">{{ d.title }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Status</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.status' | transloco }}</span>
                   <span class="property-value">{{ d.status }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Grand Total</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.grandTotal' | transloco }}</span>
                   <span class="property-value">{{ d.grandTotal | currency:'USD':'symbol':'1.2-2' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Contact</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.contact' | transloco }}</span>
                   <span class="property-value">{{ d.contactName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Company</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.company' | transloco }}</span>
                   <span class="property-value">{{ d.companyName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Issue Date</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.issueDate' | transloco }}</span>
                   <span class="property-value">{{ d.issueDate | date:'mediumDate' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Expiry Date</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.expiryDate' | transloco }}</span>
                   <span class="property-value">{{ d.expiryDate ? (d.expiryDate | date:'mediumDate') : '---' }}</span>
                 </div>
               }
@@ -210,35 +210,35 @@
             @case ('Request') {
               @if (requestData(); as d) {
                 <div class="property">
-                  <span class="property-label">Subject</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.subject' | transloco }}</span>
                   <span class="property-value">{{ d.subject }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Status</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.status' | transloco }}</span>
                   <span class="property-value">{{ d.status }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Priority</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.priority' | transloco }}</span>
                   <span class="property-value">{{ d.priority }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Category</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.category' | transloco }}</span>
                   <span class="property-value">{{ d.category || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Contact</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.contact' | transloco }}</span>
                   <span class="property-value">{{ d.contactName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Company</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.company' | transloco }}</span>
                   <span class="property-value">{{ d.companyName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Owner</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.owner' | transloco }}</span>
                   <span class="property-value">{{ d.ownerName || '---' }}</span>
                 </div>
                 <div class="property">
-                  <span class="property-label">Assigned To</span>
+                  <span class="property-label">{{ 'common.summaryTab.fields.assignedTo' | transloco }}</span>
                   <span class="property-value">{{ d.assignedToName || '---' }}</span>
                 </div>
               }
@@ -309,7 +309,7 @@
           <div class="summary-card status-card">
             <h3 class="card-title">
               <span class="card-title-icon"><mat-icon>receipt_long</mat-icon></span>
-              Status
+              {{ 'common.summaryTab.fields.status' | transloco }}
             </h3>
             @if (quoteData(); as d) {
               <div class="status-chips">
@@ -327,7 +327,7 @@
           <div class="summary-card status-card">
             <h3 class="card-title">
               <span class="card-title-icon"><mat-icon>support_agent</mat-icon></span>
-              Status
+              {{ 'common.summaryTab.fields.status' | transloco }}
             </h3>
             @if (requestData(); as d) {
               <div class="status-chips">

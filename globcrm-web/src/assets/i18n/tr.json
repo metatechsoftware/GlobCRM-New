@@ -225,6 +225,53 @@
       "comingSoon": "(yakında)",
       "comingSoonMessage": "{{tab}} gelecek bir güncellemede kullanılabilir olacak."
     },
+    "summaryTab": {
+      "fields": {
+        "name": "Ad",
+        "fullName": "Ad Soyad",
+        "email": "E-posta",
+        "phone": "Telefon",
+        "company": "Şirket",
+        "contact": "Kişi",
+        "department": "Departman",
+        "jobTitle": "Ünvan",
+        "location": "Konum",
+        "industry": "Sektör",
+        "size": "Büyüklük",
+        "website": "Web Sitesi",
+        "value": "Değer",
+        "stage": "Aşama",
+        "pipeline": "Pipeline",
+        "probability": "Olasılık",
+        "expectedClose": "Beklenen Kapanış",
+        "expiryDate": "Son Geçerlilik Tarihi",
+        "issueDate": "Düzenleme Tarihi",
+        "quoteNumber": "Teklif Numarası",
+        "grandTotal": "Genel Toplam",
+        "status": "Durum",
+        "priority": "Öncelik",
+        "source": "Kaynak",
+        "temperature": "Sıcaklık",
+        "category": "Kategori",
+        "subject": "Konu",
+        "title": "Başlık",
+        "assignedTo": "Atanan Kişi",
+        "owner": "Sahip"
+      },
+      "dealPipelineChart": {
+        "noDeals": "Henüz anlaşma yok",
+        "totalValue": "Toplam Değer",
+        "winRate": "Kazanma Oranı"
+      },
+      "emailEngagement": {
+        "noActivity": "E-posta etkinliği yok",
+        "sent": "Gönderilen",
+        "received": "Alınan",
+        "total": "Toplam",
+        "lastSent": "Son gönderilen",
+        "lastReceived": "Son alınan"
+      }
+    },
     "validation": {
       "required": "Bu alan zorunludur",
       "minLength": "Minimum uzunluk {{min}} karakterdir",

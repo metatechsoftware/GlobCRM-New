@@ -225,6 +225,53 @@
       "comingSoon": "(coming soon)",
       "comingSoonMessage": "{{tab}} will be available in a future update."
     },
+    "summaryTab": {
+      "fields": {
+        "name": "Name",
+        "fullName": "Full Name",
+        "email": "Email",
+        "phone": "Phone",
+        "company": "Company",
+        "contact": "Contact",
+        "department": "Department",
+        "jobTitle": "Job Title",
+        "location": "Location",
+        "industry": "Industry",
+        "size": "Size",
+        "website": "Website",
+        "value": "Value",
+        "stage": "Stage",
+        "pipeline": "Pipeline",
+        "probability": "Probability",
+        "expectedClose": "Expected Close",
+        "expiryDate": "Expiry Date",
+        "issueDate": "Issue Date",
+        "quoteNumber": "Quote Number",
+        "grandTotal": "Grand Total",
+        "status": "Status",
+        "priority": "Priority",
+        "source": "Source",
+        "temperature": "Temperature",
+        "category": "Category",
+        "subject": "Subject",
+        "title": "Title",
+        "assignedTo": "Assigned To",
+        "owner": "Owner"
+      },
+      "dealPipelineChart": {
+        "noDeals": "No deals yet",
+        "totalValue": "Total Value",
+        "winRate": "Win Rate"
+      },
+      "emailEngagement": {
+        "noActivity": "No email activity",
+        "sent": "Sent",
+        "received": "Received",
+        "total": "Total",
+        "lastSent": "Last sent",
+        "lastReceived": "Last received"
+      }
+    },
     "validation": {
       "required": "This field is required",
       "minLength": "Minimum length is {{min}} characters",
