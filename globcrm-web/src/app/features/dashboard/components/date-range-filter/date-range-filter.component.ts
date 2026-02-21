@@ -10,7 +10,6 @@ import { MatButtonToggleModule, MatButtonToggleChange } from '@angular/material/
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { DateRange } from '../../models/dashboard.models';
 
 type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
@@ -19,8 +18,6 @@ type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
  * Date range filter with preset ranges and custom date picker.
  * Always converts local dates to UTC ISO 8601 strings before emitting
  * to avoid timezone boundary issues (per 09-RESEARCH pitfall).
- *
- * provideNativeDateAdapter at component level matching existing pattern.
  */
 @Component({
   selector: 'app-date-range-filter',
@@ -31,7 +28,6 @@ type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
     MatFormFieldModule,
     MatInputModule,
   ],
-  providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {

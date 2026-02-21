@@ -19,7 +19,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { DatePipe } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
@@ -97,7 +96,6 @@ const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
     MatDatepickerModule,
     HasPermissionDirective,
   ],
-  providers: [provideNativeDateAdapter()],
   templateUrl: './activity-detail.component.html',
   styleUrl: './activity-detail.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

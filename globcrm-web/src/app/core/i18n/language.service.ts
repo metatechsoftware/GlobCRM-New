@@ -1,5 +1,6 @@
 import { inject, Injectable } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
+import { DateAdapter } from '@angular/material/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProfileService } from '../../features/profile/profile.service';
@@ -13,6 +14,7 @@ const SUPPORTED_LANGS: SupportedLang[] = ['en', 'tr'];
 export class LanguageService {
   private readonly translocoService = inject(TranslocoService);
   private readonly document = inject(DOCUMENT);
+  private readonly dateAdapter = inject(DateAdapter);
   private readonly profileService = inject(ProfileService);
 
   readonly currentLang = toSignal(this.translocoService.langChanges$, {
@@ -22,6 +24,7 @@ export class LanguageService {
   switchLanguage(lang: SupportedLang): void {
     this.translocoService.setActiveLang(lang);
     this.document.documentElement.lang = lang;
+    this.dateAdapter.setLocale(lang === 'tr' ? 'tr-TR' : 'en-US');
     localStorage.setItem(STORAGE_KEY, lang);
 
     // Fire-and-forget backend persistence

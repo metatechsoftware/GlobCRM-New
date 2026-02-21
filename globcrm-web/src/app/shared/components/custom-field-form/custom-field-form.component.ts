@@ -20,7 +20,6 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import { Subscription } from 'rxjs';
 
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -74,7 +73,6 @@ interface FieldGroup {
     MatProgressSpinnerModule,
     MatTooltipModule,
   ],
-  providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {

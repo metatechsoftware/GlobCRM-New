@@ -26,7 +26,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import {
   Subject,
   debounceTime,
@@ -76,7 +75,6 @@ import {
     MatAutocompleteModule,
     CustomFieldFormComponent,
   ],
-  providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
   templateUrl: './deal-form.component.html',

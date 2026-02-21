@@ -21,7 +21,6 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { provideNativeDateAdapter } from '@angular/material/core';
 import {
   TargetDto,
   MetricType,
@@ -104,7 +103,6 @@ const METRIC_GROUPS = [
     MatDatepickerModule,
     MatCheckboxModule,
   ],
-  providers: [provideNativeDateAdapter()],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .target-form {

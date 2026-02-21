@@ -7,6 +7,8 @@ import {
 import { registerLocaleData } from '@angular/common';
 import localeTr from '@angular/common/locales/tr';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatPaginatorIntl } from '@angular/material/paginator';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { provideTransloco } from '@jsverse/transloco';
 import { provideTranslocoLocale } from '@jsverse/transloco-locale';
@@ -15,6 +17,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
 import { TranslocoHttpLoader } from './core/i18n/transloco-loader';
+import { TranslatedPaginatorIntl } from './core/i18n/transloco-paginator-intl';
 
 registerLocaleData(localeTr);
 
@@ -24,6 +27,8 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes, withComponentInputBinding()),
     provideHttpClient(withInterceptors([authInterceptor])),
     provideAnimationsAsync(),
+    provideNativeDateAdapter(),
+    { provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl },
     provideCharts(withDefaultRegisterables()),
     provideTransloco({
       config: {
