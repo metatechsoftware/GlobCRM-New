@@ -226,8 +226,8 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
     .ea-circle--3 {
       width: 28px;
       height: 28px;
-      background: var(--color-secondary-soft);
-      border: 2px solid var(--color-secondary);
+      background: var(--color-info-soft);
+      border: 2px solid var(--color-info);
       bottom: 10px;
       left: 22px;
       animation-delay: 1s;
@@ -385,11 +385,11 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
     }
 
     .ea-info-card__icon-wrap--sync {
-      background: var(--color-accent-soft);
+      background: var(--color-primary-soft);
     }
 
     .ea-info-card__icon-wrap--sync mat-icon {
-      color: var(--color-accent);
+      color: var(--color-primary);
       font-size: 18px;
       width: 18px;
       height: 18px;

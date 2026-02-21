@@ -52,8 +52,8 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
     }
 
     @keyframes glowPulse {
-      0%, 100% { box-shadow: 0 4px 16px rgba(139,92,246,0.25), 0 0 0 4px rgba(139,92,246,0.08); }
-      50%      { box-shadow: 0 4px 20px rgba(139,92,246,0.35), 0 0 0 6px rgba(139,92,246,0.12); }
+      0%, 100% { box-shadow: 0 4px 16px rgba(96,165,250,0.25), 0 0 0 4px rgba(96,165,250,0.08); }
+      50%      { box-shadow: 0 4px 20px rgba(96,165,250,0.35), 0 0 0 6px rgba(96,165,250,0.12); }
     }
 
     /* ── Host ──────────────────────────────────────── */
@@ -103,7 +103,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
     }
 
     .wd-header__breadcrumb:hover {
-      color: var(--color-secondary);
+      color: var(--color-info);
     }
 
     .wd-header__top {
@@ -116,7 +116,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       width: 52px;
       height: 52px;
       border-radius: var(--radius-lg);
-      background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-secondary-hover) 100%);
+      background: linear-gradient(135deg, var(--color-info) 0%, var(--color-info-text) 100%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -128,7 +128,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       font-size: 26px;
       width: 26px;
       height: 26px;
-      color: var(--color-secondary-fg);
+      color: #fff;
     }
 
     .wd-header__text {
@@ -233,7 +233,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       font-size: 20px;
       width: 20px;
       height: 20px;
-      color: var(--color-secondary);
+      color: var(--color-info);
     }
 
     .wd-section__header-title {
