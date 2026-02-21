@@ -63,7 +63,7 @@
 
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
-- [ ] **Phase 27: Localization Foundation** (4 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes
+- [x] **Phase 27: Localization Foundation** (4 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes (completed 2026-02-21)
 - [ ] **Phase 28: Localization String Extraction** — Extract all 415+ hardcoded strings to EN/TR JSON files, CI coverage check, translation pipe in all templates
 - [ ] **Phase 29: Integration Marketplace** — Settings page with card grid, credential management, detail panel, activity log, RBAC
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
@@ -164,7 +164,7 @@ Plans:
 | 24. My Day Personal Dashboard | v1.2 | 5/5 | Complete | 2026-02-20 |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
-| 27. Localization Foundation | 3/4 | In Progress|  | - |
+| 27. Localization Foundation | 4/4 | Complete   | 2026-02-21 | - |
 | 28. Localization String Extraction | v1.3 | 0/? | Not started | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |

@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 27 of 31 (Localization Foundation)
-Plan: 3 of 4 complete
-Status: Executing
-Last activity: 2026-02-21 — Completed 27-03 (Angular Material Locale Integration)
+Plan: 4 of 4 complete
+Status: Phase Complete
+Last activity: 2026-02-21 — Completed 27-04 (Feature Scoped Translation Lazy-Loading & Org Default Language)
 
-Progress: [██████████████████░░] 86% (161/~188 plans estimated)
+Progress: [██████████████████░░] 86% (162/~188 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [██████████████████░░] 86% (16
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 161
+- Total plans completed: 162
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -46,6 +46,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 27-03: Used Intl.DateTimeFormat with TranslocoService locale mapping instead of TranslocoLocaleService pipe for synchronous DynamicTable formatting
 - 27-03: DateAdapter.setLocale() centralized in LanguageService.switchLanguage() as single locale switch point
 - 27-03: Consolidated provideNativeDateAdapter from 7 component-level providers to root app.config.ts
+- 27-04: Per-feature lazy-loading uses provideTranslocoScope in route providers with parent route wrapper
+- 27-04: Translation files at assets/i18n/{scope}/{lang}.json, compatible with existing TranslocoHttpLoader
+- 27-04: Org default language fetched via API in syncFromProfile fallback (TenantStore not yet populated)
+- 27-04: Language resolution order: user profile > org default (API) > browser detection > 'en'
 
 ### Pending Todos
 
@@ -60,6 +64,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 27-03-PLAN.md
-Resume file: .planning/phases/27-localization-foundation/27-03-SUMMARY.md
-Next step: Execute 27-04-PLAN.md (Settings Language Page & Final Wiring)
+Stopped at: Completed 27-04-PLAN.md (Phase 27 complete)
+Resume file: .planning/phases/27-localization-foundation/27-04-SUMMARY.md
+Next step: Plan Phase 28
