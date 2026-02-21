@@ -633,6 +633,13 @@ export class SettingsHubComponent {
           route: '/settings/webhooks',
           adminOnly: true,
         },
+        {
+          icon: 'language',
+          label: 'Language',
+          description: 'Set the default language for your organization',
+          route: '/settings/language',
+          adminOnly: true,
+        },
       ],
     },
     {

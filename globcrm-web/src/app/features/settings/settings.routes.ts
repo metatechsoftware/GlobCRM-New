@@ -136,6 +136,14 @@ export const SETTINGS_ROUTES: Routes = [
           ),
       },
       {
+        path: 'language',
+        canActivate: [adminGuard],
+        loadComponent: () =>
+          import('./language/language-settings.component').then(
+            (m) => m.LanguageSettingsComponent
+          ),
+      },
+      {
         path: 'email-accounts',
         loadComponent: () =>
           import('./email-accounts/email-account-settings.component').then(

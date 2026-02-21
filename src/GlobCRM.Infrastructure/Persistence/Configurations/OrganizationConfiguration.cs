@@ -52,6 +52,11 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
             .IsRequired()
             .HasDefaultValue(false);
 
+        builder.Property(o => o.DefaultLanguage)
+            .HasColumnName("default_language")
+            .HasMaxLength(5)
+            .HasDefaultValue("en");
+
         builder.Property(o => o.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired()

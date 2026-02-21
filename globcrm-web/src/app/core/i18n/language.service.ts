@@ -4,6 +4,7 @@ import { DateAdapter } from '@angular/material/core';
 import { TranslocoService } from '@jsverse/transloco';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { ProfileService } from '../../features/profile/profile.service';
+import { ApiService } from '../api/api.service';
 
 export type SupportedLang = 'en' | 'tr';
 
@@ -16,6 +17,7 @@ export class LanguageService {
   private readonly document = inject(DOCUMENT);
   private readonly dateAdapter = inject(DateAdapter);
   private readonly profileService = inject(ProfileService);
+  private readonly api = inject(ApiService);
 
   readonly currentLang = toSignal(this.translocoService.langChanges$, {
     initialValue: 'en' as string,
@@ -42,6 +44,7 @@ export class LanguageService {
 
   /**
    * Sync language from backend profile after login.
+   * Resolution order: user profile preference > org default > browser detection > 'en'.
    * Backend is the source of truth — overrides any stale localStorage value.
    */
   syncFromProfile(profileLanguage: string | null | undefined): void {
@@ -49,7 +52,34 @@ export class LanguageService {
       profileLanguage &&
       SUPPORTED_LANGS.includes(profileLanguage as SupportedLang)
     ) {
+      // User has an explicit preference — use it
       this.switchLanguage(profileLanguage as SupportedLang);
+      return;
+    }
+
+    // No user preference — fall back to organization default language
+    try {
+      this.api.get<{ defaultLanguage: string }>('/api/organizations/default-language')
+        .subscribe({
+          next: (res) => {
+            if (
+              res.defaultLanguage &&
+              SUPPORTED_LANGS.includes(res.defaultLanguage as SupportedLang)
+            ) {
+              this.switchLanguage(res.defaultLanguage as SupportedLang);
+            } else {
+              // Org default not set or invalid — fall back to browser detection
+              this.switchLanguage(this.detectLanguage());
+            }
+          },
+          error: () => {
+            // API call failed — fall back to browser detection
+            this.switchLanguage(this.detectLanguage());
+          },
+        });
+    } catch {
+      // Guard against injection errors during early bootstrap
+      this.switchLanguage(this.detectLanguage());
     }
   }
 

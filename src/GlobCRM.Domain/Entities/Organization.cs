@@ -45,6 +45,11 @@ public class Organization
     /// </summary>
     public bool SetupCompleted { get; set; } = false;
 
+    /// <summary>
+    /// Default UI language for new users in this organization (en or tr).
+    /// </summary>
+    public string DefaultLanguage { get; set; } = "en";
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 

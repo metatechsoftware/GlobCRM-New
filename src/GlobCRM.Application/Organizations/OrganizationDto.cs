@@ -16,6 +16,7 @@ public class OrganizationDto
     public bool IsActive { get; set; }
     public int UserLimit { get; set; }
     public bool SetupCompleted { get; set; }
+    public string DefaultLanguage { get; set; } = "en";
     public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
@@ -33,6 +34,7 @@ public class OrganizationDto
             IsActive = organization.IsActive,
             UserLimit = organization.UserLimit,
             SetupCompleted = organization.SetupCompleted,
+            DefaultLanguage = organization.DefaultLanguage,
             CreatedAt = organization.CreatedAt
         };
     }
