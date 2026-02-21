@@ -141,7 +141,14 @@ Plans:
   3. Cards display due date urgency indicators (yellow approaching, red overdue), assignee avatars, colored labels, checklist progress, and WIP column limits with visual warnings when exceeded
   4. User can link a card to any CRM entity (Contact, Company, Deal, Lead, etc.) with the entity name and icon displayed on the card face, clickable to open the existing preview sidebar
   5. User can write rich text descriptions on cards, add checklist items with progress tracking, comment on cards with threaded discussion, and filter visible cards by label, assignee, or due date
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+- [ ] 30-01-PLAN.md — Backend domain entities, enums, EF Core configurations, migration (7 entities + BoardVisibility enum)
+- [ ] 30-02-PLAN.md — BoardsController with ~25 REST endpoints, DTOs, validators (boards, columns, cards, labels, checklists, comments)
+- [ ] 30-03-PLAN.md — Frontend foundation: models, service, store, routes, navigation, boards list page, board creation dialog with templates
+- [ ] 30-04-PLAN.md — Board detail kanban view with columns, cards, dual CDK drag-and-drop (cards + columns), WIP limits
+- [ ] 30-05-PLAN.md — Card detail slide panel (labels, checklists, comments, entity linking, rich text) + board filter panel
+- [ ] 30-06-PLAN.md — Transloco i18n (EN/TR boards scope), full template string wiring, end-to-end verification checkpoint
 
 ### Phase 31: Quote PDF Templates
 **Goal**: Users can design custom quote PDF templates with a visual drag-and-drop editor and generate professionally branded PDFs with real quote data
@@ -188,7 +195,7 @@ Plans:
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
-| 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
+| 30. Free-Form Kanban Boards | v1.3 | 0/6 | Planned | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD
