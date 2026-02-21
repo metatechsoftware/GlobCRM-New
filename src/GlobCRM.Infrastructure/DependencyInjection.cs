@@ -10,6 +10,7 @@ using GlobCRM.Infrastructure.Duplicates;
 using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.Persistence.Repositories;
 using GlobCRM.Infrastructure.Reporting;
+using GlobCRM.Infrastructure.Services;
 using GlobCRM.Infrastructure.Webhooks;
 using GlobCRM.Infrastructure.Workflows;
 using GlobCRM.Infrastructure.Sequences;
@@ -202,6 +203,10 @@ public static class DependencyInjection
         // ---- Reporting services (repository, field metadata, query engine) ----
         services.AddScoped<IReportRepository, ReportRepository>();
         services.AddReportingServices();
+
+        // ---- Integration marketplace services ----
+        services.AddSingleton<CredentialEncryptionService>();
+        services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 
         return services;
     }

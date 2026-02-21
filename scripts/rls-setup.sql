@@ -683,6 +683,36 @@ COMMENT ON POLICY tenant_isolation_report_categories ON report_categories IS
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- integrations - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE integrations ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE integrations FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_integrations ON integrations
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_integrations ON integrations IS
+    'Ensures integration queries only return integrations for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
+-- integration_activity_logs - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE integration_activity_logs ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE integration_activity_logs FORCE ROW LEVEL SECURITY;
+
+CREATE POLICY tenant_isolation_integration_activity_logs ON integration_activity_logs
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY tenant_isolation_integration_activity_logs ON integration_activity_logs IS
+    'Ensures integration activity log queries only return logs for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

@@ -150,6 +150,10 @@ public class ApplicationDbContext
     public DbSet<Report> Reports => Set<Report>();
     public DbSet<ReportCategory> ReportCategories => Set<ReportCategory>();
 
+    // Integration Marketplace DbSets
+    public DbSet<Integration> Integrations => Set<Integration>();
+    public DbSet<IntegrationActivityLog> IntegrationActivityLogs => Set<IntegrationActivityLog>();
+
     // My Day DbSets
     public DbSet<RecentlyViewedEntity> RecentlyViewedEntities => Set<RecentlyViewedEntity>();
 
@@ -265,6 +269,10 @@ public class ApplicationDbContext
         // Reporting entity configurations
         modelBuilder.ApplyConfiguration(new ReportConfiguration());
         modelBuilder.ApplyConfiguration(new ReportCategoryConfiguration());
+
+        // Integration Marketplace entity configurations
+        modelBuilder.ApplyConfiguration(new IntegrationConfiguration());
+        modelBuilder.ApplyConfiguration(new IntegrationActivityLogConfiguration());
 
         // My Day entity configurations
         modelBuilder.ApplyConfiguration(new RecentlyViewedEntityConfiguration());
@@ -475,6 +483,14 @@ public class ApplicationDbContext
         // Global query filter: filter ReportCategories by TenantId (tenant-scoped)
         modelBuilder.Entity<ReportCategory>().HasQueryFilter(
             rc => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rc.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter Integrations by TenantId (tenant-scoped)
+        modelBuilder.Entity<Integration>().HasQueryFilter(
+            i => _tenantProvider == null || _tenantProvider.GetTenantId() == null || i.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter IntegrationActivityLogs by TenantId (tenant-scoped)
+        modelBuilder.Entity<IntegrationActivityLog>().HasQueryFilter(
+            ial => _tenantProvider == null || _tenantProvider.GetTenantId() == null || ial.TenantId == _tenantProvider.GetTenantId());
 
         // Global query filter: filter RecentlyViewedEntities by TenantId (tenant-scoped)
         modelBuilder.Entity<RecentlyViewedEntity>().HasQueryFilter(
