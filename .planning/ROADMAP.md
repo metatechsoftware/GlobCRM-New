@@ -64,8 +64,8 @@
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
-- [x] **Phase 28: Localization String Extraction** (10 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check (completed 2026-02-21) (completed 2026-02-21)
-- [ ] **Phase 29: Integration Marketplace** — Settings page with card grid, credential management, detail panel, activity log, RBAC
+- [x] **Phase 28: Localization String Extraction** (10 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check (completed 2026-02-21) (completed 2026-02-21)
+- [ ] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
 - [ ] **Phase 31: Quote PDF Templates** — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
 
@@ -109,7 +109,7 @@ Plans:
 - [x] 28-07-PLAN.md — CI enforcement script (key parity, hardcoded string detection, unused keys) + final audit
 - [x] 28-08-PLAN.md — Gap closure: settings sub-pages (webhooks, custom-fields, pipelines, duplicate-rules, email-accounts, notifications) full transloco wiring
 - [x] 28-09-PLAN.md — Gap closure: shared entity-preview + summary-tab components + misc shared components transloco wiring
-- [ ] 28-10-PLAN.md — Gap closure: remaining feature template strings + baseline regeneration + requirements update
+- [x] 28-10-PLAN.md — Gap closure: remaining feature template strings + baseline regeneration + requirements update
 
 ### Phase 29: Integration Marketplace
 **Goal**: Admins can browse, connect, and manage third-party integrations from a dedicated marketplace settings page with secure credential storage
@@ -121,7 +121,13 @@ Plans:
   3. Admin can connect an integration by entering API key credentials via a dialog, test the connection, and disconnect with confirmation — while non-admin users see read-only status
   4. Stored credentials are AES-256 encrypted with tenant-scoped isolation, and the API never returns full credentials (only masked last-4-chars values)
   5. User can view integration details in a slide-in panel showing description, connection status, credential info, and a chronological activity log of connect/disconnect/test events
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 29-01-PLAN.md — Backend domain entities, enums, EF Core config, migration, CredentialEncryptionService, repository
+- [ ] 29-02-PLAN.md — IntegrationsController with 5 API endpoints, DTOs with credential masking, validators
+- [ ] 29-03-PLAN.md — Frontend integration catalog constant, models, card grid, category filter, search, 12 SVG brand icons
+- [ ] 29-04-PLAN.md — IntegrationService, IntegrationStore, connect/disconnect dialogs, RBAC wiring
+- [ ] 29-05-PLAN.md — Detail panel with activity log, settings hub card, route registration, Transloco i18n
 
 ### Phase 30: Free-Form Kanban Boards
 **Goal**: Users can create custom Kanban boards with free-form and entity-linked cards for organizing any type of work beyond the existing deal and activity pipelines
@@ -178,9 +184,9 @@ Plans:
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
-| 28. Localization String Extraction | 10/10 | Complete    | 2026-02-21 | - |
-| 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
+| 28. Localization String Extraction | v1.3 | 10/10 | Complete | 2026-02-21 |
+| 29. Integration Marketplace | v1.3 | 0/5 | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 
-**Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 partial), v1.3 plans TBD
+**Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28), v1.3 plans TBD
