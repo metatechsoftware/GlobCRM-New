@@ -12,6 +12,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ReportExecutionResult,
   ReportFilterCondition,
@@ -46,6 +47,7 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
     MatPaginatorModule,
     MatIconModule,
     MatButtonModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -163,7 +165,7 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
     @if (drillDownFilter()) {
       <div class="drill-down-bar">
         <mat-icon>filter_list</mat-icon>
-        <span>Filtered by: {{ drillDownFilter()?.fieldId }} = "{{ drillDownFilter()?.value }}"</span>
+        <span>{{ 'builder.filteredBy' | transloco }}: {{ drillDownFilter()?.fieldId }} = "{{ drillDownFilter()?.value }}"</span>
         <button mat-icon-button (click)="clearDrillDown.emit()">
           <mat-icon>close</mat-icon>
         </button>
@@ -201,7 +203,7 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       </div>
     } @else {
       <div class="report-table__empty">
-        No data to display. Run the report to see results.
+        {{ 'builder.noData' | transloco }}
       </div>
     }
   `,
@@ -218,6 +220,7 @@ export class ReportDataTableComponent {
   readonly clearDrillDown = output<void>();
 
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
   private readonly datePipe = new DatePipe('en-US');
 
   /** Column headers from the execution result. */
@@ -273,7 +276,9 @@ export class ReportDataTableComponent {
     if (value == null) return '\u2014'; // em dash
 
     if (typeof value === 'boolean') {
-      return value ? 'Yes' : 'No';
+      return value
+        ? this.transloco.translate('panels.boolTrue')
+        : this.transloco.translate('panels.boolFalse');
     }
 
     // Arrays — recursively format each item

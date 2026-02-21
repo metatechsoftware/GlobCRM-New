@@ -1,12 +1,13 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { FFlowModule } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowNode } from '../../workflow.models';
 
 @Component({
   selector: 'app-branch-node',
   standalone: true,
-  imports: [FFlowModule, MatIconModule],
+  imports: [FFlowModule, MatIconModule, TranslocoPipe],
   template: `
     <div fNode
          [fNodeId]="node().id"
@@ -27,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>call_split</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || 'Branch' }}</span>
+            <span class="node-label">{{ node().label || ('builder.branch' | transloco) }}</span>
             @if (conditionSummary) {
               <span class="node-badge">{{ conditionSummary }}</span>
             }
@@ -200,13 +201,15 @@ export class BranchNodeComponent {
   readonly isSelected = input<boolean>(false);
   readonly selected = output<string>();
 
+  private readonly transloco = inject(TranslocoService);
+
   get conditionSummary(): string {
     const config = this.node().config;
     if (!config?.['conditions']?.length) return '';
     const first = config['conditions'][0];
     if (first?.field && first?.operator) {
       const val = first.value ? ` ${first.value}` : '';
-      return `If ${first.field} ${first.operator}${val}`;
+      return `${this.transloco.translate('nodes.ifPrefix')} ${first.field} ${first.operator}${val}`;
     }
     return '';
   }

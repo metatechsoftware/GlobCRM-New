@@ -14,6 +14,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   WorkflowNode,
   WorkflowTriggerType,
@@ -43,31 +44,32 @@ interface TriggerFormState {
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="config-panel">
       <div class="config-panel__header">
         <mat-icon class="config-panel__icon trigger-icon">bolt</mat-icon>
-        <h3>Trigger Configuration</h3>
+        <h3>{{ 'config.triggerConfig' | transloco }}</h3>
       </div>
 
       <div class="config-panel__body">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Trigger Type</mat-label>
+          <mat-label>{{ 'config.triggerType' | transloco }}</mat-label>
           <mat-select [ngModel]="form().triggerType"
                       (ngModelChange)="updateField('triggerType', $event)">
-            <mat-option value="recordCreated">Record Created</mat-option>
-            <mat-option value="recordUpdated">Record Updated</mat-option>
-            <mat-option value="recordDeleted">Record Deleted</mat-option>
-            <mat-option value="fieldChanged">Field Changed</mat-option>
-            <mat-option value="dateBased">Date Based</mat-option>
+            <mat-option value="recordCreated">{{ 'nodes.recordCreated' | transloco }}</mat-option>
+            <mat-option value="recordUpdated">{{ 'nodes.recordUpdated' | transloco }}</mat-option>
+            <mat-option value="recordDeleted">{{ 'nodes.recordDeleted' | transloco }}</mat-option>
+            <mat-option value="fieldChanged">{{ 'nodes.fieldChanged' | transloco }}</mat-option>
+            <mat-option value="dateBased">{{ 'nodes.dateBased' | transloco }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <!-- Field Changed Config -->
         @if (form().triggerType === 'fieldChanged') {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Field</mat-label>
+            <mat-label>{{ 'config.field' | transloco }}</mat-label>
             <mat-select [ngModel]="form().fieldName"
                         (ngModelChange)="updateField('fieldName', $event)">
               @for (field of entityFields(); track field.name) {
@@ -77,36 +79,36 @@ interface TriggerFormState {
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Operator</mat-label>
+            <mat-label>{{ 'config.operator' | transloco }}</mat-label>
             <mat-select [ngModel]="form().operator"
                         (ngModelChange)="updateField('operator', $event)">
-              <mat-option value="equals">Equals</mat-option>
-              <mat-option value="not_equals">Not Equals</mat-option>
-              <mat-option value="gt">Greater Than</mat-option>
-              <mat-option value="gte">Greater Than or Equal</mat-option>
-              <mat-option value="lt">Less Than</mat-option>
-              <mat-option value="lte">Less Than or Equal</mat-option>
-              <mat-option value="contains">Contains</mat-option>
-              <mat-option value="changed_to">Changed To</mat-option>
-              <mat-option value="changed_from_to">Changed From-To</mat-option>
-              <mat-option value="is_null">Is Null</mat-option>
-              <mat-option value="is_not_null">Is Not Null</mat-option>
+              <mat-option value="equals">{{ 'config.equals' | transloco }}</mat-option>
+              <mat-option value="not_equals">{{ 'config.notEquals' | transloco }}</mat-option>
+              <mat-option value="gt">{{ 'config.greaterThan' | transloco }}</mat-option>
+              <mat-option value="gte">{{ 'config.greaterThanOrEqual' | transloco }}</mat-option>
+              <mat-option value="lt">{{ 'config.lessThan' | transloco }}</mat-option>
+              <mat-option value="lte">{{ 'config.lessThanOrEqual' | transloco }}</mat-option>
+              <mat-option value="contains">{{ 'config.contains' | transloco }}</mat-option>
+              <mat-option value="changed_to">{{ 'config.changedTo' | transloco }}</mat-option>
+              <mat-option value="changed_from_to">{{ 'config.changedFromTo' | transloco }}</mat-option>
+              <mat-option value="is_null">{{ 'config.isNull' | transloco }}</mat-option>
+              <mat-option value="is_not_null">{{ 'config.isNotNull' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           @if (form().operator === 'changed_from_to') {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>From Value (optional)</mat-label>
+              <mat-label>{{ 'config.fromValueOptional' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().fromValue"
                      (ngModelChange)="updateField('fromValue', $event)"
-                     placeholder="Previous value (optional)" />
+                     [placeholder]="'config.previousValueOptional' | transloco" />
             </mat-form-field>
           }
 
           @if (needsValueInput()) {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ form().operator === 'changed_from_to' ? 'To Value' : 'Value' }}</mat-label>
+              <mat-label>{{ form().operator === 'changed_from_to' ? ('config.toValue' | transloco) : ('config.value' | transloco) }}</mat-label>
               <input matInput
                      [ngModel]="form().value"
                      (ngModelChange)="updateField('value', $event)" />
@@ -117,7 +119,7 @@ interface TriggerFormState {
         <!-- Date Based Config -->
         @if (form().triggerType === 'dateBased') {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Date Field</mat-label>
+            <mat-label>{{ 'config.dateField' | transloco }}</mat-label>
             <mat-select [ngModel]="form().dateField"
                         (ngModelChange)="updateField('dateField', $event)">
               @for (field of dateFields(); track field.name) {
@@ -128,7 +130,7 @@ interface TriggerFormState {
 
           <div class="config-panel__row">
             <mat-form-field appearance="outline" class="config-panel__number-field">
-              <mat-label>Days</mat-label>
+              <mat-label>{{ 'config.days' | transloco }}</mat-label>
               <input matInput
                      type="number"
                      min="0"
@@ -137,17 +139,17 @@ interface TriggerFormState {
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="config-panel__direction-field">
-              <mat-label>Direction</mat-label>
+              <mat-label>{{ 'config.direction' | transloco }}</mat-label>
               <mat-select [ngModel]="form().dateDirection"
                           (ngModelChange)="updateField('dateDirection', $event)">
-                <mat-option value="before">Days Before</mat-option>
-                <mat-option value="after">Days After</mat-option>
+                <mat-option value="before">{{ 'config.daysBefore' | transloco }}</mat-option>
+                <mat-option value="after">{{ 'config.daysAfter' | transloco }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Preferred Time (optional)</mat-label>
+            <mat-label>{{ 'config.preferredTime' | transloco }}</mat-label>
             <input matInput
                    type="time"
                    [ngModel]="form().preferredTime"
@@ -160,19 +162,19 @@ interface TriggerFormState {
         <span class="config-panel__hint">
           @switch (form().triggerType) {
             @case ('recordCreated') {
-              Fires when a new {{ entityType() }} is created
+              {{ 'config.firesOnCreated' | transloco:{ entity: entityType() } }}
             }
             @case ('recordUpdated') {
-              Fires when any {{ entityType() }} is updated
+              {{ 'config.firesOnUpdated' | transloco:{ entity: entityType() } }}
             }
             @case ('recordDeleted') {
-              Fires when a {{ entityType() }} is deleted
+              {{ 'config.firesOnDeleted' | transloco:{ entity: entityType() } }}
             }
             @case ('fieldChanged') {
-              Fires when the specified field changes on a {{ entityType() }}
+              {{ 'config.firesOnFieldChanged' | transloco:{ entity: entityType() } }}
             }
             @case ('dateBased') {
-              Fires based on a date field value on a {{ entityType() }}
+              {{ 'config.firesOnDateBased' | transloco:{ entity: entityType() } }}
             }
           }
         </span>

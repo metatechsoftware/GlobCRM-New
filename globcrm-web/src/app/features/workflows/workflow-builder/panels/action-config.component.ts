@@ -1,6 +1,7 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  inject,
   input,
   output,
   signal,
@@ -15,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatRadioModule } from '@angular/material/radio';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   WorkflowNode,
   WorkflowActionType,
@@ -72,6 +74,7 @@ interface ActionFormState {
     MatIconModule,
     MatSlideToggleModule,
     MatRadioModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="config-panel">
@@ -84,15 +87,15 @@ interface ActionFormState {
         <!-- Node type: action -->
         @if (nodeType() === 'action') {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Action Type</mat-label>
+            <mat-label>{{ 'config.actionType' | transloco }}</mat-label>
             <mat-select [ngModel]="form().actionType"
                         (ngModelChange)="updateFormField('actionType', $event)">
-              <mat-option value="updateField">Update Field</mat-option>
-              <mat-option value="sendNotification">Send Notification</mat-option>
-              <mat-option value="createActivity">Create Activity</mat-option>
-              <mat-option value="sendEmail">Send Email</mat-option>
-              <mat-option value="fireWebhook">Fire Webhook</mat-option>
-              <mat-option value="enrollInSequence">Enroll in Sequence</mat-option>
+              <mat-option value="updateField">{{ 'nodes.updateField' | transloco }}</mat-option>
+              <mat-option value="sendNotification">{{ 'nodes.sendNotification' | transloco }}</mat-option>
+              <mat-option value="createActivity">{{ 'nodes.createActivity' | transloco }}</mat-option>
+              <mat-option value="sendEmail">{{ 'nodes.sendEmail' | transloco }}</mat-option>
+              <mat-option value="fireWebhook">{{ 'nodes.fireWebhook' | transloco }}</mat-option>
+              <mat-option value="enrollInSequence">{{ 'nodes.enrollInSequence' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
 
@@ -100,14 +103,14 @@ interface ActionFormState {
             [ngModel]="form().continueOnError"
             (ngModelChange)="updateFormField('continueOnError', $event)"
             class="continue-toggle">
-            Continue on error
+            {{ 'config.continueOnError' | transloco }}
           </mat-slide-toggle>
         }
 
         <!-- Update Field -->
         @if (showSection('updateField')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Field to Update</mat-label>
+            <mat-label>{{ 'config.fieldToUpdate' | transloco }}</mat-label>
             <mat-select [ngModel]="form().updateFieldName"
                         (ngModelChange)="updateFormField('updateFieldName', $event)">
               @for (field of entityFields(); track field.name) {
@@ -120,12 +123,12 @@ interface ActionFormState {
             [ngModel]="form().useDynamicMapping"
             (ngModelChange)="updateFormField('useDynamicMapping', $event)"
             class="dynamic-toggle">
-            Dynamic mapping
+            {{ 'config.dynamicMapping' | transloco }}
           </mat-slide-toggle>
 
           @if (form().useDynamicMapping) {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Source Field</mat-label>
+              <mat-label>{{ 'config.sourceField' | transloco }}</mat-label>
               <mat-select [ngModel]="form().dynamicSourceField"
                           (ngModelChange)="updateFormField('dynamicSourceField', $event)">
                 @for (field of entityFields(); track field.name) {
@@ -135,7 +138,7 @@ interface ActionFormState {
             </mat-form-field>
           } @else {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>New Value</mat-label>
+              <mat-label>{{ 'config.newValue' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().updateFieldValue"
                      (ngModelChange)="updateFormField('updateFieldValue', $event)" />
@@ -146,14 +149,14 @@ interface ActionFormState {
         <!-- Send Notification -->
         @if (showSection('sendNotification')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Title</mat-label>
+            <mat-label>{{ 'config.title' | transloco }}</mat-label>
             <input matInput
                    [ngModel]="form().notificationTitle"
                    (ngModelChange)="updateFormField('notificationTitle', $event)" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Message</mat-label>
+            <mat-label>{{ 'config.message' | transloco }}</mat-label>
             <textarea matInput
                       rows="3"
                       [ngModel]="form().notificationMessage"
@@ -161,33 +164,33 @@ interface ActionFormState {
             </textarea>
           </mat-form-field>
 
-          <div class="config-panel__section-label">Recipient</div>
+          <div class="config-panel__section-label">{{ 'config.recipient' | transloco }}</div>
           <mat-radio-group [ngModel]="form().recipientType"
                            (ngModelChange)="updateFormField('recipientType', $event)"
                            class="recipient-group">
-            <mat-radio-button value="recordOwner">Record Owner</mat-radio-button>
-            <mat-radio-button value="dealOwner">Deal Owner</mat-radio-button>
-            <mat-radio-button value="specificUser">Specific User</mat-radio-button>
-            <mat-radio-button value="team">Team</mat-radio-button>
+            <mat-radio-button value="recordOwner">{{ 'config.recordOwner' | transloco }}</mat-radio-button>
+            <mat-radio-button value="dealOwner">{{ 'config.dealOwner' | transloco }}</mat-radio-button>
+            <mat-radio-button value="specificUser">{{ 'config.specificUser' | transloco }}</mat-radio-button>
+            <mat-radio-button value="team">{{ 'config.team' | transloco }}</mat-radio-button>
           </mat-radio-group>
 
           @if (form().recipientType === 'specificUser') {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>User ID</mat-label>
+              <mat-label>{{ 'config.userId' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().specificUserId"
                      (ngModelChange)="updateFormField('specificUserId', $event)"
-                     placeholder="Enter user ID" />
+                     [placeholder]="'config.enterUserId' | transloco" />
             </mat-form-field>
           }
 
           @if (form().recipientType === 'team') {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Team ID</mat-label>
+              <mat-label>{{ 'config.teamId' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().teamId"
                      (ngModelChange)="updateFormField('teamId', $event)"
-                     placeholder="Enter team ID" />
+                     [placeholder]="'config.enterTeamId' | transloco" />
             </mat-form-field>
           }
         }
@@ -195,37 +198,37 @@ interface ActionFormState {
         <!-- Create Activity -->
         @if (showSection('createActivity')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Subject</mat-label>
+            <mat-label>{{ 'config.subject' | transloco }}</mat-label>
             <input matInput
                    [ngModel]="form().activitySubject"
                    (ngModelChange)="updateFormField('activitySubject', $event)" />
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Activity Type</mat-label>
+            <mat-label>{{ 'config.activityType' | transloco }}</mat-label>
             <mat-select [ngModel]="form().activityType"
                         (ngModelChange)="updateFormField('activityType', $event)">
-              <mat-option value="Call">Call</mat-option>
-              <mat-option value="Meeting">Meeting</mat-option>
-              <mat-option value="Task">Task</mat-option>
-              <mat-option value="Email">Email</mat-option>
-              <mat-option value="Other">Other</mat-option>
+              <mat-option value="Call">{{ 'config.call' | transloco }}</mat-option>
+              <mat-option value="Meeting">{{ 'config.meeting' | transloco }}</mat-option>
+              <mat-option value="Task">{{ 'config.task' | transloco }}</mat-option>
+              <mat-option value="Email">{{ 'config.email' | transloco }}</mat-option>
+              <mat-option value="Other">{{ 'config.other' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Priority</mat-label>
+            <mat-label>{{ 'config.priority' | transloco }}</mat-label>
             <mat-select [ngModel]="form().activityPriority"
                         (ngModelChange)="updateFormField('activityPriority', $event)">
-              <mat-option value="Low">Low</mat-option>
-              <mat-option value="Medium">Medium</mat-option>
-              <mat-option value="High">High</mat-option>
-              <mat-option value="Urgent">Urgent</mat-option>
+              <mat-option value="Low">{{ 'config.low' | transloco }}</mat-option>
+              <mat-option value="Medium">{{ 'config.medium' | transloco }}</mat-option>
+              <mat-option value="High">{{ 'config.high' | transloco }}</mat-option>
+              <mat-option value="Urgent">{{ 'config.urgent' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Due date (days from now)</mat-label>
+            <mat-label>{{ 'config.dueDateDays' | transloco }}</mat-label>
             <input matInput
                    type="number"
                    min="0"
@@ -233,22 +236,22 @@ interface ActionFormState {
                    (ngModelChange)="updateFormField('dueDateOffset', $event)" />
           </mat-form-field>
 
-          <div class="config-panel__section-label">Assignee</div>
+          <div class="config-panel__section-label">{{ 'config.assignee' | transloco }}</div>
           <mat-radio-group [ngModel]="form().assigneeType"
                            (ngModelChange)="updateFormField('assigneeType', $event)"
                            class="recipient-group">
-            <mat-radio-button value="recordOwner">Record Owner</mat-radio-button>
-            <mat-radio-button value="dealOwner">Deal Owner</mat-radio-button>
-            <mat-radio-button value="specificUser">Specific User</mat-radio-button>
+            <mat-radio-button value="recordOwner">{{ 'config.recordOwner' | transloco }}</mat-radio-button>
+            <mat-radio-button value="dealOwner">{{ 'config.dealOwner' | transloco }}</mat-radio-button>
+            <mat-radio-button value="specificUser">{{ 'config.specificUser' | transloco }}</mat-radio-button>
           </mat-radio-group>
 
           @if (form().assigneeType === 'specificUser') {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>User ID</mat-label>
+              <mat-label>{{ 'config.userId' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().assigneeUserId"
                      (ngModelChange)="updateFormField('assigneeUserId', $event)"
-                     placeholder="Enter user ID" />
+                     [placeholder]="'config.enterUserId' | transloco" />
             </mat-form-field>
           }
         }
@@ -256,14 +259,14 @@ interface ActionFormState {
         <!-- Send Email -->
         @if (showSection('sendEmail')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Email Template</mat-label>
+            <mat-label>{{ 'config.emailTemplate' | transloco }}</mat-label>
             <mat-select [ngModel]="form().emailTemplateId"
                         (ngModelChange)="updateFormField('emailTemplateId', $event)"
                         (opened)="templateSearch.set('')">
               <div class="select-search">
                 <mat-icon>search</mat-icon>
                 <input matInput
-                       placeholder="Search templates..."
+                       [placeholder]="'config.searchTemplates' | transloco"
                        [value]="templateSearch()"
                        (input)="templateSearch.set($any($event.target).value)"
                        (keydown)="$event.stopPropagation()" />
@@ -277,19 +280,19 @@ interface ActionFormState {
                 </mat-option>
               }
               @empty {
-                <mat-option disabled>No templates found</mat-option>
+                <mat-option disabled>{{ 'config.noTemplatesFound' | transloco }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Recipient Field</mat-label>
+            <mat-label>{{ 'config.recipientField' | transloco }}</mat-label>
             <mat-select [ngModel]="form().emailRecipientField"
                         (ngModelChange)="updateFormField('emailRecipientField', $event)">
               @for (field of entityFields(); track field.name) {
                 <mat-option [value]="field.name">{{ field.label }}</mat-option>
               }
-              <mat-option value="email">Email (default)</mat-option>
+              <mat-option value="email">{{ 'config.emailDefault' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
         }
@@ -297,7 +300,7 @@ interface ActionFormState {
         <!-- Fire Webhook -->
         @if (showSection('fireWebhook')) {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>URL</mat-label>
+            <mat-label>{{ 'config.url' | transloco }}</mat-label>
             <input matInput
                    [ngModel]="form().webhookUrl"
                    (ngModelChange)="updateFormField('webhookUrl', $event)"
@@ -305,7 +308,7 @@ interface ActionFormState {
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Headers (JSON, optional)</mat-label>
+            <mat-label>{{ 'config.headersJson' | transloco }}</mat-label>
             <textarea matInput
                       rows="2"
                       [ngModel]="form().webhookHeaders"
@@ -315,7 +318,7 @@ interface ActionFormState {
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Payload Template (optional)</mat-label>
+            <mat-label>{{ 'config.payloadTemplate' | transloco }}</mat-label>
             <textarea matInput
                       rows="4"
                       [ngModel]="form().webhookPayload"
@@ -330,19 +333,19 @@ interface ActionFormState {
           @if (entityType() !== 'Contact') {
             <div class="config-panel__warning">
               <mat-icon>warning</mat-icon>
-              <span>Sequence enrollment is only available for Contact entity type.</span>
+              <span>{{ 'config.sequenceWarning' | transloco }}</span>
             </div>
           }
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Sequence</mat-label>
+            <mat-label>{{ 'config.sequence' | transloco }}</mat-label>
             <mat-select [ngModel]="form().sequenceId"
                         (ngModelChange)="updateFormField('sequenceId', $event)"
                         (opened)="sequenceSearch.set('')">
               <div class="select-search">
                 <mat-icon>search</mat-icon>
                 <input matInput
-                       placeholder="Search sequences..."
+                       [placeholder]="'config.searchSequences' | transloco"
                        [value]="sequenceSearch()"
                        (input)="sequenceSearch.set($any($event.target).value)"
                        (keydown)="$event.stopPropagation()" />
@@ -351,13 +354,13 @@ interface ActionFormState {
                 <mat-option [value]="s.id">
                   <span class="option-name">{{ s.name }}</span>
                   <span class="option-meta">
-                    {{ s.stepCount }} {{ s.stepCount === 1 ? 'step' : 'steps' }}
+                    {{ s.stepCount }} {{ s.stepCount === 1 ? ('config.step' | transloco) : ('config.steps' | transloco) }}
                   </span>
                   <span class="status-badge" [class]="'status-' + s.status">{{ s.status }}</span>
                 </mat-option>
               }
               @empty {
-                <mat-option disabled>No sequences found</mat-option>
+                <mat-option disabled>{{ 'config.noSequencesFound' | transloco }}</mat-option>
               }
             </mat-select>
           </mat-form-field>
@@ -367,7 +370,7 @@ interface ActionFormState {
         @if (nodeType() === 'wait') {
           <div class="config-panel__row">
             <mat-form-field appearance="outline" class="flex-1">
-              <mat-label>Duration</mat-label>
+              <mat-label>{{ 'config.duration' | transloco }}</mat-label>
               <input matInput
                      type="number"
                      min="1"
@@ -376,12 +379,12 @@ interface ActionFormState {
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="flex-1">
-              <mat-label>Unit</mat-label>
+              <mat-label>{{ 'config.unit' | transloco }}</mat-label>
               <mat-select [ngModel]="form().waitUnit"
                           (ngModelChange)="updateFormField('waitUnit', $event)">
-                <mat-option value="minutes">Minutes</mat-option>
-                <mat-option value="hours">Hours</mat-option>
-                <mat-option value="days">Days</mat-option>
+                <mat-option value="minutes">{{ 'config.minutes' | transloco }}</mat-option>
+                <mat-option value="hours">{{ 'config.hours' | transloco }}</mat-option>
+                <mat-option value="days">{{ 'config.days' | transloco }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
@@ -557,6 +560,7 @@ export class ActionConfigComponent {
   readonly sequences = input<SequenceListItem[]>([]);
   readonly configChanged = output<Record<string, any>>();
 
+  private readonly transloco = inject(TranslocoService);
   readonly templateSearch = signal('');
   readonly sequenceSearch = signal('');
 
@@ -590,9 +594,9 @@ export class ActionConfigComponent {
 
   readonly headerTitle = computed(() => {
     switch (this.nodeType()) {
-      case 'action': return 'Action Configuration';
-      case 'wait': return 'Wait Configuration';
-      default: return 'Configuration';
+      case 'action': return this.transloco.translate('config.actionConfig');
+      case 'wait': return this.transloco.translate('config.waitConfig');
+      default: return this.transloco.translate('config.configuration');
     }
   });
 

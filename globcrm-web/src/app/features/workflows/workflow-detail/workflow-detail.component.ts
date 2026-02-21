@@ -21,6 +21,7 @@ import {
 } from '@angular/material/dialog';
 import { WorkflowStore } from '../workflow.store';
 import { WorkflowService } from '../workflow.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
 import { SaveAsTemplateDialogComponent } from './save-as-template-dialog.component';
 import { ExecutionLogListComponent } from '../workflow-logs/execution-log-list.component';
@@ -41,6 +42,7 @@ import { ExecutionLogListComponent } from '../workflow-logs/execution-log-list.c
     MatSnackBarModule,
     MatDialogModule,
     ExecutionLogListComponent,
+    TranslocoPipe,
   ],
   providers: [WorkflowStore],
   templateUrl: './workflow-detail.component.html',
@@ -56,6 +58,7 @@ export class WorkflowDetailComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   /** Stats computed from execution logs */
   readonly successRate = computed(() => {
@@ -78,12 +81,12 @@ export class WorkflowDetailComponent implements OnInit {
 
   /** Relative time helper */
   getRelativeTime(dateStr?: string): string {
-    if (!dateStr) return 'Never';
+    if (!dateStr) return this.transloco.translate('detail.never');
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return 'Just now';
+    if (diffMins < 1) return this.transloco.translate('card.justNow');
     if (diffMins < 60) return `${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
@@ -114,7 +117,9 @@ export class WorkflowDetailComponent implements OnInit {
     const newActive = !wf.isActive;
     this.store.toggleStatus(wf.id, newActive);
     this.snackBar.open(
-      newActive ? 'Workflow activated.' : 'Workflow deactivated.',
+      newActive
+        ? this.transloco.translate('detail.workflowActivated')
+        : this.transloco.translate('detail.workflowDeactivated'),
       'Close',
       { duration: 3000 },
     );
@@ -126,7 +131,7 @@ export class WorkflowDetailComponent implements OnInit {
     const wf = this.store.selectedWorkflow();
     if (!wf) return;
     this.store.duplicateWorkflow(wf.id, (duplicated) => {
-      this.snackBar.open('Workflow duplicated.', 'Close', { duration: 3000 });
+      this.snackBar.open(this.transloco.translate('detail.workflowDuplicated'), 'Close', { duration: 3000 });
       this.router.navigate(['/workflows', duplicated.id]);
     });
   }
@@ -148,12 +153,12 @@ export class WorkflowDetailComponent implements OnInit {
           .saveAsTemplate(wf.id, result)
           .subscribe({
             next: () => {
-              this.snackBar.open('Saved as template.', 'Close', {
+              this.snackBar.open(this.transloco.translate('detail.savedAsTemplate'), 'Close', {
                 duration: 3000,
               });
             },
             error: () => {
-              this.snackBar.open('Failed to save template.', 'Close', {
+              this.snackBar.open(this.transloco.translate('detail.failedToSaveTemplate'), 'Close', {
                 duration: 3000,
               });
             },
@@ -176,7 +181,7 @@ export class WorkflowDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
       this.store.deleteWorkflow(wf.id, () => {
-        this.snackBar.open('Workflow deleted.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('detail.workflowDeleted'), 'Close', { duration: 3000 });
         this.router.navigate(['/workflows']);
       });
     });

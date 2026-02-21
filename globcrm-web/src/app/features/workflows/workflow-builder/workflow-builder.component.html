@@ -47,29 +47,29 @@
               class="add-node-fab"
               [matMenuTriggerFor]="addNodeMenu">
         <mat-icon>add</mat-icon>
-        Add Node
+        {{ 'builder.addNode' | transloco }}
       </button>
 
       <mat-menu #addNodeMenu="matMenu">
         <button mat-menu-item (click)="addNode('trigger')">
           <mat-icon class="menu-icon trigger-color">bolt</mat-icon>
-          <span>Trigger</span>
+          <span>{{ 'builder.trigger' | transloco }}</span>
         </button>
         <button mat-menu-item (click)="addNode('condition')">
           <mat-icon class="menu-icon condition-color">filter_list</mat-icon>
-          <span>Condition</span>
+          <span>{{ 'builder.condition' | transloco }}</span>
         </button>
         <button mat-menu-item (click)="addNode('action')">
           <mat-icon class="menu-icon action-color">play_arrow</mat-icon>
-          <span>Action</span>
+          <span>{{ 'builder.action' | transloco }}</span>
         </button>
         <button mat-menu-item (click)="addNode('branch')">
           <mat-icon class="menu-icon branch-color">call_split</mat-icon>
-          <span>Branch</span>
+          <span>{{ 'builder.branch' | transloco }}</span>
         </button>
         <button mat-menu-item (click)="addNode('wait')">
           <mat-icon class="menu-icon wait-color">hourglass_empty</mat-icon>
-          <span>Wait</span>
+          <span>{{ 'builder.wait' | transloco }}</span>
         </button>
       </mat-menu>
     }
@@ -79,12 +79,12 @@
       <div class="node-actions">
         <button mat-icon-button
                 (click)="onNodeDblClicked(selectedNodeId()!)"
-                matTooltip="Configure">
+                [matTooltip]="'builder.configure' | transloco">
           <mat-icon>settings</mat-icon>
         </button>
         <button mat-icon-button
                 (click)="removeNode(selectedNodeId()!)"
-                matTooltip="Delete"
+                [matTooltip]="'builder.deleteNode' | transloco"
                 class="delete-btn">
           <mat-icon>delete</mat-icon>
         </button>
@@ -98,7 +98,7 @@
       @switch (sidebarMode()) {
         @case ('config') {
           <div class="sidebar-header">
-            <h3>Configure Node</h3>
+            <h3>{{ 'builder.configureNode' | transloco }}</h3>
             <button mat-icon-button (click)="closeSidebar()">
               <mat-icon>close</mat-icon>
             </button>
@@ -132,7 +132,7 @@
                 <app-condition-config
                   [node]="node"
                   [entityFields]="entityFields()"
-                  [headerTitle]="'Branch Condition'"
+                  [headerTitle]="'builder.branchCondition' | transloco"
                   (configChanged)="onConfigChanged(node.id, $event)" />
               }
               @case ('wait') {

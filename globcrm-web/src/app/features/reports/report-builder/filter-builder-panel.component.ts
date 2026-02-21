@@ -4,6 +4,7 @@ import {
   input,
   output,
   computed,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatExpansionModule } from '@angular/material/expansion';
@@ -15,6 +16,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ReportFieldMetadata,
   ReportFilterGroup,
@@ -28,39 +30,39 @@ interface OperatorOption {
   label: string;
 }
 
-const STRING_OPERATORS: OperatorOption[] = [
-  { value: 'equals', label: 'Equals' },
-  { value: 'not_equals', label: 'Not equals' },
-  { value: 'contains', label: 'Contains' },
-  { value: 'not_contains', label: 'Not contains' },
-  { value: 'is_empty', label: 'Is empty' },
-  { value: 'is_not_empty', label: 'Is not empty' },
+const STRING_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
+  { value: 'equals', labelKey: 'operators.equals' },
+  { value: 'not_equals', labelKey: 'operators.not_equals' },
+  { value: 'contains', labelKey: 'operators.contains' },
+  { value: 'not_contains', labelKey: 'operators.not_contains' },
+  { value: 'is_empty', labelKey: 'operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
 ];
 
-const NUMBER_OPERATORS: OperatorOption[] = [
-  { value: 'equals', label: 'Equals' },
-  { value: 'not_equals', label: 'Not equals' },
-  { value: 'greater_than', label: 'Greater than' },
-  { value: 'less_than', label: 'Less than' },
-  { value: 'greater_than_or_equal', label: '>= ' },
-  { value: 'less_than_or_equal', label: '<= ' },
-  { value: 'between', label: 'Between' },
-  { value: 'is_empty', label: 'Is empty' },
-  { value: 'is_not_empty', label: 'Is not empty' },
+const NUMBER_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
+  { value: 'equals', labelKey: 'operators.equals' },
+  { value: 'not_equals', labelKey: 'operators.not_equals' },
+  { value: 'greater_than', labelKey: 'operators.greater_than' },
+  { value: 'less_than', labelKey: 'operators.less_than' },
+  { value: 'greater_than_or_equal', labelKey: 'operators.greater_than_or_equal' },
+  { value: 'less_than_or_equal', labelKey: 'operators.less_than_or_equal' },
+  { value: 'between', labelKey: 'operators.between' },
+  { value: 'is_empty', labelKey: 'operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
 ];
 
-const DATE_OPERATORS: OperatorOption[] = [
-  { value: 'equals', label: 'On' },
-  { value: 'not_equals', label: 'Not on' },
-  { value: 'greater_than', label: 'After' },
-  { value: 'less_than', label: 'Before' },
-  { value: 'between', label: 'Between' },
-  { value: 'is_empty', label: 'Is empty' },
-  { value: 'is_not_empty', label: 'Is not empty' },
+const DATE_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
+  { value: 'equals', labelKey: 'operators.on' },
+  { value: 'not_equals', labelKey: 'operators.not_on' },
+  { value: 'greater_than', labelKey: 'operators.after' },
+  { value: 'less_than', labelKey: 'operators.before' },
+  { value: 'between', labelKey: 'operators.between' },
+  { value: 'is_empty', labelKey: 'operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
 ];
 
-const BOOLEAN_OPERATORS: OperatorOption[] = [
-  { value: 'equals', label: 'Equals' },
+const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
+  { value: 'equals', labelKey: 'operators.equals' },
 ];
 
 /**
@@ -82,6 +84,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
     MatIconModule,
     MatDatepickerModule,
     FormsModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -90,7 +93,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
         <mat-expansion-panel-header>
           <mat-panel-title>
             <mat-icon>filter_list</mat-icon>
-            Filters
+            {{ 'panels.filters' | transloco }}
             @if (conditionCount() > 0) {
               <span class="filter-builder-panel__count">{{ conditionCount() }}</span>
             }
@@ -124,7 +127,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
           <div class="filter-condition">
             <!-- Field Selector -->
             <mat-form-field appearance="outline" class="filter-condition__field">
-              <mat-label>Field</mat-label>
+              <mat-label>{{ 'panels.field' | transloco }}</mat-label>
               <mat-select
                 [ngModel]="condition.fieldId"
                 (ngModelChange)="onConditionFieldChange(idx, $event)"
@@ -137,7 +140,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
 
             <!-- Operator Selector -->
             <mat-form-field appearance="outline" class="filter-condition__operator">
-              <mat-label>Operator</mat-label>
+              <mat-label>{{ 'panels.operator' | transloco }}</mat-label>
               <mat-select
                 [ngModel]="condition.operator"
                 (ngModelChange)="onConditionOperatorChange(idx, $event)"
@@ -152,7 +155,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
             @if (!isEmptyOperator(condition.operator)) {
               @if (isBetweenOperator(condition.operator)) {
                 <mat-form-field appearance="outline" class="filter-condition__value filter-condition__value--half">
-                  <mat-label>From</mat-label>
+                  <mat-label>{{ 'panels.from' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -161,7 +164,7 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
                   />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="filter-condition__value filter-condition__value--half">
-                  <mat-label>To</mat-label>
+                  <mat-label>{{ 'panels.to' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -171,18 +174,18 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
                 </mat-form-field>
               } @else if (isBooleanField(condition.fieldId)) {
                 <mat-form-field appearance="outline" class="filter-condition__value">
-                  <mat-label>Value</mat-label>
+                  <mat-label>{{ 'panels.value' | transloco }}</mat-label>
                   <mat-select
                     [ngModel]="condition.value"
                     (ngModelChange)="onConditionValueChange(idx, $event)"
                   >
-                    <mat-option value="true">True</mat-option>
-                    <mat-option value="false">False</mat-option>
+                    <mat-option value="true">{{ 'panels.boolTrue' | transloco }}</mat-option>
+                    <mat-option value="false">{{ 'panels.boolFalse' | transloco }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               } @else {
                 <mat-form-field appearance="outline" class="filter-condition__value">
-                  <mat-label>Value</mat-label>
+                  <mat-label>{{ 'panels.value' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -219,11 +222,11 @@ const BOOLEAN_OPERATORS: OperatorOption[] = [
         <div class="filter-group__actions">
           <button mat-button (click)="addCondition()" class="filter-group__add-btn">
             <mat-icon>add</mat-icon>
-            Add condition
+            {{ 'panels.addCondition' | transloco }}
           </button>
           <button mat-button (click)="addGroup()" class="filter-group__add-btn">
             <mat-icon>playlist_add</mat-icon>
-            Add group
+            {{ 'panels.addGroup' | transloco }}
           </button>
           @if (isNested()) {
             <button mat-icon-button (click)="removeGroup()" class="filter-group__remove-btn">
@@ -359,6 +362,8 @@ export class FilterBuilderPanelComponent {
   readonly filterGroupChange = output<ReportFilterGroup>();
   readonly removeRequest = output<void>();
 
+  private readonly transloco = inject(TranslocoService);
+
   // All available fields from metadata for dropdowns
   readonly allFields = computed((): ReportFieldInfo[] => {
     const meta = this.fieldMetadata();
@@ -397,13 +402,19 @@ export class FilterBuilderPanelComponent {
 
   getOperatorsForField(fieldId: string): OperatorOption[] {
     const field = this.fieldMap().get(fieldId);
-    if (!field) return STRING_OPERATORS;
+    let keys = STRING_OPERATOR_KEYS;
 
-    const type = field.dataType.toLowerCase();
-    if (type === 'number' || type === 'currency') return NUMBER_OPERATORS;
-    if (type === 'date' || type === 'datetime') return DATE_OPERATORS;
-    if (type === 'boolean') return BOOLEAN_OPERATORS;
-    return STRING_OPERATORS;
+    if (field) {
+      const type = field.dataType.toLowerCase();
+      if (type === 'number' || type === 'currency') keys = NUMBER_OPERATOR_KEYS;
+      else if (type === 'date' || type === 'datetime') keys = DATE_OPERATOR_KEYS;
+      else if (type === 'boolean') keys = BOOLEAN_OPERATOR_KEYS;
+    }
+
+    return keys.map(k => ({
+      value: k.value,
+      label: this.transloco.translate(k.labelKey),
+    }));
   }
 
   getInputType(fieldId: string): string {

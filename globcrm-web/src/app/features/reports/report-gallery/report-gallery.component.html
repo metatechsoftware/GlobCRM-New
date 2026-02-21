@@ -2,21 +2,21 @@
   <!-- Header -->
   <div class="report-gallery__header">
     <div>
-      <h1>Reports</h1>
+      <h1>{{ 'title' | transloco }}</h1>
       <p class="report-gallery__subtitle">
-        Build and explore data reports across your CRM
+        {{ 'subtitle' | transloco }}
       </p>
     </div>
     <a mat-raised-button color="primary" routerLink="/reports/new">
       <mat-icon>add</mat-icon>
-      New Report
+      {{ 'newReport' | transloco }}
     </a>
   </div>
 
   <!-- Filter Bar -->
   <div class="report-gallery__filters">
     <mat-form-field appearance="outline" class="report-gallery__filter-field">
-      <mat-label>Category</mat-label>
+      <mat-label>{{ 'gallery.category' | transloco }}</mat-label>
       <mat-select
         [value]="categoryFilter()"
         (selectionChange)="onCategoryChange($event.value)"
@@ -28,25 +28,25 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="report-gallery__filter-field">
-      <mat-label>Entity Type</mat-label>
+      <mat-label>{{ 'gallery.entityType' | transloco }}</mat-label>
       <mat-select
         [value]="entityTypeFilter()"
         (selectionChange)="onEntityTypeChange($event.value)"
       >
-        @for (type of entityTypes; track type.value) {
+        @for (type of entityTypes(); track type.value) {
           <mat-option [value]="type.value">{{ type.label }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="report-gallery__search-field">
-      <mat-label>Search reports</mat-label>
+      <mat-label>{{ 'gallery.searchReports' | transloco }}</mat-label>
       <mat-icon matPrefix>search</mat-icon>
       <input
         matInput
         [value]="searchFilter()"
         (input)="onSearchChange($any($event.target).value)"
-        placeholder="Search by name..."
+        [placeholder]="'gallery.searchPlaceholder' | transloco"
       />
     </mat-form-field>
   </div>
@@ -77,11 +77,11 @@
   @if (!store.loading() && store.error()) {
     <div class="report-gallery__error">
       <mat-icon>error_outline</mat-icon>
-      <h3>Unable to load reports</h3>
+      <h3>{{ 'gallery.unableToLoad' | transloco }}</h3>
       <p>{{ store.error() }}</p>
       <button mat-raised-button color="primary" (click)="loadReports()">
         <mat-icon>refresh</mat-icon>
-        Retry
+        {{ 'gallery.retry' | transloco }}
       </button>
     </div>
   }
@@ -90,13 +90,10 @@
   @if (!store.loading() && !store.error() && store.reports().length === 0) {
     <div class="report-gallery__empty">
       <mat-icon>bar_chart</mat-icon>
-      <h3>No reports found</h3>
-      <p>
-        Reports let you visualize and analyze your CRM data with charts, tables,
-        and filters. Create your first report to get started.
-      </p>
+      <h3>{{ 'gallery.noReportsFound' | transloco }}</h3>
+      <p>{{ 'gallery.noReportsDescription' | transloco }}</p>
       <a mat-raised-button color="primary" routerLink="/reports/new">
-        Create your first report
+        {{ 'gallery.createFirst' | transloco }}
       </a>
     </div>
   }

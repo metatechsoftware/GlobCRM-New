@@ -12,6 +12,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { WorkflowNode, EntityField } from '../../workflow.models';
 
 interface ConditionRow {
@@ -35,6 +36,7 @@ interface ConditionGroup {
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="config-panel">
@@ -47,7 +49,7 @@ interface ConditionGroup {
         @for (group of groups(); track $index; let gi = $index) {
           @if (gi > 0) {
             <div class="or-divider">
-              <span>OR</span>
+              <span>{{ 'config.or' | transloco }}</span>
             </div>
           }
 
@@ -55,7 +57,7 @@ interface ConditionGroup {
             @for (cond of group.conditions; track $index; let ci = $index) {
               <div class="condition-row">
                 <mat-form-field appearance="outline" class="condition-field">
-                  <mat-label>Field</mat-label>
+                  <mat-label>{{ 'config.field' | transloco }}</mat-label>
                   <mat-select [ngModel]="cond.field"
                               (ngModelChange)="updateCondition(gi, ci, 'field', $event)">
                     @for (field of entityFields(); track field.name) {
@@ -65,34 +67,34 @@ interface ConditionGroup {
                 </mat-form-field>
 
                 <mat-form-field appearance="outline" class="condition-operator">
-                  <mat-label>Operator</mat-label>
+                  <mat-label>{{ 'config.operator' | transloco }}</mat-label>
                   <mat-select [ngModel]="cond.operator"
                               (ngModelChange)="updateCondition(gi, ci, 'operator', $event)">
-                    <mat-option value="equals">Equals</mat-option>
-                    <mat-option value="not_equals">Not Equals</mat-option>
-                    <mat-option value="gt">Greater Than</mat-option>
-                    <mat-option value="gte">Greater or Equal</mat-option>
-                    <mat-option value="lt">Less Than</mat-option>
-                    <mat-option value="lte">Less or Equal</mat-option>
-                    <mat-option value="contains">Contains</mat-option>
-                    <mat-option value="changed_to">Changed To</mat-option>
-                    <mat-option value="changed_from_to">Changed From-To</mat-option>
-                    <mat-option value="is_null">Is Null</mat-option>
-                    <mat-option value="is_not_null">Is Not Null</mat-option>
+                    <mat-option value="equals">{{ 'config.equals' | transloco }}</mat-option>
+                    <mat-option value="not_equals">{{ 'config.notEquals' | transloco }}</mat-option>
+                    <mat-option value="gt">{{ 'config.greaterThan' | transloco }}</mat-option>
+                    <mat-option value="gte">{{ 'config.greaterThanOrEqual' | transloco }}</mat-option>
+                    <mat-option value="lt">{{ 'config.lessThan' | transloco }}</mat-option>
+                    <mat-option value="lte">{{ 'config.lessThanOrEqual' | transloco }}</mat-option>
+                    <mat-option value="contains">{{ 'config.contains' | transloco }}</mat-option>
+                    <mat-option value="changed_to">{{ 'config.changedTo' | transloco }}</mat-option>
+                    <mat-option value="changed_from_to">{{ 'config.changedFromTo' | transloco }}</mat-option>
+                    <mat-option value="is_null">{{ 'config.isNull' | transloco }}</mat-option>
+                    <mat-option value="is_not_null">{{ 'config.isNotNull' | transloco }}</mat-option>
                   </mat-select>
                 </mat-form-field>
 
                 @if (cond.operator !== 'is_null' && cond.operator !== 'is_not_null') {
                   @if (cond.operator === 'changed_from_to') {
                     <mat-form-field appearance="outline" class="condition-value">
-                      <mat-label>From (optional)</mat-label>
+                      <mat-label>{{ 'config.from' | transloco }}</mat-label>
                       <input matInput
                              [ngModel]="cond.fromValue"
                              (ngModelChange)="updateCondition(gi, ci, 'fromValue', $event)" />
                     </mat-form-field>
                   }
                   <mat-form-field appearance="outline" class="condition-value">
-                    <mat-label>{{ cond.operator === 'changed_from_to' ? 'To' : 'Value' }}</mat-label>
+                    <mat-label>{{ cond.operator === 'changed_from_to' ? ('config.to' | transloco) : ('config.value' | transloco) }}</mat-label>
                     <input matInput
                            [ngModel]="cond.value"
                            (ngModelChange)="updateCondition(gi, ci, 'value', $event)" />
@@ -111,7 +113,7 @@ interface ConditionGroup {
                     (click)="addCondition(gi)"
                     class="add-btn">
               <mat-icon>add</mat-icon>
-              Add condition
+              {{ 'config.addCondition' | transloco }}
             </button>
           </div>
         }
@@ -120,7 +122,7 @@ interface ConditionGroup {
                 (click)="addGroup()"
                 class="add-group-btn">
           <mat-icon>add</mat-icon>
-          Add OR group
+          {{ 'config.addOrGroup' | transloco }}
         </button>
       </div>
     </div>

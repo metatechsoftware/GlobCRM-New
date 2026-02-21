@@ -4,10 +4,12 @@ import {
   input,
   output,
   computed,
+  inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ReportListItem, ReportChartType } from '../report.models';
 
 /**
@@ -21,7 +23,7 @@ import { ReportListItem, ReportChartType } from '../report.models';
 @Component({
   selector: 'app-report-card',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatTooltipModule],
+  imports: [CommonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="report-card" (click)="viewReport.emit()">
@@ -142,16 +144,16 @@ import { ReportListItem, ReportChartType } from '../report.models';
             @if (report().isShared) {
               <mat-icon
                 class="report-card__share-icon"
-                matTooltip="Shared with team"
+                [matTooltip]="'card.sharedWithTeam' | transloco"
               >people</mat-icon>
             } @else {
               <mat-icon
                 class="report-card__share-icon report-card__share-icon--personal"
-                matTooltip="Personal report"
+                [matTooltip]="'card.personalReport' | transloco"
               >person</mat-icon>
             }
             @if (report().isSeedData) {
-              <span class="report-card__seed-chip">Starter</span>
+              <span class="report-card__seed-chip">{{ 'card.starter' | transloco }}</span>
             }
           </span>
         </div>
@@ -372,6 +374,7 @@ import { ReportListItem, ReportChartType } from '../report.models';
 export class ReportCardComponent {
   readonly report = input.required<ReportListItem>();
   readonly viewReport = output<void>();
+  private readonly transloco = inject(TranslocoService);
 
   /** Icon for the entity type */
   readonly entityIcon = computed(() => {
@@ -402,23 +405,17 @@ export class ReportCardComponent {
 
   /** Label for the chart type */
   readonly chartLabel = computed((): string => {
-    const map: Record<ReportChartType, string> = {
-      table: 'Table',
-      bar: 'Bar',
-      line: 'Line',
-      pie: 'Pie',
-      funnel: 'Funnel',
-    };
-    return map[this.report().chartType] ?? 'Table';
+    const key = `card.chartTypes.${this.report().chartType}`;
+    return this.transloco.translate(key);
   });
 
   /** Relative time for last run */
   readonly lastRunText = computed(() => {
     const lastRun = this.report().lastRunAt;
-    if (!lastRun) return 'Never run';
+    if (!lastRun) return this.transloco.translate('card.neverRun');
     const diff = Date.now() - new Date(lastRun).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return 'Just now';
+    if (minutes < 1) return this.transloco.translate('card.justNow');
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;

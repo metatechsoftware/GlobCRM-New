@@ -12,6 +12,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   WorkflowTemplateListItem,
   WorkflowDefinition,
@@ -27,11 +28,12 @@ import { WorkflowService } from '../../workflow.service';
     MatTabsModule,
     MatProgressSpinnerModule,
     MatDialogModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="gallery">
       <div class="gallery__header">
-        <h3>Template Gallery</h3>
+        <h3>{{ 'gallery.title' | transloco }}</h3>
         <button mat-icon-button (click)="close.emit()" class="gallery__close">
           <mat-icon>close</mat-icon>
         </button>
@@ -39,11 +41,11 @@ import { WorkflowService } from '../../workflow.service';
 
       <mat-tab-group (selectedIndexChange)="onCategoryChange($event)"
                      class="gallery__tabs">
-        <mat-tab label="All"></mat-tab>
-        <mat-tab label="Sales"></mat-tab>
-        <mat-tab label="Engagement"></mat-tab>
-        <mat-tab label="Operational"></mat-tab>
-        <mat-tab label="Custom"></mat-tab>
+        <mat-tab [label]="'gallery.all' | transloco"></mat-tab>
+        <mat-tab [label]="'gallery.sales' | transloco"></mat-tab>
+        <mat-tab [label]="'gallery.engagement' | transloco"></mat-tab>
+        <mat-tab [label]="'gallery.operational' | transloco"></mat-tab>
+        <mat-tab [label]="'gallery.custom' | transloco"></mat-tab>
       </mat-tab-group>
 
       <div class="gallery__list">
@@ -54,7 +56,7 @@ import { WorkflowService } from '../../workflow.service';
         } @else if (filteredTemplates().length === 0) {
           <div class="gallery__empty">
             <mat-icon>dashboard</mat-icon>
-            <p>No templates found</p>
+            <p>{{ 'gallery.noTemplates' | transloco }}</p>
           </div>
         } @else {
           @for (template of filteredTemplates(); track template.id) {
@@ -67,17 +69,17 @@ import { WorkflowService } from '../../workflow.service';
                 <div class="template-card__meta">
                   <span class="template-card__entity-badge">{{ template.entityType }}</span>
                   @if (template.isSystem) {
-                    <span class="template-card__system-badge">System</span>
+                    <span class="template-card__system-badge">{{ 'gallery.system' | transloco }}</span>
                   } @else {
-                    <span class="template-card__custom-badge">Custom</span>
+                    <span class="template-card__custom-badge">{{ 'gallery.custom' | transloco }}</span>
                   }
-                  <span class="template-card__nodes">{{ template.nodeCount }} nodes</span>
+                  <span class="template-card__nodes">{{ 'gallery.nodes' | transloco:{ count: template.nodeCount } }}</span>
                 </div>
               </div>
               <button mat-stroked-button
                       (click)="onApplyTemplate(template)"
                       class="template-card__apply">
-                Apply
+                {{ 'gallery.apply' | transloco }}
               </button>
             </div>
           }
@@ -256,6 +258,7 @@ export class TemplateGalleryComponent implements OnInit {
 
   private readonly service = inject(WorkflowService);
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   readonly templates = signal<WorkflowTemplateListItem[]>([]);
   readonly loading = signal(false);
@@ -276,7 +279,7 @@ export class TemplateGalleryComponent implements OnInit {
 
   onApplyTemplate(template: WorkflowTemplateListItem): void {
     // Confirm dialog before applying
-    if (confirm('This will replace your current workflow. Continue?')) {
+    if (confirm(this.transloco.translate('gallery.confirmReplace'))) {
       this.loading.set(true);
       this.service.getTemplate(template.id).subscribe({
         next: (fullTemplate) => {

@@ -1,12 +1,13 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
 import { FFlowModule } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowNode } from '../../workflow.models';
 
 @Component({
   selector: 'app-wait-node',
   standalone: true,
-  imports: [FFlowModule, MatIconModule],
+  imports: [FFlowModule, MatIconModule, TranslocoPipe],
   template: `
     <div fNode
          [fNodeId]="node().id"
@@ -27,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>hourglass_empty</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || 'Wait' }}</span>
+            <span class="node-label">{{ node().label || ('builder.wait' | transloco) }}</span>
             @if (waitSummary()) {
               <span class="node-badge">{{ waitSummary() }}</span>
             }
@@ -157,11 +158,13 @@ export class WaitNodeComponent {
   readonly isSelected = input<boolean>(false);
   readonly selected = output<string>();
 
+  private readonly transloco = inject(TranslocoService);
+
   readonly waitSummary = computed(() => {
     const config = this.node().config;
     if (!config?.['duration'] || !config?.['unit']) return '';
     const duration = config['duration'];
     const unit = config['unit'];
-    return `Wait ${duration} ${unit}`;
+    return `${this.transloco.translate('nodes.waitPrefix')} ${duration} ${unit}`;
   });
 }

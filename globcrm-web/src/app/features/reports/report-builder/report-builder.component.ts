@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ReportStore } from '../report.store';
 import {
   ReportField,
@@ -58,6 +59,7 @@ import { ReportAggregationCardsComponent } from '../report-viewer/report-aggrega
     ReportChartComponent,
     ReportDataTableComponent,
     ReportAggregationCardsComponent,
+    TranslocoPipe,
   ],
   providers: [ReportStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -69,6 +71,7 @@ export class ReportBuilderComponent implements OnInit {
   readonly store = inject(ReportStore);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   // Drill-down filter state (set when user clicks a chart element)
   readonly drillDownFilter = signal<ReportFilterCondition | null>(null);
@@ -273,7 +276,7 @@ export class ReportBuilderComponent implements OnInit {
 
     this.store.exportCsv(reportId, () => {
       this.snackBar.open(
-        'Export started. You\'ll be notified when it\'s ready.',
+        this.transloco.translate('builder.exportStarted'),
         'OK',
         { duration: 5000 },
       );

@@ -4,6 +4,7 @@ import {
   input,
   output,
   viewChild,
+  inject,
 } from '@angular/core';
 import {
   FFlowModule,
@@ -14,6 +15,7 @@ import {
 } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowNode, WorkflowConnection } from '../workflow.models';
 
 @Component({
@@ -23,13 +25,14 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
     FFlowModule,
     MatIconModule,
     MatButtonModule,
+    TranslocoPipe,
   ],
   template: `
     @if (nodes().length === 0) {
       <div class="empty-canvas">
         <button mat-button class="add-trigger-btn" (click)="onAddTriggerClick()">
           <mat-icon>add</mat-icon>
-          <span>Add trigger to start</span>
+          <span>{{ 'builder.trigger' | transloco }}</span>
         </button>
       </div>
     }
@@ -463,6 +466,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorkflowCanvasComponent {
+  private readonly transloco = inject(TranslocoService);
   readonly nodes = input<WorkflowNode[]>([]);
   readonly connections = input<WorkflowConnection[]>([]);
   readonly selectedNodeId = input<string | null>(null);
@@ -555,14 +559,9 @@ export class WorkflowCanvasComponent {
   }
 
   getDefaultLabel(type: string): string {
-    switch (type) {
-      case 'trigger': return 'Trigger';
-      case 'condition': return 'Condition';
-      case 'action': return 'Action';
-      case 'branch': return 'Branch';
-      case 'wait': return 'Wait';
-      default: return type;
-    }
+    const key = `builder.${type}`;
+    const translated = this.transloco.translate(key);
+    return translated !== key ? translated : type;
   }
 
   getNodeBadge(node: WorkflowNode): string {

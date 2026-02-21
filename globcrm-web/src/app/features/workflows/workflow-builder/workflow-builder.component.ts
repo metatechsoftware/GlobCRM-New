@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   WorkflowNode,
   WorkflowConnection,
@@ -48,6 +49,7 @@ import { TemplateGalleryComponent } from './panels/template-gallery.component';
     ConditionConfigComponent,
     ActionConfigComponent,
     TemplateGalleryComponent,
+    TranslocoPipe,
   ],
   templateUrl: './workflow-builder.component.html',
   styleUrl: './workflow-builder.component.scss',
@@ -64,6 +66,7 @@ export class WorkflowBuilderComponent implements OnInit {
   private readonly store = inject(WorkflowStore);
   private readonly emailTemplateService = inject(EmailTemplateService);
   private readonly sequenceService = inject(SequenceService);
+  private readonly transloco = inject(TranslocoService);
 
   // -- Picker data for action config --
   readonly templates = signal<EmailTemplateListItem[]>([]);
@@ -71,7 +74,7 @@ export class WorkflowBuilderComponent implements OnInit {
   readonly staleWarnings = signal<string[]>([]);
 
   // -- Workflow metadata --
-  readonly workflowName = signal('Untitled Workflow');
+  readonly workflowName = signal('');
   readonly workflowDescription = signal('');
   readonly entityType = signal('Contact');
   readonly isActive = signal(false);
@@ -128,7 +131,7 @@ export class WorkflowBuilderComponent implements OnInit {
         this.detectStaleReferences();
       },
       error: () => {
-        this.snackBar.open('Failed to load workflow', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('builder.failedToLoad'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -201,11 +204,11 @@ export class WorkflowBuilderComponent implements OnInit {
   }): void {
     const id = this.generateNodeId();
     const labelMap: Record<string, string> = {
-      trigger: 'Trigger',
-      condition: 'Condition',
-      action: 'Action',
-      branch: 'Branch',
-      wait: 'Wait',
+      trigger: this.transloco.translate('builder.trigger'),
+      condition: this.transloco.translate('builder.condition'),
+      action: this.transloco.translate('builder.action'),
+      branch: this.transloco.translate('builder.branch'),
+      wait: this.transloco.translate('builder.wait'),
     };
 
     const newNode: WorkflowNode = {
@@ -315,7 +318,7 @@ export class WorkflowBuilderComponent implements OnInit {
     this.sidebarMode.set(null);
     this.selectedNodeId.set(null);
     this.markDirty();
-    this.snackBar.open('Template applied', 'Dismiss', { duration: 2000 });
+    this.snackBar.open(this.transloco.translate('builder.templateApplied'), 'Dismiss', { duration: 2000 });
   }
 
   // -- Save --
@@ -325,7 +328,7 @@ export class WorkflowBuilderComponent implements OnInit {
     this.detectStaleReferences();
     if (this.staleWarnings().length > 0) {
       this.snackBar.open(
-        'Cannot save: ' + this.staleWarnings()[0] + (this.staleWarnings().length > 1 ? ` (+${this.staleWarnings().length - 1} more)` : ''),
+        this.transloco.translate('builder.cannotSave') + ': ' + this.staleWarnings()[0] + (this.staleWarnings().length > 1 ? ` (+${this.staleWarnings().length - 1} more)` : ''),
         'Dismiss',
         { duration: 5000 },
       );
@@ -346,14 +349,14 @@ export class WorkflowBuilderComponent implements OnInit {
       this.store.updateWorkflow(workflowId, request, (updated) => {
         this.isSaving.set(false);
         this.isDirty.set(false);
-        this.snackBar.open('Workflow saved', 'Dismiss', { duration: 2000 });
+        this.snackBar.open(this.transloco.translate('builder.workflowSaved'), 'Dismiss', { duration: 2000 });
       });
       // Handle store error
       setTimeout(() => {
         if (this.store.error()) {
           this.isSaving.set(false);
           this.snackBar.open(
-            this.store.error() ?? 'Failed to save',
+            this.store.error() ?? this.transloco.translate('builder.failedToSave'),
             'Dismiss',
             { duration: 3000 },
           );
@@ -363,14 +366,14 @@ export class WorkflowBuilderComponent implements OnInit {
       this.store.createWorkflow(request, (created) => {
         this.isSaving.set(false);
         this.isDirty.set(false);
-        this.snackBar.open('Workflow created', 'Dismiss', { duration: 2000 });
+        this.snackBar.open(this.transloco.translate('builder.workflowCreated'), 'Dismiss', { duration: 2000 });
         this.router.navigate(['/workflows', created.id, 'edit']);
       });
       setTimeout(() => {
         if (this.store.error()) {
           this.isSaving.set(false);
           this.snackBar.open(
-            this.store.error() ?? 'Failed to create',
+            this.store.error() ?? this.transloco.translate('builder.failedToCreate'),
             'Dismiss',
             { duration: 3000 },
           );

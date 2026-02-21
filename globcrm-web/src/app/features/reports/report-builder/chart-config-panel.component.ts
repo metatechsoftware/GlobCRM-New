@@ -11,6 +11,7 @@ import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ReportChartConfig, ReportChartType } from '../report.models';
 
 interface ChartTypeOption {
@@ -46,6 +47,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
     MatSlideToggleModule,
     MatIconModule,
     FormsModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -53,7 +55,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>insert_chart</mat-icon>
-          Visualization
+          {{ 'panels.visualization' | transloco }}
         </mat-panel-title>
       </mat-expansion-panel-header>
 
@@ -67,7 +69,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
           @for (option of chartTypeOptions; track option.value) {
             <mat-button-toggle [value]="option.value" class="chart-config-panel__type-toggle">
               <mat-icon>{{ option.icon }}</mat-icon>
-              <span class="chart-config-panel__type-label">{{ option.label }}</span>
+              <span class="chart-config-panel__type-label">{{ 'card.chartTypes.' + option.value | transloco }}</span>
             </mat-button-toggle>
           }
         </mat-button-toggle-group>
@@ -75,7 +77,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
         <!-- Display Options -->
         <div class="chart-config-panel__toggles">
           <div class="chart-config-panel__toggle-row">
-            <span>Show Legend</span>
+            <span>{{ 'panels.showLegend' | transloco }}</span>
             <mat-slide-toggle
               [checked]="showLegendValue()"
               (change)="onShowLegendChange($event.checked)"
@@ -84,7 +86,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
           </div>
 
           <div class="chart-config-panel__toggle-row">
-            <span>Show Data Labels</span>
+            <span>{{ 'panels.showDataLabels' | transloco }}</span>
             <mat-slide-toggle
               [checked]="showDataLabelsValue()"
               (change)="onShowDataLabelsChange($event.checked)"

@@ -14,6 +14,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
 import { MatBadgeModule } from '@angular/material/badge';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   ReportFieldMetadata,
   ReportField,
@@ -41,6 +42,7 @@ interface RelatedFieldGroup {
     MatIconModule,
     MatBadgeModule,
     FormsModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -48,7 +50,7 @@ interface RelatedFieldGroup {
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>view_column</mat-icon>
-          Columns
+          {{ 'panels.columns' | transloco }}
           @if (selectedCount() > 0) {
             <span class="field-selector-panel__count">{{ selectedCount() }}</span>
           }
@@ -58,12 +60,12 @@ interface RelatedFieldGroup {
       <div class="field-selector-panel__content">
         <!-- Search -->
         <mat-form-field appearance="outline" class="field-selector-panel__search">
-          <mat-label>Search fields</mat-label>
+          <mat-label>{{ 'panels.searchFields' | transloco }}</mat-label>
           <input
             matInput
             [ngModel]="searchQuery()"
             (ngModelChange)="searchQuery.set($event)"
-            placeholder="Filter fields..."
+            [placeholder]="'panels.searchFieldsPlaceholder' | transloco"
           />
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
@@ -74,7 +76,7 @@ interface RelatedFieldGroup {
             <div class="field-group">
               <div class="field-group__header" (click)="toggleGroup('system')">
                 <mat-icon>{{ expandedGroups().has('system') ? 'expand_more' : 'chevron_right' }}</mat-icon>
-                <span>System Fields</span>
+                <span>{{ 'panels.systemFields' | transloco }}</span>
                 <span class="field-group__count">{{ filteredSystemFields().length }}</span>
               </div>
               @if (expandedGroups().has('system')) {
@@ -102,7 +104,7 @@ interface RelatedFieldGroup {
             <div class="field-group">
               <div class="field-group__header" (click)="toggleGroup('custom')">
                 <mat-icon>{{ expandedGroups().has('custom') ? 'expand_more' : 'chevron_right' }}</mat-icon>
-                <span>Custom Fields</span>
+                <span>{{ 'panels.customFields' | transloco }}</span>
                 <span class="field-group__count">{{ filteredCustomFields().length }}</span>
               </div>
               @if (expandedGroups().has('custom')) {
@@ -130,7 +132,7 @@ interface RelatedFieldGroup {
             <div class="field-group">
               <div class="field-group__header" (click)="toggleGroup('formula')">
                 <mat-icon>{{ expandedGroups().has('formula') ? 'expand_more' : 'chevron_right' }}</mat-icon>
-                <span>Formula Fields</span>
+                <span>{{ 'panels.formulaFields' | transloco }}</span>
                 <span class="field-group__count">{{ filteredFormulaFields().length }}</span>
               </div>
               @if (expandedGroups().has('formula')) {
@@ -156,7 +158,7 @@ interface RelatedFieldGroup {
             <div class="field-group">
               <div class="field-group__header" (click)="toggleGroup('related-' + group.entity)">
                 <mat-icon>{{ expandedGroups().has('related-' + group.entity) ? 'expand_more' : 'chevron_right' }}</mat-icon>
-                <span>Related: {{ group.entity }}</span>
+                <span>{{ 'panels.relatedPrefix' | transloco }}: {{ group.entity }}</span>
                 <span class="field-group__count">{{ group.fields.length }}</span>
               </div>
               @if (expandedGroups().has('related-' + group.entity)) {
@@ -181,10 +183,10 @@ interface RelatedFieldGroup {
 
           @if (filteredSystemFields().length === 0 && filteredCustomFields().length === 0 &&
                filteredFormulaFields().length === 0 && filteredRelatedGroups().length === 0) {
-            <p class="field-selector-panel__empty">No fields match your search</p>
+            <p class="field-selector-panel__empty">{{ 'panels.noFieldsMatch' | transloco }}</p>
           }
         } @else {
-          <p class="field-selector-panel__empty">Select an entity type to see available fields</p>
+          <p class="field-selector-panel__empty">{{ 'panels.selectEntityFirst' | transloco }}</p>
         }
       </div>
     </mat-expansion-panel>

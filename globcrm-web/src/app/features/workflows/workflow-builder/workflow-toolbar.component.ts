@@ -1,4 +1,4 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-workflow-toolbar',
@@ -20,10 +21,11 @@ import { FormsModule } from '@angular/forms';
     MatProgressSpinnerModule,
     MatTooltipModule,
     FormsModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="toolbar">
-      <button mat-icon-button (click)="back.emit()" matTooltip="Back to workflows">
+      <button mat-icon-button (click)="back.emit()" [matTooltip]="'builder.backToWorkflows' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </button>
 
@@ -35,19 +37,19 @@ import { FormsModule } from '@angular/forms';
                    (ngModelChange)="nameChanged.emit($event)"
                    (blur)="editingName = false"
                    (keyup.enter)="editingName = false"
-                   placeholder="Workflow name"
+                   [placeholder]="'builder.workflowName' | transloco"
                    #nameInput />
           </mat-form-field>
         } @else {
           <span class="toolbar__name-display" (click)="editingName = true; focusNameInput()">
-            {{ workflowName() || 'Untitled Workflow' }}
+            {{ workflowName() || ('builder.untitledWorkflow' | transloco) }}
             <mat-icon class="toolbar__name-edit-icon">edit</mat-icon>
           </span>
         }
       </div>
 
       <mat-form-field appearance="outline" class="toolbar__entity-select">
-        <mat-label>Entity Type</mat-label>
+        <mat-label>{{ 'builder.entityType' | transloco }}</mat-label>
         <mat-select [value]="entityType()" (selectionChange)="entityTypeChanged.emit($event.value)">
           <mat-option value="Contact">Contact</mat-option>
           <mat-option value="Company">Company</mat-option>
@@ -63,7 +65,7 @@ import { FormsModule } from '@angular/forms';
               (click)="openTemplates.emit()"
               class="toolbar__template-btn">
         <mat-icon>dashboard</mat-icon>
-        Use template
+        {{ 'builder.useTemplate' | transloco }}
       </button>
 
       @if (!isNew()) {
@@ -73,10 +75,10 @@ import { FormsModule } from '@angular/forms';
                 class="toolbar__toggle-btn">
           @if (isActive()) {
             <mat-icon>pause</mat-icon>
-            Deactivate
+            {{ 'builder.deactivate' | transloco }}
           } @else {
             <mat-icon>play_arrow</mat-icon>
-            Activate
+            {{ 'builder.activate' | transloco }}
           }
         </button>
       }
@@ -91,7 +93,7 @@ import { FormsModule } from '@angular/forms';
         } @else {
           <mat-icon>save</mat-icon>
         }
-        Save
+        {{ 'builder.save' | transloco }}
       </button>
     </div>
   `,

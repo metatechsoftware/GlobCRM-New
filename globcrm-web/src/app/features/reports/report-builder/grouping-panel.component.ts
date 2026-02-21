@@ -5,6 +5,7 @@ import {
   output,
   computed,
   signal,
+  inject,
 } from '@angular/core';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ReportFieldMetadata,
   ReportField,
@@ -21,20 +23,20 @@ import {
   AggregationType,
 } from '../report.models';
 
-const DATE_TRUNCATION_OPTIONS = [
-  { value: 'day', label: 'Day' },
-  { value: 'week', label: 'Week' },
-  { value: 'month', label: 'Month' },
-  { value: 'quarter', label: 'Quarter' },
-  { value: 'year', label: 'Year' },
+const DATE_TRUNCATION_KEYS = [
+  { value: 'day', labelKey: 'dateTruncation.day' },
+  { value: 'week', labelKey: 'dateTruncation.week' },
+  { value: 'month', labelKey: 'dateTruncation.month' },
+  { value: 'quarter', labelKey: 'dateTruncation.quarter' },
+  { value: 'year', labelKey: 'dateTruncation.year' },
 ];
 
-const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
-  { value: 'count', label: 'Count' },
-  { value: 'sum', label: 'Sum' },
-  { value: 'average', label: 'Average' },
-  { value: 'min', label: 'Min' },
-  { value: 'max', label: 'Max' },
+const AGGREGATION_KEYS: { value: AggregationType; labelKey: string }[] = [
+  { value: 'count', labelKey: 'aggregation.count' },
+  { value: 'sum', labelKey: 'aggregation.sum' },
+  { value: 'average', labelKey: 'aggregation.average' },
+  { value: 'min', labelKey: 'aggregation.min' },
+  { value: 'max', labelKey: 'aggregation.max' },
 ];
 
 /**
@@ -53,6 +55,7 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
     MatIconModule,
     MatChipsModule,
     FormsModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -60,7 +63,7 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>group_work</mat-icon>
-          Grouping
+          {{ 'panels.grouping' | transloco }}
           @if (groupings().length > 0) {
             <span class="grouping-panel__count">{{ groupings().length }}</span>
           }
@@ -91,12 +94,12 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
               <!-- Date truncation selector for date fields -->
               @if (isDateField(grouping.fieldId)) {
                 <mat-form-field appearance="outline" class="grouping-panel__truncation">
-                  <mat-label>Date truncation</mat-label>
+                  <mat-label>{{ 'panels.dateTruncation' | transloco }}</mat-label>
                   <mat-select
                     [ngModel]="grouping.dateTruncation ?? 'month'"
                     (ngModelChange)="updateDateTruncation(idx, $event)"
                   >
-                    @for (opt of dateTruncationOptions; track opt.value) {
+                    @for (opt of dateTruncationOptions(); track opt.value) {
                       <mat-option [value]="opt.value">{{ opt.label }}</mat-option>
                     }
                   </mat-select>
@@ -109,7 +112,7 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
         <!-- Add Grouping -->
         @if (availableGroupFields().length > 0) {
           <mat-form-field appearance="outline" class="grouping-panel__add-field">
-            <mat-label>Group by field</mat-label>
+            <mat-label>{{ 'panels.groupByField' | transloco }}</mat-label>
             <mat-select (selectionChange)="addGrouping($event.value)">
               @for (field of availableGroupFields(); track field.fieldId) {
                 <mat-option [value]="field.fieldId">{{ field.label }}</mat-option>
@@ -121,7 +124,7 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
         <!-- Aggregations (visible when groupings active) -->
         @if (groupings().length > 0 && aggregatableFields().length > 0) {
           <div class="grouping-panel__aggregations">
-            <h4 class="grouping-panel__section-title">Aggregations</h4>
+            <h4 class="grouping-panel__section-title">{{ 'panels.aggregations' | transloco }}</h4>
             @for (field of aggregatableFields(); track field.fieldId) {
               <div class="aggregation-row">
                 <span class="aggregation-row__label">{{ field.label }}</span>
@@ -141,7 +144,7 @@ const AGGREGATION_OPTIONS: { value: AggregationType; label: string }[] = [
         }
 
         @if (availableGroupFields().length === 0 && groupings().length === 0) {
-          <p class="grouping-panel__empty">Select fields to enable grouping</p>
+          <p class="grouping-panel__empty">{{ 'panels.selectFieldsForGrouping' | transloco }}</p>
         }
       </div>
     </mat-expansion-panel>
@@ -276,7 +279,14 @@ export class GroupingPanelComponent {
   readonly groupingsChange = output<ReportGrouping[]>();
   readonly aggregationsChange = output<ReportField[]>();
 
-  readonly dateTruncationOptions = DATE_TRUNCATION_OPTIONS;
+  private readonly transloco = inject(TranslocoService);
+
+  readonly dateTruncationOptions = computed(() =>
+    DATE_TRUNCATION_KEYS.map(k => ({
+      value: k.value,
+      label: this.transloco.translate(k.labelKey),
+    }))
+  );
 
   // All groupable fields from metadata, excluding already-grouped ones
   readonly availableGroupFields = computed((): ReportFieldInfo[] => {
@@ -349,11 +359,13 @@ export class GroupingPanelComponent {
 
   getAggregationOptions(field: ReportFieldInfo): { value: AggregationType; label: string }[] {
     const isNumeric = field.dataType === 'number' || field.dataType === 'currency';
-    if (isNumeric) {
-      return AGGREGATION_OPTIONS;
-    }
-    // Non-numeric only supports count
-    return [{ value: 'count', label: 'Count' }];
+    const keys = isNumeric
+      ? AGGREGATION_KEYS
+      : [{ value: 'count' as AggregationType, labelKey: 'aggregation.count' }];
+    return keys.map(k => ({
+      value: k.value,
+      label: this.transloco.translate(k.labelKey),
+    }));
   }
 
   addGrouping(fieldId: string): void {

@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { FFlowModule } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { WorkflowNode } from '../../workflow.models';
 
 @Component({
   selector: 'app-condition-node',
   standalone: true,
-  imports: [FFlowModule, MatIconModule],
+  imports: [FFlowModule, MatIconModule, TranslocoPipe],
   template: `
     <div fNode
          [fNodeId]="node().id"
@@ -27,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>filter_list</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || 'Condition' }}</span>
+            <span class="node-label">{{ node().label || ('builder.condition' | transloco) }}</span>
             @if (conditionSummary) {
               <span class="node-badge">{{ conditionSummary }}</span>
             }

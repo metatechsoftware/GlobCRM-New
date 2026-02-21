@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ReportCategory } from '../report.models';
 
 interface EntityOption {
@@ -47,6 +48,7 @@ const ENTITY_OPTIONS: EntityOption[] = [
     MatInputModule,
     MatIconModule,
     FormsModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -54,23 +56,23 @@ const ENTITY_OPTIONS: EntityOption[] = [
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>dataset</mat-icon>
-          Data Source
+          {{ 'panels.dataSource' | transloco }}
         </mat-panel-title>
       </mat-expansion-panel-header>
 
       <div class="entity-source-panel__content">
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>Report Name</mat-label>
+          <mat-label>{{ 'panels.reportName' | transloco }}</mat-label>
           <input
             matInput
             [ngModel]="nameValue()"
             (ngModelChange)="onNameChange($event)"
-            placeholder="Untitled Report"
+            [placeholder]="'panels.reportNamePlaceholder' | transloco"
           />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>Entity Type</mat-label>
+          <mat-label>{{ 'panels.entityType' | transloco }}</mat-label>
           <mat-select
             [ngModel]="entityTypeValue()"
             (ngModelChange)="onEntityTypeChange($event)"
@@ -90,12 +92,12 @@ const ENTITY_OPTIONS: EntityOption[] = [
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>Category</mat-label>
+          <mat-label>{{ 'panels.category' | transloco }}</mat-label>
           <mat-select
             [ngModel]="categoryIdValue()"
             (ngModelChange)="onCategoryChange($event)"
           >
-            <mat-option [value]="null">None</mat-option>
+            <mat-option [value]="null">{{ 'panels.categoryNone' | transloco }}</mat-option>
             @for (cat of categories(); track cat.id) {
               <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
             }
@@ -103,12 +105,12 @@ const ENTITY_OPTIONS: EntityOption[] = [
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'panels.description' | transloco }}</mat-label>
           <textarea
             matInput
             [ngModel]="descriptionValue()"
             (ngModelChange)="onDescriptionChange($event)"
-            placeholder="Optional description..."
+            [placeholder]="'panels.descriptionPlaceholder' | transloco"
             rows="2"
           ></textarea>
         </mat-form-field>

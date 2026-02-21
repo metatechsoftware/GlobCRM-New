@@ -17,6 +17,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowStore } from '../workflow.store';
 import { WorkflowListItem } from '../workflow.models';
 import { WorkflowCardComponent } from './workflow-card.component';
@@ -50,6 +51,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatDialogModule,
     MatPaginatorModule,
     WorkflowCardComponent,
+    TranslocoPipe,
   ],
   providers: [WorkflowStore],
   templateUrl: './workflow-list.component.html',
@@ -61,25 +63,26 @@ export class WorkflowListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly entityTypeFilter = signal<string>('');
   readonly statusFilter = signal<string>('');
 
-  readonly entityTypes = [
-    { value: '', label: 'All Entity Types' },
+  readonly entityTypes = computed(() => [
+    { value: '', label: this.transloco.translate('list.allEntityTypes') },
     { value: 'Contact', label: 'Contact' },
     { value: 'Company', label: 'Company' },
     { value: 'Deal', label: 'Deal' },
     { value: 'Lead', label: 'Lead' },
     { value: 'Activity', label: 'Activity' },
-  ];
+  ]);
 
-  readonly statuses = [
-    { value: '', label: 'All Statuses' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'active', label: 'Active' },
-    { value: 'paused', label: 'Paused' },
-  ];
+  readonly statuses = computed(() => [
+    { value: '', label: this.transloco.translate('list.allStatuses') },
+    { value: 'draft', label: this.transloco.translate('list.draft') },
+    { value: 'active', label: this.transloco.translate('list.active') },
+    { value: 'paused', label: this.transloco.translate('list.paused') },
+  ]);
 
   /** Skeleton items for loading state */
   readonly skeletonItems = [1, 2, 3, 4];
@@ -124,12 +127,10 @@ export class WorkflowListComponent implements OnInit {
 
   onToggleStatus(workflow: WorkflowListItem): void {
     this.store.toggleStatus(workflow.id, !workflow.isActive);
-    const action = workflow.isActive ? 'disabled' : 'enabled';
-    this.snackBar.open(
-      `Workflow "${workflow.name}" ${action}.`,
-      'Close',
-      { duration: 3000 },
-    );
+    const msg = workflow.isActive
+      ? this.transloco.translate('list.workflowDisabled', { name: workflow.name })
+      : this.transloco.translate('list.workflowEnabled', { name: workflow.name });
+    this.snackBar.open(msg, 'Close', { duration: 3000 });
   }
 
   onEdit(workflow: WorkflowListItem): void {
@@ -139,7 +140,7 @@ export class WorkflowListComponent implements OnInit {
   onDuplicate(workflow: WorkflowListItem): void {
     this.store.duplicateWorkflow(workflow.id, (duplicated) => {
       this.snackBar.open(
-        `Workflow duplicated as "${duplicated.name}".`,
+        this.transloco.translate('list.workflowDuplicated', { name: duplicated.name }),
         'Close',
         { duration: 3000 },
       );
@@ -158,7 +159,7 @@ export class WorkflowListComponent implements OnInit {
 
       this.store.deleteWorkflow(workflow.id, () => {
         this.snackBar.open(
-          `Workflow "${workflow.name}" deleted.`,
+          this.transloco.translate('list.workflowDeleted', { name: workflow.name }),
           'Close',
           { duration: 3000 },
         );

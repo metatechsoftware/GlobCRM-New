@@ -1,12 +1,13 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { FFlowModule } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowNode } from '../../workflow.models';
 
 @Component({
   selector: 'app-trigger-node',
   standalone: true,
-  imports: [FFlowModule, MatIconModule],
+  imports: [FFlowModule, MatIconModule, TranslocoPipe],
   template: `
     <div fNode
          [fNodeId]="node().id"
@@ -21,7 +22,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>bolt</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || 'Trigger' }}</span>
+            <span class="node-label">{{ node().label || ('builder.trigger' | transloco) }}</span>
             @if (triggerTypeBadge) {
               <span class="node-badge">{{ triggerTypeBadge }}</span>
             }
@@ -145,16 +146,19 @@ export class TriggerNodeComponent {
   readonly isSelected = input<boolean>(false);
   readonly selected = output<string>();
 
+  private readonly transloco = inject(TranslocoService);
+
   get triggerTypeBadge(): string {
     const config = this.node().config;
     if (!config) return '';
-    switch (config['triggerType']) {
-      case 'recordCreated': return 'Record Created';
-      case 'recordUpdated': return 'Record Updated';
-      case 'recordDeleted': return 'Record Deleted';
-      case 'fieldChanged': return 'Field Changed';
-      case 'dateBased': return 'Date Based';
-      default: return '';
-    }
+    const keyMap: Record<string, string> = {
+      recordCreated: 'nodes.recordCreated',
+      recordUpdated: 'nodes.recordUpdated',
+      recordDeleted: 'nodes.recordDeleted',
+      fieldChanged: 'nodes.fieldChanged',
+      dateBased: 'nodes.dateBased',
+    };
+    const key = keyMap[config['triggerType']];
+    return key ? this.transloco.translate(key) : '';
   }
 }

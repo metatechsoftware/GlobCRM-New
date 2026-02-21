@@ -5,7 +5,7 @@
       <a mat-icon-button routerLink="/reports" class="report-builder__back">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ id() ? 'Edit Report' : 'New Report' }}</h1>
+      <h1>{{ id() ? ('builder.editReport' | transloco) : ('builder.newReport' | transloco) }}</h1>
     </div>
   </div>
 
@@ -75,7 +75,7 @@
           class="report-builder__run-btn"
         >
           <mat-icon>play_arrow</mat-icon>
-          Run Report
+          {{ 'builder.runReport' | transloco }}
         </button>
         <button
           mat-stroked-button
@@ -83,7 +83,7 @@
           [disabled]="!canSave() || store.loading()"
         >
           <mat-icon>save</mat-icon>
-          Save
+          {{ 'builder.save' | transloco }}
         </button>
       </div>
     </div>
@@ -93,7 +93,7 @@
       @if (store.executing()) {
         <div class="report-builder__loading">
           <mat-spinner diameter="48"></mat-spinner>
-          <p>Running report...</p>
+          <p>{{ 'builder.running' | transloco }}</p>
         </div>
       } @else if (store.executionResult()) {
         <!-- Chart (visible when chartType is not 'table') -->
@@ -130,24 +130,24 @@
         <div class="report-builder__result-actions">
           <button mat-stroked-button (click)="exportCsv()" [disabled]="store.exporting()">
             <mat-icon>download</mat-icon>
-            Export CSV
+            {{ 'builder.exportCsv' | transloco }}
           </button>
           @if (store.selectedReport()) {
             <button mat-stroked-button (click)="toggleShare()">
               <mat-icon>{{ store.selectedReport()?.isShared ? 'lock' : 'share' }}</mat-icon>
-              {{ store.selectedReport()?.isShared ? 'Make Private' : 'Share' }}
+              {{ store.selectedReport()?.isShared ? ('builder.makePrivate' | transloco) : ('builder.share' | transloco) }}
             </button>
             <button mat-stroked-button (click)="cloneReport()">
               <mat-icon>content_copy</mat-icon>
-              Clone
+              {{ 'builder.clone' | transloco }}
             </button>
           }
         </div>
       } @else {
         <div class="report-builder__empty-preview">
           <mat-icon>bar_chart</mat-icon>
-          <h3>Report Preview</h3>
-          <p>Configure your report and click "Run Report" to see results</p>
+          <h3>{{ 'builder.reportPreview' | transloco }}</h3>
+          <p>{{ 'builder.previewHint' | transloco }}</p>
         </div>
       }
 

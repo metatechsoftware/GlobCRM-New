@@ -1,12 +1,13 @@
-import { Component, ChangeDetectionStrategy, input, output, computed } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, computed, inject } from '@angular/core';
 import { FFlowModule } from '@foblex/flow';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowNode } from '../../workflow.models';
 
 @Component({
   selector: 'app-action-node',
   standalone: true,
-  imports: [FFlowModule, MatIconModule],
+  imports: [FFlowModule, MatIconModule, TranslocoPipe],
   template: `
     <div fNode
          [fNodeId]="node().id"
@@ -27,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>{{ actionIcon() }}</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || 'Action' }}</span>
+            <span class="node-label">{{ node().label || ('builder.action' | transloco) }}</span>
             @if (actionTypeBadge()) {
               <span class="node-badge">{{ actionTypeBadge() }}</span>
             }
@@ -157,6 +158,8 @@ export class ActionNodeComponent {
   readonly isSelected = input<boolean>(false);
   readonly selected = output<string>();
 
+  private readonly transloco = inject(TranslocoService);
+
   readonly actionIcon = computed(() => {
     const actionType = this.node().config?.['actionType'];
     switch (actionType) {
@@ -172,14 +175,15 @@ export class ActionNodeComponent {
 
   readonly actionTypeBadge = computed(() => {
     const actionType = this.node().config?.['actionType'];
-    switch (actionType) {
-      case 'updateField': return 'Update Field';
-      case 'sendNotification': return 'Send Notification';
-      case 'createActivity': return 'Create Activity';
-      case 'sendEmail': return 'Send Email';
-      case 'fireWebhook': return 'Fire Webhook';
-      case 'enrollInSequence': return 'Enroll in Sequence';
-      default: return '';
-    }
+    const keyMap: Record<string, string> = {
+      updateField: 'nodes.updateField',
+      sendNotification: 'nodes.sendNotification',
+      createActivity: 'nodes.createActivity',
+      sendEmail: 'nodes.sendEmail',
+      fireWebhook: 'nodes.fireWebhook',
+      enrollInSequence: 'nodes.enrollInSequence',
+    };
+    const key = actionType ? keyMap[actionType] : undefined;
+    return key ? this.transloco.translate(key) : '';
   });
 }

@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { WorkflowService } from '../workflow.service';
 import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
 
@@ -33,6 +34,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
     MatProgressSpinnerModule,
     MatTooltipModule,
     MatExpansionModule,
+    TranslocoPipe,
   ],
   template: `
     @if (loading()) {
@@ -45,11 +47,11 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
       <div class="log-detail">
         <!-- Header -->
         <div class="log-detail__header">
-          <button mat-icon-button [routerLink]="['/workflows', id()]" aria-label="Back to workflow">
+          <button mat-icon-button [routerLink]="['/workflows', id()]" [attr.aria-label]="'detail.backToWorkflows' | transloco">
             <mat-icon>arrow_back</mat-icon>
           </button>
           <div class="log-detail__header-info">
-            <h1>Execution Log</h1>
+            <h1>{{ 'logs.title' | transloco }}</h1>
           </div>
           <span class="log-detail__status-badge"
                 [class]="'status--' + exec.status">
@@ -68,19 +70,19 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <div class="log-detail__card">
           <h2>
             <mat-icon>bolt</mat-icon>
-            Trigger
+            {{ 'logs.triggerSection' | transloco }}
           </h2>
           <div class="log-detail__card-body">
             <div class="log-detail__field">
-              <span class="log-detail__field-label">Type:</span>
+              <span class="log-detail__field-label">{{ 'logs.type' | transloco }}:</span>
               <span>{{ exec.triggerType }}</span>
             </div>
             <div class="log-detail__field">
-              <span class="log-detail__field-label">Event:</span>
+              <span class="log-detail__field-label">{{ 'logs.event' | transloco }}:</span>
               <span>{{ exec.triggerEvent }}</span>
             </div>
             <div class="log-detail__field">
-              <span class="log-detail__field-label">Entity:</span>
+              <span class="log-detail__field-label">{{ 'logs.entity' | transloco }}:</span>
               <span>
                 {{ exec.entityType }}
                 <a class="log-detail__entity-link"
@@ -96,25 +98,25 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <div class="log-detail__card">
           <h2>
             <mat-icon>filter_list</mat-icon>
-            Conditions
+            {{ 'logs.conditionsSection' | transloco }}
           </h2>
           <div class="log-detail__card-body">
             @if (!exec.conditionsEvaluated) {
-              <p class="log-detail__no-conditions">No conditions configured for this workflow.</p>
+              <p class="log-detail__no-conditions">{{ 'logs.noConditions' | transloco }}</p>
             } @else {
               <div class="log-detail__field">
-                <span class="log-detail__field-label">Evaluated:</span>
-                <span>Yes</span>
+                <span class="log-detail__field-label">{{ 'logs.evaluated' | transloco }}:</span>
+                <span>{{ 'logs.yes' | transloco }}</span>
               </div>
               <div class="log-detail__field">
-                <span class="log-detail__field-label">Result:</span>
+                <span class="log-detail__field-label">{{ 'logs.result' | transloco }}:</span>
                 @if (exec.conditionsPassed) {
                   <span class="log-detail__conditions-pass">
-                    <mat-icon>check_circle</mat-icon> Passed
+                    <mat-icon>check_circle</mat-icon> {{ 'logs.conditionsPassed' | transloco }}
                   </span>
                 } @else {
                   <span class="log-detail__conditions-fail">
-                    <mat-icon>cancel</mat-icon> Failed &mdash; conditions not met
+                    <mat-icon>cancel</mat-icon> {{ 'logs.conditionsFailed' | transloco }}
                   </span>
                 }
               </div>
@@ -125,7 +127,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <!-- Actions Timeline -->
         @if (exec.actionLogs && exec.actionLogs.length > 0) {
           <div class="log-detail__section">
-            <h2>Actions Timeline</h2>
+            <h2>{{ 'logs.actionsTimeline' | transloco }}</h2>
             <div class="log-detail__timeline">
               @for (action of sortedActions(); track action.id; let i = $index; let last = $last) {
                 <div class="timeline-entry"
@@ -165,7 +167,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                       </span>
                     </div>
                     <div class="timeline-entry__details">
-                      <span class="timeline-entry__node-id">Node: {{ action.actionNodeId }}</span>
+                      <span class="timeline-entry__node-id">{{ 'logs.node' | transloco }}: {{ action.actionNodeId }}</span>
                       @if (action.startedAt) {
                         <span class="timeline-entry__timing">
                           {{ action.startedAt | date:'mediumTime' }}
@@ -184,7 +186,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                     @if (isHaltedAfter(action, exec)) {
                       <div class="timeline-entry__halt">
                         <mat-icon>dangerous</mat-icon>
-                        Execution stopped &mdash; ContinueOnError was not enabled
+                        {{ 'logs.executionStopped' | transloco }}
                       </div>
                     }
                   </div>
@@ -200,7 +202,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                   </div>
                   <div class="timeline-entry__content">
                     <span class="timeline-entry__not-reached">
-                      {{ unreachedCount() }} action{{ unreachedCount() !== 1 ? 's' : '' }} not reached
+                      {{ 'logs.actionsNotReached' | transloco:{ count: unreachedCount() } }}
                     </span>
                   </div>
                 </div>
@@ -214,7 +216,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
           <div class="log-detail__card log-detail__card--error">
             <h2>
               <mat-icon>error_outline</mat-icon>
-              Error
+              {{ 'logs.error' | transloco }}
             </h2>
             <div class="log-detail__error-body">
               <pre>{{ exec.errorMessage }}</pre>
@@ -228,7 +230,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <mat-icon>code</mat-icon>
-                Raw Execution Data
+                {{ 'logs.rawData' | transloco }}
               </mat-panel-title>
             </mat-expansion-panel-header>
             <pre class="log-detail__raw-json">{{ exec | json }}</pre>
@@ -651,6 +653,7 @@ export class ExecutionLogDetailComponent implements OnInit {
   readonly logId = input.required<string>();
 
   private readonly service = inject(WorkflowService);
+  private readonly transloco = inject(TranslocoService);
 
   readonly log = signal<WorkflowExecutionLog | null>(null);
   readonly loading = signal(false);
@@ -691,18 +694,14 @@ export class ExecutionLogDetailComponent implements OnInit {
   }
 
   formatStatus(status: string): string {
-    switch (status) {
-      case 'succeeded':
-        return 'Succeeded';
-      case 'partiallyFailed':
-        return 'Partially Failed';
-      case 'failed':
-        return 'Failed';
-      case 'skipped':
-        return 'Skipped';
-      default:
-        return status;
-    }
+    const keyMap: Record<string, string> = {
+      succeeded: 'logs.succeeded',
+      partiallyFailed: 'logs.partiallyFailed',
+      failed: 'logs.failed',
+      skipped: 'logs.skipped',
+    };
+    const key = keyMap[status];
+    return key ? this.transloco.translate(key) : status;
   }
 
   getActionIcon(actionType: string): string {

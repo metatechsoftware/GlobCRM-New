@@ -15,6 +15,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { FormsModule } from '@angular/forms';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ReportStore } from '../report.store';
 import { ReportListItem } from '../report.models';
 import { ReportCardComponent } from './report-card.component';
@@ -40,6 +41,7 @@ import { ReportCardComponent } from './report-card.component';
     MatInputModule,
     MatPaginatorModule,
     ReportCardComponent,
+    TranslocoPipe,
   ],
   providers: [ReportStore],
   templateUrl: './report-gallery.component.html',
@@ -49,28 +51,29 @@ import { ReportCardComponent } from './report-card.component';
 export class ReportGalleryComponent implements OnInit {
   readonly store = inject(ReportStore);
   private readonly router = inject(Router);
+  private readonly transloco = inject(TranslocoService);
 
   readonly categoryFilter = signal<string>('');
   readonly entityTypeFilter = signal<string>('');
   readonly searchFilter = signal<string>('');
 
-  readonly entityTypes = [
-    { value: '', label: 'All Entity Types' },
-    { value: 'Contact', label: 'Contact' },
-    { value: 'Company', label: 'Company' },
-    { value: 'Deal', label: 'Deal' },
-    { value: 'Lead', label: 'Lead' },
-    { value: 'Activity', label: 'Activity' },
-    { value: 'Quote', label: 'Quote' },
-    { value: 'Request', label: 'Request' },
-    { value: 'Product', label: 'Product' },
-  ];
+  readonly entityTypes = computed(() => [
+    { value: '', label: this.transloco.translate('gallery.allEntityTypes') },
+    { value: 'Contact', label: this.transloco.translate('entities.Contact') },
+    { value: 'Company', label: this.transloco.translate('entities.Company') },
+    { value: 'Deal', label: this.transloco.translate('entities.Deal') },
+    { value: 'Lead', label: this.transloco.translate('entities.Lead') },
+    { value: 'Activity', label: this.transloco.translate('entities.Activity') },
+    { value: 'Quote', label: this.transloco.translate('entities.Quote') },
+    { value: 'Request', label: this.transloco.translate('entities.Request') },
+    { value: 'Product', label: this.transloco.translate('entities.Product') },
+  ]);
 
   /** Computed list of category options from loaded categories */
   readonly categoryOptions = computed(() => {
     const cats = this.store.categories();
     return [
-      { value: '', label: 'All Categories' },
+      { value: '', label: this.transloco.translate('gallery.allCategories') },
       ...cats.map((c) => ({ value: c.id, label: c.name })),
     ];
   });
