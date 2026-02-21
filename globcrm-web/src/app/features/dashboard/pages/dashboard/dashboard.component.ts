@@ -7,6 +7,7 @@ import { ReactiveFormsModule, FormControl, FormGroup, Validators } from '@angula
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthStore } from '../../../../core/auth/auth.store';
 import { DashboardStore } from '../../stores/dashboard.store';
 import {
@@ -40,22 +41,23 @@ import {
     MatInputModule,
     MatCheckboxModule,
     MatButtonModule,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>Create Dashboard</h2>
+    <h2 mat-dialog-title>{{ 'createDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 12px; min-width: 360px;">
         <mat-form-field appearance="outline">
-          <mat-label>Dashboard Name</mat-label>
-          <input matInput formControlName="name" placeholder="My Dashboard" />
+          <mat-label>{{ 'createDialog.name' | transloco }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'createDialog.namePlaceholder' | transloco" />
         </mat-form-field>
-        <mat-checkbox formControlName="isTeamWide">Team-wide dashboard</mat-checkbox>
+        <mat-checkbox formControlName="isTeamWide">{{ 'createDialog.teamWide' | transloco }}</mat-checkbox>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'createDialog.cancel' | transloco }}</button>
       <button mat-flat-button color="primary" [disabled]="form.invalid" [mat-dialog-close]="form.value">
-        Create
+        {{ 'createDialog.create' | transloco }}
       </button>
     </mat-dialog-actions>
   `,
@@ -75,6 +77,7 @@ export class CreateDashboardDialogComponent {
     MatIconModule,
     MatDialogModule,
     MatTabsModule,
+    TranslocoPipe,
     DashboardGridComponent,
     DashboardSelectorComponent,
     DateRangeFilterComponent,
@@ -87,14 +90,15 @@ export class CreateDashboardDialogComponent {
 export class DashboardComponent implements OnDestroy {
   readonly store = inject(DashboardStore);
   private readonly dialog = inject(MatDialog);
+  private readonly translocoService = inject(TranslocoService);
 
   private readonly authStore = inject(AuthStore);
 
   readonly greeting = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return this.translocoService.translate('greeting.morning');
+    if (hour < 17) return this.translocoService.translate('greeting.afternoon');
+    return this.translocoService.translate('greeting.evening');
   });
 
   readonly timeIcon = computed(() => {
@@ -260,7 +264,7 @@ export class DashboardComponent implements OnDestroy {
   onDeleteDashboard(id: string): void {
     const dashboard = this.store.dashboards().find((d) => d.id === id);
     const name = dashboard?.name ?? 'this dashboard';
-    if (confirm(`Delete "${name}"? This cannot be undone.`)) {
+    if (confirm(this.translocoService.translate('deleteConfirm', { name }))) {
       this.store.deleteDashboard(id);
     }
   }

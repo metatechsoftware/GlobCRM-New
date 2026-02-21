@@ -2,13 +2,14 @@ import { Component, ChangeDetectionStrategy, input, output } from '@angular/core
 import { MatCardModule } from '@angular/material/card';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PreviewEntityLinkComponent } from '../../../../shared/components/entity-preview/preview-entity-link.component';
 import { MyDayTaskDto } from '../../my-day.models';
 
 @Component({
   selector: 'app-tasks-widget',
   standalone: true,
-  imports: [MatCardModule, MatCheckboxModule, MatIconModule, PreviewEntityLinkComponent],
+  imports: [MatCardModule, MatCheckboxModule, MatIconModule, TranslocoPipe, PreviewEntityLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="tasks-widget">
@@ -16,7 +17,7 @@ import { MyDayTaskDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>checklist</mat-icon>
         </div>
-        <mat-card-title>Today's Tasks</mat-card-title>
+        <mat-card-title>{{ 'widgets.tasks.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -29,7 +30,7 @@ import { MyDayTaskDto } from '../../my-day.models';
         } @else if (overdueTasks().length === 0 && todayTasks().length === 0) {
           <div class="tasks-widget__empty">
             <mat-icon class="tasks-widget__empty-icon">check_circle</mat-icon>
-            <span class="tasks-widget__empty-text">No tasks for today -- nice work!</span>
+            <span class="tasks-widget__empty-text">{{ 'widgets.tasks.empty' | transloco }}</span>
           </div>
         } @else {
           <!-- Overdue section -->
@@ -37,7 +38,7 @@ import { MyDayTaskDto } from '../../my-day.models';
             <div class="tasks-widget__section tasks-widget__section--overdue">
               <div class="tasks-widget__section-header tasks-widget__section-header--overdue">
                 <mat-icon>warning</mat-icon>
-                <span>Overdue</span>
+                <span>{{ 'widgets.tasks.overdue' | transloco }}</span>
               </div>
               @for (task of overdueTasks(); track task.id) {
                 <div class="tasks-widget__row tasks-widget__row--overdue"
@@ -69,7 +70,7 @@ import { MyDayTaskDto } from '../../my-day.models';
               @if (overdueTasks().length > 0) {
                 <div class="tasks-widget__section-header">
                   <mat-icon>today</mat-icon>
-                  <span>Due Today</span>
+                  <span>{{ 'widgets.tasks.dueToday' | transloco }}</span>
                 </div>
               }
               @for (task of todayTasks(); track task.id) {

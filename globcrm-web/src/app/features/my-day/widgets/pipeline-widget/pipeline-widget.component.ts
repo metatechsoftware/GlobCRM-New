@@ -2,12 +2,13 @@ import { Component, ChangeDetectionStrategy, input, computed } from '@angular/co
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MyDayPipelineStageDto } from '../../my-day.models';
 
 @Component({
   selector: 'app-pipeline-widget',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, MatTooltipModule],
+  imports: [MatCardModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="pipeline-widget">
@@ -15,7 +16,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>handshake</mat-icon>
         </div>
-        <mat-card-title>My Pipeline</mat-card-title>
+        <mat-card-title>{{ 'widgets.pipeline.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -31,7 +32,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
         } @else if (stages().length === 0) {
           <div class="pipeline-widget__empty">
             <mat-icon class="pipeline-widget__empty-icon">shopping_cart</mat-icon>
-            <span class="pipeline-widget__empty-text">No active deals</span>
+            <span class="pipeline-widget__empty-text">{{ 'widgets.pipeline.empty' | transloco }}</span>
           </div>
         } @else {
           <!-- Horizontal stacked bar chart -->
@@ -58,7 +59,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
 
           <!-- Summary -->
           <div class="pipeline-widget__summary">
-            <span class="pipeline-widget__summary-deals">{{ dealCount() }} deals</span>
+            <span class="pipeline-widget__summary-deals">{{ 'widgets.pipeline.deals' | transloco: { count: dealCount() } }}</span>
             <span class="pipeline-widget__summary-sep">&middot;</span>
             <span class="pipeline-widget__summary-value">{{ formattedTotalValue() }}</span>
           </div>

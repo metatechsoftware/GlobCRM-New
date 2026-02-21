@@ -5,6 +5,7 @@ import {
   computed,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MetricResultDto } from '../../../models/dashboard.models';
 
 interface LeaderboardEntry {
@@ -23,7 +24,7 @@ interface LeaderboardEntry {
 @Component({
   selector: 'app-leaderboard',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -167,7 +168,7 @@ interface LeaderboardEntry {
       </div>
     } @else {
       <div class="leaderboard__empty">
-        <span>No data available</span>
+        <span>{{ 'widgets.noData' | transloco }}</span>
       </div>
     }
   `,

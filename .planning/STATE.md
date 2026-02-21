@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.3 Platform & Polish — Phase 27 (Localization Foundation)
+**Current focus:** v1.3 Platform & Polish — Phase 28 (Localization String Extraction)
 
 ## Current Position
 
-Phase: 27 of 31 (Localization Foundation) — COMPLETE
-Plan: 6 of 6 complete
-Status: Phase Complete, ready for Phase 28
-Last activity: 2026-02-21 — Completed 27-06 (Gap Closure: Reactive Navbar + Paginator Fix)
+Phase: 28 of 31 (Localization String Extraction)
+Plan: 1 of 7 complete
+Status: Executing Phase 28
+Last activity: 2026-02-21 — Completed 28-01 (Shared Components i18n)
 
-Progress: [██████████████████░░] 87% (164/~188 plans estimated)
+Progress: [██████████████████░░] 88% (165/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [██████████████████░░] 87% (16
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 164
+- Total plans completed: 165
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 6 plans across 1 phase (Phase 27)
+- v1.3: 7 plans across 2 phases (Phase 27-28)
 
 ## Accumulated Context
 
@@ -54,6 +54,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 27-05: syncLanguage parameter on handleLoginSuccess skips language sync during automatic token refresh
 - 27-05: Language sync is fire-and-forget after login, does not block navigation or UI rendering
 - 27-05: On preferences fetch failure, syncFromProfile(null) triggers org default fallback chain
+- 28-01: Entity-specific property labels deferred to feature-scoped plans (not global keys)
+- 28-01: Filter operator labels remain hardcoded in TS (computed values, not template strings)
+- 28-01: Summary tab section titles translated globally; entity property labels left for feature scopes
 
 ### Pending Todos
 
@@ -68,6 +71,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Closed out Phase 27 (created 27-06-SUMMARY.md, updated ROADMAP)
-Resume file: .planning/phases/27-localization-foundation/27-06-SUMMARY.md
-Next step: Plan Phase 28 (Localization String Extraction)
+Stopped at: Completed 28-01-PLAN.md (Shared Components i18n)
+Resume file: .planning/phases/28-localization-string-extraction/28-01-SUMMARY.md
+Next step: Execute 28-02-PLAN.md

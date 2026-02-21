@@ -12,10 +12,10 @@
             <div class="dashboard__subtitle-row">
               <span class="dashboard__dash-name">{{ dashboard.name }}</span>
               @if (dashboard.isTeamWide) {
-                <span class="dashboard__badge">Team</span>
+                <span class="dashboard__badge">{{ 'header.team' | transloco }}</span>
               }
               <span class="dashboard__dot"></span>
-              <span class="dashboard__updated">Live</span>
+              <span class="dashboard__updated">{{ 'header.live' | transloco }}</span>
             </div>
           }
         </div>
@@ -35,12 +35,12 @@
         @if (store.isEditing()) {
           <button mat-stroked-button class="dashboard__add-widget-btn" (click)="onAddWidget()">
             <mat-icon>add</mat-icon>
-            Add Widget
+            {{ 'header.addWidget' | transloco }}
           </button>
         }
         <button mat-flat-button class="dashboard__edit-btn" (click)="onToggleEdit()">
           <mat-icon>{{ store.isEditing() ? 'check' : 'edit' }}</mat-icon>
-          {{ store.isEditing() ? 'Done' : 'Edit' }}
+          {{ store.isEditing() ? ('header.done' | transloco) : ('header.edit' | transloco) }}
         </button>
       </div>
     </header>
@@ -48,7 +48,7 @@
 
   <!-- Tabs: Dashboard and Targets -->
   <mat-tab-group class="dashboard__tabs" animationDuration="200ms">
-    <mat-tab label="Dashboard">
+    <mat-tab [label]="'tabs.dashboard' | transloco">
 
       <!-- Dashboard Grid -->
       @if (store.activeDashboard(); as dashboard) {
@@ -59,7 +59,7 @@
               <div class="dashboard__skeleton-card"></div>
               <div class="dashboard__skeleton-card"></div>
             </div>
-            <span class="dashboard__loading-text">Loading your dashboard...</span>
+            <span class="dashboard__loading-text">{{ 'header.loading' | transloco }}</span>
           </div>
         } @else {
           <app-dashboard-grid
@@ -78,17 +78,17 @@
           <div class="dashboard__empty-decoration">
             <mat-icon>dashboard_customize</mat-icon>
           </div>
-          <h2>No dashboards yet</h2>
-          <p>Create your first dashboard to start tracking KPIs and metrics.</p>
+          <h2>{{ 'empty.title' | transloco }}</h2>
+          <p>{{ 'empty.description' | transloco }}</p>
           <button mat-flat-button color="primary" class="dashboard__empty-cta" (click)="onCreateDashboard()">
             <mat-icon>add</mat-icon>
-            Create Dashboard
+            {{ 'empty.createButton' | transloco }}
           </button>
         </div>
       }
     </mat-tab>
 
-    <mat-tab label="Targets">
+    <mat-tab [label]="'tabs.targets' | transloco">
       <app-target-management [targets]="store.targets()" />
     </mat-tab>
   </mat-tab-group>

@@ -1,7 +1,8 @@
-import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { DatePipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MyDayEventDto } from '../../my-day.models';
 
 interface EventGroup {
@@ -12,7 +13,7 @@ interface EventGroup {
 @Component({
   selector: 'app-upcoming-events-widget',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, DatePipe],
+  imports: [MatCardModule, MatIconModule, DatePipe, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="events-widget">
@@ -20,7 +21,7 @@ interface EventGroup {
         <div class="widget-header-icon">
           <mat-icon>calendar_month</mat-icon>
         </div>
-        <mat-card-title>Upcoming Events</mat-card-title>
+        <mat-card-title>{{ 'widgets.upcomingEvents.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -33,7 +34,7 @@ interface EventGroup {
         } @else if (eventGroups().length === 0) {
           <div class="events-widget__empty">
             <mat-icon class="events-widget__empty-icon">event_busy</mat-icon>
-            <span class="events-widget__empty-text">No upcoming events</span>
+            <span class="events-widget__empty-text">{{ 'widgets.upcomingEvents.empty' | transloco }}</span>
           </div>
         } @else {
           @for (group of eventGroups(); track group.label) {
@@ -267,6 +268,7 @@ export class UpcomingEventsWidgetComponent {
   readonly events = input<MyDayEventDto[]>([]);
   readonly isLoading = input<boolean>(false);
   readonly eventClicked = output<string>();
+  private readonly translocoService = inject(TranslocoService);
 
   /** Group events by day: Today, Tomorrow, or formatted date. */
   readonly eventGroups = computed<EventGroup[]>(() => {
@@ -287,9 +289,9 @@ export class UpcomingEventsWidgetComponent {
 
       let label: string;
       if (dateKey === todayStr) {
-        label = 'Today';
+        label = this.translocoService.translate('widgets.upcomingEvents.today');
       } else if (dateKey === tomorrowStr) {
-        label = 'Tomorrow';
+        label = this.translocoService.translate('widgets.upcomingEvents.tomorrow');
       } else {
         label = new Intl.DateTimeFormat('en-US', {
           weekday: 'short',

@@ -1,13 +1,14 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, input, output, inject } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { PreviewEntityLinkComponent } from '../../../../shared/components/entity-preview/preview-entity-link.component';
 import { MyDayNotificationGroupDto } from '../../my-day.models';
 
 @Component({
   selector: 'app-notification-digest-widget',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, PreviewEntityLinkComponent],
+  imports: [MatCardModule, MatIconModule, TranslocoPipe, PreviewEntityLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="notif-widget">
@@ -15,9 +16,9 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>notifications</mat-icon>
         </div>
-        <mat-card-title>Notifications</mat-card-title>
+        <mat-card-title>{{ 'widgets.notifications.title' | transloco }}</mat-card-title>
         @if (!isLoading() && totalCount() > 0) {
-          <span class="notif-widget__badge">{{ totalCount() }} today</span>
+          <span class="notif-widget__badge">{{ 'widgets.notifications.today' | transloco: { count: totalCount() } }}</span>
         }
       </mat-card-header>
 
@@ -31,7 +32,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
         } @else if (notificationGroups().length === 0) {
           <div class="notif-widget__empty">
             <mat-icon class="notif-widget__empty-icon">notifications_none</mat-icon>
-            <span class="notif-widget__empty-text">All caught up!</span>
+            <span class="notif-widget__empty-text">{{ 'widgets.notifications.allCaughtUp' | transloco }}</span>
           </div>
         } @else {
           <div class="notif-widget__groups">
@@ -58,7 +59,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
                     </div>
                   }
                   @if (group.items.length > 3) {
-                    <span class="notif-widget__more">+{{ group.items.length - 3 }} more</span>
+                    <span class="notif-widget__more">{{ 'widgets.notifications.more' | transloco: { count: group.items.length - 3 } }}</span>
                   }
                 </div>
               </div>
@@ -291,6 +292,7 @@ export class NotificationDigestWidgetComponent {
   readonly totalCount = input<number>(0);
   readonly isLoading = input<boolean>(false);
   readonly notificationClicked = output<{ type: string; id: string }>();
+  private readonly translocoService = inject(TranslocoService);
 
   typeIcon(type: string): string {
     const icons: Record<string, string> = {
@@ -307,17 +309,13 @@ export class NotificationDigestWidgetComponent {
   }
 
   typeLabel(type: string): string {
-    const labels: Record<string, string> = {
-      assignment: 'Assignments',
-      mention: 'Mentions',
-      status_change: 'Status Changes',
-      comment: 'Comments',
-      due_date: 'Due Dates',
-      new_lead: 'New Leads',
-      deal_won: 'Deals Won',
-      deal_lost: 'Deals Lost',
-    };
-    return labels[type] ?? type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    const key = `widgets.notifications.types.${type}`;
+    const translated = this.translocoService.translate(key);
+    // If translation key doesn't exist, transloco returns the key itself
+    if (translated === key) {
+      return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+    }
+    return translated;
   }
 
   relativeTime(dateStr: string): string {

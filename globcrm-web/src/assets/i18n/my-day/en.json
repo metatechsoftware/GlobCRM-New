@@ -1,0 +1,72 @@
+{
+  "title": "My Day",
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "stats": {
+    "tasksToday": "{{count}} tasks today",
+    "overdue": "{{count}} overdue",
+    "meetings": "{{count}} meetings"
+  },
+  "quickActions": {
+    "newContact": "New Contact",
+    "newDeal": "New Deal",
+    "logActivity": "Log Activity",
+    "newNote": "New Note",
+    "sendEmail": "Send Email"
+  },
+  "widgets": {
+    "tasks": {
+      "title": "Today's Tasks",
+      "overdue": "Overdue",
+      "dueToday": "Due Today",
+      "daysOverdue": "{{count}}d overdue",
+      "empty": "No tasks for today -- nice work!"
+    },
+    "upcomingEvents": {
+      "title": "Upcoming Events",
+      "today": "Today",
+      "tomorrow": "Tomorrow",
+      "empty": "No upcoming events"
+    },
+    "pipeline": {
+      "title": "My Pipeline",
+      "deals": "{{count}} deals",
+      "empty": "No active deals"
+    },
+    "email": {
+      "title": "Email",
+      "unread": "{{count}} unread",
+      "connectEmail": "Connect your email to see messages here",
+      "setupEmail": "Set up email",
+      "noRecentEmails": "No recent emails"
+    },
+    "feed": {
+      "title": "Activity Feed",
+      "noRecentActivity": "No recent activity",
+      "viewAll": "View all activity"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "today": "{{count}} today",
+      "allCaughtUp": "All caught up!",
+      "more": "+{{count}} more",
+      "types": {
+        "assignment": "Assignments",
+        "mention": "Mentions",
+        "status_change": "Status Changes",
+        "comment": "Comments",
+        "due_date": "Due Dates",
+        "new_lead": "New Leads",
+        "deal_won": "Deals Won",
+        "deal_lost": "Deals Lost"
+      }
+    },
+    "recentRecords": {
+      "title": "Recent Records",
+      "empty": "No recently viewed records"
+    }
+  }
+}

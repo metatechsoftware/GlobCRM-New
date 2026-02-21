@@ -1,0 +1,72 @@
+{
+  "title": "Gunum",
+  "greeting": {
+    "morning": "Gunaydin",
+    "afternoon": "Iyi gunler",
+    "evening": "Iyi aksamlar"
+  },
+  "stats": {
+    "tasksToday": "{{count}} gorev bugun",
+    "overdue": "{{count}} geciken",
+    "meetings": "{{count}} toplanti"
+  },
+  "quickActions": {
+    "newContact": "Yeni Kisi",
+    "newDeal": "Yeni Firsat",
+    "logActivity": "Aktivite Kaydet",
+    "newNote": "Yeni Not",
+    "sendEmail": "E-posta Gonder"
+  },
+  "widgets": {
+    "tasks": {
+      "title": "Bugunku Gorevler",
+      "overdue": "Geciken",
+      "dueToday": "Bugun Bitmesi Gereken",
+      "daysOverdue": "{{count}} gun geciken",
+      "empty": "Bugun icin gorev yok -- harika!"
+    },
+    "upcomingEvents": {
+      "title": "Yaklasan Etkinlikler",
+      "today": "Bugun",
+      "tomorrow": "Yarin",
+      "empty": "Yaklasan etkinlik yok"
+    },
+    "pipeline": {
+      "title": "Boru Hattim",
+      "deals": "{{count}} firsat",
+      "empty": "Aktif firsat yok"
+    },
+    "email": {
+      "title": "E-posta",
+      "unread": "{{count}} okunmamis",
+      "connectEmail": "Mesajlari burada gormek icin e-postanizi baglayiniz",
+      "setupEmail": "E-postayi ayarla",
+      "noRecentEmails": "Son e-posta yok"
+    },
+    "feed": {
+      "title": "Aktivite Akisi",
+      "noRecentActivity": "Son aktivite yok",
+      "viewAll": "Tum aktiviteleri gor"
+    },
+    "notifications": {
+      "title": "Bildirimler",
+      "today": "{{count}} bugun",
+      "allCaughtUp": "Hepsi tamam!",
+      "more": "+{{count}} daha fazla",
+      "types": {
+        "assignment": "Atamalar",
+        "mention": "Bahsetmeler",
+        "status_change": "Durum Degisiklikleri",
+        "comment": "Yorumlar",
+        "due_date": "Bitis Tarihleri",
+        "new_lead": "Yeni Musteriler",
+        "deal_won": "Kazanilan Firsatlar",
+        "deal_lost": "Kaybedilen Firsatlar"
+      }
+    },
+    "recentRecords": {
+      "title": "Son Kayitlar",
+      "empty": "Son goruntulenen kayit yok"
+    }
+  }
+}

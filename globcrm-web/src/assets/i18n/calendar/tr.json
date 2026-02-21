@@ -1,0 +1,29 @@
+{
+  "title": "Takvim",
+  "header": {
+    "activitiesInView": "{{count}} aktivite goruntuluyor",
+    "activityInView": "1 aktivite goruntuluyor",
+    "filterByType": "{{type}} ile filtrele"
+  },
+  "filters": {
+    "entityType": "Varlik Turu",
+    "allEntities": "Tum Varliklar",
+    "contacts": "Kisiler",
+    "companies": "Sirketler",
+    "deals": "Firsatlar",
+    "owner": "Sahip",
+    "allOwners": "Tum Sahipler"
+  },
+  "empty": {
+    "title": "Aktivite bulunamadi",
+    "description": "Takvim etkinliklerini gormek icin filtrelerinizi veya tarih araligini ayarlayin."
+  },
+  "legend": {
+    "priority": "Oncelik"
+  },
+  "messages": {
+    "rescheduled": "Aktivite yeniden planlandi",
+    "rescheduleFailed": "Aktivite yeniden planlanamadi",
+    "loadFailed": "Takvim etkinlikleri yuklenemedi"
+  }
+}

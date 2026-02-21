@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, inject, computed, afterNextRender } from '@angular/core';
 import { Router } from '@angular/router';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../core/auth/auth.store';
 import { PreviewSidebarStore } from '../../shared/stores/preview-sidebar.store';
 import { MyDayStore } from './my-day.store';
@@ -19,6 +20,7 @@ import { RecentRecordsWidgetComponent } from './widgets/recent-records-widget/re
   selector: 'app-my-day',
   standalone: true,
   imports: [
+    TranslocoPipe,
     GreetingBannerComponent,
     TasksWidgetComponent,
     UpcomingEventsWidgetComponent,

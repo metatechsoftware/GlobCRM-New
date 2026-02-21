@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { WidgetDto, MetricResultDto, MetricType, TargetDto } from '../../models/dashboard.models';
 import { KpiCardComponent } from '../widgets/kpi-card/kpi-card.component';
 import { ChartWidgetComponent } from '../widgets/chart-widget/chart-widget.component';
@@ -31,6 +32,7 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
     MatIconModule,
     MatMenuModule,
     MatButtonModule,
+    TranslocoPipe,
     KpiCardComponent,
     ChartWidgetComponent,
     LeaderboardComponent,
@@ -192,11 +194,11 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
           <mat-menu #widgetMenu="matMenu">
             <button mat-menu-item (click)="edit.emit()">
               <mat-icon>settings</mat-icon>
-              <span>Configure</span>
+              <span>{{ 'widgets.configure' | transloco }}</span>
             </button>
             <button mat-menu-item (click)="remove.emit()">
               <mat-icon>delete</mat-icon>
-              <span>Remove</span>
+              <span>{{ 'widgets.remove' | transloco }}</span>
             </button>
           </mat-menu>
         }

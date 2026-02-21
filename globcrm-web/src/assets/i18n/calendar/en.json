@@ -1,0 +1,29 @@
+{
+  "title": "Calendar",
+  "header": {
+    "activitiesInView": "{{count}} activities in view",
+    "activityInView": "1 activity in view",
+    "filterByType": "Filter by {{type}}s"
+  },
+  "filters": {
+    "entityType": "Entity Type",
+    "allEntities": "All Entities",
+    "contacts": "Contacts",
+    "companies": "Companies",
+    "deals": "Deals",
+    "owner": "Owner",
+    "allOwners": "All Owners"
+  },
+  "empty": {
+    "title": "No activities found",
+    "description": "Try adjusting your filters or date range to see calendar events."
+  },
+  "legend": {
+    "priority": "Priority"
+  },
+  "messages": {
+    "rescheduled": "Activity rescheduled",
+    "rescheduleFailed": "Failed to reschedule activity",
+    "loadFailed": "Failed to load calendar events"
+  }
+}

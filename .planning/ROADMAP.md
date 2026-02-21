@@ -175,7 +175,7 @@ Plans:
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
-| 28. Localization String Extraction | v1.3 | 0/7 | Not started | - |
+| 28. Localization String Extraction | 1/7 | In Progress|  | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |

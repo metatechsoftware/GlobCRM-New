@@ -14,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput, EventDropArg, EventContentArg } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -43,6 +44,7 @@ import { ACTIVITY_TYPES, ACTIVITY_PRIORITIES } from '../activities/activity.mode
     MatProgressBarModule,
     MatSnackBarModule,
     MatTooltipModule,
+    TranslocoPipe,
     FullCalendarModule,
   ],
   templateUrl: './calendar.component.html',
@@ -56,6 +58,7 @@ export class CalendarComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   /** Loading state. */
   isLoading = signal(false);
@@ -221,17 +224,17 @@ export class CalendarComponent implements OnInit {
           customFields: activity.customFields,
         }).subscribe({
           next: () => {
-            this.snackBar.open('Activity rescheduled', 'Close', { duration: 2000 });
+            this.snackBar.open(this.translocoService.translate('messages.rescheduled'), 'Close', { duration: 2000 });
           },
           error: () => {
             info.revert();
-            this.snackBar.open('Failed to reschedule activity', 'Close', { duration: 5000 });
+            this.snackBar.open(this.translocoService.translate('messages.rescheduleFailed'), 'Close', { duration: 5000 });
           },
         });
       },
       error: () => {
         info.revert();
-        this.snackBar.open('Failed to reschedule activity', 'Close', { duration: 5000 });
+        this.snackBar.open(this.translocoService.translate('messages.rescheduleFailed'), 'Close', { duration: 5000 });
       },
     });
   }
@@ -297,7 +300,7 @@ export class CalendarComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load calendar events', 'Close', { duration: 5000 });
+        this.snackBar.open(this.translocoService.translate('messages.loadFailed'), 'Close', { duration: 5000 });
       },
     });
   }

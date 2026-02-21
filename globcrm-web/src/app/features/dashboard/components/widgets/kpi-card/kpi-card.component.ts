@@ -5,6 +5,7 @@ import {
   computed,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * KPI metric card widget.
@@ -14,7 +15,7 @@ import { MatIconModule } from '@angular/material/icon';
 @Component({
   selector: 'app-kpi-card',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     @keyframes progressFill {
@@ -168,7 +169,7 @@ import { MatIconModule } from '@angular/material/icon';
             ></div>
           </div>
           <div class="kpi-card__progress-meta">
-            <span class="kpi-card__progress-text">of target</span>
+            <span class="kpi-card__progress-text">{{ 'widgets.ofTarget' | transloco }}</span>
             <span class="kpi-card__progress-pct">{{ progressPercent() }}%</span>
           </div>
         </div>

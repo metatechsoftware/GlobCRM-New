@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PreviewEntityLinkComponent } from '../../../../shared/components/entity-preview/preview-entity-link.component';
 import { ENTITY_TYPE_REGISTRY } from '../../../../shared/services/entity-type-registry';
 import { MyDayRecentRecordDto } from '../../my-day.models';
@@ -8,7 +9,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
 @Component({
   selector: 'app-recent-records-widget',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, PreviewEntityLinkComponent],
+  imports: [MatCardModule, MatIconModule, TranslocoPipe, PreviewEntityLinkComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="records-widget">
@@ -16,7 +17,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>history</mat-icon>
         </div>
-        <mat-card-title>Recent Records</mat-card-title>
+        <mat-card-title>{{ 'widgets.recentRecords.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -32,7 +33,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
         } @else if (records().length === 0) {
           <div class="records-widget__empty">
             <mat-icon class="records-widget__empty-icon">history</mat-icon>
-            <span class="records-widget__empty-text">No recently viewed records</span>
+            <span class="records-widget__empty-text">{{ 'widgets.recentRecords.empty' | transloco }}</span>
           </div>
         } @else {
           <div class="records-widget__list">

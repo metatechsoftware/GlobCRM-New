@@ -10,6 +10,7 @@ import { MatButtonToggleModule, MatButtonToggleChange } from '@angular/material/
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { DateRange } from '../../models/dashboard.models';
 
 type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
@@ -27,6 +28,7 @@ type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
     MatDatepickerModule,
     MatFormFieldModule,
     MatInputModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -56,18 +58,18 @@ type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
   template: `
     <div class="date-range-filter">
       <mat-button-toggle-group [value]="activePreset()" (change)="onPresetChange($event)">
-        <mat-button-toggle value="today">Today</mat-button-toggle>
-        <mat-button-toggle value="week">This Week</mat-button-toggle>
-        <mat-button-toggle value="month">This Month</mat-button-toggle>
-        <mat-button-toggle value="quarter">Quarter</mat-button-toggle>
-        <mat-button-toggle value="year">Year</mat-button-toggle>
-        <mat-button-toggle value="custom">Custom</mat-button-toggle>
+        <mat-button-toggle value="today">{{ 'filters.today' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="week">{{ 'filters.week' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="month">{{ 'filters.month' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="quarter">{{ 'filters.quarter' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="year">{{ 'filters.year' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="custom">{{ 'filters.custom' | transloco }}</mat-button-toggle>
       </mat-button-toggle-group>
       @if (activePreset() === 'custom') {
         <mat-form-field appearance="outline">
           <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate placeholder="Start" [value]="customStart" (dateChange)="onCustomChange()">
-            <input matEndDate placeholder="End" [value]="customEnd" (dateChange)="onCustomChange()">
+            <input matStartDate [placeholder]="'filters.start' | transloco" [value]="customStart" (dateChange)="onCustomChange()">
+            <input matEndDate [placeholder]="'filters.end' | transloco" [value]="customEnd" (dateChange)="onCustomChange()">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker" />
           <mat-date-range-picker #picker />

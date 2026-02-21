@@ -1,0 +1,158 @@
+{
+  "title": "Dashboard",
+  "greeting": {
+    "morning": "Good morning",
+    "afternoon": "Good afternoon",
+    "evening": "Good evening"
+  },
+  "header": {
+    "team": "Team",
+    "live": "Live",
+    "addWidget": "Add Widget",
+    "edit": "Edit",
+    "done": "Done",
+    "loading": "Loading your dashboard..."
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "targets": "Targets"
+  },
+  "empty": {
+    "title": "No dashboards yet",
+    "description": "Create your first dashboard to start tracking KPIs and metrics.",
+    "createButton": "Create Dashboard"
+  },
+  "widgets": {
+    "noData": "No data available",
+    "ofTarget": "of target",
+    "complete": "complete",
+    "noTargetConfigured": "No target configured",
+    "configure": "Configure",
+    "remove": "Remove"
+  },
+  "config": {
+    "addTitle": "Add Widget",
+    "editTitle": "Edit Widget",
+    "title": "Title",
+    "titlePlaceholder": "Widget title",
+    "widgetType": "Widget Type",
+    "metric": "Metric",
+    "format": "Format",
+    "icon": "Icon",
+    "iconPlaceholder": "e.g. trending_up",
+    "valueFormat": "Value Format",
+    "target": "Target",
+    "cancel": "Cancel",
+    "save": "Save",
+    "add": "Add",
+    "widgetTypes": {
+      "KpiCard": "KPI Card",
+      "BarChart": "Bar Chart",
+      "LineChart": "Line Chart",
+      "PieChart": "Pie Chart",
+      "Leaderboard": "Leaderboard",
+      "Table": "Table",
+      "TargetProgress": "Target Progress"
+    },
+    "formats": {
+      "number": "Number",
+      "currency": "Currency",
+      "percent": "Percent"
+    }
+  },
+  "targets": {
+    "title": "Targets",
+    "addTarget": "Add Target",
+    "editTarget": "Edit Target",
+    "createTarget": "Create Target",
+    "targetName": "Target Name",
+    "targetNamePlaceholder": "e.g. 50 calls this week",
+    "metric": "Metric",
+    "period": "Period",
+    "targetValue": "Target Value",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "teamWide": "Team-wide target",
+    "update": "Update",
+    "create": "Create",
+    "cancel": "Cancel",
+    "created": "Target created",
+    "updated": "Target updated",
+    "deleted": "Target deleted",
+    "deleteConfirm": "Delete target \"{{name}}\"?",
+    "delete": "Delete",
+    "empty": {
+      "title": "No targets yet",
+      "description": "Set goals like \"50 calls this week\" or \"$100K pipeline\" and track your progress.",
+      "createButton": "Create your first target"
+    },
+    "periods": {
+      "Daily": "Daily",
+      "Weekly": "Weekly",
+      "Monthly": "Monthly",
+      "Quarterly": "Quarterly",
+      "Yearly": "Yearly"
+    }
+  },
+  "filters": {
+    "today": "Today",
+    "week": "This Week",
+    "month": "This Month",
+    "quarter": "Quarter",
+    "year": "Year",
+    "custom": "Custom",
+    "start": "Start",
+    "end": "End"
+  },
+  "selector": {
+    "dashboard": "Dashboard",
+    "myDashboards": "My Dashboards",
+    "teamDashboards": "Team Dashboards",
+    "deleteDashboard": "Delete dashboard",
+    "createDashboard": "Create dashboard"
+  },
+  "createDialog": {
+    "title": "Create Dashboard",
+    "name": "Dashboard Name",
+    "namePlaceholder": "My Dashboard",
+    "teamWide": "Team-wide dashboard",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "deleteConfirm": "Delete \"{{name}}\"? This cannot be undone.",
+  "metrics": {
+    "groups": {
+      "Deals": "Deals",
+      "Activities": "Activities",
+      "Quotes": "Quotes",
+      "Contacts": "Contacts",
+      "Companies": "Companies",
+      "Requests": "Requests",
+      "Leaderboard": "Leaderboard"
+    },
+    "DealCount": "Deal Count",
+    "DealPipelineValue": "Pipeline Value",
+    "DealsByStage": "Deals by Stage",
+    "DealsWon": "Deals Won",
+    "DealsLost": "Deals Lost",
+    "WinRate": "Win Rate",
+    "AverageDealValue": "Avg Deal Value",
+    "SalesLeaderboard": "Sales Leaderboard",
+    "ActivityCount": "Activity Count",
+    "ActivitiesByType": "Activities by Type",
+    "ActivitiesByStatus": "Activities by Status",
+    "ActivitiesCompleted": "Activities Completed",
+    "OverdueActivities": "Overdue Activities",
+    "ActivityLeaderboard": "Activity Leaderboard",
+    "QuoteTotal": "Quote Total",
+    "QuotesByStatus": "Quotes by Status",
+    "ContactsCreated": "Contacts Created",
+    "CompaniesCreated": "Companies Created",
+    "RequestsByStatus": "Requests by Status",
+    "RequestsByPriority": "Requests by Priority"
+  },
+  "table": {
+    "name": "Name",
+    "value": "Value"
+  }
+}

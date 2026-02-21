@@ -1,0 +1,158 @@
+{
+  "title": "Dashboard",
+  "greeting": {
+    "morning": "Gunaydin",
+    "afternoon": "Iyi gunler",
+    "evening": "Iyi aksamlar"
+  },
+  "header": {
+    "team": "Takim",
+    "live": "Canli",
+    "addWidget": "Widget Ekle",
+    "edit": "Duzenle",
+    "done": "Tamam",
+    "loading": "Dashboard yukleniyor..."
+  },
+  "tabs": {
+    "dashboard": "Dashboard",
+    "targets": "Hedefler"
+  },
+  "empty": {
+    "title": "Henuz dashboard yok",
+    "description": "KPI'lari ve metrikleri takip etmek icin ilk dashboard'unuzu olusturun.",
+    "createButton": "Dashboard Olustur"
+  },
+  "widgets": {
+    "noData": "Veri bulunamadi",
+    "ofTarget": "hedefe karsi",
+    "complete": "tamamlandi",
+    "noTargetConfigured": "Hedef yapilandirilmadi",
+    "configure": "Yapilandir",
+    "remove": "Kaldir"
+  },
+  "config": {
+    "addTitle": "Widget Ekle",
+    "editTitle": "Widget Duzenle",
+    "title": "Baslik",
+    "titlePlaceholder": "Widget basligi",
+    "widgetType": "Widget Turu",
+    "metric": "Metrik",
+    "format": "Format",
+    "icon": "Simge",
+    "iconPlaceholder": "orn. trending_up",
+    "valueFormat": "Deger Formati",
+    "target": "Hedef",
+    "cancel": "Iptal",
+    "save": "Kaydet",
+    "add": "Ekle",
+    "widgetTypes": {
+      "KpiCard": "KPI Karti",
+      "BarChart": "Cubuk Grafik",
+      "LineChart": "Cizgi Grafik",
+      "PieChart": "Pasta Grafik",
+      "Leaderboard": "Siralama",
+      "Table": "Tablo",
+      "TargetProgress": "Hedef Ilerlemesi"
+    },
+    "formats": {
+      "number": "Sayi",
+      "currency": "Para Birimi",
+      "percent": "Yuzde"
+    }
+  },
+  "targets": {
+    "title": "Hedefler",
+    "addTarget": "Hedef Ekle",
+    "editTarget": "Hedefi Duzenle",
+    "createTarget": "Hedef Olustur",
+    "targetName": "Hedef Adi",
+    "targetNamePlaceholder": "orn. Bu hafta 50 arama",
+    "metric": "Metrik",
+    "period": "Donem",
+    "targetValue": "Hedef Degeri",
+    "startDate": "Baslangic Tarihi",
+    "endDate": "Bitis Tarihi",
+    "teamWide": "Takim geneli hedef",
+    "update": "Guncelle",
+    "create": "Olustur",
+    "cancel": "Iptal",
+    "created": "Hedef olusturuldu",
+    "updated": "Hedef guncellendi",
+    "deleted": "Hedef silindi",
+    "deleteConfirm": "\"{{name}}\" hedefini silinsin mi?",
+    "delete": "Sil",
+    "empty": {
+      "title": "Henuz hedef yok",
+      "description": "\"Bu hafta 50 arama\" veya \"100.000$ boru hatti\" gibi hedefler belirleyin ve ilerlemenizi takip edin.",
+      "createButton": "Ilk hedefinizi olusturun"
+    },
+    "periods": {
+      "Daily": "Gunluk",
+      "Weekly": "Haftalik",
+      "Monthly": "Aylik",
+      "Quarterly": "Ceyreklik",
+      "Yearly": "Yillik"
+    }
+  },
+  "filters": {
+    "today": "Bugun",
+    "week": "Bu Hafta",
+    "month": "Bu Ay",
+    "quarter": "Ceyrek",
+    "year": "Yil",
+    "custom": "Ozel",
+    "start": "Baslangic",
+    "end": "Bitis"
+  },
+  "selector": {
+    "dashboard": "Dashboard",
+    "myDashboards": "Dashboard'larim",
+    "teamDashboards": "Takim Dashboard'lari",
+    "deleteDashboard": "Dashboard'u sil",
+    "createDashboard": "Dashboard olustur"
+  },
+  "createDialog": {
+    "title": "Dashboard Olustur",
+    "name": "Dashboard Adi",
+    "namePlaceholder": "Dashboard'um",
+    "teamWide": "Takim geneli dashboard",
+    "cancel": "Iptal",
+    "create": "Olustur"
+  },
+  "deleteConfirm": "\"{{name}}\" silinsin mi? Bu islem geri alinamaz.",
+  "metrics": {
+    "groups": {
+      "Deals": "Firsatlar",
+      "Activities": "Aktiviteler",
+      "Quotes": "Teklifler",
+      "Contacts": "Kisiler",
+      "Companies": "Sirketler",
+      "Requests": "Talepler",
+      "Leaderboard": "Siralama"
+    },
+    "DealCount": "Firsat Sayisi",
+    "DealPipelineValue": "Boru Hatti Degeri",
+    "DealsByStage": "Asamaya Gore Firsatlar",
+    "DealsWon": "Kazanilan Firsatlar",
+    "DealsLost": "Kaybedilen Firsatlar",
+    "WinRate": "Kazanma Orani",
+    "AverageDealValue": "Ort. Firsat Degeri",
+    "SalesLeaderboard": "Satis Siralamasi",
+    "ActivityCount": "Aktivite Sayisi",
+    "ActivitiesByType": "Ture Gore Aktiviteler",
+    "ActivitiesByStatus": "Duruma Gore Aktiviteler",
+    "ActivitiesCompleted": "Tamamlanan Aktiviteler",
+    "OverdueActivities": "Geciken Aktiviteler",
+    "ActivityLeaderboard": "Aktivite Siralamasi",
+    "QuoteTotal": "Teklif Toplami",
+    "QuotesByStatus": "Duruma Gore Teklifler",
+    "ContactsCreated": "Olusturulan Kisiler",
+    "CompaniesCreated": "Olusturulan Sirketler",
+    "RequestsByStatus": "Duruma Gore Talepler",
+    "RequestsByPriority": "Oncelike Gore Talepler"
+  },
+  "table": {
+    "name": "Ad",
+    "value": "Deger"
+  }
+}

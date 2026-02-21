@@ -4,6 +4,7 @@ import {
   input,
   computed,
 } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MetricResultDto } from '../../../models/dashboard.models';
 
 interface TableColumn {
@@ -19,7 +20,7 @@ interface TableColumn {
 @Component({
   selector: 'app-table-widget',
   standalone: true,
-  imports: [],
+  imports: [TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -115,7 +116,7 @@ interface TableColumn {
       </table>
     } @else {
       <div class="table-empty">
-        <span>No data available</span>
+        <span>{{ 'widgets.noData' | transloco }}</span>
       </div>
     }
   `,

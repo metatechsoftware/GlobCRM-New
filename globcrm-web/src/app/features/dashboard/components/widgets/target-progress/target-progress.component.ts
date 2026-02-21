@@ -5,6 +5,7 @@ import {
   computed,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 
 /**
@@ -15,7 +16,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
 @Component({
   selector: 'app-target-progress',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     @keyframes ringFill {
@@ -190,7 +191,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
             <span class="target-card__ring-percent" [class]="percentColorClass()">
               {{ progressPercent() }}%
             </span>
-            <span class="target-card__ring-sublabel">complete</span>
+            <span class="target-card__ring-sublabel">{{ 'widgets.complete' | transloco }}</span>
           </div>
         </div>
 
@@ -207,7 +208,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
     } @else {
       <div class="target-card__empty">
         <mat-icon>track_changes</mat-icon>
-        <span>No target configured</span>
+        <span>{{ 'widgets.noTargetConfigured' | transloco }}</span>
       </div>
     }
   `,

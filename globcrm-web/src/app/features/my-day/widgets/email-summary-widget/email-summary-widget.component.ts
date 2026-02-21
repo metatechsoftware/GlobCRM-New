@@ -2,12 +2,13 @@ import { Component, ChangeDetectionStrategy, input, output, computed } from '@an
 import { RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MyDayEmailDto } from '../../my-day.models';
 
 @Component({
   selector: 'app-email-summary-widget',
   standalone: true,
-  imports: [MatCardModule, MatIconModule, RouterLink],
+  imports: [MatCardModule, MatIconModule, RouterLink, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <mat-card class="email-widget">
@@ -15,11 +16,11 @@ import { MyDayEmailDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>email</mat-icon>
         </div>
-        <mat-card-title>Email</mat-card-title>
+        <mat-card-title>{{ 'widgets.email.title' | transloco }}</mat-card-title>
         @if (!isLoading()) {
           <span class="email-widget__badge"
                 [class.email-widget__badge--active]="unreadCount() > 0">
-            {{ unreadCount() }} unread
+            {{ 'widgets.email.unread' | transloco: { count: unreadCount() } }}
           </span>
         }
       </mat-card-header>
@@ -35,10 +36,10 @@ import { MyDayEmailDto } from '../../my-day.models';
           <div class="email-widget__empty">
             <mat-icon class="email-widget__empty-icon">mail_outline</mat-icon>
             @if (recentEmails().length === 0 && unreadCount() === 0) {
-              <span class="email-widget__empty-text">Connect your email to see messages here</span>
-              <a class="email-widget__setup-link" routerLink="/settings">Set up email</a>
+              <span class="email-widget__empty-text">{{ 'widgets.email.connectEmail' | transloco }}</span>
+              <a class="email-widget__setup-link" routerLink="/settings">{{ 'widgets.email.setupEmail' | transloco }}</a>
             } @else {
-              <span class="email-widget__empty-text">No recent emails</span>
+              <span class="email-widget__empty-text">{{ 'widgets.email.noRecentEmails' | transloco }}</span>
             }
           </div>
         } @else {

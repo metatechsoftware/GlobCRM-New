@@ -7,9 +7,9 @@
           <mat-icon>calendar_month</mat-icon>
         </div>
         <div>
-          <h1 class="cal-header__title">Calendar</h1>
+          <h1 class="cal-header__title">{{ 'title' | transloco }}</h1>
           <p class="cal-header__subtitle">
-            {{ events().length }} activit{{ events().length === 1 ? 'y' : 'ies' }} in view
+            {{ events().length === 1 ? ('header.activityInView' | transloco) : ('header.activitiesInView' | transloco: { count: events().length }) }}
           </p>
         </div>
       </div>
@@ -20,7 +20,7 @@
             class="stat-chip"
             [class.stat-chip--active]="filterType() === type.value"
             (click)="onTypeChanged(filterType() === type.value ? null : type.value)"
-            [matTooltip]="'Filter by ' + type.label + 's'">
+            [matTooltip]="'header.filterByType' | transloco: { type: type.label }">
             <mat-icon class="stat-chip__icon">{{ type.icon }}</mat-icon>
             <span class="stat-chip__count">{{ typeCounts()[type.value] || 0 }}</span>
             <span class="stat-chip__label">{{ type.label }}s</span>
@@ -32,7 +32,7 @@
     <!-- Filter dropdowns -->
     <div class="cal-filters">
       <mat-form-field appearance="outline" class="cal-filter">
-        <mat-label>Entity Type</mat-label>
+        <mat-label>{{ 'filters.entityType' | transloco }}</mat-label>
         <mat-select [value]="filterEntityType()" (selectionChange)="onEntityTypeChanged($event.value)">
           @for (et of entityTypes; track et.value) {
             <mat-option [value]="et.value">{{ et.label }}</mat-option>
@@ -41,9 +41,9 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="cal-filter">
-        <mat-label>Owner</mat-label>
+        <mat-label>{{ 'filters.owner' | transloco }}</mat-label>
         <mat-select [value]="filterOwnerId()" (selectionChange)="onOwnerChanged($event.value)">
-          <mat-option [value]="null">All Owners</mat-option>
+          <mat-option [value]="null">{{ 'filters.allOwners' | transloco }}</mat-option>
           @for (member of teamMembers(); track member.id) {
             <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
           }
@@ -69,15 +69,15 @@
         <div class="cal-empty__decoration">
           <mat-icon>event_available</mat-icon>
         </div>
-        <h2 class="cal-empty__title">No activities found</h2>
-        <p class="cal-empty__text">Try adjusting your filters or date range to see calendar events.</p>
+        <h2 class="cal-empty__title">{{ 'empty.title' | transloco }}</h2>
+        <p class="cal-empty__text">{{ 'empty.description' | transloco }}</p>
       </div>
     }
   </div>
 
   <!-- Priority legend -->
   <footer class="cal-legend">
-    <span class="cal-legend__label">Priority</span>
+    <span class="cal-legend__label">{{ 'legend.priority' | transloco }}</span>
     <div class="cal-legend__items">
       @for (item of priorityLegend; track item.value) {
         <div class="cal-legend__item">

@@ -1,11 +1,12 @@
-import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-greeting-banner',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule],
+  imports: [MatButtonModule, MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="greeting-banner">
@@ -35,34 +36,34 @@ import { MatIconModule } from '@angular/material/icon';
           } @else {
             <div class="greeting-banner__stat-chip">
               <mat-icon class="greeting-banner__stat-icon">task_alt</mat-icon>
-              <span>{{ stats().tasksToday }} tasks today</span>
+              <span>{{ 'stats.tasksToday' | transloco: { count: stats().tasksToday } }}</span>
             </div>
             <div class="greeting-banner__stat-chip" [class.greeting-banner__stat-chip--danger]="stats().overdue > 0">
               <mat-icon class="greeting-banner__stat-icon">warning</mat-icon>
-              <span>{{ stats().overdue }} overdue</span>
+              <span>{{ 'stats.overdue' | transloco: { count: stats().overdue } }}</span>
             </div>
             <div class="greeting-banner__stat-chip">
               <mat-icon class="greeting-banner__stat-icon">videocam</mat-icon>
-              <span>{{ stats().meetings }} meetings</span>
+              <span>{{ 'stats.meetings' | transloco: { count: stats().meetings } }}</span>
             </div>
           }
         </div>
 
         <div class="greeting-banner__actions">
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Contact')">
-            <mat-icon>person_add</mat-icon> <span>New Contact</span>
+            <mat-icon>person_add</mat-icon> <span>{{ 'quickActions.newContact' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Deal')">
-            <mat-icon>handshake</mat-icon> <span>New Deal</span>
+            <mat-icon>handshake</mat-icon> <span>{{ 'quickActions.newDeal' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Activity')">
-            <mat-icon>task_alt</mat-icon> <span>Log Activity</span>
+            <mat-icon>task_alt</mat-icon> <span>{{ 'quickActions.logActivity' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Note')">
-            <mat-icon>note_add</mat-icon> <span>New Note</span>
+            <mat-icon>note_add</mat-icon> <span>{{ 'quickActions.newNote' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Email')">
-            <mat-icon>email</mat-icon> <span>Send Email</span>
+            <mat-icon>email</mat-icon> <span>{{ 'quickActions.sendEmail' | transloco }}</span>
           </button>
         </div>
       </div>
@@ -374,12 +375,13 @@ export class GreetingBannerComponent {
   readonly stats = input.required<{ tasksToday: number; overdue: number; meetings: number }>();
   readonly isLoading = input<boolean>(false);
   readonly quickAction = output<string>();
+  private readonly translocoService = inject(TranslocoService);
 
   readonly greeting = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 17) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return this.translocoService.translate('greeting.morning');
+    if (hour < 17) return this.translocoService.translate('greeting.afternoon');
+    return this.translocoService.translate('greeting.evening');
   });
 
   readonly timeIcon = computed(() => {

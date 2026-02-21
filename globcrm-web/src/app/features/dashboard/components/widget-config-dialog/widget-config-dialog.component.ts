@@ -13,6 +13,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   WidgetDto,
   WidgetType,
@@ -121,6 +122,7 @@ export interface WidgetConfigDialogData {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -152,16 +154,16 @@ export interface WidgetConfigDialogData {
     }
   `,
   template: `
-    <h2 mat-dialog-title>{{ data?.widget ? 'Edit Widget' : 'Add Widget' }}</h2>
+    <h2 mat-dialog-title>{{ data?.widget ? ('config.editTitle' | transloco) : ('config.addTitle' | transloco) }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" class="widget-config-form">
         <mat-form-field appearance="outline">
-          <mat-label>Title</mat-label>
-          <input matInput formControlName="title" placeholder="Widget title" />
+          <mat-label>{{ 'config.title' | transloco }}</mat-label>
+          <input matInput formControlName="title" [placeholder]="'config.titlePlaceholder' | transloco" />
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Widget Type</mat-label>
+          <mat-label>{{ 'config.widgetType' | transloco }}</mat-label>
           <mat-select formControlName="type">
             @for (wt of widgetTypes; track wt.value) {
               <mat-option [value]="wt.value">{{ wt.label }}</mat-option>
@@ -171,7 +173,7 @@ export interface WidgetConfigDialogData {
 
         @if (form.value.type !== 'TargetProgress') {
           <mat-form-field appearance="outline">
-            <mat-label>Metric</mat-label>
+            <mat-label>{{ 'config.metric' | transloco }}</mat-label>
             <mat-select formControlName="metricType">
               @for (group of metricGroups; track group.label) {
                 <mat-optgroup [label]="group.label">
@@ -188,16 +190,16 @@ export interface WidgetConfigDialogData {
         @if (form.value.type === 'KpiCard') {
           <div class="widget-config-form__row">
             <mat-form-field appearance="outline">
-              <mat-label>Format</mat-label>
+              <mat-label>{{ 'config.format' | transloco }}</mat-label>
               <mat-select formControlName="format">
-                <mat-option value="number">Number</mat-option>
-                <mat-option value="currency">Currency</mat-option>
-                <mat-option value="percent">Percent</mat-option>
+                <mat-option value="number">{{ 'config.formats.number' | transloco }}</mat-option>
+                <mat-option value="currency">{{ 'config.formats.currency' | transloco }}</mat-option>
+                <mat-option value="percent">{{ 'config.formats.percent' | transloco }}</mat-option>
               </mat-select>
             </mat-form-field>
             <mat-form-field appearance="outline">
-              <mat-label>Icon</mat-label>
-              <input matInput formControlName="icon" placeholder="e.g. trending_up" />
+              <mat-label>{{ 'config.icon' | transloco }}</mat-label>
+              <input matInput formControlName="icon" [placeholder]="'config.iconPlaceholder' | transloco" />
             </mat-form-field>
           </div>
         }
@@ -205,10 +207,10 @@ export interface WidgetConfigDialogData {
         <!-- Leaderboard extra config -->
         @if (form.value.type === 'Leaderboard') {
           <mat-form-field appearance="outline">
-            <mat-label>Value Format</mat-label>
+            <mat-label>{{ 'config.valueFormat' | transloco }}</mat-label>
             <mat-select formControlName="valueFormat">
-              <mat-option value="number">Number</mat-option>
-              <mat-option value="currency">Currency</mat-option>
+              <mat-option value="number">{{ 'config.formats.number' | transloco }}</mat-option>
+              <mat-option value="currency">{{ 'config.formats.currency' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
         }
@@ -216,7 +218,7 @@ export interface WidgetConfigDialogData {
         <!-- TargetProgress extra config -->
         @if (form.value.type === 'TargetProgress') {
           <mat-form-field appearance="outline">
-            <mat-label>Target</mat-label>
+            <mat-label>{{ 'config.target' | transloco }}</mat-label>
             <mat-select formControlName="targetId">
               @for (target of availableTargets; track target.id) {
                 <mat-option [value]="target.id">{{ target.name }}</mat-option>
@@ -227,9 +229,9 @@ export interface WidgetConfigDialogData {
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'config.cancel' | transloco }}</button>
       <button mat-flat-button color="primary" [disabled]="form.invalid" (click)="onSave()">
-        {{ data?.widget ? 'Save' : 'Add' }}
+        {{ data?.widget ? ('config.save' | transloco) : ('config.add' | transloco) }}
       </button>
     </mat-dialog-actions>
   `,
