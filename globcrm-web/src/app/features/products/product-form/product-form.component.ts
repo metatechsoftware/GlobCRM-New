@@ -23,6 +23,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription } from 'rxjs';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { ProductService } from '../product.service';
 import {
@@ -50,6 +51,7 @@ import {
     MatCheckboxModule,
     MatProgressSpinnerModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   templateUrl: './product-form.component.html',
   styleUrl: './product-form.component.scss',

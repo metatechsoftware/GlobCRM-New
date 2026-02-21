@@ -12,15 +12,15 @@
           <mat-icon>inventory_2</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Products</h1>
-          <p class="list-header__subtitle">Manage your product catalog, pricing, and inventory</p>
+          <h1>{{ 'products.list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'products.list.subtitle' | transloco }}</p>
         </div>
       </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Product:Create'"
               (click)="navigateToNewProduct()">
         <mat-icon>add</mat-icon>
-        New Product
+        {{ 'products.list.newProduct' | transloco }}
       </button>
     </div>
 

@@ -1,0 +1,74 @@
+{
+  "title": "Products",
+  "list": {
+    "title": "Products",
+    "subtitle": "Manage your product catalog, pricing, and inventory",
+    "newProduct": "New Product",
+    "empty": "No products found",
+    "emptyDescription": "Create your first product to get started"
+  },
+  "detail": {
+    "title": "Product Details",
+    "notFound": "Product not found",
+    "backToProducts": "Back to Products",
+    "sections": {
+      "productInfo": "Product Information",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "name": "Name",
+      "sku": "SKU",
+      "category": "Category",
+      "unitPrice": "Unit Price",
+      "status": "Status",
+      "description": "Description",
+      "created": "Created",
+      "updated": "Updated"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "empty": {
+      "notSpecified": "Not specified"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    }
+  },
+  "form": {
+    "createTitle": "New Product",
+    "editTitle": "Edit Product",
+    "sections": {
+      "productInfo": "Product Information",
+      "status": "Status",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "productName": "Product Name",
+      "unitPrice": "Unit Price",
+      "sku": "SKU",
+      "category": "Category",
+      "description": "Description",
+      "active": "Active"
+    },
+    "validation": {
+      "nameRequired": "Product name is required",
+      "nameMaxLength": "Maximum 200 characters",
+      "unitPriceRequired": "Unit price is required",
+      "unitPriceMin": "Price must be 0 or greater",
+      "skuMaxLength": "Maximum 50 characters"
+    },
+    "activeHint": "Inactive products will not appear in search results when linking to deals.",
+    "saveChanges": "Save Changes",
+    "createProduct": "Create Product"
+  },
+  "messages": {
+    "productCreated": "Product created successfully",
+    "productCreateFailed": "Failed to create product",
+    "productUpdated": "Product updated successfully",
+    "productUpdateFailed": "Failed to update product",
+    "loadFailed": "Failed to load product data"
+  }
+}

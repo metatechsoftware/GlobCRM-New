@@ -9,8 +9,8 @@
           <mat-icon>task_alt</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Activities</h1>
-          <p class="list-header__subtitle">Manage tasks, calls, and meetings across your pipeline</p>
+          <h1>{{ 'activities.list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'activities.list.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -32,7 +32,7 @@
         <button mat-raised-button color="primary"
                 *appHasPermission="'Activity:Create'"
                 (click)="openCreateDialog()">
-          <mat-icon>add</mat-icon> New Activity
+          <mat-icon>add</mat-icon> {{ 'activities.list.newActivity' | transloco }}
         </button>
       </div>
     </div>

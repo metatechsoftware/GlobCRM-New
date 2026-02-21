@@ -21,6 +21,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { DatePipe } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { AuthStore } from '../../../core/auth/auth.store';
@@ -95,6 +96,7 @@ const MAX_FILE_SIZE_BYTES = 25 * 1024 * 1024;
     MatSelectModule,
     MatDatepickerModule,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './activity-detail.component.html',
   styleUrl: './activity-detail.component.scss',
@@ -112,6 +114,7 @@ export class ActivityDetailComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Activity detail data. */
   activity = signal<ActivityDetailDto | null>(null);
@@ -361,12 +364,12 @@ export class ActivityDetailComponent implements OnInit {
     this.activityService.updateStatus(this.activityId, newStatus).subscribe({
       next: () => {
         const label = ACTIVITY_STATUSES.find((s) => s.value === newStatus)?.label ?? newStatus;
-        this.snackBar.open(`Status updated to ${label}`, 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.statusUpdated', { status: label }), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to update status', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.statusUpdateFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -376,21 +379,21 @@ export class ActivityDetailComponent implements OnInit {
     if (this.isFollowing()) {
       this.activityService.unfollow(this.activityId).subscribe({
         next: () => {
-          this.snackBar.open('Unfollowed activity', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('activities.messages.unfollowed'), 'OK', { duration: 3000 });
           this.loadActivity();
         },
         error: () => {
-          this.snackBar.open('Failed to update follow status', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('activities.messages.followUpdateFailed'), 'OK', { duration: 3000 });
         },
       });
     } else {
       this.activityService.follow(this.activityId).subscribe({
         next: () => {
-          this.snackBar.open('Following activity', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('activities.messages.following'), 'OK', { duration: 3000 });
           this.loadActivity();
         },
         error: () => {
-          this.snackBar.open('Failed to update follow status', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('activities.messages.followUpdateFailed'), 'OK', { duration: 3000 });
         },
       });
     }
@@ -428,12 +431,12 @@ export class ActivityDetailComponent implements OnInit {
     this.activityService.addComment(this.activityId, content).subscribe({
       next: () => {
         this.commentControl.reset();
-        this.snackBar.open('Comment added', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.commentAdded'), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to add comment', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.commentAddFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -459,11 +462,11 @@ export class ActivityDetailComponent implements OnInit {
       next: () => {
         this.editingCommentId.set(null);
         this.editCommentControl.reset();
-        this.snackBar.open('Comment updated', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.commentUpdated'), 'OK', { duration: 3000 });
         this.loadActivity();
       },
       error: () => {
-        this.snackBar.open('Failed to update comment', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.commentUpdateFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -479,12 +482,12 @@ export class ActivityDetailComponent implements OnInit {
       if (confirmed) {
         this.activityService.deleteComment(this.activityId, commentId).subscribe({
           next: () => {
-            this.snackBar.open('Comment deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('activities.messages.commentDeleted'), 'OK', { duration: 3000 });
             this.loadActivity();
             this.loadTimeline();
           },
           error: () => {
-            this.snackBar.open('Failed to delete comment', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('activities.messages.commentDeleteFailed'), 'OK', { duration: 3000 });
           },
         });
       }
@@ -510,7 +513,7 @@ export class ActivityDetailComponent implements OnInit {
 
     const file = input.files[0];
     if (file.size > MAX_FILE_SIZE_BYTES) {
-      this.snackBar.open('File exceeds maximum size of 25MB', 'OK', { duration: 5000 });
+      this.snackBar.open(this.transloco.translate('activities.messages.fileExceedsSize'), 'OK', { duration: 5000 });
       input.value = '';
       return;
     }
@@ -525,13 +528,13 @@ export class ActivityDetailComponent implements OnInit {
     this.activityService.uploadAttachment(this.activityId, file).subscribe({
       next: () => {
         this.isUploading.set(false);
-        this.snackBar.open(`Uploaded ${file.name}`, 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.fileUploaded', { fileName: file.name }), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
         this.isUploading.set(false);
-        this.snackBar.open('Failed to upload file', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.fileUploadFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -548,7 +551,7 @@ export class ActivityDetailComponent implements OnInit {
         window.URL.revokeObjectURL(url);
       },
       error: () => {
-        this.snackBar.open('Failed to download file', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.fileDownloadFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -564,12 +567,12 @@ export class ActivityDetailComponent implements OnInit {
       if (confirmed) {
         this.activityService.deleteAttachment(this.activityId, attachmentId).subscribe({
           next: () => {
-            this.snackBar.open('Attachment deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('activities.messages.attachmentDeleted'), 'OK', { duration: 3000 });
             this.loadActivity();
             this.loadTimeline();
           },
           error: () => {
-            this.snackBar.open('Failed to delete attachment', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('activities.messages.attachmentDeleteFailed'), 'OK', { duration: 3000 });
           },
         });
       }
@@ -594,12 +597,12 @@ export class ActivityDetailComponent implements OnInit {
     }).subscribe({
       next: () => {
         this.timeEntryForm.reset({ entryDate: new Date() });
-        this.snackBar.open('Time entry added', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.timeEntryAdded'), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to add time entry', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.timeEntryAddFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -608,12 +611,12 @@ export class ActivityDetailComponent implements OnInit {
   deleteTimeEntry(entryId: string): void {
     this.activityService.deleteTimeEntry(this.activityId, entryId).subscribe({
       next: () => {
-        this.snackBar.open('Time entry deleted', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.timeEntryDeleted'), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to delete time entry', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.timeEntryDeleteFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -715,7 +718,7 @@ export class ActivityDetailComponent implements OnInit {
       entityName,
     }).subscribe({
       next: () => {
-        this.snackBar.open(`Linked ${entityName}`, 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.entityLinked', { name: entityName }), 'OK', { duration: 3000 });
         this.showLinkSearch.set(false);
         this.linkSearchControl.reset();
         this.linkSearchResults.set([]);
@@ -723,7 +726,7 @@ export class ActivityDetailComponent implements OnInit {
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to link entity', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.entityLinkFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -732,12 +735,12 @@ export class ActivityDetailComponent implements OnInit {
   unlinkEntity(linkId: string): void {
     this.activityService.deleteLink(this.activityId, linkId).subscribe({
       next: () => {
-        this.snackBar.open('Link removed', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.linkRemoved'), 'OK', { duration: 3000 });
         this.loadActivity();
         this.loadTimeline();
       },
       error: () => {
-        this.snackBar.open('Failed to remove link', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('activities.messages.linkRemoveFailed'), 'OK', { duration: 3000 });
       },
     });
   }

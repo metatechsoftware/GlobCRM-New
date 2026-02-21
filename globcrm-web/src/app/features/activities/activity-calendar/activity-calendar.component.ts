@@ -14,6 +14,7 @@ import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ActivityService } from '../activity.service';
 import { ActivityListDto, ACTIVITY_PRIORITIES } from '../activity.models';
 
@@ -32,6 +33,7 @@ import { ActivityListDto, ACTIVITY_PRIORITIES } from '../activity.models';
     MatButtonToggleModule,
     MatProgressBarModule,
     FullCalendarModule,
+    TranslocoPipe,
   ],
   templateUrl: './activity-calendar.component.html',
   styleUrl: './activity-calendar.component.scss',

@@ -30,6 +30,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
 import { ProductStore } from '../product.store';
 import { ProductService } from '../product.service';
 import { ProductDto } from '../product.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EntityFormDialogComponent } from '../../../shared/components/entity-form-dialog/entity-form-dialog.component';
 import { EntityFormDialogResult } from '../../../shared/components/entity-form-dialog/entity-form-dialog.models';
 
@@ -75,6 +76,7 @@ const DEFAULT_PRODUCT_COLUMNS: ViewColumn[] = [
     FilterChipsComponent,
     FilterPanelComponent,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   providers: [ViewStore, ProductStore],
   templateUrl: './product-list.component.html',

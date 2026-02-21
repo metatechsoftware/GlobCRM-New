@@ -24,6 +24,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { ActivityService } from '../activity.service';
 import {
@@ -65,6 +66,7 @@ import {
     CdkDragPreview,
     CdkDragPlaceholder,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './activity-kanban.component.html',
   styleUrl: './activity-kanban.component.scss',
@@ -74,6 +76,7 @@ export class ActivityKanbanComponent implements OnInit {
   private readonly activityService = inject(ActivityService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Kanban columns initialized from ACTIVITY_STATUSES with empty activities arrays. */
   columns = signal<ActivityKanbanColumnDto[]>(
@@ -114,7 +117,7 @@ export class ActivityKanbanComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load Kanban data', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('activities.messages.kanbanLoadFailed'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -144,7 +147,7 @@ export class ActivityKanbanComponent implements OnInit {
     // Client-side transition validation
     if (!ALLOWED_TRANSITIONS[fromStatus]?.includes(toStatus)) {
       this.snackBar.open(
-        `Cannot move from ${this.getStatusLabel(fromStatus)} to ${this.getStatusLabel(toStatus)}`,
+        this.transloco.translate('activities.messages.cannotTransition', { from: this.getStatusLabel(fromStatus), to: this.getStatusLabel(toStatus) }),
         'OK',
         { duration: 3000 },
       );
@@ -169,7 +172,7 @@ export class ActivityKanbanComponent implements OnInit {
           event.currentIndex,
           event.previousIndex,
         );
-        this.snackBar.open('Failed to update status', 'OK', {
+        this.snackBar.open(this.transloco.translate('activities.messages.statusUpdateFailed'), 'OK', {
           duration: 3000,
         });
       },

@@ -4,7 +4,7 @@
       <a mat-icon-button routerLink="/products" aria-label="Back to products">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ isEditMode ? 'Edit Product' : 'New Product' }}</h1>
+      <h1>{{ isEditMode ? ('products.form.editTitle' | transloco) : ('products.form.createTitle' | transloco) }}</h1>
     </div>
   }
 
@@ -16,46 +16,46 @@
     <form [formGroup]="productForm" (ngSubmit)="onSubmit()">
       <!-- Product Information Section -->
       <div class="form-section">
-        <h3>Product Information</h3>
+        <h3>{{ 'products.form.sections.productInfo' | transloco }}</h3>
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Product Name</mat-label>
+            <mat-label>{{ 'products.form.fields.productName' | transloco }}</mat-label>
             <input matInput formControlName="name" required>
             @if (productForm.controls['name'].hasError('required')) {
-              <mat-error>Product name is required</mat-error>
+              <mat-error>{{ 'products.form.validation.nameRequired' | transloco }}</mat-error>
             }
             @if (productForm.controls['name'].hasError('maxlength')) {
-              <mat-error>Maximum 200 characters</mat-error>
+              <mat-error>{{ 'products.form.validation.nameMaxLength' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Unit Price</mat-label>
+            <mat-label>{{ 'products.form.fields.unitPrice' | transloco }}</mat-label>
             <span matPrefix>$&nbsp;</span>
             <input matInput type="number" formControlName="unitPrice" step="0.01" min="0" required>
             @if (productForm.controls['unitPrice'].hasError('required')) {
-              <mat-error>Unit price is required</mat-error>
+              <mat-error>{{ 'products.form.validation.unitPriceRequired' | transloco }}</mat-error>
             }
             @if (productForm.controls['unitPrice'].hasError('min')) {
-              <mat-error>Price must be 0 or greater</mat-error>
+              <mat-error>{{ 'products.form.validation.unitPriceMin' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>SKU</mat-label>
+            <mat-label>{{ 'products.form.fields.sku' | transloco }}</mat-label>
             <input matInput formControlName="sku">
             @if (productForm.controls['sku'].hasError('maxlength')) {
-              <mat-error>Maximum 50 characters</mat-error>
+              <mat-error>{{ 'products.form.validation.skuMaxLength' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Category</mat-label>
+            <mat-label>{{ 'products.form.fields.category' | transloco }}</mat-label>
             <input matInput formControlName="category">
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
+            <mat-label>{{ 'products.form.fields.description' | transloco }}</mat-label>
             <textarea matInput formControlName="description" rows="3"></textarea>
           </mat-form-field>
         </div>
@@ -64,17 +64,17 @@
       <!-- Status Section (edit mode only) -->
       @if (isEditMode) {
         <div class="form-section">
-          <h3>Status</h3>
+          <h3>{{ 'products.form.sections.status' | transloco }}</h3>
           <div class="active-checkbox">
-            <mat-checkbox formControlName="isActive">Active</mat-checkbox>
-            <p class="checkbox-hint">Inactive products will not appear in search results when linking to deals.</p>
+            <mat-checkbox formControlName="isActive">{{ 'products.form.fields.active' | transloco }}</mat-checkbox>
+            <p class="checkbox-hint">{{ 'products.form.activeHint' | transloco }}</p>
           </div>
         </div>
       }
 
       <!-- Custom Fields Section -->
       <div class="form-section">
-        <h3>Custom Fields</h3>
+        <h3>{{ 'products.form.sections.customFields' | transloco }}</h3>
         <app-custom-field-form
           entityType="Product"
           [customFieldValues]="existingCustomFields"
@@ -84,13 +84,13 @@
       <!-- Form actions -->
       @if (!dialogMode()) {
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/products">Cancel</button>
+          <button mat-button type="button" routerLink="/products">{{ 'common.cancel' | transloco }}</button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="productForm.invalid || isSaving()">
             @if (isSaving()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ isEditMode ? 'Save Changes' : 'Create Product' }}
+            {{ isEditMode ? ('products.form.saveChanges' | transloco) : ('products.form.createProduct' | transloco) }}
           </button>
         </div>
       }

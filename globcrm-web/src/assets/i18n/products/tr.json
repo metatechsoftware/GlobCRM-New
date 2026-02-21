@@ -1,0 +1,74 @@
+{
+  "title": "Urunler",
+  "list": {
+    "title": "Urunler",
+    "subtitle": "Urun katalogunuzu, fiyatlandirmanizi ve stogunuzu yonetin",
+    "newProduct": "Yeni Urun",
+    "empty": "Urun bulunamadi",
+    "emptyDescription": "Baslamak icin ilk urunuzu olusturun"
+  },
+  "detail": {
+    "title": "Urun Detaylari",
+    "notFound": "Urun bulunamadi",
+    "backToProducts": "Urunlere Don",
+    "sections": {
+      "productInfo": "Urun Bilgileri",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "name": "Ad",
+      "sku": "Stok Kodu",
+      "category": "Kategori",
+      "unitPrice": "Birim Fiyat",
+      "status": "Durum",
+      "description": "Aciklama",
+      "created": "Olusturulma",
+      "updated": "Son Guncelleme"
+    },
+    "actions": {
+      "edit": "Duzenle",
+      "delete": "Sil"
+    },
+    "empty": {
+      "notSpecified": "Belirtilmedi"
+    },
+    "status": {
+      "active": "Aktif",
+      "inactive": "Pasif"
+    }
+  },
+  "form": {
+    "createTitle": "Yeni Urun",
+    "editTitle": "Urun Duzenle",
+    "sections": {
+      "productInfo": "Urun Bilgileri",
+      "status": "Durum",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "productName": "Urun Adi",
+      "unitPrice": "Birim Fiyat",
+      "sku": "Stok Kodu",
+      "category": "Kategori",
+      "description": "Aciklama",
+      "active": "Aktif"
+    },
+    "validation": {
+      "nameRequired": "Urun adi gereklidir",
+      "nameMaxLength": "Maksimum 200 karakter",
+      "unitPriceRequired": "Birim fiyat gereklidir",
+      "unitPriceMin": "Fiyat 0 veya daha buyuk olmalidir",
+      "skuMaxLength": "Maksimum 50 karakter"
+    },
+    "activeHint": "Pasif urunler, firsatlara baglanirken arama sonuclarinda gorunmez.",
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createProduct": "Urun Olustur"
+  },
+  "messages": {
+    "productCreated": "Urun basariyla olusturuldu",
+    "productCreateFailed": "Urun olusturulamadi",
+    "productUpdated": "Urun basariyla guncellendi",
+    "productUpdateFailed": "Urun guncellenemedi",
+    "loadFailed": "Urun verileri yuklenemedi"
+  }
+}

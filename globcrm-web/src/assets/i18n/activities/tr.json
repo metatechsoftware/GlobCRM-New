@@ -1,0 +1,166 @@
+{
+  "title": "Aktiviteler",
+  "list": {
+    "title": "Aktiviteler",
+    "subtitle": "Pipeline genelinde gorevleri, aramalari ve toplantilari yonetin",
+    "newActivity": "Yeni Aktivite",
+    "empty": "Aktivite bulunamadi",
+    "emptyDescription": "Baslamak icin ilk aktivitenizi olusturun",
+    "noActivities": "Aktivite yok"
+  },
+  "detail": {
+    "title": "Aktivite Detaylari",
+    "notFound": "Aktivite bulunamadi",
+    "backToActivities": "Aktivitelere Don",
+    "tabs": {
+      "details": "Detaylar",
+      "comments": "Yorumlar",
+      "attachments": "Ekler",
+      "timeLog": "Zaman Kaydi",
+      "links": "Baglantilar",
+      "timeline": "Zaman Cizelgesi",
+      "notes": "Notlar"
+    },
+    "sections": {
+      "activityInfo": "Aktivite Bilgisi",
+      "datesAssignment": "Tarihler ve Atama"
+    },
+    "fields": {
+      "subject": "Konu",
+      "type": "Tur",
+      "status": "Durum",
+      "priority": "Oncelik",
+      "dueDate": "Bitis Tarihi",
+      "assignedTo": "Atanan Kisi",
+      "owner": "Sahip",
+      "created": "Olusturulma",
+      "lastUpdated": "Son Guncelleme",
+      "completedAt": "Tamamlanma Tarihi",
+      "description": "Aciklama",
+      "totalTime": "Toplam Sure",
+      "followers": "Takipciler"
+    },
+    "actions": {
+      "edit": "Duzenle",
+      "delete": "Sil",
+      "follow": "Takip Et",
+      "following": "Takip Ediliyor",
+      "moveTo": "Tasi:"
+    },
+    "empty": {
+      "noDescription": "Aciklama girilmedi.",
+      "unassigned": "Atanmamis",
+      "notSet": "Belirlenmedi",
+      "overdue": "Gecikti"
+    },
+    "comments": {
+      "addComment": "Yorum ekle",
+      "placeholder": "Bir yorum yazin...",
+      "post": "Gonder",
+      "noComments": "Henuz yorum yok. Ilk yorumu siz yapin.",
+      "edited": "(duzenlendi)"
+    },
+    "attachments": {
+      "uploadFile": "Dosya Yukle",
+      "uploading": "Yukleniyor...",
+      "maxSize": "Maksimum dosya boyutu: 25MB",
+      "noAttachments": "Henuz ek yok. Baslamak icin bir dosya yukleyin.",
+      "uploadedBy": "Yukleyen"
+    },
+    "timeLog": {
+      "total": "Toplam:",
+      "duration": "Sure (dakika)",
+      "description": "Aciklama",
+      "whatWorkedOn": "Ne uzerinde calistiniz?",
+      "date": "Tarih",
+      "logTime": "Zaman Kaydet",
+      "noEntries": "Henuz zaman kaydi yok. Yukaridaki formu kullanarak ilk kaydınızı giriniz.",
+      "dateCol": "Tarih",
+      "durationCol": "Sure",
+      "descriptionCol": "Aciklama",
+      "loggedBy": "Kaydeden"
+    },
+    "links": {
+      "entitiesLinked": "varlik baglandi",
+      "linkEntity": "Varlik Bagla",
+      "entityType": "Varlik Turu",
+      "noLinks": "Bagli varlik yok. Iliskili kayitlari baglamak icin \"Varlik Bagla\" butonunu kullanin.",
+      "typeToSearch": "Aramak icin yazin..."
+    },
+    "timeline": {
+      "noActivity": "Henuz etkinlik yok"
+    },
+    "notes": {
+      "noNotes": "Bu aktivite icin not yok.",
+      "addNote": "Not Ekle"
+    }
+  },
+  "form": {
+    "createTitle": "Yeni Aktivite",
+    "editTitle": "Aktivite Duzenle",
+    "sections": {
+      "activityInfo": "Aktivite Bilgileri",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "subject": "Konu",
+      "type": "Tur",
+      "priority": "Oncelik",
+      "dueDate": "Bitis Tarihi",
+      "assignedTo": "Atanan Kisi",
+      "unassigned": "Atanmamis",
+      "description": "Aciklama"
+    },
+    "validation": {
+      "subjectRequired": "Konu gereklidir",
+      "subjectMinLength": "Konu en az 3 karakter olmalidir",
+      "subjectMaxLength": "Konu 500 karakteri asamaz",
+      "typeRequired": "Tur gereklidir",
+      "priorityRequired": "Oncelik gereklidir"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createActivity": "Aktivite Olustur"
+  },
+  "kanban": {
+    "title": "Aktiviteler",
+    "newActivity": "Yeni Aktivite"
+  },
+  "calendar": {
+    "title": "Aktiviteler",
+    "newActivity": "Yeni Aktivite"
+  },
+  "messages": {
+    "statusUpdated": "Durum {{status}} olarak guncellendi",
+    "statusUpdateFailed": "Durum guncellenemedi",
+    "unfollowed": "Aktivite takibi birakildi",
+    "following": "Aktivite takip ediliyor",
+    "followUpdateFailed": "Takip durumu guncellenemedi",
+    "commentAdded": "Yorum eklendi",
+    "commentAddFailed": "Yorum eklenemedi",
+    "commentUpdated": "Yorum guncellendi",
+    "commentUpdateFailed": "Yorum guncellenemedi",
+    "commentDeleted": "Yorum silindi",
+    "commentDeleteFailed": "Yorum silinemedi",
+    "fileUploaded": "{{fileName}} yuklendi",
+    "fileUploadFailed": "Dosya yuklenemedi",
+    "fileExceedsSize": "Dosya maksimum 25MB boyutunu asiyor",
+    "fileDownloadFailed": "Dosya indirilemedi",
+    "attachmentDeleted": "Ek silindi",
+    "attachmentDeleteFailed": "Ek silinemedi",
+    "timeEntryAdded": "Zaman kaydi eklendi",
+    "timeEntryAddFailed": "Zaman kaydi eklenemedi",
+    "timeEntryDeleted": "Zaman kaydi silindi",
+    "timeEntryDeleteFailed": "Zaman kaydi silinemedi",
+    "entityLinked": "{{name}} baglandi",
+    "entityLinkFailed": "Varlik baglanamadi",
+    "linkRemoved": "Baglanti kaldirildi",
+    "linkRemoveFailed": "Baglanti kaldirilamadi",
+    "cannotTransition": "{{from}} durumundan {{to}} durumuna gecilemez",
+    "kanbanLoadFailed": "Kanban verileri yuklenemedi",
+    "activityCreated": "Aktivite basariyla olusturuldu",
+    "activityCreateFailed": "Aktivite olusturulamadi",
+    "activityUpdated": "Aktivite basariyla guncellendi",
+    "activityUpdateFailed": "Aktivite guncellenemedi",
+    "loadFailed": "Aktivite verileri yuklenemedi"
+  }
+}

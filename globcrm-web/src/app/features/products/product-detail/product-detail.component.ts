@@ -15,6 +15,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { Subscription } from 'rxjs';
 
+import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
@@ -40,6 +41,7 @@ import { ProductDto } from '../product.models';
     HasPermissionDirective,
     CustomFieldFormComponent,
     ConfirmDeleteDialogComponent,
+    TranslocoPipe,
   ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',

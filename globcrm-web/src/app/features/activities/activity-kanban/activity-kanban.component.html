@@ -1,7 +1,7 @@
 <div class="kanban-layout">
   <!-- Header toolbar -->
   <div class="kanban-header">
-    <h1>Activities</h1>
+    <h1>{{ 'activities.kanban.title' | transloco }}</h1>
 
     <div class="header-actions">
       <!-- View mode switcher -->
@@ -21,7 +21,7 @@
       <button mat-raised-button color="primary"
               *appHasPermission="'Activity:Create'"
               routerLink="/activities/new">
-        <mat-icon>add</mat-icon> New Activity
+        <mat-icon>add</mat-icon> {{ 'activities.kanban.newActivity' | transloco }}
       </button>
     </div>
   </div>
@@ -94,7 +94,7 @@
             </div>
           }
           @if (column.activities.length === 0) {
-            <div class="column-empty">No activities</div>
+            <div class="column-empty">{{ 'activities.list.noActivities' | transloco }}</div>
           }
         </div>
       </div>

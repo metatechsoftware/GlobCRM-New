@@ -17,17 +17,17 @@
           <button mat-stroked-button (click)="toggleFollow()"
                   [class.following]="isFollowing()">
             <mat-icon>{{ isFollowing() ? 'visibility' : 'visibility_off' }}</mat-icon>
-            {{ isFollowing() ? 'Following' : 'Follow' }}
+            {{ isFollowing() ? ('activities.detail.actions.following' | transloco) : ('activities.detail.actions.follow' | transloco) }}
           </button>
           <button mat-stroked-button
                   *appHasPermission="'Activity:Edit'"
                   [routerLink]="['/activities', activity()!.id, 'edit']">
-            <mat-icon>edit</mat-icon> Edit
+            <mat-icon>edit</mat-icon> {{ 'activities.detail.actions.edit' | transloco }}
           </button>
           <button mat-stroked-button color="warn"
                   *appHasPermission="'Activity:Delete'"
                   (click)="onDelete()">
-            <mat-icon>delete</mat-icon> Delete
+            <mat-icon>delete</mat-icon> {{ 'activities.detail.actions.delete' | transloco }}
           </button>
         </div>
       </div>
@@ -67,7 +67,7 @@
             @if (isOverdue()) {
               <span class="badge badge--danger">
                 <mat-icon>warning</mat-icon>
-                Overdue
+                {{ 'activities.detail.empty.overdue' | transloco }}
               </span>
             }
           </div>
@@ -115,7 +115,7 @@
       @if (allowedTransitions().length > 0) {
         <hr class="hero-divider">
         <div class="status-transitions">
-          <span class="transition-label">Move to:</span>
+          <span class="transition-label">{{ 'activities.detail.actions.moveTo' | transloco }}</span>
           @for (status of allowedTransitions(); track status) {
             @if (getStatusConfig(status); as sc) {
               <button mat-stroked-button class="transition-btn"
@@ -137,28 +137,28 @@
           <!-- Tab 0: Details -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>info</mat-icon> Details</span>
+              <span class="tab-label"><mat-icon>info</mat-icon> {{ 'activities.detail.tabs.details' | transloco }}</span>
             </ng-template>
             <div class="tab-body">
               <!-- Activity Info section -->
               <div class="detail-section">
                 <div class="detail-section__header">
                   <mat-icon>task_alt</mat-icon>
-                  <h3>Activity Info</h3>
+                  <h3>{{ 'activities.detail.sections.activityInfo' | transloco }}</h3>
                 </div>
                 <div class="details-grid">
                   <div class="detail-field full-width">
-                    <span class="field-label">Description</span>
+                    <span class="field-label">{{ 'activities.detail.fields.description' | transloco }}</span>
                     <span class="field-value description-text" [class.field-value--empty]="!activity()!.description">
-                      {{ activity()!.description || 'No description provided.' }}
+                      {{ activity()!.description || ('activities.detail.empty.noDescription' | transloco) }}
                     </span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Type</span>
+                    <span class="field-label">{{ 'activities.detail.fields.type' | transloco }}</span>
                     <span class="field-value">{{ typeConfig()?.label || activity()!.type }}</span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Priority</span>
+                    <span class="field-label">{{ 'activities.detail.fields.priority' | transloco }}</span>
                     <span class="field-value">
                       @if (priorityConfig(); as pc) {
                         <span class="priority-badge" [style.color]="pc.color">{{ pc.label }}</span>
@@ -166,7 +166,7 @@
                     </span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Status</span>
+                    <span class="field-label">{{ 'activities.detail.fields.status' | transloco }}</span>
                     <span class="field-value">
                       @if (getStatusConfig(activity()!.status); as sc) {
                         <span class="status-badge" [style.color]="sc.color">{{ sc.label }}</span>
@@ -174,7 +174,7 @@
                     </span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Due Date</span>
+                    <span class="field-label">{{ 'activities.detail.fields.dueDate' | transloco }}</span>
                     <span class="field-value" [class.overdue]="isOverdue()">
                       {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : '-' }}
                       @if (isOverdue()) {
@@ -189,32 +189,32 @@
               <div class="detail-section">
                 <div class="detail-section__header">
                   <mat-icon>calendar_today</mat-icon>
-                  <h3>Dates & Assignment</h3>
+                  <h3>{{ 'activities.detail.sections.datesAssignment' | transloco }}</h3>
                 </div>
                 <div class="details-grid">
                   <div class="detail-field">
-                    <span class="field-label">Owner</span>
+                    <span class="field-label">{{ 'activities.detail.fields.owner' | transloco }}</span>
                     <span class="field-value" [class.field-value--empty]="!activity()!.ownerName">
-                      {{ activity()!.ownerName || 'Unassigned' }}
+                      {{ activity()!.ownerName || ('activities.detail.empty.unassigned' | transloco) }}
                     </span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Assigned To</span>
+                    <span class="field-label">{{ 'activities.detail.fields.assignedTo' | transloco }}</span>
                     <span class="field-value" [class.field-value--empty]="!activity()!.assignedToName">
-                      {{ activity()!.assignedToName || 'Unassigned' }}
+                      {{ activity()!.assignedToName || ('activities.detail.empty.unassigned' | transloco) }}
                     </span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Created</span>
+                    <span class="field-label">{{ 'activities.detail.fields.created' | transloco }}</span>
                     <span class="field-value">{{ activity()!.createdAt | date:'medium' }}</span>
                   </div>
                   <div class="detail-field">
-                    <span class="field-label">Last Updated</span>
+                    <span class="field-label">{{ 'activities.detail.fields.lastUpdated' | transloco }}</span>
                     <span class="field-value">{{ activity()!.updatedAt | date:'medium' }}</span>
                   </div>
                   @if (activity()!.completedAt) {
                     <div class="detail-field">
-                      <span class="field-label">Completed At</span>
+                      <span class="field-label">{{ 'activities.detail.fields.completedAt' | transloco }}</span>
                       <span class="field-value">{{ activity()!.completedAt | date:'medium' }}</span>
                     </div>
                   }
@@ -226,21 +226,21 @@
           <!-- Tab 1: Comments -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>comment</mat-icon> Comments ({{ activity()!.comments?.length || 0 }})</span>
+              <span class="tab-label"><mat-icon>comment</mat-icon> {{ 'activities.detail.tabs.comments' | transloco }} ({{ activity()!.comments?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
               <!-- Add comment form -->
               <div class="comment-form">
                 <mat-form-field appearance="outline" class="comment-input">
-                  <mat-label>Add a comment</mat-label>
+                  <mat-label>{{ 'activities.detail.comments.addComment' | transloco }}</mat-label>
                   <textarea matInput [formControl]="commentControl"
-                            placeholder="Write a comment..."
+                            [placeholder]="'activities.detail.comments.placeholder' | transloco"
                             rows="3"></textarea>
                 </mat-form-field>
                 <button mat-flat-button color="primary"
                         [disabled]="!commentControl.value.trim()"
                         (click)="addComment()">
-                  <mat-icon>send</mat-icon> Post
+                  <mat-icon>send</mat-icon> {{ 'activities.detail.comments.post' | transloco }}
                 </button>
               </div>
 
@@ -248,7 +248,7 @@
               @if (!activity()!.comments?.length) {
                 <div class="tab-empty">
                   <mat-icon>chat_bubble_outline</mat-icon>
-                  <span>No comments yet. Be the first to comment.</span>
+                  <span>{{ 'activities.detail.comments.noComments' | transloco }}</span>
                 </div>
               } @else {
                 <div class="comments-list">
@@ -262,7 +262,7 @@
                           <span class="comment-author">{{ comment.authorName }}</span>
                           <span class="comment-time">{{ comment.createdAt | date:'medium' }}</span>
                           @if (comment.updatedAt !== comment.createdAt) {
-                            <span class="comment-edited">(edited)</span>
+                            <span class="comment-edited">{{ 'activities.detail.comments.edited' | transloco }}</span>
                           }
                         </div>
                         @if (editingCommentId() === comment.id) {
@@ -274,10 +274,10 @@
                               <button mat-flat-button color="primary"
                                       [disabled]="!editCommentControl.value.trim()"
                                       (click)="saveEditComment(comment.id)">
-                                Save
+                                {{ 'common.save' | transloco }}
                               </button>
                               <button mat-stroked-button (click)="cancelEditComment()">
-                                Cancel
+                                {{ 'common.cancel' | transloco }}
                               </button>
                             </div>
                           </div>
@@ -309,7 +309,7 @@
           <!-- Tab 2: Attachments -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>attach_file</mat-icon> Attachments ({{ activity()!.attachments?.length || 0 }})</span>
+              <span class="tab-label"><mat-icon>attach_file</mat-icon> {{ 'activities.detail.tabs.attachments' | transloco }} ({{ activity()!.attachments?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
               <!-- Upload area -->
@@ -317,19 +317,19 @@
                 <input type="file" #fileInput hidden (change)="onFileSelected($event)">
                 <button mat-stroked-button (click)="fileInput.click()" [disabled]="isUploading()">
                   <mat-icon>upload_file</mat-icon>
-                  {{ isUploading() ? 'Uploading...' : 'Upload File' }}
+                  {{ isUploading() ? ('activities.detail.attachments.uploading' | transloco) : ('activities.detail.attachments.uploadFile' | transloco) }}
                 </button>
                 @if (isUploading()) {
                   <mat-spinner diameter="24" class="upload-spinner"></mat-spinner>
                 }
-                <span class="upload-hint">Max file size: 25MB</span>
+                <span class="upload-hint">{{ 'activities.detail.attachments.maxSize' | transloco }}</span>
               </div>
 
               <!-- Attachments list -->
               @if (!activity()!.attachments?.length) {
                 <div class="tab-empty">
                   <mat-icon>cloud_upload</mat-icon>
-                  <span>No attachments yet. Upload a file to get started.</span>
+                  <span>{{ 'activities.detail.attachments.noAttachments' | transloco }}</span>
                 </div>
               } @else {
                 <div class="attachments-list">
@@ -342,7 +342,7 @@
                         <span class="attachment-name">{{ attachment.fileName }}</span>
                         <span class="attachment-meta">
                           {{ formatFileSize(attachment.fileSizeBytes) }}
-                          &middot; Uploaded by {{ attachment.uploadedByName }}
+                          &middot; {{ 'activities.detail.attachments.uploadedBy' | transloco }} {{ attachment.uploadedByName }}
                           &middot; {{ attachment.uploadedAt | date:'mediumDate' }}
                         </span>
                       </div>
@@ -366,29 +366,29 @@
           <!-- Tab 3: Time Log -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>schedule</mat-icon> Time Log ({{ formatTime(activity()!.totalTimeMinutes) }})</span>
+              <span class="tab-label"><mat-icon>schedule</mat-icon> {{ 'activities.detail.tabs.timeLog' | transloco }} ({{ formatTime(activity()!.totalTimeMinutes) }})</span>
             </ng-template>
             <div class="tab-body">
               <!-- Total time summary -->
               <div class="time-summary">
                 <mat-icon>timer</mat-icon>
-                <span>Total: <strong>{{ formatTime(activity()!.totalTimeMinutes) }}</strong></span>
+                <span>{{ 'activities.detail.timeLog.total' | transloco }} <strong>{{ formatTime(activity()!.totalTimeMinutes) }}</strong></span>
               </div>
 
               <!-- Log time form -->
               <div class="time-entry-form">
                 <mat-form-field appearance="outline" class="duration-field">
-                  <mat-label>Duration (minutes)</mat-label>
+                  <mat-label>{{ 'activities.detail.timeLog.duration' | transloco }}</mat-label>
                   <input matInput type="number" [formControl]="timeEntryForm.controls.durationMinutes"
                          min="1" placeholder="e.g. 30">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="description-field">
-                  <mat-label>Description</mat-label>
+                  <mat-label>{{ 'activities.detail.timeLog.description' | transloco }}</mat-label>
                   <input matInput [formControl]="timeEntryForm.controls.description"
-                         placeholder="What did you work on?">
+                         [placeholder]="'activities.detail.timeLog.whatWorkedOn' | transloco">
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="date-field">
-                  <mat-label>Date</mat-label>
+                  <mat-label>{{ 'activities.detail.timeLog.date' | transloco }}</mat-label>
                   <input matInput [matDatepicker]="timePicker"
                          [formControl]="timeEntryForm.controls.entryDate">
                   <mat-datepicker-toggle matIconSuffix [for]="timePicker"></mat-datepicker-toggle>
@@ -397,7 +397,7 @@
                 <button mat-flat-button color="primary"
                         [disabled]="timeEntryForm.invalid"
                         (click)="addTimeEntry()">
-                  <mat-icon>add</mat-icon> Log Time
+                  <mat-icon>add</mat-icon> {{ 'activities.detail.timeLog.logTime' | transloco }}
                 </button>
               </div>
 
@@ -405,15 +405,15 @@
               @if (!activity()!.timeEntries?.length) {
                 <div class="tab-empty">
                   <mat-icon>hourglass_empty</mat-icon>
-                  <span>No time entries yet. Log your first time entry above.</span>
+                  <span>{{ 'activities.detail.timeLog.noEntries' | transloco }}</span>
                 </div>
               } @else {
                 <div class="time-entries-table">
                   <div class="time-header">
-                    <span class="time-col-date">Date</span>
-                    <span class="time-col-duration">Duration</span>
-                    <span class="time-col-description">Description</span>
-                    <span class="time-col-user">Logged By</span>
+                    <span class="time-col-date">{{ 'activities.detail.timeLog.dateCol' | transloco }}</span>
+                    <span class="time-col-duration">{{ 'activities.detail.timeLog.durationCol' | transloco }}</span>
+                    <span class="time-col-description">{{ 'activities.detail.timeLog.descriptionCol' | transloco }}</span>
+                    <span class="time-col-user">{{ 'activities.detail.timeLog.loggedBy' | transloco }}</span>
                     <span class="time-col-actions"></span>
                   </div>
                   @for (entry of activity()!.timeEntries; track entry.id) {
@@ -438,15 +438,15 @@
           <!-- Tab 4: Links -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>link</mat-icon> Links ({{ activity()!.links?.length || 0 }})</span>
+              <span class="tab-label"><mat-icon>link</mat-icon> {{ 'activities.detail.tabs.links' | transloco }} ({{ activity()!.links?.length || 0 }})</span>
             </ng-template>
             <div class="tab-body">
               <!-- Link entity controls -->
               <div class="link-header">
-                <span class="tab-count">{{ activity()!.links?.length || 0 }} entities linked</span>
+                <span class="tab-count">{{ activity()!.links?.length || 0 }} {{ 'activities.detail.links.entitiesLinked' | transloco }}</span>
                 <button mat-stroked-button (click)="toggleLinkSearch()">
                   <mat-icon>{{ showLinkSearch() ? 'close' : 'add_link' }}</mat-icon>
-                  {{ showLinkSearch() ? 'Cancel' : 'Link Entity' }}
+                  {{ showLinkSearch() ? ('common.cancel' | transloco) : ('activities.detail.links.linkEntity' | transloco) }}
                 </button>
               </div>
 
@@ -455,7 +455,7 @@
                 <div class="link-search-panel">
                   <div class="link-search-controls">
                     <mat-form-field appearance="outline" class="link-type-field">
-                      <mat-label>Entity Type</mat-label>
+                      <mat-label>{{ 'activities.detail.links.entityType' | transloco }}</mat-label>
                       <mat-select [formControl]="linkTypeControl" (selectionChange)="onLinkTypeChange()">
                         <mat-option value="Company">Company</mat-option>
                         <mat-option value="Contact">Contact</mat-option>
@@ -466,7 +466,7 @@
                       <mat-label>Search {{ linkTypeControl.value }}</mat-label>
                       <input matInput [formControl]="linkSearchControl"
                              (input)="onLinkSearchInput($any($event.target).value)"
-                             placeholder="Type to search...">
+                             [placeholder]="'activities.detail.links.typeToSearch' | transloco">
                       <mat-icon matSuffix>search</mat-icon>
                     </mat-form-field>
                   </div>
@@ -500,7 +500,7 @@
               @if (!activity()!.links?.length) {
                 <div class="tab-empty">
                   <mat-icon>link_off</mat-icon>
-                  <span>No linked entities. Use "Link Entity" to connect related records.</span>
+                  <span>{{ 'activities.detail.links.noLinks' | transloco }}</span>
                 </div>
               } @else {
                 @for (group of linksByType(); track group.type) {
@@ -538,7 +538,7 @@
           <!-- Tab 5: Timeline -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>timeline</mat-icon> Timeline</span>
+              <span class="tab-label"><mat-icon>timeline</mat-icon> {{ 'activities.detail.tabs.timeline' | transloco }}</span>
             </ng-template>
             <div class="tab-body">
               @if (timelineLoading()) {
@@ -548,7 +548,7 @@
               } @else if (sortedTimeline().length === 0) {
                 <div class="tab-empty">
                   <mat-icon>history</mat-icon>
-                  <span>No activity yet</span>
+                  <span>{{ 'activities.detail.timeline.noActivity' | transloco }}</span>
                 </div>
               } @else {
                 <div class="timeline-container">
@@ -583,7 +583,7 @@
           <!-- Tab 6: Notes -->
           <mat-tab>
             <ng-template mat-tab-label>
-              <span class="tab-label"><mat-icon>note</mat-icon> Notes</span>
+              <span class="tab-label"><mat-icon>note</mat-icon> {{ 'activities.detail.tabs.notes' | transloco }}</span>
             </ng-template>
             <div class="tab-body">
               @if (notesLoading()) {
@@ -593,11 +593,11 @@
               } @else if (activityNotes().length === 0) {
                 <div class="tab-empty">
                   <mat-icon>note</mat-icon>
-                  <span>No notes for this activity.</span>
+                  <span>{{ 'activities.detail.notes.noNotes' | transloco }}</span>
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Activity', entityId: activity()?.id, entityName: activity()?.subject }">
-                    Add Note
+                    {{ 'activities.detail.notes.addNote' | transloco }}
                   </a>
                 </div>
               } @else {
@@ -632,59 +632,59 @@
         <div class="sidebar-card">
           <div class="sidebar-card__header">
             <mat-icon>info</mat-icon>
-            <h3>Activity Info</h3>
+            <h3>{{ 'activities.detail.sections.activityInfo' | transloco }}</h3>
           </div>
           <div class="sidebar-card__body">
             <div class="sidebar-field">
-              <span class="sidebar-label">Owner</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.owner' | transloco }}</span>
               <div class="sidebar-value user-value">
                 <div class="avatar-initials">{{ (activity()!.ownerName || '?')[0] }}</div>
-                <span>{{ activity()!.ownerName || 'Unassigned' }}</span>
+                <span>{{ activity()!.ownerName || ('activities.detail.empty.unassigned' | transloco) }}</span>
               </div>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Assigned To</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.assignedTo' | transloco }}</span>
               <div class="sidebar-value user-value">
                 <div class="avatar-initials">{{ (activity()!.assignedToName || '?')[0] }}</div>
-                <span>{{ activity()!.assignedToName || 'Unassigned' }}</span>
+                <span>{{ activity()!.assignedToName || ('activities.detail.empty.unassigned' | transloco) }}</span>
               </div>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Due Date</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.dueDate' | transloco }}</span>
               <span class="sidebar-value" [class.overdue]="isOverdue()">
-                {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : 'Not set' }}
+                {{ activity()!.dueDate ? (activity()!.dueDate | date:'mediumDate') : ('activities.detail.empty.notSet' | transloco) }}
                 @if (isOverdue()) {
-                  <span class="overdue-badge">Overdue</span>
+                  <span class="overdue-badge">{{ 'activities.detail.empty.overdue' | transloco }}</span>
                 }
               </span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Created</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.created' | transloco }}</span>
               <span class="sidebar-value">{{ activity()!.createdAt | date:'mediumDate' }}</span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Updated</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.lastUpdated' | transloco }}</span>
               <span class="sidebar-value">{{ activity()!.updatedAt | date:'mediumDate' }}</span>
             </div>
 
             @if (activity()!.completedAt) {
               <div class="sidebar-field">
-                <span class="sidebar-label">Completed</span>
+                <span class="sidebar-label">{{ 'activities.detail.fields.completedAt' | transloco }}</span>
                 <span class="sidebar-value">{{ activity()!.completedAt | date:'mediumDate' }}</span>
               </div>
             }
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Total Time</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.totalTime' | transloco }}</span>
               <span class="sidebar-value">{{ formatTime(activity()!.totalTimeMinutes) }}</span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Followers</span>
+              <span class="sidebar-label">{{ 'activities.detail.fields.followers' | transloco }}</span>
               <span class="sidebar-value">{{ activity()!.followers?.length || 0 }}</span>
             </div>
           </div>
@@ -695,7 +695,7 @@
 } @else {
   <div class="detail-not-found">
     <mat-icon>error_outline</mat-icon>
-    <h2>Activity not found</h2>
-    <a mat-stroked-button routerLink="/activities">Back to Activities</a>
+    <h2>{{ 'activities.detail.notFound' | transloco }}</h2>
+    <a mat-stroked-button routerLink="/activities">{{ 'activities.detail.backToActivities' | transloco }}</a>
   </div>
 }

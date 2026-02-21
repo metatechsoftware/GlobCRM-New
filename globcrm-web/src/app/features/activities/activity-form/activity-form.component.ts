@@ -25,6 +25,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { ActivityService } from '../activity.service';
 import {
@@ -62,6 +63,7 @@ import {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
@@ -153,7 +155,7 @@ import {
           <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
             <mat-icon>arrow_back</mat-icon>
           </a>
-          <h1>{{ isEditMode ? 'Edit Activity' : 'New Activity' }}</h1>
+          <h1>{{ isEditMode ? ('activities.form.editTitle' | transloco) : ('activities.form.createTitle' | transloco) }}</h1>
         </div>
       }
 
@@ -165,24 +167,24 @@ import {
         <form [formGroup]="activityForm" (ngSubmit)="onSubmit()">
           <!-- Activity Info Section -->
           <div class="form-section">
-            <h3>Activity Information</h3>
+            <h3>{{ 'activities.form.sections.activityInfo' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Subject</mat-label>
+                <mat-label>{{ 'activities.form.fields.subject' | transloco }}</mat-label>
                 <input matInput formControlName="subject" required>
                 @if (activityForm.controls['subject'].hasError('required')) {
-                  <mat-error>Subject is required</mat-error>
+                  <mat-error>{{ 'activities.form.validation.subjectRequired' | transloco }}</mat-error>
                 }
                 @if (activityForm.controls['subject'].hasError('minlength')) {
-                  <mat-error>Subject must be at least 3 characters</mat-error>
+                  <mat-error>{{ 'activities.form.validation.subjectMinLength' | transloco }}</mat-error>
                 }
                 @if (activityForm.controls['subject'].hasError('maxlength')) {
-                  <mat-error>Subject cannot exceed 500 characters</mat-error>
+                  <mat-error>{{ 'activities.form.validation.subjectMaxLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Type</mat-label>
+                <mat-label>{{ 'activities.form.fields.type' | transloco }}</mat-label>
                 <mat-select formControlName="type" required>
                   @for (t of activityTypes; track t.value) {
                     <mat-option [value]="t.value">
@@ -191,33 +193,33 @@ import {
                   }
                 </mat-select>
                 @if (activityForm.controls['type'].hasError('required')) {
-                  <mat-error>Type is required</mat-error>
+                  <mat-error>{{ 'activities.form.validation.typeRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Priority</mat-label>
+                <mat-label>{{ 'activities.form.fields.priority' | transloco }}</mat-label>
                 <mat-select formControlName="priority" required>
                   @for (p of activityPriorities; track p.value) {
                     <mat-option [value]="p.value">{{ p.label }}</mat-option>
                   }
                 </mat-select>
                 @if (activityForm.controls['priority'].hasError('required')) {
-                  <mat-error>Priority is required</mat-error>
+                  <mat-error>{{ 'activities.form.validation.priorityRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Due Date</mat-label>
+                <mat-label>{{ 'activities.form.fields.dueDate' | transloco }}</mat-label>
                 <input matInput [matDatepicker]="dueDatePicker" formControlName="dueDate">
                 <mat-datepicker-toggle matIconSuffix [for]="dueDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #dueDatePicker></mat-datepicker>
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Assigned To</mat-label>
+                <mat-label>{{ 'activities.form.fields.assignedTo' | transloco }}</mat-label>
                 <mat-select formControlName="assignedToId">
-                  <mat-option [value]="null">Unassigned</mat-option>
+                  <mat-option [value]="null">{{ 'activities.form.fields.unassigned' | transloco }}</mat-option>
                   @for (member of teamMembers(); track member.id) {
                     <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
                   }
@@ -225,7 +227,7 @@ import {
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
+                <mat-label>{{ 'activities.form.fields.description' | transloco }}</mat-label>
                 <textarea matInput formControlName="description" rows="4"
                           cdkTextareaAutosize></textarea>
               </mat-form-field>
@@ -234,7 +236,7 @@ import {
 
           <!-- Custom fields -->
           <div class="custom-fields-section">
-            <h3>Custom Fields</h3>
+            <h3>{{ 'activities.form.sections.customFields' | transloco }}</h3>
             <app-custom-field-form
               [entityType]="'Activity'"
               [customFieldValues]="existingCustomFields"
@@ -244,13 +246,13 @@ import {
           <!-- Form actions -->
           @if (!dialogMode()) {
             <div class="form-actions">
-              <button mat-button type="button" routerLink="/activities">Cancel</button>
+              <button mat-button type="button" routerLink="/activities">{{ 'common.cancel' | transloco }}</button>
               <button mat-raised-button color="primary" type="submit"
                       [disabled]="activityForm.invalid || isSaving()">
                 @if (isSaving()) {
                   <mat-spinner diameter="20"></mat-spinner>
                 }
-                {{ isEditMode ? 'Save Changes' : 'Create Activity' }}
+                {{ isEditMode ? ('activities.form.saveChanges' | transloco) : ('activities.form.createActivity' | transloco) }}
               </button>
             </div>
           }
@@ -266,6 +268,7 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
   private readonly activityService = inject(ActivityService);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Dialog mode inputs/outputs. */
   dialogMode = input(false);
@@ -360,7 +363,7 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load activity data', 'Close', {
+        this.snackBar.open(this.transloco.translate('activities.messages.loadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -398,14 +401,14 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
       this.activityService.update(this.activityId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Activity updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('activities.messages.activityUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/activities', this.activityId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update activity', 'Close', {
+          this.snackBar.open(this.transloco.translate('activities.messages.activityUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -427,7 +430,7 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open('Activity created successfully', 'Close', {
+            this.snackBar.open(this.transloco.translate('activities.messages.activityCreated'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/activities', created.id]);
@@ -438,7 +441,7 @@ export class ActivityFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open('Failed to create activity', 'Close', {
+            this.snackBar.open(this.transloco.translate('activities.messages.activityCreateFailed'), 'Close', {
               duration: 5000,
             });
           }

@@ -1,7 +1,7 @@
 <div class="calendar-layout">
   <!-- Header toolbar -->
   <div class="calendar-header">
-    <h1>Activities</h1>
+    <h1>{{ 'activities.calendar.title' | transloco }}</h1>
 
     <div class="header-actions">
       <!-- View mode switcher -->
@@ -20,7 +20,7 @@
       <!-- Create button -->
       <a mat-flat-button color="primary" routerLink="/activities/new">
         <mat-icon>add</mat-icon>
-        New Activity
+        {{ 'activities.calendar.newActivity' | transloco }}
       </a>
     </div>
   </div>

@@ -1,0 +1,166 @@
+{
+  "title": "Activities",
+  "list": {
+    "title": "Activities",
+    "subtitle": "Manage tasks, calls, and meetings across your pipeline",
+    "newActivity": "New Activity",
+    "empty": "No activities found",
+    "emptyDescription": "Create your first activity to get started",
+    "noActivities": "No activities"
+  },
+  "detail": {
+    "title": "Activity Details",
+    "notFound": "Activity not found",
+    "backToActivities": "Back to Activities",
+    "tabs": {
+      "details": "Details",
+      "comments": "Comments",
+      "attachments": "Attachments",
+      "timeLog": "Time Log",
+      "links": "Links",
+      "timeline": "Timeline",
+      "notes": "Notes"
+    },
+    "sections": {
+      "activityInfo": "Activity Info",
+      "datesAssignment": "Dates & Assignment"
+    },
+    "fields": {
+      "subject": "Subject",
+      "type": "Type",
+      "status": "Status",
+      "priority": "Priority",
+      "dueDate": "Due Date",
+      "assignedTo": "Assigned To",
+      "owner": "Owner",
+      "created": "Created",
+      "lastUpdated": "Last Updated",
+      "completedAt": "Completed At",
+      "description": "Description",
+      "totalTime": "Total Time",
+      "followers": "Followers"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "follow": "Follow",
+      "following": "Following",
+      "moveTo": "Move to:"
+    },
+    "empty": {
+      "noDescription": "No description provided.",
+      "unassigned": "Unassigned",
+      "notSet": "Not set",
+      "overdue": "Overdue"
+    },
+    "comments": {
+      "addComment": "Add a comment",
+      "placeholder": "Write a comment...",
+      "post": "Post",
+      "noComments": "No comments yet. Be the first to comment.",
+      "edited": "(edited)"
+    },
+    "attachments": {
+      "uploadFile": "Upload File",
+      "uploading": "Uploading...",
+      "maxSize": "Max file size: 25MB",
+      "noAttachments": "No attachments yet. Upload a file to get started.",
+      "uploadedBy": "Uploaded by"
+    },
+    "timeLog": {
+      "total": "Total:",
+      "duration": "Duration (minutes)",
+      "description": "Description",
+      "whatWorkedOn": "What did you work on?",
+      "date": "Date",
+      "logTime": "Log Time",
+      "noEntries": "No time entries yet. Log your first time entry above.",
+      "dateCol": "Date",
+      "durationCol": "Duration",
+      "descriptionCol": "Description",
+      "loggedBy": "Logged By"
+    },
+    "links": {
+      "entitiesLinked": "entities linked",
+      "linkEntity": "Link Entity",
+      "entityType": "Entity Type",
+      "noLinks": "No linked entities. Use \"Link Entity\" to connect related records.",
+      "typeToSearch": "Type to search..."
+    },
+    "timeline": {
+      "noActivity": "No activity yet"
+    },
+    "notes": {
+      "noNotes": "No notes for this activity.",
+      "addNote": "Add Note"
+    }
+  },
+  "form": {
+    "createTitle": "New Activity",
+    "editTitle": "Edit Activity",
+    "sections": {
+      "activityInfo": "Activity Information",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "subject": "Subject",
+      "type": "Type",
+      "priority": "Priority",
+      "dueDate": "Due Date",
+      "assignedTo": "Assigned To",
+      "unassigned": "Unassigned",
+      "description": "Description"
+    },
+    "validation": {
+      "subjectRequired": "Subject is required",
+      "subjectMinLength": "Subject must be at least 3 characters",
+      "subjectMaxLength": "Subject cannot exceed 500 characters",
+      "typeRequired": "Type is required",
+      "priorityRequired": "Priority is required"
+    },
+    "saveChanges": "Save Changes",
+    "createActivity": "Create Activity"
+  },
+  "kanban": {
+    "title": "Activities",
+    "newActivity": "New Activity"
+  },
+  "calendar": {
+    "title": "Activities",
+    "newActivity": "New Activity"
+  },
+  "messages": {
+    "statusUpdated": "Status updated to {{status}}",
+    "statusUpdateFailed": "Failed to update status",
+    "unfollowed": "Unfollowed activity",
+    "following": "Following activity",
+    "followUpdateFailed": "Failed to update follow status",
+    "commentAdded": "Comment added",
+    "commentAddFailed": "Failed to add comment",
+    "commentUpdated": "Comment updated",
+    "commentUpdateFailed": "Failed to update comment",
+    "commentDeleted": "Comment deleted",
+    "commentDeleteFailed": "Failed to delete comment",
+    "fileUploaded": "Uploaded {{fileName}}",
+    "fileUploadFailed": "Failed to upload file",
+    "fileExceedsSize": "File exceeds maximum size of 25MB",
+    "fileDownloadFailed": "Failed to download file",
+    "attachmentDeleted": "Attachment deleted",
+    "attachmentDeleteFailed": "Failed to delete attachment",
+    "timeEntryAdded": "Time entry added",
+    "timeEntryAddFailed": "Failed to add time entry",
+    "timeEntryDeleted": "Time entry deleted",
+    "timeEntryDeleteFailed": "Failed to delete time entry",
+    "entityLinked": "Linked {{name}}",
+    "entityLinkFailed": "Failed to link entity",
+    "linkRemoved": "Link removed",
+    "linkRemoveFailed": "Failed to remove link",
+    "cannotTransition": "Cannot move from {{from}} to {{to}}",
+    "kanbanLoadFailed": "Failed to load Kanban data",
+    "activityCreated": "Activity created successfully",
+    "activityCreateFailed": "Failed to create activity",
+    "activityUpdated": "Activity updated successfully",
+    "activityUpdateFailed": "Failed to update activity",
+    "loadFailed": "Failed to load activity data"
+  }
+}
