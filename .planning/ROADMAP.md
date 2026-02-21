@@ -64,7 +64,7 @@
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
-- [x] **Phase 28: Localization String Extraction** (7 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check (completed 2026-02-21)
+- [ ] **Phase 28: Localization String Extraction** (10 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check (completed 2026-02-21)
 - [ ] **Phase 29: Integration Marketplace** — Settings page with card grid, credential management, detail panel, activity log, RBAC
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
 - [ ] **Phase 31: Quote PDF Templates** — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
@@ -98,15 +98,18 @@ Plans:
   1. All UI strings across all ~80+ component templates (labels, buttons, messages, tooltips, validation errors, snackbar messages) render via the Transloco translation pipe in the selected language
   2. A CI script validates that EN and TR translation JSON files have identical key sets and fails the build on mismatch
   3. No hardcoded English strings remain in any component template (verified by pseudo-localization test pass or grep audit)
-**Plans**: 7 plans
+**Plans**: 10 plans
 Plans:
-- [ ] 28-01-PLAN.md — Shared/global components: extend global EN/TR JSON, wire TranslocoPipe in ~25+ shared components
-- [ ] 28-02-PLAN.md — Core CRM entities: deals, companies, leads scopes + complete contacts template wiring
-- [ ] 28-03-PLAN.md — CRM operations: activities, products, quotes, requests scopes
-- [ ] 28-04-PLAN.md — Communication features: emails, email-templates, sequences, notes, feed scopes
-- [ ] 28-05-PLAN.md — Analytics & workflow: dashboard, my-day, calendar, reports, workflows scopes
-- [ ] 28-06-PLAN.md — Users & admin: auth, onboarding, profile, import, duplicates scopes + settings extension
-- [ ] 28-07-PLAN.md — CI enforcement script (key parity, hardcoded string detection, unused keys) + final audit
+- [x] 28-01-PLAN.md — Shared/global components: extend global EN/TR JSON, wire TranslocoPipe in ~25+ shared components
+- [x] 28-02-PLAN.md — Core CRM entities: deals, companies, leads scopes + complete contacts template wiring
+- [x] 28-03-PLAN.md — CRM operations: activities, products, quotes, requests scopes
+- [x] 28-04-PLAN.md — Communication features: emails, email-templates, sequences, notes, feed scopes
+- [x] 28-05-PLAN.md — Analytics & workflow: dashboard, my-day, calendar, reports, workflows scopes
+- [x] 28-06-PLAN.md — Users & admin: auth, onboarding, profile, import, duplicates scopes + settings extension
+- [x] 28-07-PLAN.md — CI enforcement script (key parity, hardcoded string detection, unused keys) + final audit
+- [ ] 28-08-PLAN.md — Gap closure: settings sub-pages (webhooks, custom-fields, pipelines, duplicate-rules, email-accounts, notifications) full transloco wiring
+- [ ] 28-09-PLAN.md — Gap closure: shared entity-preview + summary-tab components + misc shared components transloco wiring
+- [ ] 28-10-PLAN.md — Gap closure: remaining feature template strings + baseline regeneration + requirements update
 
 ### Phase 29: Integration Marketplace
 **Goal**: Admins can browse, connect, and manage third-party integrations from a dedicated marketplace settings page with secure credential storage
@@ -175,7 +178,7 @@ Plans:
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
-| 28. Localization String Extraction | 7/7 | Complete   | 2026-02-21 | - |
+| 28. Localization String Extraction | v1.3 | 7/10 | In Progress | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
