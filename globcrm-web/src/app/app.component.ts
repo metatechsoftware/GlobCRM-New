@@ -13,6 +13,7 @@ import { SidebarStateService } from './shared/services/sidebar-state.service';
 import { ThemeService } from './core/theme/theme.service';
 import { PreviewSidebarStore } from './shared/stores/preview-sidebar.store';
 import { EntityPreviewSidebarComponent } from './shared/components/entity-preview-sidebar/entity-preview-sidebar.component';
+import { LanguageService } from './core/i18n/language.service';
 
 @Component({
   selector: 'app-root',
@@ -106,6 +107,11 @@ export class AppComponent {
   private readonly breakpointObserver = inject(BreakpointObserver);
   private readonly themeService = inject(ThemeService);
   readonly previewStore = inject(PreviewSidebarStore);
+  private readonly languageService = inject(LanguageService);
+
+  constructor() {
+    this.languageService.initLanguage();
+  }
 
   /** Start/stop SignalR and load unread count based on auth state. */
   private readonly authEffect = effect(() => {
