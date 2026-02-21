@@ -4,18 +4,27 @@ import {
   signal,
   computed,
   inject,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { INTEGRATION_CATALOG } from './integration-catalog';
 import {
   IntegrationCategory,
-  IntegrationConnection,
+  IntegrationCatalogItem,
   IntegrationViewModel,
 } from './integration.models';
 import { IntegrationCardComponent } from './integration-card.component';
+import { IntegrationStore } from './integration.store';
+import {
+  IntegrationConnectDialogComponent,
+  ConnectDialogResult,
+} from './integration-connect-dialog.component';
+import { IntegrationDisconnectDialogComponent } from './integration-disconnect-dialog.component';
 
 interface CategoryOption {
   value: IntegrationCategory | 'all';
@@ -31,6 +40,7 @@ interface CategoryOption {
     MatIconModule,
     IntegrationCardComponent,
   ],
+  providers: [IntegrationStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './integration-marketplace.component.scss',
   template: `
@@ -79,6 +89,8 @@ interface CategoryOption {
             [connection]="integration.connection"
             [isAdmin]="isAdmin()"
             (connect)="onConnect(integration)"
+            (disconnect)="onDisconnect(integration)"
+            (testConnection)="onTestConnection(integration)"
             (viewDetails)="onViewDetails(integration)"
           />
         }
@@ -94,14 +106,14 @@ interface CategoryOption {
     }
   `,
 })
-export class IntegrationMarketplaceComponent {
+export class IntegrationMarketplaceComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
+  private readonly integrationStore = inject(IntegrationStore);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
 
   readonly searchQuery = signal('');
   readonly selectedCategory = signal<IntegrationCategory | 'all'>('all');
-
-  /** Populated by Plan 04 when store wiring is complete */
-  readonly connections = signal<IntegrationConnection[]>([]);
 
   readonly categories: CategoryOption[] = [
     { value: 'all', label: 'All' },
@@ -118,7 +130,7 @@ export class IntegrationMarketplaceComponent {
   readonly integrations = computed<IntegrationViewModel[]>(() => {
     const query = this.searchQuery().toLowerCase().trim();
     const category = this.selectedCategory();
-    const conns = this.connections();
+    const conns = this.integrationStore.connections();
 
     return INTEGRATION_CATALOG.filter((item) => {
       if (category !== 'all' && item.category !== category) {
@@ -138,16 +150,91 @@ export class IntegrationMarketplaceComponent {
     });
   });
 
+  ngOnInit(): void {
+    this.integrationStore.loadConnections();
+  }
+
   clearFilters(): void {
     this.searchQuery.set('');
     this.selectedCategory.set('all');
   }
 
   onConnect(integration: IntegrationViewModel): void {
-    // Placeholder -- will be wired in Plan 04
+    const dialogRef = this.dialog.open(IntegrationConnectDialogComponent, {
+      data: { catalogItem: integration.catalog },
+      width: '480px',
+    });
+
+    dialogRef.afterClosed().subscribe((result: ConnectDialogResult | undefined) => {
+      if (result) {
+        this.integrationStore.connectIntegration(
+          integration.catalog.key,
+          result.credentials,
+          () => {
+            this.snackBar.open(
+              `Connected to ${integration.catalog.name}`,
+              'Close',
+              { duration: 3000 },
+            );
+          },
+          (error) => {
+            this.snackBar.open(error, 'Close', { duration: 5000 });
+          },
+        );
+      }
+    });
+  }
+
+  onDisconnect(integration: IntegrationViewModel): void {
+    const dialogRef = this.dialog.open(IntegrationDisconnectDialogComponent, {
+      data: { integrationName: integration.catalog.name },
+      width: '420px',
+    });
+
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed && integration.connection) {
+        this.integrationStore.disconnectIntegration(
+          integration.connection.id,
+          () => {
+            this.snackBar.open(
+              `Disconnected from ${integration.catalog.name}`,
+              'Close',
+              { duration: 3000 },
+            );
+          },
+        );
+      }
+    });
+  }
+
+  onTestConnection(integration: IntegrationViewModel): void {
+    if (!integration.connection) return;
+
+    this.integrationStore.testConnection(
+      integration.connection.id,
+      (result) => {
+        if (result.success) {
+          this.snackBar.open('Connection test passed', 'Close', {
+            duration: 3000,
+          });
+        } else {
+          this.snackBar.open(
+            `Connection test failed: ${result.message}`,
+            'Close',
+            { duration: 5000 },
+          );
+        }
+      },
+      (error) => {
+        this.snackBar.open(`Connection test failed: ${error}`, 'Close', {
+          duration: 5000,
+        });
+      },
+    );
   }
 
   onViewDetails(integration: IntegrationViewModel): void {
-    // Placeholder -- will be wired in Plan 04
+    // Plan 05 will open detail panel here
+    console.log('View details:', integration.catalog.key);
   }
 }

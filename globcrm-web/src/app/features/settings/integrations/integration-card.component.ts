@@ -7,6 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import {
   IntegrationCatalogItem,
   IntegrationConnection,
@@ -15,7 +16,7 @@ import {
 @Component({
   selector: 'app-integration-card',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatMenuModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -57,6 +58,26 @@ import {
             <mat-icon>power</mat-icon>
             Connect
           </button>
+        }
+        @if (isAdmin() && connection()?.status === 'Connected') {
+          <button
+            mat-icon-button
+            class="ic-card__menu-btn"
+            [matMenuTriggerFor]="cardMenu"
+            (click)="$event.stopPropagation()"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #cardMenu="matMenu">
+            <button mat-menu-item (click)="testConnection.emit()">
+              <mat-icon>speed</mat-icon>
+              <span>Test Connection</span>
+            </button>
+            <button mat-menu-item class="ic-menu-disconnect" (click)="disconnect.emit()">
+              <mat-icon>link_off</mat-icon>
+              <span>Disconnect</span>
+            </button>
+          </mat-menu>
         }
         <button
           mat-button
@@ -199,6 +220,17 @@ import {
         margin-right: 4px;
       }
 
+      .ic-card__menu-btn {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+      }
+
+      .ic-card__menu-btn mat-icon {
+        font-size: 20px;
+        color: var(--color-text-secondary);
+      }
+
       .ic-card__details-btn {
         font-size: 12px;
         font-weight: 600;
@@ -226,5 +258,7 @@ export class IntegrationCardComponent {
   readonly isAdmin = input<boolean>(false);
 
   readonly connect = output<void>();
+  readonly disconnect = output<void>();
+  readonly testConnection = output<void>();
   readonly viewDetails = output<void>();
 }
