@@ -1,0 +1,127 @@
+{
+  "title": "Sirketler",
+  "list": {
+    "title": "Sirketler",
+    "subtitle": "Kuruluslari, hesaplari ve is iliskilerini yonetin",
+    "addCompany": "Yeni Sirket"
+  },
+  "detail": {
+    "title": "Sirket Detaylari",
+    "notFound": "Sirket bulunamadi",
+    "backToCompanies": "Sirketlere Don",
+    "sections": {
+      "companyInfo": "Sirket Bilgileri",
+      "address": "Adres",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "companyName": "Sirket Adi",
+      "industry": "Sektor",
+      "website": "Web Sitesi",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "companySize": "Sirket Buyuklugu",
+      "description": "Aciklama",
+      "streetAddress": "Sokak Adresi",
+      "city": "Sehir",
+      "stateRegion": "Il / Bolge",
+      "country": "Ulke",
+      "postalCode": "Posta Kodu",
+      "owner": "Sahip",
+      "created": "Olusturulma",
+      "lastUpdated": "Son Guncelleme"
+    },
+    "empty": {
+      "noDescription": "Aciklama yok",
+      "notSpecified": "Belirtilmemis"
+    },
+    "contacts": {
+      "noContacts": "Bu sirkete bagli kisi yok."
+    },
+    "deals": {
+      "viewDeals": "Bu sirkete bagli anlasmalari gorun",
+      "viewDealsButton": "Anlasmalari Gor"
+    },
+    "activities": {
+      "noActivities": "Bu sirkete bagli aktivite yok.",
+      "createActivity": "Aktivite Olustur",
+      "columnSubject": "Konu",
+      "columnType": "Tur",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik",
+      "columnDueDate": "Son Tarih",
+      "columnAssignedTo": "Atanan Kisi"
+    },
+    "quotes": {
+      "noQuotes": "Bu sirkete bagli teklif yok.",
+      "viewAllQuotes": "Tum Teklifleri Gor",
+      "columnQuoteNumber": "Teklif #",
+      "columnTitle": "Baslik",
+      "columnStatus": "Durum",
+      "columnGrandTotal": "Genel Toplam"
+    },
+    "requests": {
+      "noRequests": "Bu sirkete bagli talep yok.",
+      "viewAllRequests": "Tum Talepleri Gor",
+      "columnSubject": "Konu",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik",
+      "columnAssignedTo": "Atanan Kisi"
+    },
+    "emails": {
+      "noEmails": "Bu sirkete bagli e-posta yok.",
+      "viewAllEmails": "Tum E-postalari Gor",
+      "columnSubject": "Konu",
+      "columnPreview": "Onizleme",
+      "columnDate": "Tarih"
+    },
+    "notes": {
+      "noNotes": "Bu sirket icin not yok.",
+      "addNote": "Not Ekle",
+      "columnTitle": "Baslik",
+      "columnPreview": "Onizleme",
+      "columnAuthor": "Yazar",
+      "columnDate": "Tarih"
+    },
+    "timeline": "Zaman Cizelgesi",
+    "mergedRedirect": "Bu sirket baska bir kayitla birlestirildi. Yonlendiriliyor..."
+  },
+  "form": {
+    "createTitle": "Yeni Sirket",
+    "editTitle": "Sirket Duzenle",
+    "sections": {
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "companyName": "Sirket Adi",
+      "industry": "Sektor",
+      "website": "Web Sitesi",
+      "phone": "Telefon",
+      "email": "E-posta",
+      "companySize": "Sirket Buyuklugu",
+      "address": "Adres",
+      "city": "Sehir",
+      "stateRegion": "Il / Bolge",
+      "country": "Ulke",
+      "postalCode": "Posta Kodu",
+      "description": "Aciklama"
+    },
+    "validation": {
+      "nameRequired": "Sirket adi zorunludur",
+      "nameMaxLength": "Sirket adi 200 karakteri asamaz"
+    },
+    "duplicates": {
+      "title": "Olasi kopyalar bulundu:",
+      "matchPercent": "% eslesme"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createCompany": "Sirket Olustur"
+  },
+  "messages": {
+    "companyCreated": "Sirket basariyla olusturuldu",
+    "companyUpdated": "Sirket basariyla guncellendi",
+    "companyCreateFailed": "Sirket olusturulamadi",
+    "companyUpdateFailed": "Sirket guncellenemedi",
+    "companyLoadFailed": "Sirket verileri yuklenemedi"
+  }
+}

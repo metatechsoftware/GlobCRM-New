@@ -1,0 +1,152 @@
+{
+  "title": "Deals",
+  "list": {
+    "title": "Deals",
+    "subtitle": "Track opportunities, pipeline stages, and revenue forecasts",
+    "addDeal": "New Deal",
+    "allPipelines": "All Pipelines",
+    "selectPipeline": "Select Pipeline"
+  },
+  "detail": {
+    "title": "Deal Details",
+    "notFound": "Deal not found",
+    "backToDeals": "Back to Deals",
+    "sections": {
+      "dealInfo": "Deal Info",
+      "datesAssignment": "Dates & Assignment",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "description": "Description",
+      "pipeline": "Pipeline",
+      "stage": "Stage",
+      "value": "Value",
+      "probability": "Probability",
+      "expectedCloseDate": "Expected Close Date",
+      "actualCloseDate": "Actual Close Date",
+      "owner": "Owner",
+      "company": "Company",
+      "created": "Created",
+      "lastUpdated": "Last Updated"
+    },
+    "empty": {
+      "noDescription": "No description",
+      "notSpecified": "Not specified",
+      "unassigned": "Unassigned"
+    },
+    "contacts": {
+      "count": "{{count}} contacts linked",
+      "linkContact": "Link Contact",
+      "searchContacts": "Search contacts",
+      "searchPlaceholder": "Type to search contacts...",
+      "noContacts": "No contacts linked to this deal."
+    },
+    "products": {
+      "count": "{{count}} products linked",
+      "linkProduct": "Link Product",
+      "searchProducts": "Search products",
+      "searchPlaceholder": "Type to search products...",
+      "noProducts": "No products linked to this deal.",
+      "quantity": "Quantity",
+      "unitPriceOverride": "Unit Price Override",
+      "useProductDefault": "Use product default",
+      "columnProduct": "Product",
+      "columnQty": "Qty",
+      "columnUnitPrice": "Unit Price",
+      "columnSubtotal": "Subtotal",
+      "total": "Total"
+    },
+    "activities": {
+      "noActivities": "No activities linked to this deal.",
+      "createActivity": "Create Activity",
+      "columnSubject": "Subject",
+      "columnType": "Type",
+      "columnStatus": "Status",
+      "columnPriority": "Priority",
+      "columnDueDate": "Due Date",
+      "columnAssignedTo": "Assigned To"
+    },
+    "quotes": {
+      "noQuotes": "No quotes linked to this deal.",
+      "viewAllQuotes": "View All Quotes",
+      "columnQuoteNumber": "Quote #",
+      "columnTitle": "Title",
+      "columnStatus": "Status",
+      "columnGrandTotal": "Grand Total",
+      "columnVersion": "Version"
+    },
+    "notes": {
+      "noNotes": "No notes for this deal.",
+      "addNote": "Add Note",
+      "columnTitle": "Title",
+      "columnPreview": "Preview",
+      "columnAuthor": "Author",
+      "columnDate": "Date"
+    },
+    "timeline": "Timeline"
+  },
+  "form": {
+    "createTitle": "New Deal",
+    "editTitle": "Edit Deal",
+    "sections": {
+      "dealInfo": "Deal Information",
+      "pipelineStage": "Pipeline & Stage",
+      "companyOwner": "Company & Owner",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "title": "Title",
+      "value": "Value",
+      "probability": "Probability (%)",
+      "expectedCloseDate": "Expected Close Date",
+      "description": "Description",
+      "pipeline": "Pipeline",
+      "stage": "Stage",
+      "company": "Company",
+      "owner": "Owner",
+      "unassigned": "Unassigned",
+      "searchCompanies": "Search companies..."
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMaxLength": "Title cannot exceed 500 characters",
+      "pipelineRequired": "Pipeline is required"
+    },
+    "saveChanges": "Save Changes",
+    "createDeal": "Create Deal"
+  },
+  "kanban": {
+    "title": "Deals",
+    "showClosed": "Show Closed",
+    "selectPipeline": "Select Pipeline",
+    "noDeals": "No deals in this stage",
+    "forwardOnly": "Deals can only move forward in the pipeline.",
+    "emptyTitle": "Select a pipeline to view the Kanban board",
+    "emptySubtext": "Choose a pipeline from the dropdown above",
+    "daysOverdue": "{{days}}d overdue",
+    "dueToday": "Due today",
+    "daysLeft": "{{days}}d left"
+  },
+  "calendar": {
+    "title": "Deals",
+    "allPipelines": "All Pipelines"
+  },
+  "messages": {
+    "dealCreated": "Deal created successfully",
+    "dealUpdated": "Deal updated successfully",
+    "dealCreateFailed": "Failed to create deal",
+    "dealUpdateFailed": "Failed to update deal",
+    "dealLoadFailed": "Failed to load deal data",
+    "contactLinked": "Linked {{name}}",
+    "contactLinkFailed": "Failed to link contact",
+    "contactUnlinked": "Unlinked {{name}}",
+    "contactUnlinkFailed": "Failed to unlink contact",
+    "productLinked": "Linked {{name}}",
+    "productLinkFailed": "Failed to link product",
+    "productUnlinked": "Unlinked {{name}}",
+    "productUnlinkFailed": "Failed to unlink product",
+    "pipelineLoadFailed": "Failed to load pipelines",
+    "kanbanLoadFailed": "Failed to load Kanban data",
+    "stageUpdateFailed": "Failed to update deal stage"
+  }
+}

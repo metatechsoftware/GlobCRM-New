@@ -1,0 +1,127 @@
+{
+  "title": "Companies",
+  "list": {
+    "title": "Companies",
+    "subtitle": "Manage organizations, accounts, and business relationships",
+    "addCompany": "New Company"
+  },
+  "detail": {
+    "title": "Company Details",
+    "notFound": "Company not found",
+    "backToCompanies": "Back to Companies",
+    "sections": {
+      "companyInfo": "Company Info",
+      "address": "Address",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "companyName": "Company Name",
+      "industry": "Industry",
+      "website": "Website",
+      "phone": "Phone",
+      "email": "Email",
+      "companySize": "Company Size",
+      "description": "Description",
+      "streetAddress": "Street Address",
+      "city": "City",
+      "stateRegion": "State / Region",
+      "country": "Country",
+      "postalCode": "Postal Code",
+      "owner": "Owner",
+      "created": "Created",
+      "lastUpdated": "Last Updated"
+    },
+    "empty": {
+      "noDescription": "No description",
+      "notSpecified": "Not specified"
+    },
+    "contacts": {
+      "noContacts": "No contacts linked to this company."
+    },
+    "deals": {
+      "viewDeals": "View deals linked to this company",
+      "viewDealsButton": "View Deals"
+    },
+    "activities": {
+      "noActivities": "No activities linked to this company.",
+      "createActivity": "Create Activity",
+      "columnSubject": "Subject",
+      "columnType": "Type",
+      "columnStatus": "Status",
+      "columnPriority": "Priority",
+      "columnDueDate": "Due Date",
+      "columnAssignedTo": "Assigned To"
+    },
+    "quotes": {
+      "noQuotes": "No quotes linked to this company.",
+      "viewAllQuotes": "View All Quotes",
+      "columnQuoteNumber": "Quote #",
+      "columnTitle": "Title",
+      "columnStatus": "Status",
+      "columnGrandTotal": "Grand Total"
+    },
+    "requests": {
+      "noRequests": "No requests linked to this company.",
+      "viewAllRequests": "View All Requests",
+      "columnSubject": "Subject",
+      "columnStatus": "Status",
+      "columnPriority": "Priority",
+      "columnAssignedTo": "Assigned To"
+    },
+    "emails": {
+      "noEmails": "No emails linked to this company.",
+      "viewAllEmails": "View All Emails",
+      "columnSubject": "Subject",
+      "columnPreview": "Preview",
+      "columnDate": "Date"
+    },
+    "notes": {
+      "noNotes": "No notes for this company.",
+      "addNote": "Add Note",
+      "columnTitle": "Title",
+      "columnPreview": "Preview",
+      "columnAuthor": "Author",
+      "columnDate": "Date"
+    },
+    "timeline": "Timeline",
+    "mergedRedirect": "This company was merged into another record. Redirecting..."
+  },
+  "form": {
+    "createTitle": "New Company",
+    "editTitle": "Edit Company",
+    "sections": {
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "companyName": "Company Name",
+      "industry": "Industry",
+      "website": "Website",
+      "phone": "Phone",
+      "email": "Email",
+      "companySize": "Company Size",
+      "address": "Address",
+      "city": "City",
+      "stateRegion": "State / Region",
+      "country": "Country",
+      "postalCode": "Postal Code",
+      "description": "Description"
+    },
+    "validation": {
+      "nameRequired": "Company name is required",
+      "nameMaxLength": "Company name cannot exceed 200 characters"
+    },
+    "duplicates": {
+      "title": "Potential duplicates found:",
+      "matchPercent": "% match"
+    },
+    "saveChanges": "Save Changes",
+    "createCompany": "Create Company"
+  },
+  "messages": {
+    "companyCreated": "Company created successfully",
+    "companyUpdated": "Company updated successfully",
+    "companyCreateFailed": "Failed to create company",
+    "companyUpdateFailed": "Failed to update company",
+    "companyLoadFailed": "Failed to load company data"
+  }
+}

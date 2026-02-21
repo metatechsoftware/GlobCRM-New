@@ -1,0 +1,184 @@
+{
+  "title": "Lead'ler",
+  "list": {
+    "title": "Lead'ler",
+    "subtitle": "Potansiyel musterileri yakayin, sicaklik derecesini takip edin ve kisilere donusturun",
+    "addLead": "Yeni Lead"
+  },
+  "detail": {
+    "title": "Lead Detaylari",
+    "notFound": "Lead bulunamadi",
+    "backToLeads": "Lead'lere Don",
+    "convertLead": "Lead'i Donustur",
+    "reopenLead": "Lead'i Yeniden Ac",
+    "leadPipeline": "Lead Pipeline",
+    "convertedBanner": {
+      "title": "Bu lead donusturuldu",
+      "onDate": "tarihinde",
+      "byUser": "tarafindan"
+    },
+    "sections": {
+      "contactInfo": "Iletisim Bilgileri",
+      "leadDetails": "Lead Detaylari",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobile": "Cep Telefonu",
+      "jobTitle": "Unvan",
+      "company": "Sirket",
+      "stage": "Asama",
+      "source": "Kaynak",
+      "owner": "Sahip",
+      "temperature": "Sicaklik",
+      "description": "Aciklama",
+      "created": "Olusturulma",
+      "lastUpdated": "Son Guncelleme"
+    },
+    "empty": {
+      "noDescription": "Aciklama yok",
+      "notSpecified": "Belirtilmemis",
+      "unassigned": "Atanmamis",
+      "unknown": "Bilinmiyor"
+    },
+    "activities": {
+      "noActivities": "Bu lead'e bagli aktivite yok.",
+      "createActivity": "Aktivite Olustur",
+      "columnSubject": "Konu",
+      "columnType": "Tur",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik",
+      "columnDueDate": "Son Tarih",
+      "columnAssignedTo": "Atanan Kisi"
+    },
+    "notes": {
+      "noNotes": "Bu lead icin not yok.",
+      "addNote": "Not Ekle",
+      "columnTitle": "Baslik",
+      "columnPreview": "Onizleme",
+      "columnAuthor": "Yazar",
+      "columnDate": "Tarih"
+    },
+    "conversion": {
+      "title": "Donusum Detaylari",
+      "convertedOn": "Donusum Tarihi",
+      "convertedBy": "Donusturen Kisi",
+      "createdRecords": "Olusturulan Kayitlar",
+      "contact": "Kisi",
+      "company": "Sirket",
+      "deal": "Anlasma",
+      "viewContact": "Kisiyi Gor",
+      "viewCompany": "Sirketi Gor",
+      "viewDeal": "Anlasmay Gor",
+      "conversionNotes": "Donusum Notlari"
+    }
+  },
+  "form": {
+    "createTitle": "Yeni Lead",
+    "editTitle": "Lead Duzenle",
+    "sections": {
+      "contactInfo": "Iletisim Bilgileri",
+      "company": "Sirket",
+      "leadDetails": "Lead Detaylari",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobilePhone": "Cep Telefonu",
+      "jobTitle": "Unvan",
+      "companyName": "Sirket Adi",
+      "stage": "Asama",
+      "source": "Kaynak",
+      "sourceNone": "Yok",
+      "temperature": "Sicaklik",
+      "tempHot": "Sicak",
+      "tempWarm": "Ilik",
+      "tempCold": "Soguk",
+      "owner": "Sahip",
+      "unassigned": "Atanmamis",
+      "description": "Aciklama"
+    },
+    "validation": {
+      "firstNameRequired": "Ad zorunludur",
+      "lastNameRequired": "Soyad zorunludur",
+      "firstNameMaxLength": "En fazla 100 karakter",
+      "lastNameMaxLength": "En fazla 100 karakter",
+      "phoneMaxLength": "En fazla 50 karakter",
+      "invalidEmail": "Gecersiz e-posta formati",
+      "stageRequired": "Asama zorunludur",
+      "cannotEditConverted": "Donusturulmus bir lead duzenlenemez"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createLead": "Lead Olustur"
+  },
+  "kanban": {
+    "title": "Lead Pipeline",
+    "showLostConverted": "Kaybedilen/Donusturulenleri Goster",
+    "addLead": "Yeni Lead",
+    "noLeads": "Bu asamada lead yok",
+    "forwardOnly": "Lead'ler yalnizca ileri tasiyabilir. Geri tasimak icin Yeniden Ac'i kullanin.",
+    "useConvertAction": "Detay sayfasindaki Lead'i Donustur islemini kullanin",
+    "emptyTitle": "Lead bulunamadi",
+    "emptySubtext": "Baslamak icin ilk lead'inizi olusturun"
+  },
+  "convert": {
+    "dialogTitle": "Lead'i Donustur:",
+    "checkingDuplicates": "Kopyalar kontrol ediliyor...",
+    "contactSection": "Kisi",
+    "required": "Zorunlu",
+    "companySection": "Sirket",
+    "createOrLink": "Sirket olustur veya bagla",
+    "linkToExisting": "Mevcut sirkete bagla",
+    "createNew": "Yeni sirket olustur",
+    "searchCompanies": "Sirket ara",
+    "searchPlaceholder": "Sirket aramak icin yazin...",
+    "newCompanyName": "Sirket Adi",
+    "newCompanyWebsite": "Web Sitesi",
+    "newCompanyPhone": "Telefon",
+    "dealSection": "Anlasma",
+    "createDeal": "Anlasma olustur",
+    "dealTitle": "Anlasma Basligi",
+    "dealValue": "Deger",
+    "dealPipeline": "Pipeline",
+    "convertButton": "Lead'i Donustur",
+    "duplicateContact": "Bu e-posta adresine sahip bir kisi zaten mevcut: {{name}} ({{email}}). Yine de yeni bir kisi olusturulacaktir.",
+    "duplicateCompany": "\"{{name}}\" sirketi zaten mevcut. Yeni bir tane olusturmak yerine mevcut sirkete baglayabilirsiniz.",
+    "companyNameRequired": "Yeni sirket olustururken sirket adi zorunludur",
+    "selectCompanyRequired": "Lutfen baglanacak mevcut bir sirket secin",
+    "dealTitleRequired": "Anlasma olustururken anlasma basligi zorunludur",
+    "fields": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobilePhone": "Cep Telefonu",
+      "jobTitle": "Unvan"
+    },
+    "validation": {
+      "firstNameRequired": "Ad zorunludur",
+      "lastNameRequired": "Soyad zorunludur",
+      "invalidEmail": "Gecersiz e-posta formati"
+    }
+  },
+  "messages": {
+    "leadCreated": "Lead basariyla olusturuldu",
+    "leadUpdated": "Lead basariyla guncellendi",
+    "leadDeleted": "Lead silindi",
+    "leadCreateFailed": "Lead olusturulamadi",
+    "leadUpdateFailed": "Lead guncellenemedi",
+    "leadDeleteFailed": "Lead silinemedi",
+    "leadLoadFailed": "Lead yuklenemedi",
+    "stageUpdated": "Lead {{stage}} asamasina tasindi",
+    "stageUpdateFailed": "Asama guncellenemedi",
+    "leadReopened": "Lead {{stage}} asamasinda yeniden acildi",
+    "leadReopenFailed": "Lead yeniden acilamadi",
+    "leadConverted": "Lead basariyla donusturuldu",
+    "leadConvertFailed": "Lead donusturulemedi",
+    "kanbanLoadFailed": "Kanban verileri yuklenemedi",
+    "leadDataLoadFailed": "Lead verileri yuklenemedi"
+  }
+}

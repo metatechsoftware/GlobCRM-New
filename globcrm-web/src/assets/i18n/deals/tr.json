@@ -1,0 +1,152 @@
+{
+  "title": "Anlasmalar",
+  "list": {
+    "title": "Anlasmalar",
+    "subtitle": "Firsatlari, Pipeline asamalarini ve gelir tahminlerini takip edin",
+    "addDeal": "Yeni Anlasma",
+    "allPipelines": "Tum Pipeline'lar",
+    "selectPipeline": "Pipeline Secin"
+  },
+  "detail": {
+    "title": "Anlasma Detaylari",
+    "notFound": "Anlasma bulunamadi",
+    "backToDeals": "Anlasmalara Don",
+    "sections": {
+      "dealInfo": "Anlasma Bilgileri",
+      "datesAssignment": "Tarihler ve Atama",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "description": "Aciklama",
+      "pipeline": "Pipeline",
+      "stage": "Asama",
+      "value": "Deger",
+      "probability": "Olasilik",
+      "expectedCloseDate": "Beklenen Kapanis Tarihi",
+      "actualCloseDate": "Gerceklesen Kapanis Tarihi",
+      "owner": "Sahip",
+      "company": "Sirket",
+      "created": "Olusturulma",
+      "lastUpdated": "Son Guncelleme"
+    },
+    "empty": {
+      "noDescription": "Aciklama yok",
+      "notSpecified": "Belirtilmemis",
+      "unassigned": "Atanmamis"
+    },
+    "contacts": {
+      "count": "{{count}} kisi baglandi",
+      "linkContact": "Kisi Bagla",
+      "searchContacts": "Kisi ara",
+      "searchPlaceholder": "Kisi aramak icin yazin...",
+      "noContacts": "Bu anlasmaya bagli kisi yok."
+    },
+    "products": {
+      "count": "{{count}} urun baglandi",
+      "linkProduct": "Urun Bagla",
+      "searchProducts": "Urun ara",
+      "searchPlaceholder": "Urun aramak icin yazin...",
+      "noProducts": "Bu anlasmaya bagli urun yok.",
+      "quantity": "Miktar",
+      "unitPriceOverride": "Birim Fiyat Degisikligi",
+      "useProductDefault": "Urun varsayilanini kullan",
+      "columnProduct": "Urun",
+      "columnQty": "Adet",
+      "columnUnitPrice": "Birim Fiyat",
+      "columnSubtotal": "Ara Toplam",
+      "total": "Toplam"
+    },
+    "activities": {
+      "noActivities": "Bu anlasmaya bagli aktivite yok.",
+      "createActivity": "Aktivite Olustur",
+      "columnSubject": "Konu",
+      "columnType": "Tur",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik",
+      "columnDueDate": "Son Tarih",
+      "columnAssignedTo": "Atanan Kisi"
+    },
+    "quotes": {
+      "noQuotes": "Bu anlasmaya bagli teklif yok.",
+      "viewAllQuotes": "Tum Teklifleri Gor",
+      "columnQuoteNumber": "Teklif #",
+      "columnTitle": "Baslik",
+      "columnStatus": "Durum",
+      "columnGrandTotal": "Genel Toplam",
+      "columnVersion": "Surum"
+    },
+    "notes": {
+      "noNotes": "Bu anlasma icin not yok.",
+      "addNote": "Not Ekle",
+      "columnTitle": "Baslik",
+      "columnPreview": "Onizleme",
+      "columnAuthor": "Yazar",
+      "columnDate": "Tarih"
+    },
+    "timeline": "Zaman Cizelgesi"
+  },
+  "form": {
+    "createTitle": "Yeni Anlasma",
+    "editTitle": "Anlasma Duzenle",
+    "sections": {
+      "dealInfo": "Anlasma Bilgileri",
+      "pipelineStage": "Pipeline ve Asama",
+      "companyOwner": "Sirket ve Sahip",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "title": "Baslik",
+      "value": "Deger",
+      "probability": "Olasilik (%)",
+      "expectedCloseDate": "Beklenen Kapanis Tarihi",
+      "description": "Aciklama",
+      "pipeline": "Pipeline",
+      "stage": "Asama",
+      "company": "Sirket",
+      "owner": "Sahip",
+      "unassigned": "Atanmamis",
+      "searchCompanies": "Sirket ara..."
+    },
+    "validation": {
+      "titleRequired": "Baslik zorunludur",
+      "titleMaxLength": "Baslik 500 karakteri asamaz",
+      "pipelineRequired": "Pipeline zorunludur"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createDeal": "Anlasma Olustur"
+  },
+  "kanban": {
+    "title": "Anlasmalar",
+    "showClosed": "Kapananlari Goster",
+    "selectPipeline": "Pipeline Secin",
+    "noDeals": "Bu asamada anlasma yok",
+    "forwardOnly": "Anlasmalar Pipeline'da yalnizca ileri tasiyabilir.",
+    "emptyTitle": "Kanban panosunu gormek icin bir Pipeline secin",
+    "emptySubtext": "Yukaridaki acilir menudan bir Pipeline secin",
+    "daysOverdue": "{{days}} gun gecikti",
+    "dueToday": "Bugune kadar",
+    "daysLeft": "{{days}} gun kaldi"
+  },
+  "calendar": {
+    "title": "Anlasmalar",
+    "allPipelines": "Tum Pipeline'lar"
+  },
+  "messages": {
+    "dealCreated": "Anlasma basariyla olusturuldu",
+    "dealUpdated": "Anlasma basariyla guncellendi",
+    "dealCreateFailed": "Anlasma olusturulamadi",
+    "dealUpdateFailed": "Anlasma guncellenemedi",
+    "dealLoadFailed": "Anlasma verileri yuklenemedi",
+    "contactLinked": "{{name}} baglandi",
+    "contactLinkFailed": "Kisi baglanamadi",
+    "contactUnlinked": "{{name}} baglantisi kaldirildi",
+    "contactUnlinkFailed": "Kisi baglantisi kaldirilamadi",
+    "productLinked": "{{name}} baglandi",
+    "productLinkFailed": "Urun baglanamadi",
+    "productUnlinked": "{{name}} baglantisi kaldirildi",
+    "productUnlinkFailed": "Urun baglantisi kaldirilamadi",
+    "pipelineLoadFailed": "Pipeline'lar yuklenemedi",
+    "kanbanLoadFailed": "Kanban verileri yuklenemedi",
+    "stageUpdateFailed": "Anlasma asamasi guncellenemedi"
+  }
+}

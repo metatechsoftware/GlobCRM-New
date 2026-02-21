@@ -1,0 +1,184 @@
+{
+  "title": "Leads",
+  "list": {
+    "title": "Leads",
+    "subtitle": "Capture prospects, track temperature, and convert to contacts",
+    "addLead": "New Lead"
+  },
+  "detail": {
+    "title": "Lead Details",
+    "notFound": "Lead not found",
+    "backToLeads": "Back to Leads",
+    "convertLead": "Convert Lead",
+    "reopenLead": "Reopen Lead",
+    "leadPipeline": "Lead Pipeline",
+    "convertedBanner": {
+      "title": "This lead has been converted",
+      "onDate": "on",
+      "byUser": "by"
+    },
+    "sections": {
+      "contactInfo": "Contact Information",
+      "leadDetails": "Lead Details",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "email": "Email",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "jobTitle": "Job Title",
+      "company": "Company",
+      "stage": "Stage",
+      "source": "Source",
+      "owner": "Owner",
+      "temperature": "Temperature",
+      "description": "Description",
+      "created": "Created",
+      "lastUpdated": "Last Updated"
+    },
+    "empty": {
+      "noDescription": "No description",
+      "notSpecified": "Not specified",
+      "unassigned": "Unassigned",
+      "unknown": "Unknown"
+    },
+    "activities": {
+      "noActivities": "No activities linked to this lead.",
+      "createActivity": "Create Activity",
+      "columnSubject": "Subject",
+      "columnType": "Type",
+      "columnStatus": "Status",
+      "columnPriority": "Priority",
+      "columnDueDate": "Due Date",
+      "columnAssignedTo": "Assigned To"
+    },
+    "notes": {
+      "noNotes": "No notes for this lead.",
+      "addNote": "Add Note",
+      "columnTitle": "Title",
+      "columnPreview": "Preview",
+      "columnAuthor": "Author",
+      "columnDate": "Date"
+    },
+    "conversion": {
+      "title": "Conversion Details",
+      "convertedOn": "Converted On",
+      "convertedBy": "Converted By",
+      "createdRecords": "Created Records",
+      "contact": "Contact",
+      "company": "Company",
+      "deal": "Deal",
+      "viewContact": "View Contact",
+      "viewCompany": "View Company",
+      "viewDeal": "View Deal",
+      "conversionNotes": "Conversion Notes"
+    }
+  },
+  "form": {
+    "createTitle": "New Lead",
+    "editTitle": "Edit Lead",
+    "sections": {
+      "contactInfo": "Contact Information",
+      "company": "Company",
+      "leadDetails": "Lead Details",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "mobilePhone": "Mobile Phone",
+      "jobTitle": "Job Title",
+      "companyName": "Company Name",
+      "stage": "Stage",
+      "source": "Source",
+      "sourceNone": "None",
+      "temperature": "Temperature",
+      "tempHot": "Hot",
+      "tempWarm": "Warm",
+      "tempCold": "Cold",
+      "owner": "Owner",
+      "unassigned": "Unassigned",
+      "description": "Description"
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "firstNameMaxLength": "Max 100 characters",
+      "lastNameMaxLength": "Max 100 characters",
+      "phoneMaxLength": "Max 50 characters",
+      "invalidEmail": "Invalid email format",
+      "stageRequired": "Stage is required",
+      "cannotEditConverted": "Cannot edit a converted lead"
+    },
+    "saveChanges": "Save Changes",
+    "createLead": "Create Lead"
+  },
+  "kanban": {
+    "title": "Leads Pipeline",
+    "showLostConverted": "Show Lost/Converted",
+    "addLead": "New Lead",
+    "noLeads": "No leads in this stage",
+    "forwardOnly": "Leads can only move forward. Use Reopen to move backward.",
+    "useConvertAction": "Use the Convert Lead action on the detail page",
+    "emptyTitle": "No leads found",
+    "emptySubtext": "Create your first lead to get started"
+  },
+  "convert": {
+    "dialogTitle": "Convert Lead:",
+    "checkingDuplicates": "Checking for duplicates...",
+    "contactSection": "Contact",
+    "required": "Required",
+    "companySection": "Company",
+    "createOrLink": "Create or link a company",
+    "linkToExisting": "Link to existing company",
+    "createNew": "Create new company",
+    "searchCompanies": "Search companies",
+    "searchPlaceholder": "Type to search companies...",
+    "newCompanyName": "Company Name",
+    "newCompanyWebsite": "Website",
+    "newCompanyPhone": "Phone",
+    "dealSection": "Deal",
+    "createDeal": "Create a deal",
+    "dealTitle": "Deal Title",
+    "dealValue": "Value",
+    "dealPipeline": "Pipeline",
+    "convertButton": "Convert Lead",
+    "duplicateContact": "A contact with this email already exists: {{name}} ({{email}}). This will create a new contact regardless.",
+    "duplicateCompany": "Company \"{{name}}\" already exists. You can link to the existing company instead of creating a new one.",
+    "companyNameRequired": "Company name is required when creating a new company",
+    "selectCompanyRequired": "Please select an existing company to link",
+    "dealTitleRequired": "Deal title is required when creating a deal",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "mobilePhone": "Mobile Phone",
+      "jobTitle": "Job Title"
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "invalidEmail": "Invalid email format"
+    }
+  },
+  "messages": {
+    "leadCreated": "Lead created successfully",
+    "leadUpdated": "Lead updated successfully",
+    "leadDeleted": "Lead deleted",
+    "leadCreateFailed": "Failed to create lead",
+    "leadUpdateFailed": "Failed to update lead",
+    "leadDeleteFailed": "Failed to delete lead",
+    "leadLoadFailed": "Failed to load lead",
+    "stageUpdated": "Lead moved to {{stage}}",
+    "stageUpdateFailed": "Failed to update stage",
+    "leadReopened": "Lead reopened to {{stage}}",
+    "leadReopenFailed": "Failed to reopen lead",
+    "leadConverted": "Lead converted successfully",
+    "leadConvertFailed": "Failed to convert lead",
+    "kanbanLoadFailed": "Failed to load Kanban data",
+    "leadDataLoadFailed": "Failed to load lead data"
+  }
+}
