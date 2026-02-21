@@ -132,7 +132,7 @@ export class BoardDetailComponent {
     }
     const options: AssigneeOption[] = [];
     if (hasUnassigned) {
-      options.push({ id: null, name: 'Unassigned' });
+      options.push({ id: null, name: this.transloco.translate('boards.cardDetail.unassigned') });
     }
     map.forEach((name, id) => options.push({ id, name }));
     return options;
