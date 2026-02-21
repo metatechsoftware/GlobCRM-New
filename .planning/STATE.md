@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 29 of 31 (Integration Marketplace)
-Plan: 2 of 5 complete
+Plan: 3 of 5 complete
 Status: Executing Phase 29
-Last activity: 2026-02-21 — Completed 29-03 (Integration Marketplace Frontend)
+Last activity: 2026-02-21 — Completed 29-02 (Integration API Controller)
 
-Progress: [███████████████████░] 96% (180/~188 plans estimated)
+Progress: [███████████████████░] 96% (181/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 96% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 180
+- Total plans completed: 181
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 19 plans across 3 phases (Phase 27-29)
+- v1.3: 20 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -84,6 +84,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 29-03: Card component uses custom CSS badges instead of Material chips for lighter weight and better brand-color control
 - 29-03: Category filter uses custom pill buttons instead of MatChipListbox for visual consistency with settings hub
 - 29-03: Placeholder methods for connect/viewDetails prepared for Plan 04 wiring
+- 29-02: ITenantProvider used for tenant context (consistent with WebhooksController) instead of IHttpContextAccessor
+- 29-02: User name from firstName/lastName JWT claims with email fallback for activity log denormalization
+- 29-02: Re-connect flow reuses existing disconnected Integration entity to avoid unique index violation
 
 ### Pending Todos
 
@@ -98,6 +101,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 29-03-PLAN.md (Integration Marketplace Frontend)
-Resume file: .planning/phases/29-integration-marketplace/29-03-SUMMARY.md
-Next step: Execute remaining Phase 29 plans (02, 04, 05)
+Stopped at: Completed 29-02-PLAN.md (Integration API Controller)
+Resume file: .planning/phases/29-integration-marketplace/29-02-SUMMARY.md
+Next step: Execute remaining Phase 29 plans (04, 05)
