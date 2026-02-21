@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/api/api.service';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { LanguageService, SupportedLang } from '../../../core/i18n/language.service';
 
 interface LanguageOption {
   value: string;
@@ -160,6 +161,7 @@ export class LanguageSettingsComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly transloco = inject(TranslocoService);
+  private readonly languageService = inject(LanguageService);
 
   readonly selectedLanguage = signal('en');
   readonly saving = signal(false);
@@ -179,6 +181,7 @@ export class LanguageSettingsComponent implements OnInit {
       .subscribe({
         next: () => {
           this.selectedLanguage.set(lang);
+          this.languageService.switchLanguage(lang as SupportedLang);
           this.saving.set(false);
           this.snackBar.open(this.transloco.translate('settings.language.saveSuccess'), 'OK', {
             duration: 3000,
