@@ -1,0 +1,81 @@
+<!-- Board Card — Trello-style compact card with metadata -->
+<div class="board-card" (click)="onCardClick()" role="button" tabindex="0">
+  <!-- Label Color Bars -->
+  @if (card().labels.length > 0) {
+    <div class="label-bars">
+      @for (label of card().labels; track label.labelId) {
+        <span class="label-bar"
+              [style.background-color]="label.color"
+              [matTooltip]="label.name">
+        </span>
+      }
+    </div>
+  }
+
+  <!-- Hover Actions -->
+  <div class="hover-actions">
+    <button class="hover-action-btn"
+            (click)="onEdit($event)"
+            [matTooltip]="'boards.card.edit' | transloco">
+      <mat-icon>edit</mat-icon>
+    </button>
+    <button class="hover-action-btn"
+            (click)="onLabel($event)"
+            [matTooltip]="'boards.card.labels' | transloco">
+      <mat-icon>label</mat-icon>
+    </button>
+    <button class="hover-action-btn"
+            (click)="onArchive($event)"
+            [matTooltip]="'boards.card.archive' | transloco">
+      <mat-icon>archive</mat-icon>
+    </button>
+  </div>
+
+  <!-- Card Title -->
+  <div class="card-title">{{ card().title }}</div>
+
+  <!-- Entity Link Badge -->
+  @if (card().linkedEntityType) {
+    <div class="entity-badge">
+      <mat-icon class="entity-badge-icon">{{ getEntityIcon(card().linkedEntityType) }}</mat-icon>
+      <span class="entity-badge-name">{{ card().linkedEntityName }}</span>
+    </div>
+  }
+
+  <!-- Bottom Metadata Row -->
+  <div class="card-metadata">
+    <!-- Assignee Avatar -->
+    @if (card().assigneeId) {
+      <span class="assignee-avatar" [matTooltip]="card().assigneeName ?? ''">
+        {{ getInitials(card().assigneeName) }}
+      </span>
+    }
+
+    <!-- Due Date -->
+    @if (card().dueDate) {
+      <span class="due-date"
+            [class.urgency-overdue]="dueDateUrgency() === 'overdue'"
+            [class.urgency-today]="dueDateUrgency() === 'today'"
+            [class.urgency-approaching]="dueDateUrgency() === 'approaching'">
+        <mat-icon class="meta-icon">event</mat-icon>
+        <span class="due-date-text">{{ card().dueDate | date:'MMM d' }}</span>
+      </span>
+    }
+
+    <!-- Checklist Progress -->
+    @if (card().checklistTotal > 0) {
+      <span class="checklist-progress" [class.checklist-complete]="checklistComplete()">
+        <mat-icon class="meta-icon">check_box</mat-icon>
+        <span>{{ card().checklistChecked }}/{{ card().checklistTotal }}</span>
+      </span>
+    }
+
+    <!-- Comment Count -->
+    @if (card().commentCount > 0) {
+      <span class="comment-count">
+        <mat-icon class="meta-icon">chat_bubble_outline</mat-icon>
+        <span>{{ card().commentCount }}</span>
+      </span>
+    }
+  </div>
+</div>

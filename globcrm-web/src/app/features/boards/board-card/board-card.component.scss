@@ -1,0 +1,252 @@
+// ─── Board Card — Trello-style Compact ──────────────────────────────────────
+// Warm Modern tokens, label bars, metadata row, hover actions.
+
+// ─── Card Container ─────────────────────────────────────────────────────────
+
+.board-card {
+  position: relative;
+  background: var(--color-surface);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  cursor: pointer;
+  border: 1px solid var(--color-border-subtle);
+  transition:
+    border-color 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+  user-select: none;
+  outline: none;
+
+  &:hover {
+    border-color: var(--color-border);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+    .hover-actions {
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &:focus-visible {
+    border-color: var(--orange-500);
+    box-shadow: 0 0 0 3px var(--orange-glow);
+  }
+}
+
+// ─── Label Color Bars ───────────────────────────────────────────────────────
+
+.label-bars {
+  display: flex;
+  gap: 2px;
+  margin: -12px -12px 8px -12px;
+  border-radius: var(--radius-md) var(--radius-md) 0 0;
+  overflow: hidden;
+}
+
+.label-bar {
+  display: block;
+  height: 4px;
+  flex: 1;
+  min-width: 20px;
+  cursor: pointer;
+  transition: height 0.2s ease;
+
+  &:hover {
+    height: 8px;
+  }
+}
+
+// ─── Hover Actions ──────────────────────────────────────────────────────────
+
+.hover-actions {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+  z-index: 2;
+}
+
+.hover-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--color-surface) 90%, transparent);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  backdrop-filter: blur(4px);
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: var(--color-surface-hover);
+    color: var(--color-text);
+  }
+}
+
+// ─── Card Title ─────────────────────────────────────────────────────────────
+
+.card-title {
+  font-weight: 500;
+  font-size: var(--text-base);
+  color: var(--color-text);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
+}
+
+// ─── Entity Link Badge ──────────────────────────────────────────────────────
+
+.entity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 2px 8px;
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+  max-width: 100%;
+  overflow: hidden;
+
+  &:hover {
+    background: var(--color-surface-hover);
+  }
+}
+
+.entity-badge-icon {
+  font-size: 13px;
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+}
+
+.entity-badge-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Bottom Metadata Row ────────────────────────────────────────────────────
+
+.card-metadata {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+
+  // Only show if there's content
+  &:empty {
+    display: none;
+  }
+}
+
+.meta-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+// ─── Assignee Avatar ────────────────────────────────────────────────────────
+
+.assignee-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--orange-400), var(--orange-600));
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  flex-shrink: 0;
+  letter-spacing: 0.02em;
+}
+
+// ─── Due Date ───────────────────────────────────────────────────────────────
+
+.due-date {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+
+  &.urgency-overdue {
+    color: var(--color-negative);
+
+    .meta-icon {
+      color: var(--color-negative);
+    }
+  }
+
+  &.urgency-today {
+    color: var(--color-danger);
+
+    .meta-icon {
+      color: var(--color-danger);
+    }
+  }
+
+  &.urgency-approaching {
+    color: var(--color-caution);
+
+    .meta-icon {
+      color: var(--color-caution);
+    }
+  }
+}
+
+.due-date-text {
+  white-space: nowrap;
+}
+
+// ─── Checklist Progress ─────────────────────────────────────────────────────
+
+.checklist-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+
+  &.checklist-complete {
+    color: var(--color-positive);
+
+    .meta-icon {
+      color: var(--color-positive);
+    }
+  }
+}
+
+// ─── Comment Count ──────────────────────────────────────────────────────────
+
+.comment-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
