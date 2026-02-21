@@ -31,6 +31,16 @@
       </div>
 
       <div class="board-header-right">
+        <button mat-icon-button
+                (click)="toggleFilterPanel()"
+                [matTooltip]="'boards.cardDetail.filter' | transloco"
+                class="filter-toggle-btn"
+                [class.filter-active]="hasActiveFilters()">
+          <mat-icon>filter_list</mat-icon>
+          @if (activeFilterCount() > 0) {
+            <span class="filter-badge">{{ activeFilterCount() }}</span>
+          }
+        </button>
         <button mat-icon-button [matMenuTriggerFor]="boardMenu"
                 [matTooltip]="'boards.detail.boardMenu' | transloco">
           <mat-icon>more_vert</mat-icon>
@@ -53,6 +63,16 @@
         <p (click)="descriptionExpanded.set(!descriptionExpanded())">{{ board.description }}</p>
       </div>
     }
+
+    <!-- Filter Panel -->
+    <app-board-filter-panel
+      [isOpen]="isFilterOpen()"
+      [labels]="board.labels"
+      [assignees]="boardAssignees()"
+      [filter]="cardFilter()"
+      (filterChanged)="onFilterChanged($event)"
+      (clearAll)="onClearFilters()">
+    </app-board-filter-panel>
 
     <!-- Kanban Board — Column Reorder Container -->
     <div class="kanban-board"
@@ -107,7 +127,7 @@
                       <span class="column-name" (click)="startEditColumnName(col)">{{ col.name }}</span>
                     }
 
-                    <span class="column-count-badge">{{ col.cards.length }}</span>
+                    <span class="column-count-badge">{{ getVisibleCardCount(col) }}</span>
 
                     @if (col.wipLimit != null) {
                       <span class="wip-badge" [class.wip-over]="isWipExceeded(col)">
@@ -154,7 +174,8 @@
                    (cdkDropListDropped)="onCardDrop($event, col)">
 
                 @for (card of col.cards; track trackCardById($index, card)) {
-                  <div cdkDrag [cdkDragData]="card" class="card-drag-wrapper">
+                  <div cdkDrag [cdkDragData]="card" class="card-drag-wrapper"
+                       [class.card-filtered-out]="hasActiveFilters() && !isCardVisible(card)">
                     <!-- Card Drag Preview -->
                     <div *cdkDragPreview class="card-drag-preview">
                       <div class="card-preview-title">{{ card.title }}</div>

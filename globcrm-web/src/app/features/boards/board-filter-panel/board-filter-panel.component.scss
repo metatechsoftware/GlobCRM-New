@@ -1,0 +1,213 @@
+// ─── Board Filter Panel — Collapsible filter bar ─────────────────────────────
+// Warm Modern tokens, pill-style chips, collapse animation.
+
+.bfp-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  align-items: flex-start;
+  padding: var(--space-3) var(--space-6);
+  background: var(--color-bg-card, var(--color-surface));
+  border-bottom: 1px solid var(--color-border-subtle);
+  animation: bfp-slide-down 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes bfp-slide-down {
+  from {
+    opacity: 0;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    opacity: 1;
+    max-height: 200px;
+    padding-top: var(--space-3);
+    padding-bottom: var(--space-3);
+  }
+}
+
+// ─── Filter Group ────────────────────────────────────────────────────────────
+
+.bfp-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.bfp-group-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: var(--font-mono);
+}
+
+.bfp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: center;
+}
+
+.bfp-no-options {
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+}
+
+// ─── Label Chips ─────────────────────────────────────────────────────────────
+
+.bfp-label-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--color-border);
+    background: var(--color-surface-hover);
+  }
+
+  &.active {
+    border-color: var(--orange-500);
+    background: var(--orange-glow);
+    color: var(--orange-500);
+    font-weight: 500;
+  }
+}
+
+.bfp-label-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+// ─── Assignee Chips ──────────────────────────────────────────────────────────
+
+.bfp-assignee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px 3px 4px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--color-border);
+    background: var(--color-surface-hover);
+  }
+
+  &.active {
+    border-color: var(--orange-500);
+    background: var(--orange-glow);
+    color: var(--orange-500);
+    font-weight: 500;
+  }
+}
+
+.bfp-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(135deg, var(--orange-400), var(--orange-600));
+  color: #fff;
+  font-size: 8px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.bfp-avatar-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+  color: var(--color-text-muted);
+}
+
+// ─── Due Date Chips ──────────────────────────────────────────────────────────
+
+.bfp-due-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border: 1px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+
+  &:hover {
+    border-color: var(--color-border);
+    background: var(--color-surface-hover);
+  }
+
+  &.active {
+    border-color: var(--orange-500);
+    background: var(--orange-glow);
+    color: var(--orange-500);
+    font-weight: 500;
+  }
+}
+
+// ─── Clear Button ────────────────────────────────────────────────────────────
+
+.bfp-clear-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 12px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+  margin-left: auto;
+  align-self: center;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    color: var(--color-negative);
+    background: color-mix(in srgb, var(--color-negative) 8%, transparent);
+  }
+}
+
+// ─── Responsive ──────────────────────────────────────────────────────────────
+
+@media (max-width: 768px) {
+  .bfp-panel {
+    padding: var(--space-3) var(--space-4);
+    gap: var(--space-3);
+  }
+}

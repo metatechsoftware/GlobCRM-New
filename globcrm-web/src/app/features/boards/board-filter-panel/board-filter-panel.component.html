@@ -1,0 +1,65 @@
+<!-- Board Filter Panel — Collapsible filter bar below board header -->
+
+@if (isOpen()) {
+  <div class="bfp-panel">
+    <!-- Labels filter -->
+    <div class="bfp-group">
+      <span class="bfp-group-label">{{ 'boards.cardDetail.filterByLabel' | transloco }}</span>
+      <div class="bfp-chips">
+        @for (label of labels(); track label.id) {
+          <button class="bfp-label-chip"
+                  [class.active]="isLabelSelected(label.id)"
+                  [style.--label-color]="label.color"
+                  (click)="toggleLabel(label.id)">
+            <span class="bfp-label-dot" [style.background-color]="label.color"></span>
+            {{ label.name }}
+          </button>
+        }
+        @if (labels().length === 0) {
+          <span class="bfp-no-options">--</span>
+        }
+      </div>
+    </div>
+
+    <!-- Assignee filter -->
+    <div class="bfp-group">
+      <span class="bfp-group-label">{{ 'boards.cardDetail.filterByAssignee' | transloco }}</span>
+      <div class="bfp-chips">
+        @for (assignee of assignees(); track assignee.id) {
+          <button class="bfp-assignee-chip"
+                  [class.active]="isAssigneeSelected(assignee.id)"
+                  (click)="selectAssignee(assignee.id)">
+            @if (assignee.id) {
+              <span class="bfp-avatar">{{ assignee.name.substring(0, 2).toLocaleUpperCase() }}</span>
+            } @else {
+              <mat-icon class="bfp-avatar-icon">person_off</mat-icon>
+            }
+            <span>{{ assignee.name }}</span>
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Due date filter -->
+    <div class="bfp-group">
+      <span class="bfp-group-label">{{ 'boards.cardDetail.filterByDueDate' | transloco }}</span>
+      <div class="bfp-chips">
+        @for (option of dueDateOptions; track option.value) {
+          <button class="bfp-due-chip"
+                  [class.active]="isDueDateSelected(option.value)"
+                  (click)="selectDueDateRange(option.value)">
+            {{ option.labelKey | transloco }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Clear all -->
+    @if (activeFilterCount() > 0) {
+      <button class="bfp-clear-btn" (click)="onClearAll()">
+        <mat-icon>filter_list_off</mat-icon>
+        {{ 'boards.cardDetail.clearFilters' | transloco }}
+      </button>
+    }
+  </div>
+}

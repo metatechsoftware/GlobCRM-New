@@ -731,6 +731,53 @@
   }
 }
 
+// ─── Filter Toggle Button ───────────────────────────────────────────────────
+
+.filter-toggle-btn {
+  position: relative;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: var(--color-text);
+  }
+
+  &.filter-active {
+    color: var(--orange-500);
+  }
+}
+
+.filter-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: var(--radius-full);
+  background: var(--orange-500);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  line-height: 1;
+}
+
+// ─── Card Filtered Out ─────────────────────────────────────────────────────
+
+.card-filtered-out {
+  opacity: 0;
+  height: 0;
+  margin: 0 !important;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s ease, height 0.2s ease;
+}
+
 // ─── Danger Menu Action ─────────────────────────────────────────────────────
 
 .danger-action {

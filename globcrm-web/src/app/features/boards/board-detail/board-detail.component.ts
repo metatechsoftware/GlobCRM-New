@@ -30,7 +30,8 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { BoardStore } from '../boards.store';
 import { BoardCardComponent } from '../board-card/board-card.component';
 import { CardDetailPanelComponent } from '../card-detail-panel/card-detail-panel.component';
-import { ColumnDto, CardDto } from '../boards.models';
+import { BoardFilterPanelComponent, AssigneeOption } from '../board-filter-panel/board-filter-panel.component';
+import { ColumnDto, CardDto, CardFilter } from '../boards.models';
 
 /**
  * Board detail component — the core kanban board view.
@@ -56,6 +57,7 @@ import { ColumnDto, CardDto } from '../boards.models';
     TranslocoPipe,
     BoardCardComponent,
     CardDetailPanelComponent,
+    BoardFilterPanelComponent,
   ],
   templateUrl: './board-detail.component.html',
   styleUrl: './board-detail.component.scss',
@@ -93,6 +95,48 @@ export class BoardDetailComponent {
 
   /** Collapsed columns (local UI state, also synced to store) */
   readonly collapsedColumns = signal<Set<string>>(new Set());
+
+  /** Filter panel open state */
+  readonly isFilterOpen = signal(false);
+
+  /** Card filter from store */
+  readonly cardFilter = this.boardStore.cardFilter;
+
+  /** Active filter count for badge */
+  readonly activeFilterCount = computed(() => {
+    const f = this.cardFilter();
+    let count = 0;
+    if (f.labels.length > 0) count++;
+    if (f.assigneeId !== null) count++;
+    if (f.dueDateRange !== null && f.dueDateRange !== 'all') count++;
+    return count;
+  });
+
+  /** Whether any filter is active */
+  readonly hasActiveFilters = computed(() => this.activeFilterCount() > 0);
+
+  /** Extract unique assignees from all board cards */
+  readonly boardAssignees = computed<AssigneeOption[]>(() => {
+    const board = this.board();
+    if (!board) return [];
+    const map = new Map<string, string>();
+    let hasUnassigned = false;
+    for (const col of board.columns) {
+      for (const card of col.cards) {
+        if (card.assigneeId && card.assigneeName) {
+          map.set(card.assigneeId, card.assigneeName);
+        } else if (!card.assigneeId) {
+          hasUnassigned = true;
+        }
+      }
+    }
+    const options: AssigneeOption[] = [];
+    if (hasUnassigned) {
+      options.push({ id: null, name: 'Unassigned' });
+    }
+    map.forEach((name, id) => options.push({ id, name }));
+    return options;
+  });
 
   /** Column IDs for CdkDropList connection */
   readonly columnDropListIds = computed(() => {
@@ -425,6 +469,75 @@ export class BoardDetailComponent {
     const prev = cards[index - 1];
     const next = cards[index + 1];
     return prev && next ? (prev.sortOrder + next.sortOrder) / 2 : 1.0;
+  }
+
+  // ---- Filter Management ----
+
+  toggleFilterPanel(): void {
+    this.isFilterOpen.update((v) => !v);
+  }
+
+  onFilterChanged(filter: CardFilter): void {
+    this.boardStore.setCardFilter(filter);
+  }
+
+  onClearFilters(): void {
+    this.boardStore.clearCardFilter();
+  }
+
+  /** Check if a card matches the active filters */
+  isCardVisible(card: CardDto): boolean {
+    const filter = this.cardFilter();
+
+    // Label filter (OR logic)
+    if (filter.labels.length > 0) {
+      const cardLabelIds = card.labels.map((l) => l.labelId);
+      if (!filter.labels.some((id) => cardLabelIds.includes(id))) {
+        return false;
+      }
+    }
+
+    // Assignee filter
+    if (filter.assigneeId !== undefined && filter.assigneeId !== null) {
+      if (card.assigneeId !== filter.assigneeId) return false;
+    } else if (filter.assigneeId === null && this.hasActiveFilters()) {
+      // Only apply "unassigned" filter when explicitly selected
+      // Since null is the default, we need to check if assignee filter is actually active
+      // This is handled by the filter panel — null means "Unassigned" was explicitly picked
+    }
+
+    // Due date filter
+    if (filter.dueDateRange && filter.dueDateRange !== 'all') {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (filter.dueDateRange === 'overdue') {
+        if (!card.dueDate) return false;
+        const due = new Date(card.dueDate);
+        due.setHours(0, 0, 0, 0);
+        if (due >= today) return false;
+      } else if (filter.dueDateRange === 'today') {
+        if (!card.dueDate) return false;
+        const due = new Date(card.dueDate);
+        due.setHours(0, 0, 0, 0);
+        if (due.getTime() !== today.getTime()) return false;
+      } else if (filter.dueDateRange === 'week') {
+        if (!card.dueDate) return false;
+        const due = new Date(card.dueDate);
+        due.setHours(0, 0, 0, 0);
+        const weekEnd = new Date(today);
+        weekEnd.setDate(weekEnd.getDate() + 7);
+        if (due < today || due > weekEnd) return false;
+      }
+    }
+
+    return true;
+  }
+
+  /** Get visible card count for a column */
+  getVisibleCardCount(col: ColumnDto): number {
+    if (!this.hasActiveFilters()) return col.cards.length;
+    return col.cards.filter((c) => this.isCardVisible(c)).length;
   }
 
   trackColumnById(_index: number, col: ColumnDto): string {
