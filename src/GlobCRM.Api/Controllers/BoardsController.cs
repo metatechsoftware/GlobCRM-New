@@ -523,6 +523,17 @@ public class BoardsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> MoveCard(Guid id, Guid cardId, [FromBody] MoveCardRequest request)
     {
+        var moveValidator = new MoveCardValidator();
+        var moveValidation = await moveValidator.ValidateAsync(request);
+        if (!moveValidation.IsValid)
+        {
+            return BadRequest(new
+            {
+                errors = moveValidation.Errors
+                    .Select(e => new { field = e.PropertyName, message = e.ErrorMessage })
+            });
+        }
+
         var userId = GetCurrentUserId();
         var board = await GetBoardWithAccessCheck(id, userId);
         if (board is null)
@@ -1560,5 +1571,39 @@ public class UpdateCardCommentValidator : AbstractValidator<UpdateCardCommentReq
         RuleFor(x => x.Content)
             .NotEmpty().WithMessage("Comment content is required.")
             .MaximumLength(5000).WithMessage("Content must be 5000 characters or fewer.");
+    }
+}
+
+public class MoveCardValidator : AbstractValidator<MoveCardRequest>
+{
+    public MoveCardValidator()
+    {
+        RuleFor(x => x.TargetColumnId)
+            .NotEmpty().WithMessage("Target column ID is required.");
+
+        RuleFor(x => x.SortOrder)
+            .GreaterThanOrEqualTo(0).WithMessage("Sort order must be non-negative.");
+    }
+}
+
+public class UpdateCardValidator : AbstractValidator<UpdateCardRequest>
+{
+    public UpdateCardValidator()
+    {
+        RuleFor(x => x.Title)
+            .MaximumLength(500).When(x => x.Title is not null)
+            .WithMessage("Card title must be 500 characters or fewer.");
+
+        RuleFor(x => x.Description)
+            .MaximumLength(10000).When(x => x.Description is not null)
+            .WithMessage("Description must be 10000 characters or fewer.");
+
+        RuleFor(x => x.LinkedEntityType)
+            .MaximumLength(50).When(x => x.LinkedEntityType is not null)
+            .WithMessage("Entity type must be 50 characters or fewer.");
+
+        RuleFor(x => x.LinkedEntityName)
+            .MaximumLength(200).When(x => x.LinkedEntityName is not null)
+            .WithMessage("Entity name must be 200 characters or fewer.");
     }
 }
