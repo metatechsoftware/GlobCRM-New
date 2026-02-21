@@ -1,0 +1,56 @@
+{
+  "title": "Emails",
+  "list": {
+    "title": "Emails",
+    "compose": "Compose",
+    "connectionBanner": "Connect your Gmail account in <a href='/settings/email-accounts'>Settings</a> to see emails here.",
+    "columns": {
+      "from": "From",
+      "subject": "Subject",
+      "preview": "Preview",
+      "date": "Date",
+      "contact": "Contact"
+    }
+  },
+  "detail": {
+    "backToEmails": "Back to Emails",
+    "messages": "{{ count }} message",
+    "messagesPlural": "{{ count }} messages",
+    "contact": "Contact",
+    "company": "Company",
+    "reply": "Reply",
+    "markUnread": "Mark Unread",
+    "markRead": "Mark Read",
+    "unstar": "Unstar",
+    "star": "Star",
+    "to": "To",
+    "cc": "Cc",
+    "noContent": "(No content)",
+    "notFound": "Email not found",
+    "backToList": "Back to Emails"
+  },
+  "compose": {
+    "title": "Compose Email",
+    "replyTitle": "Reply",
+    "to": "To",
+    "toPlaceholder": "recipient@example.com",
+    "subject": "Subject",
+    "subjectPlaceholder": "Email subject",
+    "body": "Body",
+    "bodyPlaceholder": "Write your email...",
+    "send": "Send",
+    "sending": "Sending...",
+    "cancel": "Cancel"
+  },
+  "messages": {
+    "sent": "Email sent",
+    "sendFailed": "Failed to send email",
+    "markedRead": "Email marked as read",
+    "starRemoved": "Star removed",
+    "starred": "Email starred",
+    "recipientRequired": "Recipient email is required",
+    "validEmail": "Please enter a valid email address",
+    "subjectRequired": "Subject is required",
+    "bodyRequired": "Email body is required"
+  }
+}

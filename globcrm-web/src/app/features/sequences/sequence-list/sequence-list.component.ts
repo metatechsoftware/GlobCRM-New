@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SequenceStore } from '../sequence.store';
 import { SequenceListItem } from '../sequence.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
@@ -31,6 +32,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   providers: [SequenceStore],
   templateUrl: './sequence-list.component.html',
@@ -41,6 +43,7 @@ export class SequenceListComponent implements OnInit {
   readonly store = inject(SequenceStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly displayedColumns = [
     'name',
@@ -80,8 +83,8 @@ export class SequenceListComponent implements OnInit {
 
       this.store.deleteSequence(seq.id, () => {
         this.snackBar.open(
-          `Sequence "${seq.name}" deleted.`,
-          'Close',
+          this.transloco.translate('sequences.messages.deleted', { name: seq.name }),
+          this.transloco.translate('common.close'),
           { duration: 3000 },
         );
       });

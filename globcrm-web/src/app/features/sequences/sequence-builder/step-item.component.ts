@@ -15,6 +15,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { CdkDragHandle } from '@angular/cdk/drag-drop';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SequenceStep, UpdateStepRequest } from '../sequence.models';
 import {
   TemplatePickerDialogComponent,
@@ -36,6 +37,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
     MatDialogModule,
     CdkDragHandle,
     SafeHtmlPipe,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -246,7 +248,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
         <div class="step-item__info">
           <div class="step-item__template-name">
-            {{ step().emailTemplateName || 'No template selected' }}
+            {{ step().emailTemplateName || ('sequences.builder.stepItem.noTemplate' | transloco) }}
           </div>
           <div class="step-item__delay">
             <mat-icon>schedule</mat-icon>
@@ -256,7 +258,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
         <div class="step-item__actions" (click)="$event.stopPropagation()">
           <button mat-icon-button
-                  matTooltip="Delete step"
+                  [matTooltip]="'sequences.builder.stepItem.deleteStep' | transloco"
                   color="warn"
                   (click)="stepDeleted.emit()">
             <mat-icon>delete</mat-icon>
@@ -272,17 +274,17 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
         <div class="step-item__expanded">
           <!-- Template Selection -->
           <div class="step-item__section">
-            <div class="step-item__section-label">Email Template</div>
+            <div class="step-item__section-label">{{ 'sequences.builder.stepItem.emailTemplate' | transloco }}</div>
             <div class="step-item__template-select">
               <button mat-stroked-button (click)="openTemplatePicker()">
                 <mat-icon>drafts</mat-icon>
-                {{ step().emailTemplateName || 'Select Template' }}
+                {{ step().emailTemplateName || ('sequences.builder.stepItem.selectTemplate' | transloco) }}
               </button>
               @if (step().emailTemplateId) {
                 <a class="step-item__edit-link"
                    [href]="'/email-templates/' + step().emailTemplateId + '/edit'"
                    target="_blank">
-                  Edit Template
+                  {{ 'sequences.builder.stepItem.editTemplate' | transloco }}
                 </a>
               }
             </div>
@@ -297,9 +299,9 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
           <!-- Subject Override -->
           <div class="step-item__section">
-            <div class="step-item__section-label">Subject Line Override</div>
+            <div class="step-item__section-label">{{ 'sequences.builder.stepItem.subjectOverride' | transloco }}</div>
             <mat-form-field class="step-item__delay-field" appearance="outline">
-              <mat-label>Subject (optional - defaults to template subject)</mat-label>
+              <mat-label>{{ 'sequences.builder.stepItem.subjectPlaceholder' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="step().subjectOverride ?? ''"
                      (ngModelChange)="onSubjectChange($event)" />
@@ -308,10 +310,10 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 
           <!-- Delay Configuration -->
           <div class="step-item__section">
-            <div class="step-item__section-label">Delay</div>
+            <div class="step-item__section-label">{{ 'sequences.builder.stepItem.delay' | transloco }}</div>
             <div class="step-item__delay-row">
               <mat-form-field class="step-item__delay-field" appearance="outline">
-                <mat-label>Wait (days)</mat-label>
+                <mat-label>{{ 'sequences.builder.stepItem.waitDaysLabel' | transloco }}</mat-label>
                 <input matInput
                        type="number"
                        min="0"
@@ -319,7 +321,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
                        (ngModelChange)="onDelayChange($event)" />
               </mat-form-field>
               <mat-form-field class="step-item__delay-field" appearance="outline">
-                <mat-label>Send at (time)</mat-label>
+                <mat-label>{{ 'sequences.builder.stepItem.sendAtLabel' | transloco }}</mat-label>
                 <input matInput
                        type="time"
                        [ngModel]="step().preferredSendTime ?? ''"
@@ -338,6 +340,7 @@ export class StepItemComponent {
   readonly stepDeleted = output<void>();
 
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   readonly expanded = signal(false);
   readonly templatePreviewHtml = signal<string | null>(null);
@@ -351,15 +354,16 @@ export class StepItemComponent {
     const parts: string[] = [];
 
     if (s.stepNumber === 1 && s.delayDays === 0) {
-      parts.push('Send immediately');
+      parts.push(this.transloco.translate('sequences.builder.stepItem.sendImmediately'));
     } else if (s.delayDays === 0) {
-      parts.push('No delay');
+      parts.push(this.transloco.translate('sequences.builder.stepItem.noDelay'));
     } else {
-      parts.push(`Wait ${s.delayDays} day${s.delayDays !== 1 ? 's' : ''}`);
+      const key = s.delayDays === 1 ? 'sequences.builder.stepItem.waitDays' : 'sequences.builder.stepItem.waitDaysPlural';
+      parts.push(this.transloco.translate(key, { count: s.delayDays }));
     }
 
     if (s.preferredSendTime) {
-      parts.push(`send at ${s.preferredSendTime}`);
+      parts.push(this.transloco.translate('sequences.builder.stepItem.sendAt', { time: s.preferredSendTime }));
     }
 
     return parts.join(', ');

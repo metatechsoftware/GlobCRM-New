@@ -12,6 +12,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { MergeFieldGroup, MergeField } from '../email-template.models';
 
 /**
@@ -42,6 +43,7 @@ const ENTITY_COLORS: Record<string, { bg: string; text: string; label: string }>
     MatIconModule,
     MatTooltipModule,
     MatSnackBarModule,
+    TranslocoPipe,
   ],
   templateUrl: './merge-field-panel.component.html',
   styleUrl: './merge-field-panel.component.scss',
@@ -50,6 +52,7 @@ const ENTITY_COLORS: Record<string, { bg: string; text: string; label: string }>
 export class MergeFieldPanelComponent {
   private readonly clipboard = inject(Clipboard);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Merge fields grouped by entity type */
   readonly mergeFields = input<MergeFieldGroup>({});
@@ -96,8 +99,8 @@ export class MergeFieldPanelComponent {
     this.copiedField.set(field.key);
     setTimeout(() => this.copiedField.set(null), 1500);
     this.snackBar.open(
-      `Copied ${tag} -- paste in editor or use Unlayer toolbar to insert`,
-      'Close',
+      this.transloco.translate('email-templates.messages.copiedTag', { tag }),
+      this.transloco.translate('common.close'),
       { duration: 3000 },
     );
   }

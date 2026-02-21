@@ -16,6 +16,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { SequenceService } from '../sequence.service';
 import { SequenceListItem } from '../sequence.models';
 
@@ -35,6 +36,7 @@ import { SequenceListItem } from '../sequence.models';
     MatFormFieldModule,
     MatInputModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -130,15 +132,15 @@ import { SequenceListItem } from '../sequence.models';
   `,
   template: `
     <div class="picker">
-      <h2 mat-dialog-title>Select Sequence</h2>
+      <h2 mat-dialog-title>{{ 'sequences.sequencePicker.title' | transloco }}</h2>
 
       <mat-dialog-content>
         <mat-form-field class="picker__search" appearance="outline">
-          <mat-label>Search sequences</mat-label>
+          <mat-label>{{ 'sequences.sequencePicker.search' | transloco }}</mat-label>
           <mat-icon matPrefix>search</mat-icon>
           <input matInput
                  [(ngModel)]="searchQuery"
-                 placeholder="Filter by name..." />
+                 [placeholder]="'sequences.sequencePicker.searchPlaceholder' | transloco" />
         </mat-form-field>
 
         @if (loading()) {
@@ -148,7 +150,7 @@ import { SequenceListItem } from '../sequence.models';
         } @else if (filteredSequences().length === 0) {
           <div class="picker__empty">
             <mat-icon>schedule_send</mat-icon>
-            <p>No active sequences found.</p>
+            <p>{{ 'sequences.sequencePicker.noSequences' | transloco }}</p>
           </div>
         } @else {
           <div class="picker__list">
@@ -160,7 +162,7 @@ import { SequenceListItem } from '../sequence.models';
                 <div class="picker__item-info">
                   <div class="picker__item-name">{{ seq.name }}</div>
                   <div class="picker__item-meta">
-                    {{ seq.stepCount }} steps &middot; {{ seq.totalEnrolled }} enrolled &middot; {{ seq.status }}
+                    {{ seq.stepCount }} {{ 'sequences.sequencePicker.steps' | transloco }} &middot; {{ seq.totalEnrolled }} {{ 'sequences.sequencePicker.enrolled' | transloco }} &middot; {{ seq.status }}
                   </div>
                 </div>
               </div>
@@ -170,12 +172,12 @@ import { SequenceListItem } from '../sequence.models';
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
         <button mat-flat-button
                 color="primary"
                 [disabled]="!selectedSequence()"
                 (click)="confirm()">
-          Select
+          {{ 'sequences.sequencePicker.selectButton' | transloco }}
         </button>
       </mat-dialog-actions>
     </div>

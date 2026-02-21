@@ -1,8 +1,8 @@
 <div class="preview-dialog">
   <!-- Header -->
   <div class="preview-header">
-    <h2>Preview Template</h2>
-    <button mat-icon-button (click)="close()" aria-label="Close preview">
+    <h2>{{ 'email-templates.preview.title' | transloco }}</h2>
+    <button mat-icon-button (click)="close()" [attr.aria-label]="'common.close' | transloco">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -15,17 +15,17 @@
       (change)="onDeviceChange($event.value)"
       aria-label="Device preview mode"
     >
-      <mat-button-toggle value="desktop" matTooltip="Desktop (600px)">
+      <mat-button-toggle value="desktop" [matTooltip]="'email-templates.preview.desktopTooltip' | transloco">
         <mat-icon>monitor</mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle value="mobile" matTooltip="Mobile (320px)">
+      <mat-button-toggle value="mobile" [matTooltip]="'email-templates.preview.mobileTooltip' | transloco">
         <mat-icon>smartphone</mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>
 
     <!-- Entity Selector -->
     <div class="entity-selector">
-      <span class="entity-label">Preview with:</span>
+      <span class="entity-label">{{ 'email-templates.preview.previewWith' | transloco }}</span>
 
       <mat-form-field appearance="outline" class="entity-type-field">
         <mat-select
@@ -72,7 +72,7 @@
     <div class="control-actions">
       <button
         mat-icon-button
-        matTooltip="Refresh preview"
+        [matTooltip]="'email-templates.preview.refreshTooltip' | transloco"
         (click)="loadPreview()"
         [disabled]="previewLoading()"
       >
@@ -91,7 +91,7 @@
         } @else {
           <mat-icon>send</mat-icon>
         }
-        Send Test
+        {{ 'email-templates.preview.sendTest' | transloco }}
       </button>
     </div>
   </div>
@@ -102,7 +102,7 @@
     @if (renderedSubject()) {
       <div class="email-client-header">
         <div class="email-header-row">
-          <span class="email-header-label">Subject</span>
+          <span class="email-header-label">{{ 'email-templates.preview.subject' | transloco }}</span>
           <span class="email-header-value">{{ renderedSubject() }}</span>
         </div>
       </div>
@@ -128,7 +128,7 @@
         @if (previewLoading()) {
           <div class="preview-loading">
             <mat-spinner diameter="40"></mat-spinner>
-            <p>Loading preview...</p>
+            <p>{{ 'email-templates.preview.loading' | transloco }}</p>
           </div>
         }
         <iframe

@@ -1,0 +1,56 @@
+{
+  "title": "E-postalar",
+  "list": {
+    "title": "E-postalar",
+    "compose": "Yaz",
+    "connectionBanner": "E-postaları burada gorebilmek icin Gmail hesabinizi <a href='/settings/email-accounts'>Ayarlar</a> sayfasindan baglayiniz.",
+    "columns": {
+      "from": "Gonderen",
+      "subject": "Konu",
+      "preview": "Onizleme",
+      "date": "Tarih",
+      "contact": "Kisi"
+    }
+  },
+  "detail": {
+    "backToEmails": "E-postalara Don",
+    "messages": "{{ count }} mesaj",
+    "messagesPlural": "{{ count }} mesaj",
+    "contact": "Kisi",
+    "company": "Sirket",
+    "reply": "Yanitla",
+    "markUnread": "Okunmadi Olarak Isaretle",
+    "markRead": "Okundu Olarak Isaretle",
+    "unstar": "Yildizi Kaldir",
+    "star": "Yildizla",
+    "to": "Kime",
+    "cc": "Bilgi",
+    "noContent": "(Icerik yok)",
+    "notFound": "E-posta bulunamadi",
+    "backToList": "E-postalara Don"
+  },
+  "compose": {
+    "title": "E-posta Yaz",
+    "replyTitle": "Yanitla",
+    "to": "Kime",
+    "toPlaceholder": "alici@ornek.com",
+    "subject": "Konu",
+    "subjectPlaceholder": "E-posta konusu",
+    "body": "Icerik",
+    "bodyPlaceholder": "E-postanizi yazin...",
+    "send": "Gonder",
+    "sending": "Gonderiyor...",
+    "cancel": "Iptal"
+  },
+  "messages": {
+    "sent": "E-posta gonderildi",
+    "sendFailed": "E-posta gonderilemedi",
+    "markedRead": "E-posta okundu olarak isaretlendi",
+    "starRemoved": "Yildiz kaldirildi",
+    "starred": "E-posta yildizlandi",
+    "recipientRequired": "Alici e-posta adresi gereklidir",
+    "validEmail": "Lutfen gecerli bir e-posta adresi girin",
+    "subjectRequired": "Konu gereklidir",
+    "bodyRequired": "E-posta icerigi gereklidir"
+  }
+}

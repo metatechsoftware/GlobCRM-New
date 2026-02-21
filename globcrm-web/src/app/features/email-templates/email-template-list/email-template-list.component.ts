@@ -17,6 +17,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
 import { EmailTemplateStore } from '../email-template.store';
@@ -49,6 +50,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatTooltipModule,
     HasPermissionDirective,
     SafeHtmlPipe,
+    TranslocoPipe,
   ],
   providers: [EmailTemplateStore],
   templateUrl: './email-template-list.component.html',
@@ -60,6 +62,7 @@ export class EmailTemplateListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly searchValue = signal('');
   readonly selectedCategoryId = signal<string | null>(null);
@@ -103,7 +106,7 @@ export class EmailTemplateListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: CloneTemplateDialogResult | undefined) => {
       if (result?.name) {
         this.store.cloneTemplate(template.id, result.name, () => {
-          this.snackBar.open('Template cloned successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('email-templates.messages.cloned'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });
@@ -122,7 +125,7 @@ export class EmailTemplateListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.store.deleteTemplate(template.id, () => {
-          this.snackBar.open('Template deleted', 'Close', {
+          this.snackBar.open(this.transloco.translate('email-templates.messages.deleted'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });

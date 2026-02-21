@@ -22,6 +22,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { HttpParams } from '@angular/common/http';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ApiService } from '../../../core/api/api.service';
 import { SequenceService } from '../sequence.service';
 
@@ -64,6 +65,7 @@ interface SelectedContact {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatAutocompleteModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -201,19 +203,19 @@ interface SelectedContact {
   template: `
     <div class="enrollment-dialog">
       <h2 mat-dialog-title>
-        {{ data.mode === 're-enroll' ? 'Re-enroll Contact' : 'Enroll Contacts' }}
+        {{ (data.mode === 're-enroll' ? 'sequences.enrollment.reEnrollTitle' : 'sequences.enrollment.enrollTitle') | transloco }}
       </h2>
 
       <mat-dialog-content>
         @if (data.mode === 'enroll') {
           <!-- Contact Search -->
           <mat-form-field class="enrollment-dialog__search" appearance="outline">
-            <mat-label>Search contacts</mat-label>
+            <mat-label>{{ 'sequences.enrollment.searchContacts' | transloco }}</mat-label>
             <mat-icon matPrefix>search</mat-icon>
             <input matInput
                    [(ngModel)]="searchQuery"
                    (ngModelChange)="onSearch($event)"
-                   placeholder="Type to search contacts..." />
+                   [placeholder]="'sequences.enrollment.searchPlaceholder' | transloco" />
           </mat-form-field>
 
           <!-- Search Results -->
@@ -251,7 +253,7 @@ interface SelectedContact {
         }
 
         @if (data.mode === 're-enroll' && data.enrollment) {
-          <p>Re-enroll <strong>{{ data.enrollment.contactName }}</strong> into this sequence.</p>
+          <p [innerHTML]="'sequences.enrollment.reEnrollPrompt' | transloco:{ name: data.enrollment.contactName }"></p>
         }
 
         <!-- Warning for multi-sequence enrollment -->
@@ -265,23 +267,23 @@ interface SelectedContact {
         <!-- Re-enrollment Start Position -->
         @if (data.mode === 're-enroll') {
           <div class="enrollment-dialog__re-enroll">
-            <div class="enrollment-dialog__re-enroll-label">Start from:</div>
+            <div class="enrollment-dialog__re-enroll-label">{{ 'sequences.enrollment.startFrom' | transloco }}</div>
             <mat-radio-group [(ngModel)]="startFromStep">
               <mat-radio-button [value]="1">
-                Start from beginning (Step 1)
+                {{ 'sequences.enrollment.startBeginning' | transloco }}
               </mat-radio-button>
               @if (data.enrollment?.currentStepNumber) {
                 <mat-radio-button [value]="data.enrollment!.currentStepNumber">
-                  Resume from where they left off (Step {{ data.enrollment!.currentStepNumber }})
+                  {{ 'sequences.enrollment.resumeFromStep' | transloco:{ step: data.enrollment!.currentStepNumber } }}
                 </mat-radio-button>
               }
               <mat-radio-button [value]="customStep()">
-                Start from specific step
+                {{ 'sequences.enrollment.startSpecificStep' | transloco }}
               </mat-radio-button>
             </mat-radio-group>
             @if (startFromStep === customStep()) {
               <mat-form-field appearance="outline" style="width: 120px; margin-top: 8px;">
-                <mat-label>Step number</mat-label>
+                <mat-label>{{ 'sequences.enrollment.stepNumber' | transloco }}</mat-label>
                 <input matInput
                        type="number"
                        min="1"
@@ -294,18 +296,18 @@ interface SelectedContact {
         @if (submitting()) {
           <div class="enrollment-dialog__submitting">
             <mat-spinner diameter="24"></mat-spinner>
-            <span>Enrolling...</span>
+            <span>{{ 'sequences.enrollment.enrolling' | transloco }}</span>
           </div>
         }
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
         <button mat-flat-button
                 color="primary"
                 [disabled]="!canConfirm() || submitting()"
                 (click)="confirm()">
-          {{ data.mode === 're-enroll' ? 'Re-enroll' : 'Enroll' }}
+          {{ (data.mode === 're-enroll' ? 'sequences.enrollment.reEnrollButton' : 'sequences.enrollment.enrollButton') | transloco }}
           @if (data.mode === 'enroll' && selectedContacts().length > 0) {
             ({{ selectedContacts().length }})
           }
@@ -320,6 +322,7 @@ export class EnrollmentDialogComponent {
   private readonly api = inject(ApiService);
   private readonly sequenceService = inject(SequenceService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   searchQuery = '';
   readonly searchResults = signal<ContactSearchResult[]>([]);
@@ -409,7 +412,7 @@ export class EnrollmentDialogComponent {
         .subscribe({
           next: () => {
             this.submitting.set(false);
-            this.snackBar.open('Contact re-enrolled.', 'Close', {
+            this.snackBar.open(this.transloco.translate('sequences.messages.reEnrolled'), this.transloco.translate('common.close'), {
               duration: 3000,
             });
             this.dialogRef.close(true);
@@ -417,8 +420,8 @@ export class EnrollmentDialogComponent {
           error: (err) => {
             this.submitting.set(false);
             this.snackBar.open(
-              err?.message ?? 'Failed to re-enroll contact.',
-              'Close',
+              err?.message ?? this.transloco.translate('sequences.messages.reEnrollFailed'),
+              this.transloco.translate('common.close'),
               { duration: 5000 },
             );
           },
@@ -442,7 +445,7 @@ export class EnrollmentDialogComponent {
             if (warnings?.length > 0) {
               this.multiSequenceWarning.set(warnings[0]);
             }
-            this.snackBar.open('Contact enrolled.', 'Close', {
+            this.snackBar.open(this.transloco.translate('sequences.messages.enrolled'), this.transloco.translate('common.close'), {
               duration: 3000,
             });
             this.dialogRef.close(true);
@@ -450,8 +453,8 @@ export class EnrollmentDialogComponent {
           error: (err) => {
             this.submitting.set(false);
             this.snackBar.open(
-              err?.message ?? 'Failed to enroll contact.',
-              'Close',
+              err?.message ?? this.transloco.translate('sequences.messages.enrollFailed'),
+              this.transloco.translate('common.close'),
               { duration: 5000 },
             );
           },
@@ -465,18 +468,17 @@ export class EnrollmentDialogComponent {
         .subscribe({
           next: (result) => {
             this.submitting.set(false);
-            const msg =
-              result.skipped > 0
-                ? `Enrolled ${result.enrolled} contacts, ${result.skipped} skipped (already enrolled).`
-                : `Enrolled ${result.enrolled} contacts.`;
-            this.snackBar.open(msg, 'Close', { duration: 5000 });
+            const msg = result.skipped > 0
+              ? this.transloco.translate('sequences.messages.bulkEnrolledWithSkipped', { enrolled: result.enrolled, skipped: result.skipped })
+              : this.transloco.translate('sequences.messages.bulkEnrolled', { enrolled: result.enrolled });
+            this.snackBar.open(msg, this.transloco.translate('common.close'), { duration: 5000 });
             this.dialogRef.close(true);
           },
           error: (err) => {
             this.submitting.set(false);
             this.snackBar.open(
-              err?.message ?? 'Failed to enroll contacts.',
-              'Close',
+              err?.message ?? this.transloco.translate('sequences.messages.bulkEnrollFailed'),
+              this.transloco.translate('common.close'),
               { duration: 5000 },
             );
           },

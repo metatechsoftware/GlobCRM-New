@@ -23,6 +23,7 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EmailEditorModule, EmailEditorComponent } from 'angular-email-editor';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { EmailTemplateStore } from '../email-template.store';
 import { MergeFieldGroup } from '../email-template.models';
 import { MergeFieldPanelComponent } from '../merge-field-panel/merge-field-panel.component';
@@ -54,6 +55,7 @@ import {
     MatDialogModule,
     MatTooltipModule,
     EmailEditorModule,
+    TranslocoPipe,
     MergeFieldPanelComponent,
   ],
   providers: [EmailTemplateStore],
@@ -71,6 +73,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   // ─── Form State ────────────────────────────────────────────────────────
 
@@ -83,7 +86,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   readonly showMergePanel = signal(false);
 
   readonly isEditMode = computed(() => !!this.id());
-  readonly pageTitle = computed(() => (this.isEditMode() ? 'Edit Template' : 'New Template'));
+  readonly pageTitle = computed(() => (this.isEditMode() ? this.transloco.translate('email-templates.editor.editTitle') : this.transloco.translate('email-templates.editor.newTitle')));
 
   // ─── Unlayer Editor Options ────────────────────────────────────────────
 
@@ -183,7 +186,7 @@ export class EmailTemplateEditorComponent implements OnInit {
 
   save(): void {
     if (!this.templateName().trim()) {
-      this.snackBar.open('Template name is required', 'Close', {
+      this.snackBar.open(this.transloco.translate('email-templates.messages.nameRequired'), this.transloco.translate('common.close'), {
         duration: 3000,
       });
       return;
@@ -206,7 +209,7 @@ export class EmailTemplateEditorComponent implements OnInit {
         // Update existing
         this.store.updateTemplate(templateId, request, () => {
           this.saving.set(false);
-          this.snackBar.open('Template saved successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('email-templates.messages.saved'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });
@@ -214,7 +217,7 @@ export class EmailTemplateEditorComponent implements OnInit {
         // Create new
         this.store.createTemplate(request, () => {
           this.saving.set(false);
-          this.snackBar.open('Template created successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('email-templates.messages.created'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
           this.router.navigate(['/email-templates']);
@@ -226,7 +229,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   openPreview(): void {
     const templateId = this.id();
     if (!templateId) {
-      this.snackBar.open('Please save the template before previewing', 'Close', {
+      this.snackBar.open(this.transloco.translate('email-templates.messages.saveBeforePreview'), this.transloco.translate('common.close'), {
         duration: 3000,
       });
       return;

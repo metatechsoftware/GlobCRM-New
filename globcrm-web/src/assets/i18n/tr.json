@@ -44,6 +44,7 @@
     "view": "Görüntüle",
     "copy": "Kopyala",
     "skip": "Atla",
+    "templates": "sablon",
     "paginator": {
       "itemsPerPage": "Sayfa başına öğe",
       "nextPage": "Sonraki sayfa",

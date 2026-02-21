@@ -21,6 +21,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { EmailService } from '../email.service';
 import { SendEmailRequest } from '../email.models';
 
@@ -54,6 +55,7 @@ export interface ComposeDialogData {
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -92,54 +94,54 @@ export interface ComposeDialogData {
   `,
   template: `
     <h2 mat-dialog-title>
-      {{ isReply ? 'Reply' : 'Compose Email' }}
+      {{ (isReply ? 'emails.compose.replyTitle' : 'emails.compose.title') | transloco }}
     </h2>
 
     <mat-dialog-content>
       <form [formGroup]="form" class="compose-form">
         <mat-form-field appearance="outline">
-          <mat-label>To</mat-label>
-          <input matInput formControlName="to" type="email" placeholder="recipient@example.com">
+          <mat-label>{{ 'emails.compose.to' | transloco }}</mat-label>
+          <input matInput formControlName="to" type="email" [placeholder]="'emails.compose.toPlaceholder' | transloco">
           @if (form.controls.to.hasError('required') && form.controls.to.touched) {
-            <mat-error>Recipient email is required</mat-error>
+            <mat-error>{{ 'emails.messages.recipientRequired' | transloco }}</mat-error>
           }
           @if (form.controls.to.hasError('email') && form.controls.to.touched) {
-            <mat-error>Please enter a valid email address</mat-error>
+            <mat-error>{{ 'emails.messages.validEmail' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Subject</mat-label>
-          <input matInput formControlName="subject" placeholder="Email subject">
+          <mat-label>{{ 'emails.compose.subject' | transloco }}</mat-label>
+          <input matInput formControlName="subject" [placeholder]="'emails.compose.subjectPlaceholder' | transloco">
           @if (form.controls.subject.hasError('required') && form.controls.subject.touched) {
-            <mat-error>Subject is required</mat-error>
+            <mat-error>{{ 'emails.messages.subjectRequired' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Body</mat-label>
+          <mat-label>{{ 'emails.compose.body' | transloco }}</mat-label>
           <textarea matInput formControlName="htmlBody"
-                    placeholder="Write your email..."
+                    [placeholder]="'emails.compose.bodyPlaceholder' | transloco"
                     rows="10"></textarea>
           @if (form.controls.htmlBody.hasError('required') && form.controls.htmlBody.touched) {
-            <mat-error>Email body is required</mat-error>
+            <mat-error>{{ 'emails.messages.bodyRequired' | transloco }}</mat-error>
           }
         </mat-form-field>
       </form>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end" class="dialog-actions">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'emails.compose.cancel' | transloco }}</button>
       <button mat-raised-button color="primary"
               [disabled]="form.invalid || sending()"
               (click)="onSend()">
         <span class="send-btn">
           @if (sending()) {
             <mat-spinner diameter="18" class="send-spinner"></mat-spinner>
-            Sending...
+            {{ 'emails.compose.sending' | transloco }}
           } @else {
             <mat-icon>send</mat-icon>
-            Send
+            {{ 'emails.compose.send' | transloco }}
           }
         </span>
       </button>
@@ -150,6 +152,7 @@ export class EmailComposeComponent {
   private readonly dialogRef = inject(MatDialogRef<EmailComposeComponent>);
   private readonly emailService = inject(EmailService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
   private readonly fb = inject(FormBuilder);
   private readonly dialogData: ComposeDialogData | null = inject(MAT_DIALOG_DATA, { optional: true });
 
@@ -184,12 +187,12 @@ export class EmailComposeComponent {
 
     this.emailService.send(request).subscribe({
       next: () => {
-        this.snackBar.open('Email sent', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('emails.messages.sent'), 'OK', { duration: 3000 });
         this.dialogRef.close(true);
       },
       error: (err) => {
         this.sending.set(false);
-        const message = err?.error?.message ?? err?.message ?? 'Failed to send email';
+        const message = err?.error?.message ?? err?.message ?? this.transloco.translate('emails.messages.sendFailed');
         this.snackBar.open(message, 'OK', { duration: 5000 });
       },
     });

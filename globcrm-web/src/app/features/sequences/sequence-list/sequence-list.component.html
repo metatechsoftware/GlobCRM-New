@@ -6,13 +6,13 @@
         <div class="sequence-list__icon">
           <mat-icon>route</mat-icon>
         </div>
-        <h1>Sequences</h1>
+        <h1>{{ 'sequences.list.title' | transloco }}</h1>
       </div>
-      <p class="sequence-list__subtitle">Automate multi-step email outreach to contacts</p>
+      <p class="sequence-list__subtitle">{{ 'sequences.list.subtitle' | transloco }}</p>
     </div>
     <a mat-flat-button color="primary" routerLink="/sequences/new">
       <mat-icon>add</mat-icon>
-      Create Sequence
+      {{ 'sequences.list.createButton' | transloco }}
     </a>
   </div>
 
@@ -20,7 +20,7 @@
   @if (store.loading()) {
     <div class="sequence-list__loading">
       <mat-spinner diameter="40"></mat-spinner>
-      <span>Loading sequences...</span>
+      <span>{{ 'sequences.list.loading' | transloco }}</span>
     </div>
   } @else if (store.sequences().length === 0) {
     <!-- Empty State -->
@@ -28,11 +28,11 @@
       <div class="sequence-list__empty-icon">
         <mat-icon>campaign</mat-icon>
       </div>
-      <h3>No sequences yet</h3>
-      <p>Create your first email sequence to automate outreach</p>
+      <h3>{{ 'sequences.list.empty.title' | transloco }}</h3>
+      <p>{{ 'sequences.list.empty.description' | transloco }}</p>
       <a mat-flat-button color="primary" routerLink="/sequences/new">
         <mat-icon>add</mat-icon>
-        Create Sequence
+        {{ 'sequences.list.createButton' | transloco }}
       </a>
     </div>
   } @else {
@@ -41,21 +41,21 @@
       <div class="sequence-list__stat-item">
         <span class="sequence-list__stat-dot sequence-list__stat-dot--active"></span>
         <span class="sequence-list__stat-value">{{ getActiveCount() }}</span>
-        Active
+        {{ 'sequences.list.stats.active' | transloco }}
       </div>
       <div class="sequence-list__stat-item">
         <span class="sequence-list__stat-dot sequence-list__stat-dot--paused"></span>
         <span class="sequence-list__stat-value">{{ getPausedCount() }}</span>
-        Paused
+        {{ 'sequences.list.stats.paused' | transloco }}
       </div>
       <div class="sequence-list__stat-item">
         <span class="sequence-list__stat-dot sequence-list__stat-dot--draft"></span>
         <span class="sequence-list__stat-value">{{ getDraftCount() }}</span>
-        Draft
+        {{ 'sequences.list.stats.draft' | transloco }}
       </div>
       <div class="sequence-list__stat-item" style="margin-left: auto;">
         <span class="sequence-list__stat-value">{{ store.sequences().length }}</span>
-        Total
+        {{ 'sequences.list.stats.total' | transloco }}
       </div>
     </div>
 
@@ -64,7 +64,7 @@
       <table mat-table [dataSource]="store.sequences()">
         <!-- Name Column -->
         <ng-container matColumnDef="name">
-          <th mat-header-cell *matHeaderCellDef>Name</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.name' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <div class="sequence-list__name-cell">
               <a class="sequence-list__name-link" [routerLink]="['/sequences', seq.id]">
@@ -79,7 +79,7 @@
 
         <!-- Status Column -->
         <ng-container matColumnDef="status">
-          <th mat-header-cell *matHeaderCellDef>Status</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.status' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <span class="sequence-list__status"
                   [class.status--draft]="seq.status === 'draft'"
@@ -94,7 +94,7 @@
 
         <!-- Steps Column -->
         <ng-container matColumnDef="steps">
-          <th mat-header-cell *matHeaderCellDef>Steps</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.steps' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <span class="sequence-list__stat">{{ seq.stepCount }}</span>
           </td>
@@ -102,7 +102,7 @@
 
         <!-- Enrolled Column -->
         <ng-container matColumnDef="enrolled">
-          <th mat-header-cell *matHeaderCellDef>Enrolled</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.enrolled' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <span class="sequence-list__stat">{{ seq.totalEnrolled }}</span>
           </td>
@@ -110,7 +110,7 @@
 
         <!-- Active Column -->
         <ng-container matColumnDef="active">
-          <th mat-header-cell *matHeaderCellDef>Active</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.active' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <span class="sequence-list__stat">{{ seq.activeEnrollments }}</span>
           </td>
@@ -118,7 +118,7 @@
 
         <!-- Completed Column -->
         <ng-container matColumnDef="completed">
-          <th mat-header-cell *matHeaderCellDef>Completed</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.completed' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <span class="sequence-list__stat">{{ seq.completedEnrollments }}</span>
           </td>
@@ -126,7 +126,7 @@
 
         <!-- Reply Rate Column -->
         <ng-container matColumnDef="replyRate">
-          <th mat-header-cell *matHeaderCellDef>Reply Rate</th>
+          <th mat-header-cell *matHeaderCellDef>{{ 'sequences.list.columns.replyRate' | transloco }}</th>
           <td mat-cell *matCellDef="let seq">
             <div class="sequence-list__reply-rate">
               <div class="sequence-list__reply-bar">
@@ -143,11 +143,11 @@
           <th mat-header-cell *matHeaderCellDef></th>
           <td mat-cell *matCellDef="let seq">
             <div class="sequence-list__actions" (click)="$event.stopPropagation()">
-              <button mat-icon-button matTooltip="Edit"
+              <button mat-icon-button [matTooltip]="'sequences.detail.edit' | transloco"
                       [routerLink]="['/sequences', seq.id, 'edit']">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-icon-button matTooltip="Delete" color="warn"
+              <button mat-icon-button [matTooltip]="'common.delete' | transloco" color="warn"
                       (click)="onDelete(seq)">
                 <mat-icon>delete</mat-icon>
               </button>

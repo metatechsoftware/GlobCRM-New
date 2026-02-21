@@ -17,6 +17,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   CdkDragDrop,
   CdkDrag,
@@ -45,6 +46,7 @@ import {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
+    TranslocoPipe,
     CdkDrag,
     CdkDropList,
     StepItemComponent,
@@ -63,6 +65,7 @@ export class SequenceBuilderComponent implements OnInit {
   private readonly location = inject(Location);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   readonly isEditMode = signal(false);
   readonly steps = signal<SequenceStep[]>([]);
@@ -153,7 +156,7 @@ export class SequenceBuilderComponent implements OnInit {
           .filter((s) => s.id !== step.id)
           .map((s, i) => ({ ...s, stepNumber: i + 1 }));
         this.steps.set(remaining);
-        this.snackBar.open('Step deleted.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('sequences.messages.stepDeleted'), this.transloco.translate('common.close'), { duration: 3000 });
       });
     } else {
       // Temp step: just remove locally
@@ -220,7 +223,7 @@ export class SequenceBuilderComponent implements OnInit {
           description: this.description || null,
         },
         () => {
-          this.snackBar.open('Sequence updated.', 'Close', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('sequences.messages.updated'), this.transloco.translate('common.close'), { duration: 3000 });
           this.router.navigate(['/sequences', routeId]);
         },
       );
@@ -251,7 +254,7 @@ export class SequenceBuilderComponent implements OnInit {
             if (!tempStep.emailTemplateId) {
               added++;
               if (added === tempSteps.length) {
-                this.snackBar.open('Sequence created.', 'Close', {
+                this.snackBar.open(this.transloco.translate('sequences.messages.created'), this.transloco.translate('common.close'), {
                   duration: 3000,
                 });
                 this.router.navigate(['/sequences', created.id, 'edit']);

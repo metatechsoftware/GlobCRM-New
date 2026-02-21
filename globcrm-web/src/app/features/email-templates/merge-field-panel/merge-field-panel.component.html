@@ -1,8 +1,8 @@
 <div class="merge-panel">
   <!-- Panel Header -->
   <div class="panel-header">
-    <h3>Merge Fields</h3>
-    <button mat-icon-button (click)="closePanel.emit()" matTooltip="Close panel">
+    <h3>{{ 'email-templates.mergePanel.title' | transloco }}</h3>
+    <button mat-icon-button (click)="closePanel.emit()" [matTooltip]="'email-templates.mergePanel.closeTooltip' | transloco">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -10,9 +10,7 @@
   <!-- Info Hint -->
   <div class="panel-hint">
     <mat-icon class="hint-icon">info_outline</mat-icon>
-    <span>
-      Click a field to copy. You can also use Unlayer's toolbar dropdown or type
-      <code>{{ '{{' }}</code> in the editor for autocomplete.
+    <span [innerHTML]="'email-templates.mergePanel.hint' | transloco">
     </span>
   </div>
 
@@ -44,7 +42,7 @@
             >
               <span class="field-label">{{ field.label }}</span>
               @if (field.isCustomField) {
-                <span class="custom-badge">Custom</span>
+                <span class="custom-badge">{{ 'email-templates.mergePanel.custom' | transloco }}</span>
               }
               <mat-icon class="copy-icon">{{ copiedField() === field.key ? 'check' : 'content_copy' }}</mat-icon>
             </button>
@@ -57,8 +55,7 @@
   <!-- Fallback Hint -->
   <div class="fallback-hint">
     <mat-icon class="hint-icon">lightbulb_outline</mat-icon>
-    <span>
-      Set fallback values using: <code>{{ '{{' }} field | default: 'fallback' {{ '}}' }}</code>
+    <span [innerHTML]="'email-templates.mergePanel.fallbackHint' | transloco">
     </span>
   </div>
 </div>

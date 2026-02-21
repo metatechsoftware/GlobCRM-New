@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import { DecimalPipe, PercentPipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { BaseChartDirective } from 'ng2-charts';
 import { ChartData, ChartOptions } from 'chart.js';
 import { SequenceAnalytics, StepMetrics, FunnelData } from '../sequence.models';
@@ -35,6 +36,7 @@ const FUNNEL_COLORS = [
     DecimalPipe,
     PercentPipe,
     MatIconModule,
+    TranslocoPipe,
     BaseChartDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -282,27 +284,27 @@ const FUNNEL_COLORS = [
         <div class="metric-card metric-card--primary">
           <div class="metric-card__icon"><mat-icon>people</mat-icon></div>
           <span class="metric-card__value">{{ analytics()!.totalEnrolled }}</span>
-          <span class="metric-card__label">Total Enrolled</span>
+          <span class="metric-card__label">{{ 'sequences.analytics.totalEnrolled' | transloco }}</span>
         </div>
         <div class="metric-card metric-card--active">
           <div class="metric-card__icon"><mat-icon>play_circle</mat-icon></div>
           <span class="metric-card__value">{{ analytics()!.active }}</span>
-          <span class="metric-card__label">Active</span>
+          <span class="metric-card__label">{{ 'sequences.analytics.active' | transloco }}</span>
         </div>
         <div class="metric-card metric-card--completed">
           <div class="metric-card__icon"><mat-icon>check_circle</mat-icon></div>
           <span class="metric-card__value">{{ analytics()!.completed }}</span>
-          <span class="metric-card__label">Completed</span>
+          <span class="metric-card__label">{{ 'sequences.analytics.completed' | transloco }}</span>
         </div>
         <div class="metric-card metric-card--replied">
           <div class="metric-card__icon"><mat-icon>reply</mat-icon></div>
           <span class="metric-card__value">{{ analytics()!.replied }}</span>
-          <span class="metric-card__label">Replied</span>
+          <span class="metric-card__label">{{ 'sequences.analytics.replied' | transloco }}</span>
         </div>
         <div class="metric-card metric-card--bounced">
           <div class="metric-card__icon"><mat-icon>error</mat-icon></div>
           <span class="metric-card__value">{{ analytics()!.bounced }}</span>
-          <span class="metric-card__label">Bounced</span>
+          <span class="metric-card__label">{{ 'sequences.analytics.bounced' | transloco }}</span>
         </div>
       </div>
     }
@@ -312,7 +314,7 @@ const FUNNEL_COLORS = [
       <div class="analytics__funnel">
         <h3 class="analytics__section-title">
           <mat-icon>filter_alt</mat-icon>
-          Enrollment Funnel
+          {{ 'sequences.analytics.funnelTitle' | transloco }}
         </h3>
         <div class="analytics__chart-wrap">
           <canvas baseChart
@@ -329,16 +331,16 @@ const FUNNEL_COLORS = [
       <div class="analytics__step-metrics">
         <h3 class="analytics__section-title">
           <mat-icon>bar_chart</mat-icon>
-          Per-Step Performance
+          {{ 'sequences.analytics.stepPerformanceTitle' | transloco }}
         </h3>
         <table class="step-table">
           <thead>
             <tr>
-              <th>Step</th>
-              <th>Template</th>
-              <th>Sent</th>
-              <th>Open Rate</th>
-              <th>Click Rate</th>
+              <th>{{ 'sequences.analytics.stepColumns.step' | transloco }}</th>
+              <th>{{ 'sequences.analytics.stepColumns.template' | transloco }}</th>
+              <th>{{ 'sequences.analytics.stepColumns.sent' | transloco }}</th>
+              <th>{{ 'sequences.analytics.stepColumns.openRate' | transloco }}</th>
+              <th>{{ 'sequences.analytics.stepColumns.clickRate' | transloco }}</th>
             </tr>
           </thead>
           <tbody>
@@ -351,7 +353,7 @@ const FUNNEL_COLORS = [
                 <td>{{ metric.sent }}</td>
                 <td>
                   <span class="step-table__rate">{{ metric.openRate }}%</span>
-                  <span class="step-table__estimated">(estimated)</span>
+                  <span class="step-table__estimated">{{ 'sequences.analytics.estimated' | transloco }}</span>
                 </td>
                 <td>
                   <span class="step-table__rate">{{ metric.clickRate }}%</span>
@@ -365,7 +367,7 @@ const FUNNEL_COLORS = [
 
     @if (!analytics() && funnelData().length === 0 && stepMetrics().length === 0) {
       <div class="analytics__empty">
-        No analytics data available yet. Enroll contacts and send emails to see metrics.
+        {{ 'sequences.analytics.noData' | transloco }}
       </div>
     }
   `,

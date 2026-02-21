@@ -8,7 +8,7 @@
   @if (store.selectedSequence(); as seq) {
     <!-- Hero Header -->
     <div class="detail__header">
-      <button mat-icon-button routerLink="/sequences" aria-label="Back to sequences"
+      <button mat-icon-button routerLink="/sequences" [attr.aria-label]="'sequences.detail.backToSequences' | transloco"
               class="detail__back-btn">
         <mat-icon>arrow_back</mat-icon>
       </button>
@@ -30,36 +30,36 @@
         @if (seq.status === 'draft') {
           <button mat-stroked-button (click)="activateSequence()">
             <mat-icon>play_arrow</mat-icon>
-            Activate
+            {{ 'sequences.detail.activate' | transloco }}
           </button>
         }
         @if (seq.status === 'active') {
           <button mat-stroked-button (click)="pauseSequence()">
             <mat-icon>pause</mat-icon>
-            Pause
+            {{ 'sequences.detail.pause' | transloco }}
           </button>
         }
         @if (seq.status === 'paused') {
           <button mat-stroked-button (click)="activateSequence()">
             <mat-icon>play_arrow</mat-icon>
-            Resume
+            {{ 'sequences.detail.resume' | transloco }}
           </button>
         }
         @if (seq.status !== 'archived') {
           <button mat-stroked-button (click)="archiveSequence()">
             <mat-icon>archive</mat-icon>
-            Archive
+            {{ 'sequences.detail.archive' | transloco }}
           </button>
         }
         <button mat-flat-button
                 color="primary"
                 (click)="openEnrollmentDialog()">
           <mat-icon>person_add</mat-icon>
-          Add Contacts
+          {{ 'sequences.detail.addContacts' | transloco }}
         </button>
         <a mat-stroked-button [routerLink]="['/sequences', seq.id, 'edit']">
           <mat-icon>edit</mat-icon>
-          Edit
+          {{ 'sequences.detail.edit' | transloco }}
         </a>
       </div>
     </div>
@@ -74,10 +74,10 @@
     <div class="detail__section">
       <h2 class="detail__section-title">
         <mat-icon>route</mat-icon>
-        Steps
+        {{ 'sequences.detail.stepsTitle' | transloco }}
       </h2>
       @if (seq.steps.length === 0) {
-        <p class="detail__empty-hint">No steps configured. <a [routerLink]="['/sequences', seq.id, 'edit']">Add steps</a></p>
+        <p class="detail__empty-hint">{{ 'sequences.detail.noSteps' | transloco }} <a [routerLink]="['/sequences', seq.id, 'edit']">{{ 'sequences.detail.addStepsLink' | transloco }}</a></p>
       } @else {
         <div class="detail__steps">
           @for (step of seq.steps; track step.id) {
@@ -87,35 +87,35 @@
               <span class="step-overview__badge">{{ step.stepNumber }}</span>
               <div class="step-overview__header">
                 <div class="step-overview__info">
-                  <span class="step-overview__name">{{ step.emailTemplateName || 'No template' }}</span>
+                  <span class="step-overview__name">{{ step.emailTemplateName || ('sequences.builder.stepItem.noTemplate' | transloco) }}</span>
                   <span class="step-overview__delay">
                     <mat-icon>schedule</mat-icon>
                     @if (step.delayDays === 0 && step.stepNumber === 1) {
-                      Send immediately
+                      {{ 'sequences.detail.sendImmediately' | transloco }}
                     } @else if (step.delayDays === 0) {
-                      No delay
+                      {{ 'sequences.detail.noDelay' | transloco }}
                     } @else {
-                      Wait {{ step.delayDays }} day{{ step.delayDays !== 1 ? 's' : '' }}
+                      {{ (step.delayDays === 1 ? 'sequences.detail.waitDays' : 'sequences.detail.waitDaysPlural') | transloco:{ count: step.delayDays } }}
                     }
                     @if (step.preferredSendTime) {
-                      at {{ step.preferredSendTime }}
+                      {{ 'sequences.detail.atTime' | transloco:{ time: step.preferredSendTime } }}
                     }
                   </span>
                 </div>
                 <!-- Inline step metrics -->
                 @if (getStepMetric(step.stepNumber); as metric) {
                   <div class="step-overview__metrics">
-                    <span class="step-metric" matTooltip="Emails sent">
+                    <span class="step-metric" [matTooltip]="'sequences.analytics.stepColumns.sent' | transloco">
                       <strong>{{ metric.sent }}</strong>
-                      sent
+                      {{ 'sequences.detail.sent' | transloco }}
                     </span>
-                    <span class="step-metric" matTooltip="Open rate">
+                    <span class="step-metric" [matTooltip]="'sequences.analytics.stepColumns.openRate' | transloco">
                       <strong>{{ metric.openRate }}%</strong>
-                      opens
+                      {{ 'sequences.detail.opens' | transloco }}
                     </span>
-                    <span class="step-metric" matTooltip="Click rate">
+                    <span class="step-metric" [matTooltip]="'sequences.analytics.stepColumns.clickRate' | transloco">
                       <strong>{{ metric.clickRate }}%</strong>
-                      clicks
+                      {{ 'sequences.detail.clicks' | transloco }}
                     </span>
                   </div>
                 }
@@ -127,17 +127,17 @@
                 <div class="step-overview__detail">
                   @if (step.subjectOverride) {
                     <div class="step-overview__field">
-                      <span class="step-overview__field-label">Subject Override:</span>
+                      <span class="step-overview__field-label">{{ 'sequences.detail.subjectOverride' | transloco }}</span>
                       {{ step.subjectOverride }}
                     </div>
                   }
                   @if (getStepMetric(step.stepNumber); as metric) {
                     <div class="step-overview__field">
-                      <span class="step-overview__field-label">Unique Opens:</span>
+                      <span class="step-overview__field-label">{{ 'sequences.detail.uniqueOpens' | transloco }}</span>
                       {{ metric.uniqueOpens }} / {{ metric.sent }}
                     </div>
                     <div class="step-overview__field">
-                      <span class="step-overview__field-label">Unique Clicks:</span>
+                      <span class="step-overview__field-label">{{ 'sequences.detail.uniqueClicks' | transloco }}</span>
                       {{ metric.uniqueClicks }} / {{ metric.sent }}
                     </div>
                   }
@@ -154,18 +154,18 @@
       <div class="detail__section-header">
         <h2 class="detail__section-title">
           <mat-icon>people</mat-icon>
-          Enrollments
+          {{ 'sequences.detail.enrollmentsTitle' | transloco }}
         </h2>
         @if (selectedEnrollmentIds().size > 0) {
           <div class="detail__bulk-actions">
-            <span class="detail__bulk-count">{{ selectedEnrollmentIds().size }} selected</span>
+            <span class="detail__bulk-count">{{ 'sequences.detail.selected' | transloco:{ count: selectedEnrollmentIds().size } }}</span>
             <button mat-stroked-button (click)="bulkPause()">
               <mat-icon>pause</mat-icon>
-              Pause Selected
+              {{ 'sequences.detail.pauseSelected' | transloco }}
             </button>
             <button mat-stroked-button (click)="bulkResume()">
               <mat-icon>play_arrow</mat-icon>
-              Resume Selected
+              {{ 'sequences.detail.resumeSelected' | transloco }}
             </button>
           </div>
         }
@@ -177,10 +177,10 @@
             <div class="detail__empty-enrollment-icon">
               <mat-icon>people_outline</mat-icon>
             </div>
-            <p>No contacts enrolled</p>
+            <p>{{ 'sequences.detail.noEnrollments' | transloco }}</p>
             <button mat-flat-button color="primary" (click)="openEnrollmentDialog()">
               <mat-icon>person_add</mat-icon>
-              Add Contacts
+              {{ 'sequences.detail.addContacts' | transloco }}
             </button>
           </div>
         } @else {
@@ -205,11 +205,11 @@
 
               <!-- Contact Column -->
               <ng-container matColumnDef="contact">
-                <th mat-header-cell *matHeaderCellDef>Contact</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.contact' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">
                   <div class="detail__contact-cell">
                     <a class="detail__contact-link" [routerLink]="['/contacts', enrollment.contactId]">
-                      {{ enrollment.contactName || 'Unknown' }}
+                      {{ enrollment.contactName || ('sequences.detail.unknown' | transloco) }}
                     </a>
                     <div class="detail__contact-email">{{ enrollment.contactEmail }}</div>
                   </div>
@@ -218,7 +218,7 @@
 
               <!-- Status Column -->
               <ng-container matColumnDef="status">
-                <th mat-header-cell *matHeaderCellDef>Status</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.status' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">
                   <span class="enrollment-status"
                         [class]="'enrollment-status--' + enrollment.status">
@@ -230,7 +230,7 @@
 
               <!-- Current Step Column -->
               <ng-container matColumnDef="currentStep">
-                <th mat-header-cell *matHeaderCellDef>Current Step</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.currentStep' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">
                   {{ enrollment.currentStepNumber || '-' }}
                 </td>
@@ -238,13 +238,13 @@
 
               <!-- Steps Sent Column -->
               <ng-container matColumnDef="stepsSent">
-                <th mat-header-cell *matHeaderCellDef>Sent</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.sent' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">{{ enrollment.stepsSent }}</td>
               </ng-container>
 
               <!-- Last Sent Column -->
               <ng-container matColumnDef="lastSent">
-                <th mat-header-cell *matHeaderCellDef>Last Sent</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.lastSent' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">
                   {{ enrollment.lastStepSentAt ? (enrollment.lastStepSentAt | date:'short') : '-' }}
                 </td>
@@ -252,26 +252,26 @@
 
               <!-- Actions Column -->
               <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef>Actions</th>
+                <th mat-header-cell *matHeaderCellDef>{{ 'sequences.detail.enrollmentColumns.actions' | transloco }}</th>
                 <td mat-cell *matCellDef="let enrollment">
                   <div class="detail__enrollment-actions" (click)="$event.stopPropagation()">
                     @if (enrollment.status === 'active') {
                       <mat-slide-toggle
                         [checked]="true"
-                        matTooltip="Pause enrollment"
+                        [matTooltip]="'sequences.detail.pauseEnrollmentTooltip' | transloco"
                         (change)="onToggleEnrollment(enrollment)">
                       </mat-slide-toggle>
                     }
                     @if (enrollment.status === 'paused') {
                       <mat-slide-toggle
                         [checked]="false"
-                        matTooltip="Resume enrollment"
+                        [matTooltip]="'sequences.detail.resumeEnrollmentTooltip' | transloco"
                         (change)="onToggleEnrollment(enrollment)">
                       </mat-slide-toggle>
                     }
                     @if (enrollment.status === 'active' || enrollment.status === 'paused') {
                       <button mat-icon-button
-                              matTooltip="Unenroll"
+                              [matTooltip]="'sequences.detail.unenrollTooltip' | transloco"
                               color="warn"
                               (click)="onUnenroll(enrollment)">
                         <mat-icon>person_remove</mat-icon>

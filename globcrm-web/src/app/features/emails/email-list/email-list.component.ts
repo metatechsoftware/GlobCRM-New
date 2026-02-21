@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { DynamicTableComponent } from '../../../shared/components/dynamic-table/dynamic-table.component';
 import { FilterPanelComponent } from '../../../shared/components/filter-panel/filter-panel.component';
 import { FilterChipsComponent } from '../../../shared/components/filter-chips/filter-chips.component';
@@ -47,6 +48,7 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
     MatIconModule,
     MatMenuModule,
     MatChipsModule,
+    TranslocoPipe,
     DynamicTableComponent,
     FilterPanelComponent,
     FilterChipsComponent,
@@ -135,12 +137,12 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
         (viewSelected)="onViewSelected($event)" />
       <div class="entity-list-content">
         <div class="list-header">
-          <h1>Emails</h1>
+          <h1>{{ 'emails.list.title' | transloco }}</h1>
 
           <div class="list-header-actions">
             <button mat-raised-button color="primary"
                     (click)="openCompose()">
-              <mat-icon>edit</mat-icon> Compose
+              <mat-icon>edit</mat-icon> {{ 'emails.list.compose' | transloco }}
             </button>
           </div>
         </div>
@@ -148,9 +150,7 @@ import { EmailComposeComponent } from '../email-compose/email-compose.component'
         @if (!emailStore.isConnected()) {
           <div class="connection-banner">
             <mat-icon>warning</mat-icon>
-            <span>Connect your Gmail account in
-              <a routerLink="/settings/email-accounts">Settings</a>
-              to see emails here.
+            <span [innerHTML]="'emails.list.connectionBanner' | transloco">
             </span>
           </div>
         }

@@ -44,6 +44,7 @@
     "view": "View",
     "copy": "Copy",
     "skip": "Skip",
+    "templates": "templates",
     "paginator": {
       "itemsPerPage": "Items per page",
       "nextPage": "Next page",

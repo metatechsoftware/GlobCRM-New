@@ -2,7 +2,7 @@
   <!-- Top Toolbar -->
   <div class="editor-toolbar">
     <div class="toolbar-left">
-      <button mat-icon-button (click)="goBack()" matTooltip="Back to templates">
+      <button mat-icon-button (click)="goBack()" [matTooltip]="'email-templates.editor.backTooltip' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <h2 class="page-title">{{ pageTitle() }}</h2>
@@ -11,32 +11,32 @@
     <div class="toolbar-center">
       <div class="fields-group">
         <mat-form-field appearance="outline" class="name-field">
-          <mat-label>Template Name</mat-label>
+          <mat-label>{{ 'email-templates.editor.templateName' | transloco }}</mat-label>
           <input
             matInput
             [value]="templateName()"
             (input)="templateName.set($any($event.target).value)"
-            placeholder="Enter template name"
+            [placeholder]="'email-templates.editor.templateNamePlaceholder' | transloco"
           />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="subject-field">
-          <mat-label>Subject Line</mat-label>
+          <mat-label>{{ 'email-templates.editor.subjectLine' | transloco }}</mat-label>
           <input
             matInput
             [value]="templateSubject()"
             (input)="templateSubject.set($any($event.target).value)"
-            placeholder="Email subject (supports merge fields)"
+            [placeholder]="'email-templates.editor.subjectPlaceholder' | transloco"
           />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="category-field">
-          <mat-label>Category</mat-label>
+          <mat-label>{{ 'email-templates.editor.category' | transloco }}</mat-label>
           <mat-select
             [value]="selectedCategoryId()"
             (selectionChange)="selectedCategoryId.set($event.value)"
           >
-            <mat-option [value]="null">None</mat-option>
+            <mat-option [value]="null">{{ 'email-templates.editor.categoryNone' | transloco }}</mat-option>
             @for (category of store.categories(); track category.id) {
               <mat-option [value]="category.id">{{ category.name }}</mat-option>
             }
@@ -49,28 +49,28 @@
       <mat-slide-toggle
         [checked]="isShared()"
         (change)="isShared.set($event.checked)"
-        matTooltip="Share with team"
+        [matTooltip]="'email-templates.editor.shareTooltip' | transloco"
       >
-        Shared
+        {{ 'email-templates.editor.shared' | transloco }}
       </mat-slide-toggle>
 
       <button
         mat-stroked-button
         (click)="toggleMergePanel()"
-        matTooltip="Browse merge fields"
+        [matTooltip]="'email-templates.editor.mergeFieldsTooltip' | transloco"
       >
         <mat-icon>data_object</mat-icon>
-        Merge Fields
+        {{ 'email-templates.editor.mergeFields' | transloco }}
       </button>
 
       <button
         mat-stroked-button
         (click)="openPreview()"
         [disabled]="saving()"
-        matTooltip="Preview template with sample or real data"
+        [matTooltip]="'email-templates.editor.previewTooltip' | transloco"
       >
         <mat-icon>visibility</mat-icon>
-        Preview
+        {{ 'email-templates.editor.preview' | transloco }}
       </button>
 
       <button
@@ -85,7 +85,7 @@
         } @else {
           <mat-icon>save</mat-icon>
         }
-        Save
+        {{ 'email-templates.editor.save' | transloco }}
       </button>
     </div>
   </div>

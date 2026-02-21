@@ -34,6 +34,7 @@ import {
   map,
   catchError,
 } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { EmailTemplateService } from '../email-template.service';
 import { PreviewResponse } from '../email-template.models';
 import { ApiService } from '../../../core/api/api.service';
@@ -72,6 +73,7 @@ interface EntityOption {
     MatSnackBarModule,
     MatTooltipModule,
     SafeHtmlPipe,
+    TranslocoPipe,
   ],
   templateUrl: './email-template-preview.component.html',
   styleUrl: './email-template-preview.component.scss',
@@ -83,6 +85,7 @@ export class EmailTemplatePreviewComponent implements OnInit, OnDestroy {
   private readonly service = inject(EmailTemplateService);
   private readonly api = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
   private readonly destroy$ = new Subject<void>();
 
   // ---- State ----
@@ -188,7 +191,7 @@ export class EmailTemplatePreviewComponent implements OnInit, OnDestroy {
         this.previewLoading.set(false);
       },
       error: () => {
-        this.snackBar.open('Failed to load preview', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('email-templates.messages.previewFailed'), this.transloco.translate('common.close'), { duration: 3000 });
         this.previewLoading.set(false);
       },
     });
@@ -208,11 +211,11 @@ export class EmailTemplatePreviewComponent implements OnInit, OnDestroy {
 
     this.service.testSend(this.templateId, request).subscribe({
       next: () => {
-        this.snackBar.open('Test email sent to your inbox!', 'Close', { duration: 4000 });
+        this.snackBar.open(this.transloco.translate('email-templates.messages.testSent'), this.transloco.translate('common.close'), { duration: 4000 });
         this.sendingTest.set(false);
       },
       error: () => {
-        this.snackBar.open('Failed to send test email', 'Close', { duration: 4000 });
+        this.snackBar.open(this.transloco.translate('email-templates.messages.testFailed'), this.transloco.translate('common.close'), { duration: 4000 });
         this.sendingTest.set(false);
       },
     });

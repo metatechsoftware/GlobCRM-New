@@ -1,10 +1,10 @@
 <div class="builder">
   <!-- Header -->
   <div class="builder__header">
-    <button mat-icon-button (click)="goBack()" aria-label="Back">
+    <button mat-icon-button (click)="goBack()" [attr.aria-label]="'common.back' | transloco">
       <mat-icon>arrow_back</mat-icon>
     </button>
-    <h1>{{ isEditMode() ? 'Edit Sequence' : 'Create Sequence' }}</h1>
+    <h1>{{ (isEditMode() ? 'sequences.builder.editTitle' : 'sequences.builder.createTitle') | transloco }}</h1>
   </div>
 
   @if (store.loading() && isEditMode()) {
@@ -16,24 +16,24 @@
     <div class="builder__section">
       <div class="builder__form-card">
         <mat-form-field class="builder__field" appearance="outline">
-          <mat-label>Sequence Name</mat-label>
+          <mat-label>{{ 'sequences.builder.sequenceName' | transloco }}</mat-label>
           <input matInput
                  [(ngModel)]="name"
-                 placeholder="e.g., New Customer Onboarding"
+                 [placeholder]="'sequences.builder.namePlaceholder' | transloco"
                  required />
         </mat-form-field>
 
         <mat-form-field class="builder__field" appearance="outline">
-          <mat-label>Description (optional)</mat-label>
+          <mat-label>{{ 'sequences.builder.description' | transloco }}</mat-label>
           <textarea matInput
                     [(ngModel)]="description"
                     rows="2"
-                    placeholder="Brief description of this sequence"></textarea>
+                    [placeholder]="'sequences.builder.descriptionPlaceholder' | transloco"></textarea>
         </mat-form-field>
 
         @if (isEditMode() && store.selectedSequence()) {
           <div class="builder__status-row">
-            <span class="builder__status-label">Status:</span>
+            <span class="builder__status-label">{{ 'sequences.builder.status' | transloco }}</span>
             <span class="builder__status-badge"
                   [class.status--draft]="store.selectedSequence()!.status === 'draft'"
                   [class.status--active]="store.selectedSequence()!.status === 'active'"
@@ -53,8 +53,8 @@
         <div class="builder__section-icon">
           <mat-icon>route</mat-icon>
         </div>
-        <h2>Steps</h2>
-        <span class="builder__step-count">{{ steps().length }} step{{ steps().length !== 1 ? 's' : '' }}</span>
+        <h2>{{ 'sequences.builder.stepsTitle' | transloco }}</h2>
+        <span class="builder__step-count">{{ (steps().length === 1 ? 'sequences.builder.stepCount' : 'sequences.builder.stepCountPlural') | transloco:{ count: steps().length } }}</span>
       </div>
 
       @if (steps().length === 0) {
@@ -62,7 +62,7 @@
           <div class="builder__empty-steps-icon">
             <mat-icon>mail_outline</mat-icon>
           </div>
-          <p>No steps yet. Add your first email step below.</p>
+          <p>{{ 'sequences.builder.emptySteps' | transloco }}</p>
         </div>
       } @else {
         <div cdkDropList
@@ -83,18 +83,18 @@
               class="builder__add-step"
               (click)="addStep()">
         <mat-icon>add</mat-icon>
-        Add Step
+        {{ 'sequences.builder.addStep' | transloco }}
       </button>
     </div>
 
     <!-- Actions -->
     <div class="builder__actions">
-      <button mat-button (click)="goBack()">Cancel</button>
+      <button mat-button (click)="goBack()">{{ 'common.cancel' | transloco }}</button>
       <button mat-flat-button
               color="primary"
               [disabled]="!name || store.loading()"
               (click)="save()">
-        {{ isEditMode() ? 'Save Changes' : 'Create Sequence' }}
+        {{ (isEditMode() ? 'sequences.builder.saveChanges' : 'sequences.builder.createSequence') | transloco }}
       </button>
     </div>
   }

@@ -16,6 +16,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { EmailStore } from '../email.store';
 import { EmailDetailDto } from '../email.models';
 import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email-compose.component';
@@ -38,6 +39,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
     MatChipsModule,
     MatDividerModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   providers: [EmailStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -273,7 +275,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
         <!-- Header -->
         <div class="detail-header">
           <div class="header-left">
-            <a mat-icon-button routerLink="/emails" aria-label="Back to emails">
+            <a mat-icon-button routerLink="/emails" [attr.aria-label]="'emails.detail.backToEmails' | transloco">
               <mat-icon>arrow_back</mat-icon>
             </a>
             <h1>{{ threadSubject() }}</h1>
@@ -282,31 +284,31 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
 
         <!-- Thread metadata -->
         <div class="thread-meta">
-          <span>{{ threadMessageCount() }} message{{ threadMessageCount() === 1 ? '' : 's' }}</span>
+          <span>{{ (threadMessageCount() === 1 ? 'emails.detail.messages' : 'emails.detail.messagesPlural') | transloco:{ count: threadMessageCount() } }}</span>
           @if (store.selectedItem()!.linkedContactId) {
             <span>
-              Contact: <a [routerLink]="['/contacts', store.selectedItem()!.linkedContactId]">
+              {{ 'emails.detail.contact' | transloco }}: <a [routerLink]="['/contacts', store.selectedItem()!.linkedContactId]">
                 {{ store.selectedItem()!.linkedContactName }}
               </a>
             </span>
           }
           @if (store.selectedItem()!.linkedCompanyName) {
-            <span>Company: {{ store.selectedItem()!.linkedCompanyName }}</span>
+            <span>{{ 'emails.detail.company' | transloco }}: {{ store.selectedItem()!.linkedCompanyName }}</span>
           }
         </div>
 
         <!-- Action Bar -->
         <div class="action-bar">
           <button mat-raised-button color="primary" (click)="onReply()">
-            <mat-icon>reply</mat-icon> Reply
+            <mat-icon>reply</mat-icon> {{ 'emails.detail.reply' | transloco }}
           </button>
           <button mat-stroked-button (click)="onToggleRead()">
             <mat-icon>{{ store.selectedItem()!.isRead ? 'mark_email_unread' : 'mark_email_read' }}</mat-icon>
-            {{ store.selectedItem()!.isRead ? 'Mark Unread' : 'Mark Read' }}
+            {{ (store.selectedItem()!.isRead ? 'emails.detail.markUnread' : 'emails.detail.markRead') | transloco }}
           </button>
           <button mat-stroked-button (click)="onToggleStar()">
             <mat-icon>{{ store.selectedItem()!.isStarred ? 'star' : 'star_border' }}</mat-icon>
-            {{ store.selectedItem()!.isStarred ? 'Unstar' : 'Star' }}
+            {{ (store.selectedItem()!.isStarred ? 'emails.detail.unstar' : 'emails.detail.star') | transloco }}
           </button>
         </div>
 
@@ -358,9 +360,9 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
                 @if (expandedMessages()[i]) {
                   <div class="message-body">
                     <div class="message-recipients">
-                      <span>To: {{ message.toAddresses?.join(', ') }}</span>
+                      <span>{{ 'emails.detail.to' | transloco }}: {{ message.toAddresses?.join(', ') }}</span>
                       @if (message.ccAddresses && message.ccAddresses.length > 0) {
-                        <span>Cc: {{ message.ccAddresses.join(', ') }}</span>
+                        <span>{{ 'emails.detail.cc' | transloco }}: {{ message.ccAddresses.join(', ') }}</span>
                       }
                     </div>
                     <mat-divider></mat-divider>
@@ -368,7 +370,7 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
                       @if (message.bodyHtml) {
                         <div [innerHTML]="message.bodyHtml"></div>
                       } @else {
-                        <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">{{ message.bodyText || '(No content)' }}</pre>
+                        <pre style="white-space: pre-wrap; font-family: inherit; margin: 0;">{{ message.bodyText || ('emails.detail.noContent' | transloco) }}</pre>
                       }
                     </div>
                   </div>
@@ -380,8 +382,8 @@ import { EmailComposeComponent, ComposeDialogData } from '../email-compose/email
       </div>
     } @else {
       <div class="empty-state">
-        <h2>Email not found</h2>
-        <a mat-button routerLink="/emails">Back to Emails</a>
+        <h2>{{ 'emails.detail.notFound' | transloco }}</h2>
+        <a mat-button routerLink="/emails">{{ 'emails.detail.backToList' | transloco }}</a>
       </div>
     }
   `,
@@ -392,6 +394,7 @@ export class EmailDetailComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Tracks which messages are expanded (by index). */
   expandedMessages = signal<Record<number, boolean>>({});
@@ -527,7 +530,7 @@ export class EmailDetailComponent implements OnInit {
     // Currently only markAsRead is supported by the API
     // For unread, we would need markAsUnread endpoint -- using markAsRead for now
     this.store.markAsRead(detail.id);
-    this.snackBar.open('Email marked as read', 'OK', { duration: 3000 });
+    this.snackBar.open(this.transloco.translate('emails.messages.markedRead'), 'OK', { duration: 3000 });
   }
 
   /** Toggle star status. */
@@ -537,7 +540,7 @@ export class EmailDetailComponent implements OnInit {
 
     this.store.toggleStar(detail.id);
     this.snackBar.open(
-      detail.isStarred ? 'Star removed' : 'Email starred',
+      detail.isStarred ? this.transloco.translate('emails.messages.starRemoved') : this.transloco.translate('emails.messages.starred'),
       'OK',
       { duration: 3000 },
     );

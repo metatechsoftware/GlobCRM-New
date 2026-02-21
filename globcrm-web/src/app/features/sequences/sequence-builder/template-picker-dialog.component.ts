@@ -18,6 +18,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EmailTemplateService } from '../../email-templates/email-template.service';
 import { EmailTemplateListItem } from '../../email-templates/email-template.models';
 import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
@@ -45,6 +46,7 @@ export interface TemplatePickerResult {
     MatInputModule,
     MatProgressSpinnerModule,
     SafeHtmlPipe,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -150,16 +152,16 @@ export interface TemplatePickerResult {
   `,
   template: `
     <div class="picker">
-      <h2 mat-dialog-title>Select Email Template</h2>
+      <h2 mat-dialog-title>{{ 'sequences.templatePicker.title' | transloco }}</h2>
 
       <mat-dialog-content>
         <mat-form-field class="picker__search" appearance="outline">
-          <mat-label>Search templates</mat-label>
+          <mat-label>{{ 'sequences.templatePicker.search' | transloco }}</mat-label>
           <mat-icon matPrefix>search</mat-icon>
           <input matInput
                  [(ngModel)]="searchQuery"
                  (ngModelChange)="onSearchChange($event)"
-                 placeholder="Search by name..." />
+                 [placeholder]="'sequences.templatePicker.searchPlaceholder' | transloco" />
         </mat-form-field>
 
         @if (loading()) {
@@ -169,7 +171,7 @@ export interface TemplatePickerResult {
         } @else if (filteredTemplates().length === 0) {
           <div class="picker__empty">
             <mat-icon>drafts</mat-icon>
-            <p>No templates found</p>
+            <p>{{ 'sequences.templatePicker.noTemplates' | transloco }}</p>
           </div>
         } @else {
           <div class="picker__grid">
@@ -198,11 +200,11 @@ export interface TemplatePickerResult {
       </mat-dialog-content>
 
       <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
         <button mat-flat-button color="primary"
                 [disabled]="!selectedId()"
                 (click)="confirm()">
-          Select Template
+          {{ 'sequences.templatePicker.selectButton' | transloco }}
         </button>
       </mat-dialog-actions>
     </div>

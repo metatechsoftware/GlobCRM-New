@@ -19,6 +19,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SequenceStore } from '../sequence.store';
 import { EnrollmentListItem, StepMetrics } from '../sequence.models';
 import { EnrollmentDialogComponent } from '../enrollment-dialog/enrollment-dialog.component';
@@ -43,6 +44,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatTooltipModule,
     MatSnackBarModule,
     MatDialogModule,
+    TranslocoPipe,
     SequenceAnalyticsComponent,
   ],
   providers: [SequenceStore],
@@ -57,6 +59,7 @@ export class SequenceDetailComponent implements OnInit {
   readonly store = inject(SequenceStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly transloco = inject(TranslocoService);
 
   readonly expandedStepId = signal<string | null>(null);
   readonly selectedEnrollmentIds = signal<Set<string>>(new Set());
@@ -99,7 +102,7 @@ export class SequenceDetailComponent implements OnInit {
     if (!seq) return;
 
     this.store.updateSequence(seq.id, { status: 'active' }, () => {
-      this.snackBar.open('Sequence activated.', 'Close', { duration: 3000 });
+      this.snackBar.open(this.transloco.translate('sequences.messages.activated'), this.transloco.translate('common.close'), { duration: 3000 });
     });
   }
 
@@ -108,7 +111,7 @@ export class SequenceDetailComponent implements OnInit {
     if (!seq) return;
 
     this.store.updateSequence(seq.id, { status: 'paused' }, () => {
-      this.snackBar.open('Sequence paused.', 'Close', { duration: 3000 });
+      this.snackBar.open(this.transloco.translate('sequences.messages.paused'), this.transloco.translate('common.close'), { duration: 3000 });
     });
   }
 
@@ -117,7 +120,7 @@ export class SequenceDetailComponent implements OnInit {
     if (!seq) return;
 
     this.store.updateSequence(seq.id, { status: 'archived' }, () => {
-      this.snackBar.open('Sequence archived.', 'Close', { duration: 3000 });
+      this.snackBar.open(this.transloco.translate('sequences.messages.archived'), this.transloco.translate('common.close'), { duration: 3000 });
     });
   }
 
@@ -128,11 +131,11 @@ export class SequenceDetailComponent implements OnInit {
 
     if (enrollment.status === 'active') {
       this.store.pauseEnrollment(seqId, enrollment.id, () => {
-        this.snackBar.open('Enrollment paused.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('sequences.messages.enrollmentPaused'), this.transloco.translate('common.close'), { duration: 3000 });
       });
     } else if (enrollment.status === 'paused') {
       this.store.resumeEnrollment(seqId, enrollment.id, () => {
-        this.snackBar.open('Enrollment resumed.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('sequences.messages.enrollmentResumed'), this.transloco.translate('common.close'), { duration: 3000 });
       });
     }
   }
@@ -150,7 +153,7 @@ export class SequenceDetailComponent implements OnInit {
       if (!confirmed) return;
 
       this.store.unenroll(this.id(), enrollment.id, () => {
-        this.snackBar.open('Contact unenrolled.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('sequences.messages.unenrolled'), this.transloco.translate('common.close'), { duration: 3000 });
       });
     });
   }
@@ -188,8 +191,8 @@ export class SequenceDetailComponent implements OnInit {
     this.store.bulkPauseEnrollments(this.id(), ids, (result) => {
       this.selectedEnrollmentIds.set(new Set());
       this.snackBar.open(
-        `${result.paused} enrollment(s) paused.`,
-        'Close',
+        this.transloco.translate('sequences.messages.bulkPaused', { count: result.paused }),
+        this.transloco.translate('common.close'),
         { duration: 3000 },
       );
     });
@@ -202,8 +205,8 @@ export class SequenceDetailComponent implements OnInit {
     this.store.bulkResumeEnrollments(this.id(), ids, (result) => {
       this.selectedEnrollmentIds.set(new Set());
       this.snackBar.open(
-        `${result.resumed} enrollment(s) resumed.`,
-        'Close',
+        this.transloco.translate('sequences.messages.bulkResumed', { count: result.resumed }),
+        this.transloco.translate('common.close'),
         { duration: 3000 },
       );
     });

@@ -1,0 +1,80 @@
+{
+  "title": "Email Templates",
+  "list": {
+    "title": "Email Templates",
+    "tagline": "Craft beautiful emails that convert",
+    "createButton": "Create Template",
+    "searchPlaceholder": "Search templates...",
+    "templateCount": "{{ count }} templates",
+    "allCategory": "All",
+    "loading": "Loading templates...",
+    "shared": "Shared",
+    "personal": "Personal",
+    "starter": "Starter",
+    "by": "by {{ name }}",
+    "empty": {
+      "title": "No email templates yet",
+      "description": "Create your first email template to start sending personalized emails.",
+      "button": "Create your first template"
+    },
+    "actions": {
+      "edit": "Edit",
+      "clone": "Clone",
+      "delete": "Delete"
+    }
+  },
+  "editor": {
+    "editTitle": "Edit Template",
+    "newTitle": "New Template",
+    "templateName": "Template Name",
+    "templateNamePlaceholder": "Enter template name",
+    "subjectLine": "Subject Line",
+    "subjectPlaceholder": "Email subject (supports merge fields)",
+    "category": "Category",
+    "categoryNone": "None",
+    "shared": "Shared",
+    "shareTooltip": "Share with team",
+    "mergeFields": "Merge Fields",
+    "mergeFieldsTooltip": "Browse merge fields",
+    "preview": "Preview",
+    "previewTooltip": "Preview template with sample or real data",
+    "save": "Save",
+    "backTooltip": "Back to templates"
+  },
+  "preview": {
+    "title": "Preview Template",
+    "desktopTooltip": "Desktop (600px)",
+    "mobileTooltip": "Mobile (320px)",
+    "previewWith": "Preview with:",
+    "sampleData": "Sample Data",
+    "refreshTooltip": "Refresh preview",
+    "sendTest": "Send Test",
+    "subject": "Subject",
+    "loading": "Loading preview..."
+  },
+  "clone": {
+    "title": "Clone Template",
+    "prompt": "Enter a name for the cloned template:",
+    "nameLabel": "Template Name",
+    "button": "Clone"
+  },
+  "mergePanel": {
+    "title": "Merge Fields",
+    "closeTooltip": "Close panel",
+    "hint": "Click a field to copy. You can also use Unlayer's toolbar dropdown or type <code>{{</code> in the editor for autocomplete.",
+    "custom": "Custom",
+    "fallbackHint": "Set fallback values using: <code>{{ field | default: 'fallback' }}</code>"
+  },
+  "messages": {
+    "saved": "Template saved successfully",
+    "created": "Template created successfully",
+    "cloned": "Template cloned successfully",
+    "deleted": "Template deleted",
+    "nameRequired": "Template name is required",
+    "saveBeforePreview": "Please save the template before previewing",
+    "previewFailed": "Failed to load preview",
+    "testSent": "Test email sent to your inbox!",
+    "testFailed": "Failed to send test email",
+    "copiedTag": "Copied {{ tag }} -- paste in editor or use Unlayer toolbar to insert"
+  }
+}

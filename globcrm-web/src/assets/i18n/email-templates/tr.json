@@ -1,0 +1,80 @@
+{
+  "title": "E-posta Sablonlari",
+  "list": {
+    "title": "E-posta Sablonlari",
+    "tagline": "Donusum saglayan guzel e-postalar olusturun",
+    "createButton": "Sablon Olustur",
+    "searchPlaceholder": "Sablon ara...",
+    "templateCount": "{{ count }} sablon",
+    "allCategory": "Tumunu",
+    "loading": "Sablonlar yukleniyor...",
+    "shared": "Paylasilan",
+    "personal": "Kisisel",
+    "starter": "Baslangic",
+    "by": "{{ name }} tarafindan",
+    "empty": {
+      "title": "Henuz e-posta sablonu yok",
+      "description": "Kisisellestirilmis e-postalar gondermeye baslamak icin ilk sablonunuzu olusturun.",
+      "button": "Ilk sablonunuzu olusturun"
+    },
+    "actions": {
+      "edit": "Duzenle",
+      "clone": "Kopyala",
+      "delete": "Sil"
+    }
+  },
+  "editor": {
+    "editTitle": "Sablonu Duzenle",
+    "newTitle": "Yeni Sablon",
+    "templateName": "Sablon Adi",
+    "templateNamePlaceholder": "Sablon adini girin",
+    "subjectLine": "Konu Satiri",
+    "subjectPlaceholder": "E-posta konusu (birlestirme alanlarini destekler)",
+    "category": "Kategori",
+    "categoryNone": "Yok",
+    "shared": "Paylasilan",
+    "shareTooltip": "Takimla paylas",
+    "mergeFields": "Birlestirme Alanlari",
+    "mergeFieldsTooltip": "Birlestirme alanlarini gezin",
+    "preview": "Onizleme",
+    "previewTooltip": "Sablonu ornek veya gercek veriyle onizleyin",
+    "save": "Kaydet",
+    "backTooltip": "Sablonlara don"
+  },
+  "preview": {
+    "title": "Sablon Onizleme",
+    "desktopTooltip": "Masaustu (600px)",
+    "mobileTooltip": "Mobil (320px)",
+    "previewWith": "Su sekilde onizle:",
+    "sampleData": "Ornek Veri",
+    "refreshTooltip": "Onizlemeyi yenile",
+    "sendTest": "Test Gonder",
+    "subject": "Konu",
+    "loading": "Onizleme yukleniyor..."
+  },
+  "clone": {
+    "title": "Sablonu Kopyala",
+    "prompt": "Kopyalanan sablon icin bir ad girin:",
+    "nameLabel": "Sablon Adi",
+    "button": "Kopyala"
+  },
+  "mergePanel": {
+    "title": "Birlestirme Alanlari",
+    "closeTooltip": "Paneli kapat",
+    "hint": "Kopyalamak icin bir alana tiklayin. Ayrica Unlayer arac cubugu acilir menusunu veya otomatik tamamlama icin editorde <code>{{</code> yazabilirsiniz.",
+    "custom": "Ozel",
+    "fallbackHint": "Varsayilan degerleri su sekilde ayarlayin: <code>{{ alan | default: 'varsayilan' }}</code>"
+  },
+  "messages": {
+    "saved": "Sablon basariyla kaydedildi",
+    "created": "Sablon basariyla olusturuldu",
+    "cloned": "Sablon basariyla kopyalandi",
+    "deleted": "Sablon silindi",
+    "nameRequired": "Sablon adi gereklidir",
+    "saveBeforePreview": "Onizleme yapmadan once lutfen sablonu kaydedin",
+    "previewFailed": "Onizleme yuklenemedi",
+    "testSent": "Test e-postasi gelen kutunuza gonderildi!",
+    "testFailed": "Test e-postasi gonderilemedi",
+    "copiedTag": "{{ tag }} kopyalandi -- editore yapistirin veya eklemek icin Unlayer arac cubugunu kullanin"
+  }
+}

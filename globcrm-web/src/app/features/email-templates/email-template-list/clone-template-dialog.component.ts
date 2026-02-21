@@ -8,6 +8,7 @@ import {
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface CloneTemplateDialogData {
   originalName: string;
@@ -29,25 +30,26 @@ export interface CloneTemplateDialogResult {
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>Clone Template</h2>
+    <h2 mat-dialog-title>{{ 'email-templates.clone.title' | transloco }}</h2>
     <mat-dialog-content>
-      <p>Enter a name for the cloned template:</p>
+      <p>{{ 'email-templates.clone.prompt' | transloco }}</p>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Template Name</mat-label>
+        <mat-label>{{ 'email-templates.clone.nameLabel' | transloco }}</mat-label>
         <input matInput [(ngModel)]="cloneName" (keydown.enter)="confirm()" />
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
       <button
         mat-raised-button
         color="primary"
         [disabled]="!cloneName.trim()"
         (click)="confirm()"
       >
-        Clone
+        {{ 'email-templates.clone.button' | transloco }}
       </button>
     </mat-dialog-actions>
   `,
