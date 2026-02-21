@@ -14,6 +14,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import {
@@ -68,6 +69,7 @@ import { ContactSummaryDto } from '../../../shared/components/summary-tab/summar
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   templateUrl: './contact-detail.component.html',
   styleUrl: './contact-detail.component.scss',
@@ -87,6 +89,7 @@ export class ContactDetailComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Contact detail data. */
   contact = signal<ContactDetailDto | null>(null);
@@ -171,8 +174,8 @@ export class ContactDetailComponent implements OnInit {
         // Check if the response is a merged-record redirect
         if (response?.isMerged && response?.mergedIntoId) {
           this.snackBar.open(
-            'This contact was merged into another record. Redirecting...',
-            'Close',
+            this.transloco.translate('messages.mergedRedirect'),
+            this.transloco.translate('common.close'),
             { duration: 3000 }
           );
           this.router.navigate(['/contacts', response.mergedIntoId], {
@@ -462,16 +465,16 @@ export class ContactDetailComponent implements OnInit {
             .subscribe({
               next: () => {
                 this.snackBar.open(
-                  `Contact enrolled in ${selectedSequence.name}.`,
-                  'Close',
+                  this.transloco.translate('messages.enrolledInSequence', { name: selectedSequence.name }),
+                  this.transloco.translate('common.close'),
                   { duration: 3000 },
                 );
                 this.markSummaryDirty();
               },
               error: (err) => {
                 this.snackBar.open(
-                  err?.message ?? 'Failed to enroll contact.',
-                  'Close',
+                  err?.message ?? this.transloco.translate('messages.enrollFailed'),
+                  this.transloco.translate('common.close'),
                   { duration: 5000 },
                 );
               },

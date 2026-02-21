@@ -1,10 +1,10 @@
 <div class="entity-form-container">
   @if (!dialogMode()) {
     <div class="form-header">
-      <a mat-icon-button routerLink="/contacts" aria-label="Back to contacts">
+      <a mat-icon-button routerLink="/contacts" [attr.aria-label]="'form.backToContacts' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ isEditMode ? 'Edit Contact' : 'New Contact' }}</h1>
+      <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
     </div>
   }
 
@@ -18,14 +18,14 @@
       <div class="duplicate-warning">
         <mat-icon>warning</mat-icon>
         <div class="duplicate-warning__content">
-          <strong>Potential duplicates found:</strong>
+          <strong>{{ 'form.duplicates.title' | transloco }}</strong>
           @for (match of potentialDuplicates(); track match.id) {
             <div class="duplicate-warning__match">
               <a [routerLink]="['/contacts', match.id]" target="_blank">
                 {{ match.fullName }}
               </a>
               <span class="duplicate-warning__details">
-                {{ match.email ? '(' + match.email + ')' : '' }} -- {{ match.score }}% match
+                {{ match.email ? '(' + match.email + ')' : '' }} -- {{ match.score }}{{ 'form.duplicates.matchPercent' | transloco }}
               </span>
             </div>
           }
@@ -40,62 +40,62 @@
     <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
       <div class="form-grid">
         <mat-form-field appearance="outline">
-          <mat-label>First Name</mat-label>
+          <mat-label>{{ 'form.fields.firstName' | transloco }}</mat-label>
           <input matInput formControlName="firstName" required
                  (blur)="onNameOrEmailBlur()">
           @if (contactForm.controls['firstName'].hasError('required')) {
-            <mat-error>First name is required</mat-error>
+            <mat-error>{{ 'form.validation.firstNameRequired' | transloco }}</mat-error>
           }
           @if (contactForm.controls['firstName'].hasError('maxlength')) {
-            <mat-error>First name cannot exceed 100 characters</mat-error>
+            <mat-error>{{ 'form.validation.firstNameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Last Name</mat-label>
+          <mat-label>{{ 'form.fields.lastName' | transloco }}</mat-label>
           <input matInput formControlName="lastName" required
                  (blur)="onNameOrEmailBlur()">
           @if (contactForm.controls['lastName'].hasError('required')) {
-            <mat-error>Last name is required</mat-error>
+            <mat-error>{{ 'form.validation.lastNameRequired' | transloco }}</mat-error>
           }
           @if (contactForm.controls['lastName'].hasError('maxlength')) {
-            <mat-error>Last name cannot exceed 100 characters</mat-error>
+            <mat-error>{{ 'form.validation.lastNameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
+          <mat-label>{{ 'form.fields.email' | transloco }}</mat-label>
           <input matInput formControlName="email" type="email"
                  (blur)="onNameOrEmailBlur()">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Phone</mat-label>
+          <mat-label>{{ 'form.fields.phone' | transloco }}</mat-label>
           <input matInput formControlName="phone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Mobile Phone</mat-label>
+          <mat-label>{{ 'form.fields.mobilePhone' | transloco }}</mat-label>
           <input matInput formControlName="mobilePhone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Job Title</mat-label>
+          <mat-label>{{ 'form.fields.jobTitle' | transloco }}</mat-label>
           <input matInput formControlName="jobTitle">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Department</mat-label>
+          <mat-label>{{ 'form.fields.department' | transloco }}</mat-label>
           <input matInput formControlName="department">
         </mat-form-field>
 
         <!-- Company autocomplete selector -->
         <mat-form-field appearance="outline" class="company-field">
-          <mat-label>Company</mat-label>
+          <mat-label>{{ 'form.fields.company' | transloco }}</mat-label>
           <input matInput
                  [formControl]="companySearchControl"
                  [matAutocomplete]="companyAuto"
-                 placeholder="Search companies...">
+                 [placeholder]="'form.fields.companySearchPlaceholder' | transloco">
           <mat-autocomplete #companyAuto="matAutocomplete"
                             [displayWith]="displayCompanyName"
                             (optionSelected)="onCompanySelected($event)">
@@ -120,39 +120,39 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Address</mat-label>
+          <mat-label>{{ 'form.fields.address' | transloco }}</mat-label>
           <input matInput formControlName="address">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>City</mat-label>
+          <mat-label>{{ 'form.fields.city' | transloco }}</mat-label>
           <input matInput formControlName="city">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>State / Region</mat-label>
+          <mat-label>{{ 'form.fields.state' | transloco }}</mat-label>
           <input matInput formControlName="state">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Country</mat-label>
+          <mat-label>{{ 'form.fields.country' | transloco }}</mat-label>
           <input matInput formControlName="country">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Postal Code</mat-label>
+          <mat-label>{{ 'form.fields.postalCode' | transloco }}</mat-label>
           <input matInput formControlName="postalCode">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'form.fields.description' | transloco }}</mat-label>
           <textarea matInput formControlName="description" rows="3"></textarea>
         </mat-form-field>
       </div>
 
       <!-- Custom fields -->
       <div class="custom-fields-section">
-        <h3>Custom Fields</h3>
+        <h3>{{ 'form.sections.customFields' | transloco }}</h3>
         <app-custom-field-form
           [entityType]="'Contact'"
           [customFieldValues]="existingCustomFields"
@@ -162,13 +162,13 @@
       <!-- Form actions -->
       @if (!dialogMode()) {
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/contacts">Cancel</button>
+          <button mat-button type="button" routerLink="/contacts">{{ 'common.cancel' | transloco }}</button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="contactForm.invalid || isSaving()">
             @if (isSaving()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ isEditMode ? 'Save Changes' : 'Create Contact' }}
+            {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createContact' | transloco) }}
           </button>
         </div>
       }

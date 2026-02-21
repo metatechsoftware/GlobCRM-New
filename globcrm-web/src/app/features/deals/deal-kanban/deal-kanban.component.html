@@ -1,7 +1,7 @@
 <div class="kanban-layout">
   <!-- Header toolbar -->
   <div class="kanban-header">
-    <h1>Deals</h1>
+    <h1>{{ 'kanban.title' | transloco }}</h1>
 
     <div class="header-actions">
       <!-- Pipeline selector -->
@@ -9,7 +9,7 @@
         <mat-select
           [value]="selectedPipelineId()"
           (selectionChange)="onPipelineChanged($event.value)"
-          placeholder="Select Pipeline">
+          [placeholder]="'kanban.selectPipeline' | transloco">
           @for (pipeline of pipelines(); track pipeline.id) {
             <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
           }
@@ -21,7 +21,7 @@
         [checked]="includeTerminal()"
         (change)="onTerminalToggled($event.checked)"
         class="terminal-toggle">
-        Show Closed
+        {{ 'kanban.showClosed' | transloco }}
       </mat-slide-toggle>
 
       <!-- View mode switcher -->
@@ -41,7 +41,7 @@
       <button mat-raised-button color="primary"
               *appHasPermission="'Deal:Create'"
               routerLink="/deals/new">
-        <mat-icon>add</mat-icon> New Deal
+        <mat-icon>add</mat-icon> {{ 'list.addDeal' | transloco }}
       </button>
     </div>
   </div>
@@ -139,7 +139,7 @@
               </div>
             }
             @if (stage.deals.length === 0) {
-              <div class="column-empty">No deals in this stage</div>
+              <div class="column-empty">{{ 'kanban.noDeals' | transloco }}</div>
             }
           </div>
         </div>
@@ -148,8 +148,8 @@
   } @else if (!isLoading()) {
     <div class="kanban-empty">
       <mat-icon class="empty-icon">view_kanban</mat-icon>
-      <p>Select a pipeline to view the Kanban board</p>
-      <p class="empty-subtext">Choose a pipeline from the dropdown above</p>
+      <p>{{ 'kanban.emptyTitle' | transloco }}</p>
+      <p class="empty-subtext">{{ 'kanban.emptySubtext' | transloco }}</p>
     </div>
   }
 </div>

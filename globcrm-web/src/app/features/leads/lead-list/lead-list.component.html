@@ -9,8 +9,8 @@
           <mat-icon>person_search</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Leads</h1>
-          <p class="list-header__subtitle">Capture prospects, track temperature, and convert to contacts</p>
+          <h1>{{ 'list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'list.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -29,7 +29,7 @@
         <button mat-raised-button color="primary"
                 *appHasPermission="'Lead:Create'"
                 (click)="openCreateDialog()">
-          <mat-icon>add</mat-icon> New Lead
+          <mat-icon>add</mat-icon> {{ 'list.addLead' | transloco }}
         </button>
       </div>
     </div>

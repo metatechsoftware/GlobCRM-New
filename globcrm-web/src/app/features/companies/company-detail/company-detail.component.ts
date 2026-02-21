@@ -14,6 +14,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import {
@@ -67,6 +68,7 @@ import { CompanySummaryDto } from '../../../shared/components/summary-tab/summar
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   templateUrl: './company-detail.component.html',
   styleUrl: './company-detail.component.scss',
@@ -85,6 +87,7 @@ export class CompanyDetailComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Company detail data. */
   company = signal<CompanyDetailDto | null>(null);
@@ -173,7 +176,7 @@ export class CompanyDetailComponent implements OnInit {
         // Check if the response is a merged-record redirect
         if (response?.isMerged && response?.mergedIntoId) {
           this.snackBar.open(
-            'This company was merged into another record. Redirecting...',
+            this.transloco.translate('detail.mergedRedirect'),
             'Close',
             { duration: 3000 }
           );

@@ -20,6 +20,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { CompanyService } from '../company.service';
 import {
@@ -49,6 +50,7 @@ import { CompanyDuplicateMatch } from '../../duplicates/duplicate.models';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
@@ -62,6 +64,7 @@ export class CompanyFormComponent implements OnInit {
   private readonly companyService = inject(CompanyService);
   private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Dialog mode inputs/outputs. */
   dialogMode = input(false);
@@ -144,7 +147,7 @@ export class CompanyFormComponent implements OnInit {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load company data', 'Close', {
+        this.snackBar.open(this.transloco.translate('messages.companyLoadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -222,14 +225,14 @@ export class CompanyFormComponent implements OnInit {
       this.companyService.update(this.companyId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Company updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.companyUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/companies', this.companyId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update company', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.companyUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -257,7 +260,7 @@ export class CompanyFormComponent implements OnInit {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open('Company created successfully', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.companyCreated'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/companies', created.id]);
@@ -268,7 +271,7 @@ export class CompanyFormComponent implements OnInit {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open('Failed to create company', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.companyCreateFailed'), 'Close', {
               duration: 5000,
             });
           }

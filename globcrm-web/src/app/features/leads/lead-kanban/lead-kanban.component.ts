@@ -22,6 +22,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { LeadService } from '../lead.service';
 import {
@@ -52,6 +53,7 @@ import {
     CdkDropList,
     CdkDrag,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './lead-kanban.component.html',
   styleUrl: './lead-kanban.component.scss',
@@ -61,6 +63,7 @@ export class LeadKanbanComponent implements OnInit {
   private readonly leadService = inject(LeadService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Loaded Kanban data with stages and lead cards. */
   kanbanData = signal<LeadKanbanDto | null>(null);
@@ -114,7 +117,7 @@ export class LeadKanbanComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load Kanban data', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('messages.kanbanLoadFailed'), this.transloco.translate('common.close'), {
           duration: 3000,
         });
       },
@@ -156,8 +159,8 @@ export class LeadKanbanComponent implements OnInit {
     // Reject dropping on Converted stage -- use Convert Lead action
     if (targetStage.isConverted) {
       this.snackBar.open(
-        'Use the Convert Lead action on the detail page',
-        'Dismiss',
+        this.transloco.translate('kanban.useConvertAction'),
+        this.transloco.translate('common.close'),
         { duration: 4000 },
       );
       return;
@@ -166,8 +169,8 @@ export class LeadKanbanComponent implements OnInit {
     // Forward-only enforcement
     if (targetStage.sortOrder <= sourceStage.sortOrder) {
       this.snackBar.open(
-        'Leads can only move forward. Use Reopen to move backward.',
-        'Dismiss',
+        this.transloco.translate('kanban.forwardOnly'),
+        this.transloco.translate('common.close'),
         { duration: 4000 },
       );
       return;
@@ -195,7 +198,7 @@ export class LeadKanbanComponent implements OnInit {
           event.currentIndex,
           event.previousIndex,
         );
-        this.snackBar.open('Failed to update lead stage', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), this.transloco.translate('common.close'), {
           duration: 3000,
         });
       },

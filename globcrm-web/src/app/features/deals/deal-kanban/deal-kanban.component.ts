@@ -25,6 +25,7 @@ import {
   moveItemInArray,
   transferArrayItem,
 } from '@angular/cdk/drag-drop';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { DealService } from '../deal.service';
 import { PipelineService } from '../pipeline.service';
@@ -60,6 +61,7 @@ import {
     CdkDropList,
     CdkDrag,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   templateUrl: './deal-kanban.component.html',
   styleUrl: './deal-kanban.component.scss',
@@ -70,6 +72,7 @@ export class DealKanbanComponent implements OnInit {
   private readonly pipelineService = inject(PipelineService);
   private readonly router = inject(Router);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** All pipelines for the selector dropdown. */
   pipelines = signal<PipelineDto[]>([]);
@@ -112,7 +115,7 @@ export class DealKanbanComponent implements OnInit {
         }
       },
       error: () => {
-        this.snackBar.open('Failed to load pipelines', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('messages.pipelineLoadFailed'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -132,7 +135,7 @@ export class DealKanbanComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load Kanban data', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('messages.kanbanLoadFailed'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -181,7 +184,7 @@ export class DealKanbanComponent implements OnInit {
     // Forward-only enforcement
     if (targetStage.sortOrder <= sourceStage.sortOrder) {
       this.snackBar.open(
-        'Deals can only move forward in the pipeline.',
+        this.transloco.translate('kanban.forwardOnly'),
         'Dismiss',
         { duration: 4000 },
       );
@@ -206,7 +209,7 @@ export class DealKanbanComponent implements OnInit {
           event.currentIndex,
           event.previousIndex,
         );
-        this.snackBar.open('Failed to update deal stage', 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), 'Dismiss', {
           duration: 3000,
         });
       },

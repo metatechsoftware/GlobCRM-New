@@ -9,8 +9,8 @@
           <mat-icon>handshake</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Deals</h1>
-          <p class="list-header__subtitle">Track opportunities, pipeline stages, and revenue forecasts</p>
+          <h1>{{ 'list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'list.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -20,8 +20,8 @@
           <mat-select
             [value]="selectedPipelineId()"
             (selectionChange)="onPipelineChanged($event.value)"
-            placeholder="All Pipelines">
-            <mat-option [value]="null">All Pipelines</mat-option>
+            [placeholder]="'list.allPipelines' | transloco">
+            <mat-option [value]="null">{{ 'list.allPipelines' | transloco }}</mat-option>
             @for (pipeline of pipelines(); track pipeline.id) {
               <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
             }
@@ -45,7 +45,7 @@
         <button mat-raised-button color="primary"
                 *appHasPermission="'Deal:Create'"
                 (click)="openCreateDialog()">
-          <mat-icon>add</mat-icon> New Deal
+          <mat-icon>add</mat-icon> {{ 'list.addDeal' | transloco }}
         </button>
       </div>
     </div>

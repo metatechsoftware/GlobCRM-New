@@ -16,6 +16,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatSelectModule } from '@angular/material/select';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import {
   RelatedEntityTabsComponent,
@@ -66,6 +67,7 @@ import { LeadSummaryDto } from '../../../shared/components/summary-tab/summary.m
     EntityAttachmentsComponent,
     CustomFieldFormComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   templateUrl: './lead-detail.component.html',
   styleUrl: './lead-detail.component.scss',
@@ -80,6 +82,7 @@ export class LeadDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Lead detail data. */
   lead = signal<LeadDetailDto | null>(null);
@@ -199,7 +202,7 @@ export class LeadDetailComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load lead', 'Close', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('messages.leadLoadFailed'), 'Close', { duration: 5000 });
         this.router.navigate(['/leads']);
       },
     });
@@ -348,13 +351,13 @@ export class LeadDetailComponent implements OnInit {
           next: (updated) => {
             this.lead.set(updated);
             this.stageChangeInProgress.set(false);
-            this.snackBar.open(`Lead moved to ${stage.name}`, 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.stageUpdated', { stage: stage.name }), 'OK', { duration: 3000 });
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
             this.stageChangeInProgress.set(false);
-            this.snackBar.open('Failed to update stage', 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), 'Close', { duration: 5000 });
           },
         });
       }
@@ -378,12 +381,12 @@ export class LeadDetailComponent implements OnInit {
         this.leadService.reopenLead(this.leadId, firstActive.id).subscribe({
           next: (updated) => {
             this.lead.set(updated);
-            this.snackBar.open(`Lead reopened to ${firstActive.name}`, 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.leadReopened', { stage: firstActive.name }), 'OK', { duration: 3000 });
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open('Failed to reopen lead', 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('messages.leadReopenFailed'), 'Close', { duration: 5000 });
           },
         });
       }
@@ -408,7 +411,7 @@ export class LeadDetailComponent implements OnInit {
           this.loadLead();
           this.loadTimeline();
           this.markSummaryDirty();
-          this.snackBar.open('Lead converted successfully', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('messages.leadConverted'), 'OK', { duration: 3000 });
         }
       });
     });
@@ -486,11 +489,11 @@ export class LeadDetailComponent implements OnInit {
       if (confirmed) {
         this.leadService.delete(this.leadId).subscribe({
           next: () => {
-            this.snackBar.open('Lead deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.leadDeleted'), 'OK', { duration: 3000 });
             this.router.navigate(['/leads']);
           },
           error: () => {
-            this.snackBar.open('Failed to delete lead', 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('messages.leadDeleteFailed'), 'Close', { duration: 5000 });
           },
         });
       }

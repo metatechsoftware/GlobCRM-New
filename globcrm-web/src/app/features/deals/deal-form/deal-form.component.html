@@ -1,10 +1,10 @@
 <div class="entity-form-container">
   @if (!dialogMode()) {
     <div class="form-header">
-      <a mat-icon-button routerLink="/deals" aria-label="Back to deals">
+      <a mat-icon-button routerLink="/deals" [attr.aria-label]="'detail.backToDeals' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ isEditMode ? 'Edit Deal' : 'New Deal' }}</h1>
+      <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
     </div>
   }
 
@@ -16,40 +16,40 @@
     <form [formGroup]="dealForm" (ngSubmit)="onSubmit()">
       <!-- Deal Info Section -->
       <div class="form-section">
-        <h3>Deal Information</h3>
+        <h3>{{ 'form.sections.dealInfo' | transloco }}</h3>
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Title</mat-label>
+            <mat-label>{{ 'form.fields.title' | transloco }}</mat-label>
             <input matInput formControlName="title" required>
             @if (dealForm.controls['title'].hasError('required')) {
-              <mat-error>Title is required</mat-error>
+              <mat-error>{{ 'form.validation.titleRequired' | transloco }}</mat-error>
             }
             @if (dealForm.controls['title'].hasError('maxlength')) {
-              <mat-error>Title cannot exceed 500 characters</mat-error>
+              <mat-error>{{ 'form.validation.titleMaxLength' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Value</mat-label>
+            <mat-label>{{ 'form.fields.value' | transloco }}</mat-label>
             <input matInput formControlName="value" type="number" min="0">
             <span matTextPrefix>$&nbsp;</span>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Probability (%)</mat-label>
+            <mat-label>{{ 'form.fields.probability' | transloco }}</mat-label>
             <input matInput formControlName="probability" type="number" min="0" max="100">
             <span matTextSuffix>&nbsp;%</span>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Expected Close Date</mat-label>
+            <mat-label>{{ 'form.fields.expectedCloseDate' | transloco }}</mat-label>
             <input matInput [matDatepicker]="closeDatePicker" formControlName="expectedCloseDate">
             <mat-datepicker-toggle matIconSuffix [for]="closeDatePicker"></mat-datepicker-toggle>
             <mat-datepicker #closeDatePicker></mat-datepicker>
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Description</mat-label>
+            <mat-label>{{ 'form.fields.description' | transloco }}</mat-label>
             <textarea matInput formControlName="description" rows="3"></textarea>
           </mat-form-field>
         </div>
@@ -57,22 +57,22 @@
 
       <!-- Pipeline & Stage Section -->
       <div class="form-section">
-        <h3>Pipeline & Stage</h3>
+        <h3>{{ 'form.sections.pipelineStage' | transloco }}</h3>
         <div class="form-grid">
           <mat-form-field appearance="outline">
-            <mat-label>Pipeline</mat-label>
+            <mat-label>{{ 'form.fields.pipeline' | transloco }}</mat-label>
             <mat-select formControlName="pipelineId" required>
               @for (pipeline of pipelines(); track pipeline.id) {
                 <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
               }
             </mat-select>
             @if (dealForm.controls['pipelineId'].hasError('required')) {
-              <mat-error>Pipeline is required</mat-error>
+              <mat-error>{{ 'form.validation.pipelineRequired' | transloco }}</mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Stage</mat-label>
+            <mat-label>{{ 'form.fields.stage' | transloco }}</mat-label>
             <mat-select formControlName="pipelineStageId">
               @for (stage of pipelineStages(); track stage.id) {
                 <mat-option [value]="stage.id">{{ stage.name }}</mat-option>
@@ -84,15 +84,15 @@
 
       <!-- Company & Owner Section -->
       <div class="form-section">
-        <h3>Company & Owner</h3>
+        <h3>{{ 'form.sections.companyOwner' | transloco }}</h3>
         <div class="form-grid">
           <!-- Company autocomplete -->
           <mat-form-field appearance="outline">
-            <mat-label>Company</mat-label>
+            <mat-label>{{ 'form.fields.company' | transloco }}</mat-label>
             <input matInput
                    [formControl]="companySearchControl"
                    [matAutocomplete]="companyAuto"
-                   placeholder="Search companies...">
+                   [placeholder]="'form.fields.searchCompanies' | transloco">
             <mat-autocomplete #companyAuto="matAutocomplete"
                               [displayWith]="displayCompanyName"
                               (optionSelected)="onCompanySelected($event)">
@@ -118,9 +118,9 @@
 
           <!-- Owner select -->
           <mat-form-field appearance="outline">
-            <mat-label>Owner</mat-label>
+            <mat-label>{{ 'form.fields.owner' | transloco }}</mat-label>
             <mat-select formControlName="ownerId">
-              <mat-option [value]="null">Unassigned</mat-option>
+              <mat-option [value]="null">{{ 'form.fields.unassigned' | transloco }}</mat-option>
               @for (member of teamMembers(); track member.id) {
                 <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
               }
@@ -131,7 +131,7 @@
 
       <!-- Custom fields -->
       <div class="custom-fields-section">
-        <h3>Custom Fields</h3>
+        <h3>{{ 'form.sections.customFields' | transloco }}</h3>
         <app-custom-field-form
           [entityType]="'Deal'"
           [customFieldValues]="existingCustomFields"
@@ -141,13 +141,13 @@
       <!-- Form actions -->
       @if (!dialogMode()) {
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/deals">Cancel</button>
+          <button mat-button type="button" routerLink="/deals">{{ 'common.cancel' | transloco }}</button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="dealForm.invalid || isSaving()">
             @if (isSaving()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ isEditMode ? 'Save Changes' : 'Create Deal' }}
+            {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createDeal' | transloco) }}
           </button>
         </div>
       }

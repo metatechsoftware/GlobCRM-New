@@ -9,14 +9,14 @@
           <mat-icon>people</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Contacts</h1>
-          <p class="list-header__subtitle">Manage people, relationships, and communication history</p>
+          <h1>{{ 'list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'list.subtitle' | transloco }}</p>
         </div>
       </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Contact:Create'"
               (click)="openCreateDialog()">
-        <mat-icon>add</mat-icon> New Contact
+        <mat-icon>add</mat-icon> {{ 'list.addContact' | transloco }}
       </button>
     </div>
 
@@ -53,13 +53,13 @@
     <!-- Bulk Action Bar -->
     @if (selectedContacts().length > 0) {
       <div class="bulk-action-bar">
-        <span class="bulk-action-bar__count">{{ selectedContacts().length }} contact{{ selectedContacts().length !== 1 ? 's' : '' }} selected</span>
+        <span class="bulk-action-bar__count">{{ 'list.bulkCount' | transloco: { count: selectedContacts().length } }}</span>
         <button mat-flat-button color="primary" (click)="bulkEnrollInSequence()">
           <mat-icon>schedule_send</mat-icon>
-          Enroll in Sequence
+          {{ 'list.enrollInSequence' | transloco }}
         </button>
         <button mat-stroked-button (click)="clearSelection()">
-          Clear Selection
+          {{ 'list.clearSelection' | transloco }}
         </button>
       </div>
     }

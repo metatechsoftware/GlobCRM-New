@@ -1,50 +1,162 @@
 {
-  "title": "Kişiler",
+  "title": "Kisiler",
   "list": {
-    "title": "Kişiler",
-    "addContact": "Kişi Ekle",
-    "importContacts": "Kişileri İçe Aktar",
-    "empty": "Kişi bulunamadı",
-    "emptyDescription": "Başlamak için ilk kişinizi oluşturun"
+    "title": "Kisiler",
+    "subtitle": "Kisileri, iliskileri ve iletisim gecmisini yonetin",
+    "addContact": "Yeni Kisi",
+    "importContacts": "Kisileri Ice Aktar",
+    "empty": "Kisi bulunamadi",
+    "emptyDescription": "Baslamak icin ilk kisinizi olusturun",
+    "bulkCount": "{{count}} kisi secildi",
+    "enrollInSequence": "Siraya Kaydet",
+    "clearSelection": "Secimi Temizle"
   },
   "detail": {
-    "title": "Kişi Detayları",
+    "title": "Kisi Detaylari",
+    "notFound": "Kisi bulunamadi",
+    "backToContacts": "Kisilere Don",
+    "enrollInSequence": "Siraya Kaydet",
+    "sections": {
+      "contactInfo": "Iletisim Bilgileri",
+      "address": "Adres",
+      "customFields": "Ozel Alanlar"
+    },
     "tabs": {
-      "summary": "Özet",
-      "timeline": "Zaman Çizelgesi",
+      "summary": "Ozet",
+      "details": "Detaylar",
+      "company": "Sirket",
+      "deals": "Anlasmalar",
       "activities": "Aktiviteler",
-      "deals": "Fırsatlar",
+      "quotes": "Teklifler",
+      "requests": "Talepler",
       "emails": "E-postalar",
       "notes": "Notlar",
-      "attachments": "Ekler"
+      "attachments": "Ekler",
+      "timeline": "Zaman Cizelgesi"
     },
     "fields": {
       "firstName": "Ad",
       "lastName": "Soyad",
       "email": "E-posta",
       "phone": "Telefon",
-      "mobile": "Cep Telefonu",
-      "company": "Şirket",
+      "mobilePhone": "Cep Telefonu",
+      "company": "Sirket",
       "jobTitle": "Unvan",
       "department": "Departman",
-      "address": "Adres",
-      "city": "Şehir",
-      "state": "İl",
-      "country": "Ülke",
-      "zipCode": "Posta Kodu",
+      "address": "Sokak Adresi",
+      "city": "Sehir",
+      "state": "Il / Bolge",
+      "country": "Ulke",
+      "postalCode": "Posta Kodu",
       "source": "Kaynak",
       "owner": "Sahip",
       "tags": "Etiketler",
-      "description": "Açıklama",
-      "createdAt": "Oluşturulma",
-      "updatedAt": "Son Güncelleme"
-    }
+      "description": "Aciklama",
+      "createdAt": "Olusturulma",
+      "updatedAt": "Son Guncelleme"
+    },
+    "empty": {
+      "noDescription": "Aciklama yok",
+      "notSpecified": "Belirtilmemis"
+    },
+    "company": {
+      "name": "Sirket Adi",
+      "noCompany": "Bu kisiye bagli sirket yok.",
+      "linkCompany": "Sirket Bagla"
+    },
+    "deals": {
+      "viewDeals": "Anlasmalari Gor",
+      "noDeals": "Bu kisiye bagli anlasmalari goruntuleyin"
+    },
+    "activities": {
+      "noActivities": "Bu kisiye bagli aktivite yok.",
+      "createActivity": "Aktivite Olustur",
+      "columnSubject": "Konu",
+      "columnType": "Tur",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik",
+      "columnDueDate": "Son Tarih",
+      "columnAssignedTo": "Atanan Kisi"
+    },
+    "quotes": {
+      "noQuotes": "Bu kisiye bagli teklif yok.",
+      "viewAll": "Tum Teklifleri Gor",
+      "columnNumber": "Teklif #",
+      "columnTitle": "Baslik",
+      "columnStatus": "Durum",
+      "columnGrandTotal": "Genel Toplam"
+    },
+    "requests": {
+      "noRequests": "Bu kisiye bagli talep yok.",
+      "viewAll": "Tum Talepleri Gor",
+      "columnSubject": "Konu",
+      "columnStatus": "Durum",
+      "columnPriority": "Oncelik"
+    },
+    "emails": {
+      "noEmails": "Bu kisiye bagli e-posta yok.",
+      "viewAll": "Tum E-postalari Gor",
+      "columnSubject": "Konu",
+      "columnPreview": "Onizleme",
+      "columnDate": "Tarih"
+    },
+    "notes": {
+      "noNotes": "Bu kisi icin not yok.",
+      "addNote": "Not Ekle",
+      "columnTitle": "Baslik",
+      "columnPreview": "Onizleme",
+      "columnAuthor": "Yazar",
+      "columnDate": "Tarih"
+    },
+    "timeline": "Zaman Cizelgesi"
   },
   "form": {
-    "createTitle": "Kişi Oluştur",
-    "editTitle": "Kişi Düzenle",
-    "saveSuccess": "Kişi başarıyla kaydedildi",
-    "deleteConfirm": "Bu kişiyi silmek istediğinizden emin misiniz?",
-    "deleteSuccess": "Kişi başarıyla silindi"
+    "createTitle": "Yeni Kisi",
+    "editTitle": "Kisi Duzenle",
+    "backToContacts": "Kisilere don",
+    "sections": {
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobilePhone": "Cep Telefonu",
+      "jobTitle": "Unvan",
+      "department": "Departman",
+      "company": "Sirket",
+      "companySearchPlaceholder": "Sirket ara...",
+      "address": "Adres",
+      "city": "Sehir",
+      "state": "Il / Bolge",
+      "country": "Ulke",
+      "postalCode": "Posta Kodu",
+      "description": "Aciklama"
+    },
+    "validation": {
+      "firstNameRequired": "Ad zorunludur",
+      "lastNameRequired": "Soyad zorunludur",
+      "firstNameMaxLength": "Ad 100 karakteri asamaz",
+      "lastNameMaxLength": "Soyad 100 karakteri asamaz"
+    },
+    "duplicates": {
+      "title": "Olasi kopyalar bulundu:",
+      "matchPercent": "% eslesme"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createContact": "Kisi Olustur"
+  },
+  "messages": {
+    "contactCreated": "Kisi basariyla olusturuldu",
+    "contactUpdated": "Kisi basariyla guncellendi",
+    "contactCreateFailed": "Kisi olusturulamadi",
+    "contactUpdateFailed": "Kisi guncellenemedi",
+    "contactLoadFailed": "Kisi verileri yuklenemedi",
+    "mergedRedirect": "Bu kisi baska bir kayitla birlestirildi. Yonlendiriliyor...",
+    "enrolledInSequence": "Kisi {{name}} sirasina kaydedildi.",
+    "enrollFailed": "Kisi kaydedilemedi.",
+    "bulkEnrolled": "{{enrolled}} kisi {{name}} sirasina kaydedildi.",
+    "bulkEnrolledWithSkipped": "{{enrolled}} kisi {{name}} sirasina kaydedildi, {{skipped}} atlandi (zaten kayitli)."
   }
 }

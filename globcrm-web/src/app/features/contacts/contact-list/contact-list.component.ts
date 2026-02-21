@@ -23,6 +23,7 @@ import {
   ViewSort,
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -52,6 +53,7 @@ import { SequenceListItem } from '../../sequences/sequence.models';
     FilterChipsComponent,
     ViewSidebarComponent,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   providers: [ViewStore, ContactStore],
   templateUrl: './contact-list.component.html',
@@ -68,6 +70,7 @@ export class ContactListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Selected contacts for bulk actions. */
   selectedContacts = signal<any[]>([]);
@@ -305,17 +308,16 @@ export class ContactListComponent implements OnInit {
             .bulkEnroll(selectedSequence.id, { contactIds })
             .subscribe({
               next: (result) => {
-                const msg =
-                  result.skipped > 0
-                    ? `Enrolled ${result.enrolled} contacts in ${selectedSequence.name}, ${result.skipped} skipped (already enrolled).`
-                    : `Enrolled ${result.enrolled} contacts in ${selectedSequence.name}.`;
-                this.snackBar.open(msg, 'Close', { duration: 5000 });
+                const msg = result.skipped > 0
+                    ? this.transloco.translate('messages.bulkEnrolledWithSkipped', { enrolled: result.enrolled, name: selectedSequence.name, skipped: result.skipped })
+                    : this.transloco.translate('messages.bulkEnrolled', { enrolled: result.enrolled, name: selectedSequence.name });
+                this.snackBar.open(msg, this.transloco.translate('common.close'), { duration: 5000 });
                 this.selectedContacts.set([]);
               },
               error: (err) => {
                 this.snackBar.open(
-                  err?.message ?? 'Failed to enroll contacts.',
-                  'Close',
+                  err?.message ?? this.transloco.translate('messages.enrollFailed'),
+                  this.transloco.translate('common.close'),
                   { duration: 5000 },
                 );
               },

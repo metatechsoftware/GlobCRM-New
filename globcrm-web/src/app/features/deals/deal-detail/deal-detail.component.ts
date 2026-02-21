@@ -19,6 +19,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { CurrencyPipe, DatePipe, DecimalPipe } from '@angular/common';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import {
@@ -77,6 +78,7 @@ import { DealSummaryDto } from '../../../shared/components/summary-tab/summary.m
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   templateUrl: './deal-detail.component.html',
   styleUrl: './deal-detail.component.scss',
@@ -95,6 +97,7 @@ export class DealDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Deal detail data. */
   deal = signal<DealDetailDto | null>(null);
@@ -470,7 +473,7 @@ export class DealDetailComponent implements OnInit {
   linkContact(contact: ContactDto): void {
     this.dealService.linkContact(this.dealId, contact.id).subscribe({
       next: () => {
-        this.snackBar.open(`Linked ${contact.fullName}`, 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('messages.contactLinked', { name: contact.fullName }), 'OK', { duration: 3000 });
         this.showContactSearch.set(false);
         this.contactSearchTerm.set('');
         this.contactSearchResults.set([]);
@@ -479,7 +482,7 @@ export class DealDetailComponent implements OnInit {
         this.markSummaryDirty();
       },
       error: () => {
-        this.snackBar.open('Failed to link contact', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('messages.contactLinkFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -495,13 +498,13 @@ export class DealDetailComponent implements OnInit {
       if (confirmed) {
         this.dealService.unlinkContact(this.dealId, contact.id).subscribe({
           next: () => {
-            this.snackBar.open(`Unlinked ${contact.name}`, 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.contactUnlinked', { name: contact.name }), 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open('Failed to unlink contact', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.contactUnlinkFailed'), 'OK', { duration: 3000 });
           },
         });
       }
@@ -571,7 +574,7 @@ export class DealDetailComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.snackBar.open(`Linked ${product.name}`, 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('messages.productLinked', { name: product.name }), 'OK', { duration: 3000 });
           this.showProductSearch.set(false);
           this.productSearchTerm.set('');
           this.productSearchResults.set([]);
@@ -582,7 +585,7 @@ export class DealDetailComponent implements OnInit {
           this.markSummaryDirty();
         },
         error: () => {
-          this.snackBar.open('Failed to link product', 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('messages.productLinkFailed'), 'OK', { duration: 3000 });
         },
       });
   }
@@ -598,13 +601,13 @@ export class DealDetailComponent implements OnInit {
       if (confirmed) {
         this.dealService.unlinkProduct(this.dealId, product.id).subscribe({
           next: () => {
-            this.snackBar.open(`Unlinked ${product.name}`, 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.productUnlinked', { name: product.name }), 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open('Failed to unlink product', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.productUnlinkFailed'), 'OK', { duration: 3000 });
           },
         });
       }

@@ -2,49 +2,161 @@
   "title": "Contacts",
   "list": {
     "title": "Contacts",
-    "addContact": "Add Contact",
+    "subtitle": "Manage people, relationships, and communication history",
+    "addContact": "New Contact",
     "importContacts": "Import Contacts",
     "empty": "No contacts found",
-    "emptyDescription": "Create your first contact to get started"
+    "emptyDescription": "Create your first contact to get started",
+    "bulkCount": "{{count}} contact(s) selected",
+    "enrollInSequence": "Enroll in Sequence",
+    "clearSelection": "Clear Selection"
   },
   "detail": {
     "title": "Contact Details",
+    "notFound": "Contact not found",
+    "backToContacts": "Back to Contacts",
+    "enrollInSequence": "Enroll in Sequence",
+    "sections": {
+      "contactInfo": "Contact Info",
+      "address": "Address",
+      "customFields": "Custom Fields"
+    },
     "tabs": {
       "summary": "Summary",
-      "timeline": "Timeline",
-      "activities": "Activities",
+      "details": "Details",
+      "company": "Company",
       "deals": "Deals",
+      "activities": "Activities",
+      "quotes": "Quotes",
+      "requests": "Requests",
       "emails": "Emails",
       "notes": "Notes",
-      "attachments": "Attachments"
+      "attachments": "Attachments",
+      "timeline": "Timeline"
     },
     "fields": {
       "firstName": "First Name",
       "lastName": "Last Name",
       "email": "Email",
       "phone": "Phone",
-      "mobile": "Mobile",
+      "mobilePhone": "Mobile Phone",
       "company": "Company",
       "jobTitle": "Job Title",
       "department": "Department",
-      "address": "Address",
+      "address": "Street Address",
       "city": "City",
-      "state": "State",
+      "state": "State / Region",
       "country": "Country",
-      "zipCode": "Zip Code",
+      "postalCode": "Postal Code",
       "source": "Source",
       "owner": "Owner",
       "tags": "Tags",
       "description": "Description",
       "createdAt": "Created",
       "updatedAt": "Last Updated"
-    }
+    },
+    "empty": {
+      "noDescription": "No description",
+      "notSpecified": "Not specified"
+    },
+    "company": {
+      "name": "Company Name",
+      "noCompany": "No company linked to this contact.",
+      "linkCompany": "Link Company"
+    },
+    "deals": {
+      "viewDeals": "View Deals",
+      "noDeals": "View deals linked to this contact"
+    },
+    "activities": {
+      "noActivities": "No activities linked to this contact.",
+      "createActivity": "Create Activity",
+      "columnSubject": "Subject",
+      "columnType": "Type",
+      "columnStatus": "Status",
+      "columnPriority": "Priority",
+      "columnDueDate": "Due Date",
+      "columnAssignedTo": "Assigned To"
+    },
+    "quotes": {
+      "noQuotes": "No quotes linked to this contact.",
+      "viewAll": "View All Quotes",
+      "columnNumber": "Quote #",
+      "columnTitle": "Title",
+      "columnStatus": "Status",
+      "columnGrandTotal": "Grand Total"
+    },
+    "requests": {
+      "noRequests": "No requests linked to this contact.",
+      "viewAll": "View All Requests",
+      "columnSubject": "Subject",
+      "columnStatus": "Status",
+      "columnPriority": "Priority"
+    },
+    "emails": {
+      "noEmails": "No emails linked to this contact.",
+      "viewAll": "View All Emails",
+      "columnSubject": "Subject",
+      "columnPreview": "Preview",
+      "columnDate": "Date"
+    },
+    "notes": {
+      "noNotes": "No notes for this contact.",
+      "addNote": "Add Note",
+      "columnTitle": "Title",
+      "columnPreview": "Preview",
+      "columnAuthor": "Author",
+      "columnDate": "Date"
+    },
+    "timeline": "Timeline"
   },
   "form": {
-    "createTitle": "Create Contact",
+    "createTitle": "New Contact",
     "editTitle": "Edit Contact",
-    "saveSuccess": "Contact saved successfully",
-    "deleteConfirm": "Are you sure you want to delete this contact?",
-    "deleteSuccess": "Contact deleted successfully"
+    "backToContacts": "Back to contacts",
+    "sections": {
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "mobilePhone": "Mobile Phone",
+      "jobTitle": "Job Title",
+      "department": "Department",
+      "company": "Company",
+      "companySearchPlaceholder": "Search companies...",
+      "address": "Address",
+      "city": "City",
+      "state": "State / Region",
+      "country": "Country",
+      "postalCode": "Postal Code",
+      "description": "Description"
+    },
+    "validation": {
+      "firstNameRequired": "First name is required",
+      "lastNameRequired": "Last name is required",
+      "firstNameMaxLength": "First name cannot exceed 100 characters",
+      "lastNameMaxLength": "Last name cannot exceed 100 characters"
+    },
+    "duplicates": {
+      "title": "Potential duplicates found:",
+      "matchPercent": "% match"
+    },
+    "saveChanges": "Save Changes",
+    "createContact": "Create Contact"
+  },
+  "messages": {
+    "contactCreated": "Contact created successfully",
+    "contactUpdated": "Contact updated successfully",
+    "contactCreateFailed": "Failed to create contact",
+    "contactUpdateFailed": "Failed to update contact",
+    "contactLoadFailed": "Failed to load contact data",
+    "mergedRedirect": "This contact was merged into another record. Redirecting...",
+    "enrolledInSequence": "Contact enrolled in {{name}}.",
+    "enrollFailed": "Failed to enroll contact.",
+    "bulkEnrolled": "Enrolled {{enrolled}} contacts in {{name}}.",
+    "bulkEnrolledWithSkipped": "Enrolled {{enrolled}} contacts in {{name}}, {{skipped}} skipped (already enrolled)."
   }
 }

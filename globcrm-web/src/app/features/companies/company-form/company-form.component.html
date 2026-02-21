@@ -1,10 +1,10 @@
 <div class="entity-form-container">
   @if (!dialogMode()) {
     <div class="form-header">
-      <a mat-icon-button routerLink="/companies" aria-label="Back to companies">
+      <a mat-icon-button routerLink="/companies" [attr.aria-label]="'detail.backToCompanies' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ isEditMode ? 'Edit Company' : 'New Company' }}</h1>
+      <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
     </div>
   }
 
@@ -18,14 +18,14 @@
       <div class="duplicate-warning">
         <mat-icon>warning</mat-icon>
         <div class="duplicate-warning__content">
-          <strong>Potential duplicates found:</strong>
+          <strong>{{ 'form.duplicates.title' | transloco }}</strong>
           @for (match of potentialDuplicates(); track match.id) {
             <div class="duplicate-warning__match">
               <a [routerLink]="['/companies', match.id]" target="_blank">
                 {{ match.name }}
               </a>
               <span class="duplicate-warning__details">
-                {{ match.website ? '(' + match.website + ')' : '' }} -- {{ match.score }}% match
+                {{ match.website ? '(' + match.website + ')' : '' }} -- {{ match.score }}{{ 'form.duplicates.matchPercent' | transloco }}
               </span>
             </div>
           }
@@ -40,77 +40,77 @@
     <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
       <div class="form-grid">
         <mat-form-field appearance="outline">
-          <mat-label>Company Name</mat-label>
+          <mat-label>{{ 'form.fields.companyName' | transloco }}</mat-label>
           <input matInput formControlName="name" required
                  (blur)="onNameOrWebsiteBlur()">
           @if (companyForm.controls['name'].hasError('required')) {
-            <mat-error>Company name is required</mat-error>
+            <mat-error>{{ 'form.validation.nameRequired' | transloco }}</mat-error>
           }
           @if (companyForm.controls['name'].hasError('maxlength')) {
-            <mat-error>Company name cannot exceed 200 characters</mat-error>
+            <mat-error>{{ 'form.validation.nameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Industry</mat-label>
+          <mat-label>{{ 'form.fields.industry' | transloco }}</mat-label>
           <input matInput formControlName="industry">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Website</mat-label>
+          <mat-label>{{ 'form.fields.website' | transloco }}</mat-label>
           <input matInput formControlName="website"
                  (blur)="onNameOrWebsiteBlur()">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Phone</mat-label>
+          <mat-label>{{ 'form.fields.phone' | transloco }}</mat-label>
           <input matInput formControlName="phone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
+          <mat-label>{{ 'form.fields.email' | transloco }}</mat-label>
           <input matInput formControlName="email" type="email">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Company Size</mat-label>
+          <mat-label>{{ 'form.fields.companySize' | transloco }}</mat-label>
           <input matInput formControlName="size">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Address</mat-label>
+          <mat-label>{{ 'form.fields.address' | transloco }}</mat-label>
           <input matInput formControlName="address">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>City</mat-label>
+          <mat-label>{{ 'form.fields.city' | transloco }}</mat-label>
           <input matInput formControlName="city">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>State / Region</mat-label>
+          <mat-label>{{ 'form.fields.stateRegion' | transloco }}</mat-label>
           <input matInput formControlName="state">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Country</mat-label>
+          <mat-label>{{ 'form.fields.country' | transloco }}</mat-label>
           <input matInput formControlName="country">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>Postal Code</mat-label>
+          <mat-label>{{ 'form.fields.postalCode' | transloco }}</mat-label>
           <input matInput formControlName="postalCode">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Description</mat-label>
+          <mat-label>{{ 'form.fields.description' | transloco }}</mat-label>
           <textarea matInput formControlName="description" rows="3"></textarea>
         </mat-form-field>
       </div>
 
       <!-- Custom fields -->
       <div class="custom-fields-section">
-        <h3>Custom Fields</h3>
+        <h3>{{ 'form.sections.customFields' | transloco }}</h3>
         <app-custom-field-form
           [entityType]="'Company'"
           [customFieldValues]="existingCustomFields"
@@ -120,13 +120,13 @@
       <!-- Form actions -->
       @if (!dialogMode()) {
         <div class="form-actions">
-          <button mat-button type="button" routerLink="/companies">Cancel</button>
+          <button mat-button type="button" routerLink="/companies">{{ 'common.cancel' | transloco }}</button>
           <button mat-raised-button color="primary" type="submit"
                   [disabled]="companyForm.invalid || isSaving()">
             @if (isSaving()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ isEditMode ? 'Save Changes' : 'Create Company' }}
+            {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createCompany' | transloco) }}
           </button>
         </div>
       }

@@ -13,6 +13,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { FullCalendarModule } from '@fullcalendar/angular';
 import { CalendarOptions, EventInput } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
@@ -39,6 +40,7 @@ import { PipelineDto, DealListDto } from '../deal.models';
     MatButtonToggleModule,
     MatProgressBarModule,
     FullCalendarModule,
+    TranslocoPipe,
   ],
   templateUrl: './deal-calendar.component.html',
   styleUrl: './deal-calendar.component.scss',

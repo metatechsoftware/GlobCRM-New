@@ -24,6 +24,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Subject, takeUntil } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { LeadService } from '../lead.service';
@@ -61,6 +62,7 @@ import {
     MatProgressSpinnerModule,
     MatSnackBarModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
@@ -75,6 +77,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
   private readonly profileService = inject(ProfileService);
   private readonly authStore = inject(AuthStore);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Dialog mode inputs/outputs. */
   dialogMode = input(false);
@@ -185,7 +188,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       next: (lead) => {
         // Redirect if lead is converted (cannot edit)
         if (lead.isConverted) {
-          this.snackBar.open('Cannot edit a converted lead', 'Close', { duration: 5000 });
+          this.snackBar.open(this.transloco.translate('form.validation.cannotEditConverted'), this.transloco.translate('common.close'), { duration: 5000 });
           this.router.navigate(['/leads', this.leadId]);
           return;
         }
@@ -210,7 +213,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load lead data', 'Close', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('messages.leadDataLoadFailed'), this.transloco.translate('common.close'), { duration: 5000 });
       },
     });
   }
@@ -247,12 +250,12 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       this.leadService.update(this.leadId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Lead updated successfully', 'Close', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('messages.leadUpdated'), this.transloco.translate('common.close'), { duration: 3000 });
           this.router.navigate(['/leads', this.leadId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update lead', 'Close', { duration: 5000 });
+          this.snackBar.open(this.transloco.translate('messages.leadUpdateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
         },
       });
     } else {
@@ -278,7 +281,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open('Lead created successfully', 'Close', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('messages.leadCreated'), this.transloco.translate('common.close'), { duration: 3000 });
             this.router.navigate(['/leads', created.id]);
           }
         },
@@ -287,7 +290,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open('Failed to create lead', 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('messages.leadCreateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
           }
         },
       });

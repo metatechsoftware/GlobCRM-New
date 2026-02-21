@@ -34,6 +34,7 @@ import {
   takeUntil,
   of,
 } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { DealService } from '../deal.service';
 import { PipelineService } from '../pipeline.service';
@@ -74,6 +75,7 @@ import {
     MatSnackBarModule,
     MatAutocompleteModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
@@ -89,6 +91,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
   private readonly companyService = inject(CompanyService);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Dialog mode inputs/outputs. */
   dialogMode = input(false);
@@ -298,7 +301,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load deal data', 'Close', {
+        this.snackBar.open(this.transloco.translate('messages.dealLoadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -357,14 +360,14 @@ export class DealFormComponent implements OnInit, OnDestroy {
       this.dealService.update(this.dealId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Deal updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.dealUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/deals', this.dealId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update deal', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.dealUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -389,7 +392,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open('Deal created successfully', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.dealCreated'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/deals', created.id]);
@@ -400,7 +403,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open('Failed to create deal', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.dealCreateFailed'), 'Close', {
               duration: 5000,
             });
           }

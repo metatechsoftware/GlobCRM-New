@@ -36,6 +36,7 @@ import {
   takeUntil,
   of,
 } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { LeadService } from '../lead.service';
 import {
   LeadDetailDto,
@@ -72,6 +73,7 @@ import { PipelineDto } from '../../deals/deal.models';
     MatAutocompleteModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    TranslocoPipe,
   ],
   templateUrl: './lead-convert-dialog.component.html',
   styleUrl: './lead-convert-dialog.component.scss',
@@ -85,6 +87,7 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
   private readonly companyService = inject(CompanyService);
   private readonly pipelineService = inject(PipelineService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   private readonly destroy$ = new Subject<void>();
 
@@ -293,14 +296,14 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
     // Validate company section
     if (this.createCompanyEnabled() && this.companyMode() === 'create') {
       if (!companyFv.newCompanyName?.trim()) {
-        this.snackBar.open('Company name is required when creating a new company', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('convert.companyNameRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
 
     if (this.createCompanyEnabled() && this.companyMode() === 'link') {
       if (!this.selectedCompanyId()) {
-        this.snackBar.open('Please select an existing company to link', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('convert.selectCompanyRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
@@ -308,7 +311,7 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
     // Validate deal section
     if (this.createDealEnabled()) {
       if (!dealFv.dealTitle?.trim()) {
-        this.snackBar.open('Deal title is required when creating a deal', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('convert.dealTitleRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
@@ -352,7 +355,7 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isSaving.set(false);
-        this.snackBar.open('Failed to convert lead', 'Close', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('messages.leadConvertFailed'), this.transloco.translate('common.close'), { duration: 5000 });
       },
     });
   }

@@ -24,6 +24,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, takeUntil, of } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { ContactService } from '../contact.service';
 import { CompanyService } from '../../companies/company.service';
@@ -57,6 +58,7 @@ import { ContactDuplicateMatch } from '../../duplicates/duplicate.models';
     MatSnackBarModule,
     MatAutocompleteModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { '[class.dialog-mode]': 'dialogMode()' },
@@ -71,6 +73,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
   private readonly companyService = inject(CompanyService);
   private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Dialog mode inputs/outputs. */
   dialogMode = input(false);
@@ -213,7 +216,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load contact data', 'Close', {
+        this.snackBar.open(this.transloco.translate('messages.contactLoadFailed'), this.transloco.translate('common.close'), {
           duration: 5000,
         });
       },
@@ -312,14 +315,14 @@ export class ContactFormComponent implements OnInit, OnDestroy {
       this.contactService.update(this.contactId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Contact updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.contactUpdated'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
           this.router.navigate(['/contacts', this.contactId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update contact', 'Close', {
+          this.snackBar.open(this.transloco.translate('messages.contactUpdateFailed'), this.transloco.translate('common.close'), {
             duration: 5000,
           });
         },
@@ -349,7 +352,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open('Contact created successfully', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.contactCreated'), this.transloco.translate('common.close'), {
               duration: 3000,
             });
             this.router.navigate(['/contacts', created.id]);
@@ -360,7 +363,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open('Failed to create contact', 'Close', {
+            this.snackBar.open(this.transloco.translate('messages.contactCreateFailed'), this.transloco.translate('common.close'), {
               duration: 5000,
             });
           }
