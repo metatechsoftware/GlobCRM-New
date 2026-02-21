@@ -1,0 +1,168 @@
+<div class="boards-page">
+  <!-- Page Header -->
+  <div class="boards-header">
+    <div class="boards-header__text">
+      <h1 class="boards-header__title">{{ 'boards.list.title' | transloco }}</h1>
+      <p class="boards-header__subtitle">{{ 'boards.list.subtitle' | transloco }}</p>
+    </div>
+    <button class="boards-header__create-btn" (click)="openCreateDialog()">
+      <mat-icon>add</mat-icon>
+      <span>{{ 'boards.list.newBoard' | transloco }}</span>
+    </button>
+  </div>
+
+  <!-- Loading Spinner -->
+  @if (boardStore.isLoading()) {
+    <div class="boards-loading">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  } @else {
+    <!-- Empty State (no custom boards) -->
+    @if (!hasCustomBoards()) {
+      <div class="boards-empty">
+        <div class="boards-empty__card">
+          <h2 class="boards-empty__heading">{{ 'boards.empty.heading' | transloco }}</h2>
+          <p class="boards-empty__description">{{ 'boards.empty.description' | transloco }}</p>
+
+          <div class="boards-empty__templates">
+            @for (template of templates; track template.key) {
+              <button class="template-preview-card" (click)="openCreateDialog(template.key)">
+                <div class="template-preview-card__icon-wrap">
+                  <mat-icon>{{ template.icon }}</mat-icon>
+                </div>
+                <h3 class="template-preview-card__name">{{ template.nameKey | transloco }}</h3>
+                <p class="template-preview-card__desc">{{ template.descriptionKey | transloco }}</p>
+                <div class="template-preview-card__columns">
+                  @for (col of template.columns; track col) {
+                    <span class="template-preview-card__col-chip">{{ col }}</span>
+                  }
+                </div>
+              </button>
+            }
+          </div>
+
+          <button class="boards-empty__cta" (click)="openCreateDialog()">
+            <mat-icon>add</mat-icon>
+            <span>{{ 'boards.empty.createBoard' | transloco }}</span>
+          </button>
+        </div>
+      </div>
+    }
+
+    <!-- System Boards Section -->
+    <section class="boards-section">
+      <span class="boards-section__overline">{{ 'boards.list.systemBoards' | transloco }}</span>
+      <div class="boards-grid">
+        @for (sb of systemBoards; track sb.route) {
+          <button class="board-card board-card--system" (click)="navigateToSystem(sb.route)">
+            <div class="board-card__color-stripe" style="background-color: var(--orange-500)"></div>
+            <div class="board-card__body">
+              <div class="board-card__header">
+                <div class="board-card__icon-wrap board-card__icon-wrap--system">
+                  <mat-icon>{{ sb.icon }}</mat-icon>
+                </div>
+                <div class="board-card__info">
+                  <h3 class="board-card__name">{{ sb.nameKey | transloco }}</h3>
+                  <span class="board-card__system-badge">{{ 'boards.list.system' | transloco }}</span>
+                </div>
+              </div>
+              <p class="board-card__description">{{ sb.descriptionKey | transloco }}</p>
+            </div>
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- My Boards Section -->
+    @if (myBoards().length > 0) {
+      <section class="boards-section">
+        <span class="boards-section__overline">{{ 'boards.list.myBoards' | transloco }}</span>
+        <div class="boards-grid">
+          @for (board of myBoards(); track board.id) {
+            <button class="board-card" (click)="navigateToBoard(board)">
+              <div class="board-card__color-stripe" [ngStyle]="getBoardColorStyle(board)"></div>
+              <div class="board-card__body">
+                <div class="board-card__header">
+                  <div class="board-card__info">
+                    <h3 class="board-card__name">{{ board.name }}</h3>
+                  </div>
+                  <button class="board-card__menu-trigger"
+                    [matMenuTriggerFor]="boardMenu"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #boardMenu="matMenu">
+                    <button mat-menu-item (click)="deleteBoard($event, board)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{ 'boards.actions.delete' | transloco }}</span>
+                    </button>
+                  </mat-menu>
+                </div>
+                <div class="board-card__meta">
+                  <span class="board-card__badge">
+                    <mat-icon class="board-card__badge-icon">view_column</mat-icon>
+                    {{ board.columnCount }} {{ 'boards.list.columns' | transloco }}
+                  </span>
+                  <span class="board-card__badge">
+                    <mat-icon class="board-card__badge-icon">style</mat-icon>
+                    {{ board.cardCount }} {{ 'boards.list.cards' | transloco }}
+                  </span>
+                </div>
+                <div class="board-card__footer">
+                  <span class="board-card__creator">{{ board.creatorName }}</span>
+                  <span class="board-card__updated">{{ 'boards.list.updatedAt' | transloco }}: {{ board.updatedAt | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Team Boards Section -->
+    @if (teamBoards().length > 0) {
+      <section class="boards-section">
+        <span class="boards-section__overline">{{ 'boards.list.teamBoards' | transloco }}</span>
+        <div class="boards-grid">
+          @for (board of teamBoards(); track board.id) {
+            <button class="board-card" (click)="navigateToBoard(board)">
+              <div class="board-card__color-stripe" [ngStyle]="getBoardColorStyle(board)"></div>
+              <div class="board-card__body">
+                <div class="board-card__header">
+                  <div class="board-card__info">
+                    <h3 class="board-card__name">{{ board.name }}</h3>
+                  </div>
+                  <button class="board-card__menu-trigger"
+                    [matMenuTriggerFor]="teamBoardMenu"
+                    (click)="$event.stopPropagation()">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <mat-menu #teamBoardMenu="matMenu">
+                    <button mat-menu-item (click)="deleteBoard($event, board)">
+                      <mat-icon>delete</mat-icon>
+                      <span>{{ 'boards.actions.delete' | transloco }}</span>
+                    </button>
+                  </mat-menu>
+                </div>
+                <div class="board-card__meta">
+                  <span class="board-card__badge">
+                    <mat-icon class="board-card__badge-icon">view_column</mat-icon>
+                    {{ board.columnCount }} {{ 'boards.list.columns' | transloco }}
+                  </span>
+                  <span class="board-card__badge">
+                    <mat-icon class="board-card__badge-icon">style</mat-icon>
+                    {{ board.cardCount }} {{ 'boards.list.cards' | transloco }}
+                  </span>
+                </div>
+                <div class="board-card__footer">
+                  <span class="board-card__creator">{{ board.creatorName }}</span>
+                  <span class="board-card__updated">{{ 'boards.list.updatedAt' | transloco }}: {{ board.updatedAt | date:'mediumDate' }}</span>
+                </div>
+              </div>
+            </button>
+          }
+        </div>
+      </section>
+    }
+  }
+</div>

@@ -1,0 +1,374 @@
+// ---- Board Create Dialog Styles ----
+// Follows Warm Modern design system tokens
+
+.create-dialog {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  &__title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+
+    &:hover {
+      background: var(--color-elevated, var(--bg-elevated));
+    }
+  }
+
+  &__body {
+    padding: 24px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  &__step-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin: 0 0 16px;
+  }
+
+  &__back {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    padding: 4px 0;
+    margin-bottom: 16px;
+
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+    }
+
+    &:hover {
+      color: var(--text-primary);
+    }
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 16px;
+  }
+
+  &__field {
+    width: 100%;
+  }
+
+  &__field-label {
+    display: block;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+  }
+
+  &__color-section {
+    margin-bottom: 8px;
+  }
+
+  &__visibility-section {
+    margin-bottom: 8px;
+  }
+
+  &__error {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.8125rem;
+    color: var(--negative, #fb7185);
+    margin: 8px 0 0;
+  }
+
+  &__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  &__cancel-btn {
+    padding: 8px 20px;
+    border: 1px solid var(--border-default);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: border-color 0.2s, color 0.2s;
+
+    &:hover {
+      border-color: var(--border-hover);
+      color: var(--text-primary);
+    }
+  }
+
+  &__submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 24px;
+    background: var(--orange-500);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &:hover:not(:disabled) {
+      background: var(--orange-600);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  &__spinner {
+    animation: spin 1s linear infinite;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ---- Template Selection Grid ----
+
+.template-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.template-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 20px 16px;
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  background: var(--color-card, var(--bg-card));
+  cursor: pointer;
+  transition: border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &:hover {
+    border-color: var(--border-hover);
+  }
+
+  &--selected {
+    border-color: var(--orange-500);
+    background: var(--orange-glow, rgba(249, 115, 22, 0.12));
+    box-shadow: 0 0 0 3px var(--orange-glow, rgba(249, 115, 22, 0.12));
+  }
+
+  &__icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--orange-glow, rgba(249, 115, 22, 0.12));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+
+    mat-icon {
+      color: var(--orange-500);
+      font-size: 22px;
+      width: 22px;
+      height: 22px;
+    }
+  }
+
+  &__name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    margin: 0 0 4px;
+  }
+
+  &__desc {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 0 0 10px;
+    line-height: 1.5;
+  }
+
+  &__columns {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+  }
+
+  &__col-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.55rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-faint);
+    background: var(--color-surface, var(--bg-surface));
+    border: 1px solid var(--border-subtle);
+    border-radius: 100px;
+    padding: 2px 6px;
+  }
+}
+
+// ---- Selected Template Preview ----
+
+.selected-template-preview {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--orange-glow, rgba(249, 115, 22, 0.12));
+  border: 1px solid var(--orange-500);
+  border-radius: 8px;
+  flex-wrap: wrap;
+
+  &__icon {
+    color: var(--orange-500);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &__name {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+  }
+
+  &__cols {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+}
+
+// ---- Color Palette ----
+
+.color-palette {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.color-swatch {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, border-color 0.2s;
+
+  &:hover {
+    transform: scale(1.1);
+  }
+
+  &--selected {
+    border-color: var(--text-primary);
+    transform: scale(1.1);
+  }
+
+  &__check {
+    color: #fff;
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ---- Visibility Radio Group ----
+
+.visibility-group {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .visibility-option {
+    &__content {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        color: var(--text-muted);
+      }
+
+      span {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.8125rem;
+        color: var(--text-secondary);
+      }
+    }
+  }
+}
+
+// ---- Animations ----
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

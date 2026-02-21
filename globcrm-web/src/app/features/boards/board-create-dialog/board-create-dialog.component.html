@@ -1,0 +1,154 @@
+<div class="create-dialog">
+  <div class="create-dialog__header">
+    <h2 class="create-dialog__title">{{ 'boards.create.title' | transloco }}</h2>
+    <button class="create-dialog__close" (click)="cancel()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Step 1: Template Selection -->
+  @if (step() === 'template') {
+    <div class="create-dialog__body">
+      <p class="create-dialog__step-label">{{ 'boards.create.selectTemplate' | transloco }}</p>
+
+      <div class="template-grid">
+        <!-- Blank Board -->
+        <button
+          class="template-option"
+          [class.template-option--selected]="selectedTemplate() === ''"
+          (click)="selectTemplate('')">
+          <div class="template-option__icon-wrap">
+            <mat-icon>dashboard_customize</mat-icon>
+          </div>
+          <h3 class="template-option__name">{{ 'boards.templates.blank.name' | transloco }}</h3>
+          <p class="template-option__desc">{{ 'boards.templates.blank.description' | transloco }}</p>
+        </button>
+
+        <!-- Template Options -->
+        @for (template of templates; track template.key) {
+          <button
+            class="template-option"
+            [class.template-option--selected]="selectedTemplate() === template.key"
+            (click)="selectTemplate(template.key)">
+            <div class="template-option__icon-wrap">
+              <mat-icon>{{ template.icon }}</mat-icon>
+            </div>
+            <h3 class="template-option__name">{{ template.nameKey | transloco }}</h3>
+            <p class="template-option__desc">{{ template.descriptionKey | transloco }}</p>
+            <div class="template-option__columns">
+              @for (col of template.columns; track col) {
+                <span class="template-option__col-chip">{{ col }}</span>
+              }
+            </div>
+          </button>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Step 2: Board Details -->
+  @if (step() === 'details') {
+    <div class="create-dialog__body">
+      <!-- Back to templates link -->
+      <button class="create-dialog__back" (click)="goBackToTemplates()">
+        <mat-icon>arrow_back</mat-icon>
+        <span>{{ 'boards.create.selectTemplate' | transloco }}</span>
+      </button>
+
+      <!-- Selected template preview -->
+      @if (selectedTemplateObj; as tmpl) {
+        <div class="selected-template-preview">
+          <mat-icon class="selected-template-preview__icon">{{ tmpl.icon }}</mat-icon>
+          <span class="selected-template-preview__name">{{ tmpl.nameKey | transloco }}</span>
+          @if (tmpl.columns.length > 0) {
+            <span class="selected-template-preview__cols">
+              {{ 'boards.create.columnsPreview' | transloco }}: {{ tmpl.columns.join(', ') }}
+            </span>
+          }
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="create-dialog__form">
+        <!-- Name -->
+        <mat-form-field appearance="outline" class="create-dialog__field">
+          <mat-label>{{ 'boards.create.name' | transloco }}</mat-label>
+          <input matInput formControlName="name" maxlength="100" />
+          @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
+            <mat-error>{{ 'boards.create.nameRequired' | transloco }}</mat-error>
+          }
+        </mat-form-field>
+
+        <!-- Description -->
+        <mat-form-field appearance="outline" class="create-dialog__field">
+          <mat-label>{{ 'boards.create.description' | transloco }}</mat-label>
+          <textarea matInput formControlName="description" rows="3"></textarea>
+        </mat-form-field>
+
+        <!-- Color Picker -->
+        <div class="create-dialog__color-section">
+          <label class="create-dialog__field-label">{{ 'boards.create.color' | transloco }}</label>
+          <div class="color-palette">
+            @for (color of colorPresets; track color) {
+              <button
+                type="button"
+                class="color-swatch"
+                [class.color-swatch--selected]="form.get('color')?.value === color"
+                [style.background-color]="color"
+                (click)="selectColor(color)">
+                @if (form.get('color')?.value === color) {
+                  <mat-icon class="color-swatch__check">check</mat-icon>
+                }
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Visibility -->
+        <div class="create-dialog__visibility-section">
+          <label class="create-dialog__field-label">{{ 'boards.create.visibility' | transloco }}</label>
+          <mat-radio-group formControlName="visibility" class="visibility-group">
+            <mat-radio-button value="private" class="visibility-option">
+              <div class="visibility-option__content">
+                <mat-icon>lock</mat-icon>
+                <span>{{ 'boards.create.visibilityPrivate' | transloco }}</span>
+              </div>
+            </mat-radio-button>
+            <mat-radio-button value="team" class="visibility-option">
+              <div class="visibility-option__content">
+                <mat-icon>group</mat-icon>
+                <span>{{ 'boards.create.visibilityTeam' | transloco }}</span>
+              </div>
+            </mat-radio-button>
+            <mat-radio-button value="public" class="visibility-option">
+              <div class="visibility-option__content">
+                <mat-icon>public</mat-icon>
+                <span>{{ 'boards.create.visibilityPublic' | transloco }}</span>
+              </div>
+            </mat-radio-button>
+          </mat-radio-group>
+        </div>
+
+        <!-- Error message -->
+        @if (error()) {
+          <p class="create-dialog__error">{{ error() }}</p>
+        }
+      </form>
+    </div>
+
+    <!-- Footer with actions -->
+    <div class="create-dialog__footer">
+      <button class="create-dialog__cancel-btn" (click)="cancel()">
+        {{ 'boards.create.cancel' | transloco }}
+      </button>
+      <button
+        class="create-dialog__submit-btn"
+        [disabled]="form.invalid || isSubmitting()"
+        (click)="submit()">
+        @if (isSubmitting()) {
+          <mat-icon class="create-dialog__spinner">sync</mat-icon>
+        }
+        <span>{{ 'boards.create.create' | transloco }}</span>
+      </button>
+    </div>
+  }
+</div>
