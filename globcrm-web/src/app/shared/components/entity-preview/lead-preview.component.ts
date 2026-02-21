@@ -1,17 +1,18 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EntityPreviewDto } from '../../models/entity-preview.models';
 import { MiniStageBarComponent } from './mini-stage-bar.component';
 
 @Component({
   selector: 'app-lead-preview',
   standalone: true,
-  imports: [MiniStageBarComponent],
+  imports: [MiniStageBarComponent, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-fields">
       @if (data().pipelineStage; as stage) {
         <div class="field-row">
-          <span class="field-label">Stage</span>
+          <span class="field-label">{{ 'common.preview.fields.stage' | transloco }}</span>
           <span class="field-value">{{ stage.currentStageName }}</span>
         </div>
         <app-mini-stage-bar
@@ -21,25 +22,25 @@ import { MiniStageBarComponent } from './mini-stage-bar.component';
       }
       @if (data().fields['email']; as email) {
         <div class="field-row">
-          <span class="field-label">Email</span>
+          <span class="field-label">{{ 'common.preview.fields.email' | transloco }}</span>
           <a class="field-value field-link" [href]="'mailto:' + email">{{ email }}</a>
         </div>
       }
       @if (data().fields['phone']; as phone) {
         <div class="field-row">
-          <span class="field-label">Phone</span>
+          <span class="field-label">{{ 'common.preview.fields.phone' | transloco }}</span>
           <span class="field-value">{{ phone }}</span>
         </div>
       }
       @if (data().fields['companyName']; as companyName) {
         <div class="field-row">
-          <span class="field-label">Company</span>
+          <span class="field-label">{{ 'common.preview.fields.company' | transloco }}</span>
           <span class="field-value">{{ companyName }}</span>
         </div>
       }
       @if (data().fields['temperature']; as temp) {
         <div class="field-row">
-          <span class="field-label">Temperature</span>
+          <span class="field-label">{{ 'common.preview.fields.temperature' | transloco }}</span>
           <span class="field-value">
             <span class="temp-badge" [class]="'temp-' + temp.toString().toLowerCase()">{{ temp }}</span>
           </span>
@@ -47,7 +48,7 @@ import { MiniStageBarComponent } from './mini-stage-bar.component';
       }
       @if (data().fields['source']; as source) {
         <div class="field-row">
-          <span class="field-label">Source</span>
+          <span class="field-label">{{ 'common.preview.fields.source' | transloco }}</span>
           <span class="field-value">{{ source }}</span>
         </div>
       }

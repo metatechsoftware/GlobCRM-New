@@ -2,12 +2,13 @@ import { Component, ChangeDetectionStrategy, input, inject, signal, OnInit } fro
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NoteService } from '../../../features/notes/note.service';
 
 @Component({
   selector: 'app-preview-notes-tab',
   standalone: true,
-  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isLoading()) {
@@ -17,7 +18,7 @@ import { NoteService } from '../../../features/notes/note.service';
     } @else if (notes().length === 0) {
       <div class="tab-empty">
         <mat-icon>note</mat-icon>
-        <span>No notes yet</span>
+        <span>{{ 'common.preview.noNotes' | transloco }}</span>
       </div>
     } @else {
       <div class="notes-list">

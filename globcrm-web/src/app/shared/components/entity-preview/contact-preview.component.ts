@@ -1,35 +1,36 @@
 import { Component, ChangeDetectionStrategy, input, computed } from '@angular/core';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EntityPreviewDto } from '../../models/entity-preview.models';
 import { PreviewEntityLinkComponent } from './preview-entity-link.component';
 
 @Component({
   selector: 'app-contact-preview',
   standalone: true,
-  imports: [PreviewEntityLinkComponent],
+  imports: [PreviewEntityLinkComponent, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-fields">
       @if (data().fields['email']; as email) {
         <div class="field-row">
-          <span class="field-label">Email</span>
+          <span class="field-label">{{ 'common.preview.fields.email' | transloco }}</span>
           <a class="field-value field-link" [href]="'mailto:' + email">{{ email }}</a>
         </div>
       }
       @if (data().fields['phone']; as phone) {
         <div class="field-row">
-          <span class="field-label">Phone</span>
+          <span class="field-label">{{ 'common.preview.fields.phone' | transloco }}</span>
           <span class="field-value">{{ phone }}</span>
         </div>
       }
       @if (data().fields['jobTitle']; as jobTitle) {
         <div class="field-row">
-          <span class="field-label">Job Title</span>
+          <span class="field-label">{{ 'common.preview.fields.jobTitle' | transloco }}</span>
           <span class="field-value">{{ jobTitle }}</span>
         </div>
       }
       @if (data().fields['companyName']; as companyName) {
         <div class="field-row">
-          <span class="field-label">Company</span>
+          <span class="field-label">{{ 'common.preview.fields.company' | transloco }}</span>
           <span class="field-value">
             @if (companyAssociation(); as ca) {
               <app-preview-entity-link
@@ -44,7 +45,7 @@ import { PreviewEntityLinkComponent } from './preview-entity-link.component';
       }
       @if (data().fields['city']; as city) {
         <div class="field-row">
-          <span class="field-label">City</span>
+          <span class="field-label">{{ 'common.preview.fields.city' | transloco }}</span>
           <span class="field-value">{{ city }}</span>
         </div>
       }

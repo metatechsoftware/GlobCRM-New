@@ -1,35 +1,36 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { CurrencyPipe } from '@angular/common';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EntityPreviewDto } from '../../models/entity-preview.models';
 
 @Component({
   selector: 'app-product-preview',
   standalone: true,
-  imports: [CurrencyPipe],
+  imports: [CurrencyPipe, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-fields">
       @if (data().fields['unitPrice'] != null) {
         <div class="field-row">
-          <span class="field-label">Unit Price</span>
+          <span class="field-label">{{ 'common.preview.fields.unitPrice' | transloco }}</span>
           <span class="field-value">{{ data().fields['unitPrice'] | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
       }
       @if (data().fields['sku']; as sku) {
         <div class="field-row">
-          <span class="field-label">SKU</span>
+          <span class="field-label">{{ 'common.preview.fields.sku' | transloco }}</span>
           <span class="field-value">{{ sku }}</span>
         </div>
       }
       @if (data().fields['category']; as category) {
         <div class="field-row">
-          <span class="field-label">Category</span>
+          <span class="field-label">{{ 'common.preview.fields.category' | transloco }}</span>
           <span class="field-value">{{ category }}</span>
         </div>
       }
       @if (data().fields['description']; as desc) {
         <div class="field-row field-row--description">
-          <span class="field-label">Description</span>
+          <span class="field-label">{{ 'common.preview.fields.description' | transloco }}</span>
           <span class="field-value description-text">{{ truncate(desc) }}</span>
         </div>
       }

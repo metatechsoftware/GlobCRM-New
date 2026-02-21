@@ -1,16 +1,17 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { RecentActivityDto } from '../../models/entity-preview.models';
 
 @Component({
   selector: 'app-mini-timeline',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule],
+  imports: [MatIconModule, MatButtonModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-section">
-      <div class="section-title">Recent Activities</div>
+      <div class="section-title">{{ 'common.preview.recentActivities' | transloco }}</div>
       <div class="mini-timeline">
         @for (activity of activities(); track activity.id) {
           <div class="timeline-item">
@@ -31,7 +32,7 @@ import { RecentActivityDto } from '../../models/entity-preview.models';
         }
       </div>
       <button mat-button color="primary" class="view-all-btn" (click)="viewAllClick.emit()">
-        View all activities
+        {{ 'common.preview.viewAllActivities' | transloco }}
       </button>
     </div>
   `,

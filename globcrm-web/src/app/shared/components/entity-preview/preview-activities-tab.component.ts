@@ -2,12 +2,13 @@ import { Component, ChangeDetectionStrategy, input, inject, signal, OnInit } fro
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ActivityService } from '../../../features/activities/activity.service';
 
 @Component({
   selector: 'app-preview-activities-tab',
   standalone: true,
-  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (isLoading()) {
@@ -17,7 +18,7 @@ import { ActivityService } from '../../../features/activities/activity.service';
     } @else if (activities().length === 0) {
       <div class="tab-empty">
         <mat-icon>task_alt</mat-icon>
-        <span>No activities yet</span>
+        <span>{{ 'common.preview.noActivities' | transloco }}</span>
       </div>
     } @else {
       <div class="activities-list">

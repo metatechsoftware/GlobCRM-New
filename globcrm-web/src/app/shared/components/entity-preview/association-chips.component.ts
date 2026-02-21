@@ -1,17 +1,18 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AssociationChipDto, PreviewEntry } from '../../models/entity-preview.models';
 import { getEntityConfig } from '../../services/entity-type-registry';
 
 @Component({
   selector: 'app-association-chips',
   standalone: true,
-  imports: [MatChipsModule, MatIconModule],
+  imports: [MatChipsModule, MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-section">
-      <div class="section-title">Related</div>
+      <div class="section-title">{{ 'common.preview.related' | transloco }}</div>
       <mat-chip-set>
         @for (assoc of associations(); track assoc.entityType) {
           @if (assoc.count <= 3) {

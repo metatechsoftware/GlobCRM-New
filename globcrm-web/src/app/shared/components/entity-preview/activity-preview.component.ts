@@ -1,29 +1,30 @@
 import { Component, ChangeDetectionStrategy, input } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EntityPreviewDto } from '../../models/entity-preview.models';
 
 @Component({
   selector: 'app-activity-preview',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="preview-fields">
       @if (data().fields['type']; as type) {
         <div class="field-row">
-          <span class="field-label">Type</span>
+          <span class="field-label">{{ 'common.preview.fields.type' | transloco }}</span>
           <span class="field-value">{{ type }}</span>
         </div>
       }
       @if (data().fields['status']; as status) {
         <div class="field-row">
-          <span class="field-label">Status</span>
+          <span class="field-label">{{ 'common.preview.fields.status' | transloco }}</span>
           <span class="field-value">{{ status }}</span>
         </div>
       }
       @if (data().fields['priority']; as priority) {
         <div class="field-row">
-          <span class="field-label">Priority</span>
+          <span class="field-label">{{ 'common.preview.fields.priority' | transloco }}</span>
           <span class="field-value">
             <span class="priority-badge" [class]="'priority-' + priority.toString().toLowerCase()">{{ priority }}</span>
           </span>
@@ -31,7 +32,7 @@ import { EntityPreviewDto } from '../../models/entity-preview.models';
       }
       @if (data().fields['dueDate']; as dueDate) {
         <div class="field-row">
-          <span class="field-label">Due Date</span>
+          <span class="field-label">{{ 'common.preview.fields.dueDate' | transloco }}</span>
           <span class="field-value">{{ dueDate | date:'mediumDate' }}</span>
         </div>
       }
