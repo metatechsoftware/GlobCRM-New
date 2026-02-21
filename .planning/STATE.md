@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 28 of 31 (Localization String Extraction)
-Plan: 3 of 7 complete
+Plan: 6 of 7 complete
 Status: Executing Phase 28
-Last activity: 2026-02-21 — Completed 28-03 (Activities/Products/Quotes/Requests i18n)
+Last activity: 2026-02-21 — Completed 28-05 (Dashboard/My-Day/Calendar/Reports/Workflows i18n)
 
-Progress: [██████████████████░░] 89% (168/~188 plans estimated)
+Progress: [███████████████████░] 92% (171/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [██████████████████░░] 89% (16
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 166
+- Total plans completed: 169
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 9 plans across 2 phases (Phase 27-28)
+- v1.3: 12 plans across 2 phases (Phase 27-28)
 
 ## Accumulated Context
 
@@ -63,6 +63,12 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-02: Stage/source/pipeline names are API-provided data, not translated in scope JSON
 - 28-03: TranslocoService.translate() used for snackBar messages and getTransitionLabel methods (programmatic TS calls)
 - 28-03: mat-tab labels use [label] property binding with transloco pipe for dynamic translation
+- 28-05: Module-level const arrays (operators, aggregation) use labelKey pattern translated dynamically via TranslocoService.translate() at call time
+- 28-05: entityTypes/statuses arrays in workflow-list converted to computed() signals for reactive language switching
+- 28-05: Workflow node badges use TranslocoService.translate() with Record keyMap for clean translation code
+- 28-06: Settings hub data model refactored to use translation key references (titleKey/labelKey/descriptionKey)
+- 28-06: TranslocoService.translate() used in computed filteredSections for live search against translated labels
+- 28-06: Webhook/email/notifications/duplicate-rules inline templates got TranslocoPipe in imports for future template updates
 
 ### Pending Todos
 
@@ -77,6 +83,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-03-PLAN.md (Activities/Products/Quotes/Requests i18n)
-Resume file: .planning/phases/28-localization-string-extraction/28-03-SUMMARY.md
-Next step: Execute 28-04-PLAN.md
+Stopped at: Completed 28-05-PLAN.md (Dashboard/My-Day/Calendar/Reports/Workflows i18n)
+Resume file: .planning/phases/28-localization-string-extraction/28-05-SUMMARY.md
+Next step: Execute remaining plans (28-04 pending summary, 28-07)
