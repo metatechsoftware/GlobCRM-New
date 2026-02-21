@@ -107,7 +107,7 @@ Plans:
 - [x] 28-05-PLAN.md — Analytics & workflow: dashboard, my-day, calendar, reports, workflows scopes
 - [x] 28-06-PLAN.md — Users & admin: auth, onboarding, profile, import, duplicates scopes + settings extension
 - [x] 28-07-PLAN.md — CI enforcement script (key parity, hardcoded string detection, unused keys) + final audit
-- [ ] 28-08-PLAN.md — Gap closure: settings sub-pages (webhooks, custom-fields, pipelines, duplicate-rules, email-accounts, notifications) full transloco wiring
+- [x] 28-08-PLAN.md — Gap closure: settings sub-pages (webhooks, custom-fields, pipelines, duplicate-rules, email-accounts, notifications) full transloco wiring
 - [x] 28-09-PLAN.md — Gap closure: shared entity-preview + summary-tab components + misc shared components transloco wiring
 - [ ] 28-10-PLAN.md — Gap closure: remaining feature template strings + baseline regeneration + requirements update
 
@@ -183,4 +183,4 @@ Plans:
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 
-**Totals:** 31 phases, 176 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 partial), v1.3 plans TBD
+**Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 partial), v1.3 plans TBD

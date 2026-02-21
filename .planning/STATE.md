@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 28 of 31 (Localization String Extraction)
-Plan: 8 of 10 complete
+Plan: 9 of 10 complete
 Status: Executing Phase 28
-Last activity: 2026-02-21 — Completed 28-09 (Shared Entity-Preview + Summary-Tab i18n)
+Last activity: 2026-02-21 — Completed 28-08 (Settings Sub-Page i18n)
 
-Progress: [███████████████████░] 93% (176/~188 plans estimated)
+Progress: [███████████████████░] 94% (177/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 93% (17
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 176
+- Total plans completed: 177
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 14 plans across 2 phases (Phase 27-28)
+- v1.3: 15 plans across 2 phases (Phase 27-28)
 
 ## Accumulated Context
 
@@ -73,6 +73,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-09: common.preview.fields.* dedicated namespace for entity-preview field labels (separate from summaryTab)
 - 28-09: Added SKU key to preview.fields for product-preview completeness beyond original plan
 - 28-09: Added nav.expandSidebar/collapseSidebar keys for sidebar aria-labels (Rule 2 - accessibility)
+- 28-08: emailAccountSnack separate JSON section for email account snackbar messages to avoid collision with emailAccounts template keys
+- 28-08: TranslocoService.translate() with interpolation params for member add/remove snackbar messages containing user names
+- 28-08: window.confirm() disconnect prompt uses transloco.translate() for runtime i18n of browser native dialog
 
 ### Pending Todos
 
@@ -87,6 +90,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-09-PLAN.md (Shared Entity-Preview + Summary-Tab i18n)
-Resume file: .planning/phases/28-localization-string-extraction/28-09-SUMMARY.md
-Next step: Execute remaining plans (28-08, 28-10)
+Stopped at: Completed 28-08-PLAN.md (Settings Sub-Page i18n)
+Resume file: .planning/phases/28-localization-string-extraction/28-08-SUMMARY.md
+Next step: Execute remaining plan (28-10)
