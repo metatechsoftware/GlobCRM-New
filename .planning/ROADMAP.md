@@ -64,10 +64,10 @@
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
-- [x] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures (completed 2026-02-21)
+- [x] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures (completed 2026-02-21)
 - [x] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n (completed 2026-02-21)
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
-- [ ] **Phase 31: Quote PDF Templates** — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
+- [ ] **Phase 31: Quote PDF Templates** (5 plans) — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
 
 ## Phase Details
 
@@ -160,7 +160,13 @@ Plans:
   3. User can preview a template rendered with real quote data before generating, and then generate and download a PDF from a quote using a selected template
   4. User can manage multiple templates from a dedicated templates section under quotes, set one as default for new quotes, clone existing templates, and identify templates by thumbnail previews
   5. Quotes without a custom template fall back to the existing QuestPDF-generated layout, preserving backward compatibility
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 31-01-PLAN.md — Backend foundation: QuoteTemplate entity, migration, PlaywrightPdfService, Organization branding fields
+- [ ] 31-02-PLAN.md — QuoteTemplatesController CRUD + clone + set-default, QuotesController PDF update, merge data builder
+- [ ] 31-03-PLAN.md — Frontend models, service, store, Unlayer template editor (web displayMode, merge tags, page settings)
+- [ ] 31-04-PLAN.md — Template list card grid with thumbnails, routes, settings hub integration, quote detail shortcut
+- [ ] 31-05-PLAN.md — Preview dialog, PDF download, starter seed templates, i18n (EN/TR), end-to-end verification
 
 ## Progress
 
@@ -196,6 +202,6 @@ Plans:
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
 | 30. Free-Form Kanban Boards | 5/6 | In Progress|  | - |
-| 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
+| 31. Quote PDF Templates | v1.3 | 0/5 | Not started | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD
