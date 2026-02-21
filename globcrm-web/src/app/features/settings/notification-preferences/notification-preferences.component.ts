@@ -21,21 +21,6 @@ interface PreferenceRow {
   emailEnabled: boolean;
 }
 
-const NOTIFICATION_TYPE_LABELS: Record<string, string> = {
-  [NotificationType.ActivityAssigned]: 'Activity Assigned',
-  [NotificationType.DealStageChanged]: 'Deal Stage Changed',
-  [NotificationType.Mention]: 'Mentions',
-  [NotificationType.DueDateApproaching]: 'Due Date Approaching',
-  [NotificationType.EmailReceived]: 'Email Received',
-};
-
-const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
-  [NotificationType.ActivityAssigned]: 'Get notified when a task or activity is assigned to you',
-  [NotificationType.DealStageChanged]: 'Track when deals move between pipeline stages',
-  [NotificationType.Mention]: 'Know when someone mentions you in notes or comments',
-  [NotificationType.DueDateApproaching]: 'Receive reminders before tasks and activities are due',
-  [NotificationType.EmailReceived]: 'Stay informed when new emails arrive for your contacts',
-};
 
 @Component({
   selector: 'app-notification-preferences',
@@ -592,9 +577,7 @@ export class NotificationPreferencesComponent implements OnInit {
           this.preferences.set(
             prefs.map((p) => ({
               type: p.notificationType,
-              label:
-                NOTIFICATION_TYPE_LABELS[p.notificationType] ??
-                p.notificationType,
+              label: this.transloco.translate('settings.notifications.typeLabels.' + p.notificationType),
               inAppEnabled: p.inAppEnabled,
               emailEnabled: p.emailEnabled,
             }))
@@ -613,7 +596,7 @@ export class NotificationPreferencesComponent implements OnInit {
   private generateDefaults(): PreferenceRow[] {
     return Object.values(NotificationType).map((type) => ({
       type,
-      label: NOTIFICATION_TYPE_LABELS[type] ?? type,
+      label: this.transloco.translate('settings.notifications.typeLabels.' + type),
       inAppEnabled: true,
       emailEnabled: true,
     }));
@@ -655,6 +638,6 @@ export class NotificationPreferencesComponent implements OnInit {
   }
 
   getNotificationDescription(type: string): string {
-    return NOTIFICATION_TYPE_DESCRIPTIONS[type] ?? '';
+    return this.transloco.translate('settings.notifications.typeDescriptions.' + type);
   }
 }

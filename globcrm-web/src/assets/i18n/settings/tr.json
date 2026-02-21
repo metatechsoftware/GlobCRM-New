@@ -532,6 +532,20 @@
       "system": "Sistem Uyarilari",
       "systemDesc": "Onemli sistem duyurulari ve bakim bildirimleri"
     },
+    "typeLabels": {
+      "ActivityAssigned": "G\u00f6rev Atand\u0131",
+      "DealStageChanged": "Anla\u015fma A\u015famas\u0131 De\u011fi\u015fti",
+      "Mention": "Bahsetmeler",
+      "DueDateApproaching": "Yakla\u015fan Tarih",
+      "EmailReceived": "E-posta Al\u0131nd\u0131"
+    },
+    "typeDescriptions": {
+      "ActivityAssigned": "Size bir g\u00f6rev veya aktivite atand\u0131\u011f\u0131nda bildirim al\u0131n",
+      "DealStageChanged": "Anla\u015fmalar a\u015famalar aras\u0131nda ge\u00e7ti\u011finde takip edin",
+      "Mention": "Birisi sizi notlarda veya yorumlarda bahsetti\u011finde bilin",
+      "DueDateApproaching": "G\u00f6revler ve aktiviteler tamamlanmadan \u00f6nce hat\u0131rlat\u0131c\u0131 al\u0131n",
+      "EmailReceived": "Ki\u015fileriniz i\u00e7in yeni e-postalar geldi\u011finde haberdar olun"
+    },
     "saveSuccess": "Bildirim tercihleri kaydedildi.",
     "saveFailed": "Bildirim tercihleri kaydedilemedi.",
     "breadcrumb": "Ayarlar",
@@ -641,7 +655,8 @@
       "testFailed": "Baglanti testi basarisiz",
       "connectError": "{{name}} uygulamasina baglanilamadi"
     },
-    "empty": "Entegrasyon bulunamadi"
+    "empty": "Entegrasyon bulunamadi",
+    "emptyHint": "Aramanizi duzenlemeyi veya filtreleri temizlemeyi deneyin"
   },
   "emailAccountSnack": {
     "connectedSuccess": "Gmail hesabi basariyla baglandi!",

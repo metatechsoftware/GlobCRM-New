@@ -54,14 +54,24 @@
       "allCaughtUp": "Hepsi tamam!",
       "more": "+{{count}} daha fazla",
       "types": {
+        "ActivityAssigned": "Atamalar",
+        "DealStageChanged": "A\u015fama De\u011fi\u015fiklikleri",
+        "Mention": "Bahsetmeler",
+        "DueDateApproaching": "Yakla\u015fan Tarihler",
+        "EmailReceived": "E-postalar",
         "assignment": "Atamalar",
         "mention": "Bahsetmeler",
-        "status_change": "Durum Degisiklikleri",
+        "status_change": "Durum De\u011fi\u015fiklikleri",
         "comment": "Yorumlar",
-        "due_date": "Bitis Tarihleri",
-        "new_lead": "Yeni Musteriler",
-        "deal_won": "Kazanilan Firsatlar",
-        "deal_lost": "Kaybedilen Firsatlar"
+        "due_date": "Yakla\u015fan Tarihler",
+        "new_lead": "Yeni Adaylar",
+        "deal_won": "Kazan\u0131lan Anla\u015fma",
+        "deal_lost": "Kaybedilen Anla\u015fma"
+      },
+      "time": {
+        "justNow": "az \u00f6nce",
+        "minutes": "{{count}}dk",
+        "hours": "{{count}}sa"
       }
     },
     "recentRecords": {

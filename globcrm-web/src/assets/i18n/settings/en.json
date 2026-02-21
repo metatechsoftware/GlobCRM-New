@@ -532,6 +532,20 @@
       "system": "System Alerts",
       "systemDesc": "Important system announcements and maintenance"
     },
+    "typeLabels": {
+      "ActivityAssigned": "Activity Assigned",
+      "DealStageChanged": "Deal Stage Changed",
+      "Mention": "Mentions",
+      "DueDateApproaching": "Due Date Approaching",
+      "EmailReceived": "Email Received"
+    },
+    "typeDescriptions": {
+      "ActivityAssigned": "Get notified when a task or activity is assigned to you",
+      "DealStageChanged": "Track when deals move between pipeline stages",
+      "Mention": "Know when someone mentions you in notes or comments",
+      "DueDateApproaching": "Receive reminders before tasks and activities are due",
+      "EmailReceived": "Stay informed when new emails arrive for your contacts"
+    },
     "saveSuccess": "Notification preferences saved.",
     "saveFailed": "Failed to save notification preferences.",
     "breadcrumb": "Settings",
@@ -641,7 +655,8 @@
       "testFailed": "Connection test failed",
       "connectError": "Failed to connect to {{name}}"
     },
-    "empty": "No integrations found"
+    "empty": "No integrations found",
+    "emptyHint": "Try adjusting your search or clearing filters"
   },
   "emailAccountSnack": {
     "connectedSuccess": "Gmail account connected successfully!",

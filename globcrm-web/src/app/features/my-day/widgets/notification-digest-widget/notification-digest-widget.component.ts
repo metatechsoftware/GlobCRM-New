@@ -313,7 +313,8 @@ export class NotificationDigestWidgetComponent {
     const translated = this.translocoService.translate(key);
     // If translation key doesn't exist, transloco returns the key itself
     if (translated === key) {
-      return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+      // Locale-safe fallback: humanize without toUpperCase (which breaks Turkish I/i)
+      return type.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toLocaleUpperCase());
     }
     return translated;
   }
@@ -325,9 +326,10 @@ export class NotificationDigestWidgetComponent {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
 
-    if (diffMins < 1) return 'just now';
-    if (diffMins < 60) return `${diffMins}m`;
-    if (diffHours < 24) return `${diffHours}h`;
-    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    if (diffMins < 1) return this.translocoService.translate('widgets.notifications.time.justNow');
+    if (diffMins < 60) return this.translocoService.translate('widgets.notifications.time.minutes', { count: diffMins });
+    if (diffHours < 24) return this.translocoService.translate('widgets.notifications.time.hours', { count: diffHours });
+    const locale = this.translocoService.getActiveLang() === 'tr' ? 'tr-TR' : 'en-US';
+    return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
   }
 }

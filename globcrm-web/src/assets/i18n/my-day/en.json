@@ -54,6 +54,11 @@
       "allCaughtUp": "All caught up!",
       "more": "+{{count}} more",
       "types": {
+        "ActivityAssigned": "Assignments",
+        "DealStageChanged": "Stage Changes",
+        "Mention": "Mentions",
+        "DueDateApproaching": "Due Dates",
+        "EmailReceived": "Emails",
         "assignment": "Assignments",
         "mention": "Mentions",
         "status_change": "Status Changes",
@@ -62,6 +67,11 @@
         "new_lead": "New Leads",
         "deal_won": "Deals Won",
         "deal_lost": "Deals Lost"
+      },
+      "time": {
+        "justNow": "just now",
+        "minutes": "{{count}}m",
+        "hours": "{{count}}h"
       }
     },
     "recentRecords": {
