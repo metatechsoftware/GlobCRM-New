@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.3 Platform & Polish — Phase 30 (Free-form Kanban Boards)
+**Current focus:** v1.3 Platform & Polish — Phase 31 (Quote PDF Templates) ready to plan
 
 ## Current Position
 
-Phase: 30 of 31 (Free-form Kanban Boards)
-Plan: 5 of 6 complete
-Status: In progress
-Last activity: 2026-02-21 — Completed 30-05-PLAN.md (Card detail panel, board filter panel)
+Phase: 30 of 31 complete (Free-form Kanban Boards)
+Plan: 6 of 6 complete
+Status: Phase 30 complete, Phase 31 ready to plan
+Last activity: 2026-02-21 — Completed 30-06-PLAN.md (Boards i18n + feature completion)
 
-Progress: [████████████████████] 99% (190/~191 plans estimated)
+Progress: [████████████████████] 99.5% (191/~192 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 99% (19
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 190
+- Total plans completed: 191
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 29 plans across 4 phases (Phase 27-30)
+- v1.3: 30 plans across 4 phases (Phase 27-30)
 
 ## Accumulated Context
 
@@ -131,6 +131,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 30-05-PLAN.md (Card detail panel, board filter panel)
-Resume file: .planning/phases/30-free-form-kanban-boards/30-05-SUMMARY.md
-Next step: Execute 30-06-PLAN.md (Board settings, keyboard shortcuts, accessibility)
+Stopped at: Completed Phase 30 (Free-form Kanban Boards) — all 6 plans done, 30-06-SUMMARY.md written
+Resume file: .planning/phases/30-free-form-kanban-boards/30-06-SUMMARY.md
+Next step: Phase 31 (Quote PDF Templates) — needs /gsd:research-phase before planning
