@@ -36,7 +36,9 @@
       @if (state() === 'setup') {
         <div class="setup-section">
           <div class="setup-header">
-            <mat-icon class="shield-icon">shield</mat-icon>
+            <div class="state-icon-container state-icon-container--info">
+              <mat-icon>shield</mat-icon>
+            </div>
             <h3>Enable Two-Factor Authentication</h3>
             <p class="setup-description">
               Add an extra layer of security to your account. You'll need an authenticator app
@@ -52,7 +54,7 @@
           }
 
           <!-- Step 1: QR Code -->
-          <div class="setup-step">
+          <div class="setup-step anim-step-1">
             <div class="step-number">1</div>
             <div class="step-content">
               <h4>Scan this QR code with your authenticator app</h4>
@@ -79,7 +81,7 @@
           <mat-divider></mat-divider>
 
           <!-- Step 2: Verify -->
-          <div class="setup-step">
+          <div class="setup-step anim-step-2">
             <div class="step-number">2</div>
             <div class="step-content">
               <h4>Enter the code from your authenticator app</h4>
@@ -115,7 +117,9 @@
       @if (state() === 'recovery-codes') {
         <div class="recovery-section">
           <div class="recovery-header">
-            <mat-icon class="success-icon">check_circle</mat-icon>
+            <div class="state-icon-container state-icon-container--success">
+              <mat-icon>check_circle</mat-icon>
+            </div>
             <h3>Two-Factor Authentication Enabled</h3>
             <p class="recovery-description">
               Save these recovery codes in a safe place. Each code can only be used once
@@ -147,7 +151,9 @@
       @if (state() === 'enabled') {
         <div class="enabled-section">
           <div class="enabled-header">
-            <mat-icon class="enabled-icon">verified_user</mat-icon>
+            <div class="state-icon-container state-icon-container--success">
+              <mat-icon>verified_user</mat-icon>
+            </div>
             <h3>Two-Factor Authentication is Enabled</h3>
             <p class="enabled-description">
               Your account is protected with an extra layer of security.

@@ -1,94 +1,123 @@
-<div class="auth-container">
-  <mat-card class="auth-card">
-    <mat-card-header class="auth-card-header">
-      <div class="brand-header">
-        <h1 class="brand-title">GlobCRM</h1>
+<div class="auth-page">
+  <div class="auth-page__side">
+    <div class="decor-circle decor-circle--lg"></div>
+    <div class="decor-circle decor-circle--sm"></div>
+    <div class="decor-line"></div>
+    <div class="decor-dots"></div>
+
+    <div class="auth-page__side-content">
+      <div class="auth-page__brand anim-1">
+        <span class="auth-page__mark">G</span>
+        <span class="auth-page__brand-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
       </div>
-    </mat-card-header>
+      <h2 class="auth-page__tagline anim-2">One last step<br>before you're in.</h2>
+      <p class="auth-page__blurb anim-3">Verify your email to unlock the full CRM experience.</p>
+    </div>
+  </div>
 
-    <mat-card-content>
-      <!-- Confirming state (loading) -->
-      @if (state() === 'confirming') {
-        <div class="state-content">
-          <mat-spinner diameter="48"></mat-spinner>
-          <h2>Verifying your email...</h2>
-          <p class="state-subtitle">Please wait while we confirm your email address.</p>
-        </div>
-      }
-
-      <!-- Pending state (after signup) -->
-      @if (state() === 'pending') {
-        <div class="state-content">
-          <mat-icon class="state-icon pending-icon">mark_email_unread</mat-icon>
-          <h2>Check your email</h2>
-          <p class="state-subtitle">
-            @if (email()) {
-              We sent a verification link to <strong>{{ email() }}</strong>. Click the link to verify your account.
-            } @else {
-              We sent a verification link to your email address. Click the link to verify your account.
-            }
-          </p>
-
-          <div class="resend-section">
-            <p class="resend-text">Didn't receive the email?</p>
-            @if (email()) {
-              <button
-                mat-stroked-button
-                color="primary"
-                (click)="resendVerification()"
-                [disabled]="resendCooldown() > 0 || resendLoading()">
-                @if (resendLoading()) {
-                  <mat-spinner diameter="18"></mat-spinner>
-                } @else if (resendCooldown() > 0) {
-                  Resend in {{ resendCooldown() }}s
-                } @else {
-                  Resend verification email
-                }
-              </button>
-            }
+  <div class="auth-page__main">
+    <mat-card class="auth-card anim-card">
+      <mat-card-header class="auth-card-header">
+        <div class="brand-header">
+          <div class="brand-header__mobile-mark">
+            <span class="auth-page__mark auth-page__mark--sm">G</span>
+            <span class="brand-header__mobile-name">Glob<span class="auth-page__brand-accent">CRM</span></span>
           </div>
         </div>
-      }
+      </mat-card-header>
 
-      <!-- Confirmed state (success) -->
-      @if (state() === 'confirmed') {
-        <div class="state-content">
-          <mat-icon class="state-icon success-icon">check_circle</mat-icon>
-          <h2>Email verified!</h2>
-          <p class="state-subtitle">Your email has been verified successfully. You can now log in to your account.</p>
-          <a mat-flat-button color="primary" routerLink="/auth/login" class="action-button">
-            Go to Login
-          </a>
-        </div>
-      }
-
-      <!-- Error state -->
-      @if (state() === 'error') {
-        <div class="state-content">
-          <mat-icon class="state-icon error-icon">error</mat-icon>
-          <h2>Verification failed</h2>
-          <p class="state-subtitle">{{ errorMessage() }}</p>
-
-          <div class="error-actions">
-            @if (email()) {
-              <button
-                mat-stroked-button
-                color="primary"
-                (click)="resendVerification()"
-                [disabled]="resendCooldown() > 0 || resendLoading()">
-                @if (resendLoading()) {
-                  <mat-spinner diameter="18"></mat-spinner>
-                } @else if (resendCooldown() > 0) {
-                  Resend in {{ resendCooldown() }}s
-                } @else {
-                  Resend verification email
-                }
-              </button>
-            }
-            <a mat-button routerLink="/auth/login">Back to Login</a>
+      <mat-card-content>
+        <!-- Confirming state (loading) -->
+        @if (state() === 'confirming') {
+          <div class="state-content">
+            <div class="state-icon-container state-icon-container--info">
+              <mat-spinner diameter="36"></mat-spinner>
+            </div>
+            <h2>Verifying your email...</h2>
+            <p class="state-subtitle">Please wait while we confirm your email address.</p>
           </div>
-        </div>
-      }
-    </mat-card-content>
-  </mat-card>
+        }
+
+        <!-- Pending state (after signup) -->
+        @if (state() === 'pending') {
+          <div class="state-content">
+            <div class="state-icon-container state-icon-container--warning">
+              <mat-icon>mark_email_unread</mat-icon>
+            </div>
+            <h2>Check your email</h2>
+            <p class="state-subtitle">
+              @if (email()) {
+                We sent a verification link to <strong>{{ email() }}</strong>. Click the link to verify your account.
+              } @else {
+                We sent a verification link to your email address. Click the link to verify your account.
+              }
+            </p>
+
+            <div class="resend-section">
+              <p class="resend-text">Didn't receive the email?</p>
+              @if (email()) {
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="resendVerification()"
+                  [disabled]="resendCooldown() > 0 || resendLoading()">
+                  @if (resendLoading()) {
+                    <mat-spinner diameter="18"></mat-spinner>
+                  } @else if (resendCooldown() > 0) {
+                    Resend in {{ resendCooldown() }}s
+                  } @else {
+                    Resend verification email
+                  }
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Confirmed state (success) -->
+        @if (state() === 'confirmed') {
+          <div class="state-content">
+            <div class="state-icon-container state-icon-container--success">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <h2>Email verified!</h2>
+            <p class="state-subtitle">Your email has been verified successfully. You can now log in to your account.</p>
+            <a mat-flat-button color="primary" routerLink="/auth/login" class="action-button">
+              Go to Login
+            </a>
+          </div>
+        }
+
+        <!-- Error state -->
+        @if (state() === 'error') {
+          <div class="state-content">
+            <div class="state-icon-container state-icon-container--error">
+              <mat-icon>error</mat-icon>
+            </div>
+            <h2>Verification failed</h2>
+            <p class="state-subtitle">{{ errorMessage() }}</p>
+
+            <div class="error-actions">
+              @if (email()) {
+                <button
+                  mat-stroked-button
+                  color="primary"
+                  (click)="resendVerification()"
+                  [disabled]="resendCooldown() > 0 || resendLoading()">
+                  @if (resendLoading()) {
+                    <mat-spinner diameter="18"></mat-spinner>
+                  } @else if (resendCooldown() > 0) {
+                    Resend in {{ resendCooldown() }}s
+                  } @else {
+                    Resend verification email
+                  }
+                </button>
+              }
+              <a mat-button routerLink="/auth/login">Back to Login</a>
+            </div>
+          </div>
+        }
+      </mat-card-content>
+    </mat-card>
+  </div>
 </div>
