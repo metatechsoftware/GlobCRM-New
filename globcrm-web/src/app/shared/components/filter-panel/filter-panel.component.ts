@@ -11,6 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   ColumnDefinition,
   ViewFilter,
@@ -84,6 +85,7 @@ const SELECT_OPERATORS: OperatorOption[] = [
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   templateUrl: './filter-panel.component.html',
   styleUrl: './filter-panel.component.scss',

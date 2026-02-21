@@ -13,6 +13,7 @@ import { QuickActionBarComponent } from '../quick-action-bar/quick-action-bar.co
 import { MiniStageBarComponent } from '../entity-preview/mini-stage-bar.component';
 import { DealPipelineChartComponent } from './deal-pipeline-chart.component';
 import { EmailEngagementCardComponent } from './email-engagement-card.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { StageInfoDto } from '../../models/entity-preview.models';
 import {
@@ -44,6 +45,7 @@ import {
     MiniStageBarComponent,
     DealPipelineChartComponent,
     EmailEngagementCardComponent,
+    TranslocoPipe,
     HasPermissionDirective,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

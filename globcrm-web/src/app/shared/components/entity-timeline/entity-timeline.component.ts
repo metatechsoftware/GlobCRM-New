@@ -7,6 +7,7 @@ import {
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Represents a single entry in an entity timeline.
@@ -82,7 +83,7 @@ const TIMELINE_COLORS: Record<string, string> = {
 @Component({
   selector: 'app-entity-timeline',
   standalone: true,
-  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule],
+  imports: [DatePipe, MatIconModule, MatProgressSpinnerModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -210,7 +211,7 @@ const TIMELINE_COLORS: Record<string, string> = {
     } @else if (sortedEntries().length === 0) {
       <div class="timeline-empty">
         <mat-icon>history</mat-icon>
-        <span>No activity yet</span>
+        <span>{{ 'common.timeline.noEvents' | transloco }}</span>
       </div>
     } @else {
       <div class="timeline-container">

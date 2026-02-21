@@ -18,6 +18,7 @@ import {
   MatDialogRef,
   MAT_DIALOG_DATA,
 } from '@angular/material/dialog';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AttachmentService } from '../../services/attachment.service';
 import { AttachmentDto } from '../../models/attachment.models';
 
@@ -30,12 +31,12 @@ import { AttachmentDto } from '../../models/attachment.models';
 @Component({
   selector: 'app-image-preview-dialog',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatDialogModule],
+  imports: [MatButtonModule, MatIconModule, MatDialogModule, TranslocoPipe],
   template: `
     <div class="image-preview-dialog">
       <div class="dialog-header">
         <span class="dialog-title">{{ data.fileName }}</span>
-        <button mat-icon-button (click)="dialogRef.close()" aria-label="Close">
+        <button mat-icon-button (click)="dialogRef.close()" [attr.aria-label]="'common.close' | transloco">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -103,14 +104,15 @@ export class ImagePreviewDialogComponent {
     MatProgressBarModule,
     MatSnackBarModule,
     MatDialogModule,
+    TranslocoPipe,
   ],
   template: `
     <!-- Header -->
     <div class="attachments-header">
-      <h3 class="attachments-title">Attachments</h3>
+      <h3 class="attachments-title">{{ 'common.attachments.title' | transloco }}</h3>
       <button mat-flat-button color="primary" (click)="fileInput.click()" [disabled]="isUploading()">
         <mat-icon>upload_file</mat-icon>
-        Upload
+        {{ 'common.attachments.upload' | transloco }}
       </button>
       <input
         #fileInput
@@ -143,7 +145,7 @@ export class ImagePreviewDialogComponent {
       @if (attachments().length === 0) {
         <div class="empty-state">
           <mat-icon class="empty-icon">attach_file</mat-icon>
-          <span class="empty-text">No attachments</span>
+          <span class="empty-text">{{ 'common.attachments.noAttachments' | transloco }}</span>
         </div>
       } @else {
         <div class="attachment-list">
@@ -162,14 +164,14 @@ export class ImagePreviewDialogComponent {
               </div>
               <div class="attachment-actions">
                 @if (isImage(attachment.contentType)) {
-                  <button mat-icon-button (click)="openImagePreview(attachment)" title="Preview">
+                  <button mat-icon-button (click)="openImagePreview(attachment)" [title]="'common.attachments.preview' | transloco">
                     <mat-icon>visibility</mat-icon>
                   </button>
                 }
-                <button mat-icon-button (click)="onDownload(attachment)" title="Download">
+                <button mat-icon-button (click)="onDownload(attachment)" [title]="'common.attachments.download' | transloco">
                   <mat-icon>download</mat-icon>
                 </button>
-                <button mat-icon-button (click)="onDelete(attachment)" title="Delete" color="warn">
+                <button mat-icon-button (click)="onDelete(attachment)" [title]="'common.attachments.delete' | transloco" color="warn">
                   <mat-icon>delete</mat-icon>
                 </button>
               </div>
@@ -294,6 +296,7 @@ export class EntityAttachmentsComponent implements OnDestroy {
   private readonly attachmentService = inject(AttachmentService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly translocoService = inject(TranslocoService);
 
   // ─── Signals ──────────────────────────────────────────────────────────
 
@@ -334,7 +337,7 @@ export class EntityAttachmentsComponent implements OnDestroy {
         this.isLoading.set(false);
       },
       error: () => {
-        this.error.set('Failed to load attachments.');
+        this.error.set(this.translocoService.translate('common.attachments.loadFailed'));
         this.isLoading.set(false);
       },
     });
@@ -352,7 +355,7 @@ export class EntityAttachmentsComponent implements OnDestroy {
     // Validate file before upload
     const validation = this.attachmentService.validateFile(file);
     if (!validation.valid) {
-      this.snackBar.open(validation.error!, 'OK', { duration: 5000 });
+      this.snackBar.open(validation.error!, this.translocoService.translate('common.ok'), { duration: 5000 });
       return;
     }
 
@@ -365,11 +368,11 @@ export class EntityAttachmentsComponent implements OnDestroy {
         next: (newAttachment) => {
           this.attachments.update((list) => [newAttachment, ...list]);
           this.isUploading.set(false);
-          this.snackBar.open(`Uploaded ${file.name}`, 'OK', { duration: 3000 });
+          this.snackBar.open(this.translocoService.translate('common.attachments.uploaded', { name: file.name }), this.translocoService.translate('common.ok'), { duration: 3000 });
         },
         error: () => {
           this.isUploading.set(false);
-          this.snackBar.open('Failed to upload file', 'OK', { duration: 5000 });
+          this.snackBar.open(this.translocoService.translate('common.attachments.uploadFailed'), this.translocoService.translate('common.ok'), { duration: 5000 });
         },
       });
   }
@@ -387,7 +390,7 @@ export class EntityAttachmentsComponent implements OnDestroy {
         URL.revokeObjectURL(url);
       },
       error: () => {
-        this.snackBar.open('Failed to download file', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('common.attachments.downloadFailed'), this.translocoService.translate('common.ok'), { duration: 3000 });
       },
     });
   }
@@ -395,16 +398,16 @@ export class EntityAttachmentsComponent implements OnDestroy {
   // ─── Delete ───────────────────────────────────────────────────────────
 
   onDelete(attachment: AttachmentDto): void {
-    const confirmed = confirm(`Delete "${attachment.fileName}"?`);
+    const confirmed = confirm(this.translocoService.translate('common.attachments.deleteConfirm', { name: attachment.fileName }));
     if (!confirmed) return;
 
     this.attachmentService.delete(attachment.id).subscribe({
       next: () => {
         this.attachments.update((list) => list.filter((a) => a.id !== attachment.id));
-        this.snackBar.open('Attachment deleted', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('common.attachments.deleted'), this.translocoService.translate('common.ok'), { duration: 3000 });
       },
       error: () => {
-        this.snackBar.open('Failed to delete attachment', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('common.attachments.deleteFailed'), this.translocoService.translate('common.ok'), { duration: 3000 });
       },
     });
   }
@@ -430,7 +433,7 @@ export class EntityAttachmentsComponent implements OnDestroy {
         });
       },
       error: () => {
-        this.snackBar.open('Failed to load image preview', 'OK', { duration: 3000 });
+        this.snackBar.open(this.translocoService.translate('common.attachments.previewFailed'), this.translocoService.translate('common.ok'), { duration: 3000 });
       },
     });
   }

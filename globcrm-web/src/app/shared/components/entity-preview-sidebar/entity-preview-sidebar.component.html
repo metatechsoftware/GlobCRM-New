@@ -18,9 +18,9 @@
     <div class="preview-header-right">
       <button mat-button color="primary" (click)="store.openFullRecord()">
         <mat-icon>open_in_new</mat-icon>
-        Open full record
+        {{ 'common.preview.openFullRecord' | transloco }}
       </button>
-      <button mat-icon-button class="close-btn" (click)="store.close()" matTooltip="Close preview (Esc)">
+      <button mat-icon-button class="close-btn" (click)="store.close()" [matTooltip]="'common.preview.closePreview' | transloco">
         <mat-icon>close</mat-icon>
       </button>
     </div>
@@ -60,7 +60,7 @@
       <div class="preview-error">
         <mat-icon>error_outline</mat-icon>
         <p>{{ store.error() }}</p>
-        <button mat-stroked-button (click)="store.close()">Close</button>
+        <button mat-stroked-button (click)="store.close()">{{ 'common.close' | transloco }}</button>
       </div>
     } @else if (store.currentData()) {
       @if (availableTabs().length > 1) {
@@ -146,7 +146,7 @@
   <!-- Pinned Custom Fields -->
   @if (store.currentData()!.pinnedCustomFields.length > 0) {
     <div class="preview-section">
-      <div class="section-title">Custom Fields</div>
+      <div class="section-title">{{ 'common.preview.customFields' | transloco }}</div>
       @for (field of store.currentData()!.pinnedCustomFields; track field.label) {
         <div class="field-row">
           <span class="field-label">{{ field.label }}</span>

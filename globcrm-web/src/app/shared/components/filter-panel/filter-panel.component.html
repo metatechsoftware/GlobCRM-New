@@ -6,7 +6,7 @@
        [attr.aria-expanded]="isPanelOpen()"
        aria-controls="filter-panel-body">
     <mat-icon class="header-icon">filter_list</mat-icon>
-    <span class="header-title">Advanced Filters</span>
+    <span class="header-title">{{ 'common.filters.advancedFilters' | transloco }}</span>
     @if (activeFilters().length > 0) {
       <span class="badge badge--primary">{{ activeFilters().length }}</span>
     }
@@ -23,8 +23,8 @@
           <!-- Empty state -->
           <div class="filter-empty">
             <mat-icon class="filter-empty__icon">tune</mat-icon>
-            <span class="filter-empty__title">No filters applied</span>
-            <span class="filter-empty__subtitle">Add filters to narrow down your results</span>
+            <span class="filter-empty__title">{{ 'common.filters.noFilters' | transloco }}</span>
+            <span class="filter-empty__subtitle">{{ 'common.filters.addFiltersHint' | transloco }}</span>
           </div>
         } @else {
           <!-- Filter rows -->
@@ -36,7 +36,7 @@
                 <div class="filter-row__fields">
                   <!-- Field selector -->
                   <mat-form-field appearance="outline" class="filter-field">
-                    <mat-label>Field</mat-label>
+                    <mat-label>{{ 'common.filters.field' | transloco }}</mat-label>
                     <mat-select
                       [value]="filter.fieldId"
                       (selectionChange)="onFieldChange($index, $event.value)">
@@ -48,7 +48,7 @@
 
                   <!-- Operator selector -->
                   <mat-form-field appearance="outline" class="filter-operator">
-                    <mat-label>Operator</mat-label>
+                    <mat-label>{{ 'common.filters.operator' | transloco }}</mat-label>
                     <mat-select
                       [value]="filter.operator"
                       (selectionChange)="onOperatorChange($index, $event.value)">
@@ -61,7 +61,7 @@
                   <!-- Value input -->
                   @if (!isNullOperator(filter.operator)) {
                     <mat-form-field appearance="outline" class="filter-value">
-                      <mat-label>Value</mat-label>
+                      <mat-label>{{ 'common.filters.value' | transloco }}</mat-label>
                       <input matInput
                              [value]="filter.value ?? ''"
                              (input)="onValueChange($index, $any($event.target).value)">
@@ -73,7 +73,7 @@
                 <button mat-icon-button
                         class="filter-row__remove"
                         (click)="removeFilter($index)"
-                        aria-label="Remove filter">
+                        [attr.aria-label]="'common.filters.removeFilter' | transloco">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
@@ -86,21 +86,21 @@
       <div class="filter-actions">
         <button mat-stroked-button (click)="addFilter()" class="filter-actions__add">
           <mat-icon>add</mat-icon>
-          Add Filter
+          {{ 'common.filters.addFilter' | transloco }}
         </button>
         <span class="filter-actions__spacer"></span>
         <button mat-button
                 (click)="clearFilters()"
                 [disabled]="filterRows.length === 0"
                 class="filter-actions__clear">
-          Clear All
+          {{ 'common.filters.clearAll' | transloco }}
         </button>
         <button mat-flat-button
                 color="primary"
                 (click)="applyFilters()"
                 [disabled]="filterRows.length === 0"
                 class="filter-actions__apply">
-          Apply Filters
+          {{ 'common.filters.applyFilters' | transloco }}
         </button>
       </div>
     </div>

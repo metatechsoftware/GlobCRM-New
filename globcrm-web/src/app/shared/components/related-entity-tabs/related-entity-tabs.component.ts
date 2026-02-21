@@ -9,6 +9,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Configuration for a single tab in the related entity tabs component.
@@ -97,7 +98,7 @@ export const DEAL_TABS: EntityTab[] = [
 @Component({
   selector: 'app-related-entity-tabs',
   standalone: true,
-  imports: [NgTemplateOutlet, MatTabsModule, MatIconModule],
+  imports: [NgTemplateOutlet, MatTabsModule, MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     :host {
@@ -156,7 +157,7 @@ export const DEAL_TABS: EntityTab[] = [
               <mat-icon>{{ tab.icon }}</mat-icon>
               {{ tab.label }}
               @if (!tab.enabled) {
-                <span class="coming-soon">(coming soon)</span>
+                <span class="coming-soon">{{ 'common.tabs.comingSoon' | transloco }}</span>
               }
             </span>
           </ng-template>
@@ -169,7 +170,7 @@ export const DEAL_TABS: EntityTab[] = [
             } @else if (!tab.enabled) {
               <div class="disabled-tab-content">
                 <mat-icon>{{ tab.icon }}</mat-icon>
-                <span>{{ tab.label }} will be available in a future update.</span>
+                <span>{{ 'common.tabs.comingSoonMessage' | transloco:{ tab: tab.label } }}</span>
               </div>
             }
           </div>

@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTabsModule } from '@angular/material/tabs';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PreviewSidebarStore } from '../../stores/preview-sidebar.store';
 import { getEntityConfig, EntityTypeConfig } from '../../services/entity-type-registry';
 import { SlideInPanelService } from '../../services/slide-in-panel/slide-in-panel.service';
@@ -56,6 +57,7 @@ const ENTITY_TABS: Record<string, string[]> = {
     MatButtonModule,
     MatTooltipModule,
     MatTabsModule,
+    TranslocoPipe,
     PreviewSkeletonComponent,
     PreviewBreadcrumbsComponent,
     ContactPreviewComponent,

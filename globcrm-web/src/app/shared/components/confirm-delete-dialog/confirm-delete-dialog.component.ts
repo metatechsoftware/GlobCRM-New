@@ -2,20 +2,21 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-confirm-delete-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, TranslocoPipe],
   template: `
-    <h2 mat-dialog-title>Confirm Delete</h2>
+    <h2 mat-dialog-title>{{ 'common.dialog.confirmDelete' | transloco }}</h2>
     <mat-dialog-content>
-      <p>Are you sure you want to delete the {{ data.type }} "{{ data.name }}"?</p>
-      <p>This action cannot be undone.</p>
+      <p>{{ 'common.dialog.deleteWarning' | transloco:{ type: data.type, name: data.name } }}</p>
+      <p>{{ 'common.dialog.cannotBeUndone' | transloco }}</p>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Cancel</button>
-      <button mat-flat-button color="warn" [mat-dialog-close]="true">Delete</button>
+      <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
+      <button mat-flat-button color="warn" [mat-dialog-close]="true">{{ 'common.delete' | transloco }}</button>
     </mat-dialog-actions>
   `,
 })

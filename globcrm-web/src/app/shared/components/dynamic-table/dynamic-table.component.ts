@@ -28,7 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslocoService } from '@jsverse/transloco';
+import { TranslocoService, TranslocoPipe } from '@jsverse/transloco';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
 import { ColumnPickerComponent } from './column-picker.component';
 import { QuickAddFieldComponent } from './quick-add-field.component';
@@ -63,6 +63,7 @@ import {
     MatCheckboxModule,
     MatProgressBarModule,
     MatTooltipModule,
+    TranslocoPipe,
     ColumnResizeDirective,
     ColumnPickerComponent,
     QuickAddFieldComponent,
@@ -545,11 +546,11 @@ export class DynamicTableComponent {
    */
   getPageRangeSummary(): string {
     const total = this.totalCount();
-    if (total === 0) return 'No records';
+    if (total === 0) return this.translocoService.translate('common.table.noRecordsShort');
     const size = this.pageSize();
     const pageIdx = this.currentPageIndex();
     const start = pageIdx * size + 1;
     const end = Math.min(start + size - 1, total);
-    return `Showing ${start}\u2013${end} of ${total}`;
+    return this.translocoService.translate('common.table.showing', { start, end, total });
   }
 }

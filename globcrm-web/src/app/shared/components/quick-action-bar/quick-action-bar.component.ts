@@ -1,12 +1,13 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 
 @Component({
   selector: 'app-quick-action-bar',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, HasPermissionDirective],
+  imports: [MatButtonModule, MatIconModule, TranslocoPipe, HasPermissionDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="quick-action-bar">
@@ -15,14 +16,14 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
               *appHasPermission="'Note:Create'"
               (click)="addNote.emit()">
         <mat-icon>note_add</mat-icon>
-        Add Note
+        {{ 'common.quickActions.addNote' | transloco }}
       </button>
       <button mat-flat-button
               class="action-pill"
               *appHasPermission="'Activity:Create'"
               (click)="logActivity.emit()">
         <mat-icon>add_task</mat-icon>
-        Log Activity
+        {{ 'common.quickActions.logActivity' | transloco }}
       </button>
       @if (showSendEmail()) {
         <button mat-flat-button
@@ -30,7 +31,7 @@ import { HasPermissionDirective } from '../../../core/permissions/has-permission
                 *appHasPermission="'Email:Create'"
                 (click)="sendEmail.emit()">
           <mat-icon>email</mat-icon>
-          Send Email
+          {{ 'common.quickActions.sendEmail' | transloco }}
         </button>
       }
     </div>

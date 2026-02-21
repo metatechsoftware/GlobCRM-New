@@ -7,6 +7,7 @@ import {
   output,
 } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { ViewStore } from './view.store';
 import { SavedView } from './view.models';
 
@@ -17,7 +18,7 @@ import { SavedView } from './view.models';
 @Component({
   selector: 'app-view-sidebar',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [MatIconModule, TranslocoPipe],
   providers: [ViewStore],
   templateUrl: './view-sidebar.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -103,6 +104,7 @@ import { SavedView } from './view.models';
 })
 export class ViewSidebarComponent implements OnInit {
   readonly viewStore = inject(ViewStore);
+  private readonly translocoService = inject(TranslocoService);
 
   entityType = input.required<string>();
   viewSelected = output<SavedView>();
@@ -117,7 +119,7 @@ export class ViewSidebarComponent implements OnInit {
   }
 
   saveView(): void {
-    const name = prompt('Enter a name for this view:');
+    const name = prompt(this.translocoService.translate('common.views.enterViewName'));
     if (!name) return;
 
     this.viewStore.saveCurrentState(

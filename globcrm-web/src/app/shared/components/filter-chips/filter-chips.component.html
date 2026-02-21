@@ -12,9 +12,9 @@
     }
     <button class="filter-chips__clear"
             (click)="filtersCleared.emit()"
-            aria-label="Clear all filters">
+            [attr.aria-label]="'common.filters.clearAllFilters' | transloco">
       <mat-icon>clear_all</mat-icon>
-      Clear all
+      {{ 'common.filters.clearAll' | transloco }}
     </button>
   </div>
 }

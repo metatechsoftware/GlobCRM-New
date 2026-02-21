@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { NotificationStore } from '../notification.store';
 import { NotificationDto } from '../notification.models';
 
@@ -15,14 +16,14 @@ import { NotificationDto } from '../notification.models';
 @Component({
   selector: 'app-notification-center',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatBadgeModule],
+  imports: [CommonModule, MatIconModule, MatButtonModule, MatBadgeModule, TranslocoPipe],
   template: `
     <div class="notification-center">
       <button
         mat-icon-button
         class="notification-center__bell"
         (click)="store.togglePanel()"
-        aria-label="Notifications"
+        [attr.aria-label]="'common.notifications.title' | transloco"
       >
         <mat-icon
           [matBadge]="store.unreadCount()"
@@ -35,22 +36,22 @@ import { NotificationDto } from '../notification.models';
       @if (store.isOpen()) {
         <div class="notification-center__panel">
           <div class="notification-center__header">
-            <span class="notification-center__title">Notifications</span>
+            <span class="notification-center__title">{{ 'common.notifications.title' | transloco }}</span>
             @if (store.hasUnread()) {
               <button
                 class="notification-center__mark-all"
                 (click)="onMarkAllAsRead()"
-              >Mark all as read</button>
+              >{{ 'common.notifications.markAllRead' | transloco }}</button>
             }
           </div>
 
           <div class="notification-center__list">
             @if (store.isLoading()) {
-              <div class="notification-center__loading">Loading...</div>
+              <div class="notification-center__loading">{{ 'common.notifications.loading' | transloco }}</div>
             } @else if (store.notifications().length === 0) {
               <div class="notification-center__empty">
                 <mat-icon class="notification-center__empty-icon">notifications_none</mat-icon>
-                <span>No notifications yet</span>
+                <span>{{ 'common.notifications.noNotifications' | transloco }}</span>
               </div>
             } @else {
               @for (notification of store.notifications(); track notification.id) {
@@ -70,8 +71,8 @@ import { NotificationDto } from '../notification.models';
                       mat-icon-button
                       class="notification-center__unread-btn"
                       (click)="onMarkAsUnread($event, notification)"
-                      title="Mark as unread"
-                      aria-label="Mark as unread"
+                      [title]="'common.notifications.markAsUnread' | transloco"
+                      [attr.aria-label]="'common.notifications.markAsUnread' | transloco"
                     >
                       <mat-icon>markunread</mat-icon>
                     </button>

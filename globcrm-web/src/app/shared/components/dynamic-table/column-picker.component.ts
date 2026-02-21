@@ -3,6 +3,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   ColumnDefinition,
   ViewColumn,
@@ -15,15 +16,15 @@ import {
 @Component({
   selector: 'app-column-picker',
   standalone: true,
-  imports: [MatMenuModule, MatButtonModule, MatIconModule, MatCheckboxModule],
+  imports: [MatMenuModule, MatButtonModule, MatIconModule, MatCheckboxModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <button mat-icon-button [matMenuTriggerFor]="columnMenu" aria-label="Configure columns">
+    <button mat-icon-button [matMenuTriggerFor]="columnMenu" [attr.aria-label]="'common.columnPicker.configureColumns' | transloco">
       <mat-icon>view_column</mat-icon>
     </button>
     <mat-menu #columnMenu="matMenu" class="column-picker-menu">
       <div class="column-picker-header" (click)="$event.stopPropagation()">
-        <span>Show/Hide Columns</span>
+        <span>{{ 'common.columnPicker.showHideColumns' | transloco }}</span>
       </div>
       @for (col of allColumns(); track col.fieldId) {
         <div mat-menu-item (click)="$event.stopPropagation(); toggleColumn(col.fieldId)">

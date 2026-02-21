@@ -16,6 +16,7 @@ import { DealFormComponent } from '../../../features/deals/deal-form/deal-form.c
 import { ActivityFormComponent } from '../../../features/activities/activity-form/activity-form.component';
 import { NoteFormComponent } from '../../../features/notes/note-form/note-form.component';
 
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { SlideInConfig, SlideInStep } from './slide-in-panel.models';
 import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
 
@@ -27,6 +28,7 @@ import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
+    TranslocoPipe,
     ContactFormComponent,
     CompanyFormComponent,
     DealFormComponent,
@@ -131,7 +133,7 @@ import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
   template: `
     <div class="slide-in-panel__container">
       <div class="slide-in-panel__header">
-        <h3>{{ currentStep() === 'form' ? (config.title || 'New ' + config.entityType) : "What's next?" }}</h3>
+        <h3>{{ currentStep() === 'form' ? (config.title || ('common.dialog.newEntity' | transloco:{ type: config.entityType })) : ('common.slideInPanel.whatsNext' | transloco) }}</h3>
         <button mat-icon-button (click)="onClose()">
           <mat-icon>close</mat-icon>
         </button>
@@ -170,7 +172,7 @@ import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
                 (entityCreateError)="onCreateError()" />
             }
             @case ('Email') {
-              <p class="slide-in-panel__placeholder">Email compose coming soon</p>
+              <p class="slide-in-panel__placeholder">{{ 'common.slideInPanel.emailComingSoon' | transloco }}</p>
             }
           }
         } @else {
@@ -178,9 +180,9 @@ import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
           <div class="slide-in-panel__follow-up">
             <div class="slide-in-panel__success">
               <mat-icon class="slide-in-panel__success-icon">check_circle</mat-icon>
-              <p>{{ config.entityType }} created successfully!</p>
+              <p>{{ 'common.slideInPanel.createdSuccess' | transloco:{ type: config.entityType } }}</p>
             </div>
-            <p class="slide-in-panel__follow-up-prompt">Would you like to do anything else?</p>
+            <p class="slide-in-panel__follow-up-prompt">{{ 'common.slideInPanel.followUpPrompt' | transloco }}</p>
             <div class="slide-in-panel__follow-up-actions">
               @for (step of config.followUpSteps; track step.action) {
                 <button mat-stroked-button class="slide-in-panel__follow-up-btn" (click)="onFollowUpAction(step.action)">
@@ -194,13 +196,13 @@ import { SlideInPanelService, SLIDE_IN_CONFIG } from './slide-in-panel.service';
       </div>
       <div class="slide-in-panel__footer">
         @if (currentStep() === 'form') {
-          <button mat-button (click)="onClose()">Cancel</button>
+          <button mat-button (click)="onClose()">{{ 'common.cancel' | transloco }}</button>
           <button mat-flat-button color="primary" [disabled]="isSaving()" (click)="onSubmit()">
             @if (isSaving()) { <mat-spinner diameter="18"></mat-spinner> }
-            Create
+            {{ 'common.create' | transloco }}
           </button>
         } @else {
-          <button mat-flat-button (click)="onSkipFollowUp()">Skip</button>
+          <button mat-flat-button (click)="onSkipFollowUp()">{{ 'common.skip' | transloco }}</button>
         }
       </div>
     </div>
@@ -210,6 +212,7 @@ export class SlideInPanelComponent {
   readonly config = inject<SlideInConfig>(SLIDE_IN_CONFIG);
   private readonly slideInPanelService = inject(SlideInPanelService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   /** ViewChild references for each entity form (to trigger submit). */
   private readonly contactForm = viewChild(ContactFormComponent);
@@ -265,7 +268,7 @@ export class SlideInPanelComponent {
   /** Called when entity creation fails. */
   onCreateError(): void {
     this.isSaving.set(false);
-    this.snackBar.open(`Failed to create ${this.config.entityType.toLowerCase()}`, 'Close', {
+    this.snackBar.open(this.translocoService.translate('common.messages.createdFailed', { type: this.config.entityType.toLowerCase() }), this.translocoService.translate('common.close'), {
       duration: 5000,
     });
   }

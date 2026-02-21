@@ -22,6 +22,7 @@ import { ActivityFormComponent } from '../../../features/activities/activity-for
 import { ProductFormComponent } from '../../../features/products/product-form/product-form.component';
 import { LeadFormComponent } from '../../../features/leads/lead-form/lead-form.component';
 import { NoteFormComponent } from '../../../features/notes/note-form/note-form.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   EntityFormDialogData,
   EntityFormDialogResult,
@@ -37,6 +38,7 @@ import {
     MatProgressSpinnerModule,
     MatDialogModule,
     MatSnackBarModule,
+    TranslocoPipe,
     ContactFormComponent,
     CompanyFormComponent,
     DealFormComponent,
@@ -60,7 +62,7 @@ import {
     }
   `,
   template: `
-    <h2 mat-dialog-title>New {{ data.entityType }}</h2>
+    <h2 mat-dialog-title>{{ 'common.dialog.newEntity' | transloco:{ type: data.entityType } }}</h2>
 
     <mat-dialog-content class="dialog-form-content">
       @switch (data.entityType) {
@@ -110,14 +112,14 @@ import {
     </mat-dialog-content>
 
     <mat-dialog-actions class="dialog-actions">
-      <button mat-button mat-dialog-close>Cancel</button>
+      <button mat-button mat-dialog-close>{{ 'common.cancel' | transloco }}</button>
       <button mat-stroked-button
               [disabled]="isSaving()"
               (click)="submitAndClose()">
         @if (isSaving() && pendingAction() === 'close') {
           <mat-spinner diameter="18"></mat-spinner>
         }
-        Create & Close
+        {{ 'common.dialog.createAndClose' | transloco }}
       </button>
       <button mat-raised-button color="primary"
               [disabled]="isSaving()"
@@ -125,7 +127,7 @@ import {
         @if (isSaving() && pendingAction() === 'view') {
           <mat-spinner diameter="18"></mat-spinner>
         }
-        Create & View
+        {{ 'common.dialog.createAndView' | transloco }}
       </button>
     </mat-dialog-actions>
   `,
@@ -134,6 +136,7 @@ export class EntityFormDialogComponent {
   readonly data = inject<EntityFormDialogData>(MAT_DIALOG_DATA);
   private readonly dialogRef = inject(MatDialogRef<EntityFormDialogComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   /** ViewChild references for each entity form. */
   private readonly contactForm = viewChild(ContactFormComponent);
@@ -186,7 +189,7 @@ export class EntityFormDialogComponent {
     this.isSaving.set(false);
     this.createdEntity = entity;
     const action = this.pendingAction() ?? 'close';
-    this.snackBar.open(`${this.data.entityType} created successfully`, 'Close', {
+    this.snackBar.open(this.translocoService.translate('common.messages.createdSuccess', { type: this.data.entityType }), this.translocoService.translate('common.close'), {
       duration: 3000,
     });
     this.dialogRef.close({
@@ -198,7 +201,7 @@ export class EntityFormDialogComponent {
   onCreateError(): void {
     this.isSaving.set(false);
     this.pendingAction.set(null);
-    this.snackBar.open(`Failed to create ${this.data.entityType.toLowerCase()}`, 'Close', {
+    this.snackBar.open(this.translocoService.translate('common.messages.createdFailed', { type: this.data.entityType.toLowerCase() }), this.translocoService.translate('common.close'), {
       duration: 5000,
     });
   }

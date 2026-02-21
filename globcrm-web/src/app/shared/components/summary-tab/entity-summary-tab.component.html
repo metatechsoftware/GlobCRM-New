@@ -31,7 +31,7 @@
       <div class="summary-card key-properties-card">
         <h3 class="card-title">
           <span class="card-title-icon"><mat-icon>info</mat-icon></span>
-          Key Properties
+          {{ 'common.summary.keyProperties' | transloco }}
         </h3>
         <div class="properties-grid">
           @switch (entityType()) {
@@ -253,7 +253,7 @@
           <div class="summary-card stage-card">
             <h3 class="card-title">
               <span class="card-title-icon"><mat-icon>linear_scale</mat-icon></span>
-              Pipeline Progress
+              {{ 'common.summary.pipelineProgress' | transloco }}
             </h3>
             @if (dealData(); as d) {
               <div class="stage-label">
@@ -279,7 +279,7 @@
           <div class="summary-card stage-card">
             <h3 class="card-title">
               <span class="card-title-icon"><mat-icon>trending_up</mat-icon></span>
-              Lead Progress
+              {{ 'common.summary.leadProgress' | transloco }}
             </h3>
             @if (leadData(); as d) {
               @if (leadTerminalStage(); as terminal) {
@@ -288,7 +288,7 @@
                   {{ terminal.name }}
                 </div>
               } @else {
-                <div class="stage-label">Current Stage</div>
+                <div class="stage-label">{{ 'common.summary.currentStage' | transloco }}</div>
               }
               <app-mini-stage-bar
                 [stages]="leadStages()"
@@ -351,13 +351,13 @@
       <div class="summary-card activities-card full-width">
         <h3 class="card-title">
           <span class="card-title-icon"><mat-icon>task_alt</mat-icon></span>
-          Activities
+          {{ 'common.summary.activities' | transloco }}
         </h3>
 
         <!-- Recent Activities Section -->
         @if (data()!.recentActivities.length > 0) {
           <div class="activities-section">
-            <h4 class="section-subtitle">Recent</h4>
+            <h4 class="section-subtitle">{{ 'common.summary.recent' | transloco }}</h4>
             @for (activity of data()!.recentActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
@@ -376,7 +376,7 @@
         <!-- Upcoming Activities Section (visually distinct with accent border) -->
         @if (data()!.upcomingActivities.length > 0) {
           <div class="activities-section upcoming-section">
-            <h4 class="section-subtitle">Upcoming</h4>
+            <h4 class="section-subtitle">{{ 'common.summary.upcoming' | transloco }}</h4>
             @for (activity of data()!.upcomingActivities; track activity.id) {
               <div class="activity-row">
                 <div class="activity-info">
@@ -392,7 +392,7 @@
         }
 
         @if (data()!.recentActivities.length === 0 && data()!.upcomingActivities.length === 0) {
-          <div class="empty-state"><mat-icon>event_busy</mat-icon> No activities</div>
+          <div class="empty-state"><mat-icon>event_busy</mat-icon> {{ 'common.summary.noActivities' | transloco }}</div>
         }
       </div>
 
@@ -401,7 +401,7 @@
         <div class="summary-card associations-card">
           <h3 class="card-title">
             <span class="card-title-icon"><mat-icon>link</mat-icon></span>
-            Associations
+            {{ 'common.summary.associations' | transloco }}
           </h3>
           <div class="associations-grid">
             @for (assoc of data()!.associations; track assoc.entityType) {
@@ -419,7 +419,7 @@
       <div class="summary-card notes-card">
         <h3 class="card-title">
           <span class="card-title-icon"><mat-icon>note</mat-icon></span>
-          Recent Notes
+          {{ 'common.summary.recentNotes' | transloco }}
         </h3>
         @if (data()!.recentNotes.length > 0) {
           @for (note of data()!.recentNotes; track note.id) {
@@ -432,7 +432,7 @@
             </div>
           }
         } @else {
-          <div class="empty-state"><mat-icon>note</mat-icon> No notes</div>
+          <div class="empty-state"><mat-icon>note</mat-icon> {{ 'common.summary.noNotes' | transloco }}</div>
         }
       </div>
 
@@ -440,7 +440,7 @@
       <div class="summary-card meta-card">
         <h3 class="card-title">
           <span class="card-title-icon"><mat-icon>insights</mat-icon></span>
-          Overview
+          {{ 'common.summary.overview' | transloco }}
         </h3>
         <div class="meta-stats-row">
           <div class="meta-stat-block">
@@ -450,16 +450,16 @@
             @if (data()!.lastContacted) {
               <span class="meta-stat-value" [title]="data()!.lastContacted | date:'full'">{{ getRelativeTime(data()!.lastContacted!) }}</span>
             } @else {
-              <span class="meta-stat-value empty">Never</span>
+              <span class="meta-stat-value empty">{{ 'common.summary.never' | transloco }}</span>
             }
-            <span class="meta-stat-label">Last Contacted</span>
+            <span class="meta-stat-label">{{ 'common.summary.lastContacted' | transloco }}</span>
           </div>
           <div class="meta-stat-block">
             <span class="meta-stat-icon icon-attachment">
               <mat-icon>attach_file</mat-icon>
             </span>
             <span class="meta-stat-value">{{ data()!.attachmentCount }}</span>
-            <span class="meta-stat-label">Attachments</span>
+            <span class="meta-stat-label">{{ 'common.attachments.title' | transloco }}</span>
           </div>
         </div>
       </div>
@@ -469,7 +469,7 @@
         <div class="summary-card pipeline-card">
           <h3 class="card-title">
             <span class="card-title-icon"><mat-icon>trending_up</mat-icon></span>
-            Deal Pipeline
+            {{ 'common.summary.dealPipeline' | transloco }}
           </h3>
           <app-deal-pipeline-chart [pipeline]="dealPipeline()!" />
         </div>
@@ -480,7 +480,7 @@
         <div class="summary-card email-card">
           <h3 class="card-title">
             <span class="card-title-icon"><mat-icon>email</mat-icon></span>
-            Email Engagement
+            {{ 'common.summary.emailEngagement' | transloco }}
           </h3>
           <app-email-engagement-card [engagement]="emailEngagement()!" />
         </div>
@@ -489,7 +489,7 @@
   } @else {
     <div class="summary-error">
       <mat-icon>error_outline</mat-icon>
-      <span>Unable to load summary data.</span>
+      <span>{{ 'common.summary.unableToLoad' | transloco }}</span>
     </div>
   }
 </div>

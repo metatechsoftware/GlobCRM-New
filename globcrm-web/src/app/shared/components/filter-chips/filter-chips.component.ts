@@ -1,6 +1,7 @@
 import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ColumnDefinition, ViewFilter } from '../saved-views/view.models';
 
 /**
@@ -10,7 +11,7 @@ import { ColumnDefinition, ViewFilter } from '../saved-views/view.models';
 @Component({
   selector: 'app-filter-chips',
   standalone: true,
-  imports: [MatIconModule, NgClass],
+  imports: [MatIconModule, NgClass, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './filter-chips.component.html',
   styleUrl: './filter-chips.component.scss',

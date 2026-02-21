@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Subject, Subscription, of } from 'rxjs';
 import {
   catchError,
@@ -31,7 +32,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
 @Component({
   selector: 'app-global-search',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslocoPipe],
   template: `
     <div class="global-search" [class.active]="isOpen() || showRecent() || showRecentPreviews()">
       <mat-icon class="search-icon">search</mat-icon>
@@ -39,7 +40,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
         #searchInput
         type="text"
         class="search-input"
-        placeholder="Search... (Ctrl+K)"
+        [placeholder]="'common.search.placeholder' | transloco"
         [value]="searchTerm()"
         (input)="onSearch($event)"
         (focus)="onFocus()"
@@ -86,7 +87,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
         <div class="search-overlay">
           <div class="search-error">
             <mat-icon>error_outline</mat-icon>
-            <span>Search failed. Please try again.</span>
+            <span>{{ 'common.search.searchFailed' | transloco }}</span>
           </div>
         </div>
       }
@@ -94,7 +95,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
       <!-- No Results -->
       @if (isOpen() && !searchError() && results() && results()!.groups.length === 0 && searchTerm().length >= 2) {
         <div class="search-overlay">
-          <div class="no-results">No results found for "{{ searchTerm() }}"</div>
+          <div class="no-results">{{ 'common.search.noResults' | transloco:{ term: searchTerm() } }}</div>
         </div>
       }
 
@@ -102,7 +103,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
       @if (showRecent() && !isOpen() && recentSearches().length > 0) {
         <div class="search-overlay">
           <div class="recent-header">
-            <span>Recent Searches</span>
+            <span>{{ 'common.search.recentSearches' | transloco }}</span>
             <button class="recent-clear-btn" (click)="clearRecent()">
               <mat-icon>delete_outline</mat-icon>
             </button>
@@ -120,7 +121,7 @@ import { getEntityConfig } from '../../services/entity-type-registry';
       @if (showRecentPreviews() && !isOpen() && recentPreviews().length > 0) {
         <div class="search-overlay">
           <div class="recent-header">
-            <span>Recently Viewed</span>
+            <span>{{ 'common.search.recentlyViewed' | transloco }}</span>
             <button class="recent-clear-btn" (click)="clearRecentPreviews()">
               <mat-icon>delete_outline</mat-icon>
             </button>
