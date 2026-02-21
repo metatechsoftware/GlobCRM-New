@@ -45,7 +45,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-06**: User can assign colored labels to cards for categorization
 - [x] **KANB-07**: User can assign a team member to a card (avatar displayed on card face)
 - [ ] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
-- [ ] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
+- [x] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
 - [x] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
 - [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
 - [ ] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
@@ -54,7 +54,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-15**: User can add checklist items to a card with progress indicator on card face
 - [x] **KANB-16**: User can comment on cards with threaded discussion
 - [ ] **KANB-17**: User can filter visible cards by label, assignee, or due date
-- [ ] **KANB-18**: Empty boards page shows a create prompt with template suggestions
+- [x] **KANB-18**: Empty boards page shows a create prompt with template suggestions
 
 ### Quote PDF Templates
 
@@ -161,7 +161,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-06 | Phase 30 | Complete |
 | KANB-07 | Phase 30 | Complete |
 | KANB-08 | Phase 30 | Pending |
-| KANB-09 | Phase 30 | Pending |
+| KANB-09 | Phase 30 | Complete |
 | KANB-10 | Phase 30 | Complete |
 | KANB-11 | Phase 30 | Pending |
 | KANB-12 | Phase 30 | Pending |
@@ -170,7 +170,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-15 | Phase 30 | Complete |
 | KANB-16 | Phase 30 | Complete |
 | KANB-17 | Phase 30 | Pending |
-| KANB-18 | Phase 30 | Pending |
+| KANB-18 | Phase 30 | Complete |
 | QTPL-01 | Phase 31 | Pending |
 | QTPL-02 | Phase 31 | Pending |
 | QTPL-03 | Phase 31 | Pending |

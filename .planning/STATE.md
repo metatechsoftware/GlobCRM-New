@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 30 of 31 (Free-form Kanban Boards)
-Plan: 2 of 6 complete
+Plan: 3 of 6 complete
 Status: In progress
-Last activity: 2026-02-21 — Completed 30-02-PLAN.md (Kanban API endpoints)
+Last activity: 2026-02-21 — Completed 30-03-PLAN.md (Kanban frontend infrastructure & boards list)
 
-Progress: [████████████████████] 98% (187/~191 plans estimated)
+Progress: [████████████████████] 98% (188/~191 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 98% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 186
+- Total plans completed: 188
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 25 plans across 4 phases (Phase 27-30)
+- v1.3: 27 plans across 4 phases (Phase 27-30)
 
 ## Accumulated Context
 
@@ -104,6 +104,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 30-01: CreatorId made nullable (Guid?) to support SetNull FK delete behavior when user is deleted
 - 30-02: Renamed CreateCommentRequest to CreateCardCommentRequest to avoid namespace collision with FeedController
 - 30-02: Added MoveCardValidator and UpdateCardValidator beyond plan spec for input validation completeness
+- 30-03: BoardStore provided at route level (not component level) so list and detail pages share state
+- 30-03: System boards (Deal Pipeline, Activity Board) implemented as hardcoded UI cards routing to existing kanban pages
+- 30-03: Placeholder BoardDetailComponent created for lazy-loaded :id route (full implementation in Plan 04)
 
 ### Pending Todos
 
@@ -118,6 +121,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 30-02-PLAN.md (Kanban API endpoints)
-Resume file: .planning/phases/30-free-form-kanban-boards/30-02-SUMMARY.md
-Next step: Execute 30-03-PLAN.md (Kanban frontend service & store)
+Stopped at: Completed 30-03-PLAN.md (Kanban frontend infrastructure & boards list)
+Resume file: .planning/phases/30-free-form-kanban-boards/30-03-SUMMARY.md
+Next step: Execute 30-04-PLAN.md (Board detail kanban view with drag-and-drop)

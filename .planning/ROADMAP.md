@@ -195,7 +195,7 @@ Plans:
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
-| 30. Free-Form Kanban Boards | 2/6 | In Progress|  | - |
+| 30. Free-Form Kanban Boards | 3/6 | In Progress|  | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD
