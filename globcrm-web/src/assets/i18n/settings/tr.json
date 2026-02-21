@@ -1,0 +1,43 @@
+{
+  "title": "Ayarlar",
+  "subtitle": "Çalışma alanınızı, izinleri ve entegrasyonları yapılandırın",
+  "search": "Ayarlarda ara...",
+  "noResults": "Eşleyen ayar yok",
+  "clearSearch": "Aramayı temizle",
+  "sections": {
+    "organization": "Organizasyon",
+    "dataOperations": "Veri İşlemleri",
+    "personal": "Kişisel"
+  },
+  "language": {
+    "title": "Dil",
+    "description": "Organizasyonunuz için varsayılan dili ayarlayın",
+    "defaultLanguage": "Varsayılan Dil",
+    "defaultLanguageHint": "Yeni kullanıcılar bu dil tercihini devralacaktır",
+    "english": "İngilizce",
+    "turkish": "Türkçe",
+    "saveSuccess": "Varsayılan dil başarıyla güncellendi"
+  },
+  "items": {
+    "roles": "Roller ve İzinler",
+    "rolesDesc": "Kullanıcı rolleri, erişim seviyeleri ve alan görünürlük kurallarını tanımlayın",
+    "teams": "Takımlar",
+    "teamsDesc": "İşbirliği iş akışları için takımlar oluşturun ve üyeler atayın",
+    "customFields": "Özel Alanlar",
+    "customFieldsDesc": "Tüm varlıklarda özel veri alanları ekleyin ve yönetin",
+    "pipelines": "Boru Hatları",
+    "pipelinesDesc": "Fırsat boru hattı aşamaları ve kazanma/kaybetme iş akışları tasarlayın",
+    "duplicateDetection": "Yineleme Algılama",
+    "duplicateDetectionDesc": "Eşleştirme kuralları, eşikler ve birleştirme stratejilerini yapılandırın",
+    "webhooks": "Webhooklar",
+    "webhooksDesc": "Harici entegrasyonlar için etkinlik aboneliklerini yönetin",
+    "importData": "Veri İçe Aktarma",
+    "importDataDesc": "CSV dosyalarından kişileri, şirketleri veya fırsatları içe aktarın",
+    "importHistory": "İçe Aktarma Geçmişi",
+    "importHistoryDesc": "Geçmiş içe aktarma işlerini, sonuçları ve hata günlüklerini inceleyin",
+    "emailAccounts": "E-posta Hesapları",
+    "emailAccountsDesc": "Mesaj göndermek ve izlemek için e-posta hesaplarını bağlatın",
+    "notifications": "Bildirimler",
+    "notificationsDesc": "Hangi olayların uyarı tetikleyeceğini ve nasıl iletileceğini özelleştirin"
+  }
+}

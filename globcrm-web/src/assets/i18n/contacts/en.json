@@ -1,0 +1,50 @@
+{
+  "title": "Contacts",
+  "list": {
+    "title": "Contacts",
+    "addContact": "Add Contact",
+    "importContacts": "Import Contacts",
+    "empty": "No contacts found",
+    "emptyDescription": "Create your first contact to get started"
+  },
+  "detail": {
+    "title": "Contact Details",
+    "tabs": {
+      "summary": "Summary",
+      "timeline": "Timeline",
+      "activities": "Activities",
+      "deals": "Deals",
+      "emails": "Emails",
+      "notes": "Notes",
+      "attachments": "Attachments"
+    },
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email",
+      "phone": "Phone",
+      "mobile": "Mobile",
+      "company": "Company",
+      "jobTitle": "Job Title",
+      "department": "Department",
+      "address": "Address",
+      "city": "City",
+      "state": "State",
+      "country": "Country",
+      "zipCode": "Zip Code",
+      "source": "Source",
+      "owner": "Owner",
+      "tags": "Tags",
+      "description": "Description",
+      "createdAt": "Created",
+      "updatedAt": "Last Updated"
+    }
+  },
+  "form": {
+    "createTitle": "Create Contact",
+    "editTitle": "Edit Contact",
+    "saveSuccess": "Contact saved successfully",
+    "deleteConfirm": "Are you sure you want to delete this contact?",
+    "deleteSuccess": "Contact deleted successfully"
+  }
+}

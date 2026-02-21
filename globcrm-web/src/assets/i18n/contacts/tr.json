@@ -1,0 +1,50 @@
+{
+  "title": "Kişiler",
+  "list": {
+    "title": "Kişiler",
+    "addContact": "Kişi Ekle",
+    "importContacts": "Kişileri İçe Aktar",
+    "empty": "Kişi bulunamadı",
+    "emptyDescription": "Başlamak için ilk kişinizi oluşturun"
+  },
+  "detail": {
+    "title": "Kişi Detayları",
+    "tabs": {
+      "summary": "Özet",
+      "timeline": "Zaman Çizelgesi",
+      "activities": "Aktiviteler",
+      "deals": "Fırsatlar",
+      "emails": "E-postalar",
+      "notes": "Notlar",
+      "attachments": "Ekler"
+    },
+    "fields": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "mobile": "Cep Telefonu",
+      "company": "Şirket",
+      "jobTitle": "Unvan",
+      "department": "Departman",
+      "address": "Adres",
+      "city": "Şehir",
+      "state": "İl",
+      "country": "Ülke",
+      "zipCode": "Posta Kodu",
+      "source": "Kaynak",
+      "owner": "Sahip",
+      "tags": "Etiketler",
+      "description": "Açıklama",
+      "createdAt": "Oluşturulma",
+      "updatedAt": "Son Güncelleme"
+    }
+  },
+  "form": {
+    "createTitle": "Kişi Oluştur",
+    "editTitle": "Kişi Düzenle",
+    "saveSuccess": "Kişi başarıyla kaydedildi",
+    "deleteConfirm": "Bu kişiyi silmek istediğinizden emin misiniz?",
+    "deleteSuccess": "Kişi başarıyla silindi"
+  }
+}

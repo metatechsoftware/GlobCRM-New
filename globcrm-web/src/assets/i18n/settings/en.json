@@ -1,0 +1,43 @@
+{
+  "title": "Settings",
+  "subtitle": "Configure your workspace, permissions, and integrations",
+  "search": "Search settings...",
+  "noResults": "No settings match",
+  "clearSearch": "Clear search",
+  "sections": {
+    "organization": "Organization",
+    "dataOperations": "Data Operations",
+    "personal": "Personal"
+  },
+  "language": {
+    "title": "Language",
+    "description": "Set the default language for your organization",
+    "defaultLanguage": "Default Language",
+    "defaultLanguageHint": "New users will inherit this language preference",
+    "english": "English",
+    "turkish": "Turkish",
+    "saveSuccess": "Default language updated successfully"
+  },
+  "items": {
+    "roles": "Roles & Permissions",
+    "rolesDesc": "Define user roles, access levels, and field visibility rules",
+    "teams": "Teams",
+    "teamsDesc": "Create teams and assign members for collaborative workflows",
+    "customFields": "Custom Fields",
+    "customFieldsDesc": "Add and manage custom data fields across all entities",
+    "pipelines": "Pipelines",
+    "pipelinesDesc": "Design deal pipeline stages and win/loss workflows",
+    "duplicateDetection": "Duplicate Detection",
+    "duplicateDetectionDesc": "Configure matching rules, thresholds, and merge strategies",
+    "webhooks": "Webhooks",
+    "webhooksDesc": "Manage event subscriptions for external integrations",
+    "importData": "Import Data",
+    "importDataDesc": "Import contacts, companies, or deals from CSV files",
+    "importHistory": "Import History",
+    "importHistoryDesc": "Review past import jobs, results, and error logs",
+    "emailAccounts": "Email Accounts",
+    "emailAccountsDesc": "Connect email accounts for sending and tracking messages",
+    "notifications": "Notifications",
+    "notificationsDesc": "Customize which events trigger alerts and how they are delivered"
+  }
+}
