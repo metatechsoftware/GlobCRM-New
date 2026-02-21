@@ -28,7 +28,11 @@
     "codeRequired": "Verification code is required",
     "codeMinLength": "Code must be 6 digits",
     "verify": "Verify",
-    "backToLogin": "Back to login"
+    "backToLogin": "Back to login",
+    "qrCodeAlt": "2FA QR Code",
+    "aria": {
+      "goBack": "Go back"
+    }
   },
   "signup": {
     "tagline": "Start building\nstronger connections.",

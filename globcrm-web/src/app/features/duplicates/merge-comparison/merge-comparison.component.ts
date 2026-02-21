@@ -101,7 +101,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
     <div class="merge-page">
       <!-- Header -->
       <div class="merge-header">
-        <button mat-icon-button class="back-btn" routerLink="/duplicates/scan" aria-label="Back to scan">
+        <button mat-icon-button class="back-btn" routerLink="/duplicates/scan" [attr.aria-label]="'merge.aria.backToScan' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div class="merge-header__text">
@@ -148,7 +148,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               mat-icon-button
               class="swap-btn"
               (click)="swapPrimary()"
-              aria-label="Swap primary record"
+              [attr.aria-label]="'merge.aria.swapPrimary' | transloco"
             >
               <mat-icon>swap_horiz</mat-icon>
             </button>
@@ -219,8 +219,8 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
                           [ngModel]="fieldSelections()[row.fieldName]"
                           (ngModelChange)="onFieldSelection(row.fieldName, $event)"
                         >
-                          <mat-radio-button value="a" aria-label="Select Record A value"></mat-radio-button>
-                          <mat-radio-button value="b" aria-label="Select Record B value"></mat-radio-button>
+                          <mat-radio-button value="a" [attr.aria-label]="'merge.aria.selectRecordA' | transloco"></mat-radio-button>
+                          <mat-radio-button value="b" [attr.aria-label]="'merge.aria.selectRecordB' | transloco"></mat-radio-button>
                         </mat-radio-group>
                       } @else {
                         <span class="same-check">

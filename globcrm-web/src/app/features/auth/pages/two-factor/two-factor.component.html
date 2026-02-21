@@ -2,7 +2,7 @@
   <mat-card class="tfa-card">
     <mat-card-header class="tfa-card-header">
       <div class="header-row">
-        <button mat-icon-button (click)="goBack()" aria-label="Go back">
+        <button mat-icon-button (click)="goBack()" [attr.aria-label]="'auth.twoFactor.aria.goBack' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div>
@@ -54,7 +54,7 @@
 
               @if (qrCodeDataUrl()) {
                 <div class="qr-code-container">
-                  <img [src]="qrCodeDataUrl()" alt="2FA QR Code" class="qr-code-image">
+                  <img [src]="qrCodeDataUrl()" [alt]="'auth.twoFactor.qrCodeAlt' | transloco" class="qr-code-image">
                 </div>
               } @else {
                 <div class="qr-code-container">

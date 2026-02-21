@@ -35,6 +35,9 @@
     "status": {
       "active": "Active",
       "inactive": "Inactive"
+    },
+    "aria": {
+      "backToProducts": "Back to products"
     }
   },
   "form": {
@@ -62,7 +65,10 @@
     },
     "activeHint": "Inactive products will not appear in search results when linking to deals.",
     "saveChanges": "Save Changes",
-    "createProduct": "Create Product"
+    "createProduct": "Create Product",
+    "aria": {
+      "backToProducts": "Back to products"
+    }
   },
   "messages": {
     "productCreated": "Product created successfully",

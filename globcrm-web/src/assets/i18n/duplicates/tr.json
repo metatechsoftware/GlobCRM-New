@@ -47,6 +47,12 @@
     "survivingRecord": "Hayatta kalan kayit",
     "recordToMerge": "Birlestirilecek kayit",
     "warningMessage": "Bu islem kolayca geri alinamaz. Birlestirilen kayit kalici olarak silinecektir.",
+    "aria": {
+      "backToScan": "Taramaya don",
+      "selectRecordA": "Kayit A degerini sec",
+      "selectRecordB": "Kayit B degerini sec",
+      "swapPrimary": "Birincil kaydi degistir"
+    },
     "messages": {
       "loadFailed": "Karsilastirma icin kayitlar yuklenemedi",
       "mergeSuccess": "Kayitlar basariyla birlestirildi",

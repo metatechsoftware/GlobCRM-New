@@ -47,6 +47,12 @@
     "survivingRecord": "Surviving record",
     "recordToMerge": "Record to merge",
     "warningMessage": "This action cannot be easily undone. The merged record will be permanently deleted.",
+    "aria": {
+      "backToScan": "Back to scan",
+      "selectRecordA": "Select Record A value",
+      "selectRecordB": "Select Record B value",
+      "swapPrimary": "Swap primary record"
+    },
     "messages": {
       "loadFailed": "Failed to load records for comparison",
       "mergeSuccess": "Records merged successfully",

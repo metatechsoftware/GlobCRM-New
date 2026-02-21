@@ -10,7 +10,7 @@
 
       <!-- Navigation bar -->
       <div class="hero-nav">
-        <a mat-icon-button routerLink="/products" aria-label="Back to products">
+        <a mat-icon-button routerLink="/products" [attr.aria-label]="'products.detail.aria.backToProducts' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div class="hero-actions">

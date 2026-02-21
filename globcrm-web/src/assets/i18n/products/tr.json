@@ -35,6 +35,9 @@
     "status": {
       "active": "Aktif",
       "inactive": "Pasif"
+    },
+    "aria": {
+      "backToProducts": "Urunlere don"
     }
   },
   "form": {
@@ -62,7 +65,10 @@
     },
     "activeHint": "Pasif urunler, firsatlara baglanirken arama sonuclarinda gorunmez.",
     "saveChanges": "Degisiklikleri Kaydet",
-    "createProduct": "Urun Olustur"
+    "createProduct": "Urun Olustur",
+    "aria": {
+      "backToProducts": "Urunlere don"
+    }
   },
   "messages": {
     "productCreated": "Urun basariyla olusturuldu",

@@ -28,7 +28,11 @@
     "codeRequired": "Doğrulama kodu gereklidir",
     "codeMinLength": "Kod 6 haneli olmalıdır",
     "verify": "Doğrula",
-    "backToLogin": "Girişe dön"
+    "backToLogin": "Girişe dön",
+    "qrCodeAlt": "2FA QR Kodu",
+    "aria": {
+      "goBack": "Geri don"
+    }
   },
   "signup": {
     "tagline": "Daha güçlü bağlantılar\nkurmaya başlayın.",
