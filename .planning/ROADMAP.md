@@ -108,7 +108,7 @@ Plans:
 - [x] 28-06-PLAN.md — Users & admin: auth, onboarding, profile, import, duplicates scopes + settings extension
 - [x] 28-07-PLAN.md — CI enforcement script (key parity, hardcoded string detection, unused keys) + final audit
 - [ ] 28-08-PLAN.md — Gap closure: settings sub-pages (webhooks, custom-fields, pipelines, duplicate-rules, email-accounts, notifications) full transloco wiring
-- [ ] 28-09-PLAN.md — Gap closure: shared entity-preview + summary-tab components + misc shared components transloco wiring
+- [x] 28-09-PLAN.md — Gap closure: shared entity-preview + summary-tab components + misc shared components transloco wiring
 - [ ] 28-10-PLAN.md — Gap closure: remaining feature template strings + baseline regeneration + requirements update
 
 ### Phase 29: Integration Marketplace
@@ -178,9 +178,9 @@ Plans:
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
-| 28. Localization String Extraction | v1.3 | 7/10 | In Progress | - |
+| 28. Localization String Extraction | v1.3 | 8/10 | In Progress | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
 | 31. Quote PDF Templates | v1.3 | 0/? | Not started | - |
 
-**Totals:** 31 phases, 164 plans complete (v1.0-v1.2 + Phase 27), v1.3 plans TBD
+**Totals:** 31 phases, 176 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 partial), v1.3 plans TBD
