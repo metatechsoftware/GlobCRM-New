@@ -40,7 +40,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-01**: User can create, edit, and delete custom Kanban boards with name, description, and color
 - [x] **KANB-02**: User can add, rename, reorder, and delete columns on a board
 - [x] **KANB-03**: User can create, edit, and archive cards with title, description, due date, and assignee
-- [ ] **KANB-04**: User can drag-and-drop cards between columns and reorder within columns (optimistic UI)
+- [x] **KANB-04**: User can drag-and-drop cards between columns and reorder within columns (optimistic UI)
 - [x] **KANB-05**: User can set board visibility: Private (creator only), Team (team members), or Public (all tenant users)
 - [x] **KANB-06**: User can assign colored labels to cards for categorization
 - [x] **KANB-07**: User can assign a team member to a card (avatar displayed on card face)
@@ -50,7 +50,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
 - [ ] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
 - [x] **KANB-13**: Columns display WIP (work-in-progress) limit with visual warning when exceeded
-- [ ] **KANB-14**: User can create a board from predefined templates (Sprint, Content Calendar, Sales Follow-up)
+- [x] **KANB-14**: User can create a board from predefined templates (Sprint, Content Calendar, Sales Follow-up)
 - [x] **KANB-15**: User can add checklist items to a card with progress indicator on card face
 - [x] **KANB-16**: User can comment on cards with threaded discussion
 - [ ] **KANB-17**: User can filter visible cards by label, assignee, or due date
@@ -156,7 +156,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-01 | Phase 30 | Complete |
 | KANB-02 | Phase 30 | Complete |
 | KANB-03 | Phase 30 | Complete |
-| KANB-04 | Phase 30 | Pending |
+| KANB-04 | Phase 30 | Complete |
 | KANB-05 | Phase 30 | Complete |
 | KANB-06 | Phase 30 | Complete |
 | KANB-07 | Phase 30 | Complete |
@@ -166,7 +166,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-11 | Phase 30 | Pending |
 | KANB-12 | Phase 30 | Pending |
 | KANB-13 | Phase 30 | Complete |
-| KANB-14 | Phase 30 | Pending |
+| KANB-14 | Phase 30 | Complete |
 | KANB-15 | Phase 30 | Complete |
 | KANB-16 | Phase 30 | Complete |
 | KANB-17 | Phase 30 | Pending |

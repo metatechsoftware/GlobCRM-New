@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 30 of 31 (Free-form Kanban Boards)
-Plan: 1 of 6 complete
+Plan: 2 of 6 complete
 Status: In progress
-Last activity: 2026-02-21 — Completed 30-01-PLAN.md (Domain entities & migration)
+Last activity: 2026-02-21 — Completed 30-02-PLAN.md (Kanban API endpoints)
 
-Progress: [████████████████████] 98% (186/~191 plans estimated)
+Progress: [████████████████████] 98% (187/~191 plans estimated)
 
 ## Milestones
 
@@ -102,6 +102,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-12: Products uses module-level PRODUCT_CORE_COLUMNS const; emails skips labelKey for icon-only columns
 - 28-12: Settings notification prefs use transloco.translate() with typeLabels/typeDescriptions namespace replacing hardcoded consts
 - 30-01: CreatorId made nullable (Guid?) to support SetNull FK delete behavior when user is deleted
+- 30-02: Renamed CreateCommentRequest to CreateCardCommentRequest to avoid namespace collision with FeedController
+- 30-02: Added MoveCardValidator and UpdateCardValidator beyond plan spec for input validation completeness
 
 ### Pending Todos
 
@@ -116,6 +118,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 30-01-PLAN.md (Kanban domain entities & migration)
-Resume file: .planning/phases/30-free-form-kanban-boards/30-01-SUMMARY.md
-Next step: Execute 30-02-PLAN.md (Kanban API endpoints)
+Stopped at: Completed 30-02-PLAN.md (Kanban API endpoints)
+Resume file: .planning/phases/30-free-form-kanban-boards/30-02-SUMMARY.md
+Next step: Execute 30-03-PLAN.md (Kanban frontend service & store)
