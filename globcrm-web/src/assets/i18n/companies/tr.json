@@ -115,7 +115,10 @@
       "matchPercent": "% eslesme"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createCompany": "Sirket Olustur"
+    "createCompany": "Sirket Olustur",
+    "aria": {
+      "dismissWarning": "Uyariyi kapat"
+    }
   },
   "messages": {
     "companyCreated": "Sirket basariyla olusturuldu",

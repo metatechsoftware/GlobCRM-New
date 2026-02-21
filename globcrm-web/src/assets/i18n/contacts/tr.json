@@ -145,7 +145,11 @@
       "matchPercent": "% eslesme"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createContact": "Kisi Olustur"
+    "createContact": "Kisi Olustur",
+    "aria": {
+      "clearCompany": "Sirket temizle",
+      "dismissWarning": "Uyariyi kapat"
+    }
   },
   "messages": {
     "contactCreated": "Kisi basariyla olusturuldu",

@@ -60,6 +60,9 @@
       "columnAuthor": "Author",
       "columnDate": "Date"
     },
+    "sidebar": {
+      "timeline": "Timeline"
+    },
     "conversion": {
       "title": "Conversion Details",
       "convertedOn": "Converted On",

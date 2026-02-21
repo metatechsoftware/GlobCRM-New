@@ -44,6 +44,9 @@
     "notes": {
       "noNotes": "No notes for this request.",
       "addNote": "Add Note"
+    },
+    "aria": {
+      "backToRequests": "Back to requests"
     }
   },
   "form": {
@@ -71,7 +74,12 @@
       "priorityRequired": "Priority is required"
     },
     "saveChanges": "Save Changes",
-    "createRequest": "Create Request"
+    "createRequest": "Create Request",
+    "aria": {
+      "backToRequests": "Back to requests",
+      "clearCompany": "Clear company",
+      "clearContact": "Clear contact"
+    }
   },
   "messages": {
     "requestCreated": "Request created successfully",

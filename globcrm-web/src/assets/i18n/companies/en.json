@@ -115,7 +115,10 @@
       "matchPercent": "% match"
     },
     "saveChanges": "Save Changes",
-    "createCompany": "Create Company"
+    "createCompany": "Create Company",
+    "aria": {
+      "dismissWarning": "Dismiss warning"
+    }
   },
   "messages": {
     "companyCreated": "Company created successfully",

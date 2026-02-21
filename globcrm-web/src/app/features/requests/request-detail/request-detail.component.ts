@@ -230,7 +230,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
         <!-- Header -->
         <div class="detail-header">
           <div class="header-left">
-            <a mat-icon-button routerLink="/requests" aria-label="Back to requests">
+            <a mat-icon-button routerLink="/requests" [attr.aria-label]="'requests.detail.aria.backToRequests' | transloco">
               <mat-icon>arrow_back</mat-icon>
             </a>
             <div>

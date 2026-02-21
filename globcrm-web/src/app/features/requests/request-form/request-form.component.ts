@@ -148,7 +148,7 @@ import {
   template: `
     <div class="entity-form-container">
       <div class="form-header">
-        <a mat-icon-button routerLink="/requests" aria-label="Back to requests">
+        <a mat-icon-button routerLink="/requests" [attr.aria-label]="'requests.form.aria.backToRequests' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <h1>{{ isEditMode ? ('requests.form.editTitle' | transloco) : ('requests.form.createTitle' | transloco) }}</h1>
@@ -217,7 +217,7 @@ import {
                   }
                 </mat-autocomplete>
                 @if (selectedContactId()) {
-                  <button matSuffix mat-icon-button (click)="clearContact($event)" aria-label="Clear contact">
+                  <button matSuffix mat-icon-button (click)="clearContact($event)" [attr.aria-label]="'requests.form.aria.clearContact' | transloco">
                     <mat-icon>close</mat-icon>
                   </button>
                 }
@@ -243,7 +243,7 @@ import {
                   }
                 </mat-autocomplete>
                 @if (selectedCompanyId()) {
-                  <button matSuffix mat-icon-button (click)="clearCompany($event)" aria-label="Clear company">
+                  <button matSuffix mat-icon-button (click)="clearCompany($event)" [attr.aria-label]="'requests.form.aria.clearCompany' | transloco">
                     <mat-icon>close</mat-icon>
                   </button>
                 }

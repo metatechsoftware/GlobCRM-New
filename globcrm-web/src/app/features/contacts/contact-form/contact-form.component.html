@@ -31,7 +31,7 @@
           }
         </div>
         <button mat-icon-button class="duplicate-warning__dismiss"
-                (click)="dismissDuplicateWarning()" aria-label="Dismiss warning">
+                (click)="dismissDuplicateWarning()" [attr.aria-label]="'form.aria.dismissWarning' | transloco">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -113,7 +113,7 @@
           @if (selectedCompanyId()) {
             <button mat-icon-button matSuffix type="button"
                     (click)="clearCompany()"
-                    aria-label="Clear company">
+                    [attr.aria-label]="'form.aria.clearCompany' | transloco">
               <mat-icon>close</mat-icon>
             </button>
           }

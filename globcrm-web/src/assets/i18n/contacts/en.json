@@ -145,7 +145,11 @@
       "matchPercent": "% match"
     },
     "saveChanges": "Save Changes",
-    "createContact": "Create Contact"
+    "createContact": "Create Contact",
+    "aria": {
+      "clearCompany": "Clear company",
+      "dismissWarning": "Dismiss warning"
+    }
   },
   "messages": {
     "contactCreated": "Contact created successfully",

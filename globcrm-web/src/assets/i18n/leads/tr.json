@@ -60,6 +60,9 @@
       "columnAuthor": "Yazar",
       "columnDate": "Tarih"
     },
+    "sidebar": {
+      "timeline": "Zaman Cizelgesi"
+    },
     "conversion": {
       "title": "Donusum Detaylari",
       "convertedOn": "Donusum Tarihi",

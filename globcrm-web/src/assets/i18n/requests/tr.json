@@ -44,6 +44,9 @@
     "notes": {
       "noNotes": "Bu talep icin not bulunmuyor.",
       "addNote": "Not Ekle"
+    },
+    "aria": {
+      "backToRequests": "Taleplere don"
     }
   },
   "form": {
@@ -71,7 +74,12 @@
       "priorityRequired": "Oncelik zorunludur"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createRequest": "Talep Olustur"
+    "createRequest": "Talep Olustur",
+    "aria": {
+      "backToRequests": "Taleplere don",
+      "clearCompany": "Sirket temizle",
+      "clearContact": "Kisiyi temizle"
+    }
   },
   "messages": {
     "requestCreated": "Talep basariyla olusturuldu",
