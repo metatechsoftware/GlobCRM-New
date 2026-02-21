@@ -9,8 +9,8 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 
 ### Localization
 
-- [ ] **LOCL-01**: User can switch UI language between English and Turkish at runtime without page reload
-- [ ] **LOCL-02**: User's language preference persists across sessions (saved to profile)
+- [x] **LOCL-01**: User can switch UI language between English and Turkish at runtime without page reload
+- [x] **LOCL-02**: User's language preference persists across sessions (saved to profile)
 - [ ] **LOCL-03**: All UI strings (labels, buttons, messages, tooltips) render in the selected language via translation pipe
 - [ ] **LOCL-04**: Date, number, and currency values format according to selected locale (Turkish: dd.MM.yyyy, comma decimal)
 - [ ] **LOCL-05**: Translation files lazy-load per feature scope (only load contact translations when on contacts page)
@@ -131,8 +131,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| LOCL-01 | Phase 27 | Pending |
-| LOCL-02 | Phase 27 | Pending |
+| LOCL-01 | Phase 27 | Complete |
+| LOCL-02 | Phase 27 | Complete |
 | LOCL-03 | Phase 28 | Pending |
 | LOCL-04 | Phase 27 | Pending |
 | LOCL-05 | Phase 27 | Pending |

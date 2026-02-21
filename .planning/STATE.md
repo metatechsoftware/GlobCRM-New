@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 27 of 31 (Localization Foundation)
-Plan: 1 of 4 complete
+Plan: 2 of 4 complete
 Status: Executing
-Last activity: 2026-02-21 — Completed 27-01 (Transloco i18n Foundation)
+Last activity: 2026-02-21 — Completed 27-02 (Navbar Language Switcher)
 
-Progress: [██████████████████░░] 85% (159/~188 plans estimated)
+Progress: [██████████████████░░] 85% (160/~188 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [██████████████████░░] 85% (15
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 159
+- Total plans completed: 160
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -40,6 +40,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 27-01: LanguageService uses localStorage-only persistence; backend profile API integration deferred to Plan 02
 - 27-01: missingHandler configured with useFallbackTranslation: true for graceful fallback (LOCL-06)
 - 27-01: Language detection priority: localStorage > navigator.language > default 'en'
+- 27-02: Backend persistence is fire-and-forget with silent error handling to never block the UI
+- 27-02: Language toggle uses self-translating label (Language/Dil) for bootstrap reliability
+- 27-02: stopPropagation keeps mat-menu open during language toggle interaction
 
 ### Pending Todos
 
@@ -54,6 +57,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 27-01-PLAN.md
-Resume file: .planning/phases/27-localization-foundation/27-01-SUMMARY.md
-Next step: Execute 27-02-PLAN.md (Navbar Language Switcher & Auth Page Localization)
+Stopped at: Completed 27-02-PLAN.md
+Resume file: .planning/phases/27-localization-foundation/27-02-SUMMARY.md
+Next step: Execute 27-03-PLAN.md

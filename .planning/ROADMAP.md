@@ -164,7 +164,7 @@ Plans:
 | 24. My Day Personal Dashboard | v1.2 | 5/5 | Complete | 2026-02-20 |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
-| 27. Localization Foundation | 1/4 | In Progress|  | - |
+| 27. Localization Foundation | 2/4 | In Progress|  | - |
 | 28. Localization String Extraction | v1.3 | 0/? | Not started | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
