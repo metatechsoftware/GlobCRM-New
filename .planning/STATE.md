@@ -50,6 +50,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Roadmap created for v1.3 milestone
-Resume file: N/A
+Stopped at: Phase 27 context gathered
+Resume file: .planning/phases/27-localization-foundation/27-CONTEXT.md
 Next step: `/gsd:plan-phase 27` (Localization Foundation)
