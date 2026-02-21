@@ -191,7 +191,7 @@ export interface TemplatePickerResult {
                           [srcdoc]="template.htmlBody | safeHtml"
                           sandbox
                           scrolling="no"
-                          title="Template preview"></iframe>
+                          [title]="'sequences.templatePicker.templatePreviewTitle' | transloco"></iframe>
                 }
               </div>
             }

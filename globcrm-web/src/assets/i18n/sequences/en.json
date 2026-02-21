@@ -96,7 +96,8 @@
       "subjectPlaceholder": "Subject (optional - defaults to template subject)",
       "delay": "Delay",
       "waitDaysLabel": "Wait (days)",
-      "sendAtLabel": "Send at (time)"
+      "sendAtLabel": "Send at (time)",
+      "templatePreviewTitle": "Template preview"
     }
   },
   "templatePicker": {
@@ -104,7 +105,8 @@
     "search": "Search templates",
     "searchPlaceholder": "Search by name...",
     "noTemplates": "No templates found",
-    "selectButton": "Select Template"
+    "selectButton": "Select Template",
+    "templatePreviewTitle": "Template preview"
   },
   "sequencePicker": {
     "title": "Select Sequence",

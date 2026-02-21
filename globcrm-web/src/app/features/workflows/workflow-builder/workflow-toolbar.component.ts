@@ -51,11 +51,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
       <mat-form-field appearance="outline" class="toolbar__entity-select">
         <mat-label>{{ 'builder.entityType' | transloco }}</mat-label>
         <mat-select [value]="entityType()" (selectionChange)="entityTypeChanged.emit($event.value)">
-          <mat-option value="Contact">Contact</mat-option>
-          <mat-option value="Company">Company</mat-option>
-          <mat-option value="Deal">Deal</mat-option>
-          <mat-option value="Lead">Lead</mat-option>
-          <mat-option value="Activity">Activity</mat-option>
+          <mat-option value="Contact">{{ 'builder.entityTypes.Contact' | transloco }}</mat-option>
+          <mat-option value="Company">{{ 'builder.entityTypes.Company' | transloco }}</mat-option>
+          <mat-option value="Deal">{{ 'builder.entityTypes.Deal' | transloco }}</mat-option>
+          <mat-option value="Lead">{{ 'builder.entityTypes.Lead' | transloco }}</mat-option>
+          <mat-option value="Activity">{{ 'builder.entityTypes.Activity' | transloco }}</mat-option>
         </mat-select>
       </mat-form-field>
 

@@ -43,7 +43,7 @@ import { WorkflowNode } from '../../workflow.models';
                fOutputConnectableSide="bottom"
                class="connector connector-output-yes">
           </div>
-          <span class="branch-label yes-label">Yes</span>
+          <span class="branch-label yes-label">{{ 'builder.branchYes' | transloco }}</span>
         </div>
         <div class="branch-output-wrapper">
           <div fNodeOutput
@@ -51,7 +51,7 @@ import { WorkflowNode } from '../../workflow.models';
                fOutputConnectableSide="bottom"
                class="connector connector-output-no">
           </div>
-          <span class="branch-label no-label">No</span>
+          <span class="branch-label no-label">{{ 'builder.branchNo' | transloco }}</span>
         </div>
       </div>
     </div>

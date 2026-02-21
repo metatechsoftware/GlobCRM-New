@@ -81,7 +81,19 @@
     "failedToSave": "Kaydedilemedi",
     "failedToCreate": "Olusturulamadi",
     "cannotSave": "Kaydedilemiyor",
-    "templateApplied": "Sablon uygulandi"
+    "templateApplied": "Sablon uygulandi",
+    "branchYes": "Evet",
+    "branchNo": "Hayir",
+    "zoomIn": "Yakinlastir",
+    "zoomOut": "Uzaklastir",
+    "fitToView": "Ekrana sigdir",
+    "entityTypes": {
+      "Contact": "Kisi",
+      "Company": "Sirket",
+      "Deal": "Anlasmma",
+      "Lead": "Aday",
+      "Activity": "Aktivite"
+    }
   },
   "saveTemplate": {
     "title": "Sablon Olarak Kaydet",

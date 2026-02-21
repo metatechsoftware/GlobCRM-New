@@ -13,7 +13,7 @@
     <mat-button-toggle-group
       [value]="deviceMode()"
       (change)="onDeviceChange($event.value)"
-      aria-label="Device preview mode"
+      [attr.aria-label]="'email-templates.preview.aria.devicePreviewMode' | transloco"
     >
       <mat-button-toggle value="desktop" [matTooltip]="'email-templates.preview.desktopTooltip' | transloco">
         <mat-icon>monitor</mat-icon>
@@ -46,7 +46,7 @@
             [value]="entitySearchQuery()"
             (input)="onEntitySearchInput($any($event.target).value)"
             [matAutocomplete]="entityAuto"
-            placeholder="Type to search..."
+            [placeholder]="'email-templates.preview.searchPlaceholder' | transloco"
           />
           @if (searchingEntities()) {
             <mat-spinner matSuffix diameter="18"></mat-spinner>

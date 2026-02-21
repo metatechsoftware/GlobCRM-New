@@ -50,7 +50,11 @@
     "refreshTooltip": "Refresh preview",
     "sendTest": "Send Test",
     "subject": "Subject",
-    "loading": "Loading preview..."
+    "loading": "Loading preview...",
+    "aria": {
+      "devicePreviewMode": "Device preview mode"
+    },
+    "searchPlaceholder": "Type to search..."
   },
   "clone": {
     "title": "Clone Template",

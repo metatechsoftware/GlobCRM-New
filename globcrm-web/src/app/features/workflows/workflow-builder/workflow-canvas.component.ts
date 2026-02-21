@@ -103,7 +103,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
                        fOutputConnectableSide="bottom"
                        class="connector connector-output-yes">
                   </div>
-                  <span class="branch-label yes-label">Yes</span>
+                  <span class="branch-label yes-label">{{ 'builder.branchYes' | transloco }}</span>
                 </div>
                 <div class="branch-output-wrapper">
                   <div fNodeOutput
@@ -111,7 +111,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
                        fOutputConnectableSide="bottom"
                        class="connector connector-output-no">
                   </div>
-                  <span class="branch-label no-label">No</span>
+                  <span class="branch-label no-label">{{ 'builder.branchNo' | transloco }}</span>
                 </div>
               </div>
             }
@@ -146,13 +146,13 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
     <!-- Zoom Controls -->
     @if (nodes().length > 0) {
       <div class="zoom-controls">
-        <button mat-icon-button (click)="zoomIn()" class="zoom-btn" title="Zoom in">
+        <button mat-icon-button (click)="zoomIn()" class="zoom-btn" [title]="'builder.zoomIn' | transloco">
           <mat-icon>add</mat-icon>
         </button>
-        <button mat-icon-button (click)="zoomOut()" class="zoom-btn" title="Zoom out">
+        <button mat-icon-button (click)="zoomOut()" class="zoom-btn" [title]="'builder.zoomOut' | transloco">
           <mat-icon>remove</mat-icon>
         </button>
-        <button mat-icon-button (click)="fitToView()" class="zoom-btn" title="Fit to view">
+        <button mat-icon-button (click)="fitToView()" class="zoom-btn" [title]="'builder.fitToView' | transloco">
           <mat-icon>fit_screen</mat-icon>
         </button>
       </div>
@@ -578,14 +578,13 @@ export class WorkflowCanvasComponent {
   private getTriggerBadge(node: WorkflowNode): string {
     const config = node.config;
     if (!config) return '';
-    switch (config['triggerType']) {
-      case 'recordCreated': return 'Record Created';
-      case 'recordUpdated': return 'Record Updated';
-      case 'recordDeleted': return 'Record Deleted';
-      case 'fieldChanged': return 'Field Changed';
-      case 'dateBased': return 'Date Based';
-      default: return '';
+    const triggerType = config['triggerType'];
+    if (triggerType) {
+      const key = `nodes.${triggerType}`;
+      const translated = this.transloco.translate(key);
+      return translated !== key ? translated : '';
     }
+    return '';
   }
 
   private getActionIcon(node: WorkflowNode): string {
@@ -603,15 +602,12 @@ export class WorkflowCanvasComponent {
 
   private getActionBadge(node: WorkflowNode): string {
     const actionType = node.config?.['actionType'];
-    switch (actionType) {
-      case 'updateField': return 'Update Field';
-      case 'sendNotification': return 'Send Notification';
-      case 'createActivity': return 'Create Activity';
-      case 'sendEmail': return 'Send Email';
-      case 'fireWebhook': return 'Fire Webhook';
-      case 'enrollInSequence': return 'Enroll in Sequence';
-      default: return '';
+    if (actionType) {
+      const key = `nodes.${actionType}`;
+      const translated = this.transloco.translate(key);
+      return translated !== key ? translated : '';
     }
+    return '';
   }
 
   private getConditionSummary(node: WorkflowNode): string {
@@ -630,6 +626,6 @@ export class WorkflowCanvasComponent {
     if (!config?.['duration'] || !config?.['unit']) return '';
     const duration = config['duration'];
     const unit = config['unit'];
-    return `Wait ${duration} ${unit}`;
+    return `${this.transloco.translate('nodes.waitPrefix')} ${duration} ${unit}`;
   }
 }

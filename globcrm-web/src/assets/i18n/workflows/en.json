@@ -81,7 +81,19 @@
     "failedToSave": "Failed to save",
     "failedToCreate": "Failed to create",
     "cannotSave": "Cannot save",
-    "templateApplied": "Template applied"
+    "templateApplied": "Template applied",
+    "branchYes": "Yes",
+    "branchNo": "No",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out",
+    "fitToView": "Fit to view",
+    "entityTypes": {
+      "Contact": "Contact",
+      "Company": "Company",
+      "Deal": "Deal",
+      "Lead": "Lead",
+      "Activity": "Activity"
+    }
   },
   "saveTemplate": {
     "title": "Save as Template",

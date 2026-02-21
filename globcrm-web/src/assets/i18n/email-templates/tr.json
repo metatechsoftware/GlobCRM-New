@@ -50,7 +50,11 @@
     "refreshTooltip": "Onizlemeyi yenile",
     "sendTest": "Test Gonder",
     "subject": "Konu",
-    "loading": "Onizleme yukleniyor..."
+    "loading": "Onizleme yukleniyor...",
+    "aria": {
+      "devicePreviewMode": "Cihaz onizleme modu"
+    },
+    "searchPlaceholder": "Aramak icin yazin..."
   },
   "clone": {
     "title": "Sablonu Kopyala",

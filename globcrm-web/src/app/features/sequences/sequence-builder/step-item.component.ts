@@ -293,7 +293,7 @@ import { SafeHtmlPipe } from '../../../shared/pipes/safe-html.pipe';
                       [srcdoc]="templatePreviewHtml()! | safeHtml"
                       sandbox
                       scrolling="no"
-                      title="Template preview"></iframe>
+                      [title]="'sequences.builder.stepItem.templatePreviewTitle' | transloco"></iframe>
             }
           </div>
 

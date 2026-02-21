@@ -96,7 +96,8 @@
       "subjectPlaceholder": "Konu (istege bagli - varsayilan olarak sablon konusu)",
       "delay": "Gecikme",
       "waitDaysLabel": "Bekleme (gun)",
-      "sendAtLabel": "Gonderim saati"
+      "sendAtLabel": "Gonderim saati",
+      "templatePreviewTitle": "Sablon onizleme"
     }
   },
   "templatePicker": {
@@ -104,7 +105,8 @@
     "search": "Sablon ara",
     "searchPlaceholder": "Ada gore ara...",
     "noTemplates": "Sablon bulunamadi",
-    "selectButton": "Sablon Sec"
+    "selectButton": "Sablon Sec",
+    "templatePreviewTitle": "Sablon onizleme"
   },
   "sequencePicker": {
     "title": "Dizi Sec",
