@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 27 of 31 (Localization Foundation)
-Plan: 4 of 4 complete
+Plan: 5 of 5 complete
 Status: Phase Complete
-Last activity: 2026-02-21 — Completed 27-04 (Feature Scoped Translation Lazy-Loading & Org Default Language)
+Last activity: 2026-02-21 — Completed 27-05 (Gap Closure: syncFromProfile Auth Wiring)
 
-Progress: [██████████████████░░] 86% (162/~188 plans estimated)
+Progress: [██████████████████░░] 87% (163/~188 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [██████████████████░░] 86% (16
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 162
+- Total plans completed: 163
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -50,6 +50,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 27-04: Translation files at assets/i18n/{scope}/{lang}.json, compatible with existing TranslocoHttpLoader
 - 27-04: Org default language fetched via API in syncFromProfile fallback (TenantStore not yet populated)
 - 27-04: Language resolution order: user profile > org default (API) > browser detection > 'en'
+- 27-05: syncLanguage parameter on handleLoginSuccess skips language sync during automatic token refresh
+- 27-05: Language sync is fire-and-forget after login, does not block navigation or UI rendering
+- 27-05: On preferences fetch failure, syncFromProfile(null) triggers org default fallback chain
 
 ### Pending Todos
 
@@ -64,6 +67,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 27-04-PLAN.md (Phase 27 complete)
-Resume file: .planning/phases/27-localization-foundation/27-04-SUMMARY.md
+Stopped at: Completed 27-05-PLAN.md (Phase 27 gap closure complete)
+Resume file: .planning/phases/27-localization-foundation/27-05-SUMMARY.md
 Next step: Plan Phase 28
