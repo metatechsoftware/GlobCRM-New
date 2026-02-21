@@ -14,7 +14,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [ ] **LOCL-03**: All UI strings (labels, buttons, messages, tooltips) render in the selected language via translation pipe
 - [ ] **LOCL-04**: Date, number, and currency values format according to selected locale (Turkish: dd.MM.yyyy, comma decimal)
 - [ ] **LOCL-05**: Translation files lazy-load per feature scope (only load contact translations when on contacts page)
-- [ ] **LOCL-06**: Missing translations fall back to English without showing broken keys
+- [x] **LOCL-06**: Missing translations fall back to English without showing broken keys
 - [ ] **LOCL-07**: Admin can set a default language for the organization (new users inherit it)
 - [ ] **LOCL-08**: Angular Material components (paginator, sort headers, date picker) display labels in selected language
 - [ ] **LOCL-09**: CI check validates EN and TR translation files have matching key sets
@@ -136,7 +136,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOCL-03 | Phase 28 | Pending |
 | LOCL-04 | Phase 27 | Pending |
 | LOCL-05 | Phase 27 | Pending |
-| LOCL-06 | Phase 27 | Pending |
+| LOCL-06 | Phase 27 | Complete |
 | LOCL-07 | Phase 27 | Pending |
 | LOCL-08 | Phase 27 | Pending |
 | LOCL-09 | Phase 28 | Pending |
