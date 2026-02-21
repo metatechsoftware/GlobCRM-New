@@ -53,6 +53,12 @@
     }
   },
   "nav": {
+    "groups": {
+      "crm": "CRM",
+      "work": "İş",
+      "connect": "Bağlantı",
+      "admin": "Yönetim"
+    },
     "myDay": "Günüm",
     "analytics": "Analitik",
     "reports": "Raporlar",

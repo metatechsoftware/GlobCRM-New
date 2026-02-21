@@ -53,6 +53,12 @@
     }
   },
   "nav": {
+    "groups": {
+      "crm": "CRM",
+      "work": "Work",
+      "connect": "Connect",
+      "admin": "Admin"
+    },
     "myDay": "My Day",
     "analytics": "Analytics",
     "reports": "Reports",

@@ -20,7 +20,7 @@
 
     <!-- Navigation -->
     <nav class="sidebar__nav">
-      @for (group of navGroups; track group.label) {
+      @for (group of navGroups(); track group.label) {
         @if (group.label) {
           <div class="sidebar__group-label">{{ group.label }}</div>
           <div class="sidebar__group-divider"></div>
@@ -112,7 +112,7 @@
     }
 
     <nav class="sidebar__nav">
-      @for (group of navGroups; track group.label) {
+      @for (group of navGroups(); track group.label) {
         @if (group.label) {
           <div class="sidebar__group-label">{{ group.label }}</div>
         }
@@ -144,16 +144,16 @@
   <mat-divider></mat-divider>
   <button mat-menu-item routerLink="/profile">
     <mat-icon>person_outline</mat-icon>
-    <span>My Profile</span>
+    <span>{{ 'userMenu.myProfile' | transloco }}</span>
   </button>
   <button mat-menu-item (click)="navigateToSecurity()">
     <mat-icon>shield</mat-icon>
-    <span>Security</span>
+    <span>{{ 'userMenu.security' | transloco }}</span>
   </button>
   <mat-divider></mat-divider>
   <div class="sidebar-user-menu__lang-toggle" (click)="$event.stopPropagation()">
     <mat-icon>language</mat-icon>
-    <span class="sidebar-user-menu__lang-label">{{ currentLang() === 'tr' ? 'Dil' : 'Language' }}</span>
+    <span class="sidebar-user-menu__lang-label">{{ 'userMenu.language' | transloco }}</span>
     <div class="lang-segmented">
       <button class="lang-segmented__btn"
               [class.lang-segmented__btn--active]="currentLang() === 'en'"
@@ -166,6 +166,6 @@
   <mat-divider></mat-divider>
   <button mat-menu-item (click)="logout()" class="sidebar-user-menu__logout">
     <mat-icon>logout</mat-icon>
-    <span>Sign Out</span>
+    <span>{{ 'userMenu.signOut' | transloco }}</span>
   </button>
 </mat-menu>
