@@ -157,6 +157,15 @@ public class ApplicationDbContext
     // My Day DbSets
     public DbSet<RecentlyViewedEntity> RecentlyViewedEntities => Set<RecentlyViewedEntity>();
 
+    // Kanban Boards DbSets
+    public DbSet<KanbanBoard> KanbanBoards => Set<KanbanBoard>();
+    public DbSet<KanbanColumn> KanbanColumns => Set<KanbanColumn>();
+    public DbSet<KanbanCard> KanbanCards => Set<KanbanCard>();
+    public DbSet<KanbanLabel> KanbanLabels => Set<KanbanLabel>();
+    public DbSet<KanbanCardLabel> KanbanCardLabels => Set<KanbanCardLabel>();
+    public DbSet<KanbanChecklistItem> KanbanChecklistItems => Set<KanbanChecklistItem>();
+    public DbSet<KanbanCardComment> KanbanCardComments => Set<KanbanCardComment>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -276,6 +285,15 @@ public class ApplicationDbContext
 
         // My Day entity configurations
         modelBuilder.ApplyConfiguration(new RecentlyViewedEntityConfiguration());
+
+        // Kanban Boards entity configurations
+        modelBuilder.ApplyConfiguration(new KanbanBoardConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanColumnConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanCardConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanLabelConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanCardLabelConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanChecklistItemConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanCardCommentConfiguration());
 
         // Global query filter: filter Invitations by TenantId matching current tenant
         // When no tenant is resolved (e.g., login, org creation), filter is bypassed
@@ -495,5 +513,13 @@ public class ApplicationDbContext
         // Global query filter: filter RecentlyViewedEntities by TenantId (tenant-scoped)
         modelBuilder.Entity<RecentlyViewedEntity>().HasQueryFilter(
             rv => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rv.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter KanbanBoards by TenantId (tenant-scoped)
+        modelBuilder.Entity<KanbanBoard>().HasQueryFilter(
+            kb => _tenantProvider == null || _tenantProvider.GetTenantId() == null || kb.TenantId == _tenantProvider.GetTenantId());
+
+        // Note: KanbanColumn, KanbanCard, KanbanLabel, KanbanCardLabel, KanbanChecklistItem,
+        // KanbanCardComment do NOT need their own query filters -- they are filtered through
+        // their parent KanbanBoard FK chain which is already tenant-filtered.
     }
 }

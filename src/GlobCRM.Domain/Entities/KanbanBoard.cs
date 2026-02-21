@@ -32,7 +32,7 @@ public class KanbanBoard
     /// <summary>
     /// The user who created this board. Set to null if the creator is deleted (SET NULL on delete).
     /// </summary>
-    public Guid CreatorId { get; set; }
+    public Guid? CreatorId { get; set; }
 
     /// <summary>
     /// Required when Visibility == Team. The team whose members can access this board.
