@@ -13,6 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { FeedStore } from '../feed.store';
 import { FeedItemDto, FeedItemType, CreateFeedPostPayload } from '../feed.models';
 import { FeedPostFormComponent } from '../feed-post-form/feed-post-form.component';
@@ -41,6 +42,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     FeedPostFormComponent,
     RenderMentionsPipe,
     AvatarComponent,
+    TranslocoPipe,
   ],
   providers: [FeedStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -686,8 +688,8 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
         <mat-icon>dynamic_feed</mat-icon>
       </div>
       <div class="feed-header-text">
-        <h1>Team Feed</h1>
-        <span class="feed-subtitle">Activity and updates from your team</span>
+        <h1>{{ 'list.title' | transloco }}</h1>
+        <span class="feed-subtitle">{{ 'list.subtitle' | transloco }}</span>
       </div>
     </div>
 
@@ -716,8 +718,8 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
         <div class="empty-icon-wrap">
           <mat-icon>dynamic_feed</mat-icon>
         </div>
-        <p class="empty-title">No activity yet</p>
-        <p class="empty-description">Share an update, celebrate a win, or tag a colleague to get the conversation started.</p>
+        <p class="empty-title">{{ 'list.emptyTitle' | transloco }}</p>
+        <p class="empty-description">{{ 'list.emptyDescription' | transloco }}</p>
       </div>
     } @else {
       <div class="feed-items">
@@ -741,7 +743,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                     [class.feed-type-badge--system]="item.type === 'SystemEvent'"
                     [class.feed-type-badge--social]="item.type === 'SocialPost'">
                 <mat-icon>{{ item.type === 'SystemEvent' ? 'auto_awesome' : 'chat' }}</mat-icon>
-                {{ item.type === 'SystemEvent' ? 'Activity' : 'Post' }}
+                {{ item.type === 'SystemEvent' ? ('list.activity' | transloco) : ('list.post' | transloco) }}
               </span>
             </div>
 
@@ -756,7 +758,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                  (click)="onEntityClick($event, item)"
                  (auxclick)="onEntityMiddleClick($event, item)">
                 <mat-icon class="entity-link-icon" [style.color]="getEntityColor(item.entityType)">{{ getEntityIcon(item.entityType) }}</mat-icon>
-                {{ item.entityName || ('View ' + item.entityType) }}
+                {{ item.entityName || ('list.viewEntity' | transloco: { entityType: item.entityType }) }}
                 <mat-icon class="entity-link-arrow">chevron_right</mat-icon>
               </a>
             }
@@ -764,7 +766,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
             @if (item.attachmentCount > 0) {
               <div class="feed-attachments">
                 <mat-icon>attach_file</mat-icon>
-                {{ item.attachmentCount }} attachment{{ item.attachmentCount !== 1 ? 's' : '' }}
+                {{ (item.attachmentCount !== 1 ? 'list.attachments' : 'list.attachment') | transloco: { count: item.attachmentCount } }}
               </div>
             }
 
@@ -773,12 +775,12 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                       [class.action-btn--active]="expandedComments().has(item.id)"
                       (click)="toggleComments(item.id)">
                 <mat-icon>comment</mat-icon>
-                {{ item.commentCount }}{{ item.commentCount === 1 ? ' comment' : ' comments' }}
+                {{ (item.commentCount === 1 ? 'list.comment' : 'list.comments') | transloco: { count: item.commentCount } }}
               </button>
               @if (canDelete(item)) {
                 <button class="action-btn action-btn--danger" (click)="deleteItem(item.id)">
                   <mat-icon>delete_outline</mat-icon>
-                  Delete
+                  {{ 'common.delete' | transloco }}
                 </button>
               }
             </div>
@@ -810,7 +812,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                     size="sm" />
                   <div class="comment-input-wrap">
                     <input class="comment-input"
-                           placeholder="Write a comment..."
+                           [placeholder]="'comments.placeholder' | transloco"
                            [value]="commentTexts()[item.id] || ''"
                            (input)="setCommentText(item.id, $any($event.target).value)"
                            (keydown.enter)="submitComment(item.id)" />
@@ -833,9 +835,9 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                   [disabled]="store.isLoading()"
                   (click)="store.loadMore()">
             @if (store.isLoading()) {
-              Loading...
+              {{ 'list.loadingMore' | transloco }}
             } @else {
-              Load more
+              {{ 'list.loadMore' | transloco }}
             }
           </button>
         </div>
@@ -850,6 +852,7 @@ export class FeedListComponent implements OnInit, OnDestroy {
   private readonly authStore = inject(AuthStore);
   private readonly router = inject(Router);
   private readonly userPreviewService = inject(UserPreviewService);
+  private readonly translocoService = inject(TranslocoService);
 
   /** Track which items have expanded comment sections. */
   readonly expandedComments = signal(new Set<string>());
@@ -1041,10 +1044,11 @@ export class FeedListComponent implements OnInit, OnDestroy {
     const diffHours = Math.floor(diffMinutes / 60);
     const diffDays = Math.floor(diffHours / 24);
 
-    if (diffSeconds < 60) return 'just now';
-    if (diffMinutes < 60) return `${diffMinutes}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(new Date(dateStr));
+    if (diffSeconds < 60) return this.translocoService.translate('feed.time.justNow');
+    if (diffMinutes < 60) return this.translocoService.translate('feed.time.minutesAgo', { count: diffMinutes });
+    if (diffHours < 24) return this.translocoService.translate('feed.time.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return this.translocoService.translate('feed.time.daysAgo', { count: diffDays });
+    const locale = this.translocoService.getActiveLang() === 'tr' ? 'tr-TR' : 'en-US';
+    return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(dateStr));
   }
 }

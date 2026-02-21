@@ -1,0 +1,54 @@
+{
+  "title": "Notes",
+  "list": {
+    "title": "Notes",
+    "newNote": "New Note",
+    "columns": {
+      "title": "Title",
+      "entityType": "Entity Type",
+      "entityName": "Entity Name",
+      "author": "Author",
+      "preview": "Preview",
+      "created": "Created",
+      "updated": "Updated"
+    }
+  },
+  "detail": {
+    "backToNotes": "Back to notes",
+    "author": "Author",
+    "entityType": "Entity Type",
+    "created": "Created",
+    "updated": "Updated",
+    "notFound": "Note not found",
+    "backToList": "Back to Notes"
+  },
+  "form": {
+    "createTitle": "Create Note",
+    "editTitle": "Edit Note",
+    "backToNotes": "Back to notes",
+    "noteInformation": "Note Information",
+    "title": "Title",
+    "titleRequired": "Title is required",
+    "titleMaxLength": "Title cannot exceed 200 characters",
+    "linkedEntity": "Linked Entity",
+    "entityType": "Entity Type",
+    "entityTypeRequired": "Entity type is required",
+    "entity": "Entity",
+    "searchEntity": "Search entity...",
+    "entityRequired": "Entity is required",
+    "body": "Body",
+    "bodyRequired": "Note body is required",
+    "bodyPlaceholder": "Write your note...",
+    "saveChanges": "Save Changes",
+    "createNote": "Create Note"
+  },
+  "messages": {
+    "deleted": "Note deleted",
+    "deleteFailed": "Failed to delete note",
+    "updated": "Note updated successfully",
+    "updateFailed": "Failed to update note",
+    "created": "Note created successfully",
+    "createFailed": "Failed to create note",
+    "loadFailed": "Failed to load note data"
+  }
+}

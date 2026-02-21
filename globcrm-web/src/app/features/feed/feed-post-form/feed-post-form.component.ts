@@ -12,6 +12,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AttachmentService } from '../../../shared/services/attachment.service';
 import { MentionTypeaheadComponent } from '../mention-typeahead/mention-typeahead.component';
@@ -34,6 +35,7 @@ import { CreateFeedPostPayload } from '../feed.models';
     MentionTypeaheadComponent,
     EmojiPickerComponent,
     AvatarComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -250,7 +252,7 @@ import { CreateFeedPostPayload } from '../feed.models';
                     #textareaRef
                     [(ngModel)]="postContent"
                     rows="2"
-                    placeholder="Share something with your team..."
+                    [placeholder]="'post.placeholder' | transloco"
                     (focus)="isFocused.set(true)"
                     (blur)="isFocused.set(false)"
                     (input)="onTextareaInput()"
@@ -271,15 +273,15 @@ import { CreateFeedPostPayload } from '../feed.models';
 
         <div class="post-form-actions">
           <div class="post-form-toolbar">
-            <button class="toolbar-btn" matTooltip="Attach file" type="button" (click)="fileInput.click()">
+            <button class="toolbar-btn" [matTooltip]="'post.attachFile' | transloco" type="button" (click)="fileInput.click()">
               <mat-icon>attach_file</mat-icon>
             </button>
             <input #fileInput type="file" hidden multiple (change)="onFileSelected($event)" />
-            <button class="toolbar-btn" matTooltip="Mention @" type="button" (click)="insertAtSymbol()">
+            <button class="toolbar-btn" [matTooltip]="'post.mention' | transloco" type="button" (click)="insertAtSymbol()">
               <mat-icon>alternate_email</mat-icon>
             </button>
             <div class="emoji-container">
-              <button class="toolbar-btn" matTooltip="Emoji" type="button" (click)="toggleEmojiPicker($event)">
+              <button class="toolbar-btn" [matTooltip]="'post.emoji' | transloco" type="button" (click)="toggleEmojiPicker($event)">
                 <mat-icon>sentiment_satisfied_alt</mat-icon>
               </button>
               @if (showEmojiPicker()) {
@@ -291,7 +293,7 @@ import { CreateFeedPostPayload } from '../feed.models';
                   [disabled]="!postContent.trim() && !pendingFiles().length"
                   (click)="onSubmit()">
             <mat-icon>send</mat-icon>
-            Post
+            {{ 'post.submit' | transloco }}
           </button>
         </div>
 

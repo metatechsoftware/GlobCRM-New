@@ -13,6 +13,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DatePipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { NoteService } from '../note.service';
@@ -42,6 +43,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
     MatDialogModule,
     MatSnackBarModule,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -195,7 +197,7 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         <!-- Header -->
         <div class="detail-header">
           <div class="header-left">
-            <a mat-icon-button routerLink="/notes" aria-label="Back to notes">
+            <a mat-icon-button routerLink="/notes" [attr.aria-label]="'detail.backToNotes' | transloco">
               <mat-icon>arrow_back</mat-icon>
             </a>
             <h1>{{ note()!.title }}</h1>
@@ -206,10 +208,10 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         <div class="action-bar">
           @if (canEditOrDelete()) {
             <button mat-stroked-button [routerLink]="['/notes', note()!.id, 'edit']">
-              <mat-icon>edit</mat-icon> Edit
+              <mat-icon>edit</mat-icon> {{ 'common.edit' | transloco }}
             </button>
             <button mat-stroked-button (click)="onDelete()" color="warn">
-              <mat-icon>delete</mat-icon> Delete
+              <mat-icon>delete</mat-icon> {{ 'common.delete' | transloco }}
             </button>
           }
           <span class="spacer"></span>
@@ -219,12 +221,12 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
         <div class="meta-cards">
           @if (note()!.authorName) {
             <div class="meta-card">
-              <div class="label">Author</div>
+              <div class="label">{{ 'detail.author' | transloco }}</div>
               <div class="value">{{ note()!.authorName }}</div>
             </div>
           }
           <div class="meta-card">
-            <div class="label">Entity Type</div>
+            <div class="label">{{ 'detail.entityType' | transloco }}</div>
             <div class="value">{{ note()!.entityType }}</div>
           </div>
           @if (note()!.entityName) {
@@ -236,12 +238,12 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
             </div>
           }
           <div class="meta-card">
-            <div class="label">Created</div>
+            <div class="label">{{ 'detail.created' | transloco }}</div>
             <div class="value">{{ note()!.createdAt | date:'medium' }}</div>
           </div>
           @if (note()!.updatedAt !== note()!.createdAt) {
             <div class="meta-card">
-              <div class="label">Updated</div>
+              <div class="label">{{ 'detail.updated' | transloco }}</div>
               <div class="value">{{ note()!.updatedAt | date:'medium' }}</div>
             </div>
           }
@@ -252,8 +254,8 @@ import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm
       </div>
     } @else {
       <div class="empty-state">
-        <h2>Note not found</h2>
-        <a mat-button routerLink="/notes">Back to Notes</a>
+        <h2>{{ 'detail.notFound' | transloco }}</h2>
+        <a mat-button routerLink="/notes">{{ 'detail.backToList' | transloco }}</a>
       </div>
     }
   `,
@@ -265,6 +267,7 @@ export class NoteDetailComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   /** Note detail data. */
   note = signal<NoteDetailDto | null>(null);
@@ -343,11 +346,11 @@ export class NoteDetailComponent implements OnInit {
       if (confirmed) {
         this.noteService.delete(this.noteId).subscribe({
           next: () => {
-            this.snackBar.open('Note deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.translocoService.translate('notes.messages.deleted'), this.translocoService.translate('common.ok'), { duration: 3000 });
             this.router.navigate(['/notes']);
           },
           error: () => {
-            this.snackBar.open('Failed to delete note', 'OK', {
+            this.snackBar.open(this.translocoService.translate('notes.messages.deleteFailed'), this.translocoService.translate('common.ok'), {
               duration: 5000,
             });
           },

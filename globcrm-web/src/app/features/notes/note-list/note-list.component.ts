@@ -21,6 +21,7 @@ import {
   ViewSort,
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -47,6 +48,7 @@ import { NoteListDto } from '../note.models';
     FilterChipsComponent,
     ViewSidebarComponent,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   providers: [ViewStore, NoteStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -60,13 +62,13 @@ import { NoteListDto } from '../note.models';
         (viewSelected)="onViewSelected($event)" />
       <div class="entity-list-content">
         <div class="list-header">
-          <h1>Notes</h1>
+          <h1>{{ 'list.title' | transloco }}</h1>
 
           <div class="list-header-actions">
             <button mat-raised-button color="primary"
                     *appHasPermission="'Note:Create'"
                     routerLink="new">
-              <mat-icon>add</mat-icon> New Note
+              <mat-icon>add</mat-icon> {{ 'list.newNote' | transloco }}
             </button>
           </div>
         </div>
@@ -104,6 +106,7 @@ export class NoteListComponent implements OnInit {
   private readonly customFieldService = inject(CustomFieldService);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
+  private readonly translocoService = inject(TranslocoService);
 
   /** All column definitions (core + custom fields). */
   columnDefs = signal<ColumnDefinition[]>([]);
@@ -124,16 +127,19 @@ export class NoteListComponent implements OnInit {
     'createdAt',
   ];
 
-  /** Core column definitions for Note entity. */
-  private readonly coreColumnDefs: ColumnDefinition[] = [
-    { fieldId: 'title', label: 'Title', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'entityType', label: 'Entity Type', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'entityName', label: 'Entity Name', isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
-    { fieldId: 'authorName', label: 'Author', isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
-    { fieldId: 'plainTextBody', label: 'Preview', isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
-    { fieldId: 'createdAt', label: 'Created', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-    { fieldId: 'updatedAt', label: 'Updated', isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
-  ];
+  /** Core column definitions for Note entity (labels resolved via transloco). */
+  private get coreColumnDefs(): ColumnDefinition[] {
+    const t = (key: string) => this.translocoService.translate(`notes.list.columns.${key}`);
+    return [
+      { fieldId: 'title', label: t('title'), isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+      { fieldId: 'entityType', label: t('entityType'), isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+      { fieldId: 'entityName', label: t('entityName'), isCustomField: false, fieldType: 'text', sortable: true, filterable: true },
+      { fieldId: 'authorName', label: t('author'), isCustomField: false, fieldType: 'text', sortable: true, filterable: false },
+      { fieldId: 'plainTextBody', label: t('preview'), isCustomField: false, fieldType: 'text', sortable: false, filterable: false },
+      { fieldId: 'createdAt', label: t('created'), isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+      { fieldId: 'updatedAt', label: t('updated'), isCustomField: false, fieldType: 'date', sortable: true, filterable: true },
+    ];
+  }
 
   /**
    * Display data with truncated plainTextBody preview (first 100 chars).

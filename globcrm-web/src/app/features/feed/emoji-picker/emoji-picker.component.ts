@@ -1,10 +1,12 @@
 import {
   Component,
   ChangeDetectionStrategy,
+  inject,
   output,
   signal,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface EmojiCategory {
   name: string;
@@ -29,7 +31,7 @@ const EMOJI_CATEGORIES: EmojiCategory[] = [
 @Component({
   selector: 'app-emoji-picker',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     @keyframes pickerEnter {
@@ -156,7 +158,7 @@ const EMOJI_CATEGORIES: EmojiCategory[] = [
         }
       </div>
       <div class="emoji-category-content">
-        <div class="emoji-category-label">{{ categories[activeCategory()].name }}</div>
+        <div class="emoji-category-label">{{ getCategoryLabel(activeCategory()) }}</div>
         <div class="emoji-grid">
           @for (emoji of categories[activeCategory()].emojis; track emoji) {
             <button class="emoji-btn" type="button" (click)="selectEmoji(emoji)">{{ emoji }}</button>
@@ -170,6 +172,20 @@ export class EmojiPickerComponent {
   readonly emojiSelected = output<string>();
   readonly categories = EMOJI_CATEGORIES;
   readonly activeCategory = signal(0);
+  private readonly translocoService = inject(TranslocoService);
+
+  /** Map category names to transloco keys. */
+  private readonly categoryTranslocoKeys: Record<string, string> = {
+    Reactions: 'feed.emoji.reactions',
+    Hands: 'feed.emoji.hands',
+    Objects: 'feed.emoji.objects',
+  };
+
+  getCategoryLabel(index: number): string {
+    const name = this.categories[index].name;
+    const key = this.categoryTranslocoKeys[name];
+    return key ? this.translocoService.translate(key) : name;
+  }
 
   setCategory(index: number): void {
     this.activeCategory.set(index);

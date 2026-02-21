@@ -35,6 +35,7 @@ import {
   takeUntil,
   of,
 } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { RichTextEditorComponent } from '../../../shared/components/rich-text-editor/rich-text-editor.component';
 import { NoteService } from '../note.service';
 import {
@@ -83,6 +84,7 @@ import { RequestListDto } from '../../requests/request.models';
     MatSnackBarModule,
     MatAutocompleteModule,
     RichTextEditorComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -181,10 +183,10 @@ import { RequestListDto } from '../../requests/request.models';
     <div class="entity-form-container">
       @if (!dialogMode()) {
         <div class="form-header">
-          <a mat-icon-button routerLink="/notes" aria-label="Back to notes">
+          <a mat-icon-button routerLink="/notes" [attr.aria-label]="'form.backToNotes' | transloco">
             <mat-icon>arrow_back</mat-icon>
           </a>
-          <h1>{{ isEditMode ? 'Edit Note' : 'Create Note' }}</h1>
+          <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
         </div>
       }
 
@@ -196,16 +198,16 @@ import { RequestListDto } from '../../requests/request.models';
         <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
           <!-- Note Title -->
           <div class="form-section">
-            <h3>Note Information</h3>
+            <h3>{{ 'form.noteInformation' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Title</mat-label>
+                <mat-label>{{ 'form.title' | transloco }}</mat-label>
                 <input matInput formControlName="title" required>
                 @if (noteForm.controls['title'].hasError('required')) {
-                  <mat-error>Title is required</mat-error>
+                  <mat-error>{{ 'form.titleRequired' | transloco }}</mat-error>
                 }
                 @if (noteForm.controls['title'].hasError('maxlength')) {
-                  <mat-error>Title cannot exceed 200 characters</mat-error>
+                  <mat-error>{{ 'form.titleMaxLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -213,10 +215,10 @@ import { RequestListDto } from '../../requests/request.models';
 
           <!-- Entity Linking -->
           <div class="form-section">
-            <h3>Linked Entity</h3>
+            <h3>{{ 'form.linkedEntity' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline">
-                <mat-label>Entity Type</mat-label>
+                <mat-label>{{ 'form.entityType' | transloco }}</mat-label>
                 <mat-select formControlName="entityType" required
                             (selectionChange)="onEntityTypeChanged()">
                   @for (type of entityTypes; track type.value) {
@@ -224,16 +226,16 @@ import { RequestListDto } from '../../requests/request.models';
                   }
                 </mat-select>
                 @if (noteForm.controls['entityType'].hasError('required')) {
-                  <mat-error>Entity type is required</mat-error>
+                  <mat-error>{{ 'form.entityTypeRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Entity</mat-label>
+                <mat-label>{{ 'form.entity' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="entitySearchControl"
                        [matAutocomplete]="entityAuto"
-                       placeholder="Search entity..."
+                       [placeholder]="'form.searchEntity' | transloco"
                        required>
                 <mat-autocomplete #entityAuto="matAutocomplete"
                                   [displayWith]="displayEntityName"
@@ -250,7 +252,7 @@ import { RequestListDto } from '../../requests/request.models';
                   }
                 </mat-autocomplete>
                 @if (noteForm.controls['entityId'].hasError('required')) {
-                  <mat-error>Entity is required</mat-error>
+                  <mat-error>{{ 'form.entityRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -258,27 +260,27 @@ import { RequestListDto } from '../../requests/request.models';
 
           <!-- Rich Text Body -->
           <div class="body-section">
-            <label>Body *</label>
+            <label>{{ 'form.body' | transloco }} *</label>
             <app-rich-text-editor
               formControlName="body"
-              placeholder="Write your note..."
+              [placeholder]="'form.bodyPlaceholder' | transloco"
               height="300px"
             />
             @if (noteForm.controls['body'].touched && noteForm.controls['body'].hasError('required')) {
-              <mat-error style="margin-top: 4px;">Note body is required</mat-error>
+              <mat-error style="margin-top: 4px;">{{ 'form.bodyRequired' | transloco }}</mat-error>
             }
           </div>
 
           <!-- Form actions -->
           @if (!dialogMode()) {
             <div class="form-actions">
-              <button mat-button type="button" routerLink="/notes">Cancel</button>
+              <button mat-button type="button" routerLink="/notes">{{ 'common.cancel' | transloco }}</button>
               <button mat-raised-button color="primary" type="submit"
                       [disabled]="noteForm.invalid || isSaving()">
                 @if (isSaving()) {
                   <mat-spinner diameter="20"></mat-spinner>
                 }
-                {{ isEditMode ? 'Save Changes' : 'Create Note' }}
+                {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createNote' | transloco) }}
               </button>
             </div>
           }
@@ -298,6 +300,7 @@ export class NoteFormComponent implements OnInit, OnDestroy {
   private readonly quoteService = inject(QuoteService);
   private readonly requestService = inject(RequestService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translocoService = inject(TranslocoService);
 
   /** Optional dialog data injected when used inside EntityFormDialogComponent. */
   private readonly dialogData = inject(MAT_DIALOG_DATA, { optional: true }) as { prefill?: { entityType?: string; entityId?: string; entityName?: string } } | null;
@@ -614,7 +617,7 @@ export class NoteFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load note data', 'Close', {
+        this.snackBar.open(this.translocoService.translate('notes.messages.loadFailed'), this.translocoService.translate('common.close'), {
           duration: 5000,
         });
       },
@@ -638,14 +641,14 @@ export class NoteFormComponent implements OnInit, OnDestroy {
       this.noteService.update(this.noteId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Note updated successfully', 'Close', {
+          this.snackBar.open(this.translocoService.translate('notes.messages.updated'), this.translocoService.translate('common.close'), {
             duration: 3000,
           });
           this.router.navigate(['/notes', this.noteId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update note', 'Close', {
+          this.snackBar.open(this.translocoService.translate('notes.messages.updateFailed'), this.translocoService.translate('common.close'), {
             duration: 5000,
           });
         },
@@ -662,7 +665,7 @@ export class NoteFormComponent implements OnInit, OnDestroy {
       this.noteService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Note created successfully', 'Close', {
+          this.snackBar.open(this.translocoService.translate('notes.messages.created'), this.translocoService.translate('common.close'), {
             duration: 3000,
           });
           if (this.dialogMode()) {
@@ -673,7 +676,7 @@ export class NoteFormComponent implements OnInit, OnDestroy {
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create note', 'Close', {
+          this.snackBar.open(this.translocoService.translate('notes.messages.createFailed'), this.translocoService.translate('common.close'), {
             duration: 5000,
           });
           if (this.dialogMode()) {

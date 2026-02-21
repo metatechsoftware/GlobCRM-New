@@ -1,0 +1,51 @@
+{
+  "title": "Feed",
+  "list": {
+    "title": "Team Feed",
+    "subtitle": "Activity and updates from your team",
+    "emptyTitle": "No activity yet",
+    "emptyDescription": "Share an update, celebrate a win, or tag a colleague to get the conversation started.",
+    "activity": "Activity",
+    "post": "Post",
+    "viewEntity": "View {{ entityType }}",
+    "attachment": "{{ count }} attachment",
+    "attachments": "{{ count }} attachments",
+    "comment": "{{ count }} comment",
+    "comments": "{{ count }} comments",
+    "loadMore": "Load more",
+    "loadingMore": "Loading..."
+  },
+  "post": {
+    "placeholder": "Share something with your team...",
+    "submit": "Post",
+    "attachFile": "Attach file",
+    "mention": "Mention @",
+    "emoji": "Emoji"
+  },
+  "comments": {
+    "placeholder": "Write a comment...",
+    "noComments": "No comments yet"
+  },
+  "emoji": {
+    "reactions": "Reactions",
+    "hands": "Hands",
+    "objects": "Objects"
+  },
+  "mention": {
+    "teamMember": "Team Member"
+  },
+  "time": {
+    "justNow": "just now",
+    "minutesAgo": "{{ count }}m ago",
+    "hoursAgo": "{{ count }}h ago",
+    "daysAgo": "{{ count }}d ago"
+  },
+  "messages": {
+    "posted": "Post shared",
+    "postFailed": "Failed to share post",
+    "deleted": "Post deleted",
+    "deleteFailed": "Failed to delete post",
+    "commentAdded": "Comment added",
+    "commentFailed": "Failed to add comment"
+  }
+}

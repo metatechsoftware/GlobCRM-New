@@ -11,6 +11,7 @@ import { HttpParams } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { MatIconModule } from '@angular/material/icon';
 
+import { TranslocoService } from '@jsverse/transloco';
 import { ApiService } from '../../../core/api/api.service';
 import { SearchService } from '../../../shared/components/global-search/search.service';
 import { SearchResponse } from '../../../shared/components/global-search/search.models';
@@ -184,6 +185,7 @@ interface TeamDirectoryResponse {
 export class MentionTypeaheadComponent {
   private readonly searchService = inject(SearchService);
   private readonly apiService = inject(ApiService);
+  private readonly translocoService = inject(TranslocoService);
 
   /** The textarea element to track cursor position from. */
   textareaEl = input<HTMLTextAreaElement | undefined>();
@@ -390,7 +392,7 @@ export class MentionTypeaheadComponent {
         id: member.id,
         name: `${member.firstName} ${member.lastName}`,
         type: 'User',
-        typeLabel: 'Team Member',
+        typeLabel: this.translocoService.translate('feed.mention.teamMember'),
         icon: 'person',
       });
     }

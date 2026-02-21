@@ -1,0 +1,51 @@
+{
+  "title": "Akis",
+  "list": {
+    "title": "Ekip Akisi",
+    "subtitle": "Ekibinizden aktivite ve guncellemeler",
+    "emptyTitle": "Henuz aktivite yok",
+    "emptyDescription": "Bir guncelleme paylasin, bir basariyi kutlayin veya sohbeti baslatmak icin bir meslektasinizi etiketleyin.",
+    "activity": "Aktivite",
+    "post": "Gonderi",
+    "viewEntity": "{{ entityType }} Goruntule",
+    "attachment": "{{ count }} ek",
+    "attachments": "{{ count }} ek",
+    "comment": "{{ count }} yorum",
+    "comments": "{{ count }} yorum",
+    "loadMore": "Daha fazla yukle",
+    "loadingMore": "Yukleniyor..."
+  },
+  "post": {
+    "placeholder": "Ekibinizle bir seyler paylasin...",
+    "submit": "Paylas",
+    "attachFile": "Dosya ekle",
+    "mention": "Bahset @",
+    "emoji": "Emoji"
+  },
+  "comments": {
+    "placeholder": "Bir yorum yazin...",
+    "noComments": "Henuz yorum yok"
+  },
+  "emoji": {
+    "reactions": "Tepkiler",
+    "hands": "Eller",
+    "objects": "Nesneler"
+  },
+  "mention": {
+    "teamMember": "Ekip Uyesi"
+  },
+  "time": {
+    "justNow": "az once",
+    "minutesAgo": "{{ count }}dk once",
+    "hoursAgo": "{{ count }}sa once",
+    "daysAgo": "{{ count }}g once"
+  },
+  "messages": {
+    "posted": "Gonderi paylasıldı",
+    "postFailed": "Gonderi paylasilamadi",
+    "deleted": "Gonderi silindi",
+    "deleteFailed": "Gonderi silinemedi",
+    "commentAdded": "Yorum eklendi",
+    "commentFailed": "Yorum eklenemedi"
+  }
+}

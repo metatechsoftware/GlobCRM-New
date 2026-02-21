@@ -1,0 +1,54 @@
+{
+  "title": "Notlar",
+  "list": {
+    "title": "Notlar",
+    "newNote": "Yeni Not",
+    "columns": {
+      "title": "Baslik",
+      "entityType": "Varlik Turu",
+      "entityName": "Varlik Adi",
+      "author": "Yazar",
+      "preview": "Onizleme",
+      "created": "Olusturulma",
+      "updated": "Guncellenme"
+    }
+  },
+  "detail": {
+    "backToNotes": "Notlara don",
+    "author": "Yazar",
+    "entityType": "Varlik Turu",
+    "created": "Olusturulma",
+    "updated": "Guncellenme",
+    "notFound": "Not bulunamadi",
+    "backToList": "Notlara Don"
+  },
+  "form": {
+    "createTitle": "Not Olustur",
+    "editTitle": "Notu Duzenle",
+    "backToNotes": "Notlara don",
+    "noteInformation": "Not Bilgileri",
+    "title": "Baslik",
+    "titleRequired": "Baslik zorunludur",
+    "titleMaxLength": "Baslik 200 karakteri asamaz",
+    "linkedEntity": "Bagli Varlik",
+    "entityType": "Varlik Turu",
+    "entityTypeRequired": "Varlik turu zorunludur",
+    "entity": "Varlik",
+    "searchEntity": "Varlik ara...",
+    "entityRequired": "Varlik zorunludur",
+    "body": "Icerik",
+    "bodyRequired": "Not icerigi zorunludur",
+    "bodyPlaceholder": "Notunuzu yazin...",
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createNote": "Not Olustur"
+  },
+  "messages": {
+    "deleted": "Not silindi",
+    "deleteFailed": "Not silinemedi",
+    "updated": "Not basariyla guncellendi",
+    "updateFailed": "Not guncellenemedi",
+    "created": "Not basariyla olusturuldu",
+    "createFailed": "Not olusturulamadi",
+    "loadFailed": "Not verileri yuklenemedi"
+  }
+}
