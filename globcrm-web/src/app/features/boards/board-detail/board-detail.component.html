@@ -1,0 +1,250 @@
+<!-- Board Detail — Kanban View -->
+
+@if (isLoading() && !board()) {
+  <mat-progress-bar mode="indeterminate" class="board-loading"></mat-progress-bar>
+}
+
+@if (board(); as board) {
+  <div class="board-layout">
+    <!-- Board Header -->
+    <div class="board-header">
+      <div class="board-header-left">
+        <button mat-icon-button (click)="goBack()" class="back-button"
+                [matTooltip]="'boards.detail.back' | transloco">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        @if (board.color) {
+          <span class="board-color-dot" [style.background-color]="board.color"></span>
+        }
+
+        @if (editingBoardName()) {
+          <input class="board-name-input"
+                 [(ngModel)]="editBoardNameValue"
+                 (blur)="saveBoardName()"
+                 (keydown.enter)="saveBoardName()"
+                 (keydown.escape)="cancelEditBoardName()"
+                 autofocus />
+        } @else {
+          <h1 class="board-name" (click)="startEditBoardName()">{{ board.name }}</h1>
+        }
+      </div>
+
+      <div class="board-header-right">
+        <button mat-icon-button [matMenuTriggerFor]="boardMenu"
+                [matTooltip]="'boards.detail.boardMenu' | transloco">
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #boardMenu="matMenu">
+          <button mat-menu-item (click)="startEditBoardName()">
+            <mat-icon>edit</mat-icon>
+            <span>{{ 'boards.actions.edit' | transloco }}</span>
+          </button>
+          <button mat-menu-item (click)="deleteBoard()" class="danger-action">
+            <mat-icon>delete</mat-icon>
+            <span>{{ 'boards.actions.delete' | transloco }}</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    @if (board.description) {
+      <div class="board-description" [class.expanded]="descriptionExpanded()">
+        <p (click)="descriptionExpanded.set(!descriptionExpanded())">{{ board.description }}</p>
+      </div>
+    }
+
+    <!-- Kanban Board — Column Reorder Container -->
+    <div class="kanban-board"
+         cdkDropList
+         [cdkDropListData]="board.columns"
+         cdkDropListOrientation="horizontal"
+         cdkDropListLockAxis="x"
+         (cdkDropListDropped)="onColumnDrop($event)"
+         [id]="'column-reorder'">
+
+      <!-- Columns (inside DropListGroup for card transfers) -->
+      <div class="card-drop-group" cdkDropListGroup>
+        @for (col of board.columns; track trackColumnById($index, col)) {
+          <div class="kanban-column"
+               cdkDrag
+               [cdkDragData]="col"
+               [class.collapsed]="isColumnCollapsed(col.id)"
+               [class.wip-exceeded]="isWipExceeded(col)"
+               [style.--column-color]="col.color || 'var(--orange-500)'">
+
+            <!-- Column Drag Preview (header only) -->
+            <div *cdkDragPreview class="column-drag-preview">
+              <mat-icon class="drag-preview-icon">drag_indicator</mat-icon>
+              <span class="drag-preview-name">{{ col.name }}</span>
+              <span class="drag-preview-count">{{ col.cards.length }}</span>
+            </div>
+
+            <!-- Column Drag Placeholder -->
+            <div *cdkDragPlaceholder class="column-placeholder"></div>
+
+            <!-- Collapsed Column View -->
+            @if (isColumnCollapsed(col.id)) {
+              <div class="column-collapsed-strip" (click)="toggleColumnCollapse(col)">
+                <span class="collapsed-name">{{ col.name }}</span>
+                <span class="collapsed-count">{{ col.cards.length }}</span>
+              </div>
+            } @else {
+              <!-- Column Header -->
+              <div class="column-header" cdkDragHandle>
+                <div class="column-header-top">
+                  <div class="column-header-left">
+                    <mat-icon class="column-drag-handle">drag_indicator</mat-icon>
+
+                    @if (editingColumnId() === col.id) {
+                      <input class="column-name-input"
+                             [(ngModel)]="editColumnNameValue"
+                             (blur)="saveColumnName(col)"
+                             (keydown.enter)="saveColumnName(col)"
+                             (keydown.escape)="cancelEditColumnName()"
+                             autofocus />
+                    } @else {
+                      <span class="column-name" (click)="startEditColumnName(col)">{{ col.name }}</span>
+                    }
+
+                    <span class="column-count-badge">{{ col.cards.length }}</span>
+
+                    @if (col.wipLimit != null) {
+                      <span class="wip-badge" [class.wip-over]="isWipExceeded(col)">
+                        {{ col.cards.length }}/{{ col.wipLimit }}
+                      </span>
+                    }
+                  </div>
+
+                  <div class="column-header-right">
+                    <button mat-icon-button
+                            [matMenuTriggerFor]="colMenu"
+                            class="column-menu-btn"
+                            (click)="$event.stopPropagation()">
+                      <mat-icon>more_vert</mat-icon>
+                    </button>
+                    <mat-menu #colMenu="matMenu">
+                      <button mat-menu-item (click)="startEditColumnName(col)">
+                        <mat-icon>edit</mat-icon>
+                        <span>{{ 'boards.detail.rename' | transloco }}</span>
+                      </button>
+                      <button mat-menu-item (click)="setWipLimit(col)">
+                        <mat-icon>speed</mat-icon>
+                        <span>{{ 'boards.detail.setWipLimit' | transloco }}</span>
+                      </button>
+                      <button mat-menu-item (click)="toggleColumnCollapse(col)">
+                        <mat-icon>unfold_less</mat-icon>
+                        <span>{{ 'boards.detail.collapse' | transloco }}</span>
+                      </button>
+                      <button mat-menu-item (click)="deleteColumn(col)" class="danger-action">
+                        <mat-icon>delete</mat-icon>
+                        <span>{{ 'boards.actions.delete' | transloco }}</span>
+                      </button>
+                    </mat-menu>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Column Body (Card Drop List) -->
+              <div class="column-body"
+                   cdkDropList
+                   [cdkDropListData]="col.cards"
+                   [id]="'col-' + col.id"
+                   [cdkDropListConnectedTo]="columnDropListIds()"
+                   (cdkDropListDropped)="onCardDrop($event, col)">
+
+                @for (card of col.cards; track trackCardById($index, card)) {
+                  <div cdkDrag [cdkDragData]="card" class="card-drag-wrapper">
+                    <!-- Card Drag Preview -->
+                    <div *cdkDragPreview class="card-drag-preview">
+                      <div class="card-preview-title">{{ card.title }}</div>
+                      @if (card.dueDate) {
+                        <span class="card-preview-date">
+                          <mat-icon class="preview-icon">event</mat-icon>
+                        </span>
+                      }
+                    </div>
+
+                    <!-- Card Drag Placeholder -->
+                    <div *cdkDragPlaceholder class="card-placeholder"></div>
+
+                    <!-- Actual Card -->
+                    <app-board-card
+                      [card]="card"
+                      [boardId]="board.id"
+                      (cardClicked)="onCardClicked($event)"
+                      (cardArchived)="onCardArchived($event)">
+                    </app-board-card>
+                  </div>
+                }
+
+                @if (col.cards.length === 0) {
+                  <div class="column-empty">
+                    {{ 'boards.detail.noCards' | transloco }}
+                  </div>
+                }
+              </div>
+
+              <!-- Column Footer — Add Card -->
+              <div class="column-footer">
+                @if (addingCardColumnId() === col.id) {
+                  <div class="add-card-form">
+                    <input class="add-card-input"
+                           [(ngModel)]="newCardTitle"
+                           [placeholder]="'boards.detail.cardTitlePlaceholder' | transloco"
+                           (keydown.enter)="saveNewCard(col.id)"
+                           (keydown.escape)="cancelAddCard()"
+                           autofocus />
+                    <div class="add-card-actions">
+                      <button mat-flat-button color="primary" (click)="saveNewCard(col.id)" class="add-card-save">
+                        {{ 'boards.detail.addCard' | transloco }}
+                      </button>
+                      <button mat-icon-button (click)="cancelAddCard()">
+                        <mat-icon>close</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+                } @else {
+                  <button class="add-card-button" (click)="startAddCard(col.id)">
+                    <mat-icon>add</mat-icon>
+                    {{ 'boards.detail.addCard' | transloco }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+
+      <!-- Add New Column -->
+      @if (addingColumn()) {
+        <div class="add-column-form">
+          <input class="add-column-input"
+                 [(ngModel)]="newColumnName"
+                 [placeholder]="'boards.detail.columnNamePlaceholder' | transloco"
+                 (keydown.enter)="saveNewColumn()"
+                 (keydown.escape)="cancelAddColumn()"
+                 autofocus />
+          <div class="add-column-actions">
+            <button mat-flat-button color="primary" (click)="saveNewColumn()" class="add-column-save">
+              {{ 'boards.detail.addColumn' | transloco }}
+            </button>
+            <button mat-icon-button (click)="cancelAddColumn()">
+              <mat-icon>close</mat-icon>
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="add-column-trigger" (click)="startAddColumn()">
+          <mat-icon>add</mat-icon>
+          <span>{{ 'boards.detail.addColumn' | transloco }}</span>
+        </div>
+      }
+    </div>
+  </div>
+} @else if (!isLoading()) {
+  <div class="board-empty">
+    <mat-icon class="empty-icon">view_kanban</mat-icon>
+    <p>{{ 'boards.detail.notFound' | transloco }}</p>
+  </div>
+}

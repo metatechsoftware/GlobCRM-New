@@ -73,6 +73,32 @@
     "confirm": "Sil",
     "cancel": "Iptal"
   },
+  "detail": {
+    "back": "Panolara don",
+    "boardMenu": "Pano secenekleri",
+    "noCards": "Henuz kart yok",
+    "addCard": "Kart ekle",
+    "addColumn": "Sutun ekle",
+    "cardTitlePlaceholder": "Kart basligini girin...",
+    "columnNamePlaceholder": "Sutun adini girin...",
+    "rename": "Yeniden adlandir",
+    "setWipLimit": "WIP limitini ayarla",
+    "collapse": "Daralt",
+    "deleteColumnConfirm": "Bu sutunu ve tum kartlarini silmek istediginizden emin misiniz?",
+    "wipLimitPrompt": "WIP limitini girin (kaldirmak icin bos birakin):",
+    "wipExceeded": "Sutun WIP limitini asiyor",
+    "notFound": "Pano bulunamadi",
+    "overdue": "Gecikti",
+    "dueToday": "Bugun bitmeli",
+    "dueSoon": "Yaklasan"
+  },
+  "card": {
+    "edit": "Duzenle",
+    "archive": "Arsivle",
+    "labels": "Etiketler",
+    "checklist": "kontrol listesi",
+    "comments": "yorumlar"
+  },
   "snackbar": {
     "created": "Pano basariyla olusturuldu",
     "deleted": "Pano basariyla silindi",

@@ -12,6 +12,9 @@ import {
   CardFilter,
   CreateBoardRequest,
   UpdateBoardRequest,
+  CreateColumnRequest,
+  UpdateColumnRequest,
+  CreateCardRequest,
   MoveCardRequest,
   ReorderColumnsRequest,
   ColumnDto,
@@ -182,6 +185,141 @@ export const BoardStore = signalStore(
         boardsService.reorderColumns(boardId, req).subscribe({
           error: () => {
             patchState(store, { board: previousBoard });
+          },
+        });
+      },
+
+      createColumn(
+        boardId: string,
+        req: CreateColumnRequest,
+        onSuccess?: (col: ColumnDto) => void,
+        onError?: (err: unknown) => void,
+      ): void {
+        boardsService.createColumn(boardId, req).subscribe({
+          next: (col) => {
+            const board = store.board();
+            if (board) {
+              patchState(store, {
+                board: { ...board, columns: [...board.columns, col] },
+              });
+            }
+            onSuccess?.(col);
+          },
+          error: (err) => onError?.(err),
+        });
+      },
+
+      updateColumn(
+        boardId: string,
+        colId: string,
+        req: UpdateColumnRequest,
+        onSuccess?: () => void,
+        onError?: (err: unknown) => void,
+      ): void {
+        boardsService.updateColumn(boardId, colId, req).subscribe({
+          next: (updated) => {
+            const board = store.board();
+            if (board) {
+              patchState(store, {
+                board: {
+                  ...board,
+                  columns: board.columns.map((c) =>
+                    c.id === colId ? { ...c, ...updated } : c,
+                  ),
+                },
+              });
+            }
+            onSuccess?.();
+          },
+          error: (err) => onError?.(err),
+        });
+      },
+
+      deleteColumn(
+        boardId: string,
+        colId: string,
+        onSuccess?: () => void,
+        onError?: (err: unknown) => void,
+      ): void {
+        boardsService.deleteColumn(boardId, colId).subscribe({
+          next: () => {
+            const board = store.board();
+            if (board) {
+              patchState(store, {
+                board: {
+                  ...board,
+                  columns: board.columns.filter((c) => c.id !== colId),
+                },
+              });
+            }
+            onSuccess?.();
+          },
+          error: (err) => onError?.(err),
+        });
+      },
+
+      createCard(
+        boardId: string,
+        req: CreateCardRequest,
+        onSuccess?: (card: CardDto) => void,
+        onError?: (err: unknown) => void,
+      ): void {
+        boardsService.createCard(boardId, req).subscribe({
+          next: (card) => {
+            const board = store.board();
+            if (board) {
+              patchState(store, {
+                board: {
+                  ...board,
+                  columns: board.columns.map((col) =>
+                    col.id === req.columnId
+                      ? { ...col, cards: [...col.cards, card] }
+                      : col,
+                  ),
+                },
+              });
+            }
+            onSuccess?.(card);
+          },
+          error: (err) => onError?.(err),
+        });
+      },
+
+      archiveCard(
+        boardId: string,
+        cardId: string,
+        onSuccess?: () => void,
+        onError?: (err: unknown) => void,
+      ): void {
+        boardsService.archiveCard(boardId, cardId).subscribe({
+          next: () => {
+            const board = store.board();
+            if (board) {
+              patchState(store, {
+                board: {
+                  ...board,
+                  columns: board.columns.map((col) => ({
+                    ...col,
+                    cards: col.cards.filter((c) => c.id !== cardId),
+                  })),
+                },
+              });
+            }
+            onSuccess?.();
+          },
+          error: (err) => onError?.(err),
+        });
+      },
+
+      toggleColumnCollapse(colId: string): void {
+        const board = store.board();
+        if (!board) return;
+        patchState(store, {
+          board: {
+            ...board,
+            columns: board.columns.map((c) =>
+              c.id === colId ? { ...c, isCollapsed: !c.isCollapsed } : c,
+            ),
           },
         });
       },

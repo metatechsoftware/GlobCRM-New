@@ -73,6 +73,32 @@
     "confirm": "Delete",
     "cancel": "Cancel"
   },
+  "detail": {
+    "back": "Back to boards",
+    "boardMenu": "Board options",
+    "noCards": "No cards yet",
+    "addCard": "Add card",
+    "addColumn": "Add column",
+    "cardTitlePlaceholder": "Enter card title...",
+    "columnNamePlaceholder": "Enter column name...",
+    "rename": "Rename",
+    "setWipLimit": "Set WIP limit",
+    "collapse": "Collapse",
+    "deleteColumnConfirm": "Are you sure you want to delete this column and all its cards?",
+    "wipLimitPrompt": "Enter WIP limit (leave empty to remove):",
+    "wipExceeded": "Column exceeds WIP limit",
+    "notFound": "Board not found",
+    "overdue": "Overdue",
+    "dueToday": "Due today",
+    "dueSoon": "Due soon"
+  },
+  "card": {
+    "edit": "Edit",
+    "archive": "Archive",
+    "labels": "Labels",
+    "checklist": "checklist",
+    "comments": "comments"
+  },
   "snackbar": {
     "created": "Board created successfully",
     "deleted": "Board deleted successfully",
