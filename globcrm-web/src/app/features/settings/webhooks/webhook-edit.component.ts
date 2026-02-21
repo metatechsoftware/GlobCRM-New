@@ -24,6 +24,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   MatDialog,
   MatDialogModule,
@@ -38,7 +39,7 @@ import {
   WEBHOOK_ENTITIES,
   WEBHOOK_EVENTS,
 } from './webhook.models';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 /** Entity icon + color mapping for the event matrix */
 const ENTITY_META: Record<string, { icon: string; color: string; soft: string }> = {
@@ -484,7 +485,7 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
       <a class="we-breadcrumb"
          [routerLink]="isEditMode() ? ['/settings/webhooks', id()] : ['/settings/webhooks']">
         <mat-icon>arrow_back</mat-icon>
-        <span>Webhooks</span>
+        <span>{{ 'webhooks.edit.breadcrumb' | transloco }}</span>
       </a>
 
       <!-- Header -->
@@ -493,11 +494,11 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
           <mat-icon>webhook</mat-icon>
         </div>
         <div class="we-header__text">
-          <h1 class="we-header__title">{{ isEditMode() ? 'Edit Webhook' : 'Create Webhook' }}</h1>
+          <h1 class="we-header__title">{{ isEditMode() ? ('webhooks.edit.editTitle' | transloco) : ('webhooks.edit.createTitle' | transloco) }}</h1>
           <p class="we-header__subtitle">
             {{ isEditMode()
-              ? 'Update the webhook subscription configuration'
-              : 'Configure a new webhook subscription to receive event notifications' }}
+              ? ('webhooks.edit.editSubtitle' | transloco)
+              : ('webhooks.edit.createSubtitle' | transloco) }}
           </p>
         </div>
       </div>
@@ -515,35 +516,35 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
                 <mat-icon>tune</mat-icon>
               </div>
               <div class="we-section__title-group">
-                <h2 class="we-section__title">Webhook Details</h2>
-                <p class="we-section__desc">Name, endpoint URL, and payload options</p>
+                <h2 class="we-section__title">{{ 'webhooks.edit.webhookDetails' | transloco }}</h2>
+                <p class="we-section__desc">{{ 'webhooks.edit.webhookDetailsDesc' | transloco }}</p>
               </div>
             </div>
 
             <mat-form-field appearance="outline" class="we-field">
-              <mat-label>Name</mat-label>
-              <input matInput formControlName="name" placeholder="My Webhook" maxlength="200" />
+              <mat-label>{{ 'webhooks.edit.name' | transloco }}</mat-label>
+              <input matInput formControlName="name" [placeholder]="'webhooks.edit.namePlaceholder' | transloco" maxlength="200" />
               @if (form.get('name')?.hasError('required') && form.get('name')?.touched) {
-                <mat-error>Name is required</mat-error>
+                <mat-error>{{ 'webhooks.edit.nameRequired' | transloco }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="we-field">
-              <mat-label>URL</mat-label>
-              <input matInput formControlName="url" placeholder="https://your-endpoint.com/webhook" maxlength="2048" />
+              <mat-label>{{ 'webhooks.edit.url' | transloco }}</mat-label>
+              <input matInput formControlName="url" [placeholder]="'webhooks.edit.urlPlaceholder' | transloco" maxlength="2048" />
               @if (form.get('url')?.hasError('required') && form.get('url')?.touched) {
-                <mat-error>URL is required</mat-error>
+                <mat-error>{{ 'webhooks.edit.urlRequired' | transloco }}</mat-error>
               }
               @if (form.get('url')?.hasError('pattern') && form.get('url')?.touched) {
-                <mat-error>URL must start with https://</mat-error>
+                <mat-error>{{ 'webhooks.edit.urlPattern' | transloco }}</mat-error>
               }
             </mat-form-field>
 
             <div class="we-toggle-row">
               <mat-slide-toggle formControlName="includeCustomFields"></mat-slide-toggle>
               <div class="we-toggle-label">
-                <span class="we-toggle-label__text">Include custom fields in payload</span>
-                <span class="we-toggle-label__hint">Adds all custom field values to the webhook JSON body</span>
+                <span class="we-toggle-label__text">{{ 'webhooks.edit.includeCustomFields' | transloco }}</span>
+                <span class="we-toggle-label__hint">{{ 'webhooks.edit.includeCustomFieldsHint' | transloco }}</span>
               </div>
             </div>
           </div>
@@ -555,14 +556,14 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
                 <mat-icon>notifications_active</mat-icon>
               </div>
               <div class="we-section__title-group">
-                <h2 class="we-section__title">Event Subscriptions</h2>
-                <p class="we-section__desc">Select which entity events trigger this webhook</p>
+                <h2 class="we-section__title">{{ 'webhooks.edit.eventSubscriptions' | transloco }}</h2>
+                <p class="we-section__desc">{{ 'webhooks.edit.eventSubscriptionsDesc' | transloco }}</p>
               </div>
             </div>
 
             <div class="we-matrix">
               <div class="we-matrix__header">
-                <span class="we-matrix__header-label">Entity</span>
+                <span class="we-matrix__header-label">{{ 'webhooks.edit.entity' | transloco }}</span>
                 @for (event of events; track event) {
                   <span class="we-matrix__header-label">{{ event }}</span>
                 }
@@ -591,17 +592,17 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
 
             <div class="we-matrix__actions">
               <button mat-stroked-button type="button" (click)="selectAll()">
-                Select All
+                {{ 'webhooks.edit.selectAll' | transloco }}
               </button>
               <button mat-stroked-button type="button" (click)="deselectAll()">
-                Deselect All
+                {{ 'webhooks.edit.deselectAll' | transloco }}
               </button>
             </div>
 
             @if (selectedEvents().length === 0 && formSubmitted()) {
               <div class="we-matrix__error">
                 <mat-icon>error_outline</mat-icon>
-                <span>At least one event subscription is required</span>
+                <span>{{ 'webhooks.edit.atLeastOneEvent' | transloco }}</span>
               </div>
             }
           </div>
@@ -610,14 +611,14 @@ const ENTITY_META: Record<string, { icon: string; color: string; soft: string }>
           <div class="we-actions">
             <a mat-stroked-button
                [routerLink]="isEditMode() ? ['/settings/webhooks', id()] : ['/settings/webhooks']">
-              Cancel
+              {{ 'webhooks.edit.cancel' | transloco }}
             </a>
             <button mat-flat-button color="primary" type="submit"
                     [disabled]="store.loading()">
               @if (store.loading()) {
                 <mat-spinner diameter="20"></mat-spinner>
               }
-              {{ isEditMode() ? 'Update Webhook' : 'Create Webhook' }}
+              {{ isEditMode() ? ('webhooks.edit.updateWebhook' | transloco) : ('webhooks.edit.createWebhook' | transloco) }}
             </button>
           </div>
         </form>
@@ -632,6 +633,7 @@ export class WebhookEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly entities = WEBHOOK_ENTITIES;
   readonly events = WEBHOOK_EVENTS;
@@ -730,7 +732,7 @@ export class WebhookEditComponent implements OnInit {
       };
 
       this.store.updateSubscription(this.id()!, request, () => {
-        this.snackBar.open('Webhook updated.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('settings.webhooks.detail.webhookUpdated'), this.transloco.translate('settings.common.cancel'), { duration: 3000 });
         this.router.navigate(['/settings/webhooks', this.id()]);
       });
     } else {
@@ -749,7 +751,7 @@ export class WebhookEditComponent implements OnInit {
           data: { secret: created.secret },
         });
 
-        this.snackBar.open('Webhook created.', 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('settings.webhooks.detail.webhookCreated'), this.transloco.translate('settings.common.cancel'), { duration: 3000 });
         this.router.navigate(['/settings/webhooks']);
       });
     }
@@ -771,18 +773,20 @@ export class WebhookEditComponent implements OnInit {
     MatButtonModule,
     MatIconModule,
     ClipboardModule,
+    TranslocoPipe,
+    MatTooltipModule,
   ],
   template: `
-    <h2 mat-dialog-title>Webhook Secret</h2>
+    <h2 mat-dialog-title>{{ 'webhooks.secretDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       <div class="secret-warning">
         <mat-icon>warning</mat-icon>
-        <p>This is the only time this secret will be shown. Copy it now.</p>
+        <p>{{ 'webhooks.secretDialog.warning' | transloco }}</p>
       </div>
       <div class="secret-box">
         <code class="secret-value">{{ data.secret }}</code>
         <button mat-icon-button
-                matTooltip="Copy to clipboard"
+                [matTooltip]="'webhooks.secretDialog.copyTooltip' | transloco"
                 (click)="copySecret()">
           <mat-icon>{{ copied ? 'check' : 'content_copy' }}</mat-icon>
         </button>
@@ -790,7 +794,7 @@ export class WebhookEditComponent implements OnInit {
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-flat-button color="primary" mat-dialog-close>
-        I've copied the secret
+        {{ 'webhooks.secretDialog.confirm' | transloco }}
       </button>
     </mat-dialog-actions>
   `,

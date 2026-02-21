@@ -31,7 +31,7 @@ import {
   UpdatePipelineRequest,
   CreateStageRequest,
 } from '../../deals/deal.models';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-pipeline-edit',
@@ -60,7 +60,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       <div class="pe-header">
         <a routerLink="/settings/pipelines" class="pe-back">
           <mat-icon>arrow_back</mat-icon>
-          <span>Pipelines</span>
+          <span>{{ 'pipelines.edit.breadcrumb' | transloco }}</span>
         </a>
         <div class="pe-title-row">
           <div class="pe-icon-wrap">
@@ -68,7 +68,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
           </div>
           <div>
             <h1 class="pe-title">{{ pageTitle }}</h1>
-            <p class="pe-subtitle">{{ mode() === 'create' ? 'Define stages and flow for a new pipeline' : 'Update pipeline configuration and stages' }}</p>
+            <p class="pe-subtitle">{{ mode() === 'create' ? ('pipelines.edit.createSubtitle' | transloco) : ('pipelines.edit.editSubtitle' | transloco) }}</p>
           </div>
         </div>
       </div>
@@ -76,17 +76,17 @@ import { TranslocoPipe } from '@jsverse/transloco';
       @if (isLoading()) {
         <div class="pe-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading pipeline...</p>
+          <p>{{ 'pipelines.edit.loadingPipeline' | transloco }}</p>
         </div>
       } @else if (errorMessage() && mode() === 'edit' && !pipelineForm.dirty) {
         <div class="pe-error">
           <div class="pe-error__icon-wrap">
             <mat-icon>error_outline</mat-icon>
           </div>
-          <h3>Couldn't load pipeline</h3>
+          <h3>{{ 'pipelines.edit.couldntLoad' | transloco }}</h3>
           <p>{{ errorMessage() }}</p>
           <button mat-flat-button color="primary" routerLink="/settings/pipelines">
-            Back to Pipelines
+            {{ 'pipelines.edit.backToPipelines' | transloco }}
           </button>
         </div>
       } @else {
@@ -94,35 +94,35 @@ import { TranslocoPipe } from '@jsverse/transloco';
         <div class="pe-section" style="animation-delay: 0ms">
           <div class="pe-section__header">
             <mat-icon class="pe-section__icon">tune</mat-icon>
-            <h2>Pipeline Details</h2>
+            <h2>{{ 'pipelines.edit.pipelineDetails' | transloco }}</h2>
           </div>
 
           <form [formGroup]="pipelineForm" class="pe-form">
             <mat-form-field appearance="outline" class="pe-full-width">
-              <mat-label>Pipeline Name</mat-label>
+              <mat-label>{{ 'pipelines.edit.pipelineName' | transloco }}</mat-label>
               <input
                 matInput
                 formControlName="name"
-                placeholder="e.g. Sales Pipeline, Enterprise Deals"
+                [placeholder]="'pipelines.edit.pipelineNamePlaceholder' | transloco"
                 maxlength="200"
               />
               @if (pipelineForm.get('name')?.hasError('required') && pipelineForm.get('name')?.touched) {
-                <mat-error>Pipeline name is required.</mat-error>
+                <mat-error>{{ 'pipelines.edit.pipelineNameRequired' | transloco }}</mat-error>
               }
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="pe-full-width">
-              <mat-label>Description</mat-label>
+              <mat-label>{{ 'pipelines.edit.description' | transloco }}</mat-label>
               <textarea
                 matInput
                 formControlName="description"
-                placeholder="What is this pipeline used for?"
+                [placeholder]="'pipelines.edit.descriptionPlaceholder' | transloco"
                 rows="3"
               ></textarea>
             </mat-form-field>
 
             <mat-checkbox formControlName="isDefault" color="primary">
-              Set as default pipeline
+              {{ 'pipelines.edit.setAsDefault' | transloco }}
             </mat-checkbox>
           </form>
         </div>
@@ -131,10 +131,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
         <div class="pe-section" style="animation-delay: 80ms">
           <div class="pe-section__header">
             <mat-icon class="pe-section__icon">layers</mat-icon>
-            <h2>Stages</h2>
+            <h2>{{ 'pipelines.edit.stagesSection' | transloco }}</h2>
             <button mat-stroked-button color="primary" (click)="addStage()" class="pe-add-stage-btn">
               <mat-icon>add</mat-icon>
-              Add Stage
+              {{ 'pipelines.edit.addStage' | transloco }}
             </button>
           </div>
 
@@ -171,27 +171,27 @@ import { TranslocoPipe } from '@jsverse/transloco';
                 <div class="pe-stage-content">
                   <div class="pe-stage-row">
                     <mat-form-field appearance="outline" class="pe-stage-name">
-                      <mat-label>Stage Name</mat-label>
-                      <input matInput formControlName="name" placeholder="e.g. Qualification" />
+                      <mat-label>{{ 'pipelines.edit.stageName' | transloco }}</mat-label>
+                      <input matInput formControlName="name" [placeholder]="'pipelines.edit.stageNamePlaceholder' | transloco" />
                       @if (getStageFormGroup(i).get('name')?.hasError('required') && getStageFormGroup(i).get('name')?.touched) {
-                        <mat-error>Required</mat-error>
+                        <mat-error>{{ 'pipelines.edit.stageNameRequired' | transloco }}</mat-error>
                       }
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="pe-stage-color">
-                      <mat-label>Color</mat-label>
+                      <mat-label>{{ 'pipelines.edit.color' | transloco }}</mat-label>
                       <input matInput formControlName="color" placeholder="#4caf50" maxlength="7" />
                     </mat-form-field>
 
                     <mat-form-field appearance="outline" class="pe-stage-prob">
-                      <mat-label>Probability %</mat-label>
+                      <mat-label>{{ 'pipelines.edit.probability' | transloco }}</mat-label>
                       <input matInput type="number" formControlName="defaultProbability" min="0" max="100" />
                     </mat-form-field>
 
-                    <mat-checkbox formControlName="isWon" class="pe-stage-check">Won</mat-checkbox>
-                    <mat-checkbox formControlName="isLost" class="pe-stage-check">Lost</mat-checkbox>
+                    <mat-checkbox formControlName="isWon" class="pe-stage-check">{{ 'pipelines.edit.won' | transloco }}</mat-checkbox>
+                    <mat-checkbox formControlName="isLost" class="pe-stage-check">{{ 'pipelines.edit.lost' | transloco }}</mat-checkbox>
 
-                    <button mat-icon-button (click)="removeStage(i)" matTooltip="Remove stage" class="pe-stage-remove">
+                    <button mat-icon-button (click)="removeStage(i)" [matTooltip]="'pipelines.edit.removeStage' | transloco" class="pe-stage-remove">
                       <mat-icon>close</mat-icon>
                     </button>
                   </div>
@@ -199,18 +199,18 @@ import { TranslocoPipe } from '@jsverse/transloco';
                   <mat-expansion-panel class="pe-req-panel">
                     <mat-expansion-panel-header>
                       <mat-panel-title>
-                        Required Fields
+                        {{ 'pipelines.edit.requiredFields' | transloco }}
                         @if (getRequiredFieldCount(i) > 0) {
                           <span class="pe-req-count">({{ getRequiredFieldCount(i) }})</span>
                         }
                       </mat-panel-title>
                     </mat-expansion-panel-header>
                     <div class="pe-req-grid" formGroupName="requiredFields">
-                      <mat-checkbox formControlName="value">Deal Value</mat-checkbox>
-                      <mat-checkbox formControlName="probability">Probability</mat-checkbox>
-                      <mat-checkbox formControlName="expectedCloseDate">Expected Close Date</mat-checkbox>
-                      <mat-checkbox formControlName="companyId">Company</mat-checkbox>
-                      <mat-checkbox formControlName="ownerId">Owner</mat-checkbox>
+                      <mat-checkbox formControlName="value">{{ 'pipelines.edit.dealValue' | transloco }}</mat-checkbox>
+                      <mat-checkbox formControlName="probability">{{ 'pipelines.edit.probabilityField' | transloco }}</mat-checkbox>
+                      <mat-checkbox formControlName="expectedCloseDate">{{ 'pipelines.edit.expectedCloseDate' | transloco }}</mat-checkbox>
+                      <mat-checkbox formControlName="companyId">{{ 'pipelines.edit.company' | transloco }}</mat-checkbox>
+                      <mat-checkbox formControlName="ownerId">{{ 'pipelines.edit.owner' | transloco }}</mat-checkbox>
                     </div>
                   </mat-expansion-panel>
                 </div>
@@ -223,8 +223,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <div class="pe-no-stages__visual">
                 <mat-icon>layers</mat-icon>
               </div>
-              <p>No stages defined</p>
-              <span class="pe-no-stages__hint">Add stages to configure the deal pipeline flow</span>
+              <p>{{ 'pipelines.edit.noStagesDefined' | transloco }}</p>
+              <span class="pe-no-stages__hint">{{ 'pipelines.edit.addStagesHint' | transloco }}</span>
             </div>
           }
         </div>
@@ -237,7 +237,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
         }
 
         <div class="pe-actions">
-          <button mat-button routerLink="/settings/pipelines">Cancel</button>
+          <button mat-button routerLink="/settings/pipelines">{{ 'pipelines.edit.cancel' | transloco }}</button>
           <button
             mat-flat-button color="primary"
             (click)="onSave()"
@@ -248,7 +248,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-spinner diameter="18" class="pe-btn-spinner"></mat-spinner>
             } @else {
               <mat-icon>{{ mode() === 'create' ? 'add' : 'check' }}</mat-icon>
-              {{ mode() === 'create' ? 'Create Pipeline' : 'Save Changes' }}
+              {{ mode() === 'create' ? ('pipelines.edit.createPipeline' | transloco) : ('pipelines.edit.saveChanges' | transloco) }}
             }
           </button>
         </div>
@@ -335,6 +335,7 @@ export class PipelineEditComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly pipelineService = inject(PipelineService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   mode = signal<'create' | 'edit'>('create');
   pipelineId = signal<string | null>(null);
@@ -512,7 +513,7 @@ export class PipelineEditComponent implements OnInit {
       this.pipelineService.create(request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Pipeline created successfully.', 'Close', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('settings.pipelines.edit.createSuccess'), 'Close', { duration: 3000 });
           this.router.navigate(['/settings/pipelines']);
         },
         error: (err) => {
@@ -528,7 +529,7 @@ export class PipelineEditComponent implements OnInit {
       this.pipelineService.update(id, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Pipeline updated successfully.', 'Close', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('settings.pipelines.edit.updateSuccess'), 'Close', { duration: 3000 });
           this.router.navigate(['/settings/pipelines']);
         },
         error: (err) => {
@@ -540,6 +541,8 @@ export class PipelineEditComponent implements OnInit {
   }
 
   get pageTitle(): string {
-    return this.mode() === 'create' ? 'Create Pipeline' : 'Edit Pipeline';
+    return this.mode() === 'create'
+      ? this.transloco.translate('settings.pipelines.edit.createTitle')
+      : this.transloco.translate('settings.pipelines.edit.editTitle');
   }
 }

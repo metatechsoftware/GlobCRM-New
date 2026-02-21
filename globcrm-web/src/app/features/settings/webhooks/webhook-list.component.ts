@@ -17,7 +17,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { WebhookStore } from './webhook.store';
 import { WebhookSubscription } from './webhook.models';
 import { ConfirmDeleteDialogComponent } from '../../../shared/components/confirm-delete-dialog/confirm-delete-dialog.component';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-webhook-list',
@@ -601,26 +601,26 @@ import { TranslocoPipe } from '@jsverse/transloco';
         <div class="wl-header__left">
           <a routerLink="/settings" class="wl-back">
             <mat-icon>arrow_back</mat-icon>
-            <span>Settings</span>
+            <span>{{ 'webhooks.list.breadcrumb' | transloco }}</span>
           </a>
           <div class="wl-title-row">
             <div class="wl-icon-wrap">
               <mat-icon>webhook</mat-icon>
             </div>
             <div>
-              <h1 class="wl-title">Webhooks</h1>
-              <p class="wl-subtitle">Manage webhook subscriptions and event notifications</p>
+              <h1 class="wl-title">{{ 'webhooks.list.title' | transloco }}</h1>
+              <p class="wl-subtitle">{{ 'webhooks.list.subtitle' | transloco }}</p>
             </div>
           </div>
         </div>
         <div class="wl-header__actions">
           <a mat-stroked-button routerLink="/settings/webhooks/delivery-logs">
             <mat-icon>list_alt</mat-icon>
-            View All Delivery Logs
+            {{ 'webhooks.list.viewAllDeliveryLogs' | transloco }}
           </a>
           <a mat-flat-button color="primary" routerLink="/settings/webhooks/new">
             <mat-icon>add</mat-icon>
-            Add Webhook
+            {{ 'webhooks.list.addWebhook' | transloco }}
           </a>
         </div>
       </div>
@@ -629,7 +629,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       @if (store.loading()) {
         <div class="wl-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading webhooks...</p>
+          <p>{{ 'webhooks.list.loading' | transloco }}</p>
         </div>
       } @else if (store.subscriptions().length === 0) {
         <!-- Empty State -->
@@ -642,11 +642,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
             </div>
             <mat-icon class="wl-empty__icon">webhook</mat-icon>
           </div>
-          <h3>No webhooks configured</h3>
-          <p>Create a webhook subscription to send real-time event notifications to external systems.</p>
+          <h3>{{ 'webhooks.list.noWebhooksTitle' | transloco }}</h3>
+          <p>{{ 'webhooks.list.noWebhooksDesc' | transloco }}</p>
           <a mat-flat-button color="primary" routerLink="/settings/webhooks/new" class="wl-empty__btn">
             <mat-icon>add</mat-icon>
-            Add Webhook
+            {{ 'webhooks.list.addWebhook' | transloco }}
           </a>
         </div>
       } @else {
@@ -688,18 +688,18 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     </span>
                     <span class="wl-card__events">
                       <mat-icon>notifications</mat-icon>
-                      {{ sub.eventSubscriptions.length }} event{{ sub.eventSubscriptions.length !== 1 ? 's' : '' }}
+                      {{ sub.eventSubscriptions.length }} {{ sub.eventSubscriptions.length !== 1 ? ('webhooks.events' | transloco) : ('webhooks.event' | transloco) }}
                     </span>
                     @if (sub.consecutiveFailureCount > 0) {
                       <span class="wl-card__failures">
                         <mat-icon>warning</mat-icon>
-                        {{ sub.consecutiveFailureCount }} consecutive failure{{ sub.consecutiveFailureCount !== 1 ? 's' : '' }}
+                        {{ sub.consecutiveFailureCount }} {{ sub.consecutiveFailureCount !== 1 ? ('webhooks.list.consecutiveFailures' | transloco) : ('webhooks.list.consecutiveFailure' | transloco) }}
                       </span>
                     }
                     @if (sub.lastDeliveryAt) {
                       <span class="wl-card__last-delivery">
                         <mat-icon>schedule</mat-icon>
-                        Last delivery: {{ sub.lastDeliveryAt | date:'short' }}
+                        {{ 'webhooks.list.lastDelivery' | transloco }} {{ sub.lastDeliveryAt | date:'short' }}
                       </span>
                     }
                   </div>
@@ -708,13 +708,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
                 <!-- Actions -->
                 <div class="wl-card__actions" (click)="$event.stopPropagation()">
                   <button mat-icon-button
-                          matTooltip="Edit"
+                          [matTooltip]="'webhooks.list.editTooltip' | transloco"
                           class="wl-action-btn"
                           (click)="onEdit(sub)">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button mat-icon-button
-                          matTooltip="Delete"
+                          [matTooltip]="'webhooks.list.deleteTooltip' | transloco"
                           color="warn"
                           class="wl-action-btn wl-action-btn--danger"
                           (click)="onDelete(sub)">
@@ -734,15 +734,16 @@ export class WebhookListComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   ngOnInit(): void {
     this.store.loadSubscriptions();
   }
 
   getStatusLabel(sub: WebhookSubscription): string {
-    if (sub.isDisabled) return 'Disabled';
-    if (!sub.isActive) return 'Paused';
-    return 'Active';
+    if (sub.isDisabled) return this.transloco.translate('settings.webhooks.list.disabled');
+    if (!sub.isActive) return this.transloco.translate('settings.webhooks.list.paused');
+    return this.transloco.translate('settings.webhooks.list.active');
   }
 
   onView(sub: WebhookSubscription): void {
@@ -764,8 +765,8 @@ export class WebhookListComponent implements OnInit {
 
       this.store.deleteSubscription(sub.id, () => {
         this.snackBar.open(
-          `Webhook "${sub.name}" deleted.`,
-          'Close',
+          this.transloco.translate('settings.webhooks.deleteSuccess'),
+          this.transloco.translate('settings.common.cancel'),
           { duration: 3000 },
         );
       });

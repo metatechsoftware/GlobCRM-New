@@ -19,6 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, debounceTime, takeUntil, switchMap, of, catchError, tap, EMPTY } from 'rxjs';
 import { CustomFieldService } from '../../../../core/custom-fields/custom-field.service';
 import { FieldInfo } from '../../../../core/custom-fields/custom-field.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-formula-editor',
@@ -29,6 +30,7 @@ import { FieldInfo } from '../../../../core/custom-fields/custom-field.models';
     MatInputModule,
     MatIconModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   templateUrl: './formula-editor.component.html',
   styleUrl: './formula-editor.component.scss',
