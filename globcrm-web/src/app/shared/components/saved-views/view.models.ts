@@ -54,6 +54,7 @@ export interface SavedView {
 export interface ColumnDefinition {
   fieldId: string;
   label: string;
+  labelKey?: string;
   isCustomField: boolean;
   fieldType: string;
   sortable: boolean;

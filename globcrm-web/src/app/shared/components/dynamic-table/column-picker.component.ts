@@ -1,9 +1,9 @@
-import { Component, ChangeDetectionStrategy, input, output } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject, input, output } from '@angular/core';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   ColumnDefinition,
   ViewColumn,
@@ -32,7 +32,7 @@ import {
             [checked]="isVisible(col.fieldId)"
             (change)="toggleColumn(col.fieldId)"
             (click)="$event.stopPropagation()">
-            {{ col.label }}
+            {{ getLabel(col) }}
           </mat-checkbox>
         </div>
       }
@@ -49,9 +49,21 @@ import {
   `,
 })
 export class ColumnPickerComponent {
+  private readonly translocoService = inject(TranslocoService);
+
   allColumns = input.required<ColumnDefinition[]>();
   visibleColumns = input.required<ViewColumn[]>();
   columnsChanged = output<ViewColumn[]>();
+
+  /**
+   * Get column label, using translated labelKey when available.
+   */
+  getLabel(col: ColumnDefinition): string {
+    if (col.labelKey) {
+      return this.translocoService.translate(col.labelKey);
+    }
+    return col.label;
+  }
 
   isVisible(fieldId: string): boolean {
     const col = this.visibleColumns().find((c) => c.fieldId === fieldId);

@@ -203,9 +203,13 @@ export class DynamicTableComponent {
 
   /**
    * Get column label from column definitions.
+   * Uses translated labelKey when available, falls back to raw label for custom fields.
    */
   getColumnLabel(fieldId: string): string {
     const def = this.columnDefinitions().find((d) => d.fieldId === fieldId);
+    if (def?.labelKey) {
+      return this.translocoService.translate(def.labelKey);
+    }
     return def?.label ?? fieldId;
   }
 
