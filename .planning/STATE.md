@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 27 of 31 (Localization Foundation)
-Plan: 2 of 4 complete
+Plan: 3 of 4 complete
 Status: Executing
-Last activity: 2026-02-21 — Completed 27-02 (Navbar Language Switcher)
+Last activity: 2026-02-21 — Completed 27-03 (Angular Material Locale Integration)
 
-Progress: [██████████████████░░] 85% (160/~188 plans estimated)
+Progress: [██████████████████░░] 86% (161/~188 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [██████████████████░░] 85% (16
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 160
+- Total plans completed: 161
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -43,6 +43,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 27-02: Backend persistence is fire-and-forget with silent error handling to never block the UI
 - 27-02: Language toggle uses self-translating label (Language/Dil) for bootstrap reliability
 - 27-02: stopPropagation keeps mat-menu open during language toggle interaction
+- 27-03: Used Intl.DateTimeFormat with TranslocoService locale mapping instead of TranslocoLocaleService pipe for synchronous DynamicTable formatting
+- 27-03: DateAdapter.setLocale() centralized in LanguageService.switchLanguage() as single locale switch point
+- 27-03: Consolidated provideNativeDateAdapter from 7 component-level providers to root app.config.ts
 
 ### Pending Todos
 
@@ -57,6 +60,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 27-02-PLAN.md
-Resume file: .planning/phases/27-localization-foundation/27-02-SUMMARY.md
-Next step: Execute 27-03-PLAN.md
+Stopped at: Completed 27-03-PLAN.md
+Resume file: .planning/phases/27-localization-foundation/27-03-SUMMARY.md
+Next step: Execute 27-04-PLAN.md (Settings Language Page & Final Wiring)
