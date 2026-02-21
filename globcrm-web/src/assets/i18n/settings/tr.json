@@ -17,6 +17,7 @@
     "english": "Ingilizce",
     "turkish": "Turkce",
     "saveSuccess": "Varsayilan dil basariyla guncellendi",
+    "saveFailed": "Dil guncellenemedi",
     "cardTitle": "Varsayilan Dil",
     "cardDesc": "Organizasyonunuza katilan yeni kullanicilar bu dil tercihini devralacaktir. Kullanicilar kisisel ayarlarinda bunu degistirebilir."
   },
@@ -164,6 +165,10 @@
     "saveSuccess": "Takim basariyla kaydedildi.",
     "saveFailed": "Takim kaydedilemedi.",
     "createSuccess": "Takim basariyla olusturuldu.",
+    "memberAdded": "{{name}} takima eklendi.",
+    "memberAddFailed": "Uye eklenemedi.",
+    "memberRemoved": "{{name}} takimdan cikarildi.",
+    "memberRemoveFailed": "Uye cikarilmadi.",
     "addMemberDialog": {
       "title": "Takim Uyesi Ekle",
       "searchLabel": "Kullanici ara",
@@ -576,6 +581,18 @@
     "fieldWebsite": "Web Sitesi / Alan Adi",
     "fieldWebsiteDesc": "Web sitesi URL'lerini ve alan adlarini karsilastirin",
     "required": "Zorunlu",
-    "saveRules": "{{entity}} Kurallarini Kaydet"
+    "saveRules": "{{entity}} Kurallarini Kaydet",
+    "loadFailed": "Yineleme algilama ayarlari yuklenemedi",
+    "settingsUpdated": "Ayarlar guncellendi",
+    "settingsFailed": "Ayarlar kaydedilemedi"
+  },
+  "emailAccountSnack": {
+    "connectedSuccess": "Gmail hesabi basariyla baglandi!",
+    "connectFailed": "Gmail baglantisi baslatilamadi",
+    "disconnectConfirm": "Gmail hesabinizin baglantisini kesmek istediginizden emin misiniz? Senkronize edilen e-postalar kalacak, ancak yeni e-postalar senkronize edilmeyecektir.",
+    "disconnected": "Gmail hesabi baglantisi kesildi",
+    "disconnectFailed": "Gmail hesabi baglantisi kesilemedi",
+    "syncCompleted": "E-posta senkronizasyonu tamamlandi",
+    "syncFailed": "E-postalar senkronize edilemedi"
   }
 }

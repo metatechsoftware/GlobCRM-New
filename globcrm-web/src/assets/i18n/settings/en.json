@@ -17,6 +17,7 @@
     "english": "English",
     "turkish": "Turkish",
     "saveSuccess": "Default language updated successfully",
+    "saveFailed": "Failed to update language",
     "cardTitle": "Default Language",
     "cardDesc": "New users who join your organization will inherit this language preference. Users can override this in their personal settings."
   },
@@ -164,6 +165,10 @@
     "saveSuccess": "Team saved successfully.",
     "saveFailed": "Failed to save team.",
     "createSuccess": "Team created successfully.",
+    "memberAdded": "{{name}} added to team.",
+    "memberAddFailed": "Failed to add member.",
+    "memberRemoved": "{{name}} removed from team.",
+    "memberRemoveFailed": "Failed to remove member.",
     "addMemberDialog": {
       "title": "Add Team Member",
       "searchLabel": "Search users",
@@ -576,6 +581,18 @@
     "fieldWebsite": "Website / Domain",
     "fieldWebsiteDesc": "Compare website URLs and domain names",
     "required": "Required",
-    "saveRules": "Save {{entity}} Rules"
+    "saveRules": "Save {{entity}} Rules",
+    "loadFailed": "Failed to load duplicate detection settings",
+    "settingsUpdated": "Settings updated",
+    "settingsFailed": "Failed to save settings"
+  },
+  "emailAccountSnack": {
+    "connectedSuccess": "Gmail account connected successfully!",
+    "connectFailed": "Failed to initiate Gmail connection",
+    "disconnectConfirm": "Are you sure you want to disconnect your Gmail account? Synced emails will remain, but no new emails will be synced.",
+    "disconnected": "Gmail account disconnected",
+    "disconnectFailed": "Failed to disconnect Gmail account",
+    "syncCompleted": "Email sync completed",
+    "syncFailed": "Failed to sync emails"
   }
 }

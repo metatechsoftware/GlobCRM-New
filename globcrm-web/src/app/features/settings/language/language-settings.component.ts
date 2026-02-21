@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ApiService } from '../../../core/api/api.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface LanguageOption {
   value: string;
@@ -27,6 +28,7 @@ interface LanguageOption {
     MatFormFieldModule,
     MatSelectModule,
     MatSnackBarModule,
+    TranslocoPipe,
   ],
   template: `
     <div class="lang-settings">
@@ -38,20 +40,19 @@ interface LanguageOption {
           <mat-icon>language</mat-icon>
         </div>
         <div>
-          <h1 class="lang-settings__title">Language</h1>
-          <p class="lang-settings__subtitle">Set the default language for your organization</p>
+          <h1 class="lang-settings__title">{{ 'language.title' | transloco }}</h1>
+          <p class="lang-settings__subtitle">{{ 'language.description' | transloco }}</p>
         </div>
       </div>
 
       <div class="lang-settings__card">
-        <h2 class="lang-settings__card-title">Default Language</h2>
+        <h2 class="lang-settings__card-title">{{ 'language.cardTitle' | transloco }}</h2>
         <p class="lang-settings__card-desc">
-          New users who join your organization will inherit this language preference.
-          Users can override this in their personal settings.
+          {{ 'language.cardDesc' | transloco }}
         </p>
 
         <mat-form-field appearance="outline" class="lang-settings__select">
-          <mat-label>Default Language</mat-label>
+          <mat-label>{{ 'language.defaultLanguage' | transloco }}</mat-label>
           <mat-select
             [ngModel]="selectedLanguage()"
             (ngModelChange)="onLanguageChange($event)"
@@ -158,6 +159,7 @@ interface LanguageOption {
 export class LanguageSettingsComponent implements OnInit {
   private readonly api = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly selectedLanguage = signal('en');
   readonly saving = signal(false);
@@ -178,7 +180,7 @@ export class LanguageSettingsComponent implements OnInit {
         next: () => {
           this.selectedLanguage.set(lang);
           this.saving.set(false);
-          this.snackBar.open('Default language updated successfully', 'OK', {
+          this.snackBar.open(this.transloco.translate('settings.language.saveSuccess'), 'OK', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
@@ -186,7 +188,7 @@ export class LanguageSettingsComponent implements OnInit {
         },
         error: (err) => {
           this.saving.set(false);
-          this.snackBar.open(err.message || 'Failed to update language', 'OK', {
+          this.snackBar.open(err.message || this.transloco.translate('settings.language.saveFailed'), 'OK', {
             duration: 5000,
           });
         },

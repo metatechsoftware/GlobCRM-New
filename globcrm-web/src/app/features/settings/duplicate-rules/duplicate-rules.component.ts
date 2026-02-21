@@ -17,7 +17,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule } from '@angular/forms';
 import { DuplicateService } from '../../duplicates/duplicate.service';
 import { DuplicateSettings } from '../../duplicates/duplicate.models';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 /** Local editable state per entity type */
 interface EntityRuleConfig {
@@ -524,7 +524,7 @@ interface EntityRuleConfig {
       <!-- Breadcrumb -->
       <a routerLink="/settings" class="dr-breadcrumb">
         <mat-icon>arrow_back</mat-icon>
-        <span>Settings</span>
+        <span>{{ 'duplicateRules.breadcrumb' | transloco }}</span>
       </a>
 
       <!-- Header -->
@@ -533,8 +533,8 @@ interface EntityRuleConfig {
           <mat-icon>compare_arrows</mat-icon>
         </div>
         <div class="dr-header__text">
-          <h1 class="dr-header__title">Duplicate Detection Rules</h1>
-          <p class="dr-header__subtitle">Configure how the system detects potential duplicate records</p>
+          <h1 class="dr-header__title">{{ 'duplicateRules.pageTitle' | transloco }}</h1>
+          <p class="dr-header__subtitle">{{ 'duplicateRules.pageSubtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -554,7 +554,7 @@ interface EntityRuleConfig {
                 <mat-icon>{{ config.entityType === 'Contact' ? 'person' : 'business' }}</mat-icon>
               </div>
               <h2 class="dr-section__title">
-                {{ config.entityType === 'Contact' ? 'Contact Matching Rules' : 'Company Matching Rules' }}
+                {{ config.entityType === 'Contact' ? ('duplicateRules.contactMatchingRules' | transloco) : ('duplicateRules.companyMatchingRules' | transloco) }}
               </h2>
             </div>
 
@@ -566,9 +566,9 @@ interface EntityRuleConfig {
                   (change)="config.autoDetectionEnabled = $event.checked">
                 </mat-slide-toggle>
                 <div class="dr-toggle__content">
-                  <div class="dr-rule__label">Enable auto-detection on create</div>
+                  <div class="dr-rule__label">{{ 'duplicateRules.enableAutoDetection' | transloco }}</div>
                   <p class="dr-rule__helper">
-                    When enabled, the system warns users about potential duplicates when creating new records
+                    {{ 'duplicateRules.autoDetectionHint' | transloco }}
                   </p>
                 </div>
               </div>
@@ -578,13 +578,13 @@ interface EntityRuleConfig {
             <div class="dr-rule">
               <div class="dr-threshold">
                 <div class="dr-threshold__header">
-                  <span class="dr-rule__label">Similarity Threshold:</span>
+                  <span class="dr-rule__label">{{ 'duplicateRules.similarityThreshold' | transloco }}</span>
                   <span class="dr-threshold__value">{{ config.similarityThreshold }}%</span>
                   <span class="dr-threshold__badge"
                         [class.dr-threshold__badge--strict]="config.similarityThreshold > 85"
                         [class.dr-threshold__badge--moderate]="config.similarityThreshold >= 70 && config.similarityThreshold <= 85"
                         [class.dr-threshold__badge--permissive]="config.similarityThreshold < 70">
-                    {{ config.similarityThreshold > 85 ? 'Strict' : (config.similarityThreshold >= 70 ? 'Moderate' : 'Permissive') }}
+                    {{ config.similarityThreshold > 85 ? ('duplicateRules.strict' | transloco) : (config.similarityThreshold >= 70 ? ('duplicateRules.moderate' | transloco) : ('duplicateRules.permissive' | transloco)) }}
                   </span>
                 </div>
                 <div class="dr-threshold__slider-wrap">
@@ -602,16 +602,16 @@ interface EntityRuleConfig {
                   </mat-slider>
                 </div>
                 <p class="dr-rule__helper">
-                  Records scoring above this threshold are flagged as potential duplicates
+                  {{ 'duplicateRules.thresholdHint' | transloco }}
                 </p>
               </div>
             </div>
 
             <!-- Matching fields -->
             <div class="dr-rule">
-              <div class="dr-rule__label">Matching Fields</div>
+              <div class="dr-rule__label">{{ 'duplicateRules.matchingFieldsLabel' | transloco }}</div>
               <p class="dr-rule__helper" style="margin-bottom: var(--space-3)">
-                Select which fields participate in duplicate matching
+                {{ 'duplicateRules.matchingFieldsHint' | transloco }}
               </p>
               <div class="dr-fields">
                 @if (config.entityType === 'Contact') {
@@ -620,10 +620,10 @@ interface EntityRuleConfig {
                       <mat-icon>badge</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">Name</div>
-                      <div class="dr-field-card__desc">First and last name comparison</div>
+                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldName' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldNameDesc' | transloco }}</div>
                     </div>
-                    <span class="dr-field-card__required">Required</span>
+                    <span class="dr-field-card__required">{{ 'duplicateRules.required' | transloco }}</span>
                   </div>
                   <label class="dr-field-card"
                          [class.dr-field-card--active]="isFieldEnabled(config, 'email')">
@@ -631,8 +631,8 @@ interface EntityRuleConfig {
                       <mat-icon>email</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">Email</div>
-                      <div class="dr-field-card__desc">Match by email address similarity</div>
+                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldEmail' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldEmailDesc' | transloco }}</div>
                     </div>
                     <mat-checkbox
                       [checked]="isFieldEnabled(config, 'email')"
@@ -645,10 +645,10 @@ interface EntityRuleConfig {
                       <mat-icon>business</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">Company Name</div>
-                      <div class="dr-field-card__desc">Primary name and alias matching</div>
+                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldCompanyName' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldCompanyNameDesc' | transloco }}</div>
                     </div>
-                    <span class="dr-field-card__required">Required</span>
+                    <span class="dr-field-card__required">{{ 'duplicateRules.required' | transloco }}</span>
                   </div>
                   <label class="dr-field-card"
                          [class.dr-field-card--active]="isFieldEnabled(config, 'website')">
@@ -656,8 +656,8 @@ interface EntityRuleConfig {
                       <mat-icon>language</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">Website / Domain</div>
-                      <div class="dr-field-card__desc">Compare website URLs and domain names</div>
+                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldWebsite' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldWebsiteDesc' | transloco }}</div>
                     </div>
                     <mat-checkbox
                       [checked]="isFieldEnabled(config, 'website')"
@@ -676,7 +676,7 @@ interface EntityRuleConfig {
                 @if (config.saving) {
                   <mat-spinner diameter="20"></mat-spinner>
                 }
-                Save {{ config.entityType }} Rules
+                {{ 'duplicateRules.saveRules' | transloco: { entity: config.entityType } }}
               </button>
             </div>
           </div>
@@ -688,6 +688,7 @@ interface EntityRuleConfig {
 export class DuplicateRulesComponent implements OnInit {
   private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   isLoading = signal(true);
   configs = signal<EntityRuleConfig[]>([]);
@@ -712,7 +713,7 @@ export class DuplicateRulesComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open('Failed to load duplicate detection settings', 'Close', {
+        this.snackBar.open(this.transloco.translate('settings.duplicateRules.loadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -748,14 +749,14 @@ export class DuplicateRulesComponent implements OnInit {
         next: () => {
           config.saving = false;
           this.configs.update((configs) => [...configs]);
-          this.snackBar.open('Settings updated', 'Close', {
+          this.snackBar.open(this.transloco.translate('settings.duplicateRules.settingsUpdated'), 'Close', {
             duration: 3000,
           });
         },
         error: () => {
           config.saving = false;
           this.configs.update((configs) => [...configs]);
-          this.snackBar.open('Failed to save settings', 'Close', {
+          this.snackBar.open(this.transloco.translate('settings.duplicateRules.settingsFailed'), 'Close', {
             duration: 5000,
           });
         },

@@ -12,7 +12,7 @@ import {
   NotificationPreferenceDto,
   NotificationType,
 } from '../../notifications/notification.models';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 interface PreferenceRow {
   type: string;
@@ -58,7 +58,7 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
       <!-- Breadcrumb back-link -->
       <a routerLink="/settings" class="np-breadcrumb">
         <mat-icon class="np-breadcrumb__icon">arrow_back</mat-icon>
-        <span class="np-breadcrumb__text">Settings</span>
+        <span class="np-breadcrumb__text">{{ 'notifications.breadcrumb' | transloco }}</span>
       </a>
 
       <!-- Page header -->
@@ -67,8 +67,8 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
           <mat-icon class="np-header__icon">notifications_active</mat-icon>
         </div>
         <div class="np-header__text">
-          <h1 class="np-header__title">Notification Preferences</h1>
-          <p class="np-header__subtitle">Choose how you receive notifications</p>
+          <h1 class="np-header__title">{{ 'notifications.pageTitle' | transloco }}</h1>
+          <p class="np-header__subtitle">{{ 'notifications.pageSubtitle' | transloco }}</p>
         </div>
       </header>
 
@@ -84,8 +84,8 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
               <mat-icon class="np-section__header-icon">tune</mat-icon>
             </div>
             <div class="np-section__header-text">
-              <h2 class="np-section__title">Notification Channels</h2>
-              <p class="np-section__subtitle">Toggle in-app and email notifications for each event type</p>
+              <h2 class="np-section__title">{{ 'notifications.channelsTitle' | transloco }}</h2>
+              <p class="np-section__subtitle">{{ 'notifications.channelsSubtitle' | transloco }}</p>
             </div>
           </div>
 
@@ -93,8 +93,8 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
             <!-- Column headers -->
             <div class="np-col-headers">
               <span class="np-col-headers__spacer"></span>
-              <span class="np-col-headers__label">In-App</span>
-              <span class="np-col-headers__label">Email</span>
+              <span class="np-col-headers__label">{{ 'notifications.inAppHeader' | transloco }}</span>
+              <span class="np-col-headers__label">{{ 'notifications.emailHeader' | transloco }}</span>
             </div>
 
             <!-- Preference rows -->
@@ -145,7 +145,7 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
             @if (saving()) {
               <mat-spinner diameter="20" class="np-actions__spinner"></mat-spinner>
             }
-            Save Preferences
+            {{ 'notifications.savePreferences' | transloco }}
           </button>
         </div>
       }
@@ -571,6 +571,7 @@ const NOTIFICATION_TYPE_DESCRIPTIONS: Record<string, string> = {
 export class NotificationPreferencesComponent implements OnInit {
   private readonly notificationService = inject(NotificationService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly loading = signal(true);
   readonly saving = signal(false);
@@ -629,13 +630,13 @@ export class NotificationPreferencesComponent implements OnInit {
     this.notificationService.updatePreferences(dtos).subscribe({
       next: () => {
         this.saving.set(false);
-        this.snackBar.open('Preferences saved successfully', 'Close', {
+        this.snackBar.open(this.transloco.translate('settings.notifications.saveSuccess'), 'Close', {
           duration: 3000,
         });
       },
       error: () => {
         this.saving.set(false);
-        this.snackBar.open('Failed to save preferences', 'Close', {
+        this.snackBar.open(this.transloco.translate('settings.notifications.saveFailed'), 'Close', {
           duration: 3000,
         });
       },

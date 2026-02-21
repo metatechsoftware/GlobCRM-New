@@ -14,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { EmailService } from '../../emails/email.service';
 import { EmailAccountStatusDto } from '../../emails/email.models';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 /**
  * Email account settings page for connecting/disconnecting Gmail.
@@ -676,15 +676,15 @@ import { TranslocoPipe } from '@jsverse/transloco';
       <div class="ea-header">
         <a routerLink="/settings" class="ea-header__back">
           <mat-icon>arrow_back</mat-icon>
-          <span>Settings</span>
+          <span>{{ 'emailAccounts.breadcrumb' | transloco }}</span>
         </a>
         <div class="ea-header__row">
           <div class="ea-header__icon-wrap">
             <mat-icon>mail</mat-icon>
           </div>
           <div>
-            <h1 class="ea-header__title">Email Account</h1>
-            <p class="ea-header__subtitle">Connect and manage your email integration</p>
+            <h1 class="ea-header__title">{{ 'emailAccounts.pageTitle' | transloco }}</h1>
+            <p class="ea-header__subtitle">{{ 'emailAccounts.pageSubtitle' | transloco }}</p>
           </div>
         </div>
       </div>
@@ -696,7 +696,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
           <div class="ea-section__inner">
             <div class="ea-loading">
               <mat-spinner diameter="40"></mat-spinner>
-              <p class="ea-loading__text">Loading account status...</p>
+              <p class="ea-loading__text">{{ 'emailAccounts.loadingStatus' | transloco }}</p>
             </div>
           </div>
         } @else if (!accountStatus() || !accountStatus()!.connected) {
@@ -711,14 +711,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
                 </div>
                 <mat-icon class="ea-disconnected__icon">mail_outline</mat-icon>
               </div>
-              <h2 class="ea-disconnected__title">No Gmail account connected</h2>
+              <h2 class="ea-disconnected__title">{{ 'emailAccounts.noGmailConnected' | transloco }}</h2>
               <p class="ea-disconnected__desc">
-                Connect your Gmail account to sync emails with your CRM.
-                Emails will be automatically linked to contacts and companies.
+                {{ 'emailAccounts.noGmailDesc' | transloco }}
               </p>
               <button class="ea-connect-btn" (click)="connect()">
                 <mat-icon>link</mat-icon>
-                Connect Gmail
+                {{ 'emailAccounts.connectGmail' | transloco }}
               </button>
             </div>
           </div>
@@ -740,7 +739,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
                   <mat-icon>check</mat-icon>
                 </div>
                 <div class="ea-banner__info">
-                  <h3 class="ea-banner__title">Gmail Connected</h3>
+                  <h3 class="ea-banner__title">{{ 'emailAccounts.gmailConnected' | transloco }}</h3>
                   <p class="ea-banner__address">{{ accountStatus()!.gmailAddress }}</p>
                 </div>
               </div>
@@ -752,7 +751,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     <mat-icon>wifi_tethering</mat-icon>
                   </div>
                   <div class="ea-info-card__content">
-                    <p class="ea-info-card__label">Sync Status</p>
+                    <p class="ea-info-card__label">{{ 'emailAccounts.syncStatus' | transloco }}</p>
                     <div class="ea-info-card__value">
                       <span class="ea-badge"
                             [class.ea-badge--active]="accountStatus()!.syncStatus === 'Active'"
@@ -770,9 +769,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     <mat-icon>schedule</mat-icon>
                   </div>
                   <div class="ea-info-card__content">
-                    <p class="ea-info-card__label">Last Synced</p>
+                    <p class="ea-info-card__label">{{ 'emailAccounts.lastSynced' | transloco }}</p>
                     <p class="ea-info-card__value">
-                      {{ accountStatus()!.lastSyncAt ? formatRelativeTime(accountStatus()!.lastSyncAt!) : 'Never' }}
+                      {{ accountStatus()!.lastSyncAt ? formatRelativeTime(accountStatus()!.lastSyncAt!) : ('webhooks.detail.never' | transloco) }}
                     </p>
                   </div>
                 </div>
@@ -797,16 +796,16 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     <span class="ea-sync-btn__spinner">
                       <mat-spinner diameter="16"></mat-spinner>
                     </span>
-                    Syncing...
+                    {{ 'emailAccounts.syncing' | transloco }}
                   } @else {
                     <mat-icon>sync</mat-icon>
-                    Sync Now
+                    {{ 'emailAccounts.syncNow' | transloco }}
                   }
                 </button>
 
                 <button class="ea-disconnect-btn" (click)="disconnect()">
                   <mat-icon>link_off</mat-icon>
-                  Disconnect
+                  {{ 'emailAccounts.disconnect' | transloco }}
                 </button>
               </div>
             </div>
@@ -820,6 +819,7 @@ export class EmailAccountSettingsComponent implements OnInit {
   private readonly emailService = inject(EmailService);
   private readonly route = inject(ActivatedRoute);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Current account status from API. */
   readonly accountStatus = signal<EmailAccountStatusDto | null>(null);
@@ -836,7 +836,7 @@ export class EmailAccountSettingsComponent implements OnInit {
     // Check for OAuth callback redirect with ?connected=true
     this.route.queryParams.subscribe((params) => {
       if (params['connected'] === 'true') {
-        this.snackBar.open('Gmail account connected successfully!', 'OK', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('settings.emailAccountSnack.connectedSuccess'), 'OK', { duration: 5000 });
         this.loadAccountStatus();
       }
     });
@@ -865,7 +865,7 @@ export class EmailAccountSettingsComponent implements OnInit {
         window.location.href = response.authorizationUrl;
       },
       error: (err) => {
-        const message = err?.error?.message ?? 'Failed to initiate Gmail connection';
+        const message = err?.error?.message ?? this.transloco.translate('settings.emailAccountSnack.connectFailed');
         this.snackBar.open(message, 'OK', { duration: 5000 });
       },
     });
@@ -874,18 +874,18 @@ export class EmailAccountSettingsComponent implements OnInit {
   /** Disconnect Gmail account with confirmation. */
   disconnect(): void {
     const confirmed = window.confirm(
-      'Are you sure you want to disconnect your Gmail account? Synced emails will remain, but no new emails will be synced.',
+      this.transloco.translate('settings.emailAccountSnack.disconnectConfirm'),
     );
 
     if (!confirmed) return;
 
     this.emailService.disconnect().subscribe({
       next: () => {
-        this.snackBar.open('Gmail account disconnected', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('settings.emailAccountSnack.disconnected'), 'OK', { duration: 3000 });
         this.loadAccountStatus();
       },
       error: (err) => {
-        const message = err?.error?.message ?? 'Failed to disconnect Gmail account';
+        const message = err?.error?.message ?? this.transloco.translate('settings.emailAccountSnack.disconnectFailed');
         this.snackBar.open(message, 'OK', { duration: 5000 });
       },
     });
@@ -897,12 +897,12 @@ export class EmailAccountSettingsComponent implements OnInit {
     this.emailService.triggerSync().subscribe({
       next: () => {
         this.syncing.set(false);
-        this.snackBar.open('Email sync completed', 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('settings.emailAccountSnack.syncCompleted'), 'OK', { duration: 3000 });
         this.loadAccountStatus();
       },
       error: (err) => {
         this.syncing.set(false);
-        const message = err?.error?.message ?? 'Failed to sync emails';
+        const message = err?.error?.message ?? this.transloco.translate('settings.emailAccountSnack.syncFailed');
         this.snackBar.open(message, 'OK', { duration: 5000 });
       },
     });

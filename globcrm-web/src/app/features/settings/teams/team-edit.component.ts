@@ -207,7 +207,7 @@ export class TeamEditComponent implements OnInit {
     this.permissionService.removeTeamMember(teamId, member.userId).subscribe({
       next: () => {
         this.snackBar.open(
-          `${member.firstName} ${member.lastName} removed from team.`,
+          this.transloco.translate('settings.teamEdit.memberRemoved', { name: `${member.firstName} ${member.lastName}` }),
           'Close',
           { duration: 3000 }
         );
@@ -216,7 +216,7 @@ export class TeamEditComponent implements OnInit {
       },
       error: (err) => {
         this.snackBar.open(
-          err.message || 'Failed to remove member.',
+          err.message || this.transloco.translate('settings.teamEdit.memberRemoveFailed'),
           'Close',
           { duration: 5000 }
         );
@@ -254,17 +254,18 @@ export class TeamEditComponent implements OnInit {
     MatIconModule,
     MatListModule,
     MatProgressSpinnerModule,
+    TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>Add Team Member</h2>
+    <h2 mat-dialog-title>{{ 'teamEdit.addMemberDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Search users</mat-label>
+        <mat-label>{{ 'teamEdit.addMemberDialog.searchLabel' | transloco }}</mat-label>
         <input
           matInput
           [formControl]="searchControl"
           [matAutocomplete]="auto"
-          placeholder="Type to search by name or email..."
+          [placeholder]="'teamEdit.addMemberDialog.searchPlaceholder' | transloco"
         />
         <mat-icon matSuffix>search</mat-icon>
         <mat-autocomplete
@@ -291,17 +292,17 @@ export class TeamEditComponent implements OnInit {
           @if (isSearching()) {
             <mat-option disabled>
               <mat-spinner diameter="20"></mat-spinner>
-              Searching...
+              {{ 'teamEdit.addMemberDialog.searching' | transloco }}
             </mat-option>
           }
           @if (!isSearching() && searchControl.value && searchResults().length === 0 && hasSearched()) {
-            <mat-option disabled>No users found.</mat-option>
+            <mat-option disabled>{{ 'teamEdit.addMemberDialog.noUsersFound' | transloco }}</mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>Close</button>
+      <button mat-button mat-dialog-close>{{ 'teamEdit.addMemberDialog.close' | transloco }}</button>
     </mat-dialog-actions>
   `,
   styles: [
@@ -350,6 +351,7 @@ export class AddMemberDialogComponent implements OnInit {
   private readonly permissionService = inject(PermissionService);
   private readonly apiService = inject(ApiService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   searchControl = new FormControl('');
   searchResults = signal<DirectoryUser[]>([]);
@@ -396,7 +398,7 @@ export class AddMemberDialogComponent implements OnInit {
       .subscribe({
         next: () => {
           this.snackBar.open(
-            `${user.firstName} ${user.lastName} added to team.`,
+            this.transloco.translate('settings.teamEdit.memberAdded', { name: `${user.firstName} ${user.lastName}` }),
             'Close',
             { duration: 3000 }
           );
@@ -406,7 +408,7 @@ export class AddMemberDialogComponent implements OnInit {
         },
         error: (err) => {
           this.snackBar.open(
-            err.message || 'Failed to add member.',
+            err.message || this.transloco.translate('settings.teamEdit.memberAddFailed'),
             'Close',
             { duration: 5000 }
           );
