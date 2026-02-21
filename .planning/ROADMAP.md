@@ -63,7 +63,7 @@
 
 **Milestone Goal:** Add localization support (English + Turkish), integration marketplace infrastructure, free-form Kanban boards, and quote PDF template builder to the CRM platform.
 
-- [ ] **Phase 27: Localization Foundation** — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes
+- [ ] **Phase 27: Localization Foundation** (4 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes
 - [ ] **Phase 28: Localization String Extraction** — Extract all 415+ hardcoded strings to EN/TR JSON files, CI coverage check, translation pipe in all templates
 - [ ] **Phase 29: Integration Marketplace** — Settings page with card grid, credential management, detail panel, activity log, RBAC
 - [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
@@ -81,7 +81,12 @@
   3. Date, number, and currency values render in locale-appropriate format (Turkish: 20.02.2026, 1.234,56; English: 02/20/2026, 1,234.56)
   4. Angular Material components (paginator "of", sort headers, date picker) display labels in the selected language
   5. Translation files lazy-load per feature scope (navigating to contacts loads only contact translations), and missing keys fall back to English without showing raw keys
-**Plans**: TBD
+**Plans**: 4 plans
+Plans:
+- [ ] 27-01-PLAN.md — Transloco infrastructure setup (packages, loader, LanguageService, global EN/TR translations, app config)
+- [ ] 27-02-PLAN.md — Language switcher UI in navbar + persistence (toggle in user menu, lang badge, backend/localStorage sync)
+- [ ] 27-03-PLAN.md — Material intl + locale formatting (TranslatedPaginatorIntl, DateAdapter consolidation, DynamicTable locale-aware dates)
+- [ ] 27-04-PLAN.md — Scoped translations + org default language (contacts/settings scopes, Organization.DefaultLanguage, settings hub card)
 
 ### Phase 28: Localization String Extraction
 **Goal**: Every user-visible string in the application renders in the user's selected language via translation keys, with CI enforcement preventing regressions
@@ -159,7 +164,7 @@
 | 24. My Day Personal Dashboard | v1.2 | 5/5 | Complete | 2026-02-20 |
 | 25. Preview Sidebar Polish + Cross-Feature Integration | v1.2 | 3/3 | Complete | 2026-02-20 |
 | 26. Integration Fix — Preview Sidebar + My Day Wiring | v1.2 | 1/1 | Complete | 2026-02-20 |
-| 27. Localization Foundation | v1.3 | 0/? | Not started | - |
+| 27. Localization Foundation | v1.3 | 0/4 | Planned | - |
 | 28. Localization String Extraction | v1.3 | 0/? | Not started | - |
 | 29. Integration Marketplace | v1.3 | 0/? | Not started | - |
 | 30. Free-Form Kanban Boards | v1.3 | 0/? | Not started | - |
