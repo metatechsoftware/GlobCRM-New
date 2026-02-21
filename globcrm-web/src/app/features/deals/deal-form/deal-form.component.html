@@ -110,7 +110,7 @@
             @if (selectedCompanyId()) {
               <button mat-icon-button matSuffix type="button"
                       (click)="clearCompany()"
-                      aria-label="Clear company">
+                      [attr.aria-label]="'form.aria.clearCompany' | transloco">
                 <mat-icon>close</mat-icon>
               </button>
             }

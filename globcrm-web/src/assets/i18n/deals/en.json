@@ -83,7 +83,13 @@
       "columnAuthor": "Author",
       "columnDate": "Date"
     },
-    "timeline": "Timeline"
+    "timeline": "Timeline",
+    "aria": {
+      "linkContact": "Link contact",
+      "linkProduct": "Link product",
+      "unlinkContact": "Unlink contact",
+      "unlinkProduct": "Unlink product"
+    }
   },
   "form": {
     "createTitle": "New Deal",
@@ -113,7 +119,10 @@
       "pipelineRequired": "Pipeline is required"
     },
     "saveChanges": "Save Changes",
-    "createDeal": "Create Deal"
+    "createDeal": "Create Deal",
+    "aria": {
+      "clearCompany": "Clear company"
+    }
   },
   "kanban": {
     "title": "Deals",

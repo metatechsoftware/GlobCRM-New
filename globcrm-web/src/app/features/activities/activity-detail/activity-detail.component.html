@@ -10,7 +10,7 @@
 
       <!-- Navigation bar -->
       <div class="hero-nav">
-        <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
+        <a mat-icon-button routerLink="/activities" [attr.aria-label]="'activities.detail.aria.backToActivities' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div class="hero-actions">
@@ -286,13 +286,13 @@
                         }
                         <div class="comment-actions">
                           @if (canEditComment(comment.authorId)) {
-                            <button mat-icon-button aria-label="Edit comment"
+                            <button mat-icon-button [attr.aria-label]="'activities.detail.aria.editComment' | transloco"
                                     (click)="startEditComment(comment)">
                               <mat-icon>edit</mat-icon>
                             </button>
                           }
                           @if (canDeleteComment(comment.authorId)) {
-                            <button mat-icon-button aria-label="Delete comment"
+                            <button mat-icon-button [attr.aria-label]="'activities.detail.aria.deleteComment' | transloco"
                                     (click)="deleteComment(comment.id)">
                               <mat-icon>delete</mat-icon>
                             </button>
@@ -347,11 +347,11 @@
                         </span>
                       </div>
                       <div class="attachment-actions">
-                        <button mat-icon-button aria-label="Download"
+                        <button mat-icon-button [attr.aria-label]="'activities.detail.aria.download' | transloco"
                                 (click)="downloadAttachment(attachment.id, attachment.fileName)">
                           <mat-icon>download</mat-icon>
                         </button>
-                        <button mat-icon-button aria-label="Delete"
+                        <button mat-icon-button [attr.aria-label]="'activities.detail.aria.delete' | transloco"
                                 (click)="deleteAttachment(attachment.id, attachment.fileName)">
                           <mat-icon>delete</mat-icon>
                         </button>
@@ -423,7 +423,7 @@
                       <span class="time-col-description">{{ entry.description || '-' }}</span>
                       <span class="time-col-user">{{ entry.userName }}</span>
                       <span class="time-col-actions">
-                        <button mat-icon-button aria-label="Delete time entry"
+                        <button mat-icon-button [attr.aria-label]="'activities.detail.aria.deleteTimeEntry' | transloco"
                                 (click)="deleteTimeEntry(entry.id)">
                           <mat-icon>delete</mat-icon>
                         </button>
@@ -457,9 +457,9 @@
                     <mat-form-field appearance="outline" class="link-type-field">
                       <mat-label>{{ 'activities.detail.links.entityType' | transloco }}</mat-label>
                       <mat-select [formControl]="linkTypeControl" (selectionChange)="onLinkTypeChange()">
-                        <mat-option value="Company">Company</mat-option>
-                        <mat-option value="Contact">Contact</mat-option>
-                        <mat-option value="Deal">Deal</mat-option>
+                        <mat-option value="Company">{{ 'activities.detail.linkedEntity.company' | transloco }}</mat-option>
+                        <mat-option value="Contact">{{ 'activities.detail.linkedEntity.contact' | transloco }}</mat-option>
+                        <mat-option value="Deal">{{ 'activities.detail.linkedEntity.deal' | transloco }}</mat-option>
                       </mat-select>
                     </mat-form-field>
                     <mat-form-field appearance="outline" class="link-search-field">
@@ -523,7 +523,7 @@
                           {{ link.entityName || link.entityId }}
                         </a>
                         <span class="link-timestamp">{{ link.linkedAt | date:'mediumDate' }}</span>
-                        <button mat-icon-button aria-label="Unlink"
+                        <button mat-icon-button [attr.aria-label]="'activities.detail.aria.unlink' | transloco"
                                 (click)="unlinkEntity(link.id)">
                           <mat-icon>link_off</mat-icon>
                         </button>

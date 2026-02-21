@@ -278,7 +278,7 @@ import { ProductDto } from '../../products/product.models';
   template: `
     <div class="entity-form-container">
       <div class="form-header">
-        <a mat-icon-button routerLink="/quotes" aria-label="Back to quotes">
+        <a mat-icon-button routerLink="/quotes" [attr.aria-label]="'quotes.form.aria.backToQuotes' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <h1>{{ isEditMode ? ('quotes.form.editTitle' | transloco) : ('quotes.form.createTitle' | transloco) }}</h1>
@@ -362,7 +362,7 @@ import { ProductDto } from '../../products/product.models';
                 @if (selectedDealId()) {
                   <button mat-icon-button matSuffix type="button"
                           (click)="clearDeal()"
-                          aria-label="Clear deal">
+                          [attr.aria-label]="'quotes.form.aria.clearDeal' | transloco">
                     <mat-icon>close</mat-icon>
                   </button>
                 }
@@ -392,7 +392,7 @@ import { ProductDto } from '../../products/product.models';
                 @if (selectedContactId()) {
                   <button mat-icon-button matSuffix type="button"
                           (click)="clearContact()"
-                          aria-label="Clear contact">
+                          [attr.aria-label]="'quotes.form.aria.clearContact' | transloco">
                     <mat-icon>close</mat-icon>
                   </button>
                 }
@@ -422,7 +422,7 @@ import { ProductDto } from '../../products/product.models';
                 @if (selectedCompanyId()) {
                   <button mat-icon-button matSuffix type="button"
                           (click)="clearCompany()"
-                          aria-label="Clear company">
+                          [attr.aria-label]="'quotes.form.aria.clearCompany' | transloco">
                     <mat-icon>close</mat-icon>
                   </button>
                 }
@@ -474,7 +474,7 @@ import { ProductDto } from '../../products/product.models';
               <div class="line-item-row" [formGroupName]="'lineItems'">
                 <ng-container [formGroupName]="i">
                   <mat-form-field appearance="outline">
-                    <input matInput formControlName="description" placeholder="Description">
+                    <input matInput formControlName="description" [placeholder]="'quotes.form.fields.descriptionPlaceholder' | transloco">
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
@@ -497,7 +497,7 @@ import { ProductDto } from '../../products/product.models';
 
                   <button mat-icon-button type="button" color="warn"
                           (click)="removeLineItem(i)"
-                          aria-label="Remove line item">
+                          [attr.aria-label]="'quotes.form.aria.removeLineItem' | transloco">
                     <mat-icon>delete</mat-icon>
                   </button>
                 </ng-container>

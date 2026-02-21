@@ -152,7 +152,7 @@ import {
     <div class="entity-form-container">
       @if (!dialogMode()) {
         <div class="form-header">
-          <a mat-icon-button routerLink="/activities" aria-label="Back to activities">
+          <a mat-icon-button routerLink="/activities" [attr.aria-label]="'activities.form.aria.backToActivities' | transloco">
             <mat-icon>arrow_back</mat-icon>
           </a>
           <h1>{{ isEditMode ? ('activities.form.editTitle' | transloco) : ('activities.form.createTitle' | transloco) }}</h1>

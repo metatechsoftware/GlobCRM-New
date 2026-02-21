@@ -255,7 +255,7 @@
                           <span matListItemLine>
                             @if (contact.email) { {{ contact.email }} }
                           </span>
-                          <button mat-icon-button matListItemMeta aria-label="Link contact">
+                          <button mat-icon-button matListItemMeta [attr.aria-label]="'detail.aria.linkContact' | transloco">
                             <mat-icon>add_link</mat-icon>
                           </button>
                         </mat-list-item>
@@ -281,7 +281,7 @@
                       </a>
                       <button mat-icon-button matListItemMeta
                               *appHasPermission="'Deal:Edit'"
-                              aria-label="Unlink contact"
+                              [attr.aria-label]="'detail.aria.unlinkContact' | transloco"
                               (click)="unlinkContact(contact)">
                         <mat-icon>link_off</mat-icon>
                       </button>
@@ -354,7 +354,7 @@
                             {{ formatValue(product.unitPrice) }}
                             @if (product.sku) { &middot; SKU: {{ product.sku }} }
                           </span>
-                          <button mat-icon-button matListItemMeta aria-label="Link product">
+                          <button mat-icon-button matListItemMeta [attr.aria-label]="'detail.aria.linkProduct' | transloco">
                             <mat-icon>add_link</mat-icon>
                           </button>
                         </mat-list-item>
@@ -390,7 +390,7 @@
                       <span class="product-col-actions">
                         <button mat-icon-button
                                 *appHasPermission="'Deal:Edit'"
-                                aria-label="Unlink product"
+                                [attr.aria-label]="'detail.aria.unlinkProduct' | transloco"
                                 (click)="unlinkProduct(product)">
                           <mat-icon>link_off</mat-icon>
                         </button>

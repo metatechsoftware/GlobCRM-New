@@ -93,6 +93,20 @@
     "notes": {
       "noNotes": "Bu aktivite icin not yok.",
       "addNote": "Not Ekle"
+    },
+    "linkedEntity": {
+      "company": "Sirket",
+      "contact": "Kisi",
+      "deal": "Anlasma"
+    },
+    "aria": {
+      "backToActivities": "Etkinliklere don",
+      "delete": "Sil",
+      "deleteComment": "Yorumu sil",
+      "deleteTimeEntry": "Zaman kaydini sil",
+      "download": "Indir",
+      "editComment": "Yorumu duzenle",
+      "unlink": "Baglanti kaldir"
     }
   },
   "form": {
@@ -119,7 +133,10 @@
       "priorityRequired": "Oncelik gereklidir"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createActivity": "Aktivite Olustur"
+    "createActivity": "Aktivite Olustur",
+    "aria": {
+      "backToActivities": "Etkinliklere don"
+    }
   },
   "kanban": {
     "title": "Aktiviteler",

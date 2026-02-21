@@ -75,6 +75,9 @@
     "notes": {
       "noNotes": "Bu teklif icin not bulunmuyor.",
       "addNote": "Not Ekle"
+    },
+    "aria": {
+      "backToQuotes": "Tekliflere don"
     }
   },
   "form": {
@@ -123,7 +126,17 @@
       "grandTotal": "Genel Toplam"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createQuote": "Teklif Olustur"
+    "createQuote": "Teklif Olustur",
+    "aria": {
+      "backToQuotes": "Tekliflere don",
+      "clearCompany": "Sirket temizle",
+      "clearContact": "Kisiyi temizle",
+      "clearDeal": "Anlasmayı temizle",
+      "removeLineItem": "Satir ogesini kaldir"
+    },
+    "fields": {
+      "descriptionPlaceholder": "Aciklama"
+    }
   },
   "messages": {
     "quoteCreated": "Teklif basariyla olusturuldu",

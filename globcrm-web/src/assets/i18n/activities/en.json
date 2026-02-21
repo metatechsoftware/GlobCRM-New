@@ -93,6 +93,20 @@
     "notes": {
       "noNotes": "No notes for this activity.",
       "addNote": "Add Note"
+    },
+    "linkedEntity": {
+      "company": "Company",
+      "contact": "Contact",
+      "deal": "Deal"
+    },
+    "aria": {
+      "backToActivities": "Back to activities",
+      "delete": "Delete",
+      "deleteComment": "Delete comment",
+      "deleteTimeEntry": "Delete time entry",
+      "download": "Download",
+      "editComment": "Edit comment",
+      "unlink": "Unlink"
     }
   },
   "form": {
@@ -119,7 +133,10 @@
       "priorityRequired": "Priority is required"
     },
     "saveChanges": "Save Changes",
-    "createActivity": "Create Activity"
+    "createActivity": "Create Activity",
+    "aria": {
+      "backToActivities": "Back to activities"
+    }
   },
   "kanban": {
     "title": "Activities",

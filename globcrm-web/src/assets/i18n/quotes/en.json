@@ -75,6 +75,9 @@
     "notes": {
       "noNotes": "No notes for this quote.",
       "addNote": "Add Note"
+    },
+    "aria": {
+      "backToQuotes": "Back to quotes"
     }
   },
   "form": {
@@ -123,7 +126,17 @@
       "grandTotal": "Grand Total"
     },
     "saveChanges": "Save Changes",
-    "createQuote": "Create Quote"
+    "createQuote": "Create Quote",
+    "aria": {
+      "backToQuotes": "Back to quotes",
+      "clearCompany": "Clear company",
+      "clearContact": "Clear contact",
+      "clearDeal": "Clear deal",
+      "removeLineItem": "Remove line item"
+    },
+    "fields": {
+      "descriptionPlaceholder": "Description"
+    }
   },
   "messages": {
     "quoteCreated": "Quote created successfully",

@@ -10,7 +10,7 @@
 
       <!-- Navigation bar -->
       <div class="hero-nav">
-        <a mat-icon-button routerLink="/quotes" aria-label="Back to quotes">
+        <a mat-icon-button routerLink="/quotes" [attr.aria-label]="'quotes.detail.aria.backToQuotes' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div class="hero-actions">

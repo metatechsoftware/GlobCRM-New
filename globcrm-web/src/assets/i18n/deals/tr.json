@@ -83,7 +83,13 @@
       "columnAuthor": "Yazar",
       "columnDate": "Tarih"
     },
-    "timeline": "Zaman Cizelgesi"
+    "timeline": "Zaman Cizelgesi",
+    "aria": {
+      "linkContact": "Kisi bagla",
+      "linkProduct": "Urun bagla",
+      "unlinkContact": "Kisi baglantisini kaldir",
+      "unlinkProduct": "Urun baglantisini kaldir"
+    }
   },
   "form": {
     "createTitle": "Yeni Anlasma",
@@ -113,7 +119,10 @@
       "pipelineRequired": "Pipeline zorunludur"
     },
     "saveChanges": "Degisiklikleri Kaydet",
-    "createDeal": "Anlasma Olustur"
+    "createDeal": "Anlasma Olustur",
+    "aria": {
+      "clearCompany": "Sirket temizle"
+    }
   },
   "kanban": {
     "title": "Anlasmalar",
