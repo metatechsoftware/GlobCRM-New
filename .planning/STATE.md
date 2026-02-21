@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 28 of 31 (Localization String Extraction)
-Plan: 9 of 10 complete
-Status: Executing Phase 28
-Last activity: 2026-02-21 — Completed 28-08 (Settings Sub-Page i18n)
+Plan: 10 of 10 complete
+Status: Phase 28 Complete
+Last activity: 2026-02-21 — Completed 28-10 (Remaining Feature Template String Extraction)
 
-Progress: [███████████████████░] 94% (177/~188 plans estimated)
+Progress: [███████████████████░] 95% (178/~188 plans estimated)
 
 ## Milestones
 
@@ -30,7 +30,7 @@ Progress: [███████████████████░] 94% (17
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 15 plans across 2 phases (Phase 27-28)
+- v1.3: 16 plans across 2 phases (Phase 27-28)
 
 ## Accumulated Context
 
@@ -76,6 +76,8 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 28-08: emailAccountSnack separate JSON section for email account snackbar messages to avoid collision with emailAccounts template keys
 - 28-08: TranslocoService.translate() with interpolation params for member add/remove snackbar messages containing user names
 - 28-08: window.confirm() disconnect prompt uses transloco.translate() for runtime i18n of browser native dialog
+- 28-10: workflow-canvas getTriggerBadge/getActionBadge refactored to use existing nodes.* translation keys via transloco.translate()
+- 28-10: i18n baseline reduced from 347 to 2 false-positive entries (numeric threshold expressions, not translatable strings)
 
 ### Pending Todos
 
@@ -90,6 +92,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 28-08-PLAN.md (Settings Sub-Page i18n)
-Resume file: .planning/phases/28-localization-string-extraction/28-08-SUMMARY.md
-Next step: Execute remaining plan (28-10)
+Stopped at: Completed 28-10-PLAN.md (Remaining Feature Template String Extraction) -- Phase 28 complete
+Resume file: .planning/phases/28-localization-string-extraction/28-10-SUMMARY.md
+Next step: Plan Phase 29 or continue to next phase

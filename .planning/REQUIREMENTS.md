@@ -17,7 +17,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **LOCL-06**: Missing translations fall back to English without showing broken keys
 - [x] **LOCL-07**: Admin can set a default language for the organization (new users inherit it)
 - [x] **LOCL-08**: Angular Material components (paginator, sort headers, date picker) display labels in selected language
-- [ ] **LOCL-09**: CI check validates EN and TR translation files have matching key sets
+- [x] **LOCL-09**: CI check validates EN and TR translation files have matching key sets
 - [x] **LOCL-10**: All existing v1.0-v1.2 hardcoded strings extracted to translation files (EN + TR)
 
 ### Integration Marketplace
@@ -139,7 +139,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | LOCL-06 | Phase 27 | Complete |
 | LOCL-07 | Phase 27 | Complete |
 | LOCL-08 | Phase 27 | Complete |
-| LOCL-09 | Phase 28 | Pending |
+| LOCL-09 | Phase 28 | Complete |
 | LOCL-10 | Phase 28 | Complete |
 | INTG-01 | Phase 29 | Pending |
 | INTG-02 | Phase 29 | Pending |
