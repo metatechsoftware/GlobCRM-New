@@ -29,6 +29,16 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# .NET build artifacts (backslash path variants)
+**/bin\\Debug/
+**/bin\\Release/
+
+# Additional binary patterns
+*.dll
+*.exe
+*.pdb
+!*.exe.config
+
 # IDE
 .vs/
 .vscode/
