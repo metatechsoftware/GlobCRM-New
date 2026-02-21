@@ -7,6 +7,7 @@ import { CommonModule } from '@angular/common';
 import { MatDialogModule, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface DisconnectDialogData {
   integrationName: string;
@@ -15,23 +16,23 @@ export interface DisconnectDialogData {
 @Component({
   selector: 'app-integration-disconnect-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule],
+  imports: [CommonModule, MatDialogModule, MatButtonModule, MatIconModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h2 mat-dialog-title class="dd-title">
       <mat-icon class="dd-title__icon">link_off</mat-icon>
-      Disconnect {{ data.integrationName }}?
+      {{ 'settings.integrations.disconnectDialog.title' | transloco:{ name: data.integrationName } }}
     </h2>
 
     <mat-dialog-content class="dd-content">
       <p class="dd-content__text">
-        This will remove your stored credentials. You can reconnect later.
+        {{ 'settings.integrations.disconnectDialog.message' | transloco }}
       </p>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end" class="dd-actions">
       <button mat-button [mat-dialog-close]="false" class="dd-actions__cancel">
-        Cancel
+        {{ 'settings.integrations.disconnectDialog.cancel' | transloco }}
       </button>
       <button
         mat-flat-button
@@ -40,7 +41,7 @@ export interface DisconnectDialogData {
         class="dd-actions__disconnect"
       >
         <mat-icon>link_off</mat-icon>
-        Disconnect
+        {{ 'settings.integrations.disconnectDialog.disconnect' | transloco }}
       </button>
     </mat-dialog-actions>
   `,

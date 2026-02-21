@@ -16,6 +16,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   IntegrationCatalogItem,
   CredentialFieldDef,
@@ -40,6 +41,7 @@ export interface ConnectDialogResult {
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
@@ -49,12 +51,12 @@ export interface ConnectDialogResult {
         [alt]="data.catalogItem.name"
         class="cd-title__icon"
       />
-      Connect {{ data.catalogItem.name }}
+      {{ 'settings.integrations.connectDialog.title' | transloco:{ name: data.catalogItem.name } }}
     </h2>
 
     <mat-dialog-content class="cd-content">
       <p class="cd-content__desc">
-        Enter your credentials to connect {{ data.catalogItem.name }} with GlobCRM.
+        {{ 'settings.integrations.connectDialog.description' | transloco:{ name: data.catalogItem.name } }}
       </p>
 
       <form [formGroup]="form" class="cd-form">
@@ -68,7 +70,7 @@ export interface ConnectDialogResult {
               [placeholder]="field.placeholder ?? ''"
             />
             @if (form.get(field.key)?.hasError('required') && form.get(field.key)?.touched) {
-              <mat-error>{{ field.label }} is required</mat-error>
+              <mat-error>{{ 'settings.integrations.connectDialog.fieldRequired' | transloco:{ field: field.label } }}</mat-error>
             }
           </mat-form-field>
         }
@@ -77,7 +79,7 @@ export interface ConnectDialogResult {
 
     <mat-dialog-actions align="end" class="cd-actions">
       <button mat-button mat-dialog-close class="cd-actions__cancel">
-        Cancel
+        {{ 'settings.integrations.connectDialog.cancel' | transloco }}
       </button>
       <button
         mat-flat-button
@@ -86,7 +88,7 @@ export interface ConnectDialogResult {
         (click)="onSubmit()"
       >
         <mat-icon>power</mat-icon>
-        Connect
+        {{ 'settings.integrations.connectDialog.connect' | transloco }}
       </button>
     </mat-dialog-actions>
   `,

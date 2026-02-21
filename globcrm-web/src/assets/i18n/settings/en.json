@@ -41,7 +41,9 @@
     "emailAccounts": "Email Accounts",
     "emailAccountsDesc": "Connect email accounts for sending and tracking messages",
     "notifications": "Notifications",
-    "notificationsDesc": "Customize which events trigger alerts and how they are delivered"
+    "notificationsDesc": "Customize which events trigger alerts and how they are delivered",
+    "integrations": "Integrations",
+    "integrationsDesc": "Browse and manage third-party integrations"
   },
   "common": {
     "backToSettings": "Settings",
@@ -585,6 +587,61 @@
     "loadFailed": "Failed to load duplicate detection settings",
     "settingsUpdated": "Settings updated",
     "settingsFailed": "Failed to save settings"
+  },
+  "integrations": {
+    "title": "Integrations",
+    "subtitle": "Browse and connect third-party services to enhance your CRM workflow",
+    "search": "Search integrations...",
+    "categories": {
+      "all": "All",
+      "communication": "Communication",
+      "accounting": "Accounting",
+      "marketing": "Marketing",
+      "storage": "Storage",
+      "calendar": "Calendar",
+      "developerTools": "Developer Tools"
+    },
+    "status": {
+      "connected": "Connected",
+      "notConnected": "Not Connected"
+    },
+    "popular": "Popular",
+    "connect": "Connect",
+    "disconnect": "Disconnect",
+    "testConnection": "Test Connection",
+    "viewDetails": "View Details",
+    "connectDialog": {
+      "title": "Connect {{name}}",
+      "description": "Enter your credentials to connect {{name}} with GlobCRM.",
+      "cancel": "Cancel",
+      "connect": "Connect",
+      "fieldRequired": "{{field}} is required"
+    },
+    "disconnectDialog": {
+      "title": "Disconnect {{name}}?",
+      "message": "This will remove your stored credentials. You can reconnect later.",
+      "cancel": "Cancel",
+      "disconnect": "Disconnect"
+    },
+    "detail": {
+      "description": "Description",
+      "category": "Category",
+      "connectionInfo": "Connection Info",
+      "credentials": "Credentials",
+      "connectedAt": "Connected at",
+      "activityLog": "Activity Log",
+      "noActivity": "No activity recorded yet",
+      "testPassed": "Connection test passed",
+      "testFailed": "Connection test failed"
+    },
+    "snackbar": {
+      "connected": "Connected to {{name}}",
+      "disconnected": "Disconnected from {{name}}",
+      "testSuccess": "Connection test passed",
+      "testFailed": "Connection test failed",
+      "connectError": "Failed to connect to {{name}}"
+    },
+    "empty": "No integrations found"
   },
   "emailAccountSnack": {
     "connectedSuccess": "Gmail account connected successfully!",

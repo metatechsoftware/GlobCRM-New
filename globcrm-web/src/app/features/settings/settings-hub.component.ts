@@ -642,6 +642,13 @@ export class SettingsHubComponent {
           route: '/settings/language',
           adminOnly: true,
         },
+        {
+          icon: 'hub',
+          labelKey: 'settings.items.integrations',
+          descriptionKey: 'settings.items.integrationsDesc',
+          route: '/settings/integrations',
+          adminOnly: false,
+        },
       ],
     },
     {

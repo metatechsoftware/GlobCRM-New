@@ -8,6 +8,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslocoPipe } from '@jsverse/transloco';
 import {
   IntegrationCatalogItem,
   IntegrationConnection,
@@ -16,7 +17,7 @@ import {
 @Component({
   selector: 'app-integration-card',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatMenuModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatMenuModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div
@@ -33,12 +34,12 @@ import {
         </div>
         <div class="ic-card__badges">
           @if (catalog().isPopular) {
-            <span class="ic-badge ic-badge--popular">Popular</span>
+            <span class="ic-badge ic-badge--popular">{{ 'settings.integrations.popular' | transloco }}</span>
           }
           @if (connection()?.status === 'Connected') {
-            <span class="ic-badge ic-badge--connected">Connected</span>
+            <span class="ic-badge ic-badge--connected">{{ 'settings.integrations.status.connected' | transloco }}</span>
           } @else {
-            <span class="ic-badge ic-badge--disconnected">Not Connected</span>
+            <span class="ic-badge ic-badge--disconnected">{{ 'settings.integrations.status.notConnected' | transloco }}</span>
           }
         </div>
       </div>
@@ -56,7 +57,7 @@ import {
             (click)="connect.emit(); $event.stopPropagation()"
           >
             <mat-icon>power</mat-icon>
-            Connect
+            {{ 'settings.integrations.connect' | transloco }}
           </button>
         }
         @if (isAdmin() && connection()?.status === 'Connected') {
@@ -71,11 +72,11 @@ import {
           <mat-menu #cardMenu="matMenu">
             <button mat-menu-item (click)="testConnection.emit()">
               <mat-icon>speed</mat-icon>
-              <span>Test Connection</span>
+              <span>{{ 'settings.integrations.testConnection' | transloco }}</span>
             </button>
             <button mat-menu-item class="ic-menu-disconnect" (click)="disconnect.emit()">
               <mat-icon>link_off</mat-icon>
-              <span>Disconnect</span>
+              <span>{{ 'settings.integrations.disconnect' | transloco }}</span>
             </button>
           </mat-menu>
         }
@@ -84,7 +85,7 @@ import {
           class="ic-card__details-btn"
           (click)="viewDetails.emit()"
         >
-          View Details
+          {{ 'settings.integrations.viewDetails' | transloco }}
         </button>
       </div>
     </div>

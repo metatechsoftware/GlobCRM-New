@@ -158,6 +158,13 @@ export const SETTINGS_ROUTES: Routes = [
           ),
       },
       {
+        path: 'integrations',
+        loadComponent: () =>
+          import('./integrations/integration-marketplace.component').then(
+            (m) => m.IntegrationMarketplaceComponent
+          ),
+      },
+      {
         path: '',
         loadComponent: () =>
           import('./settings-hub.component').then(

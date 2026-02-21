@@ -41,7 +41,9 @@
     "emailAccounts": "E-posta Hesaplari",
     "emailAccountsDesc": "Mesaj gondermek ve izlemek icin e-posta hesaplarini baglatin",
     "notifications": "Bildirimler",
-    "notificationsDesc": "Hangi olaylarin uyari tetikleyecegini ve nasil iletilecegini ozellestirin"
+    "notificationsDesc": "Hangi olaylarin uyari tetikleyecegini ve nasil iletilecegini ozellestirin",
+    "integrations": "Entegrasyonlar",
+    "integrationsDesc": "Ucuncu taraf entegrasyonlari goruntulenin ve yonetin"
   },
   "common": {
     "backToSettings": "Ayarlar",
@@ -585,6 +587,61 @@
     "loadFailed": "Yineleme algilama ayarlari yuklenemedi",
     "settingsUpdated": "Ayarlar guncellendi",
     "settingsFailed": "Ayarlar kaydedilemedi"
+  },
+  "integrations": {
+    "title": "Entegrasyonlar",
+    "subtitle": "CRM is akisinizi gelistirmek icin ucuncu taraf hizmetlerini goruntuleyip baglayin",
+    "search": "Entegrasyon ara...",
+    "categories": {
+      "all": "Tumu",
+      "communication": "Iletisim",
+      "accounting": "Muhasebe",
+      "marketing": "Pazarlama",
+      "storage": "Depolama",
+      "calendar": "Takvim",
+      "developerTools": "Gelistirici Araclari"
+    },
+    "status": {
+      "connected": "Bagli",
+      "notConnected": "Bagli Degil"
+    },
+    "popular": "Populer",
+    "connect": "Baglan",
+    "disconnect": "Baglantiyi Kes",
+    "testConnection": "Baglanti Testi",
+    "viewDetails": "Detaylari Gor",
+    "connectDialog": {
+      "title": "{{name}} Bagla",
+      "description": "{{name}} uygulamasini GlobCRM'e baglamak icin kimlik bilgilerinizi girin.",
+      "cancel": "Iptal",
+      "connect": "Baglan",
+      "fieldRequired": "{{field}} alani zorunludur"
+    },
+    "disconnectDialog": {
+      "title": "{{name}} Baglantisini Kes?",
+      "message": "Bu islem kayitli kimlik bilgilerinizi silecektir. Daha sonra yeniden baglayabilirsiniz.",
+      "cancel": "Iptal",
+      "disconnect": "Baglantiyi Kes"
+    },
+    "detail": {
+      "description": "Aciklama",
+      "category": "Kategori",
+      "connectionInfo": "Baglanti Bilgisi",
+      "credentials": "Kimlik Bilgileri",
+      "connectedAt": "Baglanma tarihi",
+      "activityLog": "Etkinlik Gunlugu",
+      "noActivity": "Henuz kayitli etkinlik yok",
+      "testPassed": "Baglanti testi basarili",
+      "testFailed": "Baglanti testi basarisiz"
+    },
+    "snackbar": {
+      "connected": "{{name}} uygulamasina baglandi",
+      "disconnected": "{{name}} baglantisi kesildi",
+      "testSuccess": "Baglanti testi basarili",
+      "testFailed": "Baglanti testi basarisiz",
+      "connectError": "{{name}} uygulamasina baglanilamadi"
+    },
+    "empty": "Entegrasyon bulunamadi"
   },
   "emailAccountSnack": {
     "connectedSuccess": "Gmail hesabi basariyla baglandi!",
