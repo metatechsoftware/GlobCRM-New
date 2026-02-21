@@ -28,6 +28,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoService } from '@jsverse/transloco';
 import { ColumnResizeDirective } from '../../directives/column-resize.directive';
 import { ColumnPickerComponent } from './column-picker.component';
 import { QuickAddFieldComponent } from './quick-add-field.component';
@@ -95,6 +96,9 @@ export class DynamicTableComponent {
   rowDeleteClicked = output<any>();
   searchChanged = output<string>();
   customFieldCreated = output<CustomFieldDefinition>();
+
+  // Locale-aware formatting
+  private readonly translocoService = inject(TranslocoService);
 
   // Admin check for addColumn
   private readonly authStore = inject(AuthStore);
@@ -488,13 +492,17 @@ export class DynamicTableComponent {
   }
 
   /**
-   * Format an ISO date string to a human-readable format (e.g., "Feb 19, 2026").
+   * Format an ISO date string to a locale-aware human-readable format.
+   * Uses the active Transloco language to determine locale:
+   *   - English: "Feb 19, 2026"
+   *   - Turkish: "19 Sub 2026"
    */
   formatDate(value: any): string {
     if (!value) return '';
     const date = new Date(value);
     if (isNaN(date.getTime())) return String(value);
-    return new Intl.DateTimeFormat('en-US', {
+    const locale = this.translocoService.getActiveLang() === 'tr' ? 'tr-TR' : 'en-US';
+    return new Intl.DateTimeFormat(locale, {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
