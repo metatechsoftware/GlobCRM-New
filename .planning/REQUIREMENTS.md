@@ -44,7 +44,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-05**: User can set board visibility: Private (creator only), Team (team members), or Public (all tenant users)
 - [x] **KANB-06**: User can assign colored labels to cards for categorization
 - [x] **KANB-07**: User can assign a team member to a card (avatar displayed on card face)
-- [ ] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
+- [x] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
 - [x] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
 - [x] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
 - [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
@@ -160,7 +160,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-05 | Phase 30 | Complete |
 | KANB-06 | Phase 30 | Complete |
 | KANB-07 | Phase 30 | Complete |
-| KANB-08 | Phase 30 | Pending |
+| KANB-08 | Phase 30 | Complete |
 | KANB-09 | Phase 30 | Complete |
 | KANB-10 | Phase 30 | Complete |
 | KANB-11 | Phase 30 | Pending |
