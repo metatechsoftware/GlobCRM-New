@@ -20,19 +20,19 @@
 
     <!-- Navigation -->
     <nav class="sidebar__nav">
-      @for (group of navGroups(); track group.label) {
+      @for (group of navGroups; track group.label) {
         @if (group.label) {
-          <div class="sidebar__group-label">{{ group.label }}</div>
+          <div class="sidebar__group-label">{{ group.label | transloco }}</div>
           <div class="sidebar__group-divider"></div>
         }
         @for (item of group.items; track item.route) {
           <a [routerLink]="item.route"
              routerLinkActive="sidebar__link--active"
              class="sidebar__link"
-             [matTooltip]="sidebarState.isCollapsed() ? item.label : ''"
+             [matTooltip]="sidebarState.isCollapsed() ? (item.label | transloco) : ''"
              matTooltipPosition="right">
             <mat-icon class="sidebar__link-icon">{{ item.icon }}</mat-icon>
-            <span class="sidebar__link-text">{{ item.label }}</span>
+            <span class="sidebar__link-text">{{ item.label | transloco }}</span>
           </a>
         }
       }
@@ -112,9 +112,9 @@
     }
 
     <nav class="sidebar__nav">
-      @for (group of navGroups(); track group.label) {
+      @for (group of navGroups; track group.label) {
         @if (group.label) {
-          <div class="sidebar__group-label">{{ group.label }}</div>
+          <div class="sidebar__group-label">{{ group.label | transloco }}</div>
         }
         @for (item of group.items; track item.route) {
           <a [routerLink]="item.route"
@@ -122,7 +122,7 @@
              class="sidebar__link"
              (click)="closeMobile()">
             <mat-icon class="sidebar__link-icon">{{ item.icon }}</mat-icon>
-            <span class="sidebar__link-text">{{ item.label }}</span>
+            <span class="sidebar__link-text">{{ item.label | transloco }}</span>
           </a>
         }
       }

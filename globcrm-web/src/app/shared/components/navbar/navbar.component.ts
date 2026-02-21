@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { BreakpointObserver } from '@angular/cdk/layout';
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ThemeService } from '../../../core/theme/theme.service';
@@ -56,7 +56,6 @@ export class NavbarComponent {
   readonly sidebarState = inject(SidebarStateService);
   readonly themeService = inject(ThemeService);
   readonly languageService = inject(LanguageService);
-  private readonly translocoService = inject(TranslocoService);
   readonly currentLang = this.languageService.currentLang;
 
   isMobile = toSignal(
@@ -67,61 +66,55 @@ export class NavbarComponent {
 
   mobileOpen = signal(false);
 
-  readonly navGroups = computed(() => {
-    // Reading currentLang() makes this reactive to language changes
-    const lang = this.currentLang();
-    const t = (key: string) => this.translocoService.translate(key);
-
-    return [
-      {
-        label: '',
-        items: [
-          { route: '/my-day', icon: 'home', label: t('nav.myDay') },
-          { route: '/analytics', icon: 'grid_view', label: t('nav.analytics') },
-          { route: '/reports', icon: 'bar_chart', label: t('nav.reports') },
-        ]
-      },
-      {
-        label: t('nav.groups.crm'),
-        items: [
-          { route: '/companies', icon: 'business', label: t('nav.companies') },
-          { route: '/contacts', icon: 'people', label: t('nav.contacts') },
-          { route: '/leads', icon: 'person_search', label: t('nav.leads') },
-          { route: '/products', icon: 'inventory_2', label: t('nav.products') },
-          { route: '/deals', icon: 'handshake', label: t('nav.deals') },
-        ]
-      },
-      {
-        label: t('nav.groups.work'),
-        items: [
-          { route: '/activities', icon: 'task_alt', label: t('nav.activities') },
-          { route: '/quotes', icon: 'request_quote', label: t('nav.quotes') },
-          { route: '/requests', icon: 'support_agent', label: t('nav.requests') },
-          { route: '/notes', icon: 'note', label: t('nav.notes') },
-        ]
-      },
-      {
-        label: t('nav.groups.connect'),
-        items: [
-          { route: '/emails', icon: 'email', label: t('nav.emails') },
-          { route: '/email-templates', icon: 'drafts', label: t('nav.templates') },
-          { route: '/sequences', icon: 'schedule_send', label: t('nav.sequences') },
-          { route: '/workflows', icon: 'account_tree', label: t('nav.workflows') },
-          { route: '/feed', icon: 'dynamic_feed', label: t('nav.feed') },
-          { route: '/calendar', icon: 'calendar_month', label: t('nav.calendar') },
-        ]
-      },
-      {
-        label: t('nav.groups.admin'),
-        items: [
-          { route: '/duplicates', icon: 'compare_arrows', label: t('nav.duplicates') },
-          { route: '/import', icon: 'upload_file', label: t('nav.import') },
-          { route: '/team-directory', icon: 'groups', label: t('nav.team') },
-          { route: '/settings', icon: 'settings', label: t('nav.settings') },
-        ]
-      },
-    ];
-  });
+  readonly navGroups: NavGroup[] = [
+    {
+      label: '',
+      items: [
+        { route: '/my-day', icon: 'home', label: 'nav.myDay' },
+        { route: '/analytics', icon: 'grid_view', label: 'nav.analytics' },
+        { route: '/reports', icon: 'bar_chart', label: 'nav.reports' },
+      ]
+    },
+    {
+      label: 'nav.groups.crm',
+      items: [
+        { route: '/companies', icon: 'business', label: 'nav.companies' },
+        { route: '/contacts', icon: 'people', label: 'nav.contacts' },
+        { route: '/leads', icon: 'person_search', label: 'nav.leads' },
+        { route: '/products', icon: 'inventory_2', label: 'nav.products' },
+        { route: '/deals', icon: 'handshake', label: 'nav.deals' },
+      ]
+    },
+    {
+      label: 'nav.groups.work',
+      items: [
+        { route: '/activities', icon: 'task_alt', label: 'nav.activities' },
+        { route: '/quotes', icon: 'request_quote', label: 'nav.quotes' },
+        { route: '/requests', icon: 'support_agent', label: 'nav.requests' },
+        { route: '/notes', icon: 'note', label: 'nav.notes' },
+      ]
+    },
+    {
+      label: 'nav.groups.connect',
+      items: [
+        { route: '/emails', icon: 'email', label: 'nav.emails' },
+        { route: '/email-templates', icon: 'drafts', label: 'nav.templates' },
+        { route: '/sequences', icon: 'schedule_send', label: 'nav.sequences' },
+        { route: '/workflows', icon: 'account_tree', label: 'nav.workflows' },
+        { route: '/feed', icon: 'dynamic_feed', label: 'nav.feed' },
+        { route: '/calendar', icon: 'calendar_month', label: 'nav.calendar' },
+      ]
+    },
+    {
+      label: 'nav.groups.admin',
+      items: [
+        { route: '/duplicates', icon: 'compare_arrows', label: 'nav.duplicates' },
+        { route: '/import', icon: 'upload_file', label: 'nav.import' },
+        { route: '/team-directory', icon: 'groups', label: 'nav.team' },
+        { route: '/settings', icon: 'settings', label: 'nav.settings' },
+      ]
+    },
+  ];
 
   get userInitials(): string {
     const user = this.authStore.user();
