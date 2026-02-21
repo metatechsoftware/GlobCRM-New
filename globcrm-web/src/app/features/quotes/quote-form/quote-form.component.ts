@@ -33,6 +33,7 @@ import {
   takeUntil,
   of,
 } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { QuoteService } from '../quote.service';
 import {
   QuoteDetailDto,
@@ -75,6 +76,7 @@ import { ProductDto } from '../../products/product.models';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatAutocompleteModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -279,7 +281,7 @@ import { ProductDto } from '../../products/product.models';
         <a mat-icon-button routerLink="/quotes" aria-label="Back to quotes">
           <mat-icon>arrow_back</mat-icon>
         </a>
-        <h1>{{ isEditMode ? 'Edit Quote' : 'Create Quote' }}</h1>
+        <h1>{{ isEditMode ? ('quotes.form.editTitle' | transloco) : ('quotes.form.createTitle' | transloco) }}</h1>
       </div>
 
       @if (isLoadingDetail()) {
@@ -290,43 +292,43 @@ import { ProductDto } from '../../products/product.models';
         <form [formGroup]="quoteForm" (ngSubmit)="onSubmit()">
           <!-- Section 1: Quote Header Fields -->
           <div class="form-section">
-            <h3>Quote Information</h3>
+            <h3>{{ 'quotes.form.sections.quoteInfo' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Title</mat-label>
+                <mat-label>{{ 'quotes.form.fields.title' | transloco }}</mat-label>
                 <input matInput formControlName="title" required>
                 @if (quoteForm.controls['title'].hasError('required')) {
-                  <mat-error>Title is required</mat-error>
+                  <mat-error>{{ 'quotes.form.validation.titleRequired' | transloco }}</mat-error>
                 }
                 @if (quoteForm.controls['title'].hasError('maxlength')) {
-                  <mat-error>Title cannot exceed 500 characters</mat-error>
+                  <mat-error>{{ 'quotes.form.validation.titleMaxLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Issue Date</mat-label>
+                <mat-label>{{ 'quotes.form.fields.issueDate' | transloco }}</mat-label>
                 <input matInput [matDatepicker]="issueDatePicker" formControlName="issueDate" required>
                 <mat-datepicker-toggle matIconSuffix [for]="issueDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #issueDatePicker></mat-datepicker>
                 @if (quoteForm.controls['issueDate'].hasError('required')) {
-                  <mat-error>Issue date is required</mat-error>
+                  <mat-error>{{ 'quotes.form.validation.issueDateRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Expiry Date</mat-label>
+                <mat-label>{{ 'quotes.form.fields.expiryDate' | transloco }}</mat-label>
                 <input matInput [matDatepicker]="expiryDatePicker" formControlName="expiryDate">
                 <mat-datepicker-toggle matIconSuffix [for]="expiryDatePicker"></mat-datepicker-toggle>
                 <mat-datepicker #expiryDatePicker></mat-datepicker>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
+                <mat-label>{{ 'quotes.form.fields.description' | transloco }}</mat-label>
                 <textarea matInput formControlName="description" rows="3"></textarea>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Notes</mat-label>
+                <mat-label>{{ 'quotes.form.fields.notes' | transloco }}</mat-label>
                 <textarea matInput formControlName="notes" rows="2"></textarea>
               </mat-form-field>
             </div>
@@ -334,15 +336,15 @@ import { ProductDto } from '../../products/product.models';
 
           <!-- Section 2: Entity Links -->
           <div class="form-section">
-            <h3>Linked Entities</h3>
+            <h3>{{ 'quotes.form.sections.linkedEntities' | transloco }}</h3>
             <div class="form-grid-3">
               <!-- Deal autocomplete -->
               <mat-form-field appearance="outline">
-                <mat-label>Deal</mat-label>
+                <mat-label>{{ 'quotes.form.fields.deal' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="dealSearchControl"
                        [matAutocomplete]="dealAuto"
-                       placeholder="Search deals...">
+                       [placeholder]="'quotes.form.fields.searchDeals' | transloco">
                 <mat-autocomplete #dealAuto="matAutocomplete"
                                   [displayWith]="displayDealTitle"
                                   (optionSelected)="onDealSelected($event)">
@@ -368,11 +370,11 @@ import { ProductDto } from '../../products/product.models';
 
               <!-- Contact autocomplete -->
               <mat-form-field appearance="outline">
-                <mat-label>Contact</mat-label>
+                <mat-label>{{ 'quotes.form.fields.contact' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="contactSearchControl"
                        [matAutocomplete]="contactAuto"
-                       placeholder="Search contacts...">
+                       [placeholder]="'quotes.form.fields.searchContacts' | transloco">
                 <mat-autocomplete #contactAuto="matAutocomplete"
                                   [displayWith]="displayContactName"
                                   (optionSelected)="onContactSelected($event)">
@@ -398,11 +400,11 @@ import { ProductDto } from '../../products/product.models';
 
               <!-- Company autocomplete -->
               <mat-form-field appearance="outline">
-                <mat-label>Company</mat-label>
+                <mat-label>{{ 'quotes.form.fields.company' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="companySearchControl"
                        [matAutocomplete]="companyAuto"
-                       placeholder="Search companies...">
+                       [placeholder]="'quotes.form.fields.searchCompanies' | transloco">
                 <mat-autocomplete #companyAuto="matAutocomplete"
                                   [displayWith]="displayCompanyName"
                                   (optionSelected)="onCompanySelected($event)">
@@ -430,16 +432,16 @@ import { ProductDto } from '../../products/product.models';
 
           <!-- Section 3: Line Items -->
           <div class="line-items-section">
-            <h3>Line Items</h3>
+            <h3>{{ 'quotes.form.sections.lineItems' | transloco }}</h3>
 
             <!-- Product search for quick add -->
             <div class="product-search-row">
               <mat-form-field appearance="outline" style="width: 300px;">
-                <mat-label>Search product to add</mat-label>
+                <mat-label>{{ 'quotes.form.fields.searchProductToAdd' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="productSearchControl"
                        [matAutocomplete]="productAuto"
-                       placeholder="Search products...">
+                       [placeholder]="'quotes.form.fields.searchProducts' | transloco">
                 <mat-autocomplete #productAuto="matAutocomplete"
                                   (optionSelected)="onProductSelected($event)">
                   @for (product of productSearchResults(); track product.id) {
@@ -455,16 +457,16 @@ import { ProductDto } from '../../products/product.models';
             </div>
 
             @if (quoteForm.controls['lineItems'].hasError('minlength')) {
-              <mat-error style="margin-bottom: 8px;">At least one line item is required</mat-error>
+              <mat-error style="margin-bottom: 8px;">{{ 'quotes.form.validation.lineItemRequired' | transloco }}</mat-error>
             }
 
             <div class="line-items-header">
-              <span>Description</span>
-              <span>Qty</span>
-              <span>Unit Price</span>
-              <span>Disc %</span>
-              <span>Tax %</span>
-              <span>Line Total</span>
+              <span>{{ 'quotes.form.lineItems.description' | transloco }}</span>
+              <span>{{ 'quotes.form.lineItems.qty' | transloco }}</span>
+              <span>{{ 'quotes.form.lineItems.unitPrice' | transloco }}</span>
+              <span>{{ 'quotes.form.lineItems.discountPercent' | transloco }}</span>
+              <span>{{ 'quotes.form.lineItems.taxPercent' | transloco }}</span>
+              <span>{{ 'quotes.form.lineItems.lineTotal' | transloco }}</span>
               <span></span>
             </div>
 
@@ -504,7 +506,7 @@ import { ProductDto } from '../../products/product.models';
 
             <button mat-stroked-button type="button" class="add-line-item-btn"
                     (click)="addLineItem()">
-              <mat-icon>add</mat-icon> Add Line Item
+              <mat-icon>add</mat-icon> {{ 'quotes.form.lineItems.addLineItem' | transloco }}
             </button>
           </div>
 
@@ -512,18 +514,18 @@ import { ProductDto } from '../../products/product.models';
           <div class="totals-section">
             <mat-card class="totals-card">
               <div class="totals-grid">
-                <span class="totals-label">Subtotal</span>
+                <span class="totals-label">{{ 'quotes.form.totals.subtotal' | transloco }}</span>
                 <span class="totals-value">{{ formatCurrency(quoteTotals().subtotal) }}</span>
 
-                <span class="totals-label">Discount</span>
+                <span class="totals-label">{{ 'quotes.form.totals.discount' | transloco }}</span>
                 <span class="totals-value">-{{ formatCurrency(quoteTotals().discountTotal) }}</span>
 
-                <span class="totals-label">Tax</span>
+                <span class="totals-label">{{ 'quotes.form.totals.tax' | transloco }}</span>
                 <span class="totals-value">{{ formatCurrency(quoteTotals().taxTotal) }}</span>
 
                 <div class="totals-divider"></div>
 
-                <span class="totals-label grand-total-label">Grand Total</span>
+                <span class="totals-label grand-total-label">{{ 'quotes.form.totals.grandTotal' | transloco }}</span>
                 <span class="totals-value grand-total-value">{{ formatCurrency(quoteTotals().grandTotal) }}</span>
               </div>
             </mat-card>
@@ -531,13 +533,13 @@ import { ProductDto } from '../../products/product.models';
 
           <!-- Form actions -->
           <div class="form-actions">
-            <button mat-button type="button" routerLink="/quotes">Cancel</button>
+            <button mat-button type="button" routerLink="/quotes">{{ 'common.cancel' | transloco }}</button>
             <button mat-raised-button color="primary" type="submit"
                     [disabled]="quoteForm.invalid || isSaving()">
               @if (isSaving()) {
                 <mat-spinner diameter="20"></mat-spinner>
               }
-              {{ isEditMode ? 'Save Changes' : 'Create Quote' }}
+              {{ isEditMode ? ('quotes.form.saveChanges' | transloco) : ('quotes.form.createQuote' | transloco) }}
             </button>
           </div>
         </form>
@@ -555,6 +557,7 @@ export class QuoteFormComponent implements OnInit, OnDestroy {
   private readonly dealService = inject(DealService);
   private readonly productService = inject(ProductService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Currency formatter for display. */
   private readonly currencyFmt = new Intl.NumberFormat('en-US', {
@@ -928,7 +931,7 @@ export class QuoteFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load quote data', 'Close', {
+        this.snackBar.open(this.transloco.translate('quotes.messages.loadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -979,14 +982,14 @@ export class QuoteFormComponent implements OnInit, OnDestroy {
       this.quoteService.update(this.quoteId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Quote updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.quoteUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/quotes', this.quoteId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update quote', 'Close', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.quoteUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -1007,14 +1010,14 @@ export class QuoteFormComponent implements OnInit, OnDestroy {
       this.quoteService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Quote created successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.quoteCreated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/quotes', created.id]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create quote', 'Close', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.quoteCreateFailed'), 'Close', {
             duration: 5000,
           });
         },

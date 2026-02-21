@@ -1,0 +1,87 @@
+{
+  "title": "Requests",
+  "list": {
+    "title": "Requests",
+    "newRequest": "New Request"
+  },
+  "detail": {
+    "notFound": "Request not found",
+    "backToRequests": "Back to Requests",
+    "tabs": {
+      "summary": "Summary",
+      "details": "Details",
+      "timeline": "Timeline",
+      "notes": "Notes",
+      "attachments": "Attachments"
+    },
+    "sections": {
+      "description": "Description",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "category": "Category",
+      "owner": "Owner",
+      "assignedTo": "Assigned To",
+      "contact": "Contact",
+      "company": "Company",
+      "created": "Created",
+      "resolved": "Resolved",
+      "closed": "Closed"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "transitions": {
+      "startWork": "Start Work",
+      "resolve": "Resolve",
+      "close": "Close",
+      "reopen": "Reopen"
+    },
+    "empty": {
+      "noDescription": "No description provided"
+    },
+    "notes": {
+      "noNotes": "No notes for this request.",
+      "addNote": "Add Note"
+    }
+  },
+  "form": {
+    "createTitle": "New Request",
+    "editTitle": "Edit Request",
+    "sections": {
+      "requestInfo": "Request Information",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "subject": "Subject",
+      "priority": "Priority",
+      "category": "Category",
+      "contact": "Contact",
+      "company": "Company",
+      "assignedTo": "Assigned To",
+      "unassigned": "Unassigned",
+      "description": "Description",
+      "searching": "Searching...",
+      "none": "None"
+    },
+    "validation": {
+      "subjectRequired": "Subject is required",
+      "subjectMaxLength": "Subject cannot exceed 500 characters",
+      "priorityRequired": "Priority is required"
+    },
+    "saveChanges": "Save Changes",
+    "createRequest": "Create Request"
+  },
+  "messages": {
+    "requestCreated": "Request created successfully",
+    "requestCreateFailed": "Failed to create request",
+    "requestUpdated": "Request updated successfully",
+    "requestUpdateFailed": "Failed to update request",
+    "requestDeleted": "Request deleted",
+    "requestDeleteFailed": "Failed to delete request",
+    "statusUpdated": "Status updated to {{status}}",
+    "statusUpdateFailed": "Failed to update status",
+    "loadFailed": "Failed to load request data"
+  }
+}

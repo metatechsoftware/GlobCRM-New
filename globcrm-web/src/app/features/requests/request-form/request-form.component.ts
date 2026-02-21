@@ -24,6 +24,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { Subject, debounceTime, distinctUntilChanged, switchMap, of, takeUntil } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
 import { RequestService } from '../request.service';
 import {
@@ -65,6 +66,7 @@ import {
     MatSnackBarModule,
     MatAutocompleteModule,
     CustomFieldFormComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -149,7 +151,7 @@ import {
         <a mat-icon-button routerLink="/requests" aria-label="Back to requests">
           <mat-icon>arrow_back</mat-icon>
         </a>
-        <h1>{{ isEditMode ? 'Edit Request' : 'New Request' }}</h1>
+        <h1>{{ isEditMode ? ('requests.form.editTitle' | transloco) : ('requests.form.createTitle' | transloco) }}</h1>
       </div>
 
       @if (isLoadingDetail()) {
@@ -160,35 +162,35 @@ import {
         <form [formGroup]="requestForm" (ngSubmit)="onSubmit()">
           <!-- Request Info Section -->
           <div class="form-section">
-            <h3>Request Information</h3>
+            <h3>{{ 'requests.form.sections.requestInfo' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Subject</mat-label>
+                <mat-label>{{ 'requests.form.fields.subject' | transloco }}</mat-label>
                 <input matInput formControlName="subject" required>
                 @if (requestForm.controls['subject'].hasError('required')) {
-                  <mat-error>Subject is required</mat-error>
+                  <mat-error>{{ 'requests.form.validation.subjectRequired' | transloco }}</mat-error>
                 }
                 @if (requestForm.controls['subject'].hasError('maxlength')) {
-                  <mat-error>Subject cannot exceed 500 characters</mat-error>
+                  <mat-error>{{ 'requests.form.validation.subjectMaxLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Priority</mat-label>
+                <mat-label>{{ 'requests.form.fields.priority' | transloco }}</mat-label>
                 <mat-select formControlName="priority" required>
                   @for (p of priorities; track p.value) {
                     <mat-option [value]="p.value">{{ p.label }}</mat-option>
                   }
                 </mat-select>
                 @if (requestForm.controls['priority'].hasError('required')) {
-                  <mat-error>Priority is required</mat-error>
+                  <mat-error>{{ 'requests.form.validation.priorityRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Category</mat-label>
+                <mat-label>{{ 'requests.form.fields.category' | transloco }}</mat-label>
                 <mat-select formControlName="category">
-                  <mat-option [value]="null">None</mat-option>
+                  <mat-option [value]="null">{{ 'requests.form.fields.none' | transloco }}</mat-option>
                   @for (cat of categories; track cat) {
                     <mat-option [value]="cat">{{ cat }}</mat-option>
                   }
@@ -197,7 +199,7 @@ import {
 
               <!-- Contact autocomplete -->
               <mat-form-field appearance="outline">
-                <mat-label>Contact</mat-label>
+                <mat-label>{{ 'requests.form.fields.contact' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="contactSearchControl"
                        [matAutocomplete]="contactAuto"
@@ -206,7 +208,7 @@ import {
                                   [displayWith]="displayContact"
                                   (optionSelected)="onContactSelected($event)">
                   @if (contactSearchLoading()) {
-                    <mat-option disabled>Searching...</mat-option>
+                    <mat-option disabled>{{ 'requests.form.fields.searching' | transloco }}</mat-option>
                   }
                   @for (contact of contactResults(); track contact.id) {
                     <mat-option [value]="contact">
@@ -223,7 +225,7 @@ import {
 
               <!-- Company autocomplete -->
               <mat-form-field appearance="outline">
-                <mat-label>Company</mat-label>
+                <mat-label>{{ 'requests.form.fields.company' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="companySearchControl"
                        [matAutocomplete]="companyAuto"
@@ -232,7 +234,7 @@ import {
                                   [displayWith]="displayCompany"
                                   (optionSelected)="onCompanySelected($event)">
                   @if (companySearchLoading()) {
-                    <mat-option disabled>Searching...</mat-option>
+                    <mat-option disabled>{{ 'requests.form.fields.searching' | transloco }}</mat-option>
                   }
                   @for (company of companyResults(); track company.id) {
                     <mat-option [value]="company">
@@ -248,9 +250,9 @@ import {
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>Assigned To</mat-label>
+                <mat-label>{{ 'requests.form.fields.assignedTo' | transloco }}</mat-label>
                 <mat-select formControlName="assignedToId">
-                  <mat-option [value]="null">Unassigned</mat-option>
+                  <mat-option [value]="null">{{ 'requests.form.fields.unassigned' | transloco }}</mat-option>
                   @for (member of teamMembers(); track member.id) {
                     <mat-option [value]="member.id">{{ member.firstName }} {{ member.lastName }}</mat-option>
                   }
@@ -258,7 +260,7 @@ import {
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Description</mat-label>
+                <mat-label>{{ 'requests.form.fields.description' | transloco }}</mat-label>
                 <textarea matInput formControlName="description" rows="4"></textarea>
               </mat-form-field>
             </div>
@@ -266,7 +268,7 @@ import {
 
           <!-- Custom fields -->
           <div class="custom-fields-section">
-            <h3>Custom Fields</h3>
+            <h3>{{ 'requests.form.sections.customFields' | transloco }}</h3>
             <app-custom-field-form
               [entityType]="'Request'"
               [customFieldValues]="existingCustomFields"
@@ -275,13 +277,13 @@ import {
 
           <!-- Form actions -->
           <div class="form-actions">
-            <button mat-button type="button" routerLink="/requests">Cancel</button>
+            <button mat-button type="button" routerLink="/requests">{{ 'common.cancel' | transloco }}</button>
             <button mat-raised-button color="primary" type="submit"
                     [disabled]="requestForm.invalid || isSaving()">
               @if (isSaving()) {
                 <mat-spinner diameter="20"></mat-spinner>
               }
-              {{ isEditMode ? 'Save Changes' : 'Create Request' }}
+              {{ isEditMode ? ('requests.form.saveChanges' | transloco) : ('requests.form.createRequest' | transloco) }}
             </button>
           </div>
         </form>
@@ -298,6 +300,7 @@ export class RequestFormComponent implements OnInit, OnDestroy {
   private readonly companyService = inject(CompanyService);
   private readonly profileService = inject(ProfileService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   /** Expose constants for template. */
   readonly priorities = REQUEST_PRIORITIES;
@@ -513,7 +516,7 @@ export class RequestFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open('Failed to load request data', 'Close', {
+        this.snackBar.open(this.transloco.translate('requests.messages.loadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -547,14 +550,14 @@ export class RequestFormComponent implements OnInit, OnDestroy {
       this.requestService.update(this.requestId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Request updated successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('requests.messages.requestUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/requests', this.requestId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to update request', 'Close', {
+          this.snackBar.open(this.transloco.translate('requests.messages.requestUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -574,14 +577,14 @@ export class RequestFormComponent implements OnInit, OnDestroy {
       this.requestService.create(request).subscribe({
         next: (created) => {
           this.isSaving.set(false);
-          this.snackBar.open('Request created successfully', 'Close', {
+          this.snackBar.open(this.transloco.translate('requests.messages.requestCreated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/requests', created.id]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open('Failed to create request', 'Close', {
+          this.snackBar.open(this.transloco.translate('requests.messages.requestCreateFailed'), 'Close', {
             duration: 5000,
           });
         },

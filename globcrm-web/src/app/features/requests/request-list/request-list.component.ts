@@ -23,6 +23,7 @@ import {
   ViewSort,
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -48,6 +49,7 @@ import { RequestService } from '../request.service';
     FilterChipsComponent,
     ViewSidebarComponent,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   providers: [ViewStore, RequestStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -74,13 +76,13 @@ import { RequestService } from '../request.service';
         (viewSelected)="onViewSelected($event)" />
       <div class="entity-list-content">
         <div class="list-header">
-          <h1>Requests</h1>
+          <h1>{{ 'requests.list.title' | transloco }}</h1>
 
           <div class="header-actions">
             <button mat-raised-button color="primary"
                     *appHasPermission="'Request:Create'"
                     routerLink="new">
-              <mat-icon>add</mat-icon> New Request
+              <mat-icon>add</mat-icon> {{ 'requests.list.newRequest' | transloco }}
             </button>
           </div>
         </div>

@@ -22,6 +22,7 @@ import {
   ViewSort,
   SavedView,
 } from '../../../shared/components/saved-views/view.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { PermissionStore } from '../../../core/permissions/permission.store';
 import { CustomFieldService } from '../../../core/custom-fields/custom-field.service';
@@ -50,6 +51,7 @@ import { QuoteListDto, QUOTE_STATUSES } from '../quote.models';
     FilterChipsComponent,
     ViewSidebarComponent,
     HasPermissionDirective,
+    TranslocoPipe,
   ],
   providers: [ViewStore, QuoteStore],
   changeDetection: ChangeDetectionStrategy.OnPush,

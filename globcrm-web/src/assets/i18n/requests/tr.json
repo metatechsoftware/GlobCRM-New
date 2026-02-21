@@ -1,0 +1,87 @@
+{
+  "title": "Talepler",
+  "list": {
+    "title": "Talepler",
+    "newRequest": "Yeni Talep"
+  },
+  "detail": {
+    "notFound": "Talep bulunamadi",
+    "backToRequests": "Taleplere Don",
+    "tabs": {
+      "summary": "Ozet",
+      "details": "Detaylar",
+      "timeline": "Zaman Cizelgesi",
+      "notes": "Notlar",
+      "attachments": "Ekler"
+    },
+    "sections": {
+      "description": "Aciklama",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "category": "Kategori",
+      "owner": "Sahip",
+      "assignedTo": "Atanan Kisi",
+      "contact": "Kisi",
+      "company": "Sirket",
+      "created": "Olusturulma",
+      "resolved": "Cozulme",
+      "closed": "Kapatilma"
+    },
+    "actions": {
+      "edit": "Duzenle",
+      "delete": "Sil"
+    },
+    "transitions": {
+      "startWork": "Isleme Al",
+      "resolve": "Coz",
+      "close": "Kapat",
+      "reopen": "Yeniden Ac"
+    },
+    "empty": {
+      "noDescription": "Aciklama bulunmuyor"
+    },
+    "notes": {
+      "noNotes": "Bu talep icin not bulunmuyor.",
+      "addNote": "Not Ekle"
+    }
+  },
+  "form": {
+    "createTitle": "Yeni Talep",
+    "editTitle": "Talebi Duzenle",
+    "sections": {
+      "requestInfo": "Talep Bilgileri",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "subject": "Konu",
+      "priority": "Oncelik",
+      "category": "Kategori",
+      "contact": "Kisi",
+      "company": "Sirket",
+      "assignedTo": "Atanan Kisi",
+      "unassigned": "Atanmamis",
+      "description": "Aciklama",
+      "searching": "Araniyor...",
+      "none": "Yok"
+    },
+    "validation": {
+      "subjectRequired": "Konu zorunludur",
+      "subjectMaxLength": "Konu 500 karakteri asamaz",
+      "priorityRequired": "Oncelik zorunludur"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createRequest": "Talep Olustur"
+  },
+  "messages": {
+    "requestCreated": "Talep basariyla olusturuldu",
+    "requestCreateFailed": "Talep olusturulamadi",
+    "requestUpdated": "Talep basariyla guncellendi",
+    "requestUpdateFailed": "Talep guncellenemedi",
+    "requestDeleted": "Talep silindi",
+    "requestDeleteFailed": "Talep silinemedi",
+    "statusUpdated": "Durum {{status}} olarak guncellendi",
+    "statusUpdateFailed": "Durum guncellenemedi",
+    "loadFailed": "Talep verileri yuklenemedi"
+  }
+}

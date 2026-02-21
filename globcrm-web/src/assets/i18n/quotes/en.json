@@ -1,0 +1,142 @@
+{
+  "title": "Quotes",
+  "list": {
+    "title": "Quotes",
+    "subtitle": "Create, send, and track proposals and pricing",
+    "newQuote": "New Quote"
+  },
+  "detail": {
+    "title": "Quote Details",
+    "notFound": "Quote not found",
+    "backToQuotes": "Back to Quotes",
+    "tabs": {
+      "summary": "Summary",
+      "lineItems": "Line Items",
+      "details": "Details",
+      "versions": "Versions",
+      "timeline": "Timeline",
+      "notes": "Notes",
+      "attachments": "Attachments"
+    },
+    "sections": {
+      "quoteInfo": "Quote Info",
+      "description": "Description",
+      "termsNotes": "Terms & Notes"
+    },
+    "fields": {
+      "quoteNumber": "Quote #",
+      "status": "Status",
+      "grandTotal": "Grand Total",
+      "contact": "Contact",
+      "company": "Company",
+      "deal": "Deal",
+      "owner": "Owner",
+      "issueDate": "Issue Date",
+      "expiryDate": "Expiry Date",
+      "expires": "Expires",
+      "version": "Version"
+    },
+    "actions": {
+      "edit": "Edit",
+      "delete": "Delete",
+      "generatePdf": "Generate PDF",
+      "newVersion": "New Version",
+      "moveTo": "Move to:"
+    },
+    "transitions": {
+      "markAsSent": "Mark as Sent",
+      "accept": "Accept",
+      "reject": "Reject",
+      "markExpired": "Mark Expired",
+      "revertToDraft": "Revert to Draft"
+    },
+    "lineItems": {
+      "noLineItems": "No line items",
+      "description": "Description",
+      "qty": "Qty",
+      "unitPrice": "Unit Price",
+      "discountPercent": "Discount %",
+      "taxPercent": "Tax %",
+      "lineTotal": "Line Total",
+      "netTotal": "Net Total",
+      "subtotal": "Subtotal",
+      "discountTotal": "Discount Total",
+      "taxTotal": "Tax Total"
+    },
+    "empty": {
+      "noDetails": "No additional details",
+      "noVersionHistory": "No version history available",
+      "notSet": "Not set"
+    },
+    "versions": {
+      "view": "View",
+      "current": "Current"
+    },
+    "notes": {
+      "noNotes": "No notes for this quote.",
+      "addNote": "Add Note"
+    }
+  },
+  "form": {
+    "createTitle": "Create Quote",
+    "editTitle": "Edit Quote",
+    "sections": {
+      "quoteInfo": "Quote Information",
+      "linkedEntities": "Linked Entities",
+      "lineItems": "Line Items",
+      "customFields": "Custom Fields"
+    },
+    "fields": {
+      "title": "Title",
+      "issueDate": "Issue Date",
+      "expiryDate": "Expiry Date",
+      "description": "Description",
+      "notes": "Notes",
+      "deal": "Deal",
+      "contact": "Contact",
+      "company": "Company",
+      "searchDeals": "Search deals...",
+      "searchContacts": "Search contacts...",
+      "searchCompanies": "Search companies...",
+      "searchProductToAdd": "Search product to add",
+      "searchProducts": "Search products..."
+    },
+    "validation": {
+      "titleRequired": "Title is required",
+      "titleMaxLength": "Title cannot exceed 500 characters",
+      "issueDateRequired": "Issue date is required",
+      "lineItemRequired": "At least one line item is required"
+    },
+    "lineItems": {
+      "description": "Description",
+      "qty": "Qty",
+      "unitPrice": "Unit Price",
+      "discountPercent": "Disc %",
+      "taxPercent": "Tax %",
+      "lineTotal": "Line Total",
+      "addLineItem": "Add Line Item"
+    },
+    "totals": {
+      "subtotal": "Subtotal",
+      "discount": "Discount",
+      "tax": "Tax",
+      "grandTotal": "Grand Total"
+    },
+    "saveChanges": "Save Changes",
+    "createQuote": "Create Quote"
+  },
+  "messages": {
+    "quoteCreated": "Quote created successfully",
+    "quoteCreateFailed": "Failed to create quote",
+    "quoteUpdated": "Quote updated successfully",
+    "quoteUpdateFailed": "Failed to update quote",
+    "quoteDeleted": "Quote deleted",
+    "quoteDeleteFailed": "Failed to delete quote",
+    "statusUpdated": "Status updated to {{status}}",
+    "statusUpdateFailed": "Failed to update status",
+    "pdfFailed": "Failed to generate PDF",
+    "versionCreated": "Version {{version}} created",
+    "versionCreateFailed": "Failed to create new version",
+    "loadFailed": "Failed to load quote data"
+  }
+}

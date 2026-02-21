@@ -15,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { DatePipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { EntityTimelineComponent } from '../../../shared/components/entity-timeline/entity-timeline.component';
 import { CustomFieldFormComponent } from '../../../shared/components/custom-field-form/custom-field-form.component';
@@ -60,6 +61,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
     CustomFieldFormComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
@@ -251,11 +253,11 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
         <div class="action-bar">
           <button mat-stroked-button routerLink="/requests/{{ request()!.id }}/edit"
                   *appHasPermission="'Request:Update'">
-            <mat-icon>edit</mat-icon> Edit
+            <mat-icon>edit</mat-icon> {{ 'requests.detail.actions.edit' | transloco }}
           </button>
           <button mat-stroked-button (click)="onDelete()"
                   *appHasPermission="'Request:Delete'">
-            <mat-icon>delete</mat-icon> Delete
+            <mat-icon>delete</mat-icon> {{ 'requests.detail.actions.delete' | transloco }}
           </button>
           <span class="spacer"></span>
           <div class="transition-buttons">
@@ -272,25 +274,25 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
         <div class="info-cards">
           @if (request()!.category) {
             <div class="info-card">
-              <div class="label">Category</div>
+              <div class="label">{{ 'requests.detail.fields.category' | transloco }}</div>
               <div class="value">{{ request()!.category }}</div>
             </div>
           }
           @if (request()!.ownerName) {
             <div class="info-card">
-              <div class="label">Owner</div>
+              <div class="label">{{ 'requests.detail.fields.owner' | transloco }}</div>
               <div class="value">{{ request()!.ownerName }}</div>
             </div>
           }
           @if (request()!.assignedToName) {
             <div class="info-card">
-              <div class="label">Assigned To</div>
+              <div class="label">{{ 'requests.detail.fields.assignedTo' | transloco }}</div>
               <div class="value">{{ request()!.assignedToName }}</div>
             </div>
           }
           @if (request()!.contactName) {
             <div class="info-card">
-              <div class="label">Contact</div>
+              <div class="label">{{ 'requests.detail.fields.contact' | transloco }}</div>
               <div class="value">
                 <a [routerLink]="['/contacts', request()!.contactId]">{{ request()!.contactName }}</a>
               </div>
@@ -298,25 +300,25 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
           }
           @if (request()!.companyName) {
             <div class="info-card">
-              <div class="label">Company</div>
+              <div class="label">{{ 'requests.detail.fields.company' | transloco }}</div>
               <div class="value">
                 <a [routerLink]="['/companies', request()!.companyId]">{{ request()!.companyName }}</a>
               </div>
             </div>
           }
           <div class="info-card">
-            <div class="label">Created</div>
+            <div class="label">{{ 'requests.detail.fields.created' | transloco }}</div>
             <div class="value">{{ request()!.createdAt | date:'medium' }}</div>
           </div>
           @if (request()!.resolvedAt) {
             <div class="info-card">
-              <div class="label">Resolved</div>
+              <div class="label">{{ 'requests.detail.fields.resolved' | transloco }}</div>
               <div class="value">{{ request()!.resolvedAt | date:'medium' }}</div>
             </div>
           }
           @if (request()!.closedAt) {
             <div class="info-card">
-              <div class="label">Closed</div>
+              <div class="label">{{ 'requests.detail.fields.closed' | transloco }}</div>
               <div class="value">{{ request()!.closedAt | date:'medium' }}</div>
             </div>
           }
@@ -325,7 +327,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
         <!-- Tabs -->
         <mat-tab-group animationDuration="0ms" [selectedIndex]="selectedTabIndex()" (selectedIndexChange)="onTabSelected($event)">
           <!-- Summary Tab -->
-          <mat-tab label="Summary">
+          <mat-tab [label]="'requests.detail.tabs.summary' | transloco">
             <div style="padding: 16px 0;">
               <app-entity-summary-tab
                 entityType="Request"
@@ -338,18 +340,18 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
           </mat-tab>
 
           <!-- Details Tab -->
-          <mat-tab label="Details">
+          <mat-tab [label]="'requests.detail.tabs.details' | transloco">
             <div class="details-section">
               @if (request()!.description) {
-                <h3>Description</h3>
+                <h3>{{ 'requests.detail.sections.description' | transloco }}</h3>
                 <p>{{ request()!.description }}</p>
               }
               @if (!request()!.description) {
-                <div class="empty-state">No description provided</div>
+                <div class="empty-state">{{ 'requests.detail.empty.noDescription' | transloco }}</div>
               }
 
               <!-- Custom fields in readonly mode -->
-              <h3>Custom Fields</h3>
+              <h3>{{ 'requests.detail.sections.customFields' | transloco }}</h3>
               <app-custom-field-form
                 [entityType]="'Request'"
                 [customFieldValues]="request()!.customFields"
@@ -358,7 +360,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
           </mat-tab>
 
           <!-- Timeline Tab -->
-          <mat-tab label="Timeline">
+          <mat-tab [label]="'requests.detail.tabs.timeline' | transloco">
             <div style="padding: 16px 0;">
               @if (timelineLoading()) {
                 <div class="loading-container">
@@ -371,7 +373,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
           </mat-tab>
 
           <!-- Notes Tab -->
-          <mat-tab label="Notes">
+          <mat-tab [label]="'requests.detail.tabs.notes' | transloco">
             <div style="padding: 16px 0;">
               @if (notesLoading()) {
                 <div class="loading-container">
@@ -379,12 +381,12 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
                 </div>
               } @else if (requestNotes().length === 0) {
                 <div class="empty-state">
-                  No notes for this request.
+                  {{ 'requests.detail.notes.noNotes' | transloco }}
                   <br /><br />
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Request', entityId: request()?.id, entityName: request()?.subject }">
-                    Add Note
+                    {{ 'requests.detail.notes.addNote' | transloco }}
                   </a>
                 </div>
               } @else {
@@ -392,7 +394,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Request', entityId: request()?.id, entityName: request()?.subject }">
-                    Add Note
+                    {{ 'requests.detail.notes.addNote' | transloco }}
                   </a>
                 </div>
                 @for (note of requestNotes(); track note.id) {
@@ -411,7 +413,7 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
           </mat-tab>
 
           <!-- Attachments Tab -->
-          <mat-tab label="Attachments">
+          <mat-tab [label]="'requests.detail.tabs.attachments' | transloco">
             <div style="padding: 16px 0;">
               <app-entity-attachments [entityType]="'request'" [entityId]="request()?.id ?? ''" />
             </div>
@@ -420,8 +422,8 @@ import { RequestSummaryDto } from '../../../shared/components/summary-tab/summar
       </div>
     } @else {
       <div class="empty-state">
-        <h2>Request not found</h2>
-        <a mat-button routerLink="/requests">Back to Requests</a>
+        <h2>{{ 'requests.detail.notFound' | transloco }}</h2>
+        <a mat-button routerLink="/requests">{{ 'requests.detail.backToRequests' | transloco }}</a>
       </div>
     }
   `,
@@ -434,6 +436,7 @@ export class RequestDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Request detail data. */
   request = signal<RequestDetailDto | null>(null);
@@ -591,13 +594,13 @@ export class RequestDetailComponent implements OnInit {
   getTransitionLabel(status: string): string {
     switch (status) {
       case 'InProgress':
-        return 'Start Work';
+        return this.transloco.translate('requests.detail.transitions.startWork');
       case 'Resolved':
-        return 'Resolve';
+        return this.transloco.translate('requests.detail.transitions.resolve');
       case 'Closed':
-        return 'Close';
+        return this.transloco.translate('requests.detail.transitions.close');
       case 'New':
-        return 'Reopen';
+        return this.transloco.translate('requests.detail.transitions.reopen');
       default:
         return status;
     }
@@ -658,7 +661,7 @@ export class RequestDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           const label = this.getStatusLabel(newStatus);
-          this.snackBar.open(`Status updated to ${label}`, 'OK', {
+          this.snackBar.open(this.transloco.translate('requests.messages.statusUpdated', { status: label }), 'OK', {
             duration: 3000,
           });
           this.loadRequest();
@@ -666,7 +669,7 @@ export class RequestDetailComponent implements OnInit {
           this.markSummaryDirty();
         },
         error: () => {
-          this.snackBar.open('Failed to update status', 'OK', {
+          this.snackBar.open(this.transloco.translate('requests.messages.statusUpdateFailed'), 'OK', {
             duration: 5000,
           });
         },
@@ -687,11 +690,11 @@ export class RequestDetailComponent implements OnInit {
       if (confirmed) {
         this.requestService.delete(this.requestId).subscribe({
           next: () => {
-            this.snackBar.open('Request deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('requests.messages.requestDeleted'), 'OK', { duration: 3000 });
             this.router.navigate(['/requests']);
           },
           error: () => {
-            this.snackBar.open('Failed to delete request', 'OK', {
+            this.snackBar.open(this.transloco.translate('requests.messages.requestDeleteFailed'), 'OK', {
               duration: 5000,
             });
           },

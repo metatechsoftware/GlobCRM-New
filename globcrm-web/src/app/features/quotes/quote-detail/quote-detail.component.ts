@@ -15,6 +15,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
 import { EntityTimelineComponent } from '../../../shared/components/entity-timeline/entity-timeline.component';
 import { EntityAttachmentsComponent } from '../../../shared/components/entity-attachments/entity-attachments.component';
@@ -61,6 +62,7 @@ import { QuoteSummaryDto } from '../../../shared/components/summary-tab/summary.
     EntityTimelineComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './quote-detail.component.scss',
@@ -74,6 +76,7 @@ export class QuoteDetailComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly summaryService = inject(SummaryService);
+  private readonly transloco = inject(TranslocoService);
 
   /** Quote detail data. */
   quote = signal<QuoteDetailDto | null>(null);
@@ -245,15 +248,15 @@ export class QuoteDetailComponent implements OnInit {
   getTransitionLabel(status: QuoteStatus): string {
     switch (status) {
       case 'Sent':
-        return 'Mark as Sent';
+        return this.transloco.translate('quotes.detail.transitions.markAsSent');
       case 'Accepted':
-        return 'Accept';
+        return this.transloco.translate('quotes.detail.transitions.accept');
       case 'Rejected':
-        return 'Reject';
+        return this.transloco.translate('quotes.detail.transitions.reject');
       case 'Expired':
-        return 'Mark Expired';
+        return this.transloco.translate('quotes.detail.transitions.markExpired');
       case 'Draft':
-        return 'Revert to Draft';
+        return this.transloco.translate('quotes.detail.transitions.revertToDraft');
       default:
         return status;
     }
@@ -275,7 +278,7 @@ export class QuoteDetailComponent implements OnInit {
       },
       error: () => {
         this.pdfGenerating.set(false);
-        this.snackBar.open('Failed to generate PDF', 'OK', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('quotes.messages.pdfFailed'), 'OK', { duration: 5000 });
       },
     });
   }
@@ -296,14 +299,14 @@ export class QuoteDetailComponent implements OnInit {
         this.quoteService.createNewVersion(this.quoteId).subscribe({
           next: (newVersion) => {
             this.snackBar.open(
-              `Version ${newVersion.versionNumber} created`,
+              this.transloco.translate('quotes.messages.versionCreated', { version: newVersion.versionNumber }),
               'OK',
               { duration: 3000 },
             );
             this.router.navigate(['/quotes', newVersion.id]);
           },
           error: () => {
-            this.snackBar.open('Failed to create new version', 'OK', {
+            this.snackBar.open(this.transloco.translate('quotes.messages.versionCreateFailed'), 'OK', {
               duration: 5000,
             });
           },
@@ -367,7 +370,7 @@ export class QuoteDetailComponent implements OnInit {
       .subscribe({
         next: () => {
           const label = this.getStatusLabel(newStatus);
-          this.snackBar.open(`Status updated to ${label}`, 'OK', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.statusUpdated', { status: label }), 'OK', {
             duration: 3000,
           });
           this.loadQuote();
@@ -375,7 +378,7 @@ export class QuoteDetailComponent implements OnInit {
           this.markSummaryDirty();
         },
         error: () => {
-          this.snackBar.open('Failed to update status', 'OK', {
+          this.snackBar.open(this.transloco.translate('quotes.messages.statusUpdateFailed'), 'OK', {
             duration: 5000,
           });
         },
@@ -396,11 +399,11 @@ export class QuoteDetailComponent implements OnInit {
       if (confirmed) {
         this.quoteService.delete(this.quoteId).subscribe({
           next: () => {
-            this.snackBar.open('Quote deleted', 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('quotes.messages.quoteDeleted'), 'OK', { duration: 3000 });
             this.router.navigate(['/quotes']);
           },
           error: () => {
-            this.snackBar.open('Failed to delete quote', 'OK', {
+            this.snackBar.open(this.transloco.translate('quotes.messages.quoteDeleteFailed'), 'OK', {
               duration: 5000,
             });
           },

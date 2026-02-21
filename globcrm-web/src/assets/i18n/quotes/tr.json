@@ -1,0 +1,142 @@
+{
+  "title": "Teklifler",
+  "list": {
+    "title": "Teklifler",
+    "subtitle": "Teklifler ve fiyatlandirmalar olusturun, gonderin ve takip edin",
+    "newQuote": "Yeni Teklif"
+  },
+  "detail": {
+    "title": "Teklif Detaylari",
+    "notFound": "Teklif bulunamadi",
+    "backToQuotes": "Tekliflere Don",
+    "tabs": {
+      "summary": "Ozet",
+      "lineItems": "Kalemler",
+      "details": "Detaylar",
+      "versions": "Versiyonlar",
+      "timeline": "Zaman Cizelgesi",
+      "notes": "Notlar",
+      "attachments": "Ekler"
+    },
+    "sections": {
+      "quoteInfo": "Teklif Bilgisi",
+      "description": "Aciklama",
+      "termsNotes": "Sartlar ve Notlar"
+    },
+    "fields": {
+      "quoteNumber": "Teklif #",
+      "status": "Durum",
+      "grandTotal": "Genel Toplam",
+      "contact": "Kisi",
+      "company": "Sirket",
+      "deal": "Firsat",
+      "owner": "Sahip",
+      "issueDate": "Duzenleme Tarihi",
+      "expiryDate": "Son Gecerlilik Tarihi",
+      "expires": "Son Gecerlilik",
+      "version": "Versiyon"
+    },
+    "actions": {
+      "edit": "Duzenle",
+      "delete": "Sil",
+      "generatePdf": "PDF Olustur",
+      "newVersion": "Yeni Versiyon",
+      "moveTo": "Tasi:"
+    },
+    "transitions": {
+      "markAsSent": "Gonderildi Isaretle",
+      "accept": "Kabul Et",
+      "reject": "Reddet",
+      "markExpired": "Suresi Doldu Isaretle",
+      "revertToDraft": "Taslaga Dondur"
+    },
+    "lineItems": {
+      "noLineItems": "Kalem bulunmuyor",
+      "description": "Aciklama",
+      "qty": "Miktar",
+      "unitPrice": "Birim Fiyat",
+      "discountPercent": "Indirim %",
+      "taxPercent": "Vergi %",
+      "lineTotal": "Satir Toplami",
+      "netTotal": "Net Toplam",
+      "subtotal": "Ara Toplam",
+      "discountTotal": "Indirim Toplami",
+      "taxTotal": "Vergi Toplami"
+    },
+    "empty": {
+      "noDetails": "Ek detay bulunmuyor",
+      "noVersionHistory": "Versiyon gecmisi bulunmuyor",
+      "notSet": "Belirlenmemis"
+    },
+    "versions": {
+      "view": "Goruntule",
+      "current": "Mevcut"
+    },
+    "notes": {
+      "noNotes": "Bu teklif icin not bulunmuyor.",
+      "addNote": "Not Ekle"
+    }
+  },
+  "form": {
+    "createTitle": "Teklif Olustur",
+    "editTitle": "Teklifi Duzenle",
+    "sections": {
+      "quoteInfo": "Teklif Bilgileri",
+      "linkedEntities": "Bagli Varliklar",
+      "lineItems": "Kalemler",
+      "customFields": "Ozel Alanlar"
+    },
+    "fields": {
+      "title": "Baslik",
+      "issueDate": "Duzenleme Tarihi",
+      "expiryDate": "Son Gecerlilik Tarihi",
+      "description": "Aciklama",
+      "notes": "Notlar",
+      "deal": "Firsat",
+      "contact": "Kisi",
+      "company": "Sirket",
+      "searchDeals": "Firsat ara...",
+      "searchContacts": "Kisi ara...",
+      "searchCompanies": "Sirket ara...",
+      "searchProductToAdd": "Eklenecek urun ara",
+      "searchProducts": "Urun ara..."
+    },
+    "validation": {
+      "titleRequired": "Baslik zorunludur",
+      "titleMaxLength": "Baslik 500 karakteri asamaz",
+      "issueDateRequired": "Duzenleme tarihi zorunludur",
+      "lineItemRequired": "En az bir kalem gereklidir"
+    },
+    "lineItems": {
+      "description": "Aciklama",
+      "qty": "Miktar",
+      "unitPrice": "Birim Fiyat",
+      "discountPercent": "Ind. %",
+      "taxPercent": "Vergi %",
+      "lineTotal": "Satir Toplami",
+      "addLineItem": "Kalem Ekle"
+    },
+    "totals": {
+      "subtotal": "Ara Toplam",
+      "discount": "Indirim",
+      "tax": "Vergi",
+      "grandTotal": "Genel Toplam"
+    },
+    "saveChanges": "Degisiklikleri Kaydet",
+    "createQuote": "Teklif Olustur"
+  },
+  "messages": {
+    "quoteCreated": "Teklif basariyla olusturuldu",
+    "quoteCreateFailed": "Teklif olusturulamadi",
+    "quoteUpdated": "Teklif basariyla guncellendi",
+    "quoteUpdateFailed": "Teklif guncellenemedi",
+    "quoteDeleted": "Teklif silindi",
+    "quoteDeleteFailed": "Teklif silinemedi",
+    "statusUpdated": "Durum {{status}} olarak guncellendi",
+    "statusUpdateFailed": "Durum guncellenemedi",
+    "pdfFailed": "PDF olusturulamadi",
+    "versionCreated": "Versiyon {{version}} olusturuldu",
+    "versionCreateFailed": "Yeni versiyon olusturulamadi",
+    "loadFailed": "Teklif verileri yuklenemedi"
+  }
+}

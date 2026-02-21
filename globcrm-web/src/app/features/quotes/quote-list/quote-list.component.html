@@ -9,8 +9,8 @@
           <mat-icon>request_quote</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>Quotes</h1>
-          <p class="list-header__subtitle">Create, send, and track proposals and pricing</p>
+          <h1>{{ 'quotes.list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'quotes.list.subtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -18,7 +18,7 @@
         <button mat-raised-button color="primary"
                 *appHasPermission="'Quote:Create'"
                 routerLink="new">
-          <mat-icon>add</mat-icon> New Quote
+          <mat-icon>add</mat-icon> {{ 'quotes.list.newQuote' | transloco }}
         </button>
       </div>
     </div>

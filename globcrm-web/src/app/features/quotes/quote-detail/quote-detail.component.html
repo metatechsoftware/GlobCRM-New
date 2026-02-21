@@ -17,12 +17,12 @@
           <button mat-stroked-button
                   routerLink="/quotes/{{ quote()!.id }}/edit"
                   *appHasPermission="'Quote:Update'">
-            <mat-icon>edit</mat-icon> Edit
+            <mat-icon>edit</mat-icon> {{ 'quotes.detail.actions.edit' | transloco }}
           </button>
           <button mat-stroked-button color="warn"
                   *appHasPermission="'Quote:Delete'"
                   (click)="onDelete()">
-            <mat-icon>delete</mat-icon> Delete
+            <mat-icon>delete</mat-icon> {{ 'quotes.detail.actions.delete' | transloco }}
           </button>
           <button mat-stroked-button (click)="onGeneratePdf()"
                   [disabled]="pdfGenerating()">
@@ -31,11 +31,11 @@
             } @else {
               <mat-icon>picture_as_pdf</mat-icon>
             }
-            Generate PDF
+            {{ 'quotes.detail.actions.generatePdf' | transloco }}
           </button>
           <button mat-stroked-button (click)="onCreateNewVersion()"
                   *appHasPermission="'Quote:Create'">
-            <mat-icon>content_copy</mat-icon> New Version
+            <mat-icon>content_copy</mat-icon> {{ 'quotes.detail.actions.newVersion' | transloco }}
           </button>
         </div>
       </div>
@@ -76,7 +76,7 @@
           <span class="meta-separator"></span>
           <span class="meta-item">
             <mat-icon>event_busy</mat-icon>
-            Expires {{ quote()!.expiryDate | date:'mediumDate' }}
+            {{ 'quotes.detail.fields.expires' | transloco }} {{ quote()!.expiryDate | date:'mediumDate' }}
           </span>
         }
         @if (quote()!.contactName) {
@@ -113,7 +113,7 @@
       @if (allowedTransitions().length > 0) {
         <hr class="hero-divider">
         <div class="status-transitions">
-          <span class="transition-label">Move to:</span>
+          <span class="transition-label">{{ 'quotes.detail.actions.moveTo' | transloco }}</span>
           @for (transition of allowedTransitions(); track transition) {
             <button mat-stroked-button class="transition-btn"
                     color="primary"
@@ -133,7 +133,7 @@
           <mat-tab>
             <ng-template mat-tab-label>
               <mat-icon class="tab-icon">dashboard</mat-icon>
-              Summary
+              {{ 'quotes.detail.tabs.summary' | transloco }}
             </ng-template>
             <div class="tab-body">
               <app-entity-summary-tab
@@ -147,25 +147,25 @@
           </mat-tab>
 
           <!-- Line Items Tab -->
-          <mat-tab label="Line Items">
+          <mat-tab [label]="'quotes.detail.tabs.lineItems' | transloco">
             <div class="tab-body">
               @if (quote()!.lineItems.length === 0) {
                 <div class="tab-empty">
                   <mat-icon>receipt_long</mat-icon>
-                  <span>No line items</span>
+                  <span>{{ 'quotes.detail.lineItems.noLineItems' | transloco }}</span>
                 </div>
               } @else {
                 <table class="line-items-table">
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Description</th>
-                      <th class="num-col">Qty</th>
-                      <th class="num-col">Unit Price</th>
-                      <th class="num-col">Discount %</th>
-                      <th class="num-col">Tax %</th>
-                      <th class="num-col">Line Total</th>
-                      <th class="num-col">Net Total</th>
+                      <th>{{ 'quotes.detail.lineItems.description' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.qty' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.unitPrice' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.discountPercent' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.taxPercent' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.lineTotal' | transloco }}</th>
+                      <th class="num-col">{{ 'quotes.detail.lineItems.netTotal' | transloco }}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -186,14 +186,14 @@
 
                 <div class="totals-summary">
                   <div class="totals-grid">
-                    <span class="total-label">Subtotal</span>
+                    <span class="total-label">{{ 'quotes.detail.lineItems.subtotal' | transloco }}</span>
                     <span class="total-value">{{ subtotal() | currency:'USD':'symbol':'1.2-2' }}</span>
-                    <span class="total-label">Discount Total</span>
+                    <span class="total-label">{{ 'quotes.detail.lineItems.discountTotal' | transloco }}</span>
                     <span class="total-value">-{{ discountTotal() | currency:'USD':'symbol':'1.2-2' }}</span>
-                    <span class="total-label">Tax Total</span>
+                    <span class="total-label">{{ 'quotes.detail.lineItems.taxTotal' | transloco }}</span>
                     <span class="total-value">{{ taxTotal() | currency:'USD':'symbol':'1.2-2' }}</span>
                     <div class="grand-total">
-                      <span class="total-label">Grand Total</span>
+                      <span class="total-label">{{ 'quotes.detail.fields.grandTotal' | transloco }}</span>
                     </div>
                     <div class="grand-total">
                       <span class="total-value">{{ quote()!.grandTotal | currency:'USD':'symbol':'1.2-2' }}</span>
@@ -205,19 +205,19 @@
           </mat-tab>
 
           <!-- Details Tab -->
-          <mat-tab label="Details">
+          <mat-tab [label]="'quotes.detail.tabs.details' | transloco">
             <div class="tab-body">
               @if (!quote()!.description && !quote()!.notes) {
                 <div class="tab-empty">
                   <mat-icon>description</mat-icon>
-                  <span>No additional details</span>
+                  <span>{{ 'quotes.detail.empty.noDetails' | transloco }}</span>
                 </div>
               } @else {
                 @if (quote()!.description) {
                   <div class="detail-section">
                     <div class="detail-section__header">
                       <mat-icon>description</mat-icon>
-                      <h3>Description</h3>
+                      <h3>{{ 'quotes.detail.sections.description' | transloco }}</h3>
                     </div>
                     <p class="detail-section__text">{{ quote()!.description }}</p>
                   </div>
@@ -226,7 +226,7 @@
                   <div class="detail-section">
                     <div class="detail-section__header">
                       <mat-icon>note</mat-icon>
-                      <h3>Terms & Notes</h3>
+                      <h3>{{ 'quotes.detail.sections.termsNotes' | transloco }}</h3>
                     </div>
                     <p class="detail-section__text">{{ quote()!.notes }}</p>
                   </div>
@@ -236,12 +236,12 @@
           </mat-tab>
 
           <!-- Versions Tab -->
-          <mat-tab label="Versions ({{ quote()!.versions.length }})">
+          <mat-tab [label]="('quotes.detail.tabs.versions' | transloco) + ' (' + quote()!.versions.length + ')'">
             <div class="tab-body">
               @if (quote()!.versions.length === 0) {
                 <div class="tab-empty">
                   <mat-icon>history</mat-icon>
-                  <span>No version history available</span>
+                  <span>{{ 'quotes.detail.empty.noVersionHistory' | transloco }}</span>
                 </div>
               } @else {
                 <ul class="versions-list">
@@ -262,10 +262,10 @@
                       </div>
                       @if (version.id !== quote()!.id) {
                         <a mat-stroked-button [routerLink]="['/quotes', version.id]">
-                          View
+                          {{ 'quotes.detail.versions.view' | transloco }}
                         </a>
                       } @else {
-                        <span class="version-current-label">Current</span>
+                        <span class="version-current-label">{{ 'quotes.detail.versions.current' | transloco }}</span>
                       }
                     </li>
                   }
@@ -275,7 +275,7 @@
           </mat-tab>
 
           <!-- Timeline Tab -->
-          <mat-tab label="Timeline">
+          <mat-tab [label]="'quotes.detail.tabs.timeline' | transloco">
             <div class="tab-body">
               @if (timelineLoading()) {
                 <div class="tab-loading">
@@ -288,7 +288,7 @@
           </mat-tab>
 
           <!-- Notes Tab -->
-          <mat-tab label="Notes">
+          <mat-tab [label]="'quotes.detail.tabs.notes' | transloco">
             <div class="tab-body">
               @if (notesLoading()) {
                 <div class="tab-loading">
@@ -297,11 +297,11 @@
               } @else if (quoteNotes().length === 0) {
                 <div class="tab-empty">
                   <mat-icon>note</mat-icon>
-                  <span>No notes for this quote.</span>
+                  <span>{{ 'quotes.detail.notes.noNotes' | transloco }}</span>
                   <a mat-stroked-button
                      [routerLink]="['/notes/new']"
                      [queryParams]="{ entityType: 'Quote', entityId: quote()?.id, entityName: quote()?.title }">
-                    Add Note
+                    {{ 'quotes.detail.notes.addNote' | transloco }}
                   </a>
                 </div>
               } @else {
@@ -330,7 +330,7 @@
           </mat-tab>
 
           <!-- Attachments Tab -->
-          <mat-tab label="Attachments">
+          <mat-tab [label]="'quotes.detail.tabs.attachments' | transloco">
             <div class="tab-body">
               <app-entity-attachments [entityType]="'quote'" [entityId]="quote()?.id ?? ''" />
             </div>
@@ -343,18 +343,18 @@
         <div class="sidebar-card">
           <div class="sidebar-card__header">
             <mat-icon>info</mat-icon>
-            <h3>Quote Info</h3>
+            <h3>{{ 'quotes.detail.sections.quoteInfo' | transloco }}</h3>
           </div>
           <div class="sidebar-card__body">
             <div class="sidebar-field sidebar-field--prominent">
-              <span class="sidebar-label">Grand Total</span>
+              <span class="sidebar-label">{{ 'quotes.detail.fields.grandTotal' | transloco }}</span>
               <span class="sidebar-value sidebar-value--grand-total">
                 {{ quote()!.grandTotal | currency:'USD':'symbol':'1.2-2' }}
               </span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Status</span>
+              <span class="sidebar-label">{{ 'quotes.detail.fields.status' | transloco }}</span>
               <span class="badge"
                     [style.background-color]="getStatusColor(quote()!.status)"
                     [style.color]="'#fff'">
@@ -364,7 +364,7 @@
 
             @if (quote()!.contactName) {
               <div class="sidebar-field">
-                <span class="sidebar-label">Contact</span>
+                <span class="sidebar-label">{{ 'quotes.detail.fields.contact' | transloco }}</span>
                 <span class="sidebar-value">
                   <span class="sidebar-value">{{ quote()!.contactName }}</span>
                 </span>
@@ -373,37 +373,37 @@
 
             @if (quote()!.companyName) {
               <div class="sidebar-field">
-                <span class="sidebar-label">Company</span>
+                <span class="sidebar-label">{{ 'quotes.detail.fields.company' | transloco }}</span>
                 <span class="sidebar-value">{{ quote()!.companyName }}</span>
               </div>
             }
 
             @if (quote()!.dealTitle) {
               <div class="sidebar-field">
-                <span class="sidebar-label">Deal</span>
+                <span class="sidebar-label">{{ 'quotes.detail.fields.deal' | transloco }}</span>
                 <span class="sidebar-value">{{ quote()!.dealTitle }}</span>
               </div>
             }
 
             @if (quote()!.ownerName) {
               <div class="sidebar-field">
-                <span class="sidebar-label">Owner</span>
+                <span class="sidebar-label">{{ 'quotes.detail.fields.owner' | transloco }}</span>
                 <span class="sidebar-value">{{ quote()!.ownerName }}</span>
               </div>
             }
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Issue Date</span>
+              <span class="sidebar-label">{{ 'quotes.detail.fields.issueDate' | transloco }}</span>
               <span class="sidebar-value">{{ quote()!.issueDate | date:'mediumDate' }}</span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Expiry Date</span>
-              <span class="sidebar-value">{{ quote()!.expiryDate ? (quote()!.expiryDate | date:'mediumDate') : 'Not set' }}</span>
+              <span class="sidebar-label">{{ 'quotes.detail.fields.expiryDate' | transloco }}</span>
+              <span class="sidebar-value">{{ quote()!.expiryDate ? (quote()!.expiryDate | date:'mediumDate') : ('quotes.detail.empty.notSet' | transloco) }}</span>
             </div>
 
             <div class="sidebar-field">
-              <span class="sidebar-label">Version</span>
+              <span class="sidebar-label">{{ 'quotes.detail.fields.version' | transloco }}</span>
               <span class="sidebar-value">v{{ quote()!.versionNumber }}</span>
             </div>
           </div>
@@ -414,7 +414,7 @@
 } @else {
   <div class="detail-not-found">
     <mat-icon>error_outline</mat-icon>
-    <h2>Quote not found</h2>
-    <a mat-stroked-button routerLink="/quotes">Back to Quotes</a>
+    <h2>{{ 'quotes.detail.notFound' | transloco }}</h2>
+    <a mat-stroked-button routerLink="/quotes">{{ 'quotes.detail.backToQuotes' | transloco }}</a>
   </div>
 }
