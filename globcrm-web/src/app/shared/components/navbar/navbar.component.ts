@@ -12,6 +12,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ThemeService } from '../../../core/theme/theme.service';
+import { LanguageService, SupportedLang } from '../../../core/i18n/language.service';
 import { SidebarStateService } from '../../services/sidebar-state.service';
 import { NotificationCenterComponent } from '../../../features/notifications/notification-center/notification-center.component';
 import { GlobalSearchComponent } from '../global-search/global-search.component';
@@ -52,6 +53,8 @@ export class NavbarComponent {
   private readonly breakpointObserver = inject(BreakpointObserver);
   readonly sidebarState = inject(SidebarStateService);
   readonly themeService = inject(ThemeService);
+  readonly languageService = inject(LanguageService);
+  readonly currentLang = this.languageService.currentLang;
 
   isMobile = toSignal(
     this.breakpointObserver.observe(['(max-width: 768px)'])
@@ -137,5 +140,9 @@ export class NavbarComponent {
 
   navigateToSecurity(): void {
     this.router.navigate(['/auth/2fa']);
+  }
+
+  switchLanguage(lang: SupportedLang): void {
+    this.languageService.switchLanguage(lang);
   }
 }

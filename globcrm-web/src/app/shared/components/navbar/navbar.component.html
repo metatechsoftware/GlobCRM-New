@@ -56,6 +56,7 @@
       <mat-icon>{{ themeService.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</mat-icon>
     </button>
     <app-notification-center />
+    <span class="content-header__lang-badge">{{ currentLang() | uppercase }}</span>
 
     <!-- User Trigger -->
     <button class="content-header__user" [matMenuTriggerFor]="userMenu"
@@ -90,6 +91,7 @@
       <mat-icon>{{ themeService.theme() === 'light' ? 'dark_mode' : 'light_mode' }}</mat-icon>
     </button>
     <app-notification-center />
+    <span class="topbar__lang-badge">{{ currentLang() | uppercase }}</span>
     <button class="topbar__avatar" [matMenuTriggerFor]="userMenu" aria-label="User menu">
       {{ userInitials }}
     </button>
@@ -148,6 +150,19 @@
     <mat-icon>shield</mat-icon>
     <span>Security</span>
   </button>
+  <mat-divider></mat-divider>
+  <div class="sidebar-user-menu__lang-toggle" (click)="$event.stopPropagation()">
+    <mat-icon>language</mat-icon>
+    <span class="sidebar-user-menu__lang-label">{{ currentLang() === 'tr' ? 'Dil' : 'Language' }}</span>
+    <div class="lang-segmented">
+      <button class="lang-segmented__btn"
+              [class.lang-segmented__btn--active]="currentLang() === 'en'"
+              (click)="switchLanguage('en')">EN</button>
+      <button class="lang-segmented__btn"
+              [class.lang-segmented__btn--active]="currentLang() === 'tr'"
+              (click)="switchLanguage('tr')">TR</button>
+    </div>
+  </div>
   <mat-divider></mat-divider>
   <button mat-menu-item (click)="logout()" class="sidebar-user-menu__logout">
     <mat-icon>logout</mat-icon>
