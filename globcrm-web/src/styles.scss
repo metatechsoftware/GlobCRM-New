@@ -32,6 +32,30 @@ html {
   ));
 }
 
+// ─── Theme Transitions ──────────────────────────────────
+// Active only during theme switch (class added/removed by ThemeService).
+// Prevents interference with hover/interaction transitions.
+html.theme-transitioning {
+  &,
+  & *,
+  & *::before,
+  & *::after {
+    transition: background-color var(--duration-theme) var(--ease-default),
+                color var(--duration-theme) var(--ease-default),
+                border-color var(--duration-theme) var(--ease-default),
+                box-shadow var(--duration-theme) var(--ease-default),
+                fill var(--duration-theme) var(--ease-default),
+                stroke var(--duration-theme) var(--ease-default) !important;
+  }
+}
+
+// View Transitions API: cross-fade for theme switch
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: var(--duration-theme);
+  animation-timing-function: var(--ease-default);
+}
+
 // ─── Base ─────────────────────────────────────────────────
 *,
 *::before,

@@ -17,7 +17,19 @@ export class ThemeService {
   }
 
   toggle(): void {
-    this.theme.update(t => t === 'light' ? 'dark' : 'light');
+    const root = document.documentElement;
+    const update = () => this.theme.update(t => t === 'light' ? 'dark' : 'light');
+
+    // Progressive enhancement: View Transitions API
+    if ('startViewTransition' in document) {
+      (document as any).startViewTransition(update);
+      return;
+    }
+
+    // Fallback: CSS class-based transition
+    root.classList.add('theme-transitioning');
+    update();
+    setTimeout(() => root.classList.remove('theme-transitioning'), 500);
   }
 
   private loadTheme(): Theme {

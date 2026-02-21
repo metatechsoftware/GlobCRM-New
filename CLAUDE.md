@@ -77,6 +77,52 @@ Two parallel role systems:
 
 Frontend mirrors this with `HasPermissionDirective` (`*appHasPermission`), `FieldAccessDirective` (`[appFieldAccess]`), `permissionGuard`, and `adminGuard`.
 
+## Design System — "Warm Modern" CRM Theme
+
+All frontend UI must follow the design system defined in `crm-design-system.html`. Key rules:
+
+### Color Philosophy
+
+- **Dark mode**: Warm chocolate-brown surfaces (`#141110` → `#1C1917` → `#231F1C` → `#2C2623` → `#342D29`). Brown ≠ mud — use warm undertones, not muddy grays.
+- **Light mode**: Warm linen-to-sand beiges (`#FAF7F4` → `#F5F0EB` → `#EDE7DF` → `#E5DDD4` → `#DDD4C9`). Beige ≠ washed out — not gray-yellow. WCAG AA minimum on all text.
+- **Single accent**: Orange is the ONLY accent color. No secondary accent colors ever. Orange marks interactive, active, and high-priority elements. Everything else is monochrome.
+- **Orange scale**: `--orange-600: #EA580C`, `--orange-500: #F97316` (primary), `--orange-400: #FB923C`, `--orange-300: #FDBA74`, `--orange-glow: rgba(249,115,22,0.12)`.
+- **Semantic colors** (shared across modes): positive `#34D399`, negative `#FB7185`, caution `#FBBF24`, info `#60A5FA`.
+
+### Typography — 3 Fonts Only
+
+1. **Plus Jakarta Sans** — Primary UI font. Headers (weight 600–800), buttons/labels/body (weight 400–500). Letter-spacing: `-0.03em` for display, `-0.02em` for section titles.
+2. **Fraunces** — Accent serif, use sparingly. Only for empty states, onboarding screens, marketing pages. Italic, weight 300–600.
+3. **JetBrains Mono** — Monospace for data. Deal values, currency, dates, IDs, timestamps, metadata, overline labels, code references. Weight 400–600.
+
+### Design Tokens
+
+- **Text hierarchy** (4 tiers): `--text-primary` (headings, names), `--text-secondary` (body, values), `--text-muted` (labels, descriptions), `--text-faint` (timestamps, disabled).
+- **Borders**: `--border-subtle` (6% opacity, card borders), `--border-default` (10–12%, inputs/dividers), `--border-hover` (16–20%, hover states).
+- **Radii**: `sm: 6px` (buttons, inputs), `md: 10px` (cards, tabs), `lg: 14px` (large cards, panels), `xl: 20px`, `full: 100px` (pills, badges, avatars).
+- **Shadows**: `sm` (subtle lift), `md` (card hover), `lg` (modals/overlays), `glow` (orange focus ring: `0 0 24px var(--orange-glow)`).
+- **Easing**: `cubic-bezier(0.4, 0, 0.2, 1)` for all transitions. Theme transitions: `0.5s`. Interactive hovers: `0.25–0.35s`.
+
+### Component Patterns
+
+- **Cards**: `bg-card` background + `border-subtle` border. On hover: `border-hover` + `translateY(-2px)` + `shadow-md`.
+- **Buttons**: Primary = `orange-500` bg, white text, `radius-sm`. Ghost = transparent, `border-default`, `text-muted`.
+- **Inputs**: `bg-input` background, `border-default`. On focus: `border-color: orange-500` + `box-shadow: 0 0 0 3px var(--orange-glow)`.
+- **Avatars**: Gradient `orange-400 → orange-600`, circular, white initials, 42px default.
+- **Status chips/badges**: Monochrome `bg-elevated` + `border-subtle` by default. Active/hot variants use `orange-glow` bg + `orange-500` text.
+- **Tabs**: Pill-style inside a `bg-card` container. Active tab gets `bg-elevated` + `text-primary` + `shadow-sm`.
+- **Pipeline dots**: done = `--positive`, active = `--orange-500` + glow shadow, pending = `--text-faint`.
+- **Feed icons**: Circular with 12% opacity semantic background (email = info, call = positive, deal = orange).
+- **KPI numbers**: `JetBrains Mono`, large weight-600, separators/units in `orange-500`.
+- **Overline labels**: `JetBrains Mono`, `0.58–0.62rem`, uppercase, `letter-spacing: 0.08–0.1em`, `orange-500` color.
+
+### Design Principles
+
+1. **Comfortable density**: Cards use 20–28px padding, 12–16px gaps. Dense enough for power users, breathable enough for all-day usage.
+2. **Soft radius, sharp data**: Round corners (10–14px) on containers for warmth. Crisp, aligned text and monospace numbers for scannability.
+3. **Seamless mode switch**: Both modes share identical layouts, spacing, and component structure. Only surface colors and text shades change — users must never feel disoriented switching.
+4. **Orange is the only heat**: Constraint creates brand recognition. No blue/green/purple accents for interactive states.
+
 ## Key Conventions
 
 ### Backend
@@ -94,7 +140,7 @@ Frontend mirrors this with `HasPermissionDirective` (`*appHasPermission`), `Fiel
 ### Frontend
 
 - **Feature structure**: Each entity has `feature.routes.ts`, `feature-list/`, `feature-detail/`, `feature-form/`, `feature.store.ts`, `feature.service.ts`, `feature.models.ts`.
-- **Styling**: Three-layer system — CSS custom properties in `src/styles/tokens.css` (source of truth) → Angular Material M3 theme in `styles.scss` → Tailwind config in `tailwind.config.js` (all reference the same token vars). Primary color: orange.
+- **Styling**: Three-layer system — CSS custom properties in `src/styles/tokens.css` (source of truth) → Angular Material M3 theme in `styles.scss` → Tailwind config in `tailwind.config.js` (all reference the same token vars). Must follow the "Warm Modern" design system above (brown/beige surfaces, orange-only accent, 3-font type system).
 - **Shared components**: `DynamicTableComponent` (all list pages), `FilterPanelComponent`, `RelatedEntityTabsComponent` (all detail pages with tab constants like `COMPANY_TABS`), `EntityTimelineComponent`, `EntityAttachmentsComponent`, `RichTextEditorComponent`, `CrmButtonComponent`.
 - **Entity list pattern**: All list pages share `src/styles/_entity-list.scss` via `styleUrl`.
 - **Pagination/filtering**: Services build `HttpParams` from `EntityQueryParams`. Filters serialized as `JSON.stringify(filters[])` in a `filters` query param.
