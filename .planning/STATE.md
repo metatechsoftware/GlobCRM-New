@@ -94,6 +94,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 29-05: Test connection result displayed inline in detail panel (not toast) for immediate contextual visibility
 - 29-05: Transloco interpolation params used for snackbar messages with dynamic integration names
 - 29-05: Category chip labels use labelKey pattern translated via TranslocoPipe for reactive language switching
+- 28-11: TranslocoLoaderData.scope used to construct scoped file path (assets/i18n/{scope}/{lang}.json)
+- 28-11: LanguageService.switchLanguage() called in settings success handler for immediate UI update
+- 28-11: labelKey checked before label in getColumnLabel/getLabel for backward-compatible translation
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 29-05 Tasks 1-2 (awaiting human verification checkpoint)
-Resume file: .planning/phases/29-integration-marketplace/29-05-SUMMARY.md
-Next step: Human verification of complete integration marketplace (Task 3 checkpoint)
+Stopped at: Completed 28-11-PLAN.md (gap closure: foundational localization fixes)
+Resume file: .planning/phases/28-localization-string-extraction/28-11-SUMMARY.md
+Next step: Execute 28-12-PLAN.md (gap closure: entity column header translations)
