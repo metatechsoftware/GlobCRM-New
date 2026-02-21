@@ -1,0 +1,333 @@
+/* ─── Detail Panel ───────────────────────────────── */
+.dp-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 480px;
+  background: var(--color-surface);
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  z-index: 900;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dp-panel--open {
+  transform: translateX(0);
+}
+
+/* ─── Header ─────────────────────────────────────── */
+.dp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  flex-shrink: 0;
+}
+
+.dp-header__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.dp-header__icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.dp-header__info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.dp-header__name {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.dp-header__close {
+  flex-shrink: 0;
+  color: var(--color-text-muted) !important;
+}
+
+/* ─── Status Badge ───────────────────────────────── */
+.dp-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.dp-status--connected {
+  color: var(--color-success-text);
+}
+
+.dp-status--disconnected {
+  color: var(--color-text-muted);
+}
+
+.dp-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-success);
+  flex-shrink: 0;
+}
+
+/* ─── Sections ───────────────────────────────────── */
+.dp-section {
+  padding: 20px 24px;
+}
+
+.dp-section__title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-primary);
+  margin: 0 0 12px;
+  font-family: var(--font-mono);
+}
+
+.dp-section__text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.55;
+  margin: 0 0 12px;
+}
+
+/* ─── Category Chip ──────────────────────────────── */
+.dp-category-chip {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: var(--color-surface-hover);
+  color: var(--color-text-muted);
+  letter-spacing: 0.02em;
+}
+
+/* ─── Credential Fields ──────────────────────────── */
+.dp-credential {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.dp-credential:last-child {
+  margin-bottom: 0;
+}
+
+.dp-credential__label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.dp-credential__value {
+  font-size: 14px;
+  font-family: var(--font-mono);
+  color: var(--color-text-secondary);
+  padding: 8px 12px;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  letter-spacing: 0.05em;
+}
+
+.dp-credential__value--date {
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+}
+
+/* ─── Actions ────────────────────────────────────── */
+.dp-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.dp-actions__connect {
+  background: var(--color-primary) !important;
+  color: var(--color-primary-fg) !important;
+  font-weight: 600;
+}
+
+.dp-actions__connect mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.dp-actions__test {
+  font-weight: 600;
+}
+
+.dp-actions__test mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+.dp-actions__disconnect {
+  color: var(--color-error) !important;
+  border-color: var(--color-error) !important;
+  font-weight: 600;
+}
+
+.dp-actions__disconnect mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 6px;
+}
+
+/* ─── Test Result ────────────────────────────────── */
+.dp-test-result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 24px 0;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.dp-test-result--success {
+  background: var(--color-success-soft);
+  color: var(--color-success-text);
+}
+
+.dp-test-result--success mat-icon {
+  color: var(--color-success);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.dp-test-result--failure {
+  background: var(--color-error-soft, rgba(251, 113, 133, 0.1));
+  color: var(--color-error);
+}
+
+.dp-test-result--failure mat-icon {
+  color: var(--color-error);
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* ─── Activity Log ───────────────────────────────── */
+.dp-activity__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.dp-activity__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.dp-activity__item:last-child {
+  border-bottom: none;
+}
+
+.dp-activity__icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.dp-activity__icon--connected {
+  color: var(--color-success);
+}
+
+.dp-activity__icon--disconnected {
+  color: var(--color-text-muted);
+}
+
+.dp-activity__icon--success {
+  color: var(--color-success);
+}
+
+.dp-activity__icon--failure {
+  color: var(--color-error);
+}
+
+.dp-activity__content {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dp-activity__action {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.dp-activity__user {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.dp-activity__time {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.dp-activity__empty {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ─── Responsive ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .dp-panel {
+    width: 100%;
+  }
+}
+
+/* ─── Reduced motion ─────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .dp-panel {
+    transition: none;
+  }
+}

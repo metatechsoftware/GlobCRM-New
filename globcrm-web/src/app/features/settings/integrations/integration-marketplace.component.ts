@@ -11,24 +11,28 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { AuthStore } from '../../../core/auth/auth.store';
 import { INTEGRATION_CATALOG } from './integration-catalog';
 import {
   IntegrationCategory,
   IntegrationCatalogItem,
   IntegrationViewModel,
+  IntegrationActivityLogEntry,
 } from './integration.models';
 import { IntegrationCardComponent } from './integration-card.component';
 import { IntegrationStore } from './integration.store';
+import { IntegrationService } from './integration.service';
 import {
   IntegrationConnectDialogComponent,
   ConnectDialogResult,
 } from './integration-connect-dialog.component';
 import { IntegrationDisconnectDialogComponent } from './integration-disconnect-dialog.component';
+import { IntegrationDetailPanelComponent } from './integration-detail-panel.component';
 
 interface CategoryOption {
   value: IntegrationCategory | 'all';
-  label: string;
+  labelKey: string;
 }
 
 @Component({
@@ -38,7 +42,9 @@ interface CategoryOption {
     CommonModule,
     FormsModule,
     MatIconModule,
+    TranslocoPipe,
     IntegrationCardComponent,
+    IntegrationDetailPanelComponent,
   ],
   providers: [IntegrationStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -46,9 +52,9 @@ interface CategoryOption {
   template: `
     <!-- Page Header -->
     <div class="mp-header">
-      <h1 class="mp-header__title">Integrations</h1>
+      <h1 class="mp-header__title">{{ 'settings.integrations.title' | transloco }}</h1>
       <p class="mp-header__subtitle">
-        Browse and connect third-party services to enhance your CRM workflow
+        {{ 'settings.integrations.subtitle' | transloco }}
       </p>
     </div>
 
@@ -60,7 +66,7 @@ interface CategoryOption {
         <input
           type="text"
           class="mp-search__input"
-          placeholder="Search integrations..."
+          [placeholder]="'settings.integrations.search' | transloco"
           [ngModel]="searchQuery()"
           (ngModelChange)="searchQuery.set($event)"
         />
@@ -74,7 +80,7 @@ interface CategoryOption {
             [class.mp-chip--active]="selectedCategory() === cat.value"
             (click)="selectedCategory.set(cat.value)"
           >
-            {{ cat.label }}
+            {{ cat.labelKey | transloco }}
           </button>
         }
       </div>
@@ -98,31 +104,53 @@ interface CategoryOption {
     } @else {
       <div class="mp-empty">
         <mat-icon class="mp-empty__icon">search_off</mat-icon>
-        <p class="mp-empty__text">No integrations found matching your criteria</p>
+        <p class="mp-empty__text">{{ 'settings.integrations.empty' | transloco }}</p>
         <button class="mp-empty__reset" (click)="clearFilters()">
-          Clear Filters
+          {{ 'settings.clearSearch' | transloco }}
         </button>
       </div>
     }
+
+    <!-- Backdrop -->
+    @if (selectedIntegration()) {
+      <div class="mp-backdrop" (click)="onClosePanel()"></div>
+    }
+
+    <!-- Detail Panel -->
+    <app-integration-detail-panel
+      [integration]="selectedIntegration()"
+      [isAdmin]="isAdmin()"
+      [activityLog]="activityLog()"
+      [testResult]="panelTestResult()"
+      (close)="onClosePanel()"
+      (connect)="onPanelConnect($event)"
+      (disconnect)="onPanelDisconnect($event)"
+      (testConnection)="onPanelTestConnection($event)"
+    />
   `,
 })
 export class IntegrationMarketplaceComponent implements OnInit {
   private readonly authStore = inject(AuthStore);
   private readonly integrationStore = inject(IntegrationStore);
+  private readonly integrationService = inject(IntegrationService);
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly transloco = inject(TranslocoService);
 
   readonly searchQuery = signal('');
   readonly selectedCategory = signal<IntegrationCategory | 'all'>('all');
+  readonly selectedIntegration = signal<IntegrationViewModel | null>(null);
+  readonly activityLog = signal<IntegrationActivityLogEntry[]>([]);
+  readonly panelTestResult = signal<{ success: boolean; message: string } | null>(null);
 
   readonly categories: CategoryOption[] = [
-    { value: 'all', label: 'All' },
-    { value: 'communication', label: 'Communication' },
-    { value: 'accounting', label: 'Accounting' },
-    { value: 'marketing', label: 'Marketing' },
-    { value: 'storage', label: 'Storage' },
-    { value: 'calendar', label: 'Calendar' },
-    { value: 'developer-tools', label: 'Developer Tools' },
+    { value: 'all', labelKey: 'settings.integrations.categories.all' },
+    { value: 'communication', labelKey: 'settings.integrations.categories.communication' },
+    { value: 'accounting', labelKey: 'settings.integrations.categories.accounting' },
+    { value: 'marketing', labelKey: 'settings.integrations.categories.marketing' },
+    { value: 'storage', labelKey: 'settings.integrations.categories.storage' },
+    { value: 'calendar', labelKey: 'settings.integrations.categories.calendar' },
+    { value: 'developer-tools', labelKey: 'settings.integrations.categories.developerTools' },
   ];
 
   readonly isAdmin = computed(() => this.authStore.userRole() === 'Admin');
@@ -160,32 +188,95 @@ export class IntegrationMarketplaceComponent implements OnInit {
   }
 
   onConnect(integration: IntegrationViewModel): void {
+    this.openConnectDialog(integration);
+  }
+
+  onDisconnect(integration: IntegrationViewModel): void {
+    this.openDisconnectDialog(integration);
+  }
+
+  onTestConnection(integration: IntegrationViewModel): void {
+    this.executeTestConnection(integration);
+  }
+
+  onViewDetails(integration: IntegrationViewModel): void {
+    this.selectedIntegration.set(integration);
+    this.panelTestResult.set(null);
+
+    if (integration.isConnected && integration.connection) {
+      this.integrationService
+        .getActivityLog(integration.connection.id)
+        .subscribe({
+          next: (log) => this.activityLog.set(log),
+          error: () => this.activityLog.set([]),
+        });
+    } else {
+      this.activityLog.set([]);
+    }
+  }
+
+  onClosePanel(): void {
+    this.selectedIntegration.set(null);
+    this.activityLog.set([]);
+    this.panelTestResult.set(null);
+  }
+
+  onPanelConnect(catalog: IntegrationCatalogItem): void {
+    const vm = this.integrations().find((i) => i.catalog.key === catalog.key);
+    if (vm) {
+      this.openConnectDialog(vm);
+    }
+  }
+
+  onPanelDisconnect(integration: IntegrationViewModel): void {
+    this.openDisconnectDialog(integration);
+  }
+
+  onPanelTestConnection(integration: IntegrationViewModel): void {
+    this.executeTestConnection(integration);
+  }
+
+  private openConnectDialog(integration: IntegrationViewModel): void {
     const dialogRef = this.dialog.open(IntegrationConnectDialogComponent, {
       data: { catalogItem: integration.catalog },
       width: '480px',
     });
 
-    dialogRef.afterClosed().subscribe((result: ConnectDialogResult | undefined) => {
-      if (result) {
-        this.integrationStore.connectIntegration(
-          integration.catalog.key,
-          result.credentials,
-          () => {
-            this.snackBar.open(
-              `Connected to ${integration.catalog.name}`,
-              'Close',
-              { duration: 3000 },
-            );
-          },
-          (error) => {
-            this.snackBar.open(error, 'Close', { duration: 5000 });
-          },
-        );
-      }
-    });
+    dialogRef
+      .afterClosed()
+      .subscribe((result: ConnectDialogResult | undefined) => {
+        if (result) {
+          this.integrationStore.connectIntegration(
+            integration.catalog.key,
+            result.credentials,
+            () => {
+              this.snackBar.open(
+                this.transloco.translate(
+                  'settings.integrations.snackbar.connected',
+                  { name: integration.catalog.name },
+                ),
+                'Close',
+                { duration: 3000 },
+              );
+              // Refresh panel if it's open for this integration
+              this.refreshPanelIfOpen(integration.catalog.key);
+            },
+            (error) => {
+              this.snackBar.open(
+                this.transloco.translate(
+                  'settings.integrations.snackbar.connectError',
+                  { name: integration.catalog.name },
+                ),
+                'Close',
+                { duration: 5000 },
+              );
+            },
+          );
+        }
+      });
   }
 
-  onDisconnect(integration: IntegrationViewModel): void {
+  private openDisconnectDialog(integration: IntegrationViewModel): void {
     const dialogRef = this.dialog.open(IntegrationDisconnectDialogComponent, {
       data: { integrationName: integration.catalog.name },
       width: '420px',
@@ -197,44 +288,90 @@ export class IntegrationMarketplaceComponent implements OnInit {
           integration.connection.id,
           () => {
             this.snackBar.open(
-              `Disconnected from ${integration.catalog.name}`,
+              this.transloco.translate(
+                'settings.integrations.snackbar.disconnected',
+                { name: integration.catalog.name },
+              ),
               'Close',
               { duration: 3000 },
             );
+            // Refresh panel if it's open for this integration
+            this.refreshPanelIfOpen(integration.catalog.key);
           },
         );
       }
     });
   }
 
-  onTestConnection(integration: IntegrationViewModel): void {
+  private executeTestConnection(integration: IntegrationViewModel): void {
     if (!integration.connection) return;
 
     this.integrationStore.testConnection(
       integration.connection.id,
       (result) => {
+        this.panelTestResult.set(result);
         if (result.success) {
-          this.snackBar.open('Connection test passed', 'Close', {
-            duration: 3000,
-          });
+          this.snackBar.open(
+            this.transloco.translate(
+              'settings.integrations.snackbar.testSuccess',
+            ),
+            'Close',
+            { duration: 3000 },
+          );
         } else {
           this.snackBar.open(
-            `Connection test failed: ${result.message}`,
+            this.transloco.translate(
+              'settings.integrations.snackbar.testFailed',
+            ),
             'Close',
             { duration: 5000 },
           );
         }
+        // Refresh activity log after test
+        if (integration.connection) {
+          this.integrationService
+            .getActivityLog(integration.connection.id)
+            .subscribe({
+              next: (log) => this.activityLog.set(log),
+              error: () => {},
+            });
+        }
       },
       (error) => {
-        this.snackBar.open(`Connection test failed: ${error}`, 'Close', {
-          duration: 5000,
-        });
+        this.panelTestResult.set({ success: false, message: error });
+        this.snackBar.open(
+          this.transloco.translate(
+            'settings.integrations.snackbar.testFailed',
+          ),
+          'Close',
+          { duration: 5000 },
+        );
       },
     );
   }
 
-  onViewDetails(integration: IntegrationViewModel): void {
-    // Plan 05 will open detail panel here
-    console.log('View details:', integration.catalog.key);
+  private refreshPanelIfOpen(integrationKey: string): void {
+    const currentPanel = this.selectedIntegration();
+    if (currentPanel && currentPanel.catalog.key === integrationKey) {
+      // Re-find the updated integration from the computed list after store update
+      setTimeout(() => {
+        const updated = this.integrations().find(
+          (i) => i.catalog.key === integrationKey,
+        );
+        if (updated) {
+          this.selectedIntegration.set(updated);
+          if (updated.isConnected && updated.connection) {
+            this.integrationService
+              .getActivityLog(updated.connection.id)
+              .subscribe({
+                next: (log) => this.activityLog.set(log),
+                error: () => this.activityLog.set([]),
+              });
+          } else {
+            this.activityLog.set([]);
+          }
+        }
+      });
+    }
   }
 }
