@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 29 of 31 (Integration Marketplace)
-Plan: 4 of 5 complete
-Status: Executing Phase 29
-Last activity: 2026-02-21 — Completed 29-04 (Integration Marketplace Wiring)
+Plan: 5 of 5 complete (Tasks 1-2 done; Task 3 checkpoint pending human verification)
+Status: Awaiting checkpoint verification for 29-05
+Last activity: 2026-02-21 — Completed 29-05 Tasks 1-2 (Detail Panel, Settings Hub, i18n)
 
-Progress: [███████████████████░] 97% (182/~188 plans estimated)
+Progress: [████████████████████] 97% (183/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 97% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 182
+- Total plans completed: 183
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 21 plans across 3 phases (Phase 27-29)
+- v1.3: 22 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -90,6 +90,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 29-04: IntegrationStore uses callback pattern (onSuccess/onError) consistent with WebhookStore for async result handling
 - 29-04: Connect dialog builds FormGroup dynamically from CredentialFieldDef array with required validators per field definition
 - 29-04: Card component uses MatMenu three-dot pattern for connected state actions (Test/Disconnect) to keep card clean
+- 29-05: Detail panel uses template-driven right-side drawer (not CDK Overlay) with CSS transform slide animation for simplicity
+- 29-05: Test connection result displayed inline in detail panel (not toast) for immediate contextual visibility
+- 29-05: Transloco interpolation params used for snackbar messages with dynamic integration names
+- 29-05: Category chip labels use labelKey pattern translated via TranslocoPipe for reactive language switching
 
 ### Pending Todos
 
@@ -104,6 +108,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 29-04-PLAN.md (Integration Marketplace Wiring)
-Resume file: .planning/phases/29-integration-marketplace/29-04-SUMMARY.md
-Next step: Execute remaining Phase 29 plan (05)
+Stopped at: Completed 29-05 Tasks 1-2 (awaiting human verification checkpoint)
+Resume file: .planning/phases/29-integration-marketplace/29-05-SUMMARY.md
+Next step: Human verification of complete integration marketplace (Task 3 checkpoint)

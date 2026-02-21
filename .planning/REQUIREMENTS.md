@@ -29,7 +29,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **INTG-05**: Admin can disconnect an integration with confirmation
 - [x] **INTG-06**: Stored credentials are AES-256 encrypted with tenant-scoped isolation
 - [x] **INTG-07**: API never returns full credentials — only masked values (last 4 chars)
-- [ ] **INTG-08**: User can view integration details in a slide-in panel (description, status, credential info, activity log)
+- [x] **INTG-08**: User can view integration details in a slide-in panel (description, status, credential info, activity log)
 - [x] **INTG-09**: Admin can test an integration connection (validates stored credentials)
 - [x] **INTG-10**: Integration activity log records connect/disconnect/test events with user and timestamp
 - [x] **INTG-11**: Popular/featured integrations display a badge on their cards
@@ -148,7 +148,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-05 | Phase 29 | Complete |
 | INTG-06 | Phase 29 | Complete |
 | INTG-07 | Phase 29 | Complete |
-| INTG-08 | Phase 29 | Pending |
+| INTG-08 | Phase 29 | Complete |
 | INTG-09 | Phase 29 | Complete |
 | INTG-10 | Phase 29 | Complete |
 | INTG-11 | Phase 29 | Complete |
