@@ -1,0 +1,81 @@
+{
+  "title": "Boards",
+  "list": {
+    "title": "Boards",
+    "subtitle": "Organize your work visually with custom Kanban boards",
+    "newBoard": "New Board",
+    "systemBoards": "System Boards",
+    "myBoards": "My Boards",
+    "teamBoards": "Team Boards",
+    "system": "System",
+    "columns": "columns",
+    "cards": "cards",
+    "updatedAt": "Updated"
+  },
+  "empty": {
+    "heading": "Organize your work visually",
+    "description": "Create custom Kanban boards to track projects, plan sprints, manage content, and more. Start with a template or build from scratch.",
+    "createBoard": "Create Board"
+  },
+  "templates": {
+    "blank": {
+      "name": "Blank Board",
+      "description": "Start with an empty board and add your own columns"
+    },
+    "sprint": {
+      "name": "Sprint Board",
+      "description": "Plan and track agile sprints with backlog, progress, and review stages"
+    },
+    "content": {
+      "name": "Content Calendar",
+      "description": "Manage content creation from ideation through publication"
+    },
+    "sales": {
+      "name": "Sales Follow-up",
+      "description": "Track outreach and follow-up activities through the sales cycle"
+    }
+  },
+  "systemBoards": {
+    "dealPipeline": {
+      "name": "Deal Pipeline",
+      "description": "Manage deals through your sales pipeline stages"
+    },
+    "activityBoard": {
+      "name": "Activity Board",
+      "description": "Track tasks, calls, and meetings by status"
+    }
+  },
+  "create": {
+    "title": "Create Board",
+    "selectTemplate": "Choose a template",
+    "boardDetails": "Board details",
+    "name": "Board name",
+    "nameRequired": "Board name is required",
+    "description": "Description",
+    "color": "Color",
+    "visibility": "Visibility",
+    "visibilityPrivate": "Private",
+    "visibilityTeam": "Team",
+    "visibilityPublic": "Public",
+    "team": "Team",
+    "selectTeam": "Select team",
+    "columnsPreview": "Columns",
+    "cancel": "Cancel",
+    "create": "Create"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete"
+  },
+  "delete": {
+    "title": "Delete Board",
+    "message": "Are you sure you want to delete this board? This action cannot be undone.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
+  },
+  "snackbar": {
+    "created": "Board created successfully",
+    "deleted": "Board deleted successfully",
+    "error": "An error occurred. Please try again."
+  }
+}

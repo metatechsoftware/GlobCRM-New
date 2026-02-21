@@ -105,6 +105,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'boards',
+    canActivate: [authGuard],
+    loadChildren: () =>
+      import('./features/boards/boards.routes').then(
+        (m) => m.BOARD_ROUTES
+      ),
+  },
+  {
     path: 'quotes',
     canActivate: [authGuard, permissionGuard('Quote', 'View')],
     loadChildren: () =>

@@ -1,0 +1,81 @@
+{
+  "title": "Panolar",
+  "list": {
+    "title": "Panolar",
+    "subtitle": "Ozel Kanban panolari ile isinizi gorsel olarak duzenleyin",
+    "newBoard": "Yeni Pano",
+    "systemBoards": "Sistem Panolari",
+    "myBoards": "Panolarim",
+    "teamBoards": "Ekip Panolari",
+    "system": "Sistem",
+    "columns": "sutun",
+    "cards": "kart",
+    "updatedAt": "Guncellendi"
+  },
+  "empty": {
+    "heading": "Isinizi gorsel olarak duzenleyin",
+    "description": "Projeleri takip etmek, sprintleri planlamak, icerikleri yonetmek ve daha fazlasi icin ozel Kanban panolari olusturun. Bir sablonla baslayin veya sifirdan olusturun.",
+    "createBoard": "Pano Olustur"
+  },
+  "templates": {
+    "blank": {
+      "name": "Bos Pano",
+      "description": "Bos bir pano ile baslayin ve kendi sutunlarinizi ekleyin"
+    },
+    "sprint": {
+      "name": "Sprint Panosu",
+      "description": "Birikim, ilerleme ve inceleme asamalariyla cesvik sprintleri planlayin ve takip edin"
+    },
+    "content": {
+      "name": "Icerik Takvimi",
+      "description": "Icerik olusturmayi fikirden yayina kadar yonetin"
+    },
+    "sales": {
+      "name": "Satis Takibi",
+      "description": "Satis dongusu boyunca erisim ve takip faaliyetlerini izleyin"
+    }
+  },
+  "systemBoards": {
+    "dealPipeline": {
+      "name": "Firsat Hatti",
+      "description": "Firsatlari satis hatti asamalarindan yonetin"
+    },
+    "activityBoard": {
+      "name": "Aktivite Panosu",
+      "description": "Gorevleri, aramalari ve toplantilari duruma gore takip edin"
+    }
+  },
+  "create": {
+    "title": "Pano Olustur",
+    "selectTemplate": "Bir sablon secin",
+    "boardDetails": "Pano detaylari",
+    "name": "Pano adi",
+    "nameRequired": "Pano adi gereklidir",
+    "description": "Aciklama",
+    "color": "Renk",
+    "visibility": "Gorunurluk",
+    "visibilityPrivate": "Ozel",
+    "visibilityTeam": "Ekip",
+    "visibilityPublic": "Herkese Acik",
+    "team": "Ekip",
+    "selectTeam": "Ekip secin",
+    "columnsPreview": "Sutunlar",
+    "cancel": "Iptal",
+    "create": "Olustur"
+  },
+  "actions": {
+    "edit": "Duzenle",
+    "delete": "Sil"
+  },
+  "delete": {
+    "title": "Panoyu Sil",
+    "message": "Bu panoyu silmek istediginizden emin misiniz? Bu islem geri alinamaz.",
+    "confirm": "Sil",
+    "cancel": "Iptal"
+  },
+  "snackbar": {
+    "created": "Pano basariyla olusturuldu",
+    "deleted": "Pano basariyla silindi",
+    "error": "Bir hata olustu. Lutfen tekrar deneyin."
+  }
+}

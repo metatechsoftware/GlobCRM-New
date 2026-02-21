@@ -89,6 +89,7 @@ export class NavbarComponent {
       label: 'nav.groups.work',
       items: [
         { route: '/activities', icon: 'task_alt', label: 'nav.activities' },
+        { route: '/boards', icon: 'view_kanban', label: 'nav.boards' },
         { route: '/quotes', icon: 'request_quote', label: 'nav.quotes' },
         { route: '/requests', icon: 'support_agent', label: 'nav.requests' },
         { route: '/notes', icon: 'note', label: 'nav.notes' },
