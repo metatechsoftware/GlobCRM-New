@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 29 of 31 (Integration Marketplace)
-Plan: 3 of 5 complete
+Plan: 4 of 5 complete
 Status: Executing Phase 29
-Last activity: 2026-02-21 — Completed 29-02 (Integration API Controller)
+Last activity: 2026-02-21 — Completed 29-04 (Integration Marketplace Wiring)
 
-Progress: [███████████████████░] 96% (181/~188 plans estimated)
+Progress: [███████████████████░] 97% (182/~188 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [███████████████████░] 96% (18
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 181
+- Total plans completed: 182
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 20 plans across 3 phases (Phase 27-29)
+- v1.3: 21 plans across 3 phases (Phase 27-29)
 
 ## Accumulated Context
 
@@ -87,6 +87,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 29-02: ITenantProvider used for tenant context (consistent with WebhooksController) instead of IHttpContextAccessor
 - 29-02: User name from firstName/lastName JWT claims with email fallback for activity log denormalization
 - 29-02: Re-connect flow reuses existing disconnected Integration entity to avoid unique index violation
+- 29-04: IntegrationStore uses callback pattern (onSuccess/onError) consistent with WebhookStore for async result handling
+- 29-04: Connect dialog builds FormGroup dynamically from CredentialFieldDef array with required validators per field definition
+- 29-04: Card component uses MatMenu three-dot pattern for connected state actions (Test/Disconnect) to keep card clean
 
 ### Pending Todos
 
@@ -101,6 +104,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-21
-Stopped at: Completed 29-02-PLAN.md (Integration API Controller)
-Resume file: .planning/phases/29-integration-marketplace/29-02-SUMMARY.md
-Next step: Execute remaining Phase 29 plans (04, 05)
+Stopped at: Completed 29-04-PLAN.md (Integration Marketplace Wiring)
+Resume file: .planning/phases/29-integration-marketplace/29-04-SUMMARY.md
+Next step: Execute remaining Phase 29 plan (05)

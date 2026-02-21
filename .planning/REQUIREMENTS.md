@@ -33,7 +33,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **INTG-09**: Admin can test an integration connection (validates stored credentials)
 - [x] **INTG-10**: Integration activity log records connect/disconnect/test events with user and timestamp
 - [x] **INTG-11**: Popular/featured integrations display a badge on their cards
-- [ ] **INTG-12**: Non-admin users can view integration status (read-only) but cannot connect/disconnect
+- [x] **INTG-12**: Non-admin users can view integration status (read-only) but cannot connect/disconnect
 
 ### Kanban Boards
 
@@ -152,7 +152,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INTG-09 | Phase 29 | Complete |
 | INTG-10 | Phase 29 | Complete |
 | INTG-11 | Phase 29 | Complete |
-| INTG-12 | Phase 29 | Pending |
+| INTG-12 | Phase 29 | Complete |
 | KANB-01 | Phase 30 | Pending |
 | KANB-02 | Phase 30 | Pending |
 | KANB-03 | Phase 30 | Pending |
