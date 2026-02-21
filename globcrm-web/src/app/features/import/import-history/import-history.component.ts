@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { ImportService } from '../import.service';
 import { ImportJob, ImportEntityType } from '../import.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-import-history',
@@ -17,6 +18,7 @@ import { ImportJob, ImportEntityType } from '../import.models';
     MatButtonModule,
     MatProgressSpinnerModule,
     DatePipe,
+    TranslocoPipe,
   ],
   styleUrl: './import-history.component.scss',
   template: `
@@ -28,21 +30,21 @@ import { ImportJob, ImportEntityType } from '../import.models';
           <div class="import-history__header-left">
             <a routerLink="/settings" class="import-history__back">
               <mat-icon>arrow_back</mat-icon>
-              <span>Settings</span>
+              <span>{{ 'history.backToSettings' | transloco }}</span>
             </a>
             <div class="import-history__heading">
               <div class="import-history__icon-wrap">
                 <mat-icon>history</mat-icon>
               </div>
               <div>
-                <h1 class="import-history__title">Import History</h1>
-                <p class="import-history__subtitle">View past import jobs and their results</p>
+                <h1 class="import-history__title">{{ 'history.title' | transloco }}</h1>
+                <p class="import-history__subtitle">{{ 'history.subtitle' | transloco }}</p>
               </div>
             </div>
           </div>
           <a mat-flat-button color="primary" routerLink="/import" class="import-history__new-btn">
             <mat-icon>upload_file</mat-icon>
-            New Import
+            {{ 'history.newImport' | transloco }}
           </a>
         </div>
       </div>
@@ -51,7 +53,7 @@ import { ImportJob, ImportEntityType } from '../import.models';
       @if (loading()) {
         <div class="import-history__loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <span>Loading import history...</span>
+          <span>{{ 'history.loading' | transloco }}</span>
         </div>
       }
 
@@ -61,11 +63,11 @@ import { ImportJob, ImportEntityType } from '../import.models';
           <div class="import-history__empty-icon-wrapper">
             <mat-icon class="import-history__empty-icon">cloud_upload</mat-icon>
           </div>
-          <h3>No imports yet</h3>
-          <p>Import your first CSV file to get started.</p>
+          <h3>{{ 'history.noImports' | transloco }}</h3>
+          <p>{{ 'history.noImportsDesc' | transloco }}</p>
           <a mat-flat-button color="primary" routerLink="/import">
             <mat-icon>upload_file</mat-icon>
-            Import Data
+            {{ 'wizard.title' | transloco }}
           </a>
         </div>
       }
@@ -76,14 +78,14 @@ import { ImportJob, ImportEntityType } from '../import.models';
           <table class="import-history__table">
             <thead>
               <tr>
-                <th>File Name</th>
-                <th>Entity Type</th>
-                <th>Status</th>
-                <th class="text-right">Rows</th>
-                <th class="text-right">Success</th>
-                <th class="text-right">Errors</th>
-                <th>Date</th>
-                <th>Actions</th>
+                <th>{{ 'history.fileName' | transloco }}</th>
+                <th>{{ 'history.entityType' | transloco }}</th>
+                <th>{{ 'history.status' | transloco }}</th>
+                <th class="text-right">{{ 'history.rows' | transloco }}</th>
+                <th class="text-right">{{ 'history.success' | transloco }}</th>
+                <th class="text-right">{{ 'history.errors' | transloco }}</th>
+                <th>{{ 'history.date' | transloco }}</th>
+                <th>{{ 'history.actions' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
@@ -119,7 +121,7 @@ import { ImportJob, ImportEntityType } from '../import.models';
                       <button mat-button color="warn" (click)="toggleErrors(job.id)"
                               class="import-history__details-btn">
                         <mat-icon>{{ expandedJobId() === job.id ? 'expand_less' : 'expand_more' }}</mat-icon>
-                        {{ expandedJobId() === job.id ? 'Hide' : 'View' }} Details
+                        {{ expandedJobId() === job.id ? ('history.hideDetails' | transloco) : ('history.viewDetails' | transloco) }}
                       </button>
                     }
                   </td>
@@ -132,15 +134,15 @@ import { ImportJob, ImportEntityType } from '../import.models';
                       <div class="import-history__errors">
                         <h4 class="import-history__errors-title">
                           <mat-icon>error_outline</mat-icon>
-                          Import Errors ({{ job.errors.length }})
+                          {{ 'history.importErrors' | transloco }} ({{ job.errors.length }})
                         </h4>
                         <table class="import-history__errors-table">
                           <thead>
                             <tr>
-                              <th>Row</th>
-                              <th>Field</th>
-                              <th>Error</th>
-                              <th>Value</th>
+                              <th>{{ 'history.row' | transloco }}</th>
+                              <th>{{ 'history.field' | transloco }}</th>
+                              <th>{{ 'history.error' | transloco }}</th>
+                              <th>{{ 'history.value' | transloco }}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -167,7 +169,7 @@ import { ImportJob, ImportEntityType } from '../import.models';
         @if (hasMore()) {
           <div class="import-history__load-more">
             <button mat-stroked-button (click)="loadMore()">
-              Load More
+              {{ 'history.loadMore' | transloco }}
             </button>
           </div>
         }

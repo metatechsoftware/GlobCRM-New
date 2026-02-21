@@ -11,6 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { ImportStore } from '../stores/import.store';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Step 3: Preview -- displays validation results (valid/invalid/duplicate counts)
@@ -25,6 +26,7 @@ import { ImportStore } from '../stores/import.store';
     MatIconModule,
     MatProgressSpinnerModule,
     MatExpansionModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './step-preview.component.scss',
@@ -33,7 +35,7 @@ import { ImportStore } from '../stores/import.store';
       @if (store.loading()) {
         <div class="loading-container">
           <mat-spinner diameter="48"></mat-spinner>
-          <p>Running validation preview...</p>
+          <p>{{ 'wizard.preview.running' | transloco }}</p>
         </div>
       } @else if (store.previewResponse()) {
         <!-- Summary Cards -->
@@ -43,24 +45,24 @@ import { ImportStore } from '../stores/import.store';
               <mat-icon>check_circle</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.validCount }}</div>
-            <div class="card-label">Valid Rows</div>
-            <div class="card-sublabel">Ready to import</div>
+            <div class="card-label">{{ 'wizard.preview.validRows' | transloco }}</div>
+            <div class="card-sublabel">{{ 'wizard.preview.readyToImport' | transloco }}</div>
           </div>
           <div class="summary-card invalid">
             <div class="card-icon-wrapper invalid">
               <mat-icon>error</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.invalidCount }}</div>
-            <div class="card-label">Invalid Rows</div>
-            <div class="card-sublabel">Will be skipped</div>
+            <div class="card-label">{{ 'wizard.preview.invalidRows' | transloco }}</div>
+            <div class="card-sublabel">{{ 'wizard.preview.willBeSkipped' | transloco }}</div>
           </div>
           <div class="summary-card duplicate">
             <div class="card-icon-wrapper duplicate">
               <mat-icon>content_copy</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.duplicateCount }}</div>
-            <div class="card-label">Duplicates</div>
-            <div class="card-sublabel">Matched existing records</div>
+            <div class="card-label">{{ 'wizard.preview.duplicates' | transloco }}</div>
+            <div class="card-sublabel">{{ 'wizard.preview.matchedExisting' | transloco }}</div>
           </div>
         </div>
 
@@ -71,16 +73,16 @@ import { ImportStore } from '../stores/import.store';
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <mat-icon class="panel-icon error">error</mat-icon>
-                  Validation Errors ({{ store.previewResponse()!.errors.length }})
+                  {{ 'wizard.preview.validationErrors' | transloco }} ({{ store.previewResponse()!.errors.length }})
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <table class="detail-table">
                 <thead>
                   <tr>
-                    <th>Row</th>
-                    <th>Field</th>
-                    <th>Error</th>
-                    <th>Value</th>
+                    <th>{{ 'wizard.preview.row' | transloco }}</th>
+                    <th>{{ 'wizard.preview.field' | transloco }}</th>
+                    <th>{{ 'wizard.preview.error' | transloco }}</th>
+                    <th>{{ 'wizard.preview.value' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -102,15 +104,15 @@ import { ImportStore } from '../stores/import.store';
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <mat-icon class="panel-icon warning">content_copy</mat-icon>
-                  Duplicate Matches ({{ store.previewResponse()!.duplicates.length }})
+                  {{ 'wizard.preview.duplicateMatches' | transloco }} ({{ store.previewResponse()!.duplicates.length }})
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <table class="detail-table">
                 <thead>
                   <tr>
-                    <th>Row</th>
-                    <th>Match Field</th>
-                    <th>Match Value</th>
+                    <th>{{ 'wizard.preview.row' | transloco }}</th>
+                    <th>{{ 'wizard.preview.matchField' | transloco }}</th>
+                    <th>{{ 'wizard.preview.matchValue' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -133,11 +135,11 @@ import { ImportStore } from '../stores/import.store';
       }
 
       <div class="step-actions">
-        <button mat-button (click)="stepBack.emit()">Back</button>
+        <button mat-button (click)="stepBack.emit()">{{ 'wizard.back' | transloco }}</button>
         <button mat-raised-button color="primary"
                 [disabled]="store.loading() || !store.hasPreview()"
                 (click)="onExecute()">
-          Execute Import
+          {{ 'wizard.preview.executeImport' | transloco }}
         </button>
       </div>
     </div>

@@ -22,6 +22,7 @@ import {
 import { MatDividerModule } from '@angular/material/divider';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { DuplicateService } from '../duplicate.service';
 import {
   ContactComparisonRecord,
@@ -79,6 +80,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
     MatSnackBarModule,
     MatDialogModule,
     MatDividerModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './merge-comparison.component.scss',
@@ -90,8 +92,8 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
           <mat-spinner diameter="48"></mat-spinner>
         </div>
         <div class="loading-overlay__text">
-          <div class="loading-overlay__title">Merging Records</div>
-          <div class="loading-overlay__desc">Transferring relationships and consolidating data...</div>
+          <div class="loading-overlay__title">{{ 'merge.mergingRecords' | transloco }}</div>
+          <div class="loading-overlay__desc">{{ 'merge.transferringRelationships' | transloco }}</div>
         </div>
       </div>
     }
@@ -103,8 +105,8 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div class="merge-header__text">
-          <h1 class="merge-title">Merge {{ entityType() === 'contact' ? 'Contacts' : 'Companies' }}</h1>
-          <div class="merge-subtitle">Select the primary record and choose which field values to keep</div>
+          <h1 class="merge-title">{{ entityType() === 'contact' ? ('merge.mergeContacts' | transloco) : ('merge.mergeCompanies' | transloco) }}</h1>
+          <div class="merge-subtitle">{{ 'merge.subtitle' | transloco }}</div>
         </div>
       </div>
 
@@ -112,7 +114,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
       @if (pageLoading()) {
         <div class="page-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>Loading records for comparison...</p>
+          <p>{{ 'merge.loadingRecords' | transloco }}</p>
         </div>
       }
 
@@ -125,11 +127,11 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             (click)="setPrimary('a')"
           >
             <div class="record-card__label">
-              Record A
+              {{ 'merge.recordA' | transloco }}
               @if (primaryRecord() === 'a') {
                 <span class="primary-badge">
                   <mat-icon>star</mat-icon>
-                  Survivor
+                  {{ 'merge.survivor' | transloco }}
                 </span>
               }
             </div>
@@ -137,7 +139,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordA()!) }}</div>
             <div class="record-card__date">
               <mat-icon>schedule</mat-icon>
-              Updated {{ formatDate(recordA()!.updatedAt) }}
+              {{ 'merge.updated' | transloco }} {{ formatDate(recordA()!.updatedAt) }}
             </div>
           </div>
 
@@ -158,11 +160,11 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             (click)="setPrimary('b')"
           >
             <div class="record-card__label">
-              Record B
+              {{ 'merge.recordB' | transloco }}
               @if (primaryRecord() === 'b') {
                 <span class="primary-badge">
                   <mat-icon>star</mat-icon>
-                  Survivor
+                  {{ 'merge.survivor' | transloco }}
                 </span>
               }
             </div>
@@ -170,7 +172,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordB()!) }}</div>
             <div class="record-card__date">
               <mat-icon>schedule</mat-icon>
-              Updated {{ formatDate(recordB()!.updatedAt) }}
+              {{ 'merge.updated' | transloco }} {{ formatDate(recordB()!.updatedAt) }}
             </div>
           </div>
         </div>
@@ -178,25 +180,25 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Field comparison table -->
         <div class="comparison-section">
           <div class="section-label">
-            <h2>Field Comparison</h2>
+            <h2>{{ 'merge.fieldComparison' | transloco }}</h2>
             @if (diffCount() > 0) {
-              <span class="diff-count-badge">{{ diffCount() }} differences</span>
+              <span class="diff-count-badge">{{ diffCount() }} {{ 'merge.differences' | transloco }}</span>
             }
           </div>
           <table class="comparison-table">
             <thead>
               <tr>
-                <th>Field</th>
-                <th>Record A</th>
-                <th>Select</th>
-                <th>Record B</th>
+                <th>{{ 'merge.field' | transloco }}</th>
+                <th>{{ 'merge.recordA' | transloco }}</th>
+                <th>{{ 'merge.select' | transloco }}</th>
+                <th>{{ 'merge.recordB' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (row of fieldRows(); track row.fieldName) {
                 @if (row.fieldName === '__custom_fields_divider') {
                   <tr class="custom-fields-divider">
-                    <td colspan="4">Custom Fields</td>
+                    <td colspan="4">{{ 'merge.customFields' | transloco }}</td>
                   </tr>
                 } @else {
                   <tr>
@@ -246,7 +248,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Relationship summary -->
         <div class="relationship-section">
           <div class="section-label">
-            <h2>Relationships to Transfer</h2>
+            <h2>{{ 'merge.relationshipsToTransfer' | transloco }}</h2>
           </div>
           <div class="relationship-card">
             <div class="relationship-card__title">
@@ -267,7 +269,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               </div>
             } @else {
               <div class="no-relationships">
-                No relationships to transfer.
+                {{ 'merge.noRelationships' | transloco }}
               </div>
             }
           </div>
@@ -276,7 +278,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Action footer -->
         <div class="action-footer">
           <button mat-stroked-button routerLink="/duplicates/scan">
-            Cancel
+            {{ 'merge.cancel' | transloco }}
           </button>
           <button
             mat-raised-button
@@ -286,7 +288,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             [disabled]="merging()"
           >
             <mat-icon>merge</mat-icon>
-            Merge Records
+            {{ 'merge.mergeRecords' | transloco }}
           </button>
         </div>
       }
@@ -299,6 +301,7 @@ export class MergeComparisonComponent implements OnInit {
   private readonly duplicateService = inject(DuplicateService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly translocoService = inject(TranslocoService);
 
   readonly entityType = signal<'contact' | 'company'>('contact');
   readonly id1 = signal('');
@@ -552,7 +555,7 @@ export class MergeComparisonComponent implements OnInit {
     };
 
     const handleError = (): void => {
-      this.snackBar.open('Failed to load records for comparison', 'OK', {
+      this.snackBar.open(this.translocoService.translate('merge.messages.loadFailed'), 'OK', {
         duration: 5000,
       });
       this.pageLoading.set(false);
@@ -654,7 +657,7 @@ export class MergeComparisonComponent implements OnInit {
 
     const handleSuccess = (result: { survivorId: string }): void => {
       this.merging.set(false);
-      this.snackBar.open('Records merged successfully', 'OK', {
+      this.snackBar.open(this.translocoService.translate('merge.messages.mergeSuccess'), 'OK', {
         duration: 5000,
       });
 
@@ -667,7 +670,7 @@ export class MergeComparisonComponent implements OnInit {
 
     const handleError = (): void => {
       this.merging.set(false);
-      this.snackBar.open('Merge failed. No changes were made.', 'OK', {
+      this.snackBar.open(this.translocoService.translate('merge.messages.mergeFailed'), 'OK', {
         duration: 5000,
       });
     };
@@ -701,7 +704,7 @@ export class MergeComparisonComponent implements OnInit {
 @Component({
   selector: 'app-merge-confirm-dialog',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatIconModule, MatDividerModule, MatDialogModule],
+  imports: [CommonModule, MatButtonModule, MatIconModule, MatDividerModule, MatDialogModule, TranslocoPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     .dialog-content {
@@ -783,16 +786,16 @@ export class MergeComparisonComponent implements OnInit {
     }
   `,
   template: `
-    <h2 mat-dialog-title class="dialog-title">Confirm Merge</h2>
+    <h2 mat-dialog-title class="dialog-title">{{ 'merge.confirmMerge' | transloco }}</h2>
 
     <mat-dialog-content>
       <div class="dialog-content">
         <div class="merge-summary">
           <p>
-            <strong>Surviving record:</strong> {{ data.survivorName }}
+            <strong>{{ 'merge.survivingRecord' | transloco }}:</strong> {{ data.survivorName }}
           </p>
           <p>
-            <strong>Record to merge:</strong> {{ data.loserName }}
+            <strong>{{ 'merge.recordToMerge' | transloco }}:</strong> {{ data.loserName }}
           </p>
 
           @if (data.nonZeroRelationships.length > 0) {
@@ -806,15 +809,15 @@ export class MergeComparisonComponent implements OnInit {
 
         <div class="warning-banner">
           <mat-icon>warning</mat-icon>
-          <span>This action cannot be easily undone. The merged record will be permanently deleted.</span>
+          <span>{{ 'merge.warningMessage' | transloco }}</span>
         </div>
       </div>
     </mat-dialog-content>
 
     <div class="dialog-actions">
-      <button mat-stroked-button mat-dialog-close>Cancel</button>
+      <button mat-stroked-button mat-dialog-close>{{ 'merge.cancel' | transloco }}</button>
       <button mat-raised-button color="warn" [mat-dialog-close]="true">
-        Confirm Merge
+        {{ 'merge.confirmMerge' | transloco }}
       </button>
     </div>
   `,

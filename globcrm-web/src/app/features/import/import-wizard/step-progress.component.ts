@@ -9,6 +9,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { ImportStore } from '../stores/import.store';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 /**
  * Step 4: Progress -- SVG ring progress via SignalR + completion summary.
@@ -23,6 +24,7 @@ import { ImportStore } from '../stores/import.store';
     MatButtonModule,
     MatIconModule,
     RouterLink,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './step-progress.component.scss',
@@ -39,11 +41,11 @@ import { ImportStore } from '../stores/import.store';
             </svg>
             <div class="ring-center">
               <span class="ring-percent">{{ store.progressPercent() }}%</span>
-              <span class="ring-text">Complete</span>
+              <span class="ring-text">{{ 'wizard.progress.complete' | transloco }}</span>
             </div>
           </div>
 
-          <div class="progress-title">Importing data...</div>
+          <div class="progress-title">{{ 'wizard.progress.importing' | transloco }}</div>
 
           <div class="live-stats">
             <div class="stat-item">
@@ -52,7 +54,7 @@ import { ImportStore } from '../stores/import.store';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.processedRows ?? 0 }} / {{ store.progress()?.totalRows ?? 0 }}</span>
-                <span class="stat-label">Processed</span>
+                <span class="stat-label">{{ 'wizard.progress.processed' | transloco }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -61,7 +63,7 @@ import { ImportStore } from '../stores/import.store';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.successCount ?? 0 }}</span>
-                <span class="stat-label">Succeeded</span>
+                <span class="stat-label">{{ 'wizard.progress.succeeded' | transloco }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -70,7 +72,7 @@ import { ImportStore } from '../stores/import.store';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.errorCount ?? 0 }}</span>
-                <span class="stat-label">Errors</span>
+                <span class="stat-label">{{ 'wizard.progress.errors' | transloco }}</span>
               </div>
             </div>
           </div>
@@ -86,20 +88,20 @@ import { ImportStore } from '../stores/import.store';
             </mat-icon>
           </div>
           <div class="completion-title">
-            {{ store.progress()?.status === 'Completed' ? 'Import Complete' : 'Import Failed' }}
+            {{ store.progress()?.status === 'Completed' ? ('wizard.progress.importComplete' | transloco) : ('wizard.progress.importFailed' | transloco) }}
           </div>
           <div class="completion-summary">
-            Your data has been processed successfully
+            {{ 'wizard.progress.processedSuccess' | transloco }}
           </div>
           <div class="completion-detail-chips">
             <span class="detail-chip success">
               <mat-icon>check_circle</mat-icon>
-              {{ store.progress()?.successCount ?? 0 }} imported
+              {{ store.progress()?.successCount ?? 0 }} {{ 'wizard.progress.imported' | transloco }}
             </span>
             @if ((store.progress()?.errorCount ?? 0) > 0) {
               <span class="detail-chip errors">
                 <mat-icon>error</mat-icon>
-                {{ store.progress()?.errorCount ?? 0 }} errors
+                {{ store.progress()?.errorCount ?? 0 }} {{ 'wizard.progress.errors' | transloco }}
               </span>
             }
           </div>
@@ -107,13 +109,13 @@ import { ImportStore } from '../stores/import.store';
 
         @if (store.currentJob()?.errors?.length) {
           <div class="error-list">
-            <h3>Errors (showing first {{ Math.min(store.currentJob()!.errors.length, 10) }})</h3>
+            <h3>{{ 'wizard.progress.errorsShowingFirst' | transloco:{ count: Math.min(store.currentJob()!.errors.length, 10) } }}</h3>
             <table class="error-table">
               <thead>
                 <tr>
-                  <th>Row</th>
-                  <th>Field</th>
-                  <th>Error</th>
+                  <th>{{ 'wizard.progress.row' | transloco }}</th>
+                  <th>{{ 'wizard.progress.field' | transloco }}</th>
+                  <th>{{ 'wizard.progress.error' | transloco }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,10 +134,10 @@ import { ImportStore } from '../stores/import.store';
         <div class="completion-actions">
           <button mat-raised-button color="primary" (click)="importAnother.emit()">
             <mat-icon>add</mat-icon>
-            Import Another
+            {{ 'wizard.progress.importAnother' | transloco }}
           </button>
           <a mat-button routerLink="/import/history">
-            View Import History
+            {{ 'wizard.progress.viewHistory' | transloco }}
           </a>
         </div>
       }

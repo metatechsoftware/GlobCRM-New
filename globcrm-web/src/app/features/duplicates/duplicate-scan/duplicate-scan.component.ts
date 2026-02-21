@@ -18,6 +18,7 @@ import {
   ContactDuplicateMatch,
   CompanyDuplicateMatch,
 } from '../duplicate.models';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-duplicate-scan',
@@ -30,6 +31,7 @@ import {
     MatProgressSpinnerModule,
     MatPaginatorModule,
     MatTooltipModule,
+    TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrl: './duplicate-scan.component.scss',
@@ -43,10 +45,10 @@ import {
               <span class="scan-title__icon">
                 <mat-icon>content_copy</mat-icon>
               </span>
-              Duplicate Detection
+              {{ 'scan.title' | transloco }}
             </h1>
             <div class="scan-subtitle">
-              Scan your database for potential duplicate records, review matches, and merge with precision
+              {{ 'scan.subtitle' | transloco }}
             </div>
           </div>
         </div>
@@ -62,11 +64,11 @@ import {
               >
                 <mat-button-toggle value="contact">
                   <mat-icon>person</mat-icon>
-                  Contacts
+                  {{ 'scan.contacts' | transloco }}
                 </mat-button-toggle>
                 <mat-button-toggle value="company">
                   <mat-icon>business</mat-icon>
-                  Companies
+                  {{ 'scan.companies' | transloco }}
                 </mat-button-toggle>
               </mat-button-toggle-group>
             </div>
@@ -81,7 +83,7 @@ import {
             [disabled]="loading()"
           >
             <mat-icon>{{ loading() ? 'radar' : 'search' }}</mat-icon>
-            {{ loading() ? 'Scanning...' : 'Run Scan' }}
+            {{ loading() ? ('scan.scanning' | transloco) : ('scan.runScan' | transloco) }}
           </button>
         </div>
 
@@ -92,9 +94,9 @@ import {
               <mat-icon>compare_arrows</mat-icon>
             </div>
             <div class="loading-state__text">
-              <div class="loading-state__title">Analyzing Records</div>
+              <div class="loading-state__title">{{ 'scan.analyzingRecords' | transloco }}</div>
               <div class="loading-state__desc">
-                Scanning {{ entityType() === 'contact' ? 'contacts' : 'companies' }} for potential matches...
+                {{ 'scan.scanningForMatches' | transloco:{ type: entityType() === 'contact' ? ('scan.contacts' | transloco) : ('scan.companies' | transloco) } }}
               </div>
             </div>
           </div>
@@ -107,11 +109,8 @@ import {
               <mat-icon>compare_arrows</mat-icon>
             </div>
             <div class="initial-state__text">
-              <h3>Ready to Scan</h3>
-              <p>
-                Select an entity type and click "Run Scan" to find potential
-                duplicate records in your database.
-              </p>
+              <h3>{{ 'scan.readyToScan' | transloco }}</h3>
+              <p>{{ 'scan.readyToScanDesc' | transloco }}</p>
             </div>
           </div>
         }
@@ -123,12 +122,8 @@ import {
               <mat-icon>verified</mat-icon>
             </div>
             <div class="empty-state__text">
-              <h3>No Duplicates Found</h3>
-              <p>
-                No potential duplicates were detected for
-                {{ entityType() === 'contact' ? 'contacts' : 'companies' }}.
-                Your data looks clean.
-              </p>
+              <h3>{{ 'scan.noDuplicates' | transloco }}</h3>
+              <p>{{ 'scan.noDuplicatesDesc' | transloco:{ type: entityType() === 'contact' ? ('scan.contacts' | transloco) : ('scan.companies' | transloco) } }}</p>
             </div>
           </div>
         }
@@ -138,8 +133,8 @@ import {
           <div class="result-header">
             <div class="result-count">
               <span class="result-count__number">{{ totalCount() }}</span>
-              {{ totalCount() === 1 ? 'potential duplicate pair' : 'potential duplicate pairs' }}
-              found
+              {{ totalCount() === 1 ? ('scan.pairSingular' | transloco) : ('scan.pairPlural' | transloco) }}
+              {{ 'scan.found' | transloco }}
             </div>
           </div>
 
@@ -175,7 +170,7 @@ import {
                     [class.score-label--medium]="pair.score >= 70 && pair.score < 85"
                     [class.score-label--low]="pair.score < 70"
                   >
-                    {{ pair.score >= 85 ? 'High' : pair.score >= 70 ? 'Medium' : 'Low' }}
+                    {{ pair.score >= 85 ? ('scan.high' | transloco) : pair.score >= 70 ? ('scan.medium' | transloco) : ('scan.low' | transloco) }}
                   </span>
                 </div>
 
@@ -191,18 +186,18 @@ import {
                     mat-stroked-button
                     color="primary"
                     (click)="onCompare(pair)"
-                    matTooltip="Compare and merge records"
+                    [matTooltip]="'scan.compareTooltip' | transloco"
                   >
                     <mat-icon>compare</mat-icon>
-                    Compare
+                    {{ 'scan.compare' | transloco }}
                   </button>
                   <button
                     mat-stroked-button
                     class="dismiss-btn"
                     (click)="onDismiss(pair)"
-                    matTooltip="Dismiss this pair"
+                    [matTooltip]="'scan.dismissTooltip' | transloco"
                   >
-                    Dismiss
+                    {{ 'scan.dismiss' | transloco }}
                   </button>
                 </div>
               </div>

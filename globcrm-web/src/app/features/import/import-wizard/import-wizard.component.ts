@@ -18,6 +18,7 @@ import { StepUploadComponent } from './step-upload.component';
 import { StepMappingComponent } from './step-mapping.component';
 import { StepPreviewComponent } from './step-preview.component';
 import { StepProgressComponent } from './step-progress.component';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 
 /**
  * Multi-step import wizard orchestrating Upload -> Map -> Preview -> Progress steps.
@@ -36,6 +37,7 @@ import { StepProgressComponent } from './step-progress.component';
     StepMappingComponent,
     StepPreviewComponent,
     StepProgressComponent,
+    TranslocoPipe,
   ],
   providers: [ImportStore],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -48,15 +50,15 @@ import { StepProgressComponent } from './step-progress.component';
         <div class="wizard-hero__content">
           <a class="wizard-back" routerLink="/settings">
             <mat-icon>arrow_back</mat-icon>
-            <span>Settings</span>
+            <span>{{ 'wizard.backToSettings' | transloco }}</span>
           </a>
           <div class="wizard-hero__heading">
             <div class="wizard-hero__icon-wrap">
               <mat-icon>upload_file</mat-icon>
             </div>
             <div>
-              <h1>Import Data</h1>
-              <p class="header-subtitle">Upload, map, and import your CSV data</p>
+              <h1>{{ 'wizard.title' | transloco }}</h1>
+              <p class="header-subtitle">{{ 'wizard.subtitle' | transloco }}</p>
             </div>
           </div>
         </div>
@@ -76,7 +78,7 @@ import { StepProgressComponent } from './step-progress.component';
                 <span>{{ s.index + 1 }}</span>
               }
             </div>
-            <span class="node-label">{{ s.label }}</span>
+            <span class="node-label">{{ s.labelKey | transloco }}</span>
           </div>
           @if (!$last) {
             <div class="pipeline-connector"
@@ -114,10 +116,10 @@ export class ImportWizardComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') stepper!: MatStepper;
 
   readonly steps = [
-    { index: 0, label: 'Upload' },
-    { index: 1, label: 'Map Fields' },
-    { index: 2, label: 'Preview' },
-    { index: 3, label: 'Import' },
+    { index: 0, labelKey: 'wizard.steps.upload' },
+    { index: 1, labelKey: 'wizard.steps.mapFields' },
+    { index: 2, labelKey: 'wizard.steps.preview' },
+    { index: 3, labelKey: 'wizard.steps.import' },
   ];
 
   private signalRSub?: Subscription;
