@@ -1,57 +1,83 @@
 ---
 phase: 27-localization-foundation
-verified: 2026-02-21T08:30:00Z
-status: gaps_found
-score: 4/5 success criteria verified
-gaps:
-  - truth: "User's selected language persists across browser sessions (saved to user profile, restored on login)"
-    status: failed
-    reason: "syncFromProfile() method exists in LanguageService but is never called from the auth flow. Backend language preference cannot be restored on login — only localStorage is used. The persistence chain to backend (via profileService.updatePreferences) fires on switch, but no path reads it back on login."
-    artifacts:
-      - path: "globcrm-web/src/app/core/i18n/language.service.ts"
-        issue: "syncFromProfile() defined at line 50 but has zero callers outside its own file"
-      - path: "globcrm-web/src/app/core/auth/auth.service.ts"
-        issue: "handleLoginSuccess() (line 218) does not inject or call LanguageService.syncFromProfile()"
-    missing:
-      - "Call languageService.syncFromProfile(user.language) inside AuthService.handleLoginSuccess() after user info is decoded from JWT, OR after loadUserInfo() returns — wherever the user's language preference is available"
-      - "Ensure user.language or preferences.language is included in the JWT claims or fetched post-login so syncFromProfile receives the actual profile language"
+verified: 2026-02-21T10:00:00Z
+status: passed
+score: 5/5 success criteria verified
+re_verification:
+  previous_status: gaps_found
+  previous_score: 4/5
+  gaps_closed:
+    - "User's selected language persists across browser sessions (saved to user profile, restored on login)"
+  gaps_remaining: []
+  regressions: []
 human_verification:
-  - test: "Open app in English, switch to Turkish (should save to profile via fire-and-forget). Log out. Log back in. Verify Turkish is restored."
-    expected: "App loads in Turkish after re-login because syncFromProfile reads backend preference"
-    why_human: "Requires a live auth round-trip; cannot verify localStorage vs backend restoration programmatically without running the app"
+  - test: "Switch to Turkish. Log out. Log back in (on a different device or after clearing localStorage). Verify Turkish is restored from backend profile — not just localStorage."
+    expected: "App loads in Turkish after re-login because syncFromProfile reads backend preference via ProfileService.getPreferences()"
+    why_human: "Requires a live auth round-trip and storage manipulation; cannot verify localStorage vs backend restoration programmatically without running the app"
   - test: "Navigate to /contacts and open browser network tab. Verify contacts/en.json (or contacts/tr.json) loads as a separate HTTP request distinct from the global en.json."
     expected: "Separate network request to assets/i18n/contacts/en.json when visiting contacts page for the first time"
     why_human: "Lazy-loading behavior requires runtime network inspection"
   - test: "Navigate to any paginated list page. Switch language to Turkish. Verify paginator shows 'Sayfa basina oge' instead of 'Items per page'."
     expected: "Paginator labels update instantly in Turkish without page reload"
     why_human: "Requires visual verification of Angular Material component label update"
-  - test: "Admin navigates to /settings/language, changes default to Turkish. Invite a new user (or simulate first login). Verify the new user's UI loads in Turkish."
-    expected: "New user with no personal preference inherits org default language"
-    why_human: "Requires invitation flow and new user login — cannot verify programmatically. Also depends on the syncFromProfile gap being closed."
+  - test: "Admin navigates to /settings/language, changes default to Turkish. Invite a new user (or simulate first login with no prior localStorage). Verify the new user's UI loads in Turkish."
+    expected: "New user with no personal preference inherits org default language via syncFromProfile fallback chain"
+    why_human: "Requires invitation flow and new user login — cannot verify programmatically"
 ---
 
 # Phase 27: Localization Foundation Verification Report
 
 **Phase Goal:** Users can switch the CRM interface between English and Turkish at runtime, with locale-aware formatting and persistent language preference
-**Verified:** 2026-02-21T08:30:00Z
-**Status:** gaps_found — 1 gap blocking full goal achievement
-**Re-verification:** No — initial verification
+**Verified:** 2026-02-21T10:00:00Z
+**Status:** passed — all 5 success criteria verified
+**Re-verification:** Yes — after gap closure (Plan 27-05, commit `244620a`)
 
 ---
 
 ## Goal Achievement
 
-### Success Criteria (from ROADMAP.md)
+### Observable Truths (Success Criteria)
 
 | # | Success Criterion | Status | Evidence |
 |---|---|---|---|
-| 1 | User can click language selector in navbar and entire UI switches between EN/TR without page reload | VERIFIED | `navbar.component.html` lines 154-165: EN/TR segmented toggle with `(click)="switchLanguage('en'/'tr')"`. `reRenderOnLangChange: true` in app.config.ts. |
-| 2 | User's selected language persists across browser sessions (saved to user profile, restored on login) | FAILED | `updatePreferences()` fires on switch (write side works). But `syncFromProfile()` is **never called** from auth flow — backend language is never read back on login. localStorage fallback only. |
-| 3 | Date, number, and currency values render in locale-appropriate format (TR: 20.02.2026, 1.234,56; EN: 02/20/2026, 1,234.56) | VERIFIED | `dynamic-table.component.ts` line 504: `Intl.DateTimeFormat(locale, ...)` with `getActiveLang() === 'tr' ? 'tr-TR' : 'en-US'`. `DateAdapter.setLocale()` called in `switchLanguage()`. |
-| 4 | Angular Material components (paginator "of", sort headers, date picker) display labels in selected language | VERIFIED | `transloco-paginator-intl.ts`: full `TranslatedPaginatorIntl` extending `MatPaginatorIntl`, subscribed to `langChanges$`, registered at root via `{ provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl }` in `app.config.ts`. `provideNativeDateAdapter()` at root. |
-| 5 | Translation files lazy-load per feature scope (navigating to contacts loads only contact translations), and missing keys fall back to English | VERIFIED | `contacts.routes.ts` line 8: `provideTranslocoScope('contacts')`. `settings.routes.ts` line 8: `provideTranslocoScope('settings')`. `missingHandler: { useFallbackTranslation: true }` in app.config.ts. Translation files exist at `assets/i18n/contacts/{en,tr}.json` and `assets/i18n/settings/{en,tr}.json`. |
+| 1 | User can click language selector in navbar and entire UI switches between EN/TR without page reload | VERIFIED | `navbar.component.html` lines 154-165: EN/TR segmented toggle with `switchLanguage('en'/'tr')`. `reRenderOnLangChange: true` in `app.config.ts` line 38. No regressions detected. |
+| 2 | User's selected language persists across browser sessions (saved to user profile, restored on login) | VERIFIED | Write path: `language.service.ts` line 34 calls `profileService.updatePreferences({ language: lang })`. Read path: `auth.service.ts` lines 252-266 call `profileService.getPreferences()` then `languageService.syncFromProfile(prefs?.language)` inside `handleLoginSuccess()`. Auto token refresh passes `syncLanguage = false` (line 282) to skip wasteful re-sync mid-session. |
+| 3 | Date, number, and currency values render in locale-appropriate format (TR: 20.02.2026, 1.234,56; EN: 02/20/2026, 1,234.56) | VERIFIED | `dynamic-table.component.ts` line 504: `Intl.DateTimeFormat(locale, ...)` with `getActiveLang() === 'tr' ? 'tr-TR' : 'en-US'`. `DateAdapter.setLocale()` called in `switchLanguage()`. No regressions. |
+| 4 | Angular Material components (paginator "of", sort headers, date picker) display labels in selected language | VERIFIED | `transloco-paginator-intl.ts`: `TranslatedPaginatorIntl extends MatPaginatorIntl`, subscribed to `langChanges$`. Registered at root via `{ provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl }` at `app.config.ts` line 31. `provideNativeDateAdapter()` at line 30. No regressions. |
+| 5 | Translation files lazy-load per feature scope (navigating to contacts loads only contact translations), and missing keys fall back to English | VERIFIED | `contacts.routes.ts` line 8: `provideTranslocoScope('contacts')`. `settings.routes.ts` line 8: `provideTranslocoScope('settings')`. `missingHandler: { useFallbackTranslation: true }` in `app.config.ts`. All 4 scoped translation files present (`assets/i18n/contacts/{en,tr}.json`, `assets/i18n/settings/{en,tr}.json`). No regressions. |
 
-**Score:** 4/5 success criteria verified
+**Score:** 5/5 success criteria verified
+
+---
+
+## Re-Verification: Gap Closure
+
+### Previously Failed Gap
+
+**Truth:** "User's selected language persists across browser sessions (saved to user profile, restored on login)"
+
+**Previous failure:** `syncFromProfile()` was defined at `language.service.ts` line 50 but had zero callers. `auth.service.ts` `handleLoginSuccess()` did not inject or call `LanguageService`.
+
+**Gap closed by:** Plan 27-05, commit `244620a` — `feat(27-05): wire syncFromProfile into AuthService login flow`
+
+### Closure Verification (3-Level Check)
+
+**Level 1 — Exists:**
+- `globcrm-web/src/app/core/auth/auth.service.ts` — confirmed, 303 lines
+
+**Level 2 — Substantive:**
+- Line 7: `import { LanguageService } from '../i18n/language.service';` — PRESENT
+- Line 8: `import { ProfileService } from '../../features/profile/profile.service';` — PRESENT
+- Line 35: `private readonly languageService = inject(LanguageService);` — PRESENT
+- Line 36: `private readonly profileService = inject(ProfileService);` — PRESENT
+- Lines 222: `private handleLoginSuccess(response: LoginResponse, rememberMe: boolean, syncLanguage = true): void` — PRESENT (new parameter)
+- Lines 252-266: `if (syncLanguage) { profileService.getPreferences().subscribe({ next: (prefs) => { languageService.syncFromProfile(prefs?.language); }, error: () => { languageService.syncFromProfile(null); } }) }` — PRESENT
+- Line 282: `this.handleLoginSuccess(response, shouldRemember, false)` — auto-refresh correctly passes `false` to skip language sync
+
+**Level 3 — Wired:**
+- `syncFromProfile` has 2 call sites in `auth.service.ts` (lines 256, 260) — one for success path, one for error fallback
+- `profileService.getPreferences()` exists at `profile.service.ts` line 125 and calls `GET /api/profile/preferences` — WIRED
+- `syncFromProfile()` in `language.service.ts` contains the full resolution chain: user preference -> org default API -> browser detection -> 'en' — all reachable paths now live
 
 ---
 
@@ -61,34 +87,40 @@ human_verification:
 
 | Artifact | Status | Evidence |
 |---|---|---|
-| `globcrm-web/src/app/core/i18n/transloco-loader.ts` | VERIFIED | Exists, 12 lines, `TranslocoHttpLoader` implements `TranslocoLoader`, calls `http.get<Translation>(`./assets/i18n/${lang}.json`)` |
-| `globcrm-web/src/app/core/i18n/language.service.ts` | VERIFIED | Exists, 104 lines, `LanguageService` with `switchLanguage`, `detectLanguage`, `initLanguage`, `syncFromProfile`. Injected and called in `app.component.ts` constructor. |
-| `globcrm-web/src/assets/i18n/en.json` | VERIFIED | Exists, contains `common`, `common.paginator`, `nav`, `auth`, `userMenu`, `common.validation`, `common.table` keys. Valid JSON. |
-| `globcrm-web/src/assets/i18n/tr.json` | VERIFIED | Exists, contains all matching Turkish keys with proper Turkish characters. Valid JSON. |
+| `globcrm-web/src/app/core/i18n/transloco-loader.ts` | VERIFIED | Exists, `TranslocoHttpLoader` implements `TranslocoLoader`, calls `http.get<Translation>('./assets/i18n/${lang}.json')`. No regression. |
+| `globcrm-web/src/app/core/i18n/language.service.ts` | VERIFIED | Exists, 104 lines, `LanguageService` with `switchLanguage`, `detectLanguage`, `initLanguage`, `syncFromProfile`. Injected in `app.component.ts` constructor (line 113). No regression. |
+| `globcrm-web/src/assets/i18n/en.json` | VERIFIED | Exists, `common`, `nav`, `auth`, `userMenu`, `common.paginator`, `common.validation`, `common.table` keys present. No regression. |
+| `globcrm-web/src/assets/i18n/tr.json` | VERIFIED | Exists, matching Turkish keys. No regression. |
 
 ### Plan 02 Artifacts
 
 | Artifact | Status | Evidence |
 |---|---|---|
-| `globcrm-web/src/app/shared/components/navbar/navbar.component.html` | VERIFIED | Lines 59, 94: lang badges on desktop and mobile. Lines 154-165: EN/TR segmented toggle in user menu with `switchLanguage` calls. |
-| `globcrm-web/src/app/shared/components/navbar/navbar.component.ts` | VERIFIED | Line 56: `inject(LanguageService)`. Line 57: `readonly currentLang = this.languageService.currentLang`. Lines 145-147: `switchLanguage()` delegates to `languageService.switchLanguage()`. |
+| `globcrm-web/src/app/shared/components/navbar/navbar.component.html` | VERIFIED | EN/TR segmented toggle at lines 154-165. `switchLanguage` calls wired. No regression. |
+| `globcrm-web/src/app/shared/components/navbar/navbar.component.ts` | VERIFIED | Line 56: `inject(LanguageService)`. Line 146: `switchLanguage()` delegates to `languageService.switchLanguage()`. No regression. |
 
 ### Plan 03 Artifacts
 
 | Artifact | Status | Evidence |
 |---|---|---|
-| `globcrm-web/src/app/core/i18n/transloco-paginator-intl.ts` | VERIFIED | Exists, 44 lines, `TranslatedPaginatorIntl extends MatPaginatorIntl`, subscribes to `langChanges$` with `takeUntilDestroyed`, calls `this.changes.next()`. |
-| `globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.ts` | VERIFIED | Line 101: `inject(TranslocoService)`. Line 504: `getActiveLang() === 'tr' ? 'tr-TR' : 'en-US'` — locale-aware `Intl.DateTimeFormat`. No hardcoded `en-US` outside the conditional mapping. |
+| `globcrm-web/src/app/core/i18n/transloco-paginator-intl.ts` | VERIFIED | `TranslatedPaginatorIntl extends MatPaginatorIntl`, subscribes to `langChanges$` with `takeUntilDestroyed`, calls `this.changes.next()`. No regression. |
+| `globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.ts` | VERIFIED | `inject(TranslocoService)`, locale-aware `Intl.DateTimeFormat`. No regression. |
 
 ### Plan 04 Artifacts
 
 | Artifact | Status | Evidence |
 |---|---|---|
-| `globcrm-web/src/assets/i18n/contacts/en.json` | VERIFIED | Exists, contains `list`, `detail`, `form` keys as required. |
-| `globcrm-web/src/assets/i18n/contacts/tr.json` | VERIFIED | Exists, valid JSON, Turkish translations for list/detail/form. |
-| `globcrm-web/src/assets/i18n/settings/en.json` | VERIFIED | Exists, contains `language` key section. |
-| `globcrm-web/src/assets/i18n/settings/tr.json` | VERIFIED | Exists, valid JSON, Turkish translations including `language` section. |
-| `src/GlobCRM.Domain/Entities/Organization.cs` | VERIFIED | Line 51: `public string DefaultLanguage { get; set; } = "en";` with XML doc comment. |
+| `globcrm-web/src/assets/i18n/contacts/en.json` | VERIFIED | Exists with `list`, `detail`, `form` keys. No regression. |
+| `globcrm-web/src/assets/i18n/contacts/tr.json` | VERIFIED | Exists, valid Turkish translations. No regression. |
+| `globcrm-web/src/assets/i18n/settings/en.json` | VERIFIED | Exists with `language` key section. No regression. |
+| `globcrm-web/src/assets/i18n/settings/tr.json` | VERIFIED | Exists, valid Turkish translations. No regression. |
+| `src/GlobCRM.Domain/Entities/Organization.cs` | VERIFIED | `public string DefaultLanguage { get; set; } = "en";` present. No regression. |
+
+### Plan 05 Artifacts (Gap Closure)
+
+| Artifact | Status | Evidence |
+|---|---|---|
+| `globcrm-web/src/app/core/auth/auth.service.ts` | VERIFIED | Lines 7-8: imports. Lines 35-36: injections. Lines 222, 252-266, 282: `syncLanguage` parameter + `getPreferences()` + `syncFromProfile()` call chain. Commit `244620a` confirmed in git log. |
 
 ---
 
@@ -100,13 +132,14 @@ human_verification:
 | `app.component.ts` | `language.service.ts` | `inject LanguageService`, call `initLanguage()` | WIRED | `app.component.ts` lines 110, 113: `inject(LanguageService)` + `this.languageService.initLanguage()` in constructor |
 | `navbar.component.ts` | `language.service.ts` | `inject LanguageService`, call `switchLanguage()` | WIRED | `navbar.component.ts` line 56, 146: injection + delegation confirmed |
 | `language.service.ts` | `profile.service.ts` | `updatePreferences({ language })` fire-and-forget | WIRED | `language.service.ts` line 34: `this.profileService.updatePreferences({ language: lang }).subscribe(...)` |
-| `language.service.ts` | `profile.service.ts` | `syncFromProfile()` called on login | NOT WIRED | `syncFromProfile()` is defined (line 50) but has **zero callers** in the codebase. `auth.service.ts` `handleLoginSuccess()` does not call it. |
+| `auth.service.ts` | `language.service.ts` | `inject(LanguageService)` + `syncFromProfile()` in `handleLoginSuccess()` | WIRED | `auth.service.ts` lines 35, 256, 260: injection + 2 call sites (success + error path). Previously NOT WIRED — now CLOSED. |
+| `auth.service.ts` | `profile.service.ts` | `profileService.getPreferences()` to fetch language post-login | WIRED | `auth.service.ts` line 36 (injection), line 254: `this.profileService.getPreferences().subscribe(...)`. `ProfileService.getPreferences()` exists at `profile.service.ts` line 125 calling `GET /api/profile/preferences`. |
 | `app.config.ts` | `transloco-paginator-intl.ts` | `{ provide: MatPaginatorIntl, useClass: TranslatedPaginatorIntl }` | WIRED | `app.config.ts` line 31 confirmed |
 | `app.config.ts` | `@angular/material/core` | `provideNativeDateAdapter()` | WIRED | `app.config.ts` line 30 confirmed |
-| `contacts.routes.ts` | `assets/i18n/contacts/` | `provideTranslocoScope('contacts')` | WIRED | `contacts.routes.ts` line 2, 8: import + provider confirmed |
-| `settings.routes.ts` | `assets/i18n/settings/` | `provideTranslocoScope('settings')` | WIRED | `settings.routes.ts` line 2, 8: import + provider confirmed |
-| `OrganizationsController.cs` | `Organization.cs` | `GET/PUT DefaultLanguage endpoint` | WIRED | Lines 221-233 (`GetDefaultLanguage`), 240-268 (`UpdateDefaultLanguage`) both read/write `organization.DefaultLanguage` |
-| `language.service.ts` | `api/organizations/default-language` | `syncFromProfile()` org default fallback | PARTIAL | Code path exists at lines 62-83, but is unreachable because `syncFromProfile()` is never invoked |
+| `contacts.routes.ts` | `assets/i18n/contacts/` | `provideTranslocoScope('contacts')` | WIRED | `contacts.routes.ts` lines 2, 8: import + provider confirmed |
+| `settings.routes.ts` | `assets/i18n/settings/` | `provideTranslocoScope('settings')` | WIRED | `settings.routes.ts` lines 2, 8: import + provider confirmed |
+| `OrganizationsController.cs` | `Organization.cs` | `GET/PUT DefaultLanguage endpoint` | WIRED | `GetDefaultLanguage` and `UpdateDefaultLanguage` methods read/write `organization.DefaultLanguage` |
+| `language.service.ts` | `api/organizations/default-language` | `syncFromProfile()` org default fallback | WIRED | `language.service.ts` lines 62-83: org default API call reachable now that `syncFromProfile()` is called from `auth.service.ts` |
 
 ---
 
@@ -115,14 +148,14 @@ human_verification:
 | Requirement | Plan | Description | Status | Evidence |
 |---|---|---|---|---|
 | LOCL-01 | 27-02 | User can switch UI language between EN/TR at runtime without page reload | SATISFIED | Navbar toggle wired to `LanguageService.switchLanguage()`. Transloco `reRenderOnLangChange: true`. |
-| LOCL-02 | 27-02 | User's language preference persists across sessions (saved to profile) | PARTIAL | Write side works (backend `updatePreferences` called on switch). Read side broken: `syncFromProfile()` never called on login. On reload, localStorage is used (not backend profile). |
-| LOCL-04 | 27-03 | Date, number, currency values format per locale | SATISFIED | DynamicTable uses `Intl.DateTimeFormat` with active locale. `DateAdapter.setLocale()` called on switch. |
+| LOCL-02 | 27-02 + 27-05 | User's language preference persists across sessions (saved to profile) | SATISFIED | Write: `updatePreferences({ language })` on switch. Read: `getPreferences()` -> `syncFromProfile()` in `handleLoginSuccess()`. Full persistence chain now closed. Previously PARTIAL. |
+| LOCL-04 | 27-03 | Date, number, currency values format per locale | SATISFIED | `DynamicTable` uses `Intl.DateTimeFormat` with active locale. `DateAdapter.setLocale()` called on switch. |
 | LOCL-05 | 27-04 | Translation files lazy-load per feature scope | SATISFIED | `provideTranslocoScope('contacts')` and `provideTranslocoScope('settings')` in route providers. Scope files exist at `assets/i18n/{scope}/{lang}.json`. |
 | LOCL-06 | 27-01 | Missing translations fall back to English without showing broken keys | SATISFIED | `missingHandler: { useFallbackTranslation: true, logMissingKey: true }` in `app.config.ts`. |
-| LOCL-07 | 27-04 | Admin can set org default language; new users inherit it | PARTIAL | Admin UI and backend endpoints exist and are wired. But new-user inheritance depends on `syncFromProfile()` being called on login — which is not wired. |
+| LOCL-07 | 27-04 + 27-05 | Admin can set org default language; new users inherit it | SATISFIED | Admin UI and backend endpoints wired. New-user inheritance now reachable via `syncFromProfile()` org-default fallback chain (called on login). Previously PARTIAL. |
 | LOCL-08 | 27-03 | Angular Material components display labels in selected language | SATISFIED | `TranslatedPaginatorIntl` reactive labels + root `provideNativeDateAdapter()` with `DateAdapter.setLocale()` on switch. |
 
-**Orphaned requirements check:** REQUIREMENTS.md lists LOCL-03, LOCL-09, LOCL-10 as Phase 28 — correct, none are claimed by Phase 27 plans.
+**Orphaned requirements check:** REQUIREMENTS.md lists LOCL-03, LOCL-09, LOCL-10 as Phase 28 — correct, none claimed by Phase 27 plans. All 7 Phase 27 requirement IDs (LOCL-01, LOCL-02, LOCL-04, LOCL-05, LOCL-06, LOCL-07, LOCL-08) are accounted for.
 
 ---
 
@@ -130,20 +163,20 @@ human_verification:
 
 | File | Line | Pattern | Severity | Impact |
 |---|---|---|---|---|
-| `globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.ts` | 548-553 | `getPageRangeSummary()` returns hardcoded English strings ("No records", "Showing X-Y of Z") | Warning | Page range summary in footer is not localized — shows English regardless of active language |
-| `globcrm-web/src/app/shared/components/navbar/navbar.component.ts` | 67-115 | All `navGroups` labels (CRM, Work, Connect, Admin, item labels) are hardcoded English strings | Info | Nav labels are not translated through Transloco — expected in Phase 28, not a blocker for Phase 27 goals |
+| `globcrm-web/src/app/shared/components/dynamic-table/dynamic-table.component.ts` | 548-553 | `getPageRangeSummary()` returns hardcoded English strings ("No records", "Showing X-Y of Z") | Warning | Page range summary in footer is not localized — shows English regardless of active language. Not a Phase 27 blocker. |
+| `globcrm-web/src/app/shared/components/navbar/navbar.component.ts` | 67-115 | All `navGroups` labels are hardcoded English strings | Info | Nav labels not translated through Transloco. Expected scope for Phase 28 (LOCL-10). |
 
-No blockers from anti-patterns. The hardcoded nav labels are expected scope for Phase 28 (LOCL-10).
+No blockers. Both anti-patterns were present in initial verification and remain scoped to Phase 28.
 
 ---
 
 ## Human Verification Required
 
-### 1. Backend language persistence on login
+### 1. Backend language persistence on login (cross-device)
 
-**Test:** Switch to Turkish. Log out. Log back in. Check which language loads.
-**Expected:** If `syncFromProfile()` were wired, Turkish would restore from backend profile. Currently, only localStorage provides this — meaning it works on the same browser but not after clearing storage or logging in on a new device.
-**Why human:** Requires a live auth round-trip and storage inspection.
+**Test:** Switch to Turkish. Log out. Clear localStorage (DevTools > Application > Local Storage). Log back in.
+**Expected:** App loads in Turkish because `syncFromProfile()` fetches from `GET /api/profile/preferences` and applies the saved backend preference — not from localStorage (which was cleared).
+**Why human:** Requires a live auth round-trip and storage manipulation; cannot verify the localStorage vs backend restoration path programmatically.
 
 ### 2. Feature scope lazy-loading in network tab
 
@@ -157,27 +190,29 @@ No blockers from anti-patterns. The hardcoded nav labels are expected scope for 
 **Expected:** Paginator updates to "Sayfa basina oge" for "Items per page" without page reload.
 **Why human:** Requires visual verification of reactive Angular Material component label update.
 
-### 4. New user org default inheritance
+### 4. New user org default language inheritance
 
-**Test:** Admin sets org default to Turkish at `/settings/language`. Invite a new user. New user accepts invite and logs in for the first time (no personal language preference set).
-**Expected:** New user's UI loads in Turkish (inherits org default).
-**Why human:** Requires full invitation flow + new user login. Also currently blocked by the `syncFromProfile()` gap.
+**Test:** Admin sets org default to Turkish at `/settings/language`. Invite a new user. New user accepts invite and logs in for the first time (no personal language preference, no localStorage entry).
+**Expected:** New user's UI loads in Turkish (inherits org default via `syncFromProfile` fallback chain).
+**Why human:** Requires full invitation flow and new user login on a clean browser.
 
 ---
 
 ## Gaps Summary
 
-**One gap blocks full goal achievement:**
+No gaps remain. All automated checks passed.
 
-The persistence chain has a broken read path. `LanguageService.syncFromProfile()` was built to restore the user's backend language preference after login, and to apply the organization's default language for new users (LOCL-07). The method is fully implemented at lines 50-84 of `language.service.ts`, including the org-default API call fallback. However, **it is never invoked**. The `auth.service.ts` `handleLoginSuccess()` method (line 218) does not inject or call `LanguageService`, and no other component or service calls `syncFromProfile()` anywhere in the codebase.
+The one gap from initial verification — `syncFromProfile()` never being called from the auth flow — was closed by Plan 27-05 (commit `244620a`). The `AuthService.handleLoginSuccess()` now:
 
-**Impact:**
-- LOCL-02 is partial: Language saves to backend (write works), but on next login the backend preference is ignored and localStorage takes precedence. On a new device or after clearing storage, the user starts in English regardless of their backend preference.
-- LOCL-07 is partial: Org default language setting works at the admin level (backend + UI), but new users never receive the org default because `syncFromProfile()` is not called during the login flow.
+1. Injects `LanguageService` and `ProfileService`
+2. Calls `profileService.getPreferences()` fire-and-forget after every user-initiated login
+3. Passes the retrieved `prefs.language` to `languageService.syncFromProfile()`, which restores the backend preference
+4. On API failure, calls `syncFromProfile(null)` to trigger the org-default fallback chain (ensuring LOCL-07 new-user inheritance is reachable)
+5. Skips language sync on automatic token refresh (`syncLanguage = false`) to avoid wasteful API calls and disruptive mid-session switches
 
-**Fix is small:** Inject `LanguageService` into `AuthService` and call `this.languageService.syncFromProfile(userInfo?.language)` inside `handleLoginSuccess()` after the user info is decoded from JWT. Alternatively, call it from `AuthStore` when user state changes, or from `app.component.ts` in an auth effect.
+LOCL-02 and LOCL-07 are now fully satisfied. Phase 27 goal is achieved.
 
 ---
 
-*Verified: 2026-02-21T08:30:00Z*
+*Verified: 2026-02-21T10:00:00Z*
 *Verifier: Claude (gsd-verifier)*
