@@ -4,6 +4,8 @@ import { Observable, tap, catchError, throwError, of, EMPTY } from 'rxjs';
 import { ApiService } from '../api/api.service';
 import { AuthStore } from './auth.store';
 import { PermissionStore } from '../permissions/permission.store';
+import { LanguageService } from '../i18n/language.service';
+import { ProfileService } from '../../features/profile/profile.service';
 import {
   LoginRequest,
   LoginResponse,
@@ -30,6 +32,8 @@ export class AuthService implements OnDestroy {
   private readonly authStore = inject(AuthStore);
   private readonly permissionStore = inject(PermissionStore);
   private readonly router = inject(Router);
+  private readonly languageService = inject(LanguageService);
+  private readonly profileService = inject(ProfileService);
   private refreshTimerId: ReturnType<typeof setTimeout> | null = null;
 
   /**
@@ -215,7 +219,7 @@ export class AuthService implements OnDestroy {
    * Handle successful login/refresh: set tokens, extract user info from JWT,
    * persist refresh token if rememberMe, schedule automatic token refresh.
    */
-  private handleLoginSuccess(response: LoginResponse, rememberMe: boolean): void {
+  private handleLoginSuccess(response: LoginResponse, rememberMe: boolean, syncLanguage = true): void {
     this.authStore.setTokens(response.accessToken, response.refreshToken);
     this.authStore.setLoading(false);
 
@@ -240,6 +244,26 @@ export class AuthService implements OnDestroy {
     // Load user permissions after successful authentication.
     // This ensures the PermissionStore is populated before any guards or directives check access.
     this.permissionStore.loadPermissions();
+
+    // Restore user's language preference from backend profile (LOCL-02/LOCL-07).
+    // Fire-and-forget: fetch preferences, then pass language to syncFromProfile().
+    // syncFromProfile handles the resolution chain: user preference > org default > browser detection.
+    // Skipped on automatic token refresh to avoid wasteful API calls and disruptive mid-session switches.
+    if (syncLanguage) {
+      try {
+        this.profileService.getPreferences().subscribe({
+          next: (prefs) => {
+            this.languageService.syncFromProfile(prefs?.language);
+          },
+          error: () => {
+            // If preferences fetch fails, syncFromProfile with null triggers org default fallback
+            this.languageService.syncFromProfile(null);
+          },
+        });
+      } catch {
+        // Guard against injection errors during early bootstrap
+      }
+    }
   }
 
   /**
@@ -255,7 +279,7 @@ export class AuthService implements OnDestroy {
       this.refreshToken(refreshToken).subscribe({
         next: (response) => {
           const shouldRemember = localStorage.getItem(REMEMBER_ME_KEY) === 'true';
-          this.handleLoginSuccess(response, shouldRemember);
+          this.handleLoginSuccess(response, shouldRemember, false);
         },
         error: () => {
           this.logout();
