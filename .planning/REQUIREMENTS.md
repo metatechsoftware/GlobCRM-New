@@ -69,7 +69,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **QTPL-09**: User can configure page size (A4/Letter) and orientation (portrait/landscape) per template
 - [x] **QTPL-10**: Organization branding (logo, name, address) available as merge fields in templates
 - [x] **QTPL-11**: Quotes without a custom template fall back to the existing QuestPDF-generated layout
-- [ ] **QTPL-12**: User can manage quote templates from a dedicated templates section under quotes
+- [x] **QTPL-12**: User can manage quote templates from a dedicated templates section under quotes
 
 ## Future Requirements
 
@@ -182,7 +182,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | QTPL-09 | Phase 31 | Complete |
 | QTPL-10 | Phase 31 | Complete |
 | QTPL-11 | Phase 31 | Complete |
-| QTPL-12 | Phase 31 | Pending |
+| QTPL-12 | Phase 31 | Complete |
 
 **Coverage:**
 - v1.3 requirements: 52 total
