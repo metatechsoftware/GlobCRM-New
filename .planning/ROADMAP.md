@@ -162,9 +162,9 @@ Plans:
   5. Quotes without a custom template fall back to the existing QuestPDF-generated layout, preserving backward compatibility
 **Plans**: 5 plans
 Plans:
-- [ ] 31-01-PLAN.md — Backend foundation: QuoteTemplate entity, migration, PlaywrightPdfService, Organization branding fields
-- [ ] 31-02-PLAN.md — QuoteTemplatesController CRUD + clone + set-default, QuotesController PDF update, merge data builder
-- [ ] 31-03-PLAN.md — Frontend models, service, store, Unlayer template editor (web displayMode, merge tags, page settings)
+- [x] 31-01-PLAN.md — Backend foundation: QuoteTemplate entity, migration, PlaywrightPdfService, Organization branding fields
+- [x] 31-02-PLAN.md — QuoteTemplatesController CRUD + clone + set-default, QuotesController PDF update, merge data builder
+- [x] 31-03-PLAN.md — Frontend models, service, store, Unlayer template editor (web displayMode, merge tags, page settings)
 - [ ] 31-04-PLAN.md — Template list card grid with thumbnails, routes, settings hub integration, quote detail shortcut
 - [ ] 31-05-PLAN.md — Preview dialog, PDF download, starter seed templates, i18n (EN/TR), end-to-end verification
 
@@ -202,6 +202,6 @@ Plans:
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
 | 30. Free-Form Kanban Boards | 5/6 | In Progress|  | - |
-| 31. Quote PDF Templates | 2/5 | In Progress|  | - |
+| 31. Quote PDF Templates | 3/5 | In Progress|  | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD

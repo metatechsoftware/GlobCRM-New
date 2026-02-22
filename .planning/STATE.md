@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 31 of 31 in progress (Quote PDF Templates)
-Plan: 2 of 5 complete
-Status: Phase 31 plan 02 complete, plan 03 next
-Last activity: 2026-02-22 — Completed 31-02-PLAN.md (API Controllers & Merge Data)
+Plan: 3 of 5 complete
+Status: Phase 31 plan 03 complete, plan 04 next
+Last activity: 2026-02-22 — Completed 31-03-PLAN.md (Frontend Editor Foundation)
 
-Progress: [████████████████████] 99.8% (193/~196 plans estimated)
+Progress: [████████████████████] 99.8% (194/~196 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 99.8% (
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 193
+- Total plans completed: 194
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 31 plans across 5 phases (Phase 27-31)
+- v1.3: 32 plans across 5 phases (Phase 27-31)
 
 ## Accumulated Context
 
@@ -126,6 +126,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 31-02: ThumbnailUrl via Url.Action endpoint rather than raw file storage paths for access control
 - 31-02: Dual PDF path: templateId present uses Playwright+Fluid, absent uses QuestPDF fallback (backward compat)
 - 31-02: Preview endpoint on QuoteTemplatesController (template-centric with optional quoteId for real data)
+- 31-03: Merge tags hardcoded in component (not loaded from API) for immediate editor availability; API endpoint available for future dynamic loading
+- 31-03: QuoteTemplateStore provided at route level (not root) following BoardStore pattern so list and editor share state
+- 31-03: No merge field side panel (unlike email templates) -- quote merge tags accessed via Unlayer built-in dropdown per CONTEXT.md
+- 31-03: QuoteTemplateService uses HttpClient directly for text (preview) and blob (PDF) responses alongside ApiService for JSON
 
 ### Pending Todos
 
@@ -140,6 +144,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 31-02-PLAN.md (API Controllers & Merge Data) — QuoteTemplatesController, GeneratePdf dual path, MergeFieldService extensions
-Resume file: .planning/phases/31-quote-pdf-templates/31-02-SUMMARY.md
-Next step: Execute 31-03-PLAN.md
+Stopped at: Completed 31-03-PLAN.md (Frontend Editor Foundation) — QuoteTemplate models/service/store, Unlayer editor with web displayMode and merge tags
+Resume file: .planning/phases/31-quote-pdf-templates/31-03-SUMMARY.md
+Next step: Execute 31-04-PLAN.md
