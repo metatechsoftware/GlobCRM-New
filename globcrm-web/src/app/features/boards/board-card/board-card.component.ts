@@ -4,27 +4,31 @@ import {
   input,
   output,
   computed,
+  inject,
 } from '@angular/core';
-import { DatePipe } from '@angular/common';
+import { DatePipe, SlicePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { CardDto } from '../boards.models';
+import { PreviewSidebarStore } from '../../../shared/stores/preview-sidebar.store';
 
 /**
  * Board card component — renders a single Trello-style compact card in a kanban column.
  * Displays label color bars, title, entity link badge, due date urgency,
- * assignee avatar, checklist progress, comment count, and hover action buttons.
+ * stacked assignee avatars, checklist progress, comment count, and hover action buttons.
  */
 @Component({
   selector: 'app-board-card',
   standalone: true,
-  imports: [DatePipe, MatIconModule, MatTooltipModule, TranslocoPipe],
+  imports: [DatePipe, SlicePipe, MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './board-card.component.html',
   styleUrl: './board-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BoardCardComponent {
+  private readonly previewSidebarStore = inject(PreviewSidebarStore);
+
   /** Required card data */
   readonly card = input.required<CardDto>();
 
@@ -89,9 +93,27 @@ export class BoardCardComponent {
       .toLocaleUpperCase();
   }
 
+  /** Get tooltip showing all assignee names */
+  getAssigneeTooltip(): string {
+    return this.card().assignees.map((a) => a.name).join(', ');
+  }
+
   /** Click handler for the card body */
   onCardClick(): void {
     this.cardClicked.emit(this.card().id);
+  }
+
+  /** Click handler for entity badge — opens preview sidebar instead of card detail */
+  onEntityClick(event: Event): void {
+    event.stopPropagation();
+    const card = this.card();
+    if (card.linkedEntityType && card.linkedEntityId) {
+      this.previewSidebarStore.open({
+        entityType: card.linkedEntityType,
+        entityId: card.linkedEntityId,
+        entityName: card.linkedEntityName ?? undefined,
+      });
+    }
   }
 
   /** Hover action: edit */

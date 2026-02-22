@@ -107,7 +107,7 @@ export class BoardDetailComponent {
     const f = this.cardFilter();
     let count = 0;
     if (f.labels.length > 0) count++;
-    if (f.assigneeId !== null) count++;
+    if (f.assigneeIds.length > 0) count++;
     if (f.dueDateRange !== null && f.dueDateRange !== 'all') count++;
     return count;
   });
@@ -120,20 +120,14 @@ export class BoardDetailComponent {
     const board = this.board();
     if (!board) return [];
     const map = new Map<string, string>();
-    let hasUnassigned = false;
     for (const col of board.columns) {
       for (const card of col.cards) {
-        if (card.assigneeId && card.assigneeName) {
-          map.set(card.assigneeId, card.assigneeName);
-        } else if (!card.assigneeId) {
-          hasUnassigned = true;
+        for (const assignee of card.assignees) {
+          map.set(assignee.userId, assignee.name);
         }
       }
     }
     const options: AssigneeOption[] = [];
-    if (hasUnassigned) {
-      options.push({ id: null, name: this.transloco.translate('boards.cardDetail.unassigned') });
-    }
     map.forEach((name, id) => options.push({ id, name }));
     return options;
   });
@@ -485,13 +479,12 @@ export class BoardDetailComponent {
       }
     }
 
-    // Assignee filter
-    if (filter.assigneeId !== undefined && filter.assigneeId !== null) {
-      if (card.assigneeId !== filter.assigneeId) return false;
-    } else if (filter.assigneeId === null && this.hasActiveFilters()) {
-      // Only apply "unassigned" filter when explicitly selected
-      // Since null is the default, we need to check if assignee filter is actually active
-      // This is handled by the filter panel — null means "Unassigned" was explicitly picked
+    // Assignee filter (match if ANY card assignee is in filter.assigneeIds)
+    if (filter.assigneeIds.length > 0) {
+      const cardAssigneeIds = card.assignees.map((a) => a.userId);
+      if (!filter.assigneeIds.some((id) => cardAssigneeIds.includes(id))) {
+        return false;
+      }
     }
 
     // Due date filter

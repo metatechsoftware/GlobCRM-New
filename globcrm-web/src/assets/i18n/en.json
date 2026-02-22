@@ -439,5 +439,124 @@
     "security": "Security",
     "language": "Language",
     "signOut": "Sign Out"
+  },
+  "boards": {
+    "list": {
+      "title": "Boards",
+      "subtitle": "Manage your Kanban boards",
+      "newBoard": "New Board",
+      "totalBoards": "Total Boards",
+      "totalCards": "Total Cards",
+      "privateBoards": "Private",
+      "teamBoards": "Team",
+      "publicBoards": "Public",
+      "systemBoards": "System Boards",
+      "myBoards": "My Boards",
+      "system": "System",
+      "columns": "columns",
+      "cards": "cards",
+      "private": "Private",
+      "team": "Team",
+      "public": "Public"
+    },
+    "empty": {
+      "heading": "No boards yet",
+      "description": "Create your first board to start organizing work",
+      "createBoard": "Create Board"
+    },
+    "create": {
+      "title": "Create Board",
+      "selectTemplate": "Select Template",
+      "columnsPreview": "Columns",
+      "name": "Board Name",
+      "nameRequired": "Board name is required",
+      "description": "Description",
+      "color": "Color",
+      "visibility": "Visibility"
+    },
+    "actions": {
+      "delete": "Delete"
+    },
+    "templates": {
+      "blank": {
+        "name": "Blank Board",
+        "description": "Start from scratch with an empty board"
+      },
+      "sprint": {
+        "name": "Sprint Board",
+        "description": "Agile sprint workflow with backlog through done"
+      },
+      "content": {
+        "name": "Content Pipeline",
+        "description": "Content creation workflow from ideas to published"
+      },
+      "sales": {
+        "name": "Sales Pipeline",
+        "description": "Sales outreach workflow from contact to close"
+      }
+    },
+    "detail": {
+      "overdue": "Overdue",
+      "dueToday": "Due Today",
+      "dueSoon": "Due Soon",
+      "deleteColumnConfirm": "Delete this column? Cards will be moved to the first column.",
+      "wipLimitPrompt": "Enter WIP limit"
+    },
+    "card": {
+      "edit": "Edit",
+      "labels": "Labels",
+      "archive": "Archive"
+    },
+    "cardDetail": {
+      "archive": "Archive",
+      "assignee": "Assignee",
+      "assignees": "Assignees",
+      "addAssignee": "Add assignee",
+      "removeAssignee": "Remove assignee",
+      "searchMembers": "Search members...",
+      "noMembersFound": "No members found",
+      "unassigned": "Unassigned",
+      "dueDate": "Due Date",
+      "selectDate": "Select date",
+      "clearDate": "Clear date",
+      "labels": "Labels",
+      "createLabel": "Create label",
+      "labelName": "Label name",
+      "entityLink": "Entity Link",
+      "linkEntity": "Link entity",
+      "unlinkEntity": "Unlink entity",
+      "changeEntity": "Change entity",
+      "searchEntity": "Search...",
+      "searching": "Searching...",
+      "description": "Description",
+      "descriptionPlaceholder": "Add a description...",
+      "addDescription": "Click to add a description",
+      "checklist": "Checklist",
+      "addItem": "Add an item...",
+      "deleteItem": "Delete",
+      "comments": "Comments",
+      "addComment": "Write a comment...",
+      "submit": "Submit",
+      "save": "Save",
+      "cancel": "Cancel",
+      "reply": "Reply",
+      "replyPlaceholder": "Write a reply...",
+      "editComment": "Edit",
+      "deleteComment": "Delete",
+      "loadingComments": "Loading comments...",
+      "justNow": "Just now",
+      "minutesAgo": "{{count}}m ago",
+      "hoursAgo": "{{count}}h ago",
+      "daysAgo": "{{count}}d ago",
+      "filterOverdue": "Overdue",
+      "filterDueToday": "Due Today",
+      "filterDueWeek": "Due This Week",
+      "filterAll": "All"
+    },
+    "snackbar": {
+      "created": "Board created",
+      "deleted": "Board deleted",
+      "error": "Something went wrong"
+    }
   }
 }

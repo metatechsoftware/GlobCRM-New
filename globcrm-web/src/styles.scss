@@ -63,6 +63,10 @@ html.theme-transitioning {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   height: 100%;
@@ -138,11 +142,17 @@ small {
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
   border-radius: var(--radius-full);
-  transition: background var(--duration-fast) var(--ease-default);
+  transition: background var(--duration-normal) var(--ease-default);
 
   &:hover {
     background: var(--color-border-strong);
   }
+}
+
+// Firefox thin scrollbar styling
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border) transparent;
 }
 
 // Show scrollbar on hover of scrollable containers
@@ -154,6 +164,32 @@ small {
   &:hover::-webkit-scrollbar-thumb {
     background: var(--color-border);
   }
+}
+
+// ─── Smooth Scroll & Overscroll ──────────────────────────
+// Apply smooth scroll to all overflow containers
+[style*="overflow"],
+.sidebar__nav,
+.app-content {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, html {
+    scroll-behavior: auto !important;
+  }
+}
+
+// Prevent scroll chaining on inner scrollable panels
+.view-sidebar,
+.table-container,
+.card-detail-body,
+.kanban-column-cards,
+.slide-in-panel,
+.entity-preview-body,
+.mat-mdc-dialog-container .mdc-dialog__surface,
+.mat-mdc-menu-panel {
+  overscroll-behavior: contain;
 }
 
 // ─── Material Overrides ──────────────────────────────────
@@ -342,9 +378,10 @@ small {
   }
 }
 
-// ─── Prevent body horizontal overflow ────────────────────
+// ─── Prevent body horizontal overflow & overscroll bounce ─
 html, body {
-  overflow-x: hidden;
+  overflow: hidden;
+  overscroll-behavior: none;
 }
 
 // ─── Slide-In Panel (CDK Overlay) ───────────────────────

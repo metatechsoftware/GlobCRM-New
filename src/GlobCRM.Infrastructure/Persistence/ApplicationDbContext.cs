@@ -166,6 +166,7 @@ public class ApplicationDbContext
     public DbSet<KanbanCard> KanbanCards => Set<KanbanCard>();
     public DbSet<KanbanLabel> KanbanLabels => Set<KanbanLabel>();
     public DbSet<KanbanCardLabel> KanbanCardLabels => Set<KanbanCardLabel>();
+    public DbSet<KanbanCardAssignee> KanbanCardAssignees => Set<KanbanCardAssignee>();
     public DbSet<KanbanChecklistItem> KanbanChecklistItems => Set<KanbanChecklistItem>();
     public DbSet<KanbanCardComment> KanbanCardComments => Set<KanbanCardComment>();
 
@@ -298,6 +299,7 @@ public class ApplicationDbContext
         modelBuilder.ApplyConfiguration(new KanbanCardConfiguration());
         modelBuilder.ApplyConfiguration(new KanbanLabelConfiguration());
         modelBuilder.ApplyConfiguration(new KanbanCardLabelConfiguration());
+        modelBuilder.ApplyConfiguration(new KanbanCardAssigneeConfiguration());
         modelBuilder.ApplyConfiguration(new KanbanChecklistItemConfiguration());
         modelBuilder.ApplyConfiguration(new KanbanCardCommentConfiguration());
 
@@ -528,8 +530,8 @@ public class ApplicationDbContext
         modelBuilder.Entity<KanbanBoard>().HasQueryFilter(
             kb => _tenantProvider == null || _tenantProvider.GetTenantId() == null || kb.TenantId == _tenantProvider.GetTenantId());
 
-        // Note: KanbanColumn, KanbanCard, KanbanLabel, KanbanCardLabel, KanbanChecklistItem,
-        // KanbanCardComment do NOT need their own query filters -- they are filtered through
-        // their parent KanbanBoard FK chain which is already tenant-filtered.
+        // Note: KanbanColumn, KanbanCard, KanbanLabel, KanbanCardLabel, KanbanCardAssignee,
+        // KanbanChecklistItem, KanbanCardComment do NOT need their own query filters -- they are
+        // filtered through their parent KanbanBoard FK chain which is already tenant-filtered.
     }
 }

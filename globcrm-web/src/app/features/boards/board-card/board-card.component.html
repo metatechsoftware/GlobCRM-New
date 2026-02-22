@@ -36,7 +36,7 @@
 
   <!-- Entity Link Badge -->
   @if (card().linkedEntityType) {
-    <div class="entity-badge">
+    <div class="entity-badge" (click)="onEntityClick($event)" role="button">
       <mat-icon class="entity-badge-icon">{{ getEntityIcon(card().linkedEntityType) }}</mat-icon>
       <span class="entity-badge-name">{{ card().linkedEntityName }}</span>
     </div>
@@ -44,11 +44,18 @@
 
   <!-- Bottom Metadata Row -->
   <div class="card-metadata">
-    <!-- Assignee Avatar -->
-    @if (card().assigneeId) {
-      <span class="assignee-avatar" [matTooltip]="card().assigneeName ?? ''">
-        {{ getInitials(card().assigneeName) }}
-      </span>
+    <!-- Assignee Avatars (stacked) -->
+    @if (card().assignees.length > 0) {
+      <div class="assignee-stack" [matTooltip]="getAssigneeTooltip()">
+        @for (assignee of card().assignees | slice:0:3; track assignee.userId) {
+          <span class="assignee-avatar stacked">
+            {{ getInitials(assignee.name) }}
+          </span>
+        }
+        @if (card().assignees.length > 3) {
+          <span class="assignee-overflow">+{{ card().assignees.length - 3 }}</span>
+        }
+      </div>
     }
 
     <!-- Due Date -->

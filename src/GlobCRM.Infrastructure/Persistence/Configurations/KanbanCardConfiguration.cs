@@ -8,7 +8,7 @@ namespace GlobCRM.Infrastructure.Persistence.Configurations;
 /// EF Core entity type configuration for KanbanCard.
 /// Maps to "kanban_cards" table with snake_case columns.
 /// No TenantId — inherits tenant isolation via Column -> Board chain.
-/// Cascade delete from parent column. AssigneeId uses SetNull on delete.
+/// Cascade delete from parent column. Assignees managed via KanbanCardAssignee join table.
 /// </summary>
 public class KanbanCardConfiguration : IEntityTypeConfiguration<KanbanCard>
 {
@@ -36,9 +36,6 @@ public class KanbanCardConfiguration : IEntityTypeConfiguration<KanbanCard>
 
         builder.Property(c => c.DueDate)
             .HasColumnName("due_date");
-
-        builder.Property(c => c.AssigneeId)
-            .HasColumnName("assignee_id");
 
         builder.Property(c => c.SortOrder)
             .HasColumnName("sort_order")
@@ -69,11 +66,6 @@ public class KanbanCardConfiguration : IEntityTypeConfiguration<KanbanCard>
             .IsRequired();
 
         // Relationships
-        builder.HasOne(c => c.Assignee)
-            .WithMany()
-            .HasForeignKey(c => c.AssigneeId)
-            .OnDelete(DeleteBehavior.SetNull);
-
         builder.HasMany(c => c.ChecklistItems)
             .WithOne(ci => ci.Card)
             .HasForeignKey(ci => ci.CardId)

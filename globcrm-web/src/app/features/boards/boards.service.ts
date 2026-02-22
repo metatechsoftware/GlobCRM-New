@@ -114,6 +114,16 @@ export class BoardsService {
     return this.api.delete<void>(`${this.basePath}/${boardId}/cards/${cardId}/labels/${labelId}`);
   }
 
+  // ---- Card Assignees ----
+
+  addAssigneeToCard(boardId: string, cardId: string, userId: string): Observable<void> {
+    return this.api.post<void>(`${this.basePath}/${boardId}/cards/${cardId}/assignees/${userId}`);
+  }
+
+  removeAssigneeFromCard(boardId: string, cardId: string, userId: string): Observable<void> {
+    return this.api.delete<void>(`${this.basePath}/${boardId}/cards/${cardId}/assignees/${userId}`);
+  }
+
   // ---- Checklist ----
 
   createChecklistItem(boardId: string, cardId: string, req: CreateChecklistItemRequest): Observable<ChecklistItemDto> {

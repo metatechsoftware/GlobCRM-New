@@ -168,7 +168,13 @@
   height: 14px;
 }
 
-// ─── Assignee Avatar ────────────────────────────────────────────────────────
+// ─── Assignee Avatars (stacked) ─────────────────────────────────────────────
+
+.assignee-stack {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
 
 .assignee-avatar {
   display: inline-flex;
@@ -183,6 +189,31 @@
   font-weight: 600;
   flex-shrink: 0;
   letter-spacing: 0.02em;
+
+  &.stacked {
+    border: 2px solid var(--color-bg-card, var(--color-surface));
+    margin-left: -6px;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+.assignee-overflow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.08));
+  border: 2px solid var(--color-bg-card, var(--color-surface));
+  color: var(--color-text-muted);
+  font-size: 9px;
+  font-weight: 600;
+  margin-left: -6px;
+  flex-shrink: 0;
 }
 
 // ─── Due Date ───────────────────────────────────────────────────────────────

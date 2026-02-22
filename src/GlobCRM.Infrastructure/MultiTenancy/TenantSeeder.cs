@@ -2106,7 +2106,7 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Welcome Email",
                 Subject = "Welcome to {{ company.name }}!",
                 HtmlBody = BuildWelcomeEmailHtml(),
-                DesignJson = "{}",
+                DesignJson = BuildWelcomeEmailDesignJson(),
                 CategoryId = generalCategory.Id,
                 IsShared = true,
                 IsSeedData = true,
@@ -2120,7 +2120,7 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Follow-up",
                 Subject = "Following up on our conversation",
                 HtmlBody = BuildFollowUpEmailHtml(),
-                DesignJson = "{}",
+                DesignJson = BuildFollowUpEmailDesignJson(),
                 CategoryId = salesCategory.Id,
                 IsShared = true,
                 IsSeedData = true,
@@ -2134,7 +2134,7 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Meeting Request",
                 Subject = "Let's schedule a meeting",
                 HtmlBody = BuildMeetingRequestEmailHtml(),
-                DesignJson = "{}",
+                DesignJson = BuildMeetingRequestEmailDesignJson(),
                 CategoryId = salesCategory.Id,
                 IsShared = true,
                 IsSeedData = true,
@@ -2148,7 +2148,7 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Deal Won",
                 Subject = "Congratulations on {{ deal.title }}!",
                 HtmlBody = BuildDealWonEmailHtml(),
-                DesignJson = "{}",
+                DesignJson = BuildDealWonEmailDesignJson(),
                 CategoryId = salesCategory.Id,
                 IsShared = true,
                 IsSeedData = true,
@@ -2162,7 +2162,7 @@ public class TenantSeeder : ITenantSeeder
                 Name = "Support Follow-up",
                 Subject = "How was your experience?",
                 HtmlBody = BuildSupportFollowUpEmailHtml(),
-                DesignJson = "{}",
+                DesignJson = BuildSupportFollowUpEmailDesignJson(),
                 CategoryId = supportCategory.Id,
                 IsShared = true,
                 IsSeedData = true,
@@ -3284,13 +3284,14 @@ public class TenantSeeder : ITenantSeeder
             .AnyAsync(qt => qt.TenantId == organizationId && qt.IsSeedData);
         if (alreadySeeded) return;
 
-        var minimalDesignJson = @"{""body"":{""rows"":[],""values"":{""backgroundColor"":""#ffffff""}},""counters"":{""u_row"":0,""u_column"":0,""u_content_text"":0}}";
+        var standardQuoteDesignJson = BuildStandardQuoteDesignJson();
+        var detailedProposalDesignJson = BuildDetailedProposalDesignJson();
 
         var standardQuote = new QuoteTemplate
         {
             TenantId = organizationId,
             Name = "Standard Quote",
-            DesignJson = minimalDesignJson,
+            DesignJson = standardQuoteDesignJson,
             HtmlBody = BuildStandardQuoteHtml(),
             IsDefault = true,
             PageSize = "A4",
@@ -3308,7 +3309,7 @@ public class TenantSeeder : ITenantSeeder
         {
             TenantId = organizationId,
             Name = "Detailed Proposal",
-            DesignJson = minimalDesignJson,
+            DesignJson = detailedProposalDesignJson,
             HtmlBody = BuildDetailedProposalHtml(),
             IsDefault = false,
             PageSize = "A4",
@@ -3328,6 +3329,890 @@ public class TenantSeeder : ITenantSeeder
         _logger.LogInformation(
             "Quote template seed data created for organization {OrgId}: 2 starter templates",
             organizationId);
+    }
+
+    // ── Unlayer Native Block Helpers ───────────────────────────────────
+
+    private static string BuildUnlayerNativeDesignJson(object[] rows, string bgColor = "#ffffff", string contentWidth = "600px")
+    {
+        var design = new
+        {
+            counters = new { u_row = rows.Length, u_column = rows.Length, u_content_text = rows.Length },
+            body = new
+            {
+                id = "design-body",
+                rows,
+                values = new { backgroundColor = bgColor, contentWidth }
+            }
+        };
+        return JsonSerializer.Serialize(design);
+    }
+
+    private static object UnlayerRow(int rowNum, object content, string rowBgColor = "", string colBgColor = "")
+    {
+        return new
+        {
+            id = $"row-{rowNum}",
+            cells = new[] { 1 },
+            columns = new[]
+            {
+                new
+                {
+                    id = $"col-{rowNum}",
+                    contents = new[] { content },
+                    values = new { backgroundColor = colBgColor }
+                }
+            },
+            values = new { backgroundColor = rowBgColor }
+        };
+    }
+
+    private static object UnlayerText(int id, string html, string padding = "10px 20px")
+    {
+        return new
+        {
+            id = $"content-{id}",
+            type = "text",
+            values = new { text = html, containerPadding = padding }
+        };
+    }
+
+    private static object UnlayerButton(int id, string label, string bgColor = "#ea580c", string textColor = "#ffffff", string padding = "10px 20px")
+    {
+        return new
+        {
+            id = $"content-{id}",
+            type = "button",
+            values = new
+            {
+                text = label,
+                backgroundColor = bgColor,
+                textColor,
+                borderRadius = "6px",
+                href = new { name = "web", values = new { href = "#", target = "_blank" } },
+                containerPadding = padding,
+                padding = "12px 24px",
+                fontWeight = 600,
+                fontSize = "14px"
+            }
+        };
+    }
+
+    private static object UnlayerDivider(int id, string borderColor = "#e4e4e7", string padding = "10px 20px")
+    {
+        return new
+        {
+            id = $"content-{id}",
+            type = "divider",
+            values = new
+            {
+                border = new
+                {
+                    borderTopWidth = "1px",
+                    borderTopStyle = "solid",
+                    borderTopColor = borderColor
+                },
+                containerPadding = padding
+            }
+        };
+    }
+
+    private static object UnlayerHtml(int id, string html, string padding = "0px")
+    {
+        return new
+        {
+            id = $"content-{id}",
+            type = "html",
+            values = new { html, containerPadding = padding }
+        };
+    }
+
+    // ── Email Template Design Builders (native blocks) ──────────────
+
+    private static string BuildWelcomeEmailDesignJson()
+    {
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerText(1,
+                @"<p style=""font-size:20px;font-weight:700;color:#ea580c;"">{{ company.name | default: 'Your Company' }}</p>",
+                "32px 40px 24px")),
+            UnlayerRow(2, UnlayerDivider(2)),
+            UnlayerRow(3, UnlayerText(3,
+                @"<h2 style=""font-size:18px;font-weight:600;color:#18181b;margin:0;"">Welcome!</h2>",
+                "24px 40px 16px")),
+            UnlayerRow(4, UnlayerText(4,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Hi {{ contact.first_name | default: 'there' }},</p>",
+                "0px 40px 16px")),
+            UnlayerRow(5, UnlayerText(5,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Thank you for connecting with us! We're excited to have you on board and look forward to working together.</p>",
+                "0px 40px 16px")),
+            UnlayerRow(6, UnlayerText(6,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">If you have any questions or need assistance getting started, don't hesitate to reach out. Our team is here to help you every step of the way.</p>",
+                "0px 40px 24px")),
+            UnlayerRow(7, UnlayerButton(7, "Get Started", "#ea580c", "#ffffff", "0px 40px 24px")),
+            UnlayerRow(8, UnlayerDivider(8)),
+            UnlayerRow(9, UnlayerText(9,
+                @"<p style=""font-size:12px;color:#a1a1aa;text-align:center;margin:0;"">Sent via GlobCRM</p>",
+                "24px 40px")),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildFollowUpEmailDesignJson()
+    {
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerText(1,
+                @"<p style=""font-size:20px;font-weight:700;color:#ea580c;"">{{ company.name | default: 'Your Company' }}</p>",
+                "32px 40px 24px")),
+            UnlayerRow(2, UnlayerDivider(2)),
+            UnlayerRow(3, UnlayerText(3,
+                @"<h2 style=""font-size:18px;font-weight:600;color:#18181b;margin:0;"">Following Up</h2>",
+                "24px 40px 16px")),
+            UnlayerRow(4, UnlayerText(4,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Hi {{ contact.first_name | default: 'there' }},</p>",
+                "0px 40px 16px")),
+            UnlayerRow(5, UnlayerText(5,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">I wanted to follow up on our recent conversation. It was great learning about your needs and I believe we can provide significant value to your team.</p>",
+                "0px 40px 16px")),
+            UnlayerRow(6, UnlayerText(6,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;""><strong>Next steps:</strong></p>",
+                "0px 40px 8px")),
+            UnlayerRow(7, UnlayerText(7,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.8;margin:0;"">1. Review the proposal we discussed<br>2. Schedule a follow-up call to address any questions<br>3. Finalize the timeline for implementation</p>",
+                "0px 40px 24px")),
+            UnlayerRow(8, UnlayerText(8,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Looking forward to hearing from you!</p>",
+                "0px 40px 24px")),
+            UnlayerRow(9, UnlayerDivider(9)),
+            UnlayerRow(10, UnlayerText(10,
+                @"<p style=""font-size:12px;color:#a1a1aa;text-align:center;margin:0;"">Sent via GlobCRM</p>",
+                "24px 40px")),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildMeetingRequestEmailDesignJson()
+    {
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerText(1,
+                @"<p style=""font-size:20px;font-weight:700;color:#ea580c;"">{{ company.name | default: 'Your Company' }}</p>",
+                "32px 40px 24px")),
+            UnlayerRow(2, UnlayerDivider(2)),
+            UnlayerRow(3, UnlayerText(3,
+                @"<h2 style=""font-size:18px;font-weight:600;color:#18181b;margin:0;"">Let's Connect</h2>",
+                "24px 40px 16px")),
+            UnlayerRow(4, UnlayerText(4,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Hi {{ contact.first_name | default: 'there' }},</p>",
+                "0px 40px 16px")),
+            UnlayerRow(5, UnlayerText(5,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">I'd love to schedule a meeting to discuss {{ deal.title | default: 'our upcoming project' }} in more detail. I have some ideas that I think could be really valuable for your team.</p>",
+                "0px 40px 16px")),
+            UnlayerRow(6, UnlayerText(6,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Would any of these times work for you this week? I'm flexible and happy to work around your schedule.</p>",
+                "0px 40px 24px")),
+            UnlayerRow(7, UnlayerButton(7, "Schedule Meeting", "#ea580c", "#ffffff", "0px 40px 24px")),
+            UnlayerRow(8, UnlayerDivider(8)),
+            UnlayerRow(9, UnlayerText(9,
+                @"<p style=""font-size:12px;color:#a1a1aa;text-align:center;margin:0;"">Sent via GlobCRM</p>",
+                "24px 40px")),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildDealWonEmailDesignJson()
+    {
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerText(1,
+                @"<p style=""font-size:20px;font-weight:700;color:#ea580c;"">{{ company.name | default: 'Your Company' }}</p>",
+                "32px 40px 24px")),
+            UnlayerRow(2, UnlayerDivider(2)),
+            UnlayerRow(3, UnlayerText(3,
+                @"<h2 style=""font-size:18px;font-weight:600;color:#18181b;margin:0;"">Congratulations!</h2>",
+                "24px 40px 16px")),
+            UnlayerRow(4, UnlayerText(4,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Hi {{ contact.first_name | default: 'there' }},</p>",
+                "0px 40px 16px")),
+            UnlayerRow(5, UnlayerText(5,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">We're thrilled to officially welcome you as a partner! The {{ deal.title | default: 'deal' }} is now finalized and we're ready to get started.</p>",
+                "0px 40px 16px")),
+            UnlayerRow(6, UnlayerText(6,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;""><strong>Deal summary:</strong><br>Deal: {{ deal.title | default: 'N/A' }}<br>Value: ${{ deal.value | default: '0' }}</p>",
+                "0px 40px 16px")),
+            UnlayerRow(7, UnlayerText(7,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Our onboarding team will reach out shortly to schedule the kickoff and ensure a smooth transition. We're committed to making this a success!</p>",
+                "0px 40px 24px")),
+            UnlayerRow(8, UnlayerButton(8, "View Onboarding Guide", "#16a34a", "#ffffff", "0px 40px 24px")),
+            UnlayerRow(9, UnlayerDivider(9)),
+            UnlayerRow(10, UnlayerText(10,
+                @"<p style=""font-size:12px;color:#a1a1aa;text-align:center;margin:0;"">Sent via GlobCRM</p>",
+                "24px 40px")),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildSupportFollowUpEmailDesignJson()
+    {
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerText(1,
+                @"<p style=""font-size:20px;font-weight:700;color:#ea580c;"">{{ company.name | default: 'Your Company' }}</p>",
+                "32px 40px 24px")),
+            UnlayerRow(2, UnlayerDivider(2)),
+            UnlayerRow(3, UnlayerText(3,
+                @"<h2 style=""font-size:18px;font-weight:600;color:#18181b;margin:0;"">How Was Your Experience?</h2>",
+                "24px 40px 16px")),
+            UnlayerRow(4, UnlayerText(4,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">Hi {{ contact.first_name | default: 'there' }},</p>",
+                "0px 40px 16px")),
+            UnlayerRow(5, UnlayerText(5,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">We recently assisted you with a support request and wanted to check in. Your satisfaction is important to us and we'd love to hear your feedback.</p>",
+                "0px 40px 16px")),
+            UnlayerRow(6, UnlayerText(6,
+                @"<p style=""font-size:14px;color:#3f3f46;line-height:1.6;margin:0;"">If there's anything else we can help with, please don't hesitate to reach out. Our support team is always here for you.</p>",
+                "0px 40px 24px")),
+            UnlayerRow(7, UnlayerButton(7, "Share Feedback", "#ea580c", "#ffffff", "0px 40px 24px")),
+            UnlayerRow(8, UnlayerDivider(8)),
+            UnlayerRow(9, UnlayerText(9,
+                @"<p style=""font-size:12px;color:#a1a1aa;text-align:center;margin:0;"">Sent via GlobCRM</p>",
+                "24px 40px")),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    // ── Quote Template Design Builders (multi-block HTML sections) ─────
+
+    private static string BuildStandardQuoteDesignJson()
+    {
+        // Split the monolithic quote HTML into logical sections so each is
+        // independently selectable/reorderable in the Unlayer editor.
+
+        const string sqStyle = @"<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid #EA580C; }
+  .org-info h1 { font-size: 22px; font-weight: 700; color: #EA580C; margin-bottom: 4px; }
+  .org-info p { font-size: 12px; color: #666; }
+  .quote-badge { text-align: right; }
+  .quote-badge h2 { font-size: 28px; font-weight: 800; color: #EA580C; text-transform: uppercase; letter-spacing: 1px; }
+  .quote-badge .quote-number { font-size: 14px; color: #666; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+</style>";
+
+        const string sqDetailsStyle = @"<style>
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .details-grid { display: flex; gap: 40px; margin-bottom: 28px; }
+  .details-section { flex: 1; }
+  .details-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .details-section p { font-size: 13px; color: #333; margin-bottom: 2px; }
+  .details-section .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+</style>";
+
+        const string sqTableStyle = @"<style>
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th:last-child { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td:last-child { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+</style>";
+
+        const string sqTotalsStyle = @"<style>
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .totals { margin-left: auto; width: 280px; margin-bottom: 28px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row.grand-total { border-top: 2px solid #1C1917; padding-top: 10px; margin-top: 6px; font-size: 16px; font-weight: 700; color: #EA580C; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+</style>";
+
+        const string sqFooterStyle = @"<style>
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .notes-section { background: #fafaf8; border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-section p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 11px; color: #999; }
+</style>";
+
+        // Block 1: Header
+        var header = sqStyle + @"
+<div class=""sq-wrap"">
+  <div class=""header"">
+    <div class=""org-info"">
+      <h1>{{organization.name}}</h1>
+      <p>{{organization.address}}</p>
+      <p>{{organization.phone}} &middot; {{organization.email}}</p>
+    </div>
+    <div class=""quote-badge"">
+      <h2>Quote</h2>
+      <div class=""quote-number"">{{quote.number}}</div>
+    </div>
+  </div>
+</div>";
+
+        // Block 2: Details grid
+        var details = sqDetailsStyle + @"
+<div class=""sq-wrap"">
+  <div class=""details-grid"">
+    <div class=""details-section"">
+      <h3>Bill To</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{company.name}}</p>
+      <p>{{contact.email}}</p>
+    </div>
+    <div class=""details-section"">
+      <h3>Quote Details</h3>
+      <p><span class=""label"">Title:</span> {{quote.title}}</p>
+      <p><span class=""label"">Date:</span> {{quote.issue_date}}</p>
+      <p><span class=""label"">Valid Until:</span> {{quote.expiry_date}}</p>
+      <p><span class=""label"">Status:</span> {{quote.status}}</p>
+    </div>
+  </div>
+</div>";
+
+        // Block 3: Line items table
+        var lineItems = sqTableStyle + @"
+<div class=""sq-wrap"">
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in line_items %}
+      <tr>
+        <td>{{item.description}}</td>
+        <td>{{item.quantity}}</td>
+        <td>{{item.unit_price}}</td>
+        <td>{{item.line_total}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>";
+
+        // Block 4: Totals
+        var totals = sqTotalsStyle + @"
+<div class=""sq-wrap"">
+  <div class=""totals"">
+    <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+    <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+    <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+    <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+  </div>
+</div>";
+
+        // Block 5: Notes + footer
+        var footer = sqFooterStyle + @"
+<div class=""sq-wrap"">
+  <div class=""notes-section"">
+    <h3>Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+  <div class=""footer"">
+    <p>{{organization.name}} &middot; {{organization.website}}</p>
+  </div>
+</div>";
+
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerHtml(1, header)),
+            UnlayerRow(2, UnlayerHtml(2, details)),
+            UnlayerRow(3, UnlayerHtml(3, lineItems)),
+            UnlayerRow(4, UnlayerHtml(4, totals)),
+            UnlayerRow(5, UnlayerHtml(5, footer)),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildDetailedProposalDesignJson()
+    {
+        const string dpHeaderStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header-bar { background: linear-gradient(135deg, #1C1917 0%, #342D29 100%); color: white; padding: 32px; margin-bottom: 28px; }
+  .header-bar h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .header-bar .subtitle { font-size: 14px; opacity: 0.8; }
+  .header-bar .org-details { margin-top: 12px; font-size: 12px; opacity: 0.7; }
+</style>";
+
+        const string dpMetaStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .meta-row { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .meta-card { flex: 1; min-width: 140px; background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
+  .meta-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 4px; }
+  .meta-card .value { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+</style>";
+
+        const string dpClientStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .description-block { background: #fafaf8; border-left: 3px solid #EA580C; padding: 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0; }
+  .description-block p { font-size: 13px; color: #444; }
+  .client-info { display: flex; gap: 40px; margin-bottom: 24px; }
+  .client-col { flex: 1; }
+  .client-col h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .client-col p { font-size: 13px; color: #333; margin-bottom: 2px; }
+</style>";
+
+        const string dpTableStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th.num { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td.num { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+</style>";
+
+        const string dpTotalsStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .totals-wrapper { display: flex; justify-content: flex-end; margin-bottom: 28px; }
+  .totals { width: 300px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .totals .row.grand-total { border-top: 2px solid #EA580C; padding-top: 10px; margin-top: 6px; font-size: 18px; font-weight: 700; color: #EA580C; }
+</style>";
+
+        const string dpTermsStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .terms-section { background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .terms-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; }
+  .terms-section ul { padding-left: 18px; font-size: 13px; color: #555; }
+  .terms-section ul li { margin-bottom: 4px; }
+</style>";
+
+        const string dpFooterStyle = @"<style>
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .notes-box { border: 1px dashed #ddd; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-box p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 2px solid #eee; }
+  .footer p { font-size: 11px; color: #999; }
+  .footer .brand { font-size: 13px; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
+</style>";
+
+        // Block 1: Header bar
+        var headerBar = dpHeaderStyle + @"
+<div class=""dp-wrap"">
+  <div class=""header-bar"">
+    <h1>{{organization.name}}</h1>
+    <div class=""subtitle"">Proposal &middot; {{quote.number}}</div>
+    <div class=""org-details"">{{organization.address}} &middot; {{organization.phone}} &middot; {{organization.email}}</div>
+  </div>
+</div>";
+
+        // Block 2: Meta cards row
+        var metaCards = dpMetaStyle + @"
+<div class=""dp-wrap"">
+  <div class=""meta-row"">
+    <div class=""meta-card"">
+      <div class=""label"">Quote Number</div>
+      <div class=""value"">{{quote.number}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Issue Date</div>
+      <div class=""value"">{{quote.issue_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Valid Until</div>
+      <div class=""value"">{{quote.expiry_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Status</div>
+      <div class=""value"">{{quote.status}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Version</div>
+      <div class=""value"">{{quote.version}}</div>
+    </div>
+  </div>
+</div>";
+
+        // Block 3: Description + client info
+        var clientInfo = dpClientStyle + @"
+<div class=""dp-wrap"">
+  <div class=""description-block"">
+    <p>{{quote.description}}</p>
+  </div>
+  <div class=""client-info"">
+    <div class=""client-col"">
+      <h3>Client Contact</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{contact.email}}</p>
+      <p>{{contact.phone}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Company</h3>
+      <p><strong>{{company.name}}</strong></p>
+      <p>{{company.industry}}</p>
+      <p>{{company.address}}</p>
+      <p>{{company.phone}}</p>
+      <p>{{company.website}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Related Deal</h3>
+      <p><strong>{{deal.title}}</strong></p>
+      <p>Stage: {{deal.stage}}</p>
+      <p>Value: {{deal.value}}</p>
+      <p>Close Date: {{deal.close_date}}</p>
+    </div>
+  </div>
+</div>";
+
+        // Block 4: Line items table
+        var lineItems = dpTableStyle + @"
+<div class=""dp-wrap"">
+  <div class=""section"">
+    <div class=""section-title"">Line Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class=""num"">Qty</th>
+          <th class=""num"">Unit Price</th>
+          <th class=""num"">Discount %</th>
+          <th class=""num"">Tax %</th>
+          <th class=""num"">Net Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in line_items %}
+        <tr>
+          <td>{{item.description}}</td>
+          <td class=""num"">{{item.quantity}}</td>
+          <td class=""num"">{{item.unit_price}}</td>
+          <td class=""num"">{{item.discount_percent}}</td>
+          <td class=""num"">{{item.tax_percent}}</td>
+          <td class=""num"">{{item.net_total}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>";
+
+        // Block 5: Totals
+        var totalsBlock = dpTotalsStyle + @"
+<div class=""dp-wrap"">
+  <div class=""totals-wrapper"">
+    <div class=""totals"">
+      <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+      <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+      <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+      <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+    </div>
+  </div>
+</div>";
+
+        // Block 6: Terms & conditions
+        var terms = dpTermsStyle + @"
+<div class=""dp-wrap"">
+  <div class=""terms-section"">
+    <h3>Terms &amp; Conditions</h3>
+    <ul>
+      <li>This quote is valid until the expiry date shown above.</li>
+      <li>Payment is due within 30 days of invoice date.</li>
+      <li>All prices are in the agreed currency unless otherwise stated.</li>
+      <li>Scope changes may result in price adjustments.</li>
+    </ul>
+  </div>
+</div>";
+
+        // Block 7: Notes + footer
+        var footer = dpFooterStyle + @"
+<div class=""dp-wrap"">
+  <div class=""notes-box"">
+    <h3>Additional Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+  <div class=""footer"">
+    <p class=""brand"">{{organization.name}}</p>
+    <p>{{organization.address}} &middot; {{organization.website}}</p>
+    <p>Thank you for your business.</p>
+  </div>
+</div>";
+
+        var rows = new[]
+        {
+            UnlayerRow(1, UnlayerHtml(1, headerBar)),
+            UnlayerRow(2, UnlayerHtml(2, metaCards)),
+            UnlayerRow(3, UnlayerHtml(3, clientInfo)),
+            UnlayerRow(4, UnlayerHtml(4, lineItems)),
+            UnlayerRow(5, UnlayerHtml(5, totalsBlock)),
+            UnlayerRow(6, UnlayerHtml(6, terms)),
+            UnlayerRow(7, UnlayerHtml(7, footer)),
+        };
+        return BuildUnlayerNativeDesignJson(rows);
+    }
+
+    private static string BuildStandardQuoteInnerHtml()
+    {
+        return @"<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .sq-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid #EA580C; }
+  .org-info h1 { font-size: 22px; font-weight: 700; color: #EA580C; margin-bottom: 4px; }
+  .org-info p { font-size: 12px; color: #666; }
+  .quote-badge { text-align: right; }
+  .quote-badge h2 { font-size: 28px; font-weight: 800; color: #EA580C; text-transform: uppercase; letter-spacing: 1px; }
+  .quote-badge .quote-number { font-size: 14px; color: #666; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .details-grid { display: flex; gap: 40px; margin-bottom: 28px; }
+  .details-section { flex: 1; }
+  .details-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .details-section p { font-size: 13px; color: #333; margin-bottom: 2px; }
+  .details-section .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th:last-child { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td:last-child { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+  .totals { margin-left: auto; width: 280px; margin-bottom: 28px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row.grand-total { border-top: 2px solid #1C1917; padding-top: 10px; margin-top: 6px; font-size: 16px; font-weight: 700; color: #EA580C; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .notes-section { background: #fafaf8; border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-section p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 11px; color: #999; }
+</style>
+<div class=""sq-wrap"">
+  <div class=""header"">
+    <div class=""org-info"">
+      <h1>{{organization.name}}</h1>
+      <p>{{organization.address}}</p>
+      <p>{{organization.phone}} &middot; {{organization.email}}</p>
+    </div>
+    <div class=""quote-badge"">
+      <h2>Quote</h2>
+      <div class=""quote-number"">{{quote.number}}</div>
+    </div>
+  </div>
+
+  <div class=""details-grid"">
+    <div class=""details-section"">
+      <h3>Bill To</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{company.name}}</p>
+      <p>{{contact.email}}</p>
+    </div>
+    <div class=""details-section"">
+      <h3>Quote Details</h3>
+      <p><span class=""label"">Title:</span> {{quote.title}}</p>
+      <p><span class=""label"">Date:</span> {{quote.issue_date}}</p>
+      <p><span class=""label"">Valid Until:</span> {{quote.expiry_date}}</p>
+      <p><span class=""label"">Status:</span> {{quote.status}}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in line_items %}
+      <tr>
+        <td>{{item.description}}</td>
+        <td>{{item.quantity}}</td>
+        <td>{{item.unit_price}}</td>
+        <td>{{item.line_total}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class=""totals"">
+    <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+    <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+    <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+    <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+  </div>
+
+  <div class=""notes-section"">
+    <h3>Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+
+  <div class=""footer"">
+    <p>{{organization.name}} &middot; {{organization.website}}</p>
+  </div>
+</div>";
+    }
+
+    private static string BuildDetailedProposalInnerHtml()
+    {
+        return @"<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  .dp-wrap { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header-bar { background: linear-gradient(135deg, #1C1917 0%, #342D29 100%); color: white; padding: 32px; margin-bottom: 28px; }
+  .header-bar h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .header-bar .subtitle { font-size: 14px; opacity: 0.8; }
+  .header-bar .org-details { margin-top: 12px; font-size: 12px; opacity: 0.7; }
+  .meta-row { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .meta-card { flex: 1; min-width: 140px; background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
+  .meta-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 4px; }
+  .meta-card .value { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+  .description-block { background: #fafaf8; border-left: 3px solid #EA580C; padding: 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0; }
+  .description-block p { font-size: 13px; color: #444; }
+  .client-info { display: flex; gap: 40px; margin-bottom: 24px; }
+  .client-col { flex: 1; }
+  .client-col h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .client-col p { font-size: 13px; color: #333; margin-bottom: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th.num { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td.num { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+  .totals-wrapper { display: flex; justify-content: flex-end; margin-bottom: 28px; }
+  .totals { width: 300px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .totals .row.grand-total { border-top: 2px solid #EA580C; padding-top: 10px; margin-top: 6px; font-size: 18px; font-weight: 700; color: #EA580C; }
+  .terms-section { background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .terms-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; }
+  .terms-section ul { padding-left: 18px; font-size: 13px; color: #555; }
+  .terms-section ul li { margin-bottom: 4px; }
+  .notes-box { border: 1px dashed #ddd; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-box p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 2px solid #eee; }
+  .footer p { font-size: 11px; color: #999; }
+  .footer .brand { font-size: 13px; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
+</style>
+<div class=""dp-wrap"">
+  <div class=""header-bar"">
+    <h1>{{organization.name}}</h1>
+    <div class=""subtitle"">Proposal &middot; {{quote.number}}</div>
+    <div class=""org-details"">{{organization.address}} &middot; {{organization.phone}} &middot; {{organization.email}}</div>
+  </div>
+
+  <div class=""meta-row"">
+    <div class=""meta-card"">
+      <div class=""label"">Quote Number</div>
+      <div class=""value"">{{quote.number}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Issue Date</div>
+      <div class=""value"">{{quote.issue_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Valid Until</div>
+      <div class=""value"">{{quote.expiry_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Status</div>
+      <div class=""value"">{{quote.status}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Version</div>
+      <div class=""value"">{{quote.version}}</div>
+    </div>
+  </div>
+
+  <div class=""description-block"">
+    <p>{{quote.description}}</p>
+  </div>
+
+  <div class=""client-info"">
+    <div class=""client-col"">
+      <h3>Client Contact</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{contact.email}}</p>
+      <p>{{contact.phone}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Company</h3>
+      <p><strong>{{company.name}}</strong></p>
+      <p>{{company.industry}}</p>
+      <p>{{company.address}}</p>
+      <p>{{company.phone}}</p>
+      <p>{{company.website}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Related Deal</h3>
+      <p><strong>{{deal.title}}</strong></p>
+      <p>Stage: {{deal.stage}}</p>
+      <p>Value: {{deal.value}}</p>
+      <p>Close Date: {{deal.close_date}}</p>
+    </div>
+  </div>
+
+  <div class=""section"">
+    <div class=""section-title"">Line Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class=""num"">Qty</th>
+          <th class=""num"">Unit Price</th>
+          <th class=""num"">Discount %</th>
+          <th class=""num"">Tax %</th>
+          <th class=""num"">Net Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in line_items %}
+        <tr>
+          <td>{{item.description}}</td>
+          <td class=""num"">{{item.quantity}}</td>
+          <td class=""num"">{{item.unit_price}}</td>
+          <td class=""num"">{{item.discount_percent}}</td>
+          <td class=""num"">{{item.tax_percent}}</td>
+          <td class=""num"">{{item.net_total}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class=""totals-wrapper"">
+    <div class=""totals"">
+      <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+      <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+      <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+      <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+    </div>
+  </div>
+
+  <div class=""terms-section"">
+    <h3>Terms &amp; Conditions</h3>
+    <ul>
+      <li>This quote is valid until the expiry date shown above.</li>
+      <li>Payment is due within 30 days of invoice date.</li>
+      <li>All prices are in the agreed currency unless otherwise stated.</li>
+      <li>Scope changes may result in price adjustments.</li>
+    </ul>
+  </div>
+
+  <div class=""notes-box"">
+    <h3>Additional Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+
+  <div class=""footer"">
+    <p class=""brand"">{{organization.name}}</p>
+    <p>{{organization.address}} &middot; {{organization.website}}</p>
+    <p>Thank you for your business.</p>
+  </div>
+</div>";
     }
 
     private static string BuildStandardQuoteHtml()

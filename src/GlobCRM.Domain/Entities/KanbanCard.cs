@@ -23,11 +23,6 @@ public class KanbanCard
     public DateTimeOffset? DueDate { get; set; }
 
     /// <summary>
-    /// Optional user assigned to this card. Set to null if the user is deleted (SET NULL on delete).
-    /// </summary>
-    public Guid? AssigneeId { get; set; }
-
-    /// <summary>
     /// Float-based sort order for flexible insertion between existing cards within a column.
     /// </summary>
     public double SortOrder { get; set; }
@@ -53,7 +48,7 @@ public class KanbanCard
 
     // Navigation properties
     public KanbanColumn Column { get; set; } = null!;
-    public ApplicationUser? Assignee { get; set; }
+    public ICollection<KanbanCardAssignee> Assignees { get; set; } = new List<KanbanCardAssignee>();
     public ICollection<KanbanCardLabel> Labels { get; set; } = new List<KanbanCardLabel>();
     public ICollection<KanbanChecklistItem> ChecklistItems { get; set; } = new List<KanbanChecklistItem>();
     public ICollection<KanbanCardComment> Comments { get; set; } = new List<KanbanCardComment>();

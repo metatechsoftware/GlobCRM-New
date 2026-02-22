@@ -167,7 +167,8 @@ public class BoardsController : ControllerBase
                     .ThenInclude(card => card.ChecklistItems)
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Cards)
-                    .ThenInclude(card => card.Assignee)
+                    .ThenInclude(card => card.Assignees)
+                        .ThenInclude(ca => ca.User)
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Cards)
                     .ThenInclude(card => card.Comments)
@@ -451,16 +452,29 @@ public class BoardsController : ControllerBase
             Title = request.Title,
             Description = request.Description,
             DueDate = request.DueDate,
-            AssigneeId = request.AssigneeId,
             SortOrder = maxSort + 1.0
         };
 
         _db.KanbanCards.Add(card);
         await _db.SaveChangesAsync();
 
+        // Add assignees if provided
+        if (request.AssigneeIds is { Count: > 0 })
+        {
+            foreach (var uid in request.AssigneeIds)
+            {
+                _db.KanbanCardAssignees.Add(new KanbanCardAssignee
+                {
+                    CardId = card.Id,
+                    UserId = uid
+                });
+            }
+            await _db.SaveChangesAsync();
+        }
+
         // Reload with navigations for DTO
         var created = await _db.KanbanCards
-            .Include(c => c.Assignee)
+            .Include(c => c.Assignees).ThenInclude(ca => ca.User)
             .Include(c => c.Labels).ThenInclude(cl => cl.Label)
             .Include(c => c.ChecklistItems)
             .Include(c => c.Comments)
@@ -485,7 +499,7 @@ public class BoardsController : ControllerBase
             return NotFound(new { error = "Board not found or access denied." });
 
         var card = await _db.KanbanCards
-            .Include(c => c.Assignee)
+            .Include(c => c.Assignees).ThenInclude(ca => ca.User)
             .Include(c => c.Labels).ThenInclude(cl => cl.Label)
             .Include(c => c.ChecklistItems)
             .Include(c => c.Comments)
@@ -497,19 +511,12 @@ public class BoardsController : ControllerBase
         if (request.Title is not null) card.Title = request.Title;
         if (request.Description is not null) card.Description = request.Description;
         if (request.DueDate.HasValue) card.DueDate = request.DueDate;
-        if (request.AssigneeId.HasValue) card.AssigneeId = request.AssigneeId;
         if (request.LinkedEntityType is not null) card.LinkedEntityType = request.LinkedEntityType;
         if (request.LinkedEntityId.HasValue) card.LinkedEntityId = request.LinkedEntityId;
         if (request.LinkedEntityName is not null) card.LinkedEntityName = request.LinkedEntityName;
         card.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _db.SaveChangesAsync();
-
-        // Reload assignee if changed
-        if (request.AssigneeId.HasValue)
-        {
-            await _db.Entry(card).Reference(c => c.Assignee).LoadAsync();
-        }
 
         return Ok(CardDto.FromEntity(card));
     }
@@ -542,7 +549,7 @@ public class BoardsController : ControllerBase
         var boardColumnIds = board.Columns.Select(c => c.Id).ToList();
 
         var card = await _db.KanbanCards
-            .Include(c => c.Assignee)
+            .Include(c => c.Assignees).ThenInclude(ca => ca.User)
             .Include(c => c.Labels).ThenInclude(cl => cl.Label)
             .Include(c => c.ChecklistItems)
             .Include(c => c.Comments)
@@ -579,7 +586,7 @@ public class BoardsController : ControllerBase
         var boardColumnIds = board.Columns.Select(c => c.Id).ToList();
 
         var card = await _db.KanbanCards
-            .Include(c => c.Assignee)
+            .Include(c => c.Assignees).ThenInclude(ca => ca.User)
             .Include(c => c.Labels).ThenInclude(cl => cl.Label)
             .Include(c => c.ChecklistItems)
             .Include(c => c.Comments)
@@ -743,6 +750,73 @@ public class BoardsController : ControllerBase
             return NotFound(new { error = "Label not applied to this card." });
 
         _db.KanbanCardLabels.Remove(cardLabel);
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    // ---- Card Assignee Endpoints ----
+
+    /// <summary>
+    /// Adds a user as an assignee to a card. Verifies board access and user exists.
+    /// </summary>
+    [HttpPost("{id:guid}/cards/{cardId:guid}/assignees/{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> AddAssigneeToCard(Guid id, Guid cardId, Guid userId)
+    {
+        var currentUserId = GetCurrentUserId();
+        var board = await GetBoardWithAccessCheck(id, currentUserId);
+        if (board is null)
+            return NotFound(new { error = "Board not found or access denied." });
+
+        // Verify card belongs to this board
+        var boardColumnIds = board.Columns.Select(c => c.Id).ToList();
+        var card = await _db.KanbanCards.FirstOrDefaultAsync(c => c.Id == cardId && boardColumnIds.Contains(c.ColumnId));
+        if (card is null)
+            return NotFound(new { error = "Card not found on this board." });
+
+        // Verify user exists
+        var userExists = await _db.Users.AnyAsync(u => u.Id == userId);
+        if (!userExists)
+            return NotFound(new { error = "User not found." });
+
+        // Check if already assigned
+        var existing = await _db.KanbanCardAssignees
+            .FirstOrDefaultAsync(ca => ca.CardId == cardId && ca.UserId == userId);
+        if (existing is not null)
+            return Conflict(new { error = "User is already assigned to this card." });
+
+        _db.KanbanCardAssignees.Add(new KanbanCardAssignee
+        {
+            CardId = cardId,
+            UserId = userId
+        });
+        await _db.SaveChangesAsync();
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Removes a user assignment from a card.
+    /// </summary>
+    [HttpDelete("{id:guid}/cards/{cardId:guid}/assignees/{userId:guid}")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> RemoveAssigneeFromCard(Guid id, Guid cardId, Guid userId)
+    {
+        var currentUserId = GetCurrentUserId();
+        var board = await GetBoardWithAccessCheck(id, currentUserId);
+        if (board is null)
+            return NotFound(new { error = "Board not found or access denied." });
+
+        var cardAssignee = await _db.KanbanCardAssignees
+            .FirstOrDefaultAsync(ca => ca.CardId == cardId && ca.UserId == userId);
+        if (cardAssignee is null)
+            return NotFound(new { error = "User not assigned to this card." });
+
+        _db.KanbanCardAssignees.Remove(cardAssignee);
         await _db.SaveChangesAsync();
 
         return NoContent();
@@ -1087,7 +1161,8 @@ public class BoardsController : ControllerBase
                     .ThenInclude(card => card.ChecklistItems)
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Cards)
-                    .ThenInclude(card => card.Assignee)
+                    .ThenInclude(card => card.Assignees)
+                        .ThenInclude(ca => ca.User)
             .Include(b => b.Columns)
                 .ThenInclude(c => c.Cards)
                     .ThenInclude(card => card.Comments)
@@ -1272,6 +1347,21 @@ public record ColumnDto
 }
 
 /// <summary>
+/// DTO for a user assigned to a card.
+/// </summary>
+public record CardAssigneeDto
+{
+    public Guid UserId { get; init; }
+    public string Name { get; init; } = string.Empty;
+
+    public static CardAssigneeDto FromEntity(KanbanCardAssignee e) => new()
+    {
+        UserId = e.UserId,
+        Name = e.User != null ? $"{e.User.FirstName} {e.User.LastName}".Trim() : string.Empty
+    };
+}
+
+/// <summary>
 /// DTO for a card within a column.
 /// </summary>
 public record CardDto
@@ -1280,8 +1370,7 @@ public record CardDto
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
     public DateTimeOffset? DueDate { get; init; }
-    public Guid? AssigneeId { get; init; }
-    public string? AssigneeName { get; init; }
+    public List<CardAssigneeDto> Assignees { get; init; } = new();
     public double SortOrder { get; init; }
     public bool IsArchived { get; init; }
     public string? LinkedEntityType { get; init; }
@@ -1300,10 +1389,9 @@ public record CardDto
         Title = entity.Title,
         Description = entity.Description,
         DueDate = entity.DueDate,
-        AssigneeId = entity.AssigneeId,
-        AssigneeName = entity.Assignee != null
-            ? $"{entity.Assignee.FirstName} {entity.Assignee.LastName}".Trim()
-            : null,
+        Assignees = entity.Assignees
+            .Select(CardAssigneeDto.FromEntity)
+            .ToList(),
         SortOrder = entity.SortOrder,
         IsArchived = entity.IsArchived,
         LinkedEntityType = entity.LinkedEntityType,
@@ -1447,7 +1535,7 @@ public record CreateCardRequest
     public string Title { get; init; } = string.Empty;
     public string? Description { get; init; }
     public DateTimeOffset? DueDate { get; init; }
-    public Guid? AssigneeId { get; init; }
+    public List<Guid>? AssigneeIds { get; init; }
     public Guid? ColumnId { get; init; }
 }
 
@@ -1456,7 +1544,6 @@ public record UpdateCardRequest
     public string? Title { get; init; }
     public string? Description { get; init; }
     public DateTimeOffset? DueDate { get; init; }
-    public Guid? AssigneeId { get; init; }
     public string? LinkedEntityType { get; init; }
     public Guid? LinkedEntityId { get; init; }
     public string? LinkedEntityName { get; init; }

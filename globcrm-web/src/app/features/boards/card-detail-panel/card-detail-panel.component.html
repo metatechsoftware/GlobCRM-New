@@ -40,21 +40,52 @@
       <!-- Metadata Section -->
       <div class="cdp-section cdp-metadata">
 
-        <!-- Assignee -->
+        <!-- Assignees -->
         <div class="cdp-field">
           <span class="cdp-field-label">
-            <mat-icon class="cdp-field-icon">person</mat-icon>
-            {{ 'boards.cardDetail.assignee' | transloco }}
+            <mat-icon class="cdp-field-icon">group</mat-icon>
+            {{ 'boards.cardDetail.assignees' | transloco }}
           </span>
-          @if (card.assigneeId) {
-            <div class="cdp-assignee">
-              <span class="cdp-assignee-avatar">
-                {{ getInitials(card.assigneeName) }}
+          <div class="cdp-assignees-row">
+            @for (assignee of card.assignees; track assignee.userId) {
+              <span class="cdp-assignee-chip">
+                <span class="cdp-assignee-avatar">{{ getInitials(assignee.name) }}</span>
+                <span class="cdp-assignee-name">{{ assignee.name }}</span>
+                <button class="cdp-assignee-remove"
+                        (click)="removeAssignee(assignee.userId)"
+                        [matTooltip]="'boards.cardDetail.removeAssignee' | transloco">
+                  <mat-icon>close</mat-icon>
+                </button>
               </span>
-              <span class="cdp-assignee-name">{{ card.assigneeName }}</span>
-            </div>
-          } @else {
+            }
+            <button class="cdp-add-assignee-btn" (click)="toggleAssigneePicker()"
+                    [matTooltip]="'boards.cardDetail.addAssignee' | transloco">
+              <mat-icon>add</mat-icon>
+            </button>
+          </div>
+
+          @if (card.assignees.length === 0 && !assigneePickerOpen()) {
             <span class="cdp-unassigned">{{ 'boards.cardDetail.unassigned' | transloco }}</span>
+          }
+
+          <!-- Assignee Picker Dropdown -->
+          @if (assigneePickerOpen()) {
+            <div class="cdp-assignee-picker">
+              <input class="cdp-assignee-search-input"
+                     [(ngModel)]="assigneeSearchQuery"
+                     [placeholder]="'boards.cardDetail.searchMembers' | transloco"
+                     autofocus />
+              <div class="cdp-assignee-picker-list">
+                @for (member of filteredTeamMembers(); track member.id) {
+                  <button class="cdp-assignee-option" (click)="addAssignee(member)">
+                    <span class="cdp-assignee-avatar">{{ getInitials(member.firstName + ' ' + member.lastName) }}</span>
+                    <span>{{ member.firstName }} {{ member.lastName }}</span>
+                  </button>
+                } @empty {
+                  <div class="cdp-no-members">{{ 'boards.cardDetail.noMembersFound' | transloco }}</div>
+                }
+              </div>
+            </div>
           }
         </div>
 
@@ -177,6 +208,12 @@
                 <mat-icon class="cdp-entity-icon">{{ getEntityIcon(card.linkedEntityType) }}</mat-icon>
                 <span class="cdp-entity-name">{{ card.linkedEntityName }}</span>
                 <span class="cdp-entity-type-label">{{ card.linkedEntityType }}</span>
+              </button>
+              <button mat-icon-button
+                      (click)="toggleEntityLink()"
+                      [matTooltip]="'boards.cardDetail.changeEntity' | transloco"
+                      class="cdp-swap-btn">
+                <mat-icon>swap_horiz</mat-icon>
               </button>
               <button mat-icon-button
                       (click)="unlinkEntity()"

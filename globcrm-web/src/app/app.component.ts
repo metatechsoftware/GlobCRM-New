@@ -50,6 +50,7 @@ import { LanguageService } from './core/i18n/language.service';
       :host {
         display: block;
         height: 100vh;
+        overflow: hidden;
       }
 
       .app-sidenav-container {
@@ -70,6 +71,7 @@ import { LanguageService } from './core/i18n/language.service';
       .app-content {
         height: 100%;
         overflow: auto;
+        scroll-behavior: smooth;
       }
 
       .app-content--with-topbar {

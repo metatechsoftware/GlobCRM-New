@@ -43,13 +43,17 @@ export interface ColumnDto {
   cards: CardDto[];
 }
 
+export interface CardAssigneeDto {
+  userId: string;
+  name: string;
+}
+
 export interface CardDto {
   id: string;
   title: string;
   description: string | null;
   dueDate: string | null;
-  assigneeId: string | null;
-  assigneeName: string | null;
+  assignees: CardAssigneeDto[];
   sortOrder: number;
   isArchived: boolean;
   linkedEntityType: string | null;
@@ -133,7 +137,7 @@ export interface CreateCardRequest {
   title: string;
   description?: string | null;
   dueDate?: string | null;
-  assigneeId?: string | null;
+  assigneeIds?: string[];
   linkedEntityType?: string | null;
   linkedEntityId?: string | null;
 }
@@ -142,9 +146,9 @@ export interface UpdateCardRequest {
   title: string;
   description?: string | null;
   dueDate?: string | null;
-  assigneeId?: string | null;
   linkedEntityType?: string | null;
   linkedEntityId?: string | null;
+  linkedEntityName?: string | null;
 }
 
 export interface MoveCardRequest {
@@ -218,7 +222,7 @@ export const BOARD_TEMPLATES: BoardTemplate[] = [
 
 export interface CardFilter {
   labels: string[];
-  assigneeId: string | null;
+  assigneeIds: string[];
   dueDateRange: 'overdue' | 'today' | 'week' | 'all' | null;
 }
 

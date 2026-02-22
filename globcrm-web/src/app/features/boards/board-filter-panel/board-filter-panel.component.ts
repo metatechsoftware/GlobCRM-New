@@ -43,7 +43,7 @@ export class BoardFilterPanelComponent {
   /** Current filter state */
   readonly filter = input<CardFilter>({
     labels: [],
-    assigneeId: null,
+    assigneeIds: [],
     dueDateRange: null,
   });
 
@@ -56,8 +56,8 @@ export class BoardFilterPanelComponent {
   /** Currently selected label IDs (local state synced from input) */
   readonly selectedLabels = computed(() => this.filter().labels);
 
-  /** Currently selected assignee */
-  readonly selectedAssigneeId = computed(() => this.filter().assigneeId);
+  /** Currently selected assignee IDs */
+  readonly selectedAssigneeIds = computed(() => this.filter().assigneeIds);
 
   /** Currently selected due date range */
   readonly selectedDueDateRange = computed(() => this.filter().dueDateRange);
@@ -67,7 +67,7 @@ export class BoardFilterPanelComponent {
     const f = this.filter();
     let count = 0;
     if (f.labels.length > 0) count++;
-    if (f.assigneeId !== null) count++;
+    if (f.assigneeIds.length > 0) count++;
     if (f.dueDateRange !== null && f.dueDateRange !== 'all') count++;
     return count;
   });
@@ -96,14 +96,18 @@ export class BoardFilterPanelComponent {
   }
 
   selectAssignee(assigneeId: string | null): void {
+    if (!assigneeId) return;
     const current = this.filter();
-    // Toggle off if clicking the same assignee
-    const newId = current.assigneeId === assigneeId ? null : assigneeId;
-    this.filterChanged.emit({ ...current, assigneeId: newId });
+    // Toggle ID in/out of array
+    const assigneeIds = current.assigneeIds.includes(assigneeId)
+      ? current.assigneeIds.filter((id) => id !== assigneeId)
+      : [...current.assigneeIds, assigneeId];
+    this.filterChanged.emit({ ...current, assigneeIds });
   }
 
   isAssigneeSelected(assigneeId: string | null): boolean {
-    return this.filter().assigneeId === assigneeId;
+    if (!assigneeId) return false;
+    return this.filter().assigneeIds.includes(assigneeId);
   }
 
   selectDueDateRange(range: CardFilter['dueDateRange']): void {

@@ -36,7 +36,7 @@ const initialState: BoardsState = {
   isLoading: false,
   isCardPanelOpen: false,
   selectedCardId: null,
-  cardFilter: { labels: [], assigneeId: null, dueDateRange: null },
+  cardFilter: { labels: [], assigneeIds: [], dueDateRange: null },
 };
 
 /**
@@ -328,7 +328,7 @@ export const BoardStore = signalStore(
 
       clearCardFilter(): void {
         patchState(store, {
-          cardFilter: { labels: [], assigneeId: null, dueDateRange: null },
+          cardFilter: { labels: [], assigneeIds: [], dueDateRange: null },
         });
       },
     };

@@ -29,11 +29,12 @@ import {
   CardCommentDto,
   ChecklistItemDto,
   LabelDto,
-  CardLabelDto,
+  CardAssigneeDto,
 } from '../boards.models';
 import { BOARD_COLOR_PRESETS } from '../boards.models';
 import { PreviewSidebarStore } from '../../../shared/stores/preview-sidebar.store';
 import { RichTextEditorComponent } from '../../../shared/components/rich-text-editor/rich-text-editor.component';
+import { ProfileService, TeamMemberDto } from '../../profile/profile.service';
 
 /** Entity types available for linking */
 const ENTITY_TYPES = [
@@ -59,7 +60,7 @@ const ENTITY_TYPE_ICONS: Record<string, string> = {
 
 /**
  * Card detail slide panel — right-side panel for editing card details.
- * Features: inline title editing, rich text description, assignee picker,
+ * Features: inline title editing, rich text description, multi-assignee picker,
  * due date, label management, checklists with progress, threaded comments,
  * and entity linking with preview sidebar integration.
  */
@@ -91,6 +92,7 @@ export class CardDetailPanelComponent {
   private readonly previewSidebarStore = inject(PreviewSidebarStore);
   private readonly snackBar = inject(MatSnackBar);
   private readonly transloco = inject(TranslocoService);
+  private readonly profileService = inject(ProfileService);
 
   /** Whether panel is open */
   readonly isOpen = input<boolean>(false);
@@ -134,6 +136,23 @@ export class CardDetailPanelComponent {
 
   // ---- Assignee picker ----
   readonly assigneePickerOpen = signal(false);
+  readonly teamMembers = signal<TeamMemberDto[]>([]);
+  readonly assigneeSearchQuery = signal('');
+
+  /** Filtered team members: excludes already-assigned and matches search query */
+  readonly filteredTeamMembers = computed(() => {
+    const members = this.teamMembers();
+    const card = this.card();
+    const query = this.assigneeSearchQuery().toLowerCase().trim();
+    const assignedIds = new Set(card?.assignees.map((a) => a.userId) ?? []);
+
+    return members.filter((m) => {
+      if (assignedIds.has(m.id)) return false;
+      if (!query) return true;
+      const fullName = `${m.firstName} ${m.lastName}`.toLowerCase();
+      return fullName.includes(query) || m.email.toLowerCase().includes(query);
+    });
+  });
 
   // ---- Label picker ----
   readonly labelPickerOpen = signal(false);
@@ -199,6 +218,12 @@ export class CardDetailPanelComponent {
         this.loadChecklistItems(boardId, id);
       }
     });
+
+    // Load team members once for assignee picker
+    this.profileService.getTeamDirectory({ pageSize: 200 }).subscribe({
+      next: (result) => this.teamMembers.set(result.items),
+      error: () => this.teamMembers.set([]),
+    });
   }
 
   @HostListener('document:keydown.escape')
@@ -229,7 +254,6 @@ export class CardDetailPanelComponent {
         title,
         description: card.description,
         dueDate: card.dueDate,
-        assigneeId: card.assigneeId,
         linkedEntityType: card.linkedEntityType,
         linkedEntityId: card.linkedEntityId,
       })
@@ -263,7 +287,6 @@ export class CardDetailPanelComponent {
         title: card.title,
         description,
         dueDate: card.dueDate,
-        assigneeId: card.assigneeId,
         linkedEntityType: card.linkedEntityType,
         linkedEntityId: card.linkedEntityId,
       })
@@ -297,7 +320,6 @@ export class CardDetailPanelComponent {
         title: card.title,
         description: card.description,
         dueDate,
-        assigneeId: card.assigneeId,
         linkedEntityType: card.linkedEntityType,
         linkedEntityId: card.linkedEntityId,
       })
@@ -316,7 +338,6 @@ export class CardDetailPanelComponent {
         title: card.title,
         description: card.description,
         dueDate: null,
-        assigneeId: card.assigneeId,
         linkedEntityType: card.linkedEntityType,
         linkedEntityId: card.linkedEntityId,
       })
@@ -341,6 +362,37 @@ export class CardDetailPanelComponent {
     if (diffDays === 0) return 'today';
     if (diffDays <= 3) return 'approaching';
     return 'normal';
+  }
+
+  // ---- Assignees ----
+
+  toggleAssigneePicker(): void {
+    this.assigneePickerOpen.update((v) => !v);
+    this.assigneeSearchQuery.set('');
+  }
+
+  addAssignee(member: TeamMemberDto): void {
+    const card = this.card();
+    if (!card) return;
+    this.boardsService
+      .addAssigneeToCard(this.boardId(), card.id, member.id)
+      .subscribe({
+        next: () => {
+          this.refreshBoard();
+        },
+        error: () => this.showError(),
+      });
+  }
+
+  removeAssignee(userId: string): void {
+    const card = this.card();
+    if (!card) return;
+    this.boardsService
+      .removeAssigneeFromCard(this.boardId(), card.id, userId)
+      .subscribe({
+        next: () => this.refreshBoard(),
+        error: () => this.showError(),
+      });
   }
 
   // ---- Labels ----
@@ -471,9 +523,9 @@ export class CardDetailPanelComponent {
         title: card.title,
         description: card.description,
         dueDate: card.dueDate,
-        assigneeId: card.assigneeId,
         linkedEntityType: this.entityLinkType(),
         linkedEntityId: entity.id,
+        linkedEntityName: entity.name,
       })
       .subscribe({
         next: () => {
@@ -492,9 +544,9 @@ export class CardDetailPanelComponent {
         title: card.title,
         description: card.description,
         dueDate: card.dueDate,
-        assigneeId: card.assigneeId,
         linkedEntityType: null,
         linkedEntityId: null,
+        linkedEntityName: null,
       })
       .subscribe({
         next: () => this.refreshBoard(),
@@ -520,13 +572,8 @@ export class CardDetailPanelComponent {
   // ---- Checklists ----
 
   private loadChecklistItems(boardId: string, cardId: string): void {
-    // Card checklist data is returned as part of the full card on board detail;
-    // However, for full item details we need to load them. For now, we use a local approach:
-    // The API returns card.checklistTotal and card.checklistChecked in the card DTO.
-    // For full item list, we need to call the checklist endpoint.
-    // Since there's no dedicated "get checklist items" endpoint, we'll track items locally.
-    // Items are loaded by creating/toggling/deleting and tracked in signals.
-    // Initial load: items come from a separate API if available
+    // Load full checklist items from the dedicated GET endpoint.
+    // CardDto only includes checklistTotal/checklistChecked counts.
     this.api
       .get<ChecklistItemDto[]>(
         `/api/boards/${boardId}/cards/${cardId}/checklist`

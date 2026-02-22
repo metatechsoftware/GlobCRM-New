@@ -213,30 +213,157 @@
 
 // ─── Assignee ────────────────────────────────────────────────────────────────
 
-.cdp-assignee {
+// ─── Multi-Assignee ──────────────────────────────────────────────────────────
+
+.cdp-assignees-row {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cdp-assignee-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px 2px 2px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-elevated, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--color-border-subtle);
+  transition: border-color 0.2s;
+
+  &:hover {
+    border-color: var(--color-border-hover);
+  }
 }
 
 .cdp-assignee-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--orange-400), var(--orange-600));
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 600;
   flex-shrink: 0;
 }
 
 .cdp-assignee-name {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-text);
   font-weight: 500;
+  white-space: nowrap;
+}
+
+.cdp-assignee-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--color-text-faint);
+  cursor: pointer;
+  padding: 0;
+  border-radius: var(--radius-full);
+  transition: background-color 0.2s, color 0.2s;
+
+  mat-icon {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+  }
+
+  &:hover {
+    background: rgba(251, 113, 133, 0.15);
+    color: var(--color-negative);
+  }
+}
+
+.cdp-add-assignee-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-full);
+  border: 1px dashed var(--color-border-default);
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background-color 0.2s;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    border-color: var(--orange-500);
+    color: var(--orange-500);
+    background: var(--orange-glow);
+  }
+}
+
+.cdp-assignee-picker {
+  margin-top: var(--space-2);
+  background: var(--color-bg-card, var(--color-surface));
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+.cdp-assignee-search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  border-bottom: 1px solid var(--color-border-subtle);
+  background: transparent;
+  color: var(--color-text);
+  font-size: var(--text-sm);
+  outline: none;
+  box-sizing: border-box;
+
+  &::placeholder {
+    color: var(--color-text-faint);
+  }
+}
+
+.cdp-assignee-picker-list {
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.cdp-assignee-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+  font-size: var(--text-sm);
+  text-align: left;
+  transition: background-color 0.15s;
+
+  &:hover {
+    background: var(--orange-glow);
+  }
+}
+
+.cdp-no-members {
+  padding: 12px;
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-faint);
 }
 
 .cdp-unassigned {
@@ -574,6 +701,23 @@
   text-transform: uppercase;
   font-family: var(--font-mono);
   letter-spacing: 0.05em;
+}
+
+.cdp-swap-btn {
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  color: var(--color-text-faint);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    color: var(--orange-500);
+  }
 }
 
 .cdp-unlink-btn {
