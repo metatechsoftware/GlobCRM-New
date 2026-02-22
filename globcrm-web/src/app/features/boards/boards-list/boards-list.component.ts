@@ -4,6 +4,7 @@ import {
   inject,
   computed,
   OnInit,
+  ViewContainerRef,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -46,6 +47,7 @@ export class BoardsListComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly transloco = inject(TranslocoService);
+  private readonly viewContainerRef = inject(ViewContainerRef);
 
   readonly templates = BOARD_TEMPLATES;
   readonly skeletonItems = [0, 1, 2, 3];
@@ -116,6 +118,7 @@ export class BoardsListComponent implements OnInit {
       maxWidth: '95vw',
       data: { templateKey: templateKey ?? null },
       panelClass: 'boards-create-dialog',
+      viewContainerRef: this.viewContainerRef,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
