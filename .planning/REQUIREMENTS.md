@@ -59,15 +59,15 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 ### Quote PDF Templates
 
 - [x] **QTPL-01**: User can create quote PDF templates using a drag-and-drop visual editor (Unlayer document mode)
-- [ ] **QTPL-02**: User can insert CRM merge fields into templates (quote, company, contact, deal fields)
-- [ ] **QTPL-03**: Templates include a line items table that auto-expands with quote products, quantities, discounts, and totals
+- [x] **QTPL-02**: User can insert CRM merge fields into templates (quote, company, contact, deal fields)
+- [x] **QTPL-03**: Templates include a line items table that auto-expands with quote products, quantities, discounts, and totals
 - [ ] **QTPL-04**: User can preview a template rendered with real quote data before generating the PDF
-- [ ] **QTPL-05**: User can generate and download a PDF from a quote using a selected template
-- [ ] **QTPL-06**: User can create multiple templates and set one as default for new quotes
-- [ ] **QTPL-07**: User can clone an existing template to create a variant
-- [ ] **QTPL-08**: Template list shows thumbnail previews for visual identification
+- [x] **QTPL-05**: User can generate and download a PDF from a quote using a selected template
+- [x] **QTPL-06**: User can create multiple templates and set one as default for new quotes
+- [x] **QTPL-07**: User can clone an existing template to create a variant
+- [x] **QTPL-08**: Template list shows thumbnail previews for visual identification
 - [x] **QTPL-09**: User can configure page size (A4/Letter) and orientation (portrait/landscape) per template
-- [ ] **QTPL-10**: Organization branding (logo, name, address) available as merge fields in templates
+- [x] **QTPL-10**: Organization branding (logo, name, address) available as merge fields in templates
 - [x] **QTPL-11**: Quotes without a custom template fall back to the existing QuestPDF-generated layout
 - [ ] **QTPL-12**: User can manage quote templates from a dedicated templates section under quotes
 
@@ -172,15 +172,15 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-17 | Phase 30 | Complete |
 | KANB-18 | Phase 30 | Complete |
 | QTPL-01 | Phase 31 | Complete |
-| QTPL-02 | Phase 31 | Pending |
-| QTPL-03 | Phase 31 | Pending |
+| QTPL-02 | Phase 31 | Complete |
+| QTPL-03 | Phase 31 | Complete |
 | QTPL-04 | Phase 31 | Pending |
-| QTPL-05 | Phase 31 | Pending |
-| QTPL-06 | Phase 31 | Pending |
-| QTPL-07 | Phase 31 | Pending |
-| QTPL-08 | Phase 31 | Pending |
+| QTPL-05 | Phase 31 | Complete |
+| QTPL-06 | Phase 31 | Complete |
+| QTPL-07 | Phase 31 | Complete |
+| QTPL-08 | Phase 31 | Complete |
 | QTPL-09 | Phase 31 | Complete |
-| QTPL-10 | Phase 31 | Pending |
+| QTPL-10 | Phase 31 | Complete |
 | QTPL-11 | Phase 31 | Complete |
 | QTPL-12 | Phase 31 | Pending |
 

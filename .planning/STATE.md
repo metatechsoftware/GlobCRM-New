@@ -10,11 +10,11 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 ## Current Position
 
 Phase: 31 of 31 in progress (Quote PDF Templates)
-Plan: 1 of 5 complete
-Status: Phase 31 plan 01 complete, plan 02 next
-Last activity: 2026-02-22 — Completed 31-01-PLAN.md (Backend Foundation)
+Plan: 2 of 5 complete
+Status: Phase 31 plan 02 complete, plan 03 next
+Last activity: 2026-02-22 — Completed 31-02-PLAN.md (API Controllers & Merge Data)
 
-Progress: [████████████████████] 99.7% (192/~196 plans estimated)
+Progress: [████████████████████] 99.8% (193/~196 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [████████████████████] 99.7% (
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 192
+- Total plans completed: 193
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -122,6 +122,10 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 31-01: Partial unique index on (tenant_id, is_default) WHERE is_default = true enforces one default template per tenant at DB level
 - 31-01: Dual migration: ApplicationDbContext for quote_templates, TenantDbContext for organization branding fields
 - 31-01: PdfGenerationOptions as C# record type for immutable PDF settings
+- 31-02: QuoteTemplatesController reuses Permission:Quote:View/Edit policies (templates are sub-feature of quotes)
+- 31-02: ThumbnailUrl via Url.Action endpoint rather than raw file storage paths for access control
+- 31-02: Dual PDF path: templateId present uses Playwright+Fluid, absent uses QuestPDF fallback (backward compat)
+- 31-02: Preview endpoint on QuoteTemplatesController (template-centric with optional quoteId for real data)
 
 ### Pending Todos
 
@@ -136,6 +140,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 31-01-PLAN.md (Backend Foundation) — QuoteTemplate entity, PlaywrightPdfService, migrations, RLS
-Resume file: .planning/phases/31-quote-pdf-templates/31-01-SUMMARY.md
-Next step: Execute 31-02-PLAN.md
+Stopped at: Completed 31-02-PLAN.md (API Controllers & Merge Data) — QuoteTemplatesController, GeneratePdf dual path, MergeFieldService extensions
+Resume file: .planning/phases/31-quote-pdf-templates/31-02-SUMMARY.md
+Next step: Execute 31-03-PLAN.md
