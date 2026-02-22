@@ -751,6 +751,29 @@ public class BoardsController : ControllerBase
     // ---- Checklist Endpoints ----
 
     /// <summary>
+    /// Gets all checklist items for a card, ordered by SortOrder ascending.
+    /// </summary>
+    [HttpGet("{id:guid}/cards/{cardId:guid}/checklist")]
+    [ProducesResponseType(typeof(List<ChecklistItemDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetChecklistItems(Guid id, Guid cardId)
+    {
+        var userId = GetCurrentUserId();
+        var board = await GetBoardWithAccessCheck(id, userId);
+        if (board is null)
+            return NotFound(new { error = "Board not found or access denied." });
+
+        var boardColumnIds = board.Columns.Select(c => c.Id).ToList();
+        var card = await _db.KanbanCards
+            .Include(c => c.ChecklistItems)
+            .FirstOrDefaultAsync(c => c.Id == cardId && boardColumnIds.Contains(c.ColumnId));
+        if (card is null)
+            return NotFound(new { error = "Card not found on this board." });
+
+        return Ok(card.ChecklistItems.OrderBy(ci => ci.SortOrder).Select(ChecklistItemDto.FromEntity).ToList());
+    }
+
+    /// <summary>
     /// Adds a checklist item to a card. SortOrder = max existing + 1.0.
     /// </summary>
     [HttpPost("{id:guid}/cards/{cardId:guid}/checklist")]

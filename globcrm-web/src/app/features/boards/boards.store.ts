@@ -131,35 +131,25 @@ export const BoardStore = signalStore(
         boardId: string,
         cardId: string,
         req: MoveCardRequest,
-        sourceColumnId: string,
-        sourceIndex: number,
-        targetIndex: number,
       ): void {
         const board = store.board();
         if (!board) return;
 
-        // Optimistic update: move card between columns in local state
+        // Capture deep clone for rollback BEFORE patching state
+        const previousBoard = structuredClone(board);
+
+        // CDK has already mutated the arrays in-place via moveItemInArray/transferArrayItem.
+        // We only need to create new object references so Signal Store detects the change.
         const updatedColumns = board.columns.map((col) => ({
           ...col,
           cards: [...col.cards],
         }));
-
-        const sourceCol = updatedColumns.find((c) => c.id === sourceColumnId);
-        const targetCol = updatedColumns.find((c) => c.id === req.targetColumnId);
-        if (!sourceCol || !targetCol) return;
-
-        const [movedCard] = sourceCol.cards.splice(sourceIndex, 1);
-        if (!movedCard) return;
-
-        const updatedCard = { ...movedCard, sortOrder: req.sortOrder };
-        targetCol.cards.splice(targetIndex, 0, updatedCard);
 
         patchState(store, {
           board: { ...board, columns: updatedColumns },
         });
 
         // API call — revert on failure
-        const previousBoard = board;
         boardsService.moveCard(boardId, cardId, req).subscribe({
           error: () => {
             patchState(store, { board: previousBoard });

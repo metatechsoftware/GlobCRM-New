@@ -391,20 +391,17 @@ export class BoardDetailComponent {
     if (!board) return;
 
     if (event.previousContainer === event.container) {
-      // Reorder within same column
+      // Reorder within same column — capture card ID BEFORE CDK mutates
+      const card = event.container.data[event.previousIndex];
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
       const newSortOrder = this.calculateSortOrder(event.container.data, event.currentIndex);
-      const card = event.container.data[event.currentIndex];
-      this.boardStore.moveCard(
-        board.id,
-        card.id,
-        { targetColumnId: targetColumn.id, sortOrder: newSortOrder },
-        targetColumn.id,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      this.boardStore.moveCard(board.id, card.id, {
+        targetColumnId: targetColumn.id,
+        sortOrder: newSortOrder,
+      });
     } else {
-      // Move between columns
+      // Move between columns — capture card ID BEFORE CDK mutates
+      const card = event.previousContainer.data[event.previousIndex];
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -412,19 +409,10 @@ export class BoardDetailComponent {
         event.currentIndex,
       );
       const newSortOrder = this.calculateSortOrder(event.container.data, event.currentIndex);
-      const card = event.container.data[event.currentIndex];
-
-      // Extract source column ID
-      const sourceColId = event.previousContainer.id.replace('col-', '');
-
-      this.boardStore.moveCard(
-        board.id,
-        card.id,
-        { targetColumnId: targetColumn.id, sortOrder: newSortOrder },
-        sourceColId,
-        event.previousIndex,
-        event.currentIndex,
-      );
+      this.boardStore.moveCard(board.id, card.id, {
+        targetColumnId: targetColumn.id,
+        sortOrder: newSortOrder,
+      });
 
       // WIP limit warning after drop
       if (targetColumn.wipLimit != null && event.container.data.length > targetColumn.wipLimit) {
