@@ -374,18 +374,39 @@
     "expandSidebar": "Expand sidebar",
     "collapseSidebar": "Collapse sidebar"
   },
-  "auth": {
-    "login": "Login",
-    "logout": "Logout",
-    "register": "Register",
-    "forgotPassword": "Forgot Password",
-    "resetPassword": "Reset Password",
-    "email": "Email",
-    "password": "Password",
-    "rememberMe": "Remember Me",
-    "signIn": "Sign In",
-    "signUp": "Sign Up",
-    "createAccount": "Create Account"
+  "quoteTemplates": {
+    "list": {
+      "title": "Quote Templates",
+      "tagline": "Design and manage custom PDF templates for your quotes",
+      "createButton": "New Template",
+      "loading": "Loading templates...",
+      "default": "DEFAULT",
+      "lastModified": "Modified:",
+      "actions": {
+        "more": "More actions",
+        "edit": "Edit",
+        "clone": "Clone",
+        "setDefault": "Set as Default",
+        "delete": "Delete"
+      },
+      "empty": {
+        "title": "No templates yet",
+        "description": "Create your first quote template to generate beautifully branded PDF quotes.",
+        "button": "Create Template"
+      }
+    },
+    "editor": {
+      "editTitle": "Edit Template",
+      "newTitle": "New Template"
+    },
+    "messages": {
+      "cloned": "Template cloned successfully",
+      "setAsDefault": "Template set as default",
+      "deleted": "Template deleted",
+      "saved": "Template saved",
+      "created": "Template created",
+      "nameRequired": "Template name is required"
+    }
   },
   "userMenu": {
     "myProfile": "My Profile",

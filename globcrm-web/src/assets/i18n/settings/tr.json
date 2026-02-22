@@ -43,7 +43,9 @@
     "notifications": "Bildirimler",
     "notificationsDesc": "Hangi olaylarin uyari tetikleyecegini ve nasil iletilecegini ozellestirin",
     "integrations": "Entegrasyonlar",
-    "integrationsDesc": "Ucuncu taraf entegrasyonlari goruntulenin ve yonetin"
+    "integrationsDesc": "Ucuncu taraf entegrasyonlari goruntulenin ve yonetin",
+    "quoteTemplates": "Teklif Sablonlari",
+    "quoteTemplatesDesc": "Teklifler icin ozel PDF sablonlari tasarlayin ve yonetin"
   },
   "common": {
     "backToSettings": "Ayarlar",

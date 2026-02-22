@@ -374,18 +374,39 @@
     "expandSidebar": "Kenar çubuğunu genişlet",
     "collapseSidebar": "Kenar çubuğunu daralt"
   },
-  "auth": {
-    "login": "Giriş Yap",
-    "logout": "Çıkış Yap",
-    "register": "Kayıt Ol",
-    "forgotPassword": "Şifremi Unuttum",
-    "resetPassword": "Şifre Sıfırla",
-    "email": "E-posta",
-    "password": "Şifre",
-    "rememberMe": "Beni Hatırla",
-    "signIn": "Giriş Yap",
-    "signUp": "Kayıt Ol",
-    "createAccount": "Hesap Oluştur"
+  "quoteTemplates": {
+    "list": {
+      "title": "Teklif Şablonları",
+      "tagline": "Teklifleriniz için özel PDF şablonları tasarlayın ve yönetin",
+      "createButton": "Yeni Şablon",
+      "loading": "Şablonlar yükleniyor...",
+      "default": "VARSAYILAN",
+      "lastModified": "Değiştirilme:",
+      "actions": {
+        "more": "Diğer işlemler",
+        "edit": "Düzenle",
+        "clone": "Kopyala",
+        "setDefault": "Varsayılan Yap",
+        "delete": "Sil"
+      },
+      "empty": {
+        "title": "Henüz şablon yok",
+        "description": "Güzel markalı PDF teklifleri oluşturmak için ilk teklif şablonunuzu oluşturun.",
+        "button": "Şablon Oluştur"
+      }
+    },
+    "editor": {
+      "editTitle": "Şablonu Düzenle",
+      "newTitle": "Yeni Şablon"
+    },
+    "messages": {
+      "cloned": "Şablon başarıyla kopyalandı",
+      "setAsDefault": "Şablon varsayılan olarak ayarlandı",
+      "deleted": "Şablon silindi",
+      "saved": "Şablon kaydedildi",
+      "created": "Şablon oluşturuldu",
+      "nameRequired": "Şablon adı gereklidir"
+    }
   },
   "userMenu": {
     "myProfile": "Profilim",

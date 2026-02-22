@@ -37,11 +37,14 @@
       "version": "Versiyon"
     },
     "actions": {
-      "edit": "Duzenle",
+      "edit": "Düzenle",
       "delete": "Sil",
-      "generatePdf": "PDF Olustur",
+      "generatePdf": "PDF Oluştur",
       "newVersion": "Yeni Versiyon",
-      "moveTo": "Tasi:"
+      "moveTo": "Taşı:",
+      "selectTemplate": "PDF Şablonu",
+      "builtInTemplate": "Yerleşik (QuestPDF)",
+      "manageTemplates": "Şablonları Yönet"
     },
     "transitions": {
       "markAsSent": "Gonderildi Isaretle",

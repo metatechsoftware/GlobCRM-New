@@ -24,19 +24,46 @@
                   (click)="onDelete()">
             <mat-icon>delete</mat-icon> {{ 'quotes.detail.actions.delete' | transloco }}
           </button>
-          <button mat-stroked-button (click)="onGeneratePdf()"
-                  [disabled]="pdfGenerating()">
-            @if (pdfGenerating()) {
-              <mat-spinner diameter="18"></mat-spinner>
-            } @else {
-              <mat-icon>picture_as_pdf</mat-icon>
-            }
-            {{ 'quotes.detail.actions.generatePdf' | transloco }}
-          </button>
+
+          <!-- PDF Template Selector + Generate -->
+          <div class="pdf-actions">
+            <mat-form-field appearance="outline" class="template-selector">
+              <mat-select
+                [value]="selectedTemplateId()"
+                (selectionChange)="onTemplateChange($event.value)"
+                [placeholder]="'quotes.detail.actions.selectTemplate' | transloco"
+              >
+                <mat-option [value]="null">
+                  {{ 'quotes.detail.actions.builtInTemplate' | transloco }}
+                </mat-option>
+                @for (tpl of availableTemplates(); track tpl.id) {
+                  <mat-option [value]="tpl.id">
+                    {{ tpl.name }}
+                    @if (tpl.isDefault) {
+                      ({{ 'quoteTemplates.list.default' | transloco }})
+                    }
+                  </mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+            <button mat-stroked-button (click)="onGeneratePdf()"
+                    [disabled]="pdfGenerating()">
+              @if (pdfGenerating()) {
+                <mat-spinner diameter="18"></mat-spinner>
+              } @else {
+                <mat-icon>picture_as_pdf</mat-icon>
+              }
+              {{ 'quotes.detail.actions.generatePdf' | transloco }}
+            </button>
+          </div>
+
           <button mat-stroked-button (click)="onCreateNewVersion()"
                   *appHasPermission="'Quote:Create'">
             <mat-icon>content_copy</mat-icon> {{ 'quotes.detail.actions.newVersion' | transloco }}
           </button>
+          <a mat-stroked-button routerLink="/quote-templates" class="manage-templates-link">
+            <mat-icon>description</mat-icon> {{ 'quotes.detail.actions.manageTemplates' | transloco }}
+          </a>
         </div>
       </div>
 

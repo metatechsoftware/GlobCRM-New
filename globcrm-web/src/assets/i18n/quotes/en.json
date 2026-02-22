@@ -41,7 +41,10 @@
       "delete": "Delete",
       "generatePdf": "Generate PDF",
       "newVersion": "New Version",
-      "moveTo": "Move to:"
+      "moveTo": "Move to:",
+      "selectTemplate": "PDF Template",
+      "builtInTemplate": "Built-in (QuestPDF)",
+      "manageTemplates": "Manage Templates"
     },
     "transitions": {
       "markAsSent": "Mark as Sent",

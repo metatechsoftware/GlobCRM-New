@@ -177,6 +177,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'quote-templates',
+    canActivate: [authGuard, permissionGuard('Quote', 'View')],
+    loadChildren: () =>
+      import('./features/quote-templates/quote-templates.routes').then(
+        (m) => m.QUOTE_TEMPLATE_ROUTES
+      ),
+  },
+  {
     path: 'sequences',
     canActivate: [authGuard, permissionGuard('EmailSequence', 'View')],
     loadChildren: () =>

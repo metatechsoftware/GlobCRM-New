@@ -43,7 +43,9 @@
     "notifications": "Notifications",
     "notificationsDesc": "Customize which events trigger alerts and how they are delivered",
     "integrations": "Integrations",
-    "integrationsDesc": "Browse and manage third-party integrations"
+    "integrationsDesc": "Browse and manage third-party integrations",
+    "quoteTemplates": "Quote Templates",
+    "quoteTemplatesDesc": "Design and manage custom PDF templates for quotes"
   },
   "common": {
     "backToSettings": "Settings",

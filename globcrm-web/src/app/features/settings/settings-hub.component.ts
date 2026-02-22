@@ -649,6 +649,13 @@ export class SettingsHubComponent {
           route: '/settings/integrations',
           adminOnly: false,
         },
+        {
+          icon: 'description',
+          labelKey: 'settings.items.quoteTemplates',
+          descriptionKey: 'settings.items.quoteTemplatesDesc',
+          route: '/quote-templates',
+          adminOnly: false,
+        },
       ],
     },
     {

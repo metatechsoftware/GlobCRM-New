@@ -14,6 +14,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { CurrencyPipe, DatePipe, DecimalPipe, PercentPipe } from '@angular/common';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HasPermissionDirective } from '../../../core/permissions/has-permission.directive';
@@ -22,6 +24,8 @@ import { EntityAttachmentsComponent } from '../../../shared/components/entity-at
 import { NoteService } from '../../notes/note.service';
 import { NoteListDto } from '../../notes/note.models';
 import { QuoteService } from '../quote.service';
+import { QuoteTemplateService } from '../../quote-templates/quote-template.service';
+import { QuoteTemplateListItem } from '../../quote-templates/quote-template.models';
 import {
   QuoteDetailDto,
   QuoteLineItemDto,
@@ -62,6 +66,8 @@ import { QuoteSummaryDto } from '../../../shared/components/summary-tab/summary.
     EntityTimelineComponent,
     EntityAttachmentsComponent,
     EntitySummaryTabComponent,
+    MatSelectModule,
+    MatFormFieldModule,
     TranslocoPipe,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -77,6 +83,7 @@ export class QuoteDetailComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly summaryService = inject(SummaryService);
   private readonly transloco = inject(TranslocoService);
+  private readonly quoteTemplateService = inject(QuoteTemplateService);
 
   /** Quote detail data. */
   quote = signal<QuoteDetailDto | null>(null);
@@ -84,6 +91,10 @@ export class QuoteDetailComponent implements OnInit {
 
   /** PDF generation state. */
   pdfGenerating = signal(false);
+
+  /** Available quote templates for PDF generation. */
+  availableTemplates = signal<QuoteTemplateListItem[]>([]);
+  selectedTemplateId = signal<string | null>(null);
 
   /** Timeline entries. */
   timelineEntries = signal<TimelineEntry[]>([]);
@@ -144,6 +155,7 @@ export class QuoteDetailComponent implements OnInit {
     this.loadQuote();
     this.loadTimeline();
     this.loadSummary();
+    this.loadTemplates();
   }
 
   /** Load summary data for the Summary tab. */
@@ -262,10 +274,33 @@ export class QuoteDetailComponent implements OnInit {
     }
   }
 
+  /** Load available quote templates for PDF template selector. */
+  private loadTemplates(): void {
+    this.quoteTemplateService.getAll().subscribe({
+      next: (templates) => {
+        this.availableTemplates.set(templates);
+        // Auto-select the default template if one exists
+        const defaultTpl = templates.find((t) => t.isDefault);
+        if (defaultTpl) {
+          this.selectedTemplateId.set(defaultTpl.id);
+        }
+      },
+      error: () => {
+        // Silently fail -- templates are optional for PDF generation
+      },
+    });
+  }
+
+  /** Handle template selection change. */
+  onTemplateChange(templateId: string | null): void {
+    this.selectedTemplateId.set(templateId);
+  }
+
   /** Generate PDF and trigger download in browser. */
   onGeneratePdf(): void {
     this.pdfGenerating.set(true);
-    this.quoteService.generatePdf(this.quoteId).subscribe({
+    const templateId = this.selectedTemplateId() ?? undefined;
+    this.quoteTemplateService.generatePdf(this.quoteId, templateId).subscribe({
       next: (blob) => {
         const q = this.quote()!;
         const url = URL.createObjectURL(blob);
