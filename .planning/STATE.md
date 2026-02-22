@@ -5,16 +5,16 @@
 See: .planning/PROJECT.md (updated 2026-02-20)
 
 **Core value:** Every entity page is a dynamic, user-configurable table with rich custom fields, saved Views, and relational navigation — making GlobCRM the single workspace where teams manage all customer relationships and operational work.
-**Current focus:** v1.3 Platform & Polish — Phase 31 (Quote PDF Templates) ready to plan
+**Current focus:** v1.3 Platform & Polish — Phase 31 (Quote PDF Templates) in progress
 
 ## Current Position
 
-Phase: 30 of 31 complete (Free-form Kanban Boards)
-Plan: 6 of 6 complete
-Status: Phase 30 complete, Phase 31 ready to plan
-Last activity: 2026-02-21 — Completed 30-06-PLAN.md (Boards i18n + feature completion)
+Phase: 31 of 31 in progress (Quote PDF Templates)
+Plan: 1 of 5 complete
+Status: Phase 31 plan 01 complete, plan 02 next
+Last activity: 2026-02-22 — Completed 31-01-PLAN.md (Backend Foundation)
 
-Progress: [████████████████████] 99.5% (191/~192 plans estimated)
+Progress: [████████████████████] 99.7% (192/~196 plans estimated)
 
 ## Milestones
 
@@ -26,11 +26,11 @@ Progress: [████████████████████] 99.5% (
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 191
+- Total plans completed: 192
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
-- v1.3: 30 plans across 4 phases (Phase 27-30)
+- v1.3: 31 plans across 5 phases (Phase 27-31)
 
 ## Accumulated Context
 
@@ -117,6 +117,11 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 30-05: Label filter uses OR logic (show cards matching ANY selected label)
 - 30-05: Assignee options extracted dynamically from board cards rather than separate API endpoint
 - 30-05: Comment editing/deleting available for all comments (author check deferred to backend authorization)
+- 31-01: PlaywrightPdfService registered as singleton with lazy-init Chromium browser and context-per-request pattern for performance
+- 31-01: Organization branding fields added directly to existing entity (not separate OrganizationBranding entity) for simplicity
+- 31-01: Partial unique index on (tenant_id, is_default) WHERE is_default = true enforces one default template per tenant at DB level
+- 31-01: Dual migration: ApplicationDbContext for quote_templates, TenantDbContext for organization branding fields
+- 31-01: PdfGenerationOptions as C# record type for immutable PDF settings
 
 ### Pending Todos
 
@@ -130,7 +135,7 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-02-21
-Stopped at: Completed Phase 30 (Free-form Kanban Boards) — all 6 plans done, 30-06-SUMMARY.md written
-Resume file: .planning/phases/30-free-form-kanban-boards/30-06-SUMMARY.md
-Next step: Phase 31 (Quote PDF Templates) — needs /gsd:research-phase before planning
+Last session: 2026-02-22
+Stopped at: Completed 31-01-PLAN.md (Backend Foundation) — QuoteTemplate entity, PlaywrightPdfService, migrations, RLS
+Resume file: .planning/phases/31-quote-pdf-templates/31-01-SUMMARY.md
+Next step: Execute 31-02-PLAN.md
