@@ -47,7 +47,7 @@ Requirements for v1.3 Platform & Polish. Each maps to roadmap phases.
 - [x] **KANB-08**: Cards display due date with urgency indicator (yellow approaching, red overdue)
 - [x] **KANB-09**: Existing deal pipeline and activity boards appear as System Boards on the unified boards page
 - [x] **KANB-10**: User can optionally link a card to any CRM entity (Contact, Company, Deal, Lead, etc.)
-- [x] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
+- [ ] **KANB-11**: Entity-linked cards display entity name and icon, with click-to-preview via existing sidebar
 - [x] **KANB-12**: User can write rich text descriptions on cards via the existing rich text editor
 - [x] **KANB-13**: Columns display WIP (work-in-progress) limit with visual warning when exceeded
 - [x] **KANB-14**: User can create a board from predefined templates (Sprint, Content Calendar, Sales Follow-up)
@@ -163,7 +163,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KANB-08 | Phase 30 | Complete |
 | KANB-09 | Phase 30 | Complete |
 | KANB-10 | Phase 30 | Complete |
-| KANB-11 | Phase 30 | Complete |
+| KANB-11 | Phase 30 → 32 | Pending |
 | KANB-12 | Phase 30 | Complete |
 | KANB-13 | Phase 30 | Complete |
 | KANB-14 | Phase 30 | Complete |
@@ -188,7 +188,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 - v1.3 requirements: 52 total
 - Mapped to phases: 52
 - Unmapped: 0
+- Satisfied: 50 (KANB-11 pending commit, QTPL-04 pending Plan 31-05)
+- Phase 32 provides formal verification for INTG-01–12, QTPL-01–12, KANB-11
 
 ---
 *Requirements defined: 2026-02-20*
-*Last updated: 2026-02-21 after roadmap creation (traceability populated)*
+*Last updated: 2026-02-22 after v1.3 audit gap closure plan*

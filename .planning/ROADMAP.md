@@ -68,6 +68,7 @@
 - [x] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n (completed 2026-02-21)
 - [x] **Phase 30: Free-Form Kanban Boards** (7 plans) — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates + UAT gap closure (completed 2026-02-22)
 - [ ] **Phase 31: Quote PDF Templates** (5 plans) — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
+- [ ] **Phase 32: v1.3 Gap Closure — Commit, Verify & Clean** (4 plans) — Commit uncommitted code, create VERIFICATION.md for Phases 29/31, re-verify Phase 30, clean stale comments
 
 ## Phase Details
 
@@ -169,6 +170,24 @@ Plans:
 - [ ] 31-04-PLAN.md — Template list card grid with thumbnails, routes, settings hub integration, quote detail shortcut
 - [ ] 31-05-PLAN.md — Preview dialog, PDF download, starter seed templates, i18n (EN/TR), end-to-end verification
 
+### Phase 32: v1.3 Gap Closure — Commit, Verify & Clean
+**Goal**: Close all formal gaps from v1.3 milestone audit — commit uncommitted code, create missing VERIFICATION.md files, update stale verification, and clean tech debt
+**Depends on**: Phase 31
+**Requirements**: KANB-11, INTG-01–INTG-12, QTPL-01–QTPL-12 (formal verification)
+**Gap Closure:** Closes gaps from v1.3 audit
+**Success Criteria** (what must be TRUE):
+  1. All uncommitted Phase 30 code (KANB-11 fix, KanbanCardAssignee entity/config/migration) is committed to git
+  2. Phase 29 has a VERIFICATION.md confirming all 12 INTG requirements are satisfied
+  3. Phase 30 VERIFICATION.md is updated with KANB-11 marked as satisfied (entity click-to-preview works)
+  4. Phase 31 has a VERIFICATION.md confirming all 12 QTPL requirements are satisfied (including QTPL-04 after Plan 31-05)
+  5. Stale code comments in card-detail-panel and board-card components are removed
+**Plans**: 4 plans
+Plans:
+- [ ] 32-01-PLAN.md — Commit uncommitted Phase 30 changes (KANB-11 fix, KanbanCardAssignee entity/config/migration)
+- [ ] 32-02-PLAN.md — Run Phase 29 verifier (create 29-VERIFICATION.md for INTG-01 through INTG-12)
+- [ ] 32-03-PLAN.md — Re-verify Phase 30 (update 30-VERIFICATION.md) + Run Phase 31 verifier (create 31-VERIFICATION.md)
+- [ ] 32-04-PLAN.md — Clean stale comments + update ROADMAP/REQUIREMENTS completion markers
+
 ## Progress
 
 | Phase | Milestone | Plans Complete | Status | Completed |
@@ -204,5 +223,6 @@ Plans:
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
 | 30. Free-Form Kanban Boards | 7/7 | Complete   | 2026-02-22 | - |
 | 31. Quote PDF Templates | 4/5 | In Progress|  | - |
+| 32. v1.3 Gap Closure | v1.3 | 0/4 | Pending | - |
 
-**Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD
+**Totals:** 32 phases, 177 plans complete, v1.3 gap closure pending
