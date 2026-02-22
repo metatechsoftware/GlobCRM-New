@@ -208,6 +208,9 @@ public static class DependencyInjection
         services.AddSingleton<CredentialEncryptionService>();
         services.AddScoped<IIntegrationRepository, IntegrationRepository>();
 
+        // ---- Quote template services ----
+        services.AddScoped<IQuoteTemplateRepository, QuoteTemplateRepository>();
+
         return services;
     }
 }

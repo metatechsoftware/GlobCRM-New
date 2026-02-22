@@ -57,6 +57,26 @@ public class OrganizationConfiguration : IEntityTypeConfiguration<Organization>
             .HasMaxLength(5)
             .HasDefaultValue("en");
 
+        builder.Property(o => o.LogoUrl)
+            .HasColumnName("logo_url")
+            .HasMaxLength(500);
+
+        builder.Property(o => o.Address)
+            .HasColumnName("address")
+            .HasMaxLength(500);
+
+        builder.Property(o => o.Phone)
+            .HasColumnName("phone")
+            .HasMaxLength(50);
+
+        builder.Property(o => o.Email)
+            .HasColumnName("email")
+            .HasMaxLength(255);
+
+        builder.Property(o => o.Website)
+            .HasColumnName("website")
+            .HasMaxLength(500);
+
         builder.Property(o => o.CreatedAt)
             .HasColumnName("created_at")
             .IsRequired()

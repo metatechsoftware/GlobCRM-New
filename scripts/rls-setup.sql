@@ -713,6 +713,22 @@ COMMENT ON POLICY tenant_isolation_integration_activity_logs ON integration_acti
     'Uses the app.current_tenant session variable set by EF Core interceptor.';
 
 -- =====================================================================
+-- quote_templates - filtered by tenant_id
+-- =====================================================================
+ALTER TABLE quote_templates ENABLE ROW LEVEL SECURITY;
+
+ALTER TABLE quote_templates FORCE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS quote_templates_tenant_isolation ON quote_templates;
+CREATE POLICY quote_templates_tenant_isolation ON quote_templates
+    USING (tenant_id = current_setting('app.current_tenant', true)::uuid)
+    WITH CHECK (tenant_id = current_setting('app.current_tenant', true)::uuid);
+
+COMMENT ON POLICY quote_templates_tenant_isolation ON quote_templates IS
+    'Ensures quote template queries only return templates for the current tenant. '
+    'Uses the app.current_tenant session variable set by EF Core interceptor.';
+
+-- =====================================================================
 -- Notes on current_setting usage
 -- =====================================================================
 -- current_setting('app.current_tenant', true) uses the `true` parameter

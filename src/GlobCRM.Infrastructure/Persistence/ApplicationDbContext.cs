@@ -157,6 +157,9 @@ public class ApplicationDbContext
     // My Day DbSets
     public DbSet<RecentlyViewedEntity> RecentlyViewedEntities => Set<RecentlyViewedEntity>();
 
+    // Quote Templates DbSets
+    public DbSet<QuoteTemplate> QuoteTemplates => Set<QuoteTemplate>();
+
     // Kanban Boards DbSets
     public DbSet<KanbanBoard> KanbanBoards => Set<KanbanBoard>();
     public DbSet<KanbanColumn> KanbanColumns => Set<KanbanColumn>();
@@ -285,6 +288,9 @@ public class ApplicationDbContext
 
         // My Day entity configurations
         modelBuilder.ApplyConfiguration(new RecentlyViewedEntityConfiguration());
+
+        // Quote Templates entity configurations
+        modelBuilder.ApplyConfiguration(new QuoteTemplateConfiguration());
 
         // Kanban Boards entity configurations
         modelBuilder.ApplyConfiguration(new KanbanBoardConfiguration());
@@ -513,6 +519,10 @@ public class ApplicationDbContext
         // Global query filter: filter RecentlyViewedEntities by TenantId (tenant-scoped)
         modelBuilder.Entity<RecentlyViewedEntity>().HasQueryFilter(
             rv => _tenantProvider == null || _tenantProvider.GetTenantId() == null || rv.TenantId == _tenantProvider.GetTenantId());
+
+        // Global query filter: filter QuoteTemplates by TenantId (tenant-scoped)
+        modelBuilder.Entity<QuoteTemplate>().HasQueryFilter(
+            qt => _tenantProvider == null || _tenantProvider.GetTenantId() == null || qt.TenantId == _tenantProvider.GetTenantId());
 
         // Global query filter: filter KanbanBoards by TenantId (tenant-scoped)
         modelBuilder.Entity<KanbanBoard>().HasQueryFilter(
