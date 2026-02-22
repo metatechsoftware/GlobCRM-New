@@ -66,7 +66,7 @@
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
 - [x] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures (completed 2026-02-21)
 - [x] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n (completed 2026-02-21)
-- [ ] **Phase 30: Free-Form Kanban Boards** (7 plans) — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates + UAT gap closure
+- [x] **Phase 30: Free-Form Kanban Boards** (7 plans) — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates + UAT gap closure (completed 2026-02-22)
 - [ ] **Phase 31: Quote PDF Templates** (5 plans) — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
 
 ## Phase Details
@@ -202,7 +202,7 @@ Plans:
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
-| 30. Free-Form Kanban Boards | 6/7 | In Progress|  | - |
+| 30. Free-Form Kanban Boards | 7/7 | Complete   | 2026-02-22 | - |
 | 31. Quote PDF Templates | 4/5 | In Progress|  | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD

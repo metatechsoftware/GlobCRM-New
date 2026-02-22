@@ -12,9 +12,9 @@ See: .planning/PROJECT.md (updated 2026-02-20)
 Phase: 31 of 31 in progress (Quote PDF Templates)
 Plan: 4 of 5 complete
 Status: Phase 31 plan 04 complete, plan 05 next
-Last activity: 2026-02-22 — Completed 31-04-PLAN.md (Template List & Navigation)
+Last activity: 2026-02-22 — Completed 30-07-PLAN.md (UAT Gap Closure)
 
-Progress: [████████████████████] 99.9% (195/~196 plans estimated)
+Progress: [████████████████████] 99.9% (196/~197 plans estimated)
 
 ## Milestones
 
@@ -26,7 +26,7 @@ Progress: [████████████████████] 99.9% (
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 195
+- Total plans completed: 196
 - v1.0: 96 plans across 12 phases
 - v1.1: 43 plans across 9 phases
 - v1.2: 19 plans across 5 phases
@@ -135,6 +135,9 @@ All decisions logged in PROJECT.md Key Decisions table.
 - 31-04: Clone action is instant with no dialog per CONTEXT.md decision
 - 31-04: Card grid uses A4 aspect ratio (210/297) for thumbnail placeholders matching document proportions
 - 31-04: Quote detail PDF generation routed through QuoteTemplateService.generatePdf to support optional templateId for dual-path rendering
+- 30-07: Store moveCard removes all array manipulation; CDK already mutated arrays in-place so store only creates new references for signal change detection
+- 30-07: structuredClone used for deep rollback instead of shallow reference (prevents stale shared-reference issues)
+- 30-07: Card ID captured before CDK mutation to prevent undefined reference when accessing moved card
 
 ### Pending Todos
 
@@ -149,6 +152,6 @@ None.
 ## Session Continuity
 
 Last session: 2026-02-22
-Stopped at: Completed 31-04-PLAN.md (Template List & Navigation) — Card grid template list, lazy-loaded routes, settings hub card, quote detail template selector
-Resume file: .planning/phases/31-quote-pdf-templates/31-04-SUMMARY.md
+Stopped at: Completed 30-07-PLAN.md (UAT Gap Closure) — Fixed card drag-drop, GET checklist endpoint, board list dialog refresh
+Resume file: .planning/phases/30-free-form-kanban-boards/30-07-SUMMARY.md
 Next step: Execute 31-05-PLAN.md
