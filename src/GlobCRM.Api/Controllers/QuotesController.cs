@@ -4,9 +4,11 @@ using GlobCRM.Domain.Entities;
 using GlobCRM.Domain.Enums;
 using GlobCRM.Domain.Interfaces;
 using GlobCRM.Infrastructure.CustomFields;
+using GlobCRM.Infrastructure.EmailTemplates;
 using GlobCRM.Infrastructure.FormulaFields;
 using GlobCRM.Infrastructure.Pdf;
 using GlobCRM.Infrastructure.Persistence;
+using GlobCRM.Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -32,6 +34,9 @@ public class QuotesController : ControllerBase
     private readonly CustomFieldValidator _customFieldValidator;
     private readonly ITenantProvider _tenantProvider;
     private readonly FormulaEvaluationService _formulaEvaluator;
+    private readonly IQuoteTemplateRepository _quoteTemplateRepository;
+    private readonly TemplateRenderService _renderService;
+    private readonly PlaywrightPdfService _playwrightPdfService;
     private readonly ApplicationDbContext _db;
     private readonly ILogger<QuotesController> _logger;
 
@@ -43,6 +48,9 @@ public class QuotesController : ControllerBase
         CustomFieldValidator customFieldValidator,
         ITenantProvider tenantProvider,
         FormulaEvaluationService formulaEvaluator,
+        IQuoteTemplateRepository quoteTemplateRepository,
+        TemplateRenderService renderService,
+        PlaywrightPdfService playwrightPdfService,
         ApplicationDbContext db,
         ILogger<QuotesController> logger)
     {
@@ -53,6 +61,9 @@ public class QuotesController : ControllerBase
         _customFieldValidator = customFieldValidator;
         _tenantProvider = tenantProvider;
         _formulaEvaluator = formulaEvaluator;
+        _quoteTemplateRepository = quoteTemplateRepository;
+        _renderService = renderService;
+        _playwrightPdfService = playwrightPdfService;
         _db = db;
         _logger = logger;
     }
@@ -384,6 +395,8 @@ public class QuotesController : ControllerBase
 
     /// <summary>
     /// Generates a PDF for the quote on-demand.
+    /// If templateId is provided and the template exists, uses Playwright with Fluid rendering.
+    /// Otherwise, falls back to the built-in QuestPDF generator for backward compatibility.
     /// Returns application/pdf with filename Quote-{number}-v{version}.pdf.
     /// </summary>
     [HttpGet("{id:guid}/pdf")]
@@ -391,7 +404,7 @@ public class QuotesController : ControllerBase
     [ProducesResponseType(typeof(FileContentResult), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
-    public async Task<IActionResult> GeneratePdf(Guid id)
+    public async Task<IActionResult> GeneratePdf(Guid id, [FromQuery] Guid? templateId)
     {
         var quote = await _quoteRepository.GetByIdWithLineItemsAsync(id);
         if (quote is null)
@@ -404,11 +417,41 @@ public class QuotesController : ControllerBase
         if (!IsWithinScope(quote.OwnerId, permission.Scope, userId, teamMemberIds))
             return Forbid();
 
-        // Get the organization name from the tenant provider
+        var filename = $"Quote-{quote.QuoteNumber}-v{quote.VersionNumber}.pdf";
+
+        // Custom template path: Playwright + Fluid rendering
+        QuoteTemplate? template = null;
+        if (templateId.HasValue)
+        {
+            template = await _quoteTemplateRepository.GetByIdAsync(templateId.Value);
+        }
+
+        if (template != null)
+        {
+            var mergeData = await BuildQuoteMergeDataAsync(quote);
+            var renderedHtml = await _renderService.RenderAsync(template.HtmlBody, mergeData);
+
+            var pdfOptions = new PdfGenerationOptions(
+                PageSize: template.PageSize,
+                Landscape: string.Equals(template.PageOrientation, "landscape", StringComparison.OrdinalIgnoreCase),
+                MarginTop: template.PageMarginTop,
+                MarginRight: template.PageMarginRight,
+                MarginBottom: template.PageMarginBottom,
+                MarginLeft: template.PageMarginLeft
+            );
+
+            var pdfBytes = await _playwrightPdfService.GeneratePdfAsync(renderedHtml, pdfOptions);
+
+            _logger.LogInformation("Custom template PDF generated for quote {QuoteId} using template {TemplateId}: {Filename}",
+                id, template.Id, filename);
+
+            return File(pdfBytes, "application/pdf", filename);
+        }
+
+        // QuestPDF fallback: built-in default generator
         var org = await _tenantProvider.GetCurrentOrganizationAsync();
         var orgName = org?.Name ?? "Organization";
 
-        // Build PDF model
         var pdfModel = new QuotePdfModel
         {
             OrganizationName = orgName,
@@ -438,13 +481,118 @@ public class QuotesController : ControllerBase
         };
 
         var document = new QuotePdfDocument(pdfModel);
-        var pdfBytes = document.GeneratePdf();
+        var questPdfBytes = document.GeneratePdf();
 
-        var filename = $"Quote-{quote.QuoteNumber}-v{quote.VersionNumber}.pdf";
+        _logger.LogInformation("QuestPDF fallback generated for quote {QuoteId}: {Filename}", id, filename);
 
-        _logger.LogInformation("PDF generated for quote {QuoteId}: {Filename}", id, filename);
+        return File(questPdfBytes, "application/pdf", filename);
+    }
 
-        return File(pdfBytes, "application/pdf", filename);
+    /// <summary>
+    /// Builds a complete merge data dictionary from a quote entity for Fluid template rendering.
+    /// Includes quote properties, line items array, contact, company, deal, and organization data.
+    /// </summary>
+    private async Task<Dictionary<string, object?>> BuildQuoteMergeDataAsync(Quote quote)
+    {
+        var org = await _tenantProvider.GetCurrentOrganizationAsync();
+
+        var mergeData = new Dictionary<string, object?>
+        {
+            ["quote"] = new Dictionary<string, object?>
+            {
+                ["number"] = quote.QuoteNumber,
+                ["title"] = quote.Title,
+                ["description"] = quote.Description ?? string.Empty,
+                ["status"] = quote.Status.ToString(),
+                ["issue_date"] = quote.IssueDate.ToString("MMM dd, yyyy"),
+                ["expiry_date"] = quote.ExpiryDate?.ToString("MMM dd, yyyy") ?? string.Empty,
+                ["version"] = quote.VersionNumber.ToString(),
+                ["subtotal"] = quote.Subtotal.ToString("N2"),
+                ["discount_total"] = quote.DiscountTotal.ToString("N2"),
+                ["tax_total"] = quote.TaxTotal.ToString("N2"),
+                ["grand_total"] = quote.GrandTotal.ToString("N2"),
+                ["notes"] = quote.Notes ?? string.Empty
+            },
+            ["line_items"] = quote.LineItems
+                .OrderBy(li => li.SortOrder)
+                .Select(li => new Dictionary<string, object?>
+                {
+                    ["description"] = li.Description,
+                    ["quantity"] = li.Quantity.ToString("G"),
+                    ["unit_price"] = li.UnitPrice.ToString("N2"),
+                    ["discount_percent"] = li.DiscountPercent.ToString("G"),
+                    ["tax_percent"] = li.TaxPercent.ToString("G"),
+                    ["line_total"] = li.LineTotal.ToString("N2"),
+                    ["discount_amount"] = li.DiscountAmount.ToString("N2"),
+                    ["tax_amount"] = li.TaxAmount.ToString("N2"),
+                    ["net_total"] = li.NetTotal.ToString("N2")
+                })
+                .ToList()
+        };
+
+        // Contact data
+        if (quote.Contact != null)
+        {
+            mergeData["contact"] = new Dictionary<string, object?>
+            {
+                ["first_name"] = quote.Contact.FirstName,
+                ["last_name"] = quote.Contact.LastName,
+                ["email"] = quote.Contact.Email,
+                ["phone"] = quote.Contact.Phone,
+                ["job_title"] = quote.Contact.JobTitle
+            };
+        }
+        else
+        {
+            mergeData["contact"] = new Dictionary<string, object?>();
+        }
+
+        // Company data
+        if (quote.Company != null)
+        {
+            mergeData["company"] = new Dictionary<string, object?>
+            {
+                ["name"] = quote.Company.Name,
+                ["industry"] = quote.Company.Industry,
+                ["website"] = quote.Company.Website,
+                ["phone"] = quote.Company.Phone,
+                ["address"] = quote.Company.Address
+            };
+        }
+        else
+        {
+            mergeData["company"] = new Dictionary<string, object?>();
+        }
+
+        // Deal data
+        if (quote.Deal != null)
+        {
+            mergeData["deal"] = new Dictionary<string, object?>
+            {
+                ["title"] = quote.Deal.Title,
+                ["value"] = quote.Deal.Value?.ToString("N2") ?? string.Empty,
+                ["stage"] = quote.Deal.Stage?.Name,
+                ["close_date"] = quote.Deal.ExpectedCloseDate?.ToString("MMM dd, yyyy") ?? string.Empty,
+                ["description"] = quote.Deal.Description
+            };
+        }
+        else
+        {
+            mergeData["deal"] = new Dictionary<string, object?>();
+        }
+
+        // Organization data
+        mergeData["organization"] = new Dictionary<string, object?>
+        {
+            ["name"] = org?.Name ?? string.Empty,
+            ["logo_url"] = org?.LogoUrl ?? string.Empty,
+            ["address"] = org?.Address ?? string.Empty,
+            ["phone"] = org?.Phone ?? string.Empty,
+            ["email"] = org?.Email ?? string.Empty,
+            ["website"] = org?.Website ?? string.Empty
+        };
+
+        return mergeData;
     }
 
     // ---- Versioning ----

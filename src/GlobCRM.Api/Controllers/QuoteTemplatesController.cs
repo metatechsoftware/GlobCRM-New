@@ -21,6 +21,7 @@ namespace GlobCRM.Api.Controllers;
 public class QuoteTemplatesController : ControllerBase
 {
     private readonly IQuoteTemplateRepository _templateRepository;
+    private readonly IQuoteRepository _quoteRepository;
     private readonly PlaywrightPdfService _playwrightPdfService;
     private readonly TemplateRenderService _renderService;
     private readonly IFileStorageService _fileStorageService;
@@ -29,6 +30,7 @@ public class QuoteTemplatesController : ControllerBase
 
     public QuoteTemplatesController(
         IQuoteTemplateRepository templateRepository,
+        IQuoteRepository quoteRepository,
         PlaywrightPdfService playwrightPdfService,
         TemplateRenderService renderService,
         IFileStorageService fileStorageService,
@@ -36,6 +38,7 @@ public class QuoteTemplatesController : ControllerBase
         ILogger<QuoteTemplatesController> logger)
     {
         _templateRepository = templateRepository;
+        _quoteRepository = quoteRepository;
         _playwrightPdfService = playwrightPdfService;
         _renderService = renderService;
         _fileStorageService = fileStorageService;
@@ -323,6 +326,144 @@ public class QuoteTemplatesController : ControllerBase
             return NotFound(new { error = "Thumbnail file not found." });
 
         return File(imageBytes, "image/png");
+    }
+
+    // ---- Preview ----
+
+    /// <summary>
+    /// Renders a quote template with real quote data and returns HTML for preview display.
+    /// If quoteId is not provided, uses sample placeholder data.
+    /// </summary>
+    [HttpGet("{templateId:guid}/preview")]
+    [Authorize(Policy = "Permission:Quote:View")]
+    [ProducesResponseType(typeof(ContentResult), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Preview(Guid templateId, [FromQuery] Guid? quoteId)
+    {
+        var template = await _templateRepository.GetByIdAsync(templateId);
+        if (template is null)
+            return NotFound(new { error = "Quote template not found." });
+
+        Dictionary<string, object?> mergeData;
+
+        if (quoteId.HasValue)
+        {
+            var quote = await _quoteRepository.GetByIdWithLineItemsAsync(quoteId.Value);
+            if (quote is null)
+                return NotFound(new { error = "Quote not found." });
+
+            mergeData = await BuildQuoteMergeDataForPreviewAsync(quote);
+        }
+        else
+        {
+            mergeData = GetSampleMergeData();
+        }
+
+        var renderedHtml = await _renderService.RenderAsync(template.HtmlBody, mergeData);
+
+        return Content(renderedHtml, "text/html");
+    }
+
+    /// <summary>
+    /// Builds merge data from a real quote entity for preview rendering.
+    /// </summary>
+    private async Task<Dictionary<string, object?>> BuildQuoteMergeDataForPreviewAsync(Quote quote)
+    {
+        var org = await _tenantProvider.GetCurrentOrganizationAsync();
+
+        var mergeData = new Dictionary<string, object?>
+        {
+            ["quote"] = new Dictionary<string, object?>
+            {
+                ["number"] = quote.QuoteNumber,
+                ["title"] = quote.Title,
+                ["description"] = quote.Description ?? string.Empty,
+                ["status"] = quote.Status.ToString(),
+                ["issue_date"] = quote.IssueDate.ToString("MMM dd, yyyy"),
+                ["expiry_date"] = quote.ExpiryDate?.ToString("MMM dd, yyyy") ?? string.Empty,
+                ["version"] = quote.VersionNumber.ToString(),
+                ["subtotal"] = quote.Subtotal.ToString("N2"),
+                ["discount_total"] = quote.DiscountTotal.ToString("N2"),
+                ["tax_total"] = quote.TaxTotal.ToString("N2"),
+                ["grand_total"] = quote.GrandTotal.ToString("N2"),
+                ["notes"] = quote.Notes ?? string.Empty
+            },
+            ["line_items"] = quote.LineItems
+                .OrderBy(li => li.SortOrder)
+                .Select(li => new Dictionary<string, object?>
+                {
+                    ["description"] = li.Description,
+                    ["quantity"] = li.Quantity.ToString("G"),
+                    ["unit_price"] = li.UnitPrice.ToString("N2"),
+                    ["discount_percent"] = li.DiscountPercent.ToString("G"),
+                    ["tax_percent"] = li.TaxPercent.ToString("G"),
+                    ["line_total"] = li.LineTotal.ToString("N2"),
+                    ["discount_amount"] = li.DiscountAmount.ToString("N2"),
+                    ["tax_amount"] = li.TaxAmount.ToString("N2"),
+                    ["net_total"] = li.NetTotal.ToString("N2")
+                })
+                .ToList()
+        };
+
+        if (quote.Contact != null)
+        {
+            mergeData["contact"] = new Dictionary<string, object?>
+            {
+                ["first_name"] = quote.Contact.FirstName,
+                ["last_name"] = quote.Contact.LastName,
+                ["email"] = quote.Contact.Email,
+                ["phone"] = quote.Contact.Phone,
+                ["job_title"] = quote.Contact.JobTitle
+            };
+        }
+        else
+        {
+            mergeData["contact"] = new Dictionary<string, object?>();
+        }
+
+        if (quote.Company != null)
+        {
+            mergeData["company"] = new Dictionary<string, object?>
+            {
+                ["name"] = quote.Company.Name,
+                ["industry"] = quote.Company.Industry,
+                ["website"] = quote.Company.Website,
+                ["phone"] = quote.Company.Phone,
+                ["address"] = quote.Company.Address
+            };
+        }
+        else
+        {
+            mergeData["company"] = new Dictionary<string, object?>();
+        }
+
+        if (quote.Deal != null)
+        {
+            mergeData["deal"] = new Dictionary<string, object?>
+            {
+                ["title"] = quote.Deal.Title,
+                ["value"] = quote.Deal.Value?.ToString("N2") ?? string.Empty,
+                ["stage"] = quote.Deal.Stage?.Name,
+                ["close_date"] = quote.Deal.ExpectedCloseDate?.ToString("MMM dd, yyyy") ?? string.Empty,
+                ["description"] = quote.Deal.Description
+            };
+        }
+        else
+        {
+            mergeData["deal"] = new Dictionary<string, object?>();
+        }
+
+        mergeData["organization"] = new Dictionary<string, object?>
+        {
+            ["name"] = org?.Name ?? string.Empty,
+            ["logo_url"] = org?.LogoUrl ?? string.Empty,
+            ["address"] = org?.Address ?? string.Empty,
+            ["phone"] = org?.Phone ?? string.Empty,
+            ["email"] = org?.Email ?? string.Empty,
+            ["website"] = org?.Website ?? string.Empty
+        };
+
+        return mergeData;
     }
 
     // ---- Merge Fields ----

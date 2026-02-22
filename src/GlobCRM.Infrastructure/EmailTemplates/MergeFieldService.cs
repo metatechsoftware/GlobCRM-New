@@ -64,6 +64,30 @@ public class MergeFieldService
                 new("lead.company_name", "Company Name", "Lead", false),
                 new("lead.title", "Job Title", "Lead", false),
                 new("lead.source.name", "Source Name", "Lead", false),
+            },
+            ["quote"] = new List<MergeFieldDefinition>
+            {
+                new("quote.number", "Quote Number", "Quote", false),
+                new("quote.title", "Title", "Quote", false),
+                new("quote.description", "Description", "Quote", false),
+                new("quote.status", "Status", "Quote", false),
+                new("quote.issue_date", "Issue Date", "Quote", false),
+                new("quote.expiry_date", "Expiry Date", "Quote", false),
+                new("quote.subtotal", "Subtotal", "Quote", false),
+                new("quote.discount_total", "Discount Total", "Quote", false),
+                new("quote.tax_total", "Tax Total", "Quote", false),
+                new("quote.grand_total", "Grand Total", "Quote", false),
+                new("quote.notes", "Notes", "Quote", false),
+                new("quote.version", "Version", "Quote", false),
+            },
+            ["organization"] = new List<MergeFieldDefinition>
+            {
+                new("organization.name", "Name", "Organization", false),
+                new("organization.logo_url", "Logo URL", "Organization", false),
+                new("organization.address", "Address", "Organization", false),
+                new("organization.phone", "Phone", "Organization", false),
+                new("organization.email", "Email", "Organization", false),
+                new("organization.website", "Website", "Organization", false),
             }
         };
 
