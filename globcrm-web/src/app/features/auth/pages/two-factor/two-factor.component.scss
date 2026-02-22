@@ -1,106 +1,99 @@
+@use '../../../../../styles/auth-shared';
+
+// ─── Two-Factor: Authenticated Settings Page ─────────────
+// Uses shared auth partials for icon containers + form fields,
+// but keeps its own card-based layout (no split layout).
+
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .tfa-container {
   display: flex;
   justify-content: center;
-  padding: 2rem;
+  padding: var(--space-6);
   min-height: calc(100vh - 64px);
 }
 
 .tfa-card {
   width: 100%;
   max-width: 600px;
-  padding: 2rem;
+  padding: var(--space-6);
 }
 
 .tfa-card-header {
-  margin-bottom: 1.5rem;
+  margin-bottom: var(--space-5);
 }
 
 .header-row {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .page-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: var(--text-xl);
+  font-weight: var(--font-semibold);
   margin: 0;
   color: var(--color-text);
 }
 
 .page-subtitle {
-  font-size: 0.875rem;
+  font-size: var(--text-sm);
   color: var(--color-text-muted);
-  margin: 0.125rem 0 0 0;
+  margin: 2px 0 0 0;
 }
 
-// Loading state
+// ─── Loading State ──────────────────────────────────────
 .loading-state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 3rem 0;
-  gap: 1rem;
+  padding: var(--space-10) 0;
+  gap: var(--space-4);
 
   p {
     color: var(--color-text-muted);
   }
 }
 
-// Error banner
-.error-banner {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  background-color: var(--color-danger-soft);
-  border-radius: 4px;
-  margin-bottom: 1rem;
-  color: var(--color-danger-text);
-  font-size: 0.875rem;
-
-  mat-icon {
-    font-size: 20px;
-    width: 20px;
-    height: 20px;
-  }
-}
-
-// Setup section
+// ─── Setup Section ──────────────────────────────────────
 .setup-section {
   .setup-header {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: var(--space-6);
+    animation: fadeSlideUp 400ms var(--ease-out) both;
 
     h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0.75rem 0 0.5rem 0;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin: var(--space-3) 0 var(--space-2) 0;
     }
   }
 
   .setup-description {
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     margin: 0;
     max-width: 440px;
     margin-left: auto;
     margin-right: auto;
+    line-height: var(--leading-relaxed);
   }
 }
 
-.shield-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: var(--color-primary);
-}
-
-// Setup steps
+// ─── Setup Steps ────────────────────────────────────────
 .setup-step {
   display: flex;
-  gap: 1rem;
-  padding: 1.5rem 0;
+  gap: var(--space-4);
+  padding: var(--space-5) 0;
 
   .step-number {
     display: flex;
@@ -109,127 +102,140 @@
     width: 32px;
     height: 32px;
     min-width: 32px;
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     background-color: var(--color-primary);
     color: white;
-    font-weight: 600;
-    font-size: 0.875rem;
+    font-weight: var(--font-semibold);
+    font-size: var(--text-sm);
   }
 
   .step-content {
     flex: 1;
 
     h4 {
-      font-size: 1rem;
-      font-weight: 500;
-      margin: 0.25rem 0 1rem 0;
+      font-size: var(--text-md);
+      font-weight: var(--font-medium);
+      margin: var(--space-1) 0 var(--space-4) 0;
       color: var(--color-text);
     }
   }
 }
 
-// QR code
+.anim-step-1 {
+  animation: fadeSlideUp 400ms var(--ease-out) 150ms both;
+}
+
+.anim-step-2 {
+  animation: fadeSlideUp 400ms var(--ease-out) 300ms both;
+}
+
+// ─── QR Code ────────────────────────────────────────────
 .qr-code-container {
   display: flex;
   justify-content: center;
-  padding: 1rem 0;
+  padding: var(--space-4) 0;
 }
 
 .qr-code-image {
   border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 0.5rem;
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
 }
 
 .manual-entry {
   text-align: center;
-  margin-top: 0.75rem;
+  margin-top: var(--space-3);
 
   .manual-label {
-    font-size: 0.8rem;
+    font-size: var(--text-xs);
     color: var(--color-text-muted);
-    margin: 0 0 0.5rem 0;
+    margin: 0 0 var(--space-2) 0;
   }
 
   .shared-key {
     display: inline-block;
-    padding: 0.5rem 1rem;
+    padding: var(--space-2) var(--space-4);
     background-color: var(--color-bg-secondary);
-    border-radius: 4px;
-    font-size: 0.9rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm);
     letter-spacing: 2px;
     font-family: var(--font-mono);
     word-break: break-all;
+    border: 1px solid var(--color-border-subtle);
   }
-}
-
-mat-form-field {
-  width: 100%;
-  margin-bottom: 0.25rem;
 }
 
 .enable-button {
   width: 100%;
   height: 44px;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
   display: flex;
   align-items: center;
   justify-content: center;
+  transition:
+    transform 200ms var(--ease-default),
+    box-shadow 200ms var(--ease-default);
+
+  &:hover:not(:disabled) {
+    transform: scale(1.02);
+    box-shadow: 0 4px 16px rgba(249, 115, 22, 0.35);
+  }
 }
 
-// Recovery codes section
+// ─── Recovery Codes Section ─────────────────────────────
 .recovery-section {
   .recovery-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
+    animation: fadeSlideUp 400ms var(--ease-out) both;
 
     h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0.75rem 0 0.5rem 0;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin: var(--space-3) 0 var(--space-2) 0;
     }
   }
 
   .recovery-description {
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     margin: 0;
     max-width: 440px;
     margin-left: auto;
     margin-right: auto;
+    line-height: var(--leading-relaxed);
   }
-}
-
-.success-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: var(--color-success);
 }
 
 .recovery-codes-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
 }
 
 .recovery-code {
-  padding: 0.5rem 0.75rem;
+  padding: var(--space-2) var(--space-3);
   background-color: var(--color-bg-secondary);
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-subtle);
   text-align: center;
+  transition: border-color 200ms var(--ease-default);
+
+  &:hover {
+    border-color: var(--color-border);
+  }
 
   code {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: var(--text-sm);
     letter-spacing: 1px;
   }
 }
 
 .recovery-actions {
   display: flex;
-  gap: 1rem;
+  gap: var(--space-4);
   justify-content: center;
 
   button {
@@ -237,43 +243,38 @@ mat-form-field {
   }
 }
 
-// Enabled section
+// ─── Enabled Section ────────────────────────────────────
 .enabled-section {
   .enabled-header {
     text-align: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: var(--space-5);
+    animation: fadeSlideUp 400ms var(--ease-out) both;
 
     h3 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin: 0.75rem 0 0.5rem 0;
+      font-size: var(--text-lg);
+      font-weight: var(--font-semibold);
+      margin: var(--space-3) 0 var(--space-2) 0;
     }
   }
 
   .enabled-description {
     color: var(--color-text-secondary);
-    font-size: 0.9rem;
+    font-size: var(--text-sm);
     margin: 0;
   }
-}
-
-.enabled-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: var(--color-success);
 }
 
 .recovery-info {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   background-color: var(--color-info-soft);
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  font-size: 0.875rem;
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--space-5);
+  font-size: var(--text-sm);
   color: var(--color-text-secondary);
+  border: 1px solid rgba(96, 165, 250, 0.15);
 
   mat-icon {
     font-size: 20px;
@@ -284,29 +285,29 @@ mat-form-field {
 }
 
 .disable-section {
-  padding-top: 1.5rem;
+  padding-top: var(--space-5);
 
   h4 {
-    font-size: 1rem;
-    font-weight: 500;
-    margin: 0 0 0.5rem 0;
+    font-size: var(--text-md);
+    font-weight: var(--font-medium);
+    margin: 0 0 var(--space-2) 0;
   }
 
   .disable-warning {
     color: var(--color-text-muted);
-    font-size: 0.875rem;
-    margin: 0 0 1rem 0;
+    font-size: var(--text-sm);
+    margin: 0 0 var(--space-4) 0;
   }
 }
 
-// Responsive
+// ─── Responsive ──────────────────────────────────────────
 @media (max-width: 600px) {
   .tfa-container {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .tfa-card {
-    padding: 1rem;
+    padding: var(--space-4);
   }
 
   .recovery-codes-grid {
@@ -319,5 +320,22 @@ mat-form-field {
     button {
       width: 100%;
     }
+  }
+}
+
+// ─── Accessibility: Reduced Motion ───────────────────────
+@media (prefers-reduced-motion: reduce) {
+  .setup-section .setup-header,
+  .recovery-section .recovery-header,
+  .enabled-section .enabled-header,
+  .anim-step-1,
+  .anim-step-2 {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .enable-button {
+    transition: none;
   }
 }

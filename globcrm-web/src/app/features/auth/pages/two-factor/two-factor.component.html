@@ -2,41 +2,47 @@
   <mat-card class="tfa-card">
     <mat-card-header class="tfa-card-header">
       <div class="header-row">
-        <button mat-icon-button (click)="goBack()" [attr.aria-label]="'auth.twoFactor.aria.goBack' | transloco">
+        <button mat-icon-button (click)="goBack()" aria-label="Go back">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div>
-          <h2 class="page-title">{{ 'auth.twoFactorSetup.securitySettings' | transloco }}</h2>
-          <p class="page-subtitle">{{ 'auth.twoFactorSetup.title' | transloco }}</p>
+          <h2 class="page-title">Security Settings</h2>
+          <p class="page-subtitle">Two-Factor Authentication</p>
         </div>
       </div>
     </mat-card-header>
 
     <mat-card-content>
+      <!-- Loading State -->
       @if (state() === 'loading') {
         <div class="loading-state">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>{{ 'auth.twoFactorSetup.loadingSettings' | transloco }}</p>
+          <p>Loading security settings...</p>
         </div>
       }
 
+      <!-- Error State -->
       @if (state() === 'error') {
         <div class="error-banner">
           <mat-icon>error_outline</mat-icon>
           <span>{{ errorMessage() }}</span>
         </div>
         <button mat-flat-button color="primary" (click)="goBack()">
-          {{ 'auth.twoFactorSetup.returnToDashboard' | transloco }}
+          Return to Dashboard
         </button>
       }
 
+      <!-- Setup State: 2FA Not Enabled -->
       @if (state() === 'setup') {
         <div class="setup-section">
           <div class="setup-header">
-            <mat-icon class="shield-icon">shield</mat-icon>
-            <h3>{{ 'auth.twoFactorSetup.enableTitle' | transloco }}</h3>
+            <div class="state-icon-container state-icon-container--info">
+              <mat-icon>shield</mat-icon>
+            </div>
+            <h3>Enable Two-Factor Authentication</h3>
             <p class="setup-description">
-              {{ 'auth.twoFactorSetup.enableDescription' | transloco }}
+              Add an extra layer of security to your account. You'll need an authenticator app
+              like Google Authenticator, Authy, or Microsoft Authenticator.
             </p>
           </div>
 
@@ -47,14 +53,15 @@
             </div>
           }
 
-          <div class="setup-step">
+          <!-- Step 1: QR Code -->
+          <div class="setup-step anim-step-1">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h4>{{ 'auth.twoFactorSetup.step1Title' | transloco }}</h4>
+              <h4>Scan this QR code with your authenticator app</h4>
 
               @if (qrCodeDataUrl()) {
                 <div class="qr-code-container">
-                  <img [src]="qrCodeDataUrl()" [alt]="'auth.twoFactor.qrCodeAlt' | transloco" class="qr-code-image">
+                  <img [src]="qrCodeDataUrl()" alt="2FA QR Code" class="qr-code-image">
                 </div>
               } @else {
                 <div class="qr-code-container">
@@ -64,7 +71,7 @@
 
               @if (sharedKey()) {
                 <div class="manual-entry">
-                  <p class="manual-label">{{ 'auth.twoFactorSetup.manualEntry' | transloco }}</p>
+                  <p class="manual-label">Or enter this key manually:</p>
                   <code class="shared-key">{{ formatSharedKey(sharedKey()!) }}</code>
                 </div>
               }
@@ -73,21 +80,22 @@
 
           <mat-divider></mat-divider>
 
-          <div class="setup-step">
+          <!-- Step 2: Verify -->
+          <div class="setup-step anim-step-2">
             <div class="step-number">2</div>
             <div class="step-content">
-              <h4>{{ 'auth.twoFactorSetup.step2Title' | transloco }}</h4>
+              <h4>Enter the code from your authenticator app</h4>
               <form [formGroup]="verifyForm" (ngSubmit)="onEnableSubmit()">
                 <mat-form-field appearance="outline">
-                  <mat-label>{{ 'auth.twoFactorSetup.verificationCode' | transloco }}</mat-label>
+                  <mat-label>Verification Code</mat-label>
                   <input matInput formControlName="twoFactorCode" type="text"
-                         [placeholder]="'auth.twoFactorSetup.codePlaceholder' | transloco" maxlength="6" autocomplete="one-time-code">
+                         placeholder="000000" maxlength="6" autocomplete="one-time-code">
                   <mat-icon matPrefix>pin</mat-icon>
                   @if (verifyForm.get('twoFactorCode')?.hasError('required') && verifyForm.get('twoFactorCode')?.touched) {
-                    <mat-error>{{ 'auth.twoFactorSetup.codeRequired' | transloco }}</mat-error>
+                    <mat-error>Verification code is required</mat-error>
                   }
                   @if (verifyForm.get('twoFactorCode')?.hasError('minlength') && verifyForm.get('twoFactorCode')?.touched) {
-                    <mat-error>{{ 'auth.twoFactorSetup.codeMinLength' | transloco }}</mat-error>
+                    <mat-error>Code must be 6 digits</mat-error>
                   }
                 </mat-form-field>
 
@@ -96,7 +104,7 @@
                   @if (isLoading()) {
                     <mat-spinner diameter="20" color="accent"></mat-spinner>
                   } @else {
-                    {{ 'auth.twoFactorSetup.enableButton' | transloco }}
+                    Enable Two-Factor Authentication
                   }
                 </button>
               </form>
@@ -105,13 +113,17 @@
         </div>
       }
 
+      <!-- Recovery Codes State -->
       @if (state() === 'recovery-codes') {
         <div class="recovery-section">
           <div class="recovery-header">
-            <mat-icon class="success-icon">check_circle</mat-icon>
-            <h3>{{ 'auth.twoFactorSetup.enabledTitle' | transloco }}</h3>
+            <div class="state-icon-container state-icon-container--success">
+              <mat-icon>check_circle</mat-icon>
+            </div>
+            <h3>Two-Factor Authentication Enabled</h3>
             <p class="recovery-description">
-              {{ 'auth.twoFactorSetup.recoveryCodes' | transloco }}
+              Save these recovery codes in a safe place. Each code can only be used once
+              to access your account if you lose your authenticator device.
             </p>
           </div>
 
@@ -126,29 +138,32 @@
           <div class="recovery-actions">
             <button mat-stroked-button (click)="downloadRecoveryCodes()">
               <mat-icon>download</mat-icon>
-              {{ 'auth.twoFactorSetup.downloadCodes' | transloco }}
+              Download Codes
             </button>
             <button mat-flat-button color="primary" (click)="dismissRecoveryCodes()">
-              {{ 'auth.twoFactorSetup.savedCodes' | transloco }}
+              I've Saved My Codes
             </button>
           </div>
         </div>
       }
 
+      <!-- Enabled State: 2FA Already Active -->
       @if (state() === 'enabled') {
         <div class="enabled-section">
           <div class="enabled-header">
-            <mat-icon class="enabled-icon">verified_user</mat-icon>
-            <h3>{{ 'auth.twoFactorSetup.activeTitle' | transloco }}</h3>
+            <div class="state-icon-container state-icon-container--success">
+              <mat-icon>verified_user</mat-icon>
+            </div>
+            <h3>Two-Factor Authentication is Enabled</h3>
             <p class="enabled-description">
-              {{ 'auth.twoFactorSetup.activeDescription' | transloco }}
+              Your account is protected with an extra layer of security.
             </p>
           </div>
 
           @if (recoveryCodesLeft() > 0) {
             <div class="recovery-info">
               <mat-icon>info_outline</mat-icon>
-              <span>{{ 'auth.twoFactorSetup.youHave' | transloco }} <strong>{{ recoveryCodesLeft() }}</strong> {{ 'auth.twoFactorSetup.recoveryCodesRemaining' | transloco }}</span>
+              <span>You have <strong>{{ recoveryCodesLeft() }}</strong> recovery codes remaining.</span>
             </div>
           }
 
@@ -162,15 +177,15 @@
           <mat-divider></mat-divider>
 
           <div class="disable-section">
-            <h4>{{ 'auth.twoFactorSetup.disableTitle' | transloco }}</h4>
+            <h4>Disable Two-Factor Authentication</h4>
             <p class="disable-warning">
-              {{ 'auth.twoFactorSetup.disableWarning' | transloco }}
+              This will remove the extra security on your account.
             </p>
             <button mat-stroked-button color="warn" (click)="onDisableSubmit()" [disabled]="isLoading()">
               @if (isLoading()) {
                 <mat-spinner diameter="20"></mat-spinner>
               } @else {
-                {{ 'auth.twoFactorSetup.disableButton' | transloco }}
+                Disable 2FA
               }
             </button>
           </div>

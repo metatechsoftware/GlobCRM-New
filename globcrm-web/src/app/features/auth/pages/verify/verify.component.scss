@@ -1,108 +1,31 @@
-.auth-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 1rem;
-  background-color: var(--color-bg-secondary);
-}
+@use '../../../../../styles/auth-shared';
 
-.auth-card {
-  width: 100%;
-  max-width: 480px;
-  padding: 2rem;
-}
-
-.auth-card-header {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.brand-header {
-  text-align: center;
-}
-
-.brand-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-primary);
-  margin: 0;
-  letter-spacing: -0.5px;
-}
-
-.state-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 1rem 0;
-
-  h2 {
-    margin: 1rem 0 0.5rem 0;
-    font-size: 1.5rem;
-    font-weight: 600;
-    color: var(--color-text);
-  }
-}
-
-.state-subtitle {
-  color: var(--color-text-secondary);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  margin: 0 0 1.5rem 0;
-  max-width: 350px;
-}
-
-.state-icon {
-  font-size: 64px;
-  width: 64px;
-  height: 64px;
-}
-
-.pending-icon {
-  color: var(--color-primary);
-}
-
-.success-icon {
-  color: var(--color-success-text);
-}
-
-.error-icon {
-  color: var(--color-danger-text);
-}
+// ─── Verify Email-Specific Styles ───────────────────────
 
 .resend-section {
-  margin-top: 0.5rem;
+  margin-top: var(--space-2);
+  animation: fadeSlideUp 400ms var(--ease-out) 550ms both;
 }
 
 .resend-text {
   color: var(--color-text-muted);
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-}
-
-.action-button {
-  min-width: 200px;
-  height: 44px;
-  font-size: 1rem;
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-2);
 }
 
 .error-actions {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2);
+  animation: fadeSlideUp 400ms var(--ease-out) 550ms both;
 }
 
-@media (max-width: 480px) {
-  .auth-card {
-    padding: 1.5rem;
-    box-shadow: none;
-  }
-
-  .auth-container {
-    padding: 0;
-    align-items: flex-start;
+@media (prefers-reduced-motion: reduce) {
+  .resend-section,
+  .error-actions {
+    animation: none;
+    opacity: 1;
+    transform: none;
   }
 }
