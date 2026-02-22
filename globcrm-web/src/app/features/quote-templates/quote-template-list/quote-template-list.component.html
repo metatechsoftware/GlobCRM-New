@@ -1,0 +1,115 @@
+<div class="template-list-page">
+  <!-- Header -->
+  <div class="page-header">
+    <div class="header-left">
+      <h1>{{ 'quoteTemplates.list.title' | transloco }}</h1>
+      <p class="page-tagline">{{ 'quoteTemplates.list.tagline' | transloco }}</p>
+    </div>
+    <div class="header-right">
+      <span class="template-count">{{ store.templates().length }} {{ 'common.templates' | transloco }}</span>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="createTemplate()"
+      >
+        <mat-icon>add</mat-icon>
+        {{ 'quoteTemplates.list.createButton' | transloco }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (store.loading()) {
+    <div class="loading-state">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>{{ 'quoteTemplates.list.loading' | transloco }}</p>
+    </div>
+  }
+
+  <!-- Template Grid -->
+  @if (!store.loading()) {
+    @if (store.templates().length > 0) {
+      <div class="template-grid">
+        @for (template of store.templates(); track template.id; let idx = $index) {
+          <div class="template-card" [style.--card-index]="idx" (click)="editTemplate(template.id)">
+            <!-- Thumbnail -->
+            <div class="thumbnail-wrapper">
+              @if (getThumbnailUrl(template)) {
+                <img [src]="getThumbnailUrl(template)" [alt]="template.name" />
+              } @else {
+                <div class="thumbnail-placeholder">
+                  <mat-icon>description</mat-icon>
+                </div>
+              }
+            </div>
+
+            <!-- Card Info -->
+            <div class="card-info">
+              <div class="card-info__top">
+                <span class="template-name">{{ template.name }}</span>
+                @if (template.isDefault) {
+                  <span class="default-badge">{{ 'quoteTemplates.list.default' | transloco }}</span>
+                }
+              </div>
+              <span class="template-meta">
+                {{ 'quoteTemplates.list.lastModified' | transloco }} {{ template.updatedAt | date:'mediumDate' }}
+              </span>
+              <span class="template-meta template-meta--page">
+                {{ template.pageSize }} {{ template.pageOrientation }}
+              </span>
+            </div>
+
+            <!-- Three-dot Menu -->
+            <button
+              mat-icon-button
+              class="card-menu-trigger"
+              [matMenuTriggerFor]="cardMenu"
+              [matTooltip]="'quoteTemplates.list.actions.more' | transloco"
+              (click)="$event.stopPropagation()"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #cardMenu="matMenu">
+              <button mat-menu-item (click)="editTemplate(template.id)">
+                <mat-icon>edit</mat-icon>
+                <span>{{ 'quoteTemplates.list.actions.edit' | transloco }}</span>
+              </button>
+              <button mat-menu-item (click)="cloneTemplate(template)">
+                <mat-icon>content_copy</mat-icon>
+                <span>{{ 'quoteTemplates.list.actions.clone' | transloco }}</span>
+              </button>
+              @if (!template.isDefault) {
+                <button mat-menu-item (click)="setDefault(template)">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ 'quoteTemplates.list.actions.setDefault' | transloco }}</span>
+                </button>
+              }
+              <button mat-menu-item (click)="deleteTemplate(template)">
+                <mat-icon color="warn">delete</mat-icon>
+                <span>{{ 'quoteTemplates.list.actions.delete' | transloco }}</span>
+              </button>
+            </mat-menu>
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="empty-state">
+        <div class="empty-icon-wrap">
+          <mat-icon class="empty-icon">description</mat-icon>
+        </div>
+        <h2 class="empty-heading">{{ 'quoteTemplates.list.empty.title' | transloco }}</h2>
+        <p>{{ 'quoteTemplates.list.empty.description' | transloco }}</p>
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="createTemplate()"
+        >
+          <mat-icon>add</mat-icon>
+          {{ 'quoteTemplates.list.empty.button' | transloco }}
+        </button>
+      </div>
+    }
+  }
+</div>
