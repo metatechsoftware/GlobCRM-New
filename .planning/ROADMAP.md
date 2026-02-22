@@ -66,7 +66,7 @@
 - [x] **Phase 27: Localization Foundation** (6 plans) — Transloco infrastructure, language switcher, locale formatting, Material intl, lazy-loading scopes, gap closures
 - [x] **Phase 28: Localization String Extraction** (12 plans) — Extract all hardcoded strings to EN/TR JSON files across 21 feature scopes, shared components, CI coverage check + UAT gap closures (completed 2026-02-21)
 - [x] **Phase 29: Integration Marketplace** (5 plans) — Backend entities + encryption, API controller, frontend catalog grid, connect/disconnect dialogs, detail panel + activity log + i18n (completed 2026-02-21)
-- [ ] **Phase 30: Free-Form Kanban Boards** — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates
+- [ ] **Phase 30: Free-Form Kanban Boards** (7 plans) — Board/column/card CRUD, drag-drop, entity-linked cards, labels, comments, templates + UAT gap closure
 - [ ] **Phase 31: Quote PDF Templates** (5 plans) — Unlayer document mode editor, merge fields, line items, Playwright PDF, preview, QuestPDF fallback
 
 ## Phase Details
@@ -141,7 +141,7 @@ Plans:
   3. Cards display due date urgency indicators (yellow approaching, red overdue), assignee avatars, colored labels, checklist progress, and WIP column limits with visual warnings when exceeded
   4. User can link a card to any CRM entity (Contact, Company, Deal, Lead, etc.) with the entity name and icon displayed on the card face, clickable to open the existing preview sidebar
   5. User can write rich text descriptions on cards, add checklist items with progress tracking, comment on cards with threaded discussion, and filter visible cards by label, assignee, or due date
-**Plans**: 6 plans
+**Plans**: 7 plans
 Plans:
 - [ ] 30-01-PLAN.md — Backend domain entities, enums, EF Core configurations, migration (7 entities + BoardVisibility enum)
 - [ ] 30-02-PLAN.md — BoardsController with ~25 REST endpoints, DTOs, validators (boards, columns, cards, labels, checklists, comments)
@@ -149,6 +149,7 @@ Plans:
 - [ ] 30-04-PLAN.md — Board detail kanban view with columns, cards, dual CDK drag-and-drop (cards + columns), WIP limits
 - [ ] 30-05-PLAN.md — Card detail slide panel (labels, checklists, comments, entity linking, rich text) + board filter panel
 - [ ] 30-06-PLAN.md — Transloco i18n (EN/TR boards scope), full template string wiring, end-to-end verification checkpoint
+- [ ] 30-07-PLAN.md — UAT gap closure: board list refresh fix, card drag-drop persistence fix, GET checklist endpoint
 
 ### Phase 31: Quote PDF Templates
 **Goal**: Users can design custom quote PDF templates with a visual drag-and-drop editor and generate professionally branded PDFs with real quote data
@@ -201,7 +202,7 @@ Plans:
 | 27. Localization Foundation | v1.3 | 6/6 | Complete | 2026-02-21 |
 | 28. Localization String Extraction | 12/12 | Complete    | 2026-02-21 | - |
 | 29. Integration Marketplace | v1.3 | 5/5 | Complete | 2026-02-21 |
-| 30. Free-Form Kanban Boards | 5/6 | In Progress|  | - |
+| 30. Free-Form Kanban Boards | 6/7 | In Progress|  | - |
 | 31. Quote PDF Templates | 4/5 | In Progress|  | - |
 
 **Totals:** 31 phases, 177 plans complete (v1.0-v1.2 + Phase 27 + Phase 28 base + Phase 29), v1.3 plans TBD
