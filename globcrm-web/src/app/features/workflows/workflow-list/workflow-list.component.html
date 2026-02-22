@@ -14,15 +14,15 @@
           <path d="M16.5 6 Q19 6 22 10" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
           <path d="M16.5 22 Q19 22 22 18" stroke="var(--color-border-strong, #D1D5DB)" stroke-width="1.2" fill="none"/>
         </svg>
-        <h1>{{ 'title' | transloco }}</h1>
+        <h1>{{ 'workflows.title' | transloco }}</h1>
       </div>
       <p class="workflow-list__subtitle">
-        {{ 'subtitle' | transloco }}
+        {{ 'workflows.subtitle' | transloco }}
       </p>
     </div>
     <a mat-raised-button color="primary" routerLink="/workflows/new">
       <mat-icon>add</mat-icon>
-      {{ 'newWorkflow' | transloco }}
+      {{ 'workflows.newWorkflow' | transloco }}
     </a>
   </div>
 
@@ -30,22 +30,22 @@
   @if (!store.loading() && store.totalCount() > 0) {
     <div class="workflow-list__stats-ribbon">
       <div class="stats-card">
-        <span class="stats-card__label">{{ 'list.total' | transloco }}</span>
+        <span class="stats-card__label">{{ 'workflows.list.total' | transloco }}</span>
         <span class="stats-card__value">{{ store.totalCount() }}</span>
       </div>
       <div class="stats-card">
         <span class="stats-card__indicator stats-card__indicator--active"></span>
-        <span class="stats-card__label">{{ 'list.active' | transloco }}</span>
+        <span class="stats-card__label">{{ 'workflows.list.active' | transloco }}</span>
         <span class="stats-card__value">{{ activeCount() }}</span>
       </div>
       <div class="stats-card">
         <span class="stats-card__indicator stats-card__indicator--paused"></span>
-        <span class="stats-card__label">{{ 'list.paused' | transloco }}</span>
+        <span class="stats-card__label">{{ 'workflows.list.paused' | transloco }}</span>
         <span class="stats-card__value">{{ pausedCount() }}</span>
       </div>
       <div class="stats-card">
         <span class="stats-card__indicator stats-card__indicator--draft"></span>
-        <span class="stats-card__label">{{ 'list.draft' | transloco }}</span>
+        <span class="stats-card__label">{{ 'workflows.list.draft' | transloco }}</span>
         <span class="stats-card__value">{{ draftCount() }}</span>
       </div>
     </div>
@@ -55,7 +55,7 @@
   <div class="workflow-list__filters">
     <mat-icon class="workflow-list__filters-icon">tune</mat-icon>
     <mat-form-field appearance="outline" class="workflow-list__filter-field">
-      <mat-label>{{ 'list.entityType' | transloco }}</mat-label>
+      <mat-label>{{ 'workflows.list.entityType' | transloco }}</mat-label>
       <mat-select
         [value]="entityTypeFilter()"
         (selectionChange)="onEntityTypeChange($event.value)"
@@ -67,7 +67,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="workflow-list__filter-field">
-      <mat-label>{{ 'list.status' | transloco }}</mat-label>
+      <mat-label>{{ 'workflows.list.status' | transloco }}</mat-label>
       <mat-select
         [value]="statusFilter()"
         (selectionChange)="onStatusChange($event.value)"
@@ -136,12 +136,12 @@
           <line x1="120" y1="116" x2="120" y2="124" stroke="var(--color-primary, #F97316)" stroke-width="1.5" stroke-linecap="round"/>
         </g>
       </svg>
-      <h3>{{ 'list.noWorkflows' | transloco }}</h3>
+      <h3>{{ 'workflows.list.noWorkflows' | transloco }}</h3>
       <p>
-        {{ 'list.noWorkflowsDescription' | transloco }}
+        {{ 'workflows.list.noWorkflowsDescription' | transloco }}
       </p>
       <a mat-raised-button color="primary" routerLink="/workflows/new">
-        {{ 'list.createFirst' | transloco }}
+        {{ 'workflows.list.createFirst' | transloco }}
       </a>
     </div>
   }

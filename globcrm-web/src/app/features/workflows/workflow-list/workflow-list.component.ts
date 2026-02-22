@@ -69,7 +69,7 @@ export class WorkflowListComponent implements OnInit {
   readonly statusFilter = signal<string>('');
 
   readonly entityTypes = computed(() => [
-    { value: '', label: this.transloco.translate('list.allEntityTypes') },
+    { value: '', label: this.transloco.translate('workflows.list.allEntityTypes') },
     { value: 'Contact', label: 'Contact' },
     { value: 'Company', label: 'Company' },
     { value: 'Deal', label: 'Deal' },
@@ -78,10 +78,10 @@ export class WorkflowListComponent implements OnInit {
   ]);
 
   readonly statuses = computed(() => [
-    { value: '', label: this.transloco.translate('list.allStatuses') },
-    { value: 'draft', label: this.transloco.translate('list.draft') },
-    { value: 'active', label: this.transloco.translate('list.active') },
-    { value: 'paused', label: this.transloco.translate('list.paused') },
+    { value: '', label: this.transloco.translate('workflows.list.allStatuses') },
+    { value: 'draft', label: this.transloco.translate('workflows.list.draft') },
+    { value: 'active', label: this.transloco.translate('workflows.list.active') },
+    { value: 'paused', label: this.transloco.translate('workflows.list.paused') },
   ]);
 
   /** Skeleton items for loading state */
@@ -128,8 +128,8 @@ export class WorkflowListComponent implements OnInit {
   onToggleStatus(workflow: WorkflowListItem): void {
     this.store.toggleStatus(workflow.id, !workflow.isActive);
     const msg = workflow.isActive
-      ? this.transloco.translate('list.workflowDisabled', { name: workflow.name })
-      : this.transloco.translate('list.workflowEnabled', { name: workflow.name });
+      ? this.transloco.translate('workflows.list.workflowDisabled', { name: workflow.name })
+      : this.transloco.translate('workflows.list.workflowEnabled', { name: workflow.name });
     this.snackBar.open(msg, 'Close', { duration: 3000 });
   }
 
@@ -140,7 +140,7 @@ export class WorkflowListComponent implements OnInit {
   onDuplicate(workflow: WorkflowListItem): void {
     this.store.duplicateWorkflow(workflow.id, (duplicated) => {
       this.snackBar.open(
-        this.transloco.translate('list.workflowDuplicated', { name: duplicated.name }),
+        this.transloco.translate('workflows.list.workflowDuplicated', { name: duplicated.name }),
         'Close',
         { duration: 3000 },
       );
@@ -159,7 +159,7 @@ export class WorkflowListComponent implements OnInit {
 
       this.store.deleteWorkflow(workflow.id, () => {
         this.snackBar.open(
-          this.transloco.translate('list.workflowDeleted', { name: workflow.name }),
+          this.transloco.translate('workflows.list.workflowDeleted', { name: workflow.name }),
           'Close',
           { duration: 3000 },
         );

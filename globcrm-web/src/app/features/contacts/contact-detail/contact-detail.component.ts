@@ -174,7 +174,7 @@ export class ContactDetailComponent implements OnInit {
         // Check if the response is a merged-record redirect
         if (response?.isMerged && response?.mergedIntoId) {
           this.snackBar.open(
-            this.transloco.translate('messages.mergedRedirect'),
+            this.transloco.translate('contacts.messages.mergedRedirect'),
             this.transloco.translate('common.close'),
             { duration: 3000 }
           );
@@ -465,7 +465,7 @@ export class ContactDetailComponent implements OnInit {
             .subscribe({
               next: () => {
                 this.snackBar.open(
-                  this.transloco.translate('messages.enrolledInSequence', { name: selectedSequence.name }),
+                  this.transloco.translate('contacts.messages.enrolledInSequence', { name: selectedSequence.name }),
                   this.transloco.translate('common.close'),
                   { duration: 3000 },
                 );
@@ -473,7 +473,7 @@ export class ContactDetailComponent implements OnInit {
               },
               error: (err) => {
                 this.snackBar.open(
-                  err?.message ?? this.transloco.translate('messages.enrollFailed'),
+                  err?.message ?? this.transloco.translate('contacts.messages.enrollFailed'),
                   this.transloco.translate('common.close'),
                   { duration: 5000 },
                 );

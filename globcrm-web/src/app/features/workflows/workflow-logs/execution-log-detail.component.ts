@@ -47,11 +47,11 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
       <div class="log-detail">
         <!-- Header -->
         <div class="log-detail__header">
-          <button mat-icon-button [routerLink]="['/workflows', id()]" [attr.aria-label]="'detail.backToWorkflows' | transloco">
+          <button mat-icon-button [routerLink]="['/workflows', id()]" [attr.aria-label]="'workflows.detail.backToWorkflows' | transloco">
             <mat-icon>arrow_back</mat-icon>
           </button>
           <div class="log-detail__header-info">
-            <h1>{{ 'logs.title' | transloco }}</h1>
+            <h1>{{ 'workflows.logs.title' | transloco }}</h1>
           </div>
           <span class="log-detail__status-badge"
                 [class]="'status--' + exec.status">
@@ -70,19 +70,19 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <div class="log-detail__card">
           <h2>
             <mat-icon>bolt</mat-icon>
-            {{ 'logs.triggerSection' | transloco }}
+            {{ 'workflows.logs.triggerSection' | transloco }}
           </h2>
           <div class="log-detail__card-body">
             <div class="log-detail__field">
-              <span class="log-detail__field-label">{{ 'logs.type' | transloco }}:</span>
+              <span class="log-detail__field-label">{{ 'workflows.logs.type' | transloco }}:</span>
               <span>{{ exec.triggerType }}</span>
             </div>
             <div class="log-detail__field">
-              <span class="log-detail__field-label">{{ 'logs.event' | transloco }}:</span>
+              <span class="log-detail__field-label">{{ 'workflows.logs.event' | transloco }}:</span>
               <span>{{ exec.triggerEvent }}</span>
             </div>
             <div class="log-detail__field">
-              <span class="log-detail__field-label">{{ 'logs.entity' | transloco }}:</span>
+              <span class="log-detail__field-label">{{ 'workflows.logs.entity' | transloco }}:</span>
               <span>
                 {{ exec.entityType }}
                 <a class="log-detail__entity-link"
@@ -98,25 +98,25 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <div class="log-detail__card">
           <h2>
             <mat-icon>filter_list</mat-icon>
-            {{ 'logs.conditionsSection' | transloco }}
+            {{ 'workflows.logs.conditionsSection' | transloco }}
           </h2>
           <div class="log-detail__card-body">
             @if (!exec.conditionsEvaluated) {
-              <p class="log-detail__no-conditions">{{ 'logs.noConditions' | transloco }}</p>
+              <p class="log-detail__no-conditions">{{ 'workflows.logs.noConditions' | transloco }}</p>
             } @else {
               <div class="log-detail__field">
-                <span class="log-detail__field-label">{{ 'logs.evaluated' | transloco }}:</span>
-                <span>{{ 'logs.yes' | transloco }}</span>
+                <span class="log-detail__field-label">{{ 'workflows.logs.evaluated' | transloco }}:</span>
+                <span>{{ 'workflows.logs.yes' | transloco }}</span>
               </div>
               <div class="log-detail__field">
-                <span class="log-detail__field-label">{{ 'logs.result' | transloco }}:</span>
+                <span class="log-detail__field-label">{{ 'workflows.logs.result' | transloco }}:</span>
                 @if (exec.conditionsPassed) {
                   <span class="log-detail__conditions-pass">
-                    <mat-icon>check_circle</mat-icon> {{ 'logs.conditionsPassed' | transloco }}
+                    <mat-icon>check_circle</mat-icon> {{ 'workflows.logs.conditionsPassed' | transloco }}
                   </span>
                 } @else {
                   <span class="log-detail__conditions-fail">
-                    <mat-icon>cancel</mat-icon> {{ 'logs.conditionsFailed' | transloco }}
+                    <mat-icon>cancel</mat-icon> {{ 'workflows.logs.conditionsFailed' | transloco }}
                   </span>
                 }
               </div>
@@ -127,7 +127,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
         <!-- Actions Timeline -->
         @if (exec.actionLogs && exec.actionLogs.length > 0) {
           <div class="log-detail__section">
-            <h2>{{ 'logs.actionsTimeline' | transloco }}</h2>
+            <h2>{{ 'workflows.logs.actionsTimeline' | transloco }}</h2>
             <div class="log-detail__timeline">
               @for (action of sortedActions(); track action.id; let i = $index; let last = $last) {
                 <div class="timeline-entry"
@@ -167,7 +167,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                       </span>
                     </div>
                     <div class="timeline-entry__details">
-                      <span class="timeline-entry__node-id">{{ 'logs.node' | transloco }}: {{ action.actionNodeId }}</span>
+                      <span class="timeline-entry__node-id">{{ 'workflows.logs.node' | transloco }}: {{ action.actionNodeId }}</span>
                       @if (action.startedAt) {
                         <span class="timeline-entry__timing">
                           {{ action.startedAt | date:'mediumTime' }}
@@ -186,7 +186,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                     @if (isHaltedAfter(action, exec)) {
                       <div class="timeline-entry__halt">
                         <mat-icon>dangerous</mat-icon>
-                        {{ 'logs.executionStopped' | transloco }}
+                        {{ 'workflows.logs.executionStopped' | transloco }}
                       </div>
                     }
                   </div>
@@ -202,7 +202,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
                   </div>
                   <div class="timeline-entry__content">
                     <span class="timeline-entry__not-reached">
-                      {{ 'logs.actionsNotReached' | transloco:{ count: unreachedCount() } }}
+                      {{ 'workflows.logs.actionsNotReached' | transloco:{ count: unreachedCount() } }}
                     </span>
                   </div>
                 </div>
@@ -216,7 +216,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
           <div class="log-detail__card log-detail__card--error">
             <h2>
               <mat-icon>error_outline</mat-icon>
-              {{ 'logs.error' | transloco }}
+              {{ 'workflows.logs.error' | transloco }}
             </h2>
             <div class="log-detail__error-body">
               <pre>{{ exec.errorMessage }}</pre>
@@ -230,7 +230,7 @@ import { WorkflowExecutionLog, WorkflowActionLog } from '../workflow.models';
             <mat-expansion-panel-header>
               <mat-panel-title>
                 <mat-icon>code</mat-icon>
-                {{ 'logs.rawData' | transloco }}
+                {{ 'workflows.logs.rawData' | transloco }}
               </mat-panel-title>
             </mat-expansion-panel-header>
             <pre class="log-detail__raw-json">{{ exec | json }}</pre>
@@ -695,10 +695,10 @@ export class ExecutionLogDetailComponent implements OnInit {
 
   formatStatus(status: string): string {
     const keyMap: Record<string, string> = {
-      succeeded: 'logs.succeeded',
-      partiallyFailed: 'logs.partiallyFailed',
-      failed: 'logs.failed',
-      skipped: 'logs.skipped',
+      succeeded: 'workflows.logs.succeeded',
+      partiallyFailed: 'workflows.logs.partiallyFailed',
+      failed: 'workflows.logs.failed',
+      skipped: 'workflows.logs.skipped',
     };
     const key = keyMap[status];
     return key ? this.transloco.translate(key) : status;

@@ -92,8 +92,8 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
           <mat-spinner diameter="48"></mat-spinner>
         </div>
         <div class="loading-overlay__text">
-          <div class="loading-overlay__title">{{ 'merge.mergingRecords' | transloco }}</div>
-          <div class="loading-overlay__desc">{{ 'merge.transferringRelationships' | transloco }}</div>
+          <div class="loading-overlay__title">{{ 'duplicates.merge.mergingRecords' | transloco }}</div>
+          <div class="loading-overlay__desc">{{ 'duplicates.merge.transferringRelationships' | transloco }}</div>
         </div>
       </div>
     }
@@ -101,12 +101,12 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
     <div class="merge-page">
       <!-- Header -->
       <div class="merge-header">
-        <button mat-icon-button class="back-btn" routerLink="/duplicates/scan" [attr.aria-label]="'merge.aria.backToScan' | transloco">
+        <button mat-icon-button class="back-btn" routerLink="/duplicates/scan" [attr.aria-label]="'duplicates.merge.aria.backToScan' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </button>
         <div class="merge-header__text">
-          <h1 class="merge-title">{{ entityType() === 'contact' ? ('merge.mergeContacts' | transloco) : ('merge.mergeCompanies' | transloco) }}</h1>
-          <div class="merge-subtitle">{{ 'merge.subtitle' | transloco }}</div>
+          <h1 class="merge-title">{{ entityType() === 'contact' ? ('duplicates.merge.mergeContacts' | transloco) : ('duplicates.merge.mergeCompanies' | transloco) }}</h1>
+          <div class="merge-subtitle">{{ 'duplicates.merge.subtitle' | transloco }}</div>
         </div>
       </div>
 
@@ -114,7 +114,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
       @if (pageLoading()) {
         <div class="page-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>{{ 'merge.loadingRecords' | transloco }}</p>
+          <p>{{ 'duplicates.merge.loadingRecords' | transloco }}</p>
         </div>
       }
 
@@ -127,11 +127,11 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             (click)="setPrimary('a')"
           >
             <div class="record-card__label">
-              {{ 'merge.recordA' | transloco }}
+              {{ 'duplicates.merge.recordA' | transloco }}
               @if (primaryRecord() === 'a') {
                 <span class="primary-badge">
                   <mat-icon>star</mat-icon>
-                  {{ 'merge.survivor' | transloco }}
+                  {{ 'duplicates.merge.survivor' | transloco }}
                 </span>
               }
             </div>
@@ -139,7 +139,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordA()!) }}</div>
             <div class="record-card__date">
               <mat-icon>schedule</mat-icon>
-              {{ 'merge.updated' | transloco }} {{ formatDate(recordA()!.updatedAt) }}
+              {{ 'duplicates.merge.updated' | transloco }} {{ formatDate(recordA()!.updatedAt) }}
             </div>
           </div>
 
@@ -148,7 +148,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               mat-icon-button
               class="swap-btn"
               (click)="swapPrimary()"
-              [attr.aria-label]="'merge.aria.swapPrimary' | transloco"
+              [attr.aria-label]="'duplicates.merge.aria.swapPrimary' | transloco"
             >
               <mat-icon>swap_horiz</mat-icon>
             </button>
@@ -160,11 +160,11 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             (click)="setPrimary('b')"
           >
             <div class="record-card__label">
-              {{ 'merge.recordB' | transloco }}
+              {{ 'duplicates.merge.recordB' | transloco }}
               @if (primaryRecord() === 'b') {
                 <span class="primary-badge">
                   <mat-icon>star</mat-icon>
-                  {{ 'merge.survivor' | transloco }}
+                  {{ 'duplicates.merge.survivor' | transloco }}
                 </span>
               }
             </div>
@@ -172,7 +172,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             <div class="record-card__detail">{{ getRecordDisplayDetail(recordB()!) }}</div>
             <div class="record-card__date">
               <mat-icon>schedule</mat-icon>
-              {{ 'merge.updated' | transloco }} {{ formatDate(recordB()!.updatedAt) }}
+              {{ 'duplicates.merge.updated' | transloco }} {{ formatDate(recordB()!.updatedAt) }}
             </div>
           </div>
         </div>
@@ -180,25 +180,25 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Field comparison table -->
         <div class="comparison-section">
           <div class="section-label">
-            <h2>{{ 'merge.fieldComparison' | transloco }}</h2>
+            <h2>{{ 'duplicates.merge.fieldComparison' | transloco }}</h2>
             @if (diffCount() > 0) {
-              <span class="diff-count-badge">{{ diffCount() }} {{ 'merge.differences' | transloco }}</span>
+              <span class="diff-count-badge">{{ diffCount() }} {{ 'duplicates.merge.differences' | transloco }}</span>
             }
           </div>
           <table class="comparison-table">
             <thead>
               <tr>
-                <th>{{ 'merge.field' | transloco }}</th>
-                <th>{{ 'merge.recordA' | transloco }}</th>
-                <th>{{ 'merge.select' | transloco }}</th>
-                <th>{{ 'merge.recordB' | transloco }}</th>
+                <th>{{ 'duplicates.merge.field' | transloco }}</th>
+                <th>{{ 'duplicates.merge.recordA' | transloco }}</th>
+                <th>{{ 'duplicates.merge.select' | transloco }}</th>
+                <th>{{ 'duplicates.merge.recordB' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
               @for (row of fieldRows(); track row.fieldName) {
                 @if (row.fieldName === '__custom_fields_divider') {
                   <tr class="custom-fields-divider">
-                    <td colspan="4">{{ 'merge.customFields' | transloco }}</td>
+                    <td colspan="4">{{ 'duplicates.merge.customFields' | transloco }}</td>
                   </tr>
                 } @else {
                   <tr>
@@ -219,8 +219,8 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
                           [ngModel]="fieldSelections()[row.fieldName]"
                           (ngModelChange)="onFieldSelection(row.fieldName, $event)"
                         >
-                          <mat-radio-button value="a" [attr.aria-label]="'merge.aria.selectRecordA' | transloco"></mat-radio-button>
-                          <mat-radio-button value="b" [attr.aria-label]="'merge.aria.selectRecordB' | transloco"></mat-radio-button>
+                          <mat-radio-button value="a" [attr.aria-label]="'duplicates.merge.aria.selectRecordA' | transloco"></mat-radio-button>
+                          <mat-radio-button value="b" [attr.aria-label]="'duplicates.merge.aria.selectRecordB' | transloco"></mat-radio-button>
                         </mat-radio-group>
                       } @else {
                         <span class="same-check">
@@ -248,7 +248,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Relationship summary -->
         <div class="relationship-section">
           <div class="section-label">
-            <h2>{{ 'merge.relationshipsToTransfer' | transloco }}</h2>
+            <h2>{{ 'duplicates.merge.relationshipsToTransfer' | transloco }}</h2>
           </div>
           <div class="relationship-card">
             <div class="relationship-card__title">
@@ -269,7 +269,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
               </div>
             } @else {
               <div class="no-relationships">
-                {{ 'merge.noRelationships' | transloco }}
+                {{ 'duplicates.merge.noRelationships' | transloco }}
               </div>
             }
           </div>
@@ -278,7 +278,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
         <!-- Action footer -->
         <div class="action-footer">
           <button mat-stroked-button routerLink="/duplicates/scan">
-            {{ 'merge.cancel' | transloco }}
+            {{ 'duplicates.merge.cancel' | transloco }}
           </button>
           <button
             mat-raised-button
@@ -288,7 +288,7 @@ const COMPANY_FIELDS: { key: string; label: string }[] = [
             [disabled]="merging()"
           >
             <mat-icon>merge</mat-icon>
-            {{ 'merge.mergeRecords' | transloco }}
+            {{ 'duplicates.merge.mergeRecords' | transloco }}
           </button>
         </div>
       }
@@ -555,7 +555,7 @@ export class MergeComparisonComponent implements OnInit {
     };
 
     const handleError = (): void => {
-      this.snackBar.open(this.translocoService.translate('merge.messages.loadFailed'), 'OK', {
+      this.snackBar.open(this.translocoService.translate('duplicates.merge.messages.loadFailed'), 'OK', {
         duration: 5000,
       });
       this.pageLoading.set(false);
@@ -657,7 +657,7 @@ export class MergeComparisonComponent implements OnInit {
 
     const handleSuccess = (result: { survivorId: string }): void => {
       this.merging.set(false);
-      this.snackBar.open(this.translocoService.translate('merge.messages.mergeSuccess'), 'OK', {
+      this.snackBar.open(this.translocoService.translate('duplicates.merge.messages.mergeSuccess'), 'OK', {
         duration: 5000,
       });
 
@@ -670,7 +670,7 @@ export class MergeComparisonComponent implements OnInit {
 
     const handleError = (): void => {
       this.merging.set(false);
-      this.snackBar.open(this.translocoService.translate('merge.messages.mergeFailed'), 'OK', {
+      this.snackBar.open(this.translocoService.translate('duplicates.merge.messages.mergeFailed'), 'OK', {
         duration: 5000,
       });
     };
@@ -786,16 +786,16 @@ export class MergeComparisonComponent implements OnInit {
     }
   `,
   template: `
-    <h2 mat-dialog-title class="dialog-title">{{ 'merge.confirmMerge' | transloco }}</h2>
+    <h2 mat-dialog-title class="dialog-title">{{ 'duplicates.merge.confirmMerge' | transloco }}</h2>
 
     <mat-dialog-content>
       <div class="dialog-content">
         <div class="merge-summary">
           <p>
-            <strong>{{ 'merge.survivingRecord' | transloco }}:</strong> {{ data.survivorName }}
+            <strong>{{ 'duplicates.merge.survivingRecord' | transloco }}:</strong> {{ data.survivorName }}
           </p>
           <p>
-            <strong>{{ 'merge.recordToMerge' | transloco }}:</strong> {{ data.loserName }}
+            <strong>{{ 'duplicates.merge.recordToMerge' | transloco }}:</strong> {{ data.loserName }}
           </p>
 
           @if (data.nonZeroRelationships.length > 0) {
@@ -809,15 +809,15 @@ export class MergeComparisonComponent implements OnInit {
 
         <div class="warning-banner">
           <mat-icon>warning</mat-icon>
-          <span>{{ 'merge.warningMessage' | transloco }}</span>
+          <span>{{ 'duplicates.merge.warningMessage' | transloco }}</span>
         </div>
       </div>
     </mat-dialog-content>
 
     <div class="dialog-actions">
-      <button mat-stroked-button mat-dialog-close>{{ 'merge.cancel' | transloco }}</button>
+      <button mat-stroked-button mat-dialog-close>{{ 'duplicates.merge.cancel' | transloco }}</button>
       <button mat-raised-button color="warn" [mat-dialog-close]="true">
-        {{ 'merge.confirmMerge' | transloco }}
+        {{ 'duplicates.merge.confirmMerge' | transloco }}
       </button>
     </div>
   `,

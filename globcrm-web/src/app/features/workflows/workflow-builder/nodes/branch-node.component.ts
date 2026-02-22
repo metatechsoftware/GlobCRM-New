@@ -28,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>call_split</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || ('builder.branch' | transloco) }}</span>
+            <span class="node-label">{{ node().label || ('workflows.builder.branch' | transloco) }}</span>
             @if (conditionSummary) {
               <span class="node-badge">{{ conditionSummary }}</span>
             }
@@ -43,7 +43,7 @@ import { WorkflowNode } from '../../workflow.models';
                fOutputConnectableSide="bottom"
                class="connector connector-output-yes">
           </div>
-          <span class="branch-label yes-label">{{ 'builder.branchYes' | transloco }}</span>
+          <span class="branch-label yes-label">{{ 'workflows.builder.branchYes' | transloco }}</span>
         </div>
         <div class="branch-output-wrapper">
           <div fNodeOutput
@@ -51,7 +51,7 @@ import { WorkflowNode } from '../../workflow.models';
                fOutputConnectableSide="bottom"
                class="connector connector-output-no">
           </div>
-          <span class="branch-label no-label">{{ 'builder.branchNo' | transloco }}</span>
+          <span class="branch-label no-label">{{ 'workflows.builder.branchNo' | transloco }}</span>
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@ export class BranchNodeComponent {
     const first = config['conditions'][0];
     if (first?.field && first?.operator) {
       const val = first.value ? ` ${first.value}` : '';
-      return `${this.transloco.translate('nodes.ifPrefix')} ${first.field} ${first.operator}${val}`;
+      return `${this.transloco.translate('workflows.nodes.ifPrefix')} ${first.field} ${first.operator}${val}`;
     }
     return '';
   }

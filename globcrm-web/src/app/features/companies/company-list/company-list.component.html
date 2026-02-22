@@ -9,14 +9,14 @@
           <mat-icon>business</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>{{ 'list.title' | transloco }}</h1>
-          <p class="list-header__subtitle">{{ 'list.subtitle' | transloco }}</p>
+          <h1>{{ 'companies.list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'companies.list.subtitle' | transloco }}</p>
         </div>
       </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Company:Create'"
               (click)="openCreateDialog()">
-        <mat-icon>add</mat-icon> {{ 'list.addCompany' | transloco }}
+        <mat-icon>add</mat-icon> {{ 'companies.list.addCompany' | transloco }}
       </button>
     </div>
 

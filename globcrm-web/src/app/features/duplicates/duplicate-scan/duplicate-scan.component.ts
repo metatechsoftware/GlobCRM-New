@@ -45,10 +45,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <span class="scan-title__icon">
                 <mat-icon>content_copy</mat-icon>
               </span>
-              {{ 'scan.title' | transloco }}
+              {{ 'duplicates.scan.title' | transloco }}
             </h1>
             <div class="scan-subtitle">
-              {{ 'scan.subtitle' | transloco }}
+              {{ 'duplicates.scan.subtitle' | transloco }}
             </div>
           </div>
         </div>
@@ -64,11 +64,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
               >
                 <mat-button-toggle value="contact">
                   <mat-icon>person</mat-icon>
-                  {{ 'scan.contacts' | transloco }}
+                  {{ 'duplicates.scan.contacts' | transloco }}
                 </mat-button-toggle>
                 <mat-button-toggle value="company">
                   <mat-icon>business</mat-icon>
-                  {{ 'scan.companies' | transloco }}
+                  {{ 'duplicates.scan.companies' | transloco }}
                 </mat-button-toggle>
               </mat-button-toggle-group>
             </div>
@@ -83,7 +83,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
             [disabled]="loading()"
           >
             <mat-icon>{{ loading() ? 'radar' : 'search' }}</mat-icon>
-            {{ loading() ? ('scan.scanning' | transloco) : ('scan.runScan' | transloco) }}
+            {{ loading() ? ('duplicates.scan.scanning' | transloco) : ('duplicates.scan.runScan' | transloco) }}
           </button>
         </div>
 
@@ -94,9 +94,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-icon>compare_arrows</mat-icon>
             </div>
             <div class="loading-state__text">
-              <div class="loading-state__title">{{ 'scan.analyzingRecords' | transloco }}</div>
+              <div class="loading-state__title">{{ 'duplicates.scan.analyzingRecords' | transloco }}</div>
               <div class="loading-state__desc">
-                {{ 'scan.scanningForMatches' | transloco:{ type: entityType() === 'contact' ? ('scan.contacts' | transloco) : ('scan.companies' | transloco) } }}
+                {{ 'duplicates.scan.scanningForMatches' | transloco:{ type: entityType() === 'contact' ? ('duplicates.scan.contacts' | transloco) : ('duplicates.scan.companies' | transloco) } }}
               </div>
             </div>
           </div>
@@ -109,8 +109,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-icon>compare_arrows</mat-icon>
             </div>
             <div class="initial-state__text">
-              <h3>{{ 'scan.readyToScan' | transloco }}</h3>
-              <p>{{ 'scan.readyToScanDesc' | transloco }}</p>
+              <h3>{{ 'duplicates.scan.readyToScan' | transloco }}</h3>
+              <p>{{ 'duplicates.scan.readyToScanDesc' | transloco }}</p>
             </div>
           </div>
         }
@@ -122,8 +122,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-icon>verified</mat-icon>
             </div>
             <div class="empty-state__text">
-              <h3>{{ 'scan.noDuplicates' | transloco }}</h3>
-              <p>{{ 'scan.noDuplicatesDesc' | transloco:{ type: entityType() === 'contact' ? ('scan.contacts' | transloco) : ('scan.companies' | transloco) } }}</p>
+              <h3>{{ 'duplicates.scan.noDuplicates' | transloco }}</h3>
+              <p>{{ 'duplicates.scan.noDuplicatesDesc' | transloco:{ type: entityType() === 'contact' ? ('duplicates.scan.contacts' | transloco) : ('duplicates.scan.companies' | transloco) } }}</p>
             </div>
           </div>
         }
@@ -133,8 +133,8 @@ import { TranslocoPipe } from '@jsverse/transloco';
           <div class="result-header">
             <div class="result-count">
               <span class="result-count__number">{{ totalCount() }}</span>
-              {{ totalCount() === 1 ? ('scan.pairSingular' | transloco) : ('scan.pairPlural' | transloco) }}
-              {{ 'scan.found' | transloco }}
+              {{ totalCount() === 1 ? ('duplicates.scan.pairSingular' | transloco) : ('duplicates.scan.pairPlural' | transloco) }}
+              {{ 'duplicates.scan.found' | transloco }}
             </div>
           </div>
 
@@ -170,7 +170,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     [class.score-label--medium]="pair.score >= 70 && pair.score < 85"
                     [class.score-label--low]="pair.score < 70"
                   >
-                    {{ pair.score >= 85 ? ('scan.high' | transloco) : pair.score >= 70 ? ('scan.medium' | transloco) : ('scan.low' | transloco) }}
+                    {{ pair.score >= 85 ? ('duplicates.scan.high' | transloco) : pair.score >= 70 ? ('duplicates.scan.medium' | transloco) : ('duplicates.scan.low' | transloco) }}
                   </span>
                 </div>
 
@@ -186,18 +186,18 @@ import { TranslocoPipe } from '@jsverse/transloco';
                     mat-stroked-button
                     color="primary"
                     (click)="onCompare(pair)"
-                    [matTooltip]="'scan.compareTooltip' | transloco"
+                    [matTooltip]="'duplicates.scan.compareTooltip' | transloco"
                   >
                     <mat-icon>compare</mat-icon>
-                    {{ 'scan.compare' | transloco }}
+                    {{ 'duplicates.scan.compare' | transloco }}
                   </button>
                   <button
                     mat-stroked-button
                     class="dismiss-btn"
                     (click)="onDismiss(pair)"
-                    [matTooltip]="'scan.dismissTooltip' | transloco"
+                    [matTooltip]="'duplicates.scan.dismissTooltip' | transloco"
                   >
-                    {{ 'scan.dismiss' | transloco }}
+                    {{ 'duplicates.scan.dismiss' | transloco }}
                   </button>
                 </div>
               </div>

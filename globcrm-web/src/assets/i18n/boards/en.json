@@ -10,7 +10,15 @@
     "system": "System",
     "columns": "columns",
     "cards": "cards",
-    "updatedAt": "Updated"
+    "updatedAt": "Updated",
+    "totalBoards": "Total Boards",
+    "totalCards": "Total Cards",
+    "privateBoards": "Private",
+    "teamBoards2": "Team",
+    "publicBoards": "Public",
+    "private": "Private",
+    "team": "Team",
+    "public": "Public"
   },
   "empty": {
     "heading": "Organize your work visually",

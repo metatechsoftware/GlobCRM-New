@@ -58,18 +58,18 @@ type PresetRange = 'today' | 'week' | 'month' | 'quarter' | 'year' | 'custom';
   template: `
     <div class="date-range-filter">
       <mat-button-toggle-group [value]="activePreset()" (change)="onPresetChange($event)">
-        <mat-button-toggle value="today">{{ 'filters.today' | transloco }}</mat-button-toggle>
-        <mat-button-toggle value="week">{{ 'filters.week' | transloco }}</mat-button-toggle>
-        <mat-button-toggle value="month">{{ 'filters.month' | transloco }}</mat-button-toggle>
-        <mat-button-toggle value="quarter">{{ 'filters.quarter' | transloco }}</mat-button-toggle>
-        <mat-button-toggle value="year">{{ 'filters.year' | transloco }}</mat-button-toggle>
-        <mat-button-toggle value="custom">{{ 'filters.custom' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="today">{{ 'dashboard.filters.today' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="week">{{ 'dashboard.filters.week' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="month">{{ 'dashboard.filters.month' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="quarter">{{ 'dashboard.filters.quarter' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="year">{{ 'dashboard.filters.year' | transloco }}</mat-button-toggle>
+        <mat-button-toggle value="custom">{{ 'dashboard.filters.custom' | transloco }}</mat-button-toggle>
       </mat-button-toggle-group>
       @if (activePreset() === 'custom') {
         <mat-form-field appearance="outline">
           <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate [placeholder]="'filters.start' | transloco" [value]="customStart" (dateChange)="onCustomChange()">
-            <input matEndDate [placeholder]="'filters.end' | transloco" [value]="customEnd" (dateChange)="onCustomChange()">
+            <input matStartDate [placeholder]="'dashboard.filters.start' | transloco" [value]="customStart" (dateChange)="onCustomChange()">
+            <input matEndDate [placeholder]="'dashboard.filters.end' | transloco" [value]="customEnd" (dateChange)="onCustomChange()">
           </mat-date-range-input>
           <mat-datepicker-toggle matSuffix [for]="picker" />
           <mat-date-range-picker #picker />

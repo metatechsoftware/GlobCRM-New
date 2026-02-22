@@ -50,26 +50,26 @@ interface TriggerFormState {
     <div class="config-panel">
       <div class="config-panel__header">
         <mat-icon class="config-panel__icon trigger-icon">bolt</mat-icon>
-        <h3>{{ 'config.triggerConfig' | transloco }}</h3>
+        <h3>{{ 'workflows.config.triggerConfig' | transloco }}</h3>
       </div>
 
       <div class="config-panel__body">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'config.triggerType' | transloco }}</mat-label>
+          <mat-label>{{ 'workflows.config.triggerType' | transloco }}</mat-label>
           <mat-select [ngModel]="form().triggerType"
                       (ngModelChange)="updateField('triggerType', $event)">
-            <mat-option value="recordCreated">{{ 'nodes.recordCreated' | transloco }}</mat-option>
-            <mat-option value="recordUpdated">{{ 'nodes.recordUpdated' | transloco }}</mat-option>
-            <mat-option value="recordDeleted">{{ 'nodes.recordDeleted' | transloco }}</mat-option>
-            <mat-option value="fieldChanged">{{ 'nodes.fieldChanged' | transloco }}</mat-option>
-            <mat-option value="dateBased">{{ 'nodes.dateBased' | transloco }}</mat-option>
+            <mat-option value="recordCreated">{{ 'workflows.nodes.recordCreated' | transloco }}</mat-option>
+            <mat-option value="recordUpdated">{{ 'workflows.nodes.recordUpdated' | transloco }}</mat-option>
+            <mat-option value="recordDeleted">{{ 'workflows.nodes.recordDeleted' | transloco }}</mat-option>
+            <mat-option value="fieldChanged">{{ 'workflows.nodes.fieldChanged' | transloco }}</mat-option>
+            <mat-option value="dateBased">{{ 'workflows.nodes.dateBased' | transloco }}</mat-option>
           </mat-select>
         </mat-form-field>
 
         <!-- Field Changed Config -->
         @if (form().triggerType === 'fieldChanged') {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'config.field' | transloco }}</mat-label>
+            <mat-label>{{ 'workflows.config.field' | transloco }}</mat-label>
             <mat-select [ngModel]="form().fieldName"
                         (ngModelChange)="updateField('fieldName', $event)">
               @for (field of entityFields(); track field.name) {
@@ -79,36 +79,36 @@ interface TriggerFormState {
           </mat-form-field>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'config.operator' | transloco }}</mat-label>
+            <mat-label>{{ 'workflows.config.operator' | transloco }}</mat-label>
             <mat-select [ngModel]="form().operator"
                         (ngModelChange)="updateField('operator', $event)">
-              <mat-option value="equals">{{ 'config.equals' | transloco }}</mat-option>
-              <mat-option value="not_equals">{{ 'config.notEquals' | transloco }}</mat-option>
-              <mat-option value="gt">{{ 'config.greaterThan' | transloco }}</mat-option>
-              <mat-option value="gte">{{ 'config.greaterThanOrEqual' | transloco }}</mat-option>
-              <mat-option value="lt">{{ 'config.lessThan' | transloco }}</mat-option>
-              <mat-option value="lte">{{ 'config.lessThanOrEqual' | transloco }}</mat-option>
-              <mat-option value="contains">{{ 'config.contains' | transloco }}</mat-option>
-              <mat-option value="changed_to">{{ 'config.changedTo' | transloco }}</mat-option>
-              <mat-option value="changed_from_to">{{ 'config.changedFromTo' | transloco }}</mat-option>
-              <mat-option value="is_null">{{ 'config.isNull' | transloco }}</mat-option>
-              <mat-option value="is_not_null">{{ 'config.isNotNull' | transloco }}</mat-option>
+              <mat-option value="equals">{{ 'workflows.config.equals' | transloco }}</mat-option>
+              <mat-option value="not_equals">{{ 'workflows.config.notEquals' | transloco }}</mat-option>
+              <mat-option value="gt">{{ 'workflows.config.greaterThan' | transloco }}</mat-option>
+              <mat-option value="gte">{{ 'workflows.config.greaterThanOrEqual' | transloco }}</mat-option>
+              <mat-option value="lt">{{ 'workflows.config.lessThan' | transloco }}</mat-option>
+              <mat-option value="lte">{{ 'workflows.config.lessThanOrEqual' | transloco }}</mat-option>
+              <mat-option value="contains">{{ 'workflows.config.contains' | transloco }}</mat-option>
+              <mat-option value="changed_to">{{ 'workflows.config.changedTo' | transloco }}</mat-option>
+              <mat-option value="changed_from_to">{{ 'workflows.config.changedFromTo' | transloco }}</mat-option>
+              <mat-option value="is_null">{{ 'workflows.config.isNull' | transloco }}</mat-option>
+              <mat-option value="is_not_null">{{ 'workflows.config.isNotNull' | transloco }}</mat-option>
             </mat-select>
           </mat-form-field>
 
           @if (form().operator === 'changed_from_to') {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ 'config.fromValueOptional' | transloco }}</mat-label>
+              <mat-label>{{ 'workflows.config.fromValueOptional' | transloco }}</mat-label>
               <input matInput
                      [ngModel]="form().fromValue"
                      (ngModelChange)="updateField('fromValue', $event)"
-                     [placeholder]="'config.previousValueOptional' | transloco" />
+                     [placeholder]="'workflows.config.previousValueOptional' | transloco" />
             </mat-form-field>
           }
 
           @if (needsValueInput()) {
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ form().operator === 'changed_from_to' ? ('config.toValue' | transloco) : ('config.value' | transloco) }}</mat-label>
+              <mat-label>{{ form().operator === 'changed_from_to' ? ('workflows.config.toValue' | transloco) : ('workflows.config.value' | transloco) }}</mat-label>
               <input matInput
                      [ngModel]="form().value"
                      (ngModelChange)="updateField('value', $event)" />
@@ -119,7 +119,7 @@ interface TriggerFormState {
         <!-- Date Based Config -->
         @if (form().triggerType === 'dateBased') {
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'config.dateField' | transloco }}</mat-label>
+            <mat-label>{{ 'workflows.config.dateField' | transloco }}</mat-label>
             <mat-select [ngModel]="form().dateField"
                         (ngModelChange)="updateField('dateField', $event)">
               @for (field of dateFields(); track field.name) {
@@ -130,7 +130,7 @@ interface TriggerFormState {
 
           <div class="config-panel__row">
             <mat-form-field appearance="outline" class="config-panel__number-field">
-              <mat-label>{{ 'config.days' | transloco }}</mat-label>
+              <mat-label>{{ 'workflows.config.days' | transloco }}</mat-label>
               <input matInput
                      type="number"
                      min="0"
@@ -139,17 +139,17 @@ interface TriggerFormState {
             </mat-form-field>
 
             <mat-form-field appearance="outline" class="config-panel__direction-field">
-              <mat-label>{{ 'config.direction' | transloco }}</mat-label>
+              <mat-label>{{ 'workflows.config.direction' | transloco }}</mat-label>
               <mat-select [ngModel]="form().dateDirection"
                           (ngModelChange)="updateField('dateDirection', $event)">
-                <mat-option value="before">{{ 'config.daysBefore' | transloco }}</mat-option>
-                <mat-option value="after">{{ 'config.daysAfter' | transloco }}</mat-option>
+                <mat-option value="before">{{ 'workflows.config.daysBefore' | transloco }}</mat-option>
+                <mat-option value="after">{{ 'workflows.config.daysAfter' | transloco }}</mat-option>
               </mat-select>
             </mat-form-field>
           </div>
 
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'config.preferredTime' | transloco }}</mat-label>
+            <mat-label>{{ 'workflows.config.preferredTime' | transloco }}</mat-label>
             <input matInput
                    type="time"
                    [ngModel]="form().preferredTime"
@@ -162,19 +162,19 @@ interface TriggerFormState {
         <span class="config-panel__hint">
           @switch (form().triggerType) {
             @case ('recordCreated') {
-              {{ 'config.firesOnCreated' | transloco:{ entity: entityType() } }}
+              {{ 'workflows.config.firesOnCreated' | transloco:{ entity: entityType() } }}
             }
             @case ('recordUpdated') {
-              {{ 'config.firesOnUpdated' | transloco:{ entity: entityType() } }}
+              {{ 'workflows.config.firesOnUpdated' | transloco:{ entity: entityType() } }}
             }
             @case ('recordDeleted') {
-              {{ 'config.firesOnDeleted' | transloco:{ entity: entityType() } }}
+              {{ 'workflows.config.firesOnDeleted' | transloco:{ entity: entityType() } }}
             }
             @case ('fieldChanged') {
-              {{ 'config.firesOnFieldChanged' | transloco:{ entity: entityType() } }}
+              {{ 'workflows.config.firesOnFieldChanged' | transloco:{ entity: entityType() } }}
             }
             @case ('dateBased') {
-              {{ 'config.firesOnDateBased' | transloco:{ entity: entityType() } }}
+              {{ 'workflows.config.firesOnDateBased' | transloco:{ entity: entityType() } }}
             }
           }
         </span>

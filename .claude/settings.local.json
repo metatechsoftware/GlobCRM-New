@@ -1,0 +1,39 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell:*)",
+      "Bash(cd:*)",
+      "Bash(cd C:\\\\Users\\\\maliy\\\\Documents\\\\MetaTech\\\\Projects\\\\GlobCRM-New:*)",
+      "Bash(taskkill:*)",
+      "Bash(node:*)",
+      "Bash(tail:*)",
+      "Bash(head:*)",
+      "Bash(python3:*)",
+      "Bash(cd globcrm-web:*)",
+      "mcp__plugin_context7_context7__resolve-library-id",
+      "mcp__plugin_context7_context7__query-docs",
+      "Skill(gsd:execute-phase)",
+      "WebSearch",
+      "Bash(cd \"C:\\\\Users\\\\maliy\\\\Documents\\\\MetaTech\\\\Projects\\\\GlobCRM-New\\\\globcrm-web\" && npm start 2>&1)",
+      "mcp__plugin_playwright_playwright__browser_navigate",
+      "mcp__plugin_playwright_playwright__browser_take_screenshot",
+      "mcp__plugin_playwright_playwright__browser_console_messages",
+      "mcp__plugin_playwright_playwright__browser_evaluate",
+      "mcp__plugin_playwright_playwright__browser_wait_for",
+      "Bash(netstat:*)",
+      "Bash(grep:*)",
+      "Bash(sleep 15 && curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5233/health 2>/dev/null || curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5233 2>/dev/null)",
+      "WebFetch(domain:docs.unlayer.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:pdfbolt.com)",
+      "WebFetch(domain:blog.hompus.nl)",
+      "WebFetch(domain:www.meziantou.net)",
+      "WebFetch(domain:playwright.dev)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(true:*)",
+      "mcp__plugin_playwright_playwright__browser_click",
+      "Bash(cd /c/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/src/GlobCRM.Api && dotnet ef database update --context ApplicationDbContext --project ../GlobCRM.Infrastructure 2>&1)",
+      "Bash(cd /c/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/src/GlobCRM.Api && dotnet ef database update --context TenantDbContext --project ../GlobCRM.Infrastructure 2>&1)"
+    ]
+  }
+}

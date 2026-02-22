@@ -72,11 +72,11 @@ interface MappingRow {
 
             <div class="mapping-target">
               <mat-form-field appearance="outline" class="field-select">
-                <mat-label>{{ 'wizard.mapping.mapToField' | transloco }}</mat-label>
+                <mat-label>{{ 'import.wizard.mapping.mapToField' | transloco }}</mat-label>
                 <mat-select [(value)]="row.entityField"
                             (selectionChange)="onFieldChange(row, $event.value)">
-                  <mat-option value="">{{ 'wizard.mapping.skipColumn' | transloco }}</mat-option>
-                  <mat-optgroup [label]="'wizard.mapping.coreFields' | transloco">
+                  <mat-option value="">{{ 'import.wizard.mapping.skipColumn' | transloco }}</mat-option>
+                  <mat-optgroup [label]="'import.wizard.mapping.coreFields' | transloco">
                     @for (field of coreFields(); track field.key) {
                       <mat-option [value]="field.key">
                         {{ field.label }}
@@ -87,7 +87,7 @@ interface MappingRow {
                     }
                   </mat-optgroup>
                   @if (customFields().length > 0) {
-                    <mat-optgroup [label]="'wizard.mapping.customFields' | transloco">
+                    <mat-optgroup [label]="'import.wizard.mapping.customFields' | transloco">
                       @for (field of customFields(); track field.key) {
                         <mat-option [value]="'custom:' + field.key">
                           {{ field.label }}
@@ -104,28 +104,28 @@ interface MappingRow {
 
       <!-- Duplicate Strategy Cards -->
       <div class="strategy-section">
-        <h3>{{ 'wizard.mapping.duplicateHandling' | transloco }}</h3>
+        <h3>{{ 'import.wizard.mapping.duplicateHandling' | transloco }}</h3>
         <div class="strategy-cards">
           <button class="strategy-card"
                   [class.selected]="duplicateStrategy === 'skip'"
                   (click)="duplicateStrategy = 'skip'">
             <mat-icon>block</mat-icon>
-            <span class="strategy-label">{{ 'wizard.mapping.skip' | transloco }}</span>
-            <span class="strategy-desc">{{ 'wizard.mapping.skipDesc' | transloco }}</span>
+            <span class="strategy-label">{{ 'import.wizard.mapping.skip' | transloco }}</span>
+            <span class="strategy-desc">{{ 'import.wizard.mapping.skipDesc' | transloco }}</span>
           </button>
           <button class="strategy-card"
                   [class.selected]="duplicateStrategy === 'overwrite'"
                   (click)="duplicateStrategy = 'overwrite'">
             <mat-icon>swap_horiz</mat-icon>
-            <span class="strategy-label">{{ 'wizard.mapping.overwrite' | transloco }}</span>
-            <span class="strategy-desc">{{ 'wizard.mapping.overwriteDesc' | transloco }}</span>
+            <span class="strategy-label">{{ 'import.wizard.mapping.overwrite' | transloco }}</span>
+            <span class="strategy-desc">{{ 'import.wizard.mapping.overwriteDesc' | transloco }}</span>
           </button>
           <button class="strategy-card"
                   [class.selected]="duplicateStrategy === 'merge'"
                   (click)="duplicateStrategy = 'merge'">
             <mat-icon>merge_type</mat-icon>
-            <span class="strategy-label">{{ 'wizard.mapping.merge' | transloco }}</span>
-            <span class="strategy-desc">{{ 'wizard.mapping.mergeDesc' | transloco }}</span>
+            <span class="strategy-label">{{ 'import.wizard.mapping.merge' | transloco }}</span>
+            <span class="strategy-desc">{{ 'import.wizard.mapping.mergeDesc' | transloco }}</span>
           </button>
         </div>
       </div>
@@ -135,14 +135,14 @@ interface MappingRow {
       }
 
       <div class="step-actions">
-        <button mat-button (click)="stepBack.emit()">{{ 'wizard.back' | transloco }}</button>
+        <button mat-button (click)="stepBack.emit()">{{ 'import.wizard.back' | transloco }}</button>
         <button mat-raised-button color="primary"
                 [disabled]="store.loading()"
                 (click)="onNext()">
           @if (store.loading()) {
             <mat-spinner diameter="20"></mat-spinner>
           }
-          {{ 'wizard.next' | transloco }}
+          {{ 'import.wizard.next' | transloco }}
         </button>
       </div>
     </div>

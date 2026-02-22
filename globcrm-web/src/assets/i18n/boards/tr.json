@@ -10,7 +10,15 @@
     "system": "Sistem",
     "columns": "sütun",
     "cards": "kart",
-    "updatedAt": "Güncellendi"
+    "updatedAt": "Güncellendi",
+    "totalBoards": "Toplam Pano",
+    "totalCards": "Toplam Kart",
+    "privateBoards": "Özel",
+    "teamBoards2": "Ekip",
+    "publicBoards": "Herkese Açık",
+    "private": "Özel",
+    "team": "Ekip",
+    "public": "Herkese Açık"
   },
   "empty": {
     "heading": "İşinizi görsel olarak düzenleyin",

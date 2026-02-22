@@ -2,8 +2,8 @@
   <!-- Header -->
   <div class="page-header">
     <div class="header-left">
-      <h1>{{ 'email-templates.list.title' | transloco }}</h1>
-      <p class="page-tagline">{{ 'email-templates.list.tagline' | transloco }}</p>
+      <h1>{{ 'emailTemplates.list.title' | transloco }}</h1>
+      <p class="page-tagline">{{ 'emailTemplates.list.tagline' | transloco }}</p>
     </div>
     <div class="header-right">
       <span class="template-count">{{ store.filteredTemplates().length }} {{ 'common.templates' | transloco }}</span>
@@ -11,7 +11,7 @@
         <mat-icon matPrefix>search</mat-icon>
         <input
           matInput
-          [placeholder]="'email-templates.list.searchPlaceholder' | transloco"
+          [placeholder]="'emailTemplates.list.searchPlaceholder' | transloco"
           [value]="searchValue()"
           (input)="onSearchChange($any($event.target).value)"
         />
@@ -23,7 +23,7 @@
         (click)="createTemplate()"
       >
         <mat-icon>add</mat-icon>
-        {{ 'email-templates.list.createButton' | transloco }}
+        {{ 'emailTemplates.list.createButton' | transloco }}
       </button>
     </div>
   </div>
@@ -36,7 +36,7 @@
         [class.is-active]="selectedCategoryId() === null"
         (click)="onCategorySelect(null)"
       >
-        {{ 'email-templates.list.allCategory' | transloco }}
+        {{ 'emailTemplates.list.allCategory' | transloco }}
       </button>
       @for (category of store.categories(); track category.id) {
         <button
@@ -54,7 +54,7 @@
   @if (store.loading()) {
     <div class="loading-state">
       <mat-spinner diameter="40"></mat-spinner>
-      <p>{{ 'email-templates.list.loading' | transloco }}</p>
+      <p>{{ 'emailTemplates.list.loading' | transloco }}</p>
     </div>
   }
 
@@ -82,8 +82,8 @@
                 <button
                   mat-icon-button
                   *appHasPermission="'EmailTemplate:Edit'"
-                  [matTooltip]="'email-templates.list.actions.edit' | transloco"
-                  [attr.aria-label]="'email-templates.list.actions.edit' | transloco"
+                  [matTooltip]="'emailTemplates.list.actions.edit' | transloco"
+                  [attr.aria-label]="'emailTemplates.list.actions.edit' | transloco"
                   (click)="$event.stopPropagation(); editTemplate(template)"
                 >
                   <mat-icon>edit</mat-icon>
@@ -91,8 +91,8 @@
                 <button
                   mat-icon-button
                   *appHasPermission="'EmailTemplate:Create'"
-                  [matTooltip]="'email-templates.list.actions.clone' | transloco"
-                  [attr.aria-label]="'email-templates.list.actions.clone' | transloco"
+                  [matTooltip]="'emailTemplates.list.actions.clone' | transloco"
+                  [attr.aria-label]="'emailTemplates.list.actions.clone' | transloco"
                   (click)="$event.stopPropagation(); cloneTemplate(template)"
                 >
                   <mat-icon>content_copy</mat-icon>
@@ -100,8 +100,8 @@
                 <button
                   mat-icon-button
                   *appHasPermission="'EmailTemplate:Delete'"
-                  [matTooltip]="'email-templates.list.actions.delete' | transloco"
-                  [attr.aria-label]="'email-templates.list.actions.delete' | transloco"
+                  [matTooltip]="'emailTemplates.list.actions.delete' | transloco"
+                  [attr.aria-label]="'emailTemplates.list.actions.delete' | transloco"
                   color="warn"
                   (click)="$event.stopPropagation(); deleteTemplate(template)"
                 >
@@ -121,13 +121,13 @@
                   <span class="category-chip">{{ template.categoryName }}</span>
                 }
                 <span class="share-badge" [class.shared]="template.isShared">
-                  {{ (template.isShared ? 'email-templates.list.shared' : 'email-templates.list.personal') | transloco }}
+                  {{ (template.isShared ? 'emailTemplates.list.shared' : 'emailTemplates.list.personal') | transloco }}
                 </span>
                 @if (template.isSeedData) {
-                  <span class="starter-badge">{{ 'email-templates.list.starter' | transloco }}</span>
+                  <span class="starter-badge">{{ 'emailTemplates.list.starter' | transloco }}</span>
                 }
                 @if (template.isShared && template.ownerName) {
-                  <span class="owner-label">{{ 'email-templates.list.by' | transloco:{ name: template.ownerName } }}</span>
+                  <span class="owner-label">{{ 'emailTemplates.list.by' | transloco:{ name: template.ownerName } }}</span>
                 }
               </div>
             </mat-card-content>
@@ -140,8 +140,8 @@
         <div class="empty-icon-wrap">
           <mat-icon class="empty-icon">drafts</mat-icon>
         </div>
-        <h2>{{ 'email-templates.list.empty.title' | transloco }}</h2>
-        <p>{{ 'email-templates.list.empty.description' | transloco }}</p>
+        <h2>{{ 'emailTemplates.list.empty.title' | transloco }}</h2>
+        <p>{{ 'emailTemplates.list.empty.description' | transloco }}</p>
         <button
           mat-raised-button
           color="primary"
@@ -149,7 +149,7 @@
           (click)="createTemplate()"
         >
           <mat-icon>add</mat-icon>
-          {{ 'email-templates.list.empty.button' | transloco }}
+          {{ 'emailTemplates.list.empty.button' | transloco }}
         </button>
       </div>
     }

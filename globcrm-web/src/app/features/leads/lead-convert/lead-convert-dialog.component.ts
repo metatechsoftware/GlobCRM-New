@@ -296,14 +296,14 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
     // Validate company section
     if (this.createCompanyEnabled() && this.companyMode() === 'create') {
       if (!companyFv.newCompanyName?.trim()) {
-        this.snackBar.open(this.transloco.translate('convert.companyNameRequired'), this.transloco.translate('common.close'), { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('leads.convert.companyNameRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
 
     if (this.createCompanyEnabled() && this.companyMode() === 'link') {
       if (!this.selectedCompanyId()) {
-        this.snackBar.open(this.transloco.translate('convert.selectCompanyRequired'), this.transloco.translate('common.close'), { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('leads.convert.selectCompanyRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
@@ -311,7 +311,7 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
     // Validate deal section
     if (this.createDealEnabled()) {
       if (!dealFv.dealTitle?.trim()) {
-        this.snackBar.open(this.transloco.translate('convert.dealTitleRequired'), this.transloco.translate('common.close'), { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('leads.convert.dealTitleRequired'), this.transloco.translate('common.close'), { duration: 3000 });
         return;
       }
     }
@@ -355,7 +355,7 @@ export class LeadConvertDialogComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isSaving.set(false);
-        this.snackBar.open(this.transloco.translate('messages.leadConvertFailed'), this.transloco.translate('common.close'), { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('leads.messages.leadConvertFailed'), this.transloco.translate('common.close'), { duration: 5000 });
       },
     });
   }

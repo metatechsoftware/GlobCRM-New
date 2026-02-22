@@ -169,7 +169,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
             ></div>
           </div>
           <div class="kpi-card__progress-meta">
-            <span class="kpi-card__progress-text">{{ 'widgets.ofTarget' | transloco }}</span>
+            <span class="kpi-card__progress-text">{{ 'dashboard.widgets.ofTarget' | transloco }}</span>
             <span class="kpi-card__progress-pct">{{ progressPercent() }}%</span>
           </div>
         </div>

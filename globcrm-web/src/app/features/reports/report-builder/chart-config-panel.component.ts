@@ -55,7 +55,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>insert_chart</mat-icon>
-          {{ 'panels.visualization' | transloco }}
+          {{ 'reports.panels.visualization' | transloco }}
         </mat-panel-title>
       </mat-expansion-panel-header>
 
@@ -69,7 +69,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
           @for (option of chartTypeOptions; track option.value) {
             <mat-button-toggle [value]="option.value" class="chart-config-panel__type-toggle">
               <mat-icon>{{ option.icon }}</mat-icon>
-              <span class="chart-config-panel__type-label">{{ 'card.chartTypes.' + option.value | transloco }}</span>
+              <span class="chart-config-panel__type-label">{{ 'reports.card.chartTypes.' + option.value | transloco }}</span>
             </mat-button-toggle>
           }
         </mat-button-toggle-group>
@@ -77,7 +77,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
         <!-- Display Options -->
         <div class="chart-config-panel__toggles">
           <div class="chart-config-panel__toggle-row">
-            <span>{{ 'panels.showLegend' | transloco }}</span>
+            <span>{{ 'reports.panels.showLegend' | transloco }}</span>
             <mat-slide-toggle
               [checked]="showLegendValue()"
               (change)="onShowLegendChange($event.checked)"
@@ -86,7 +86,7 @@ const DEFAULT_CHART_CONFIG: ReportChartConfig = {
           </div>
 
           <div class="chart-config-panel__toggle-row">
-            <span>{{ 'panels.showDataLabels' | transloco }}</span>
+            <span>{{ 'reports.panels.showDataLabels' | transloco }}</span>
             <mat-slide-toggle
               [checked]="showDataLabelsValue()"
               (change)="onShowDataLabelsChange($event.checked)"

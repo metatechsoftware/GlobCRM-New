@@ -1,8 +1,8 @@
 <div class="merge-panel">
   <!-- Panel Header -->
   <div class="panel-header">
-    <h3>{{ 'email-templates.mergePanel.title' | transloco }}</h3>
-    <button mat-icon-button (click)="closePanel.emit()" [matTooltip]="'email-templates.mergePanel.closeTooltip' | transloco">
+    <h3>{{ 'emailTemplates.mergePanel.title' | transloco }}</h3>
+    <button mat-icon-button (click)="closePanel.emit()" [matTooltip]="'emailTemplates.mergePanel.closeTooltip' | transloco">
       <mat-icon>close</mat-icon>
     </button>
   </div>
@@ -10,7 +10,7 @@
   <!-- Info Hint -->
   <div class="panel-hint">
     <mat-icon class="hint-icon">info_outline</mat-icon>
-    <span [innerHTML]="'email-templates.mergePanel.hint' | transloco">
+    <span [innerHTML]="'emailTemplates.mergePanel.hint' | transloco">
     </span>
   </div>
 
@@ -42,7 +42,7 @@
             >
               <span class="field-label">{{ field.label }}</span>
               @if (field.isCustomField) {
-                <span class="custom-badge">{{ 'email-templates.mergePanel.custom' | transloco }}</span>
+                <span class="custom-badge">{{ 'emailTemplates.mergePanel.custom' | transloco }}</span>
               }
               <mat-icon class="copy-icon">{{ copiedField() === field.key ? 'check' : 'content_copy' }}</mat-icon>
             </button>
@@ -55,7 +55,7 @@
   <!-- Fallback Hint -->
   <div class="fallback-hint">
     <mat-icon class="hint-icon">lightbulb_outline</mat-icon>
-    <span [innerHTML]="'email-templates.mergePanel.fallbackHint' | transloco">
+    <span [innerHTML]="'emailTemplates.mergePanel.fallbackHint' | transloco">
     </span>
   </div>
 </div>

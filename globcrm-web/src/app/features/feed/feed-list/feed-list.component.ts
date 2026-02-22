@@ -48,25 +48,25 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
   changeDetection: ChangeDetectionStrategy.OnPush,
   styles: `
     /* ── Keyframe Animations ── */
-    @keyframes feedCardEnter {
+    @keyframes timelineSlideIn {
       from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateX(-16px) translateY(6px);
       }
       to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0) translateY(0);
       }
     }
 
-    @keyframes commentEnter {
+    @keyframes commentCascade {
       from {
         opacity: 0;
-        transform: translateX(-6px);
+        transform: scale(0.96) translateY(4px);
       }
       to {
         opacity: 1;
-        transform: translateX(0);
+        transform: scale(1) translateY(0);
       }
     }
 
@@ -76,8 +76,13 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     }
 
     @keyframes emptyFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-8px) scale(1.03); }
+    }
+
+    @keyframes timelinePulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(249, 115, 22, 0); }
     }
 
     /* ── Host ── */
@@ -86,14 +91,6 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       max-width: 680px;
       margin: 0 auto;
       padding: 24px 16px;
-    }
-
-    /* ── Hero Gradient Bar ── */
-    .hero-accent {
-      height: 3px;
-      border-radius: var(--radius-full, 9999px);
-      background: linear-gradient(90deg, var(--color-primary, #F97316), var(--color-secondary, #8B5CF6));
-      margin-bottom: 20px;
     }
 
     /* ── Page Header ── */
@@ -114,6 +111,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       background: var(--color-primary-soft, #FFF7ED);
       color: var(--color-primary, #F97316);
       flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
 
       mat-icon {
         font-size: 22px;
@@ -128,11 +126,12 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       gap: 2px;
 
       h1 {
-        font-size: var(--text-2xl, 1.5rem);
-        font-weight: var(--font-semibold, 600);
+        font-size: var(--text-3xl, 1.875rem);
+        font-weight: var(--font-bold, 700);
         color: var(--color-text, #1a1a1a);
         margin: 0;
         line-height: var(--leading-tight, 1.25);
+        letter-spacing: var(--tracking-tight, -0.02em);
       }
 
       .feed-subtitle {
@@ -141,14 +140,54 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       }
     }
 
+    .feed-header-overline {
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.6rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-primary, #F97316);
+    }
+
     /* ── Skeleton Loading ── */
     .skeleton-container {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 16px;
+    }
+
+    .skeleton-timeline-item {
+      display: flex;
+      gap: 14px;
+    }
+
+    .skeleton-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 20px;
+      flex-shrink: 0;
+    }
+
+    .skeleton-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(90deg, var(--color-bg-secondary, #F0F0EE) 25%, var(--color-surface-hover, #F7F7F5) 50%, var(--color-bg-secondary, #F0F0EE) 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite linear;
+      flex-shrink: 0;
+    }
+
+    .skeleton-connector {
+      flex: 1;
+      width: 2px;
+      background: var(--color-border-subtle, #F0F0EE);
+      margin-top: 4px;
     }
 
     .skeleton-card {
+      flex: 1;
       padding: 16px;
       border-radius: var(--radius-lg, 12px);
       border: 1px solid var(--color-border-subtle, #F0F0EE);
@@ -207,31 +246,34 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     /* ── Empty State ── */
     .empty-feed {
       text-align: center;
-      padding: 56px 16px;
+      padding: 72px 16px;
     }
 
     .empty-icon-wrap {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 72px;
-      height: 72px;
+      width: 88px;
+      height: 88px;
       border-radius: 50%;
       background: var(--color-primary-soft, #FFF7ED);
       margin-bottom: 16px;
       animation: emptyFloat 3s ease-in-out infinite;
+      box-shadow: 0 0 40px var(--orange-glow, rgba(249,115,22,0.12)), 0 0 80px var(--orange-glow, rgba(249,115,22,0.12));
 
       mat-icon {
-        font-size: 36px;
-        width: 36px;
-        height: 36px;
+        font-size: 42px;
+        width: 42px;
+        height: 42px;
         color: var(--color-primary, #F97316);
       }
     }
 
     .empty-title {
-      font-size: var(--text-lg, 1.125rem);
-      font-weight: var(--font-semibold, 600);
+      font-family: var(--font-serif, 'Fraunces', serif);
+      font-size: var(--text-2xl, 1.5rem);
+      font-weight: 400;
+      font-style: italic;
       color: var(--color-text, #1a1a1a);
       margin: 0 0 6px;
     }
@@ -240,48 +282,113 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       font-size: var(--text-base, 0.875rem);
       color: var(--color-text-muted, #9CA3AF);
       margin: 0;
-      max-width: 320px;
+      max-width: 360px;
       margin-left: auto;
       margin-right: auto;
       line-height: var(--leading-relaxed, 1.625);
     }
 
-    /* ── Feed Items List ── */
-    .feed-items {
+    /* ── Timeline Structure ── */
+    .feed-timeline {
       display: flex;
       flex-direction: column;
-      gap: 12px;
+    }
+
+    .feed-timeline-item {
+      display: flex;
+      gap: 14px;
+      animation: timelineSlideIn var(--duration-slow, 300ms) var(--ease-out) both;
+      animation-delay: calc(var(--item-index, 0) * 50ms);
+    }
+
+    .timeline-node {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 20px;
+      flex-shrink: 0;
+      padding-top: 20px;
+    }
+
+    .timeline-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: transform 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1));
+    }
+
+    .timeline-dot--social {
+      background: var(--color-primary, #F97316);
+      box-shadow: 0 0 8px var(--orange-glow, rgba(249,115,22,0.12));
+    }
+
+    .timeline-dot--system {
+      background: transparent;
+      border: 2px solid var(--color-text-faint, #B0ACA7);
+    }
+
+    .timeline-dot--first {
+      animation: timelinePulse 2s infinite;
+    }
+
+    .feed-timeline-item:hover .timeline-dot {
+      transform: scale(1.3);
+    }
+
+    .feed-timeline-item:hover .timeline-dot--social {
+      box-shadow: 0 0 14px rgba(249, 115, 22, 0.35);
+    }
+
+    .timeline-connector {
+      flex: 1;
+      width: 2px;
+      background: var(--color-border-subtle, #F0F0EE);
+      margin-top: 4px;
+      min-height: 12px;
     }
 
     /* ── Feed Item Card ── */
     .feed-item-card {
+      flex: 1;
+      min-width: 0;
       padding: 16px;
       border-radius: var(--radius-lg, 12px);
-      border: 1px solid var(--color-border-subtle, #F0F0EE);
       background: var(--color-surface, #fff);
+      border: 1px solid var(--color-border-subtle, #F0F0EE);
+      margin-bottom: 10px;
       transition:
-        box-shadow var(--duration-normal, 200ms) var(--ease-default),
-        transform var(--duration-normal, 200ms) var(--ease-default),
-        border-color var(--duration-normal, 200ms) var(--ease-default);
-      animation: feedCardEnter var(--duration-slow, 300ms) var(--ease-out) both;
-      animation-delay: calc(var(--item-index, 0) * 40ms);
-    }
-
-    .feed-item-card:hover {
-      box-shadow: inset 3px 0 0 var(--color-primary, #F97316), var(--shadow-md);
-      transform: translateY(-1px);
-    }
-
-    .feed-item-card--system {
-      background: linear-gradient(135deg, var(--color-bg-secondary, #F0F0EE) 0%, var(--color-surface, #fff) 100%);
-    }
-
-    .feed-item-card--system:hover {
-      box-shadow: inset 3px 0 0 var(--color-text-muted, #9CA3AF), var(--shadow-sm);
+        box-shadow 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+        transform 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+        border-color 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+        background 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1));
     }
 
     .feed-item-card--social {
+      padding: 18px 20px;
+      border-radius: var(--radius-lg, 12px);
+      border: 1px solid var(--color-border-subtle, #F0F0EE);
       background: var(--color-surface, #fff);
+      margin-bottom: 12px;
+    }
+
+    .feed-item-card--social:hover {
+      box-shadow: var(--shadow-md), var(--shadow-glow, 0 0 24px rgba(249,115,22,0.12));
+      transform: translateY(-2px);
+    }
+
+    .feed-item-card--system {
+      padding: 12px 16px 12px 18px;
+      border-radius: 0;
+      border: none;
+      border-left: 2px solid var(--color-border-subtle, #F0F0EE);
+      background: transparent;
+      margin-bottom: 8px;
+    }
+
+    .feed-item-card--system:hover {
+      border-left-color: var(--color-text-faint, #B0ACA7);
+      background: var(--color-highlight, rgba(249, 115, 22, 0.06));
     }
 
     /* ── Feed Item Header ── */
@@ -290,6 +397,24 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       align-items: center;
       gap: 10px;
       margin-bottom: 10px;
+    }
+
+    .feed-system-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--color-bg-secondary, #F0F0EE);
+      color: var(--color-text-muted, #9CA3AF);
+      flex-shrink: 0;
+
+      mat-icon {
+        font-size: 18px;
+        width: 18px;
+        height: 18px;
+      }
     }
 
     .feed-author-info {
@@ -306,8 +431,10 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     }
 
     .feed-time {
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
       font-size: var(--text-xs, 0.75rem);
-      color: var(--color-text-muted, #9CA3AF);
+      color: var(--color-text-faint, #B0ACA7);
+      letter-spacing: var(--tracking-wide, 0.02em);
     }
 
     /* ── Type Badge ── */
@@ -317,9 +444,11 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       gap: 4px;
       padding: 3px 10px;
       border-radius: var(--radius-full, 9999px);
-      font-size: var(--text-xs, 0.75rem);
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.6rem;
       font-weight: var(--font-medium, 500);
-      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-wide, 0.02em);
 
       mat-icon {
         font-size: 14px;
@@ -331,11 +460,13 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     .feed-type-badge--system {
       background: var(--color-bg-secondary, #F0F0EE);
       color: var(--color-text-secondary, #6B7280);
+      border: 1px solid var(--color-border-subtle, #F0F0EE);
     }
 
     .feed-type-badge--social {
       background: var(--color-primary-soft, #FFF7ED);
       color: var(--color-primary-text, #C2410C);
+      border: 1px solid var(--orange-glow, rgba(249,115,22,0.12));
     }
 
     /* ── Feed Content ── */
@@ -391,7 +522,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       padding: 4px 10px;
       border-radius: var(--radius-md, 8px);
       border: 1px solid var(--color-border, #E8E8E6);
-      background: var(--color-surface, #fff);
+      background: var(--color-bg-secondary, #F0F0EE);
       color: var(--color-text, #1a1a1a);
       text-decoration: none;
       cursor: pointer;
@@ -401,12 +532,14 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       transition:
         border-color var(--duration-fast, 100ms),
         box-shadow var(--duration-fast, 100ms),
-        background var(--duration-fast, 100ms);
+        background var(--duration-fast, 100ms),
+        transform var(--duration-fast, 100ms);
 
       &:hover {
         border-color: var(--color-primary, #F97316);
         box-shadow: var(--shadow-xs);
         background: var(--color-primary-soft, #FFF7ED);
+        transform: translateX(2px);
       }
 
       .entity-link-icon {
@@ -420,6 +553,12 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
         width: 14px;
         height: 14px;
         color: var(--color-text-muted, #9CA3AF);
+        transition: color var(--duration-fast, 100ms), transform var(--duration-fast, 100ms);
+      }
+
+      &:hover .entity-link-arrow {
+        color: var(--color-primary, #F97316);
+        transform: translateX(2px);
       }
     }
 
@@ -428,8 +567,10 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       display: flex;
       align-items: center;
       gap: 4px;
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
       font-size: var(--text-xs, 0.75rem);
       color: var(--color-text-muted, #9CA3AF);
+      letter-spacing: var(--tracking-wide, 0.02em);
       margin-bottom: 8px;
 
       mat-icon {
@@ -467,12 +608,22 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       &:hover {
         background: var(--color-highlight, rgba(249, 115, 22, 0.06));
         color: var(--color-text, #1a1a1a);
+        transform: scale(1.02);
+      }
+
+      &:active {
+        transform: scale(0.97);
       }
 
       mat-icon {
         font-size: 18px;
         width: 18px;
         height: 18px;
+        transition: transform var(--duration-fast, 100ms);
+      }
+
+      &:hover mat-icon {
+        transform: scale(1.1);
       }
     }
 
@@ -488,25 +639,43 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
 
     /* ── Comments Section ── */
     .comments-section {
+      position: relative;
       margin-top: 12px;
       padding-top: 12px;
+      padding-left: 20px;
       border-top: 1px solid var(--color-border-subtle, #F0F0EE);
+    }
+
+    .comments-thread-line {
+      position: absolute;
+      left: 6px;
+      top: 12px;
+      bottom: 0;
+      width: 2px;
+      background: var(--color-border-subtle, #F0F0EE);
+      border-radius: 1px;
     }
 
     .comment-item {
       display: flex;
       gap: 8px;
       margin-bottom: 10px;
-      animation: commentEnter var(--duration-slow, 300ms) var(--ease-out) both;
-      animation-delay: calc(var(--comment-index, 0) * 30ms);
+      animation: commentCascade var(--duration-slow, 300ms) var(--ease-out) both;
+      animation-delay: calc(var(--comment-index, 0) * 40ms);
     }
 
     .comment-bubble {
       flex: 1;
       background: var(--color-bg-secondary, #F0F0EE);
+      border: 1px solid var(--color-border-subtle, #F0F0EE);
       border-radius: var(--radius-lg, 12px);
       border-top-left-radius: var(--radius-sm, 4px);
       padding: 8px 12px;
+      transition: background var(--duration-fast, 100ms);
+
+      &:hover {
+        background: var(--color-surface-hover, #F7F7F5);
+      }
     }
 
     .comment-author {
@@ -516,15 +685,16 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     }
 
     .comment-time {
-      font-size: 11px;
-      color: var(--color-text-muted, #9CA3AF);
+      font-family: var(--font-mono, 'JetBrains Mono', monospace);
+      font-size: 0.65rem;
+      color: var(--color-text-faint, #B0ACA7);
       margin-left: 6px;
     }
 
     .comment-text {
       font-size: var(--text-sm, 0.8125rem);
       line-height: var(--leading-normal, 1.5);
-      color: var(--color-text, #1a1a1a);
+      color: var(--color-text-secondary, #6B7280);
       margin-top: 2px;
     }
 
@@ -613,6 +783,7 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       display: flex;
       justify-content: center;
       margin-top: 20px;
+      margin-left: 36px;
     }
 
     .load-more-btn {
@@ -664,8 +835,18 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
 
     /* ── Reduced Motion ── */
     @media (prefers-reduced-motion: reduce) {
-      .feed-item-card {
+      .feed-timeline-item {
         animation: none;
+      }
+      .feed-item-card--social:hover,
+      .feed-item-card--system:hover {
+        transform: none;
+      }
+      .timeline-dot--first {
+        animation: none;
+      }
+      .feed-timeline-item:hover .timeline-dot {
+        transform: none;
       }
       .comment-item {
         animation: none;
@@ -675,21 +856,32 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
       }
       .skeleton-avatar,
       .skeleton-line,
-      .skeleton-body-line {
+      .skeleton-body-line,
+      .skeleton-dot {
         animation: none;
+      }
+      .action-btn:hover,
+      .action-btn:active {
+        transform: none;
+      }
+      .action-btn:hover mat-icon {
+        transform: none;
+      }
+      .feed-entity-link:hover,
+      .feed-entity-link:hover .entity-link-arrow {
+        transform: none;
       }
     }
   `,
   template: `
-    <div class="hero-accent"></div>
-
     <div class="feed-header">
       <div class="list-header__icon">
         <mat-icon>dynamic_feed</mat-icon>
       </div>
       <div class="feed-header-text">
-        <h1>{{ 'list.title' | transloco }}</h1>
-        <span class="feed-subtitle">{{ 'list.subtitle' | transloco }}</span>
+        <span class="feed-header-overline">{{ 'feed.list.overline' | transloco }}</span>
+        <h1>{{ 'feed.list.title' | transloco }}</h1>
+        <span class="feed-subtitle">{{ 'feed.list.subtitle' | transloco }}</span>
       </div>
     </div>
 
@@ -698,17 +890,25 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
     @if (store.isLoading() && store.items().length === 0) {
       <div class="skeleton-container">
         @for (i of [1, 2, 3]; track i) {
-          <div class="skeleton-card">
-            <div class="skeleton-header">
-              <div class="skeleton-avatar"></div>
-              <div class="skeleton-lines">
-                <div class="skeleton-line skeleton-line--medium"></div>
-                <div class="skeleton-line skeleton-line--short"></div>
-              </div>
+          <div class="skeleton-timeline-item">
+            <div class="skeleton-node">
+              <div class="skeleton-dot"></div>
+              @if ($index < 2) {
+                <div class="skeleton-connector"></div>
+              }
             </div>
-            <div class="skeleton-body">
-              <div class="skeleton-body-line skeleton-line--long"></div>
-              <div class="skeleton-body-line skeleton-line--medium"></div>
+            <div class="skeleton-card">
+              <div class="skeleton-header">
+                <div class="skeleton-avatar"></div>
+                <div class="skeleton-lines">
+                  <div class="skeleton-line skeleton-line--medium"></div>
+                  <div class="skeleton-line skeleton-line--short"></div>
+                </div>
+              </div>
+              <div class="skeleton-body">
+                <div class="skeleton-body-line skeleton-line--long"></div>
+                <div class="skeleton-body-line skeleton-line--medium"></div>
+              </div>
             </div>
           </div>
         }
@@ -718,113 +918,134 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
         <div class="empty-icon-wrap">
           <mat-icon>dynamic_feed</mat-icon>
         </div>
-        <p class="empty-title">{{ 'list.emptyTitle' | transloco }}</p>
-        <p class="empty-description">{{ 'list.emptyDescription' | transloco }}</p>
+        <p class="empty-title">{{ 'feed.list.emptyTitle' | transloco }}</p>
+        <p class="empty-description">{{ 'feed.list.emptyDescription' | transloco }}</p>
       </div>
     } @else {
-      <div class="feed-items">
-        @for (item of store.items(); track item.id; let i = $index) {
-          <div class="feed-item-card"
-               [class.feed-item-card--system]="item.type === 'SystemEvent'"
-               [class.feed-item-card--social]="item.type === 'SocialPost'"
-               [style.--item-index]="i">
-            <div class="feed-item-header">
-              <app-avatar
-                [avatarUrl]="item.authorAvatarUrl"
-                [firstName]="getFirstName(item.authorName)"
-                [lastName]="getLastName(item.authorName)"
-                size="sm" />
-              <div class="feed-author-info">
-                <span class="feed-author-name feed-author-name--clickable"
-                      (click)="onAuthorClick($event, item)">{{ item.authorName }}</span>
-                <span class="feed-time">{{ getRelativeTime(item.createdAt) }}</span>
-              </div>
-              <span class="feed-type-badge"
-                    [class.feed-type-badge--system]="item.type === 'SystemEvent'"
-                    [class.feed-type-badge--social]="item.type === 'SocialPost'">
-                <mat-icon>{{ item.type === 'SystemEvent' ? 'auto_awesome' : 'chat' }}</mat-icon>
-                {{ item.type === 'SystemEvent' ? ('list.activity' | transloco) : ('list.post' | transloco) }}
-              </span>
-            </div>
-
-            <div class="feed-item-content"
-                 [innerHTML]="item.content | renderMentions"
-                 (click)="onContentClick($event)"></div>
-
-            @if (item.entityType && item.entityId) {
-              <a class="feed-entity-link"
-                 [matTooltip]="getEntityTooltip(item)"
-                 matTooltipShowDelay="300"
-                 (click)="onEntityClick($event, item)"
-                 (auxclick)="onEntityMiddleClick($event, item)">
-                <mat-icon class="entity-link-icon" [style.color]="getEntityColor(item.entityType)">{{ getEntityIcon(item.entityType) }}</mat-icon>
-                {{ item.entityName || ('list.viewEntity' | transloco: { entityType: item.entityType }) }}
-                <mat-icon class="entity-link-arrow">chevron_right</mat-icon>
-              </a>
-            }
-
-            @if (item.attachmentCount > 0) {
-              <div class="feed-attachments">
-                <mat-icon>attach_file</mat-icon>
-                {{ (item.attachmentCount !== 1 ? 'list.attachments' : 'list.attachment') | transloco: { count: item.attachmentCount } }}
-              </div>
-            }
-
-            <div class="feed-item-actions">
-              <button class="action-btn"
-                      [class.action-btn--active]="expandedComments().has(item.id)"
-                      (click)="toggleComments(item.id)">
-                <mat-icon>comment</mat-icon>
-                {{ (item.commentCount === 1 ? 'list.comment' : 'list.comments') | transloco: { count: item.commentCount } }}
-              </button>
-              @if (canDelete(item)) {
-                <button class="action-btn action-btn--danger" (click)="deleteItem(item.id)">
-                  <mat-icon>delete_outline</mat-icon>
-                  {{ 'common.delete' | transloco }}
-                </button>
+      <div class="feed-timeline">
+        @for (item of store.items(); track item.id; let i = $index; let last = $last) {
+          <div class="feed-timeline-item" [style.--item-index]="i">
+            <div class="timeline-node">
+              <div class="timeline-dot"
+                   [class.timeline-dot--social]="item.type === 'socialPost'"
+                   [class.timeline-dot--system]="item.type === 'systemEvent'"
+                   [class.timeline-dot--first]="i === 0 && item.type === 'socialPost'"></div>
+              @if (!last) {
+                <div class="timeline-connector"></div>
               }
             </div>
-
-            @if (expandedComments().has(item.id)) {
-              <div class="comments-section">
-                @if (store.selectedItem()?.id === item.id) {
-                  @for (comment of store.comments(); track comment.id; let ci = $index) {
-                    <div class="comment-item" [style.--comment-index]="ci">
-                      <app-avatar
-                        [avatarUrl]="comment.authorAvatarUrl"
-                        [firstName]="getFirstName(comment.authorName)"
-                        [lastName]="getLastName(comment.authorName)"
-                        size="sm" />
-                      <div class="comment-bubble">
-                        <span class="comment-author comment-author--clickable"
-                              (click)="onAuthorClick($event, { authorId: comment.authorId, authorName: comment.authorName })">{{ comment.authorName }}</span>
-                        <span class="comment-time">{{ getRelativeTime(comment.createdAt) }}</span>
-                        <div class="comment-text">{{ comment.content }}</div>
-                      </div>
-                    </div>
-                  }
-                }
-
-                <div class="add-comment-row">
+            <div class="feed-item-card"
+                 [class.feed-item-card--system]="item.type === 'systemEvent'"
+                 [class.feed-item-card--social]="item.type === 'socialPost'">
+              <div class="feed-item-header">
+                @if (item.authorName) {
                   <app-avatar
-                    [firstName]="currentUserFirstName"
-                    [lastName]="currentUserLastName"
+                    [avatarUrl]="item.authorAvatarUrl"
+                    [firstName]="getFirstName(item.authorName)"
+                    [lastName]="getLastName(item.authorName)"
                     size="sm" />
-                  <div class="comment-input-wrap">
-                    <input class="comment-input"
-                           [placeholder]="'comments.placeholder' | transloco"
-                           [value]="commentTexts()[item.id] || ''"
-                           (input)="setCommentText(item.id, $any($event.target).value)"
-                           (keydown.enter)="submitComment(item.id)" />
-                    <button class="comment-send-btn"
-                            [disabled]="!(commentTexts()[item.id]?.trim())"
-                            (click)="submitComment(item.id)">
-                      <mat-icon>send</mat-icon>
-                    </button>
+                  <div class="feed-author-info">
+                    <span class="feed-author-name feed-author-name--clickable"
+                          (click)="onAuthorClick($event, item)">{{ item.authorName }}</span>
+                    <span class="feed-time">{{ getRelativeTime(item.createdAt) }}</span>
+                  </div>
+                } @else {
+                  <div class="feed-system-icon">
+                    <mat-icon>auto_awesome</mat-icon>
+                  </div>
+                  <div class="feed-author-info">
+                    <span class="feed-author-name">{{ 'feed.list.systemAuthor' | transloco }}</span>
+                    <span class="feed-time">{{ getRelativeTime(item.createdAt) }}</span>
+                  </div>
+                }
+                <span class="feed-type-badge"
+                      [class.feed-type-badge--system]="item.type === 'systemEvent'"
+                      [class.feed-type-badge--social]="item.type === 'socialPost'">
+                  <mat-icon>{{ item.type === 'systemEvent' ? 'auto_awesome' : 'chat' }}</mat-icon>
+                  {{ item.type === 'systemEvent' ? ('feed.list.activity' | transloco) : ('feed.list.post' | transloco) }}
+                </span>
+              </div>
+
+              <div class="feed-item-content"
+                   [innerHTML]="item.content | renderMentions"
+                   (click)="onContentClick($event)"></div>
+
+              @if (item.entityType && item.entityId) {
+                <a class="feed-entity-link"
+                   [matTooltip]="getEntityTooltip(item)"
+                   matTooltipShowDelay="300"
+                   (click)="onEntityClick($event, item)"
+                   (auxclick)="onEntityMiddleClick($event, item)">
+                  <mat-icon class="entity-link-icon" [style.color]="getEntityColor(item.entityType)">{{ getEntityIcon(item.entityType) }}</mat-icon>
+                  {{ item.entityName || ('feed.list.viewEntity' | transloco: { entityType: item.entityType }) }}
+                  <mat-icon class="entity-link-arrow">chevron_right</mat-icon>
+                </a>
+              }
+
+              @if (item.attachmentCount > 0) {
+                <div class="feed-attachments">
+                  <mat-icon>attach_file</mat-icon>
+                  {{ (item.attachmentCount !== 1 ? 'feed.list.attachments' : 'feed.list.attachment') | transloco: { count: item.attachmentCount } }}
+                </div>
+              }
+
+              <div class="feed-item-actions">
+                <button class="action-btn"
+                        [class.action-btn--active]="expandedComments().has(item.id)"
+                        (click)="toggleComments(item.id)">
+                  <mat-icon>comment</mat-icon>
+                  {{ (item.commentCount === 1 ? 'feed.list.comment' : 'feed.list.comments') | transloco: { count: item.commentCount } }}
+                </button>
+                @if (canDelete(item)) {
+                  <button class="action-btn action-btn--danger" (click)="deleteItem(item.id)">
+                    <mat-icon>delete_outline</mat-icon>
+                    {{ 'common.delete' | transloco }}
+                  </button>
+                }
+              </div>
+
+              @if (expandedComments().has(item.id)) {
+                <div class="comments-section">
+                  <div class="comments-thread-line"></div>
+                  @if (store.selectedItem()?.id === item.id) {
+                    @for (comment of store.comments(); track comment.id; let ci = $index) {
+                      <div class="comment-item" [style.--comment-index]="ci">
+                        <app-avatar
+                          [avatarUrl]="comment.authorAvatarUrl"
+                          [firstName]="getFirstName(comment.authorName)"
+                          [lastName]="getLastName(comment.authorName)"
+                          size="sm" />
+                        <div class="comment-bubble">
+                          <span class="comment-author comment-author--clickable"
+                                (click)="onAuthorClick($event, { authorId: comment.authorId, authorName: comment.authorName })">{{ comment.authorName }}</span>
+                          <span class="comment-time">{{ getRelativeTime(comment.createdAt) }}</span>
+                          <div class="comment-text">{{ comment.content }}</div>
+                        </div>
+                      </div>
+                    }
+                  }
+
+                  <div class="add-comment-row">
+                    <app-avatar
+                      [firstName]="currentUserFirstName"
+                      [lastName]="currentUserLastName"
+                      size="sm" />
+                    <div class="comment-input-wrap">
+                      <input class="comment-input"
+                             [placeholder]="'feed.comments.placeholder' | transloco"
+                             [value]="commentTexts()[item.id] || ''"
+                             (input)="setCommentText(item.id, $any($event.target).value)"
+                             (keydown.enter)="submitComment(item.id)" />
+                      <button class="comment-send-btn"
+                              [disabled]="!(commentTexts()[item.id]?.trim())"
+                              (click)="submitComment(item.id)">
+                        <mat-icon>send</mat-icon>
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            }
+              }
+            </div>
           </div>
         }
       </div>
@@ -835,9 +1056,9 @@ import { UserPreviewService } from '../../../shared/services/user-preview.servic
                   [disabled]="store.isLoading()"
                   (click)="store.loadMore()">
             @if (store.isLoading()) {
-              {{ 'list.loadingMore' | transloco }}
+              {{ 'feed.list.loadingMore' | transloco }}
             } @else {
-              {{ 'list.loadMore' | transloco }}
+              {{ 'feed.list.loadMore' | transloco }}
             }
           </button>
         </div>

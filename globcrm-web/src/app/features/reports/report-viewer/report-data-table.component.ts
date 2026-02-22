@@ -165,7 +165,7 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
     @if (drillDownFilter()) {
       <div class="drill-down-bar">
         <mat-icon>filter_list</mat-icon>
-        <span>{{ 'builder.filteredBy' | transloco }}: {{ drillDownFilter()?.fieldId }} = "{{ drillDownFilter()?.value }}"</span>
+        <span>{{ 'reports.builder.filteredBy' | transloco }}: {{ drillDownFilter()?.fieldId }} = "{{ drillDownFilter()?.value }}"</span>
         <button mat-icon-button (click)="clearDrillDown.emit()">
           <mat-icon>close</mat-icon>
         </button>
@@ -203,7 +203,7 @@ const ENTITY_ROUTE_MAP: Record<string, string> = {
       </div>
     } @else {
       <div class="report-table__empty">
-        {{ 'builder.noData' | transloco }}
+        {{ 'reports.builder.noData' | transloco }}
       </div>
     }
   `,
@@ -277,8 +277,8 @@ export class ReportDataTableComponent {
 
     if (typeof value === 'boolean') {
       return value
-        ? this.transloco.translate('panels.boolTrue')
-        : this.transloco.translate('panels.boolFalse');
+        ? this.transloco.translate('reports.panels.boolTrue')
+        : this.transloco.translate('reports.panels.boolFalse');
     }
 
     // Arrays — recursively format each item

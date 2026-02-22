@@ -32,14 +32,19 @@ import {
   template: `
     @if (integration(); as vm) {
       <div class="dp-panel" [class.dp-panel--open]="!!integration()">
+        <!-- Brand Header Band -->
+        <div class="dp-header-band" [style.--brand-color]="vm.catalog.brandColor"></div>
+
         <!-- Header -->
         <div class="dp-header">
           <div class="dp-header__left">
-            <img
-              [src]="vm.catalog.iconPath"
-              [alt]="vm.catalog.name"
-              class="dp-header__icon"
-            />
+            <div class="dp-header__icon-wrap" [style.--brand-color]="vm.catalog.brandColor">
+              <img
+                [src]="vm.catalog.iconPath"
+                [alt]="vm.catalog.name"
+                class="dp-header__icon"
+              />
+            </div>
             <div class="dp-header__info">
               <h2 class="dp-header__name">{{ vm.catalog.name }}</h2>
               @if (vm.isConnected) {
@@ -173,9 +178,11 @@ import {
             <div class="dp-activity__list">
               @for (entry of activityLog(); track entry.id) {
                 <div class="dp-activity__item">
-                  <mat-icon class="dp-activity__icon" [class]="getActionIconClass(entry.action)">
-                    {{ getActionIcon(entry.action) }}
-                  </mat-icon>
+                  <div class="dp-activity__icon-wrap" [class]="getActionIconWrapClass(entry.action)">
+                    <mat-icon class="dp-activity__icon">
+                      {{ getActionIcon(entry.action) }}
+                    </mat-icon>
+                  </div>
                   <div class="dp-activity__content">
                     <span class="dp-activity__action">{{ entry.action }}</span>
                     <span class="dp-activity__user">{{ entry.performedByUserName }}</span>
@@ -224,12 +231,12 @@ export class IntegrationDetailPanelComponent {
     return 'history';
   }
 
-  getActionIconClass(action: string): string {
+  getActionIconWrapClass(action: string): string {
     const lower = action.toLowerCase();
-    if (lower.includes('connected') && !lower.includes('disconnected')) return 'dp-activity__icon--connected';
-    if (lower.includes('disconnected')) return 'dp-activity__icon--disconnected';
-    if (lower.includes('test') && lower.includes('success')) return 'dp-activity__icon--success';
-    if (lower.includes('test') && lower.includes('fail')) return 'dp-activity__icon--failure';
+    if (lower.includes('connected') && !lower.includes('disconnected')) return 'dp-activity__icon-wrap--connected';
+    if (lower.includes('disconnected')) return 'dp-activity__icon-wrap--disconnected';
+    if (lower.includes('test') && lower.includes('success')) return 'dp-activity__icon-wrap--success';
+    if (lower.includes('test') && lower.includes('fail')) return 'dp-activity__icon-wrap--failure';
     return '';
   }
 }

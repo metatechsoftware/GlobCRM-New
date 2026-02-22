@@ -25,7 +25,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
   ],
   template: `
     <div class="toolbar">
-      <button mat-icon-button (click)="back.emit()" [matTooltip]="'builder.backToWorkflows' | transloco">
+      <button mat-icon-button (click)="back.emit()" [matTooltip]="'workflows.builder.backToWorkflows' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </button>
 
@@ -37,25 +37,25 @@ import { TranslocoPipe } from '@jsverse/transloco';
                    (ngModelChange)="nameChanged.emit($event)"
                    (blur)="editingName = false"
                    (keyup.enter)="editingName = false"
-                   [placeholder]="'builder.workflowName' | transloco"
+                   [placeholder]="'workflows.builder.workflowName' | transloco"
                    #nameInput />
           </mat-form-field>
         } @else {
           <span class="toolbar__name-display" (click)="editingName = true; focusNameInput()">
-            {{ workflowName() || ('builder.untitledWorkflow' | transloco) }}
+            {{ workflowName() || ('workflows.builder.untitledWorkflow' | transloco) }}
             <mat-icon class="toolbar__name-edit-icon">edit</mat-icon>
           </span>
         }
       </div>
 
       <mat-form-field appearance="outline" class="toolbar__entity-select">
-        <mat-label>{{ 'builder.entityType' | transloco }}</mat-label>
+        <mat-label>{{ 'workflows.builder.entityType' | transloco }}</mat-label>
         <mat-select [value]="entityType()" (selectionChange)="entityTypeChanged.emit($event.value)">
-          <mat-option value="Contact">{{ 'builder.entityTypes.Contact' | transloco }}</mat-option>
-          <mat-option value="Company">{{ 'builder.entityTypes.Company' | transloco }}</mat-option>
-          <mat-option value="Deal">{{ 'builder.entityTypes.Deal' | transloco }}</mat-option>
-          <mat-option value="Lead">{{ 'builder.entityTypes.Lead' | transloco }}</mat-option>
-          <mat-option value="Activity">{{ 'builder.entityTypes.Activity' | transloco }}</mat-option>
+          <mat-option value="Contact">{{ 'workflows.builder.entityTypes.Contact' | transloco }}</mat-option>
+          <mat-option value="Company">{{ 'workflows.builder.entityTypes.Company' | transloco }}</mat-option>
+          <mat-option value="Deal">{{ 'workflows.builder.entityTypes.Deal' | transloco }}</mat-option>
+          <mat-option value="Lead">{{ 'workflows.builder.entityTypes.Lead' | transloco }}</mat-option>
+          <mat-option value="Activity">{{ 'workflows.builder.entityTypes.Activity' | transloco }}</mat-option>
         </mat-select>
       </mat-form-field>
 
@@ -65,7 +65,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
               (click)="openTemplates.emit()"
               class="toolbar__template-btn">
         <mat-icon>dashboard</mat-icon>
-        {{ 'builder.useTemplate' | transloco }}
+        {{ 'workflows.builder.useTemplate' | transloco }}
       </button>
 
       @if (!isNew()) {
@@ -75,10 +75,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
                 class="toolbar__toggle-btn">
           @if (isActive()) {
             <mat-icon>pause</mat-icon>
-            {{ 'builder.deactivate' | transloco }}
+            {{ 'workflows.builder.deactivate' | transloco }}
           } @else {
             <mat-icon>play_arrow</mat-icon>
-            {{ 'builder.activate' | transloco }}
+            {{ 'workflows.builder.activate' | transloco }}
           }
         </button>
       }
@@ -93,7 +93,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
         } @else {
           <mat-icon>save</mat-icon>
         }
-        {{ 'builder.save' | transloco }}
+        {{ 'workflows.builder.save' | transloco }}
       </button>
     </div>
   `,

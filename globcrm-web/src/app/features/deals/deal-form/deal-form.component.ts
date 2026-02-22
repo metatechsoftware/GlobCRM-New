@@ -301,7 +301,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open(this.transloco.translate('messages.dealLoadFailed'), 'Close', {
+        this.snackBar.open(this.transloco.translate('deals.messages.dealLoadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -360,14 +360,14 @@ export class DealFormComponent implements OnInit, OnDestroy {
       this.dealService.update(this.dealId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.dealUpdated'), 'Close', {
+          this.snackBar.open(this.transloco.translate('deals.messages.dealUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/deals', this.dealId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.dealUpdateFailed'), 'Close', {
+          this.snackBar.open(this.transloco.translate('deals.messages.dealUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -392,7 +392,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open(this.transloco.translate('messages.dealCreated'), 'Close', {
+            this.snackBar.open(this.transloco.translate('deals.messages.dealCreated'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/deals', created.id]);
@@ -403,7 +403,7 @@ export class DealFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open(this.transloco.translate('messages.dealCreateFailed'), 'Close', {
+            this.snackBar.open(this.transloco.translate('deals.messages.dealCreateFailed'), 'Close', {
               duration: 5000,
             });
           }

@@ -81,12 +81,12 @@ export class WorkflowDetailComponent implements OnInit {
 
   /** Relative time helper */
   getRelativeTime(dateStr?: string): string {
-    if (!dateStr) return this.transloco.translate('detail.never');
+    if (!dateStr) return this.transloco.translate('workflows.detail.never');
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return this.transloco.translate('card.justNow');
+    if (diffMins < 1) return this.transloco.translate('workflows.card.justNow');
     if (diffMins < 60) return `${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;
@@ -118,8 +118,8 @@ export class WorkflowDetailComponent implements OnInit {
     this.store.toggleStatus(wf.id, newActive);
     this.snackBar.open(
       newActive
-        ? this.transloco.translate('detail.workflowActivated')
-        : this.transloco.translate('detail.workflowDeactivated'),
+        ? this.transloco.translate('workflows.detail.workflowActivated')
+        : this.transloco.translate('workflows.detail.workflowDeactivated'),
       'Close',
       { duration: 3000 },
     );
@@ -131,7 +131,7 @@ export class WorkflowDetailComponent implements OnInit {
     const wf = this.store.selectedWorkflow();
     if (!wf) return;
     this.store.duplicateWorkflow(wf.id, (duplicated) => {
-      this.snackBar.open(this.transloco.translate('detail.workflowDuplicated'), 'Close', { duration: 3000 });
+      this.snackBar.open(this.transloco.translate('workflows.detail.workflowDuplicated'), 'Close', { duration: 3000 });
       this.router.navigate(['/workflows', duplicated.id]);
     });
   }
@@ -153,12 +153,12 @@ export class WorkflowDetailComponent implements OnInit {
           .saveAsTemplate(wf.id, result)
           .subscribe({
             next: () => {
-              this.snackBar.open(this.transloco.translate('detail.savedAsTemplate'), 'Close', {
+              this.snackBar.open(this.transloco.translate('workflows.detail.savedAsTemplate'), 'Close', {
                 duration: 3000,
               });
             },
             error: () => {
-              this.snackBar.open(this.transloco.translate('detail.failedToSaveTemplate'), 'Close', {
+              this.snackBar.open(this.transloco.translate('workflows.detail.failedToSaveTemplate'), 'Close', {
                 duration: 3000,
               });
             },
@@ -181,7 +181,7 @@ export class WorkflowDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (!confirmed) return;
       this.store.deleteWorkflow(wf.id, () => {
-        this.snackBar.open(this.transloco.translate('detail.workflowDeleted'), 'Close', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('workflows.detail.workflowDeleted'), 'Close', { duration: 3000 });
         this.router.navigate(['/workflows']);
       });
     });

@@ -183,10 +183,10 @@ import { RequestListDto } from '../../requests/request.models';
     <div class="entity-form-container">
       @if (!dialogMode()) {
         <div class="form-header">
-          <a mat-icon-button routerLink="/notes" [attr.aria-label]="'form.backToNotes' | transloco">
+          <a mat-icon-button routerLink="/notes" [attr.aria-label]="'notes.form.backToNotes' | transloco">
             <mat-icon>arrow_back</mat-icon>
           </a>
-          <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
+          <h1>{{ isEditMode ? ('notes.form.editTitle' | transloco) : ('notes.form.createTitle' | transloco) }}</h1>
         </div>
       }
 
@@ -198,16 +198,16 @@ import { RequestListDto } from '../../requests/request.models';
         <form [formGroup]="noteForm" (ngSubmit)="onSubmit()">
           <!-- Note Title -->
           <div class="form-section">
-            <h3>{{ 'form.noteInformation' | transloco }}</h3>
+            <h3>{{ 'notes.form.noteInformation' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline" class="full-width">
-                <mat-label>{{ 'form.title' | transloco }}</mat-label>
+                <mat-label>{{ 'notes.form.title' | transloco }}</mat-label>
                 <input matInput formControlName="title" required>
                 @if (noteForm.controls['title'].hasError('required')) {
-                  <mat-error>{{ 'form.titleRequired' | transloco }}</mat-error>
+                  <mat-error>{{ 'notes.form.titleRequired' | transloco }}</mat-error>
                 }
                 @if (noteForm.controls['title'].hasError('maxlength')) {
-                  <mat-error>{{ 'form.titleMaxLength' | transloco }}</mat-error>
+                  <mat-error>{{ 'notes.form.titleMaxLength' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -215,10 +215,10 @@ import { RequestListDto } from '../../requests/request.models';
 
           <!-- Entity Linking -->
           <div class="form-section">
-            <h3>{{ 'form.linkedEntity' | transloco }}</h3>
+            <h3>{{ 'notes.form.linkedEntity' | transloco }}</h3>
             <div class="form-grid">
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'form.entityType' | transloco }}</mat-label>
+                <mat-label>{{ 'notes.form.entityType' | transloco }}</mat-label>
                 <mat-select formControlName="entityType" required
                             (selectionChange)="onEntityTypeChanged()">
                   @for (type of entityTypes; track type.value) {
@@ -226,16 +226,16 @@ import { RequestListDto } from '../../requests/request.models';
                   }
                 </mat-select>
                 @if (noteForm.controls['entityType'].hasError('required')) {
-                  <mat-error>{{ 'form.entityTypeRequired' | transloco }}</mat-error>
+                  <mat-error>{{ 'notes.form.entityTypeRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
 
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'form.entity' | transloco }}</mat-label>
+                <mat-label>{{ 'notes.form.entity' | transloco }}</mat-label>
                 <input matInput
                        [formControl]="entitySearchControl"
                        [matAutocomplete]="entityAuto"
-                       [placeholder]="'form.searchEntity' | transloco"
+                       [placeholder]="'notes.form.searchEntity' | transloco"
                        required>
                 <mat-autocomplete #entityAuto="matAutocomplete"
                                   [displayWith]="displayEntityName"
@@ -252,7 +252,7 @@ import { RequestListDto } from '../../requests/request.models';
                   }
                 </mat-autocomplete>
                 @if (noteForm.controls['entityId'].hasError('required')) {
-                  <mat-error>{{ 'form.entityRequired' | transloco }}</mat-error>
+                  <mat-error>{{ 'notes.form.entityRequired' | transloco }}</mat-error>
                 }
               </mat-form-field>
             </div>
@@ -260,14 +260,14 @@ import { RequestListDto } from '../../requests/request.models';
 
           <!-- Rich Text Body -->
           <div class="body-section">
-            <label>{{ 'form.body' | transloco }} *</label>
+            <label>{{ 'notes.form.body' | transloco }} *</label>
             <app-rich-text-editor
               formControlName="body"
-              [placeholder]="'form.bodyPlaceholder' | transloco"
+              [placeholder]="'notes.form.bodyPlaceholder' | transloco"
               height="300px"
             />
             @if (noteForm.controls['body'].touched && noteForm.controls['body'].hasError('required')) {
-              <mat-error style="margin-top: 4px;">{{ 'form.bodyRequired' | transloco }}</mat-error>
+              <mat-error style="margin-top: 4px;">{{ 'notes.form.bodyRequired' | transloco }}</mat-error>
             }
           </div>
 
@@ -280,7 +280,7 @@ import { RequestListDto } from '../../requests/request.models';
                 @if (isSaving()) {
                   <mat-spinner diameter="20"></mat-spinner>
                 }
-                {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createNote' | transloco) }}
+                {{ isEditMode ? ('notes.form.saveChanges' | transloco) : ('notes.form.createNote' | transloco) }}
               </button>
             </div>
           }

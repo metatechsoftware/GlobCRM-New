@@ -106,7 +106,7 @@ export class EmailTemplateListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((result: CloneTemplateDialogResult | undefined) => {
       if (result?.name) {
         this.store.cloneTemplate(template.id, result.name, () => {
-          this.snackBar.open(this.transloco.translate('email-templates.messages.cloned'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('emailTemplates.messages.cloned'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });
@@ -125,7 +125,7 @@ export class EmailTemplateListComponent implements OnInit {
     dialogRef.afterClosed().subscribe((confirmed: boolean) => {
       if (confirmed) {
         this.store.deleteTemplate(template.id, () => {
-          this.snackBar.open(this.transloco.translate('email-templates.messages.deleted'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('emailTemplates.messages.deleted'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });

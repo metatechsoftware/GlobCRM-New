@@ -41,19 +41,19 @@ interface LanguageOption {
           <mat-icon>language</mat-icon>
         </div>
         <div>
-          <h1 class="lang-settings__title">{{ 'language.title' | transloco }}</h1>
-          <p class="lang-settings__subtitle">{{ 'language.description' | transloco }}</p>
+          <h1 class="lang-settings__title">{{ 'settings.language.title' | transloco }}</h1>
+          <p class="lang-settings__subtitle">{{ 'settings.language.description' | transloco }}</p>
         </div>
       </div>
 
       <div class="lang-settings__card">
-        <h2 class="lang-settings__card-title">{{ 'language.cardTitle' | transloco }}</h2>
+        <h2 class="lang-settings__card-title">{{ 'settings.language.cardTitle' | transloco }}</h2>
         <p class="lang-settings__card-desc">
-          {{ 'language.cardDesc' | transloco }}
+          {{ 'settings.language.cardDesc' | transloco }}
         </p>
 
         <mat-form-field appearance="outline" class="lang-settings__select">
-          <mat-label>{{ 'language.defaultLanguage' | transloco }}</mat-label>
+          <mat-label>{{ 'settings.language.defaultLanguage' | transloco }}</mat-label>
           <mat-select
             [ngModel]="selectedLanguage()"
             (ngModelChange)="onLanguageChange($event)"

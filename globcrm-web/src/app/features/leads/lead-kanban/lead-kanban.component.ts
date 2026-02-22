@@ -117,7 +117,7 @@ export class LeadKanbanComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open(this.transloco.translate('messages.kanbanLoadFailed'), this.transloco.translate('common.close'), {
+        this.snackBar.open(this.transloco.translate('leads.messages.kanbanLoadFailed'), this.transloco.translate('common.close'), {
           duration: 3000,
         });
       },
@@ -159,7 +159,7 @@ export class LeadKanbanComponent implements OnInit {
     // Reject dropping on Converted stage -- use Convert Lead action
     if (targetStage.isConverted) {
       this.snackBar.open(
-        this.transloco.translate('kanban.useConvertAction'),
+        this.transloco.translate('leads.kanban.useConvertAction'),
         this.transloco.translate('common.close'),
         { duration: 4000 },
       );
@@ -169,7 +169,7 @@ export class LeadKanbanComponent implements OnInit {
     // Forward-only enforcement
     if (targetStage.sortOrder <= sourceStage.sortOrder) {
       this.snackBar.open(
-        this.transloco.translate('kanban.forwardOnly'),
+        this.transloco.translate('leads.kanban.forwardOnly'),
         this.transloco.translate('common.close'),
         { duration: 4000 },
       );
@@ -198,7 +198,7 @@ export class LeadKanbanComponent implements OnInit {
           event.currentIndex,
           event.previousIndex,
         );
-        this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), this.transloco.translate('common.close'), {
+        this.snackBar.open(this.transloco.translate('leads.messages.stageUpdateFailed'), this.transloco.translate('common.close'), {
           duration: 3000,
         });
       },

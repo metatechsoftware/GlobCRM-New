@@ -35,7 +35,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       @if (store.loading()) {
         <div class="loading-container">
           <mat-spinner diameter="48"></mat-spinner>
-          <p>{{ 'wizard.preview.running' | transloco }}</p>
+          <p>{{ 'import.wizard.preview.running' | transloco }}</p>
         </div>
       } @else if (store.previewResponse()) {
         <!-- Summary Cards -->
@@ -45,24 +45,24 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-icon>check_circle</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.validCount }}</div>
-            <div class="card-label">{{ 'wizard.preview.validRows' | transloco }}</div>
-            <div class="card-sublabel">{{ 'wizard.preview.readyToImport' | transloco }}</div>
+            <div class="card-label">{{ 'import.wizard.preview.validRows' | transloco }}</div>
+            <div class="card-sublabel">{{ 'import.wizard.preview.readyToImport' | transloco }}</div>
           </div>
           <div class="summary-card invalid">
             <div class="card-icon-wrapper invalid">
               <mat-icon>error</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.invalidCount }}</div>
-            <div class="card-label">{{ 'wizard.preview.invalidRows' | transloco }}</div>
-            <div class="card-sublabel">{{ 'wizard.preview.willBeSkipped' | transloco }}</div>
+            <div class="card-label">{{ 'import.wizard.preview.invalidRows' | transloco }}</div>
+            <div class="card-sublabel">{{ 'import.wizard.preview.willBeSkipped' | transloco }}</div>
           </div>
           <div class="summary-card duplicate">
             <div class="card-icon-wrapper duplicate">
               <mat-icon>content_copy</mat-icon>
             </div>
             <div class="card-value">{{ store.previewResponse()!.duplicateCount }}</div>
-            <div class="card-label">{{ 'wizard.preview.duplicates' | transloco }}</div>
-            <div class="card-sublabel">{{ 'wizard.preview.matchedExisting' | transloco }}</div>
+            <div class="card-label">{{ 'import.wizard.preview.duplicates' | transloco }}</div>
+            <div class="card-sublabel">{{ 'import.wizard.preview.matchedExisting' | transloco }}</div>
           </div>
         </div>
 
@@ -73,16 +73,16 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <mat-icon class="panel-icon error">error</mat-icon>
-                  {{ 'wizard.preview.validationErrors' | transloco }} ({{ store.previewResponse()!.errors.length }})
+                  {{ 'import.wizard.preview.validationErrors' | transloco }} ({{ store.previewResponse()!.errors.length }})
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <table class="detail-table">
                 <thead>
                   <tr>
-                    <th>{{ 'wizard.preview.row' | transloco }}</th>
-                    <th>{{ 'wizard.preview.field' | transloco }}</th>
-                    <th>{{ 'wizard.preview.error' | transloco }}</th>
-                    <th>{{ 'wizard.preview.value' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.row' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.field' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.error' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.value' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -104,15 +104,15 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <mat-expansion-panel-header>
                 <mat-panel-title>
                   <mat-icon class="panel-icon warning">content_copy</mat-icon>
-                  {{ 'wizard.preview.duplicateMatches' | transloco }} ({{ store.previewResponse()!.duplicates.length }})
+                  {{ 'import.wizard.preview.duplicateMatches' | transloco }} ({{ store.previewResponse()!.duplicates.length }})
                 </mat-panel-title>
               </mat-expansion-panel-header>
               <table class="detail-table">
                 <thead>
                   <tr>
-                    <th>{{ 'wizard.preview.row' | transloco }}</th>
-                    <th>{{ 'wizard.preview.matchField' | transloco }}</th>
-                    <th>{{ 'wizard.preview.matchValue' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.row' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.matchField' | transloco }}</th>
+                    <th>{{ 'import.wizard.preview.matchValue' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -135,11 +135,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
       }
 
       <div class="step-actions">
-        <button mat-button (click)="stepBack.emit()">{{ 'wizard.back' | transloco }}</button>
+        <button mat-button (click)="stepBack.emit()">{{ 'import.wizard.back' | transloco }}</button>
         <button mat-raised-button color="primary"
                 [disabled]="store.loading() || !store.hasPreview()"
                 (click)="onExecute()">
-          {{ 'wizard.preview.executeImport' | transloco }}
+          {{ 'import.wizard.preview.executeImport' | transloco }}
         </button>
       </div>
     </div>

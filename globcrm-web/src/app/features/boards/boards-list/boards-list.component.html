@@ -1,8 +1,15 @@
 <div class="boards-page">
-  <!-- Page Header -->
+  <!-- Hero Header -->
   <div class="boards-header">
-    <div class="boards-header__text">
-      <h1 class="boards-header__title">{{ 'boards.list.title' | transloco }}</h1>
+    <div class="boards-header__content">
+      <div class="boards-header__title-row">
+        <svg class="boards-header__icon" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="4" width="6" height="18" rx="1.5" fill="currentColor" opacity="0.25"/>
+          <rect x="11" y="4" width="6" height="12" rx="1.5" fill="currentColor" opacity="0.45"/>
+          <rect x="20" y="4" width="6" height="16" rx="1.5" fill="currentColor" opacity="0.35"/>
+        </svg>
+        <h1 class="boards-header__title">{{ 'boards.list.title' | transloco }}</h1>
+      </div>
       <p class="boards-header__subtitle">{{ 'boards.list.subtitle' | transloco }}</p>
     </div>
     <button class="boards-header__create-btn" (click)="openCreateDialog()">
@@ -11,16 +18,87 @@
     </button>
   </div>
 
-  <!-- Loading Spinner -->
+  <!-- Stats Ribbon -->
+  @if (!boardStore.isLoading() && boardStats().total > 0) {
+    <div class="boards-stats-ribbon">
+      <div class="stats-card" style="--stat-index: 0">
+        <span class="stats-card__label">{{ 'boards.list.totalBoards' | transloco }}</span>
+        <span class="stats-card__value">{{ boardStats().total }}</span>
+      </div>
+      <div class="stats-card" style="--stat-index: 1">
+        <span class="stats-card__label">{{ 'boards.list.totalCards' | transloco }}</span>
+        <span class="stats-card__value">{{ boardStats().cards }}</span>
+      </div>
+      @if (boardStats().private > 0) {
+        <div class="stats-card" style="--stat-index: 2">
+          <span class="stats-card__indicator stats-card__indicator--private"></span>
+          <span class="stats-card__label">{{ 'boards.list.privateBoards' | transloco }}</span>
+          <span class="stats-card__value">{{ boardStats().private }}</span>
+        </div>
+      }
+      @if (boardStats().team > 0) {
+        <div class="stats-card" style="--stat-index: 3">
+          <span class="stats-card__indicator stats-card__indicator--team"></span>
+          <span class="stats-card__label">{{ 'boards.list.teamBoards' | transloco }}</span>
+          <span class="stats-card__value">{{ boardStats().team }}</span>
+        </div>
+      }
+      @if (boardStats().public > 0) {
+        <div class="stats-card" style="--stat-index: 4">
+          <span class="stats-card__indicator stats-card__indicator--public"></span>
+          <span class="stats-card__label">{{ 'boards.list.publicBoards' | transloco }}</span>
+          <span class="stats-card__value">{{ boardStats().public }}</span>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Skeleton Loading -->
   @if (boardStore.isLoading()) {
-    <div class="boards-loading">
-      <mat-spinner diameter="40"></mat-spinner>
+    <div class="boards-grid boards-grid--skeleton">
+      @for (item of skeletonItems; track item; let i = $index) {
+        <div class="skeleton-card" [style.--card-index]="i">
+          <div class="skeleton-card__thumbnail"></div>
+          <div class="skeleton-card__body">
+            <div class="skeleton-line skeleton-line--title"></div>
+            <div class="skeleton-line skeleton-line--desc"></div>
+            <div class="skeleton-card__badges">
+              <div class="skeleton-badge"></div>
+              <div class="skeleton-badge"></div>
+            </div>
+          </div>
+          <div class="skeleton-card__footer">
+            <div class="skeleton-line skeleton-line--stat"></div>
+          </div>
+        </div>
+      }
     </div>
   } @else {
     <!-- Empty State (no custom boards) -->
     @if (!hasCustomBoards()) {
       <div class="boards-empty">
         <div class="boards-empty__card">
+          <!-- Decorative SVG -->
+          <svg class="boards-empty__illustration" viewBox="0 0 240 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="20" y="10" width="50" height="100" rx="4" stroke="currentColor" opacity="0.15" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <rect x="80" y="10" width="50" height="100" rx="4" stroke="currentColor" opacity="0.15" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <rect x="140" y="10" width="50" height="100" rx="4" stroke="currentColor" opacity="0.15" stroke-width="1.5" stroke-dasharray="4 3"/>
+            <!-- Floating + card -->
+            <g class="boards-empty__plus-card">
+              <rect x="195" y="35" width="36" height="50" rx="5" fill="var(--orange-500, #F97316)" opacity="0.12"/>
+              <rect x="195" y="35" width="36" height="50" rx="5" stroke="var(--orange-500, #F97316)" stroke-width="1.5" fill="none" opacity="0.4"/>
+              <line x1="213" y1="50" x2="213" y2="70" stroke="var(--orange-500, #F97316)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+              <line x1="203" y1="60" x2="223" y2="60" stroke="var(--orange-500, #F97316)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+            </g>
+            <!-- Mini cards inside columns -->
+            <rect x="28" y="22" width="34" height="10" rx="2" fill="currentColor" opacity="0.08"/>
+            <rect x="28" y="38" width="34" height="10" rx="2" fill="currentColor" opacity="0.06"/>
+            <rect x="88" y="22" width="34" height="10" rx="2" fill="currentColor" opacity="0.08"/>
+            <rect x="148" y="22" width="34" height="10" rx="2" fill="currentColor" opacity="0.08"/>
+            <rect x="148" y="38" width="34" height="10" rx="2" fill="currentColor" opacity="0.06"/>
+            <rect x="148" y="54" width="34" height="10" rx="2" fill="currentColor" opacity="0.05"/>
+          </svg>
+
           <h2 class="boards-empty__heading">{{ 'boards.empty.heading' | transloco }}</h2>
           <p class="boards-empty__description">{{ 'boards.empty.description' | transloco }}</p>
 
@@ -53,18 +131,20 @@
     <section class="boards-section">
       <span class="boards-section__overline">{{ 'boards.list.systemBoards' | transloco }}</span>
       <div class="boards-grid">
-        @for (sb of systemBoards; track sb.route) {
-          <button class="board-card board-card--system" (click)="navigateToSystem(sb.route)">
-            <div class="board-card__color-stripe" style="background-color: var(--orange-500)"></div>
+        @for (sb of systemBoards; track sb.route; let i = $index) {
+          <button class="board-card board-card--system" [style.--card-index]="i" (click)="navigateToSystem(sb.route)">
+            <div class="board-card__color-stripe board-card__color-stripe--system"></div>
             <div class="board-card__body">
               <div class="board-card__header">
                 <div class="board-card__icon-wrap board-card__icon-wrap--system">
                   <mat-icon>{{ sb.icon }}</mat-icon>
+                  <span class="board-card__icon-glow"></span>
                 </div>
                 <div class="board-card__info">
                   <h3 class="board-card__name">{{ sb.nameKey | transloco }}</h3>
                   <span class="board-card__system-badge">{{ 'boards.list.system' | transloco }}</span>
                 </div>
+                <mat-icon class="board-card__arrow">arrow_forward</mat-icon>
               </div>
               <p class="board-card__description">{{ sb.descriptionKey | transloco }}</p>
             </div>
@@ -78,13 +158,58 @@
       <section class="boards-section">
         <span class="boards-section__overline">{{ 'boards.list.myBoards' | transloco }}</span>
         <div class="boards-grid">
-          @for (board of myBoards(); track board.id) {
-            <button class="board-card" (click)="navigateToBoard(board)">
-              <div class="board-card__color-stripe" [ngStyle]="getBoardColorStyle(board)"></div>
+          @for (board of myBoards(); track board.id; let i = $index) {
+            <button class="board-card" [style.--card-index]="i" (click)="navigateToBoard(board)">
+              <!-- SVG Thumbnail -->
+              <div class="board-card__thumbnail" [style.background-color]="getBoardColor(board) + '0D'">
+                <svg class="board-card__thumbnail-svg" viewBox="0 0 200 80" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Dot grid background -->
+                  @for (row of [0, 1, 2, 3]; track row) {
+                    @for (col of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; track col) {
+                      <circle [attr.cx]="10 + col * 20" [attr.cy]="10 + row * 20" r="0.8" [attr.fill]="getBoardColor(board)" opacity="0.15"/>
+                    }
+                  }
+                  <!-- Column bars -->
+                  @for (bar of getColumnBars(board); track $index; let colIdx = $index) {
+                    <rect
+                      [attr.x]="20 + colIdx * 36"
+                      [attr.y]="80 - bar.height"
+                      width="28"
+                      [attr.height]="bar.height"
+                      rx="3"
+                      [attr.fill]="getBoardColor(board)"
+                      opacity="0.2"
+                    />
+                    <!-- Card dots inside columns -->
+                    @for (dot of [0, 1, 2]; track dot) {
+                      @if (dot * 14 + 6 < bar.height - 8) {
+                        <rect
+                          [attr.x]="24 + colIdx * 36"
+                          [attr.y]="80 - bar.height + 6 + dot * 14"
+                          width="20"
+                          height="8"
+                          rx="2"
+                          [attr.fill]="getBoardColor(board)"
+                          opacity="0.25"
+                        />
+                      }
+                    }
+                  }
+                </svg>
+              </div>
               <div class="board-card__body">
                 <div class="board-card__header">
                   <div class="board-card__info">
-                    <h3 class="board-card__name">{{ board.name }}</h3>
+                    <div class="board-card__name-row">
+                      <h3 class="board-card__name">{{ board.name }}</h3>
+                      <span class="board-card__visibility-badge">
+                        <mat-icon>{{ getVisibilityIcon(board.visibility) }}</mat-icon>
+                        <span>{{ 'boards.list.' + board.visibility | transloco }}</span>
+                      </span>
+                    </div>
+                    @if (board.description) {
+                      <p class="board-card__description">{{ board.description }}</p>
+                    }
                   </div>
                   <button class="board-card__menu-trigger"
                     [matMenuTriggerFor]="boardMenu"
@@ -109,8 +234,11 @@
                   </span>
                 </div>
                 <div class="board-card__footer">
-                  <span class="board-card__creator">{{ board.creatorName }}</span>
-                  <span class="board-card__updated">{{ 'boards.list.updatedAt' | transloco }}: {{ board.updatedAt | date:'mediumDate' }}</span>
+                  <div class="board-card__creator">
+                    <span class="board-card__avatar">{{ (board.creatorName || '?')[0] }}</span>
+                    <span class="board-card__creator-name">{{ board.creatorName }}</span>
+                  </div>
+                  <span class="board-card__updated">{{ getRelativeTime(board.updatedAt) }}</span>
                 </div>
               </div>
             </button>
@@ -124,13 +252,55 @@
       <section class="boards-section">
         <span class="boards-section__overline">{{ 'boards.list.teamBoards' | transloco }}</span>
         <div class="boards-grid">
-          @for (board of teamBoards(); track board.id) {
-            <button class="board-card" (click)="navigateToBoard(board)">
-              <div class="board-card__color-stripe" [ngStyle]="getBoardColorStyle(board)"></div>
+          @for (board of teamBoards(); track board.id; let i = $index) {
+            <button class="board-card" [style.--card-index]="i" (click)="navigateToBoard(board)">
+              <!-- SVG Thumbnail -->
+              <div class="board-card__thumbnail" [style.background-color]="getBoardColor(board) + '0D'">
+                <svg class="board-card__thumbnail-svg" viewBox="0 0 200 80" preserveAspectRatio="none" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  @for (row of [0, 1, 2, 3]; track row) {
+                    @for (col of [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]; track col) {
+                      <circle [attr.cx]="10 + col * 20" [attr.cy]="10 + row * 20" r="0.8" [attr.fill]="getBoardColor(board)" opacity="0.15"/>
+                    }
+                  }
+                  @for (bar of getColumnBars(board); track $index; let colIdx = $index) {
+                    <rect
+                      [attr.x]="20 + colIdx * 36"
+                      [attr.y]="80 - bar.height"
+                      width="28"
+                      [attr.height]="bar.height"
+                      rx="3"
+                      [attr.fill]="getBoardColor(board)"
+                      opacity="0.2"
+                    />
+                    @for (dot of [0, 1, 2]; track dot) {
+                      @if (dot * 14 + 6 < bar.height - 8) {
+                        <rect
+                          [attr.x]="24 + colIdx * 36"
+                          [attr.y]="80 - bar.height + 6 + dot * 14"
+                          width="20"
+                          height="8"
+                          rx="2"
+                          [attr.fill]="getBoardColor(board)"
+                          opacity="0.25"
+                        />
+                      }
+                    }
+                  }
+                </svg>
+              </div>
               <div class="board-card__body">
                 <div class="board-card__header">
                   <div class="board-card__info">
-                    <h3 class="board-card__name">{{ board.name }}</h3>
+                    <div class="board-card__name-row">
+                      <h3 class="board-card__name">{{ board.name }}</h3>
+                      <span class="board-card__visibility-badge">
+                        <mat-icon>{{ getVisibilityIcon(board.visibility) }}</mat-icon>
+                        <span>{{ 'boards.list.' + board.visibility | transloco }}</span>
+                      </span>
+                    </div>
+                    @if (board.description) {
+                      <p class="board-card__description">{{ board.description }}</p>
+                    }
                   </div>
                   <button class="board-card__menu-trigger"
                     [matMenuTriggerFor]="teamBoardMenu"
@@ -155,8 +325,11 @@
                   </span>
                 </div>
                 <div class="board-card__footer">
-                  <span class="board-card__creator">{{ board.creatorName }}</span>
-                  <span class="board-card__updated">{{ 'boards.list.updatedAt' | transloco }}: {{ board.updatedAt | date:'mediumDate' }}</span>
+                  <div class="board-card__creator">
+                    <span class="board-card__avatar">{{ (board.creatorName || '?')[0] }}</span>
+                    <span class="board-card__creator-name">{{ board.creatorName }}</span>
+                  </div>
+                  <span class="board-card__updated">{{ getRelativeTime(board.updatedAt) }}</span>
                 </div>
               </div>
             </button>

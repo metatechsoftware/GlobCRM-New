@@ -473,7 +473,7 @@ export class DealDetailComponent implements OnInit {
   linkContact(contact: ContactDto): void {
     this.dealService.linkContact(this.dealId, contact.id).subscribe({
       next: () => {
-        this.snackBar.open(this.transloco.translate('messages.contactLinked', { name: contact.fullName }), 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('deals.messages.contactLinked', { name: contact.fullName }), 'OK', { duration: 3000 });
         this.showContactSearch.set(false);
         this.contactSearchTerm.set('');
         this.contactSearchResults.set([]);
@@ -482,7 +482,7 @@ export class DealDetailComponent implements OnInit {
         this.markSummaryDirty();
       },
       error: () => {
-        this.snackBar.open(this.transloco.translate('messages.contactLinkFailed'), 'OK', { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('deals.messages.contactLinkFailed'), 'OK', { duration: 3000 });
       },
     });
   }
@@ -498,13 +498,13 @@ export class DealDetailComponent implements OnInit {
       if (confirmed) {
         this.dealService.unlinkContact(this.dealId, contact.id).subscribe({
           next: () => {
-            this.snackBar.open(this.transloco.translate('messages.contactUnlinked', { name: contact.name }), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('deals.messages.contactUnlinked', { name: contact.name }), 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open(this.transloco.translate('messages.contactUnlinkFailed'), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('deals.messages.contactUnlinkFailed'), 'OK', { duration: 3000 });
           },
         });
       }
@@ -574,7 +574,7 @@ export class DealDetailComponent implements OnInit {
       })
       .subscribe({
         next: () => {
-          this.snackBar.open(this.transloco.translate('messages.productLinked', { name: product.name }), 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('deals.messages.productLinked', { name: product.name }), 'OK', { duration: 3000 });
           this.showProductSearch.set(false);
           this.productSearchTerm.set('');
           this.productSearchResults.set([]);
@@ -585,7 +585,7 @@ export class DealDetailComponent implements OnInit {
           this.markSummaryDirty();
         },
         error: () => {
-          this.snackBar.open(this.transloco.translate('messages.productLinkFailed'), 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('deals.messages.productLinkFailed'), 'OK', { duration: 3000 });
         },
       });
   }
@@ -601,13 +601,13 @@ export class DealDetailComponent implements OnInit {
       if (confirmed) {
         this.dealService.unlinkProduct(this.dealId, product.id).subscribe({
           next: () => {
-            this.snackBar.open(this.transloco.translate('messages.productUnlinked', { name: product.name }), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('deals.messages.productUnlinked', { name: product.name }), 'OK', { duration: 3000 });
             this.loadDeal();
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open(this.transloco.translate('messages.productUnlinkFailed'), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('deals.messages.productUnlinkFailed'), 'OK', { duration: 3000 });
           },
         });
       }

@@ -10,7 +10,7 @@
 
       <!-- Navigation bar -->
       <div class="hero-nav">
-        <a mat-icon-button routerLink="/companies" [attr.aria-label]="'detail.backToCompanies' | transloco">
+        <a mat-icon-button routerLink="/companies" [attr.aria-label]="'companies.detail.backToCompanies' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div class="hero-actions">
@@ -112,21 +112,21 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>business</mat-icon>
-                <h3>{{ 'detail.sections.companyInfo' | transloco }}</h3>
+                <h3>{{ 'companies.detail.sections.companyInfo' | transloco }}</h3>
               </div>
               <div class="details-grid">
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.companyName' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.companyName' | transloco }}</span>
                   <span class="field-value">{{ company()!.name }}</span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.industry' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.industry' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.industry">
-                    {{ company()!.industry || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.industry || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.website' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.website' | transloco }}</span>
                   @if (company()!.website) {
                     <a class="field-value field-value--link"
                        [href]="company()!.website"
@@ -135,36 +135,36 @@
                       {{ company()!.website }}
                     </a>
                   } @else {
-                    <span class="field-value field-value--empty">{{ 'detail.empty.notSpecified' | transloco }}</span>
+                    <span class="field-value field-value--empty">{{ 'companies.detail.empty.notSpecified' | transloco }}</span>
                   }
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.phone' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.phone' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.phone">
-                    {{ company()!.phone || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.phone || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.email' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.email' | transloco }}</span>
                   @if (company()!.email) {
                     <a class="field-value field-value--link"
                        [href]="'mailto:' + company()!.email">
                       {{ company()!.email }}
                     </a>
                   } @else {
-                    <span class="field-value field-value--empty">{{ 'detail.empty.notSpecified' | transloco }}</span>
+                    <span class="field-value field-value--empty">{{ 'companies.detail.empty.notSpecified' | transloco }}</span>
                   }
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.companySize' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.companySize' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.size">
-                    {{ company()!.size || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.size || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field full-width">
-                  <span class="field-label">{{ 'detail.fields.description' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.description' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.description">
-                    {{ company()!.description || ('detail.empty.noDescription' | transloco) }}
+                    {{ company()!.description || ('companies.detail.empty.noDescription' | transloco) }}
                   </span>
                 </div>
               </div>
@@ -174,37 +174,37 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>location_on</mat-icon>
-                <h3>{{ 'detail.sections.address' | transloco }}</h3>
+                <h3>{{ 'companies.detail.sections.address' | transloco }}</h3>
               </div>
               <div class="details-grid">
                 <div class="detail-field full-width">
-                  <span class="field-label">{{ 'detail.fields.streetAddress' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.streetAddress' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.address">
-                    {{ company()!.address || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.address || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.city' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.city' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.city">
-                    {{ company()!.city || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.city || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.stateRegion' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.stateRegion' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.state">
-                    {{ company()!.state || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.state || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.country' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.country' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.country">
-                    {{ company()!.country || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.country || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.postalCode' | transloco }}</span>
+                  <span class="field-label">{{ 'companies.detail.fields.postalCode' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!company()!.postalCode">
-                    {{ company()!.postalCode || ('detail.empty.notSpecified' | transloco) }}
+                    {{ company()!.postalCode || ('companies.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
               </div>
@@ -214,7 +214,7 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>tune</mat-icon>
-                <h3>{{ 'detail.sections.customFields' | transloco }}</h3>
+                <h3>{{ 'companies.detail.sections.customFields' | transloco }}</h3>
               </div>
               <app-custom-field-form
                 [entityType]="'Company'"
@@ -233,7 +233,7 @@
               } @else if (contacts().length === 0) {
                 <div class="tab-empty">
                   <mat-icon>people_outline</mat-icon>
-                  <span>{{ 'detail.contacts.noContacts' | transloco }}</span>
+                  <span>{{ 'companies.detail.contacts.noContacts' | transloco }}</span>
                 </div>
               } @else {
                 <mat-list>
@@ -257,9 +257,9 @@
           <ng-template>
             <div class="tab-placeholder">
               <mat-icon>handshake</mat-icon>
-              <p>{{ 'detail.deals.viewDeals' | transloco }}</p>
+              <p>{{ 'companies.detail.deals.viewDeals' | transloco }}</p>
               <a mat-button color="primary" [routerLink]="['/deals']" [queryParams]="{ companyId: company()?.id }">
-                {{ 'detail.deals.viewDealsButton' | transloco }}
+                {{ 'companies.detail.deals.viewDealsButton' | transloco }}
               </a>
             </div>
           </ng-template>
@@ -273,19 +273,19 @@
             } @else if (linkedActivities().length === 0) {
               <div class="tab-empty">
                 <mat-icon>task_alt</mat-icon>
-                <span>{{ 'detail.activities.noActivities' | transloco }}</span>
-                <a mat-stroked-button routerLink="/activities/new">{{ 'detail.activities.createActivity' | transloco }}</a>
+                <span>{{ 'companies.detail.activities.noActivities' | transloco }}</span>
+                <a mat-stroked-button routerLink="/activities/new">{{ 'companies.detail.activities.createActivity' | transloco }}</a>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.activities.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnType' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnPriority' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnDueDate' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnAssignedTo' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnSubject' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnType' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnStatus' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnPriority' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnDueDate' | transloco }}</th>
+                    <th>{{ 'companies.detail.activities.columnAssignedTo' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -327,16 +327,16 @@
             } @else if (linkedQuotes().length === 0) {
               <div class="tab-empty">
                 <mat-icon>request_quote</mat-icon>
-                <span>{{ 'detail.quotes.noQuotes' | transloco }}</span>
+                <span>{{ 'companies.detail.quotes.noQuotes' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.quotes.columnQuoteNumber' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnTitle' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnGrandTotal' | transloco }}</th>
+                    <th>{{ 'companies.detail.quotes.columnQuoteNumber' | transloco }}</th>
+                    <th>{{ 'companies.detail.quotes.columnTitle' | transloco }}</th>
+                    <th>{{ 'companies.detail.quotes.columnStatus' | transloco }}</th>
+                    <th>{{ 'companies.detail.quotes.columnGrandTotal' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -359,7 +359,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/quotes']" [queryParams]="{ companyId: company()?.id }">
-                  {{ 'detail.quotes.viewAllQuotes' | transloco }}
+                  {{ 'companies.detail.quotes.viewAllQuotes' | transloco }}
                 </a>
               </div>
             }
@@ -374,16 +374,16 @@
             } @else if (linkedRequests().length === 0) {
               <div class="tab-empty">
                 <mat-icon>support_agent</mat-icon>
-                <span>{{ 'detail.requests.noRequests' | transloco }}</span>
+                <span>{{ 'companies.detail.requests.noRequests' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.requests.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.requests.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.requests.columnPriority' | transloco }}</th>
-                    <th>{{ 'detail.requests.columnAssignedTo' | transloco }}</th>
+                    <th>{{ 'companies.detail.requests.columnSubject' | transloco }}</th>
+                    <th>{{ 'companies.detail.requests.columnStatus' | transloco }}</th>
+                    <th>{{ 'companies.detail.requests.columnPriority' | transloco }}</th>
+                    <th>{{ 'companies.detail.requests.columnAssignedTo' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -413,7 +413,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/requests']" [queryParams]="{ companyId: company()?.id }">
-                  {{ 'detail.requests.viewAllRequests' | transloco }}
+                  {{ 'companies.detail.requests.viewAllRequests' | transloco }}
                 </a>
               </div>
             }
@@ -428,16 +428,16 @@
             } @else if (companyEmails().length === 0) {
               <div class="tab-empty">
                 <mat-icon>email</mat-icon>
-                <span>{{ 'detail.emails.noEmails' | transloco }}</span>
+                <span>{{ 'companies.detail.emails.noEmails' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
                     <th></th>
-                    <th>{{ 'detail.emails.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.emails.columnPreview' | transloco }}</th>
-                    <th>{{ 'detail.emails.columnDate' | transloco }}</th>
+                    <th>{{ 'companies.detail.emails.columnSubject' | transloco }}</th>
+                    <th>{{ 'companies.detail.emails.columnPreview' | transloco }}</th>
+                    <th>{{ 'companies.detail.emails.columnDate' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -459,7 +459,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" routerLink="/emails">
-                  {{ 'detail.emails.viewAllEmails' | transloco }}
+                  {{ 'companies.detail.emails.viewAllEmails' | transloco }}
                 </a>
               </div>
             }
@@ -474,11 +474,11 @@
             } @else if (companyNotes().length === 0) {
               <div class="tab-empty">
                 <mat-icon>note</mat-icon>
-                <span>{{ 'detail.notes.noNotes' | transloco }}</span>
+                <span>{{ 'companies.detail.notes.noNotes' | transloco }}</span>
                 <a mat-stroked-button
                    [routerLink]="['/notes/new']"
                    [queryParams]="{ entityType: 'Company', entityId: company()?.id, entityName: company()?.name }">
-                  {{ 'detail.notes.addNote' | transloco }}
+                  {{ 'companies.detail.notes.addNote' | transloco }}
                 </a>
               </div>
             } @else {
@@ -486,16 +486,16 @@
                 <a mat-stroked-button
                    [routerLink]="['/notes/new']"
                    [queryParams]="{ entityType: 'Company', entityId: company()?.id, entityName: company()?.name }">
-                  <mat-icon>add</mat-icon> {{ 'detail.notes.addNote' | transloco }}
+                  <mat-icon>add</mat-icon> {{ 'companies.detail.notes.addNote' | transloco }}
                 </a>
               </div>
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.notes.columnTitle' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnPreview' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnAuthor' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnDate' | transloco }}</th>
+                    <th>{{ 'companies.detail.notes.columnTitle' | transloco }}</th>
+                    <th>{{ 'companies.detail.notes.columnPreview' | transloco }}</th>
+                    <th>{{ 'companies.detail.notes.columnAuthor' | transloco }}</th>
+                    <th>{{ 'companies.detail.notes.columnDate' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -524,7 +524,7 @@
         <div class="sidebar-card">
           <div class="sidebar-card__header">
             <mat-icon>timeline</mat-icon>
-            <h3>{{ 'detail.timeline' | transloco }}</h3>
+            <h3>{{ 'companies.detail.timeline' | transloco }}</h3>
           </div>
           <div class="sidebar-card__body">
             <app-entity-timeline
@@ -538,7 +538,7 @@
 } @else {
   <div class="detail-not-found">
     <mat-icon>error_outline</mat-icon>
-    <h2>{{ 'detail.notFound' | transloco }}</h2>
-    <a mat-stroked-button routerLink="/companies">{{ 'detail.backToCompanies' | transloco }}</a>
+    <h2>{{ 'companies.detail.notFound' | transloco }}</h2>
+    <a mat-stroked-button routerLink="/companies">{{ 'companies.detail.backToCompanies' | transloco }}</a>
   </div>
 }

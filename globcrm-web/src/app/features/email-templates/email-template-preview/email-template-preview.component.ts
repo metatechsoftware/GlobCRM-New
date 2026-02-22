@@ -191,7 +191,7 @@ export class EmailTemplatePreviewComponent implements OnInit, OnDestroy {
         this.previewLoading.set(false);
       },
       error: () => {
-        this.snackBar.open(this.transloco.translate('email-templates.messages.previewFailed'), this.transloco.translate('common.close'), { duration: 3000 });
+        this.snackBar.open(this.transloco.translate('emailTemplates.messages.previewFailed'), this.transloco.translate('common.close'), { duration: 3000 });
         this.previewLoading.set(false);
       },
     });
@@ -211,11 +211,11 @@ export class EmailTemplatePreviewComponent implements OnInit, OnDestroy {
 
     this.service.testSend(this.templateId, request).subscribe({
       next: () => {
-        this.snackBar.open(this.transloco.translate('email-templates.messages.testSent'), this.transloco.translate('common.close'), { duration: 4000 });
+        this.snackBar.open(this.transloco.translate('emailTemplates.messages.testSent'), this.transloco.translate('common.close'), { duration: 4000 });
         this.sendingTest.set(false);
       },
       error: () => {
-        this.snackBar.open(this.transloco.translate('email-templates.messages.testFailed'), this.transloco.translate('common.close'), { duration: 4000 });
+        this.snackBar.open(this.transloco.translate('emailTemplates.messages.testFailed'), this.transloco.translate('common.close'), { duration: 4000 });
         this.sendingTest.set(false);
       },
     });

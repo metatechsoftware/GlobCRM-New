@@ -1,0 +1,7 @@
+[      74ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   40096ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   40100ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   49076ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   49079ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   54454ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   54456ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0

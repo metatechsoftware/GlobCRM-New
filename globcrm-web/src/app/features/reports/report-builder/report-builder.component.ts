@@ -276,7 +276,7 @@ export class ReportBuilderComponent implements OnInit {
 
     this.store.exportCsv(reportId, () => {
       this.snackBar.open(
-        this.transloco.translate('builder.exportStarted'),
+        this.transloco.translate('reports.builder.exportStarted'),
         'OK',
         { duration: 5000 },
       );

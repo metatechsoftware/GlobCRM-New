@@ -97,7 +97,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
     }
   `,
   template: `
-    <h2 mat-dialog-title>{{ 'webhooks.testDialog.title' | transloco }}</h2>
+    <h2 mat-dialog-title>{{ 'settings.webhooks.testDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       @if (loadingPreview()) {
         <div class="test-dialog__loading">
@@ -111,20 +111,20 @@ import { TranslocoPipe } from '@jsverse/transloco';
       } @else if (sent()) {
         <div class="test-dialog__success">
           <mat-icon>check_circle</mat-icon>
-          <p>{{ 'webhooks.testDialog.sentSuccess' | transloco }}</p>
+          <p>{{ 'settings.webhooks.testDialog.sentSuccess' | transloco }}</p>
         </div>
       } @else if (previewPayload()) {
         <p style="font-size: 14px; color: var(--color-text-secondary)">
-          {{ 'webhooks.testDialog.previewDesc' | transloco }}
+          {{ 'settings.webhooks.testDialog.previewDesc' | transloco }}
         </p>
         <pre class="test-dialog__payload">{{ previewPayload() }}</pre>
       }
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       @if (sent()) {
-        <button mat-flat-button color="primary" mat-dialog-close>{{ 'webhooks.testDialog.close' | transloco }}</button>
+        <button mat-flat-button color="primary" mat-dialog-close>{{ 'settings.webhooks.testDialog.close' | transloco }}</button>
       } @else {
-        <button mat-button mat-dialog-close [disabled]="sending()">{{ 'webhooks.testDialog.cancel' | transloco }}</button>
+        <button mat-button mat-dialog-close [disabled]="sending()">{{ 'settings.webhooks.testDialog.cancel' | transloco }}</button>
         @if (previewPayload() && !error()) {
           <button mat-flat-button color="primary"
                   [disabled]="sending()"
@@ -132,7 +132,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
             @if (sending()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ 'webhooks.testDialog.send' | transloco }}
+            {{ 'settings.webhooks.testDialog.send' | transloco }}
           </button>
         }
       }

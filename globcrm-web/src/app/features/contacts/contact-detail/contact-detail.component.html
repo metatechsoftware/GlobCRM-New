@@ -10,7 +10,7 @@
 
       <!-- Navigation bar -->
       <div class="hero-nav">
-        <a mat-icon-button routerLink="/contacts" [attr.aria-label]="'detail.backToContacts' | transloco">
+        <a mat-icon-button routerLink="/contacts" [attr.aria-label]="'contacts.detail.backToContacts' | transloco">
           <mat-icon>arrow_back</mat-icon>
         </a>
         <div class="hero-actions">
@@ -30,7 +30,7 @@
           <mat-menu #actionsMenu="matMenu">
             <button mat-menu-item (click)="enrollInSequence()">
               <mat-icon>schedule_send</mat-icon>
-              <span>{{ 'detail.enrollInSequence' | transloco }}</span>
+              <span>{{ 'contacts.detail.enrollInSequence' | transloco }}</span>
             </button>
           </mat-menu>
         </div>
@@ -118,66 +118,66 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>person</mat-icon>
-                <h3>{{ 'detail.sections.contactInfo' | transloco }}</h3>
+                <h3>{{ 'contacts.detail.sections.contactInfo' | transloco }}</h3>
               </div>
               <div class="details-grid">
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.firstName' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.firstName' | transloco }}</span>
                   <span class="field-value">{{ contact()!.firstName }}</span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.lastName' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.lastName' | transloco }}</span>
                   <span class="field-value">{{ contact()!.lastName }}</span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.email' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.email' | transloco }}</span>
                   @if (contact()!.email) {
                     <a class="field-value field-value--link"
                        [href]="'mailto:' + contact()!.email">
                       {{ contact()!.email }}
                     </a>
                   } @else {
-                    <span class="field-value field-value--empty">{{ 'detail.empty.notSpecified' | transloco }}</span>
+                    <span class="field-value field-value--empty">{{ 'contacts.detail.empty.notSpecified' | transloco }}</span>
                   }
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.phone' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.phone' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.phone">
-                    {{ contact()!.phone || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.phone || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.mobilePhone' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.mobilePhone' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.mobilePhone">
-                    {{ contact()!.mobilePhone || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.mobilePhone || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.jobTitle' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.jobTitle' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.jobTitle">
-                    {{ contact()!.jobTitle || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.jobTitle || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.department' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.department' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.department">
-                    {{ contact()!.department || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.department || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.company' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.company' | transloco }}</span>
                   <span class="field-value">
                     @if (contact()!.companyId) {
                       <a class="field-value--link" [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
                     } @else {
-                      <span class="field-value--empty">{{ 'detail.empty.notSpecified' | transloco }}</span>
+                      <span class="field-value--empty">{{ 'contacts.detail.empty.notSpecified' | transloco }}</span>
                     }
                   </span>
                 </div>
                 <div class="detail-field full-width">
-                  <span class="field-label">{{ 'detail.fields.description' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.description' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.description">
-                    {{ contact()!.description || ('detail.empty.noDescription' | transloco) }}
+                    {{ contact()!.description || ('contacts.detail.empty.noDescription' | transloco) }}
                   </span>
                 </div>
               </div>
@@ -187,37 +187,37 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>location_on</mat-icon>
-                <h3>{{ 'detail.sections.address' | transloco }}</h3>
+                <h3>{{ 'contacts.detail.sections.address' | transloco }}</h3>
               </div>
               <div class="details-grid">
                 <div class="detail-field full-width">
-                  <span class="field-label">{{ 'detail.fields.address' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.address' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.address">
-                    {{ contact()!.address || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.address || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.city' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.city' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.city">
-                    {{ contact()!.city || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.city || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.state' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.state' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.state">
-                    {{ contact()!.state || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.state || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.country' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.country' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.country">
-                    {{ contact()!.country || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.country || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
                 <div class="detail-field">
-                  <span class="field-label">{{ 'detail.fields.postalCode' | transloco }}</span>
+                  <span class="field-label">{{ 'contacts.detail.fields.postalCode' | transloco }}</span>
                   <span class="field-value" [class.field-value--empty]="!contact()!.postalCode">
-                    {{ contact()!.postalCode || ('detail.empty.notSpecified' | transloco) }}
+                    {{ contact()!.postalCode || ('contacts.detail.empty.notSpecified' | transloco) }}
                   </span>
                 </div>
               </div>
@@ -227,7 +227,7 @@
             <div class="detail-section">
               <div class="detail-section__header">
                 <mat-icon>tune</mat-icon>
-                <h3>{{ 'detail.sections.customFields' | transloco }}</h3>
+                <h3>{{ 'contacts.detail.sections.customFields' | transloco }}</h3>
               </div>
               <app-custom-field-form
                 [entityType]="'Contact'"
@@ -242,7 +242,7 @@
               @if (contact()!.companyId) {
                 <div class="company-info-grid">
                   <div class="detail-field">
-                    <span class="field-label">{{ 'detail.company.name' | transloco }}</span>
+                    <span class="field-label">{{ 'contacts.detail.company.name' | transloco }}</span>
                     <span class="field-value">
                       <a class="field-value--link" [routerLink]="['/companies', contact()!.companyId]">{{ contact()!.companyName }}</a>
                     </span>
@@ -251,11 +251,11 @@
               } @else {
                 <div class="no-company">
                   <mat-icon>business</mat-icon>
-                  <span>{{ 'detail.company.noCompany' | transloco }}</span>
+                  <span>{{ 'contacts.detail.company.noCompany' | transloco }}</span>
                   <button mat-stroked-button
                           *appHasPermission="'Contact:Edit'"
                           routerLink="edit">
-                    {{ 'detail.company.linkCompany' | transloco }}
+                    {{ 'contacts.detail.company.linkCompany' | transloco }}
                   </button>
                 </div>
               }
@@ -266,9 +266,9 @@
           <ng-template>
             <div class="tab-placeholder">
               <mat-icon>handshake</mat-icon>
-              <p>{{ 'detail.deals.noDeals' | transloco }}</p>
+              <p>{{ 'contacts.detail.deals.noDeals' | transloco }}</p>
               <a mat-button color="primary" [routerLink]="['/deals']" [queryParams]="{ contactId: contact()?.id }">
-                {{ 'detail.deals.viewDeals' | transloco }}
+                {{ 'contacts.detail.deals.viewDeals' | transloco }}
               </a>
             </div>
           </ng-template>
@@ -282,19 +282,19 @@
             } @else if (linkedActivities().length === 0) {
               <div class="tab-empty">
                 <mat-icon>task_alt</mat-icon>
-                <span>{{ 'detail.activities.noActivities' | transloco }}</span>
-                <a mat-stroked-button routerLink="/activities/new">{{ 'detail.activities.createActivity' | transloco }}</a>
+                <span>{{ 'contacts.detail.activities.noActivities' | transloco }}</span>
+                <a mat-stroked-button routerLink="/activities/new">{{ 'contacts.detail.activities.createActivity' | transloco }}</a>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.activities.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnType' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnPriority' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnDueDate' | transloco }}</th>
-                    <th>{{ 'detail.activities.columnAssignedTo' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnSubject' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnType' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnStatus' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnPriority' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnDueDate' | transloco }}</th>
+                    <th>{{ 'contacts.detail.activities.columnAssignedTo' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -336,16 +336,16 @@
             } @else if (linkedQuotes().length === 0) {
               <div class="tab-empty">
                 <mat-icon>request_quote</mat-icon>
-                <span>{{ 'detail.quotes.noQuotes' | transloco }}</span>
+                <span>{{ 'contacts.detail.quotes.noQuotes' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.quotes.columnNumber' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnTitle' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.quotes.columnGrandTotal' | transloco }}</th>
+                    <th>{{ 'contacts.detail.quotes.columnNumber' | transloco }}</th>
+                    <th>{{ 'contacts.detail.quotes.columnTitle' | transloco }}</th>
+                    <th>{{ 'contacts.detail.quotes.columnStatus' | transloco }}</th>
+                    <th>{{ 'contacts.detail.quotes.columnGrandTotal' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -368,7 +368,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/quotes']" [queryParams]="{ contactId: contact()?.id }">
-                  {{ 'detail.quotes.viewAll' | transloco }}
+                  {{ 'contacts.detail.quotes.viewAll' | transloco }}
                 </a>
               </div>
             }
@@ -383,15 +383,15 @@
             } @else if (linkedRequests().length === 0) {
               <div class="tab-empty">
                 <mat-icon>support_agent</mat-icon>
-                <span>{{ 'detail.requests.noRequests' | transloco }}</span>
+                <span>{{ 'contacts.detail.requests.noRequests' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.requests.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.requests.columnStatus' | transloco }}</th>
-                    <th>{{ 'detail.requests.columnPriority' | transloco }}</th>
+                    <th>{{ 'contacts.detail.requests.columnSubject' | transloco }}</th>
+                    <th>{{ 'contacts.detail.requests.columnStatus' | transloco }}</th>
+                    <th>{{ 'contacts.detail.requests.columnPriority' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -420,7 +420,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" [routerLink]="['/requests']" [queryParams]="{ contactId: contact()?.id }">
-                  {{ 'detail.requests.viewAll' | transloco }}
+                  {{ 'contacts.detail.requests.viewAll' | transloco }}
                 </a>
               </div>
             }
@@ -435,16 +435,16 @@
             } @else if (contactEmails().length === 0) {
               <div class="tab-empty">
                 <mat-icon>email</mat-icon>
-                <span>{{ 'detail.emails.noEmails' | transloco }}</span>
+                <span>{{ 'contacts.detail.emails.noEmails' | transloco }}</span>
               </div>
             } @else {
               <table class="entity-table">
                 <thead>
                   <tr>
                     <th></th>
-                    <th>{{ 'detail.emails.columnSubject' | transloco }}</th>
-                    <th>{{ 'detail.emails.columnPreview' | transloco }}</th>
-                    <th>{{ 'detail.emails.columnDate' | transloco }}</th>
+                    <th>{{ 'contacts.detail.emails.columnSubject' | transloco }}</th>
+                    <th>{{ 'contacts.detail.emails.columnPreview' | transloco }}</th>
+                    <th>{{ 'contacts.detail.emails.columnDate' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -466,7 +466,7 @@
               </table>
               <div class="table-footer-link">
                 <a mat-button color="primary" routerLink="/emails">
-                  {{ 'detail.emails.viewAll' | transloco }}
+                  {{ 'contacts.detail.emails.viewAll' | transloco }}
                 </a>
               </div>
             }
@@ -481,11 +481,11 @@
             } @else if (contactNotes().length === 0) {
               <div class="tab-empty">
                 <mat-icon>note</mat-icon>
-                <span>{{ 'detail.notes.noNotes' | transloco }}</span>
+                <span>{{ 'contacts.detail.notes.noNotes' | transloco }}</span>
                 <a mat-stroked-button
                    [routerLink]="['/notes/new']"
                    [queryParams]="{ entityType: 'Contact', entityId: contact()?.id, entityName: contact()?.fullName }">
-                  {{ 'detail.notes.addNote' | transloco }}
+                  {{ 'contacts.detail.notes.addNote' | transloco }}
                 </a>
               </div>
             } @else {
@@ -493,16 +493,16 @@
                 <a mat-stroked-button
                    [routerLink]="['/notes/new']"
                    [queryParams]="{ entityType: 'Contact', entityId: contact()?.id, entityName: contact()?.fullName }">
-                  <mat-icon>add</mat-icon> {{ 'detail.notes.addNote' | transloco }}
+                  <mat-icon>add</mat-icon> {{ 'contacts.detail.notes.addNote' | transloco }}
                 </a>
               </div>
               <table class="entity-table">
                 <thead>
                   <tr>
-                    <th>{{ 'detail.notes.columnTitle' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnPreview' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnAuthor' | transloco }}</th>
-                    <th>{{ 'detail.notes.columnDate' | transloco }}</th>
+                    <th>{{ 'contacts.detail.notes.columnTitle' | transloco }}</th>
+                    <th>{{ 'contacts.detail.notes.columnPreview' | transloco }}</th>
+                    <th>{{ 'contacts.detail.notes.columnAuthor' | transloco }}</th>
+                    <th>{{ 'contacts.detail.notes.columnDate' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -531,7 +531,7 @@
         <div class="sidebar-card">
           <div class="sidebar-card__header">
             <mat-icon>timeline</mat-icon>
-            <h3>{{ 'detail.timeline' | transloco }}</h3>
+            <h3>{{ 'contacts.detail.timeline' | transloco }}</h3>
           </div>
           <div class="sidebar-card__body">
             <app-entity-timeline
@@ -545,7 +545,7 @@
 } @else {
   <div class="detail-not-found">
     <mat-icon>error_outline</mat-icon>
-    <h2>{{ 'detail.notFound' | transloco }}</h2>
-    <a mat-stroked-button routerLink="/contacts">{{ 'detail.backToContacts' | transloco }}</a>
+    <h2>{{ 'contacts.detail.notFound' | transloco }}</h2>
+    <a mat-stroked-button routerLink="/contacts">{{ 'contacts.detail.backToContacts' | transloco }}</a>
   </div>
 }

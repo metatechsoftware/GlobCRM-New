@@ -191,7 +191,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
             <span class="target-card__ring-percent" [class]="percentColorClass()">
               {{ progressPercent() }}%
             </span>
-            <span class="target-card__ring-sublabel">{{ 'widgets.complete' | transloco }}</span>
+            <span class="target-card__ring-sublabel">{{ 'dashboard.widgets.complete' | transloco }}</span>
           </div>
         </div>
 
@@ -208,7 +208,7 @@ import { MetricResultDto, TargetDto } from '../../../models/dashboard.models';
     } @else {
       <div class="target-card__empty">
         <mat-icon>track_changes</mat-icon>
-        <span>{{ 'widgets.noTargetConfigured' | transloco }}</span>
+        <span>{{ 'dashboard.widgets.noTargetConfigured' | transloco }}</span>
       </div>
     }
   `,

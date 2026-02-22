@@ -33,11 +33,11 @@ export interface CloneTemplateDialogResult {
     TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ 'email-templates.clone.title' | transloco }}</h2>
+    <h2 mat-dialog-title>{{ 'emailTemplates.clone.title' | transloco }}</h2>
     <mat-dialog-content>
-      <p>{{ 'email-templates.clone.prompt' | transloco }}</p>
+      <p>{{ 'emailTemplates.clone.prompt' | transloco }}</p>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'email-templates.clone.nameLabel' | transloco }}</mat-label>
+        <mat-label>{{ 'emailTemplates.clone.nameLabel' | transloco }}</mat-label>
         <input matInput [(ngModel)]="cloneName" (keydown.enter)="confirm()" />
       </mat-form-field>
     </mat-dialog-content>
@@ -49,7 +49,7 @@ export interface CloneTemplateDialogResult {
         [disabled]="!cloneName.trim()"
         (click)="confirm()"
       >
-        {{ 'email-templates.clone.button' | transloco }}
+        {{ 'emailTemplates.clone.button' | transloco }}
       </button>
     </mat-dialog-actions>
   `,

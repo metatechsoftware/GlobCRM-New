@@ -17,7 +17,7 @@ import { MyDayFeedItemDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>dynamic_feed</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.feed.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.feed.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -36,7 +36,7 @@ import { MyDayFeedItemDto } from '../../my-day.models';
         } @else if (feedItems().length === 0) {
           <div class="feed-widget__empty">
             <mat-icon class="feed-widget__empty-icon">dynamic_feed</mat-icon>
-            <span class="feed-widget__empty-text">{{ 'widgets.feed.noRecentActivity' | transloco }}</span>
+            <span class="feed-widget__empty-text">{{ 'myDay.widgets.feed.noRecentActivity' | transloco }}</span>
           </div>
         } @else {
           <div class="feed-widget__list">
@@ -63,7 +63,7 @@ import { MyDayFeedItemDto } from '../../my-day.models';
           </div>
 
           <a class="feed-widget__view-all" routerLink="/feed">
-            {{ 'widgets.feed.viewAll' | transloco }}
+            {{ 'myDay.widgets.feed.viewAll' | transloco }}
             <mat-icon class="feed-widget__view-all-icon">arrow_forward</mat-icon>
           </a>
         }

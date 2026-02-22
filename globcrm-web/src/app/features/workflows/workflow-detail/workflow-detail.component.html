@@ -8,7 +8,7 @@
   @if (store.selectedWorkflow(); as wf) {
     <!-- Header -->
     <div class="detail__header">
-      <button mat-icon-button routerLink="/workflows" [attr.aria-label]="'detail.backToWorkflows' | transloco">
+      <button mat-icon-button routerLink="/workflows" [attr.aria-label]="'workflows.detail.backToWorkflows' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </button>
       <div class="detail__header-info">
@@ -27,34 +27,34 @@
       <div class="detail__header-actions">
         <a mat-raised-button color="primary" [routerLink]="['/workflows', wf.id, 'edit']">
           <mat-icon>edit</mat-icon>
-          {{ 'detail.edit' | transloco }}
+          {{ 'workflows.detail.edit' | transloco }}
         </a>
         @if (wf.isActive) {
           <button mat-stroked-button (click)="toggleStatus()">
             <mat-icon>pause</mat-icon>
-            {{ 'detail.deactivate' | transloco }}
+            {{ 'workflows.detail.deactivate' | transloco }}
           </button>
         } @else {
           <button mat-stroked-button (click)="toggleStatus()">
             <mat-icon>play_arrow</mat-icon>
-            {{ 'detail.activate' | transloco }}
+            {{ 'workflows.detail.activate' | transloco }}
           </button>
         }
         <button mat-stroked-button (click)="duplicateWorkflow()">
           <mat-icon>content_copy</mat-icon>
-          {{ 'detail.duplicate' | transloco }}
+          {{ 'workflows.detail.duplicate' | transloco }}
         </button>
         <button mat-stroked-button (click)="openSaveAsTemplate()">
           <mat-icon>bookmark_add</mat-icon>
-          {{ 'detail.saveAsTemplate' | transloco }}
+          {{ 'workflows.detail.saveAsTemplate' | transloco }}
         </button>
-        <button mat-icon-button [matMenuTriggerFor]="overflowMenu" [attr.aria-label]="'card.moreActions' | transloco">
+        <button mat-icon-button [matMenuTriggerFor]="overflowMenu" [attr.aria-label]="'workflows.card.moreActions' | transloco">
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #overflowMenu="matMenu">
           <button mat-menu-item (click)="confirmDelete()" class="detail__delete-item">
             <mat-icon color="warn">delete</mat-icon>
-            <span>{{ 'detail.deleteWorkflow' | transloco }}</span>
+            <span>{{ 'workflows.detail.deleteWorkflow' | transloco }}</span>
           </button>
         </mat-menu>
       </div>
@@ -65,29 +65,29 @@
       <div class="stat-card">
         <mat-icon class="stat-card__icon stat-card__icon--primary">play_circle</mat-icon>
         <span class="stat-card__value">{{ wf.executionCount }}</span>
-        <span class="stat-card__label">{{ 'detail.totalExecutions' | transloco }}</span>
+        <span class="stat-card__label">{{ 'workflows.detail.totalExecutions' | transloco }}</span>
       </div>
       <div class="stat-card">
         <mat-icon class="stat-card__icon stat-card__icon--info">schedule</mat-icon>
         <span class="stat-card__value">{{ getRelativeTime(wf.lastExecutedAt) }}</span>
-        <span class="stat-card__label">{{ 'detail.lastRun' | transloco }}</span>
+        <span class="stat-card__label">{{ 'workflows.detail.lastRun' | transloco }}</span>
       </div>
       <div class="stat-card">
         <mat-icon class="stat-card__icon stat-card__icon--success">check_circle</mat-icon>
         <span class="stat-card__value">{{ successRate() }}%</span>
-        <span class="stat-card__label">{{ 'detail.successRate' | transloco }}</span>
+        <span class="stat-card__label">{{ 'workflows.detail.successRate' | transloco }}</span>
       </div>
       <div class="stat-card">
         <mat-icon class="stat-card__icon stat-card__icon--danger">error</mat-icon>
         <span class="stat-card__value">{{ failedCount() }}</span>
-        <span class="stat-card__label">{{ 'detail.failed' | transloco }}</span>
+        <span class="stat-card__label">{{ 'workflows.detail.failed' | transloco }}</span>
       </div>
     </div>
 
     <!-- Description -->
     @if (wf.description) {
       <div class="detail__section">
-        <h2>{{ 'detail.description' | transloco }}</h2>
+        <h2>{{ 'workflows.detail.description' | transloco }}</h2>
         <p class="detail__description-text">{{ wf.description }}</p>
       </div>
     }
@@ -95,7 +95,7 @@
     <!-- Trigger Summary -->
     @if (wf.triggerSummary && wf.triggerSummary.length > 0) {
       <div class="detail__section">
-        <h2>{{ 'detail.triggers' | transloco }}</h2>
+        <h2>{{ 'workflows.detail.triggers' | transloco }}</h2>
         <div class="detail__triggers">
           @for (trigger of wf.triggerSummary; track trigger) {
             <span class="detail__trigger-chip">
@@ -110,7 +110,7 @@
     <!-- Workflow Flow Preview -->
     @if (getFlowSummary()) {
       <div class="detail__section">
-        <h2>{{ 'detail.flowOverview' | transloco }}</h2>
+        <h2>{{ 'workflows.detail.flowOverview' | transloco }}</h2>
         <div class="detail__flow-summary">
           <mat-icon>account_tree</mat-icon>
           <span>{{ getFlowSummary() }}</span>
@@ -121,9 +121,9 @@
     <!-- Execution Logs Section (embedded) -->
     <div class="detail__section">
       <div class="detail__section-header">
-        <h2>{{ 'detail.executionHistory' | transloco }}</h2>
+        <h2>{{ 'workflows.detail.executionHistory' | transloco }}</h2>
         <a mat-stroked-button [routerLink]="['/workflows', wf.id, 'logs']">
-          {{ 'detail.viewAll' | transloco }}
+          {{ 'workflows.detail.viewAll' | transloco }}
           <mat-icon>arrow_forward</mat-icon>
         </a>
       </div>

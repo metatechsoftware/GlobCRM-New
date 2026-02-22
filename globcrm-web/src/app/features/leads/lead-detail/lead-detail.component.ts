@@ -202,7 +202,7 @@ export class LeadDetailComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open(this.transloco.translate('messages.leadLoadFailed'), 'Close', { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('leads.messages.leadLoadFailed'), 'Close', { duration: 5000 });
         this.router.navigate(['/leads']);
       },
     });
@@ -351,13 +351,13 @@ export class LeadDetailComponent implements OnInit {
           next: (updated) => {
             this.lead.set(updated);
             this.stageChangeInProgress.set(false);
-            this.snackBar.open(this.transloco.translate('messages.stageUpdated', { stage: stage.name }), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.stageUpdated', { stage: stage.name }), 'OK', { duration: 3000 });
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
             this.stageChangeInProgress.set(false);
-            this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.stageUpdateFailed'), 'Close', { duration: 5000 });
           },
         });
       }
@@ -381,12 +381,12 @@ export class LeadDetailComponent implements OnInit {
         this.leadService.reopenLead(this.leadId, firstActive.id).subscribe({
           next: (updated) => {
             this.lead.set(updated);
-            this.snackBar.open(this.transloco.translate('messages.leadReopened', { stage: firstActive.name }), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadReopened', { stage: firstActive.name }), 'OK', { duration: 3000 });
             this.loadTimeline();
             this.markSummaryDirty();
           },
           error: () => {
-            this.snackBar.open(this.transloco.translate('messages.leadReopenFailed'), 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadReopenFailed'), 'Close', { duration: 5000 });
           },
         });
       }
@@ -411,7 +411,7 @@ export class LeadDetailComponent implements OnInit {
           this.loadLead();
           this.loadTimeline();
           this.markSummaryDirty();
-          this.snackBar.open(this.transloco.translate('messages.leadConverted'), 'OK', { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('leads.messages.leadConverted'), 'OK', { duration: 3000 });
         }
       });
     });
@@ -489,11 +489,11 @@ export class LeadDetailComponent implements OnInit {
       if (confirmed) {
         this.leadService.delete(this.leadId).subscribe({
           next: () => {
-            this.snackBar.open(this.transloco.translate('messages.leadDeleted'), 'OK', { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadDeleted'), 'OK', { duration: 3000 });
             this.router.navigate(['/leads']);
           },
           error: () => {
-            this.snackBar.open(this.transloco.translate('messages.leadDeleteFailed'), 'Close', { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadDeleteFailed'), 'Close', { duration: 5000 });
           },
         });
       }

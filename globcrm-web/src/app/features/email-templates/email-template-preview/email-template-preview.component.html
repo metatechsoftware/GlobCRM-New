@@ -1,7 +1,7 @@
 <div class="preview-dialog">
   <!-- Header -->
   <div class="preview-header">
-    <h2>{{ 'email-templates.preview.title' | transloco }}</h2>
+    <h2>{{ 'emailTemplates.preview.title' | transloco }}</h2>
     <button mat-icon-button (click)="close()" [attr.aria-label]="'common.close' | transloco">
       <mat-icon>close</mat-icon>
     </button>
@@ -13,19 +13,19 @@
     <mat-button-toggle-group
       [value]="deviceMode()"
       (change)="onDeviceChange($event.value)"
-      [attr.aria-label]="'email-templates.preview.aria.devicePreviewMode' | transloco"
+      [attr.aria-label]="'emailTemplates.preview.aria.devicePreviewMode' | transloco"
     >
-      <mat-button-toggle value="desktop" [matTooltip]="'email-templates.preview.desktopTooltip' | transloco">
+      <mat-button-toggle value="desktop" [matTooltip]="'emailTemplates.preview.desktopTooltip' | transloco">
         <mat-icon>monitor</mat-icon>
       </mat-button-toggle>
-      <mat-button-toggle value="mobile" [matTooltip]="'email-templates.preview.mobileTooltip' | transloco">
+      <mat-button-toggle value="mobile" [matTooltip]="'emailTemplates.preview.mobileTooltip' | transloco">
         <mat-icon>smartphone</mat-icon>
       </mat-button-toggle>
     </mat-button-toggle-group>
 
     <!-- Entity Selector -->
     <div class="entity-selector">
-      <span class="entity-label">{{ 'email-templates.preview.previewWith' | transloco }}</span>
+      <span class="entity-label">{{ 'emailTemplates.preview.previewWith' | transloco }}</span>
 
       <mat-form-field appearance="outline" class="entity-type-field">
         <mat-select
@@ -46,7 +46,7 @@
             [value]="entitySearchQuery()"
             (input)="onEntitySearchInput($any($event.target).value)"
             [matAutocomplete]="entityAuto"
-            [placeholder]="'email-templates.preview.searchPlaceholder' | transloco"
+            [placeholder]="'emailTemplates.preview.searchPlaceholder' | transloco"
           />
           @if (searchingEntities()) {
             <mat-spinner matSuffix diameter="18"></mat-spinner>
@@ -72,7 +72,7 @@
     <div class="control-actions">
       <button
         mat-icon-button
-        [matTooltip]="'email-templates.preview.refreshTooltip' | transloco"
+        [matTooltip]="'emailTemplates.preview.refreshTooltip' | transloco"
         (click)="loadPreview()"
         [disabled]="previewLoading()"
       >
@@ -91,7 +91,7 @@
         } @else {
           <mat-icon>send</mat-icon>
         }
-        {{ 'email-templates.preview.sendTest' | transloco }}
+        {{ 'emailTemplates.preview.sendTest' | transloco }}
       </button>
     </div>
   </div>
@@ -102,7 +102,7 @@
     @if (renderedSubject()) {
       <div class="email-client-header">
         <div class="email-header-row">
-          <span class="email-header-label">{{ 'email-templates.preview.subject' | transloco }}</span>
+          <span class="email-header-label">{{ 'emailTemplates.preview.subject' | transloco }}</span>
           <span class="email-header-value">{{ renderedSubject() }}</span>
         </div>
       </div>
@@ -128,7 +128,7 @@
         @if (previewLoading()) {
           <div class="preview-loading">
             <mat-spinner diameter="40"></mat-spinner>
-            <p>{{ 'email-templates.preview.loading' | transloco }}</p>
+            <p>{{ 'emailTemplates.preview.loading' | transloco }}</p>
           </div>
         }
         <iframe

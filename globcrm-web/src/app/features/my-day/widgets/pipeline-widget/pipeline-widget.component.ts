@@ -16,7 +16,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>handshake</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.pipeline.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.pipeline.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -32,7 +32,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
         } @else if (stages().length === 0) {
           <div class="pipeline-widget__empty">
             <mat-icon class="pipeline-widget__empty-icon">shopping_cart</mat-icon>
-            <span class="pipeline-widget__empty-text">{{ 'widgets.pipeline.empty' | transloco }}</span>
+            <span class="pipeline-widget__empty-text">{{ 'myDay.widgets.pipeline.empty' | transloco }}</span>
           </div>
         } @else {
           <!-- Horizontal stacked bar chart -->
@@ -59,7 +59,7 @@ import { MyDayPipelineStageDto } from '../../my-day.models';
 
           <!-- Summary -->
           <div class="pipeline-widget__summary">
-            <span class="pipeline-widget__summary-deals">{{ 'widgets.pipeline.deals' | transloco: { count: dealCount() } }}</span>
+            <span class="pipeline-widget__summary-deals">{{ 'myDay.widgets.pipeline.deals' | transloco: { count: dealCount() } }}</span>
             <span class="pipeline-widget__summary-sep">&middot;</span>
             <span class="pipeline-widget__summary-value">{{ formattedTotalValue() }}</span>
           </div>

@@ -61,7 +61,7 @@ import { WorkflowListItem } from '../workflow.models';
         @if (workflow().nodeCount === 0) {
           <div class="workflow-card__thumbnail-empty">
             <mat-icon>account_tree</mat-icon>
-            <span>{{ 'card.emptyWorkflow' | transloco }}</span>
+            <span>{{ 'workflows.card.emptyWorkflow' | transloco }}</span>
           </div>
         } @else {
           <svg
@@ -151,20 +151,20 @@ import { WorkflowListItem } from '../workflow.models';
           </span>
           <span class="workflow-card__run-count">
             <mat-icon class="workflow-card__stat-icon">bar_chart</mat-icon>
-            {{ 'card.runs' | transloco:{ count: workflow().executionCount } }}
+            {{ 'workflows.card.runs' | transloco:{ count: workflow().executionCount } }}
           </span>
         </div>
         <div class="workflow-card__controls" (click)="$event.stopPropagation()">
           <mat-slide-toggle
             [checked]="workflow().isActive"
             (change)="toggleStatus.emit()"
-            [matTooltip]="workflow().isActive ? ('card.disableWorkflow' | transloco) : ('card.enableWorkflow' | transloco)"
+            [matTooltip]="workflow().isActive ? ('workflows.card.disableWorkflow' | transloco) : ('workflows.card.enableWorkflow' | transloco)"
             color="primary"
           />
           <button
             mat-icon-button
             [matMenuTriggerFor]="cardMenu"
-            [matTooltip]="'card.moreActions' | transloco"
+            [matTooltip]="'workflows.card.moreActions' | transloco"
             class="workflow-card__menu-btn"
           >
             <mat-icon>more_vert</mat-icon>
@@ -172,15 +172,15 @@ import { WorkflowListItem } from '../workflow.models';
           <mat-menu #cardMenu="matMenu">
             <button mat-menu-item (click)="edit.emit()">
               <mat-icon>edit</mat-icon>
-              <span>{{ 'card.edit' | transloco }}</span>
+              <span>{{ 'workflows.card.edit' | transloco }}</span>
             </button>
             <button mat-menu-item (click)="duplicate.emit()">
               <mat-icon>content_copy</mat-icon>
-              <span>{{ 'card.duplicate' | transloco }}</span>
+              <span>{{ 'workflows.card.duplicate' | transloco }}</span>
             </button>
             <button mat-menu-item (click)="deleteWorkflow.emit()" class="workflow-card__delete-item">
               <mat-icon>delete</mat-icon>
-              <span>{{ 'card.delete' | transloco }}</span>
+              <span>{{ 'workflows.card.delete' | transloco }}</span>
             </button>
           </mat-menu>
         </div>
@@ -530,10 +530,10 @@ export class WorkflowCardComponent {
   /** Relative time for last run */
   readonly lastRunText = computed(() => {
     const lastRun = this.workflow().lastExecutedAt;
-    if (!lastRun) return this.transloco.translate('card.neverRun');
+    if (!lastRun) return this.transloco.translate('workflows.card.neverRun');
     const diff = Date.now() - new Date(lastRun).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return this.transloco.translate('card.justNow');
+    if (minutes < 1) return this.transloco.translate('workflows.card.justNow');
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;

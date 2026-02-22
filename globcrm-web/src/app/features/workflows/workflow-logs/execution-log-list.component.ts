@@ -47,31 +47,31 @@ import { WorkflowExecutionLog } from '../workflow.models';
     } @else if (logs().length === 0) {
       <div class="log-list__empty">
         <mat-icon>history</mat-icon>
-        <p>{{ 'logs.noExecutions' | transloco }}</p>
+        <p>{{ 'workflows.logs.noExecutions' | transloco }}</p>
       </div>
     } @else {
       <div class="log-list__table-wrap">
         <table mat-table [dataSource]="logs()">
           <!-- Status Column -->
           <ng-container matColumnDef="status">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.status' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.status' | transloco }}</th>
             <td mat-cell *matCellDef="let log">
               @switch (log.status) {
                 @case ('succeeded') {
                   <mat-icon class="log-status log-status--success"
-                            [matTooltip]="'logs.succeeded' | transloco">check_circle</mat-icon>
+                            [matTooltip]="'workflows.logs.succeeded' | transloco">check_circle</mat-icon>
                 }
                 @case ('partiallyFailed') {
                   <mat-icon class="log-status log-status--warning"
-                            [matTooltip]="'logs.partiallyFailed' | transloco">warning</mat-icon>
+                            [matTooltip]="'workflows.logs.partiallyFailed' | transloco">warning</mat-icon>
                 }
                 @case ('failed') {
                   <mat-icon class="log-status log-status--error"
-                            [matTooltip]="'logs.failed' | transloco">error</mat-icon>
+                            [matTooltip]="'workflows.logs.failed' | transloco">error</mat-icon>
                 }
                 @case ('skipped') {
                   <mat-icon class="log-status log-status--skip"
-                            [matTooltip]="'logs.skipped' | transloco">block</mat-icon>
+                            [matTooltip]="'workflows.logs.skipped' | transloco">block</mat-icon>
                 }
               }
             </td>
@@ -79,7 +79,7 @@ import { WorkflowExecutionLog } from '../workflow.models';
 
           <!-- Trigger Column -->
           <ng-container matColumnDef="trigger">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.trigger' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.trigger' | transloco }}</th>
             <td mat-cell *matCellDef="let log">
               {{ log.triggerType }}: {{ log.triggerEvent }}
             </td>
@@ -87,7 +87,7 @@ import { WorkflowExecutionLog } from '../workflow.models';
 
           <!-- Entity Column -->
           <ng-container matColumnDef="entity">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.entity' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.entity' | transloco }}</th>
             <td mat-cell *matCellDef="let log">
               <span class="log-list__entity">
                 {{ log.entityType }}
@@ -101,21 +101,21 @@ import { WorkflowExecutionLog } from '../workflow.models';
 
           <!-- Conditions Column -->
           <ng-container matColumnDef="conditions">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.conditions' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.conditions' | transloco }}</th>
             <td mat-cell *matCellDef="let log">
               @if (!log.conditionsEvaluated) {
                 <span class="log-list__conditions log-list__conditions--na">&mdash;</span>
               } @else if (log.conditionsPassed) {
-                <span class="log-list__conditions log-list__conditions--pass">{{ 'logs.conditionsPassed' | transloco }}</span>
+                <span class="log-list__conditions log-list__conditions--pass">{{ 'workflows.logs.conditionsPassed' | transloco }}</span>
               } @else {
-                <span class="log-list__conditions log-list__conditions--fail">{{ 'logs.conditionsFailed' | transloco }}</span>
+                <span class="log-list__conditions log-list__conditions--fail">{{ 'workflows.logs.conditionsFailed' | transloco }}</span>
               }
             </td>
           </ng-container>
 
           <!-- Duration Column -->
           <ng-container matColumnDef="duration">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.duration' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.duration' | transloco }}</th>
             <td mat-cell *matCellDef="let log">
               {{ log.durationMs }}ms
             </td>
@@ -123,7 +123,7 @@ import { WorkflowExecutionLog } from '../workflow.models';
 
           <!-- Started Column -->
           <ng-container matColumnDef="started">
-            <th mat-header-cell *matHeaderCellDef>{{ 'logs.started' | transloco }}</th>
+            <th mat-header-cell *matHeaderCellDef>{{ 'workflows.logs.started' | transloco }}</th>
             <td mat-cell *matCellDef="let log"
                 [matTooltip]="log.startedAt | date:'medium'">
               {{ getRelativeTime(log.startedAt) }}
@@ -137,7 +137,7 @@ import { WorkflowExecutionLog } from '../workflow.models';
               <a mat-stroked-button
                  class="log-list__view-btn"
                  [routerLink]="['/workflows', resolvedWorkflowId(), 'logs', log.id]">
-                {{ 'logs.viewDetails' | transloco }}
+                {{ 'workflows.logs.viewDetails' | transloco }}
               </a>
             </td>
           </ng-container>
@@ -162,7 +162,7 @@ import { WorkflowExecutionLog } from '../workflow.models';
         <div class="log-list__view-all">
           <a mat-button
              [routerLink]="['/workflows', resolvedWorkflowId(), 'logs']">
-            {{ 'logs.viewAllLogs' | transloco:{ count: totalCount() } }}
+            {{ 'workflows.logs.viewAllLogs' | transloco:{ count: totalCount() } }}
             <mat-icon>arrow_forward</mat-icon>
           </a>
         </div>
@@ -319,7 +319,7 @@ export class ExecutionLogListComponent implements OnInit {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return this.transloco.translate('logs.justNow');
+    if (diffMins < 1) return this.transloco.translate('workflows.logs.justNow');
     if (diffMins < 60) return `${diffMins}m ago`;
     const diffHours = Math.floor(diffMins / 60);
     if (diffHours < 24) return `${diffHours}h ago`;

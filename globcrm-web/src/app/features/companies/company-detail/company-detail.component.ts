@@ -176,7 +176,7 @@ export class CompanyDetailComponent implements OnInit {
         // Check if the response is a merged-record redirect
         if (response?.isMerged && response?.mergedIntoId) {
           this.snackBar.open(
-            this.transloco.translate('detail.mergedRedirect'),
+            this.transloco.translate('companies.detail.mergedRedirect'),
             'Close',
             { duration: 3000 }
           );

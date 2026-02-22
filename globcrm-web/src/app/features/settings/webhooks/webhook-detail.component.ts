@@ -578,7 +578,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <div class="wd-header">
           <a class="wd-header__breadcrumb" routerLink="/settings/webhooks">
             <mat-icon>arrow_back</mat-icon>
-            {{ 'webhooks.detail.breadcrumb' | transloco }}
+            {{ 'settings.webhooks.detail.breadcrumb' | transloco }}
           </a>
 
           <div class="wd-header__top">
@@ -587,24 +587,24 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             </div>
             <div class="wd-header__text">
               <h1 class="wd-header__title">{{ sub.name }}</h1>
-              <p class="wd-header__subtitle">{{ 'webhooks.detail.subtitle' | transloco }}</p>
+              <p class="wd-header__subtitle">{{ 'settings.webhooks.detail.subtitle' | transloco }}</p>
             </div>
             <div class="wd-header__actions">
               <button mat-stroked-button (click)="onTest()">
                 <mat-icon>science</mat-icon>
-                {{ 'webhooks.detail.test' | transloco }}
+                {{ 'settings.webhooks.detail.test' | transloco }}
               </button>
               <button mat-stroked-button (click)="onRegenerateSecret()">
                 <mat-icon>key</mat-icon>
-                {{ 'webhooks.detail.regenerateSecret' | transloco }}
+                {{ 'settings.webhooks.detail.regenerateSecret' | transloco }}
               </button>
               <button mat-stroked-button (click)="onToggle()">
                 <mat-icon>{{ sub.isActive ? 'pause' : 'play_arrow' }}</mat-icon>
-                {{ sub.isActive ? ('webhooks.detail.pause' | transloco) : ('webhooks.detail.enable' | transloco) }}
+                {{ sub.isActive ? ('settings.webhooks.detail.pause' | transloco) : ('settings.webhooks.detail.enable' | transloco) }}
               </button>
               <a mat-stroked-button [routerLink]="['/settings/webhooks', sub.id, 'edit']">
                 <mat-icon>edit</mat-icon>
-                {{ 'webhooks.detail.edit' | transloco }}
+                {{ 'settings.webhooks.detail.edit' | transloco }}
               </a>
             </div>
           </div>
@@ -615,16 +615,16 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
           <div class="wd-banner">
             <mat-icon class="wd-banner__icon">error</mat-icon>
             <div class="wd-banner__content">
-              <p>{{ 'webhooks.detail.disabledBanner' | transloco }}</p>
+              <p>{{ 'settings.webhooks.detail.disabledBanner' | transloco }}</p>
               @if (sub.disabledReason) {
                 <p>{{ sub.disabledReason }}</p>
               }
               @if (sub.disabledAt) {
-                <p>{{ 'webhooks.detail.disabledAt' | transloco }} {{ sub.disabledAt | date:'medium' }}</p>
+                <p>{{ 'settings.webhooks.detail.disabledAt' | transloco }} {{ sub.disabledAt | date:'medium' }}</p>
               }
             </div>
             <button mat-flat-button color="primary" (click)="onToggle()">
-              {{ 'webhooks.detail.reEnable' | transloco }}
+              {{ 'settings.webhooks.detail.reEnable' | transloco }}
             </button>
           </div>
         }
@@ -633,14 +633,14 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <div class="wd-section wd-section--info">
           <div class="wd-section__header">
             <mat-icon class="wd-section__header-icon">info</mat-icon>
-            <h2 class="wd-section__header-title">{{ 'webhooks.detail.subscriptionDetails' | transloco }}</h2>
+            <h2 class="wd-section__header-title">{{ 'settings.webhooks.detail.subscriptionDetails' | transloco }}</h2>
           </div>
 
           <div class="wd-info-grid">
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>toggle_on</mat-icon>
-                {{ 'webhooks.detail.status' | transloco }}
+                {{ 'settings.webhooks.detail.status' | transloco }}
               </span>
               <span>
                 <span class="wd-status-badge"
@@ -656,7 +656,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>vpn_key</mat-icon>
-                {{ 'webhooks.detail.secret' | transloco }}
+                {{ 'settings.webhooks.detail.secret' | transloco }}
               </span>
               <span class="wd-info-value wd-info-value--mono">{{ sub.secretMask }}</span>
             </div>
@@ -664,7 +664,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <div class="wd-info-item wd-info-item--full">
               <span class="wd-info-label">
                 <mat-icon>link</mat-icon>
-                {{ 'webhooks.detail.url' | transloco }}
+                {{ 'settings.webhooks.detail.url' | transloco }}
               </span>
               <span class="wd-info-value wd-info-value--mono">{{ sub.url }}</span>
             </div>
@@ -672,7 +672,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <div class="wd-info-item wd-info-item--full">
               <span class="wd-info-label">
                 <mat-icon>notification_add</mat-icon>
-                {{ 'webhooks.detail.eventSubscriptions' | transloco }}
+                {{ 'settings.webhooks.detail.eventSubscriptions' | transloco }}
               </span>
               <div class="wd-event-chips">
                 @for (event of sub.eventSubscriptions; track event) {
@@ -684,15 +684,15 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>tune</mat-icon>
-                {{ 'webhooks.detail.includeCustomFields' | transloco }}
+                {{ 'settings.webhooks.detail.includeCustomFields' | transloco }}
               </span>
-              <span class="wd-info-value">{{ sub.includeCustomFields ? ('webhooks.detail.yes' | transloco) : ('webhooks.detail.no' | transloco) }}</span>
+              <span class="wd-info-value">{{ sub.includeCustomFields ? ('settings.webhooks.detail.yes' | transloco) : ('settings.webhooks.detail.no' | transloco) }}</span>
             </div>
 
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>calendar_today</mat-icon>
-                {{ 'webhooks.detail.created' | transloco }}
+                {{ 'settings.webhooks.detail.created' | transloco }}
               </span>
               <span class="wd-info-value">{{ sub.createdAt | date:'medium' }}</span>
             </div>
@@ -700,19 +700,19 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>schedule</mat-icon>
-                {{ 'webhooks.detail.lastDelivery' | transloco }}
+                {{ 'settings.webhooks.detail.lastDelivery' | transloco }}
               </span>
               @if (sub.lastDeliveryAt) {
                 <span class="wd-info-value">{{ sub.lastDeliveryAt | date:'medium' }}</span>
               } @else {
-                <span class="wd-info-value">{{ 'webhooks.detail.never' | transloco }}</span>
+                <span class="wd-info-value">{{ 'settings.webhooks.detail.never' | transloco }}</span>
               }
             </div>
 
             <div class="wd-info-item">
               <span class="wd-info-label">
                 <mat-icon>warning</mat-icon>
-                {{ 'webhooks.detail.consecutiveFailures' | transloco }}
+                {{ 'settings.webhooks.detail.consecutiveFailures' | transloco }}
               </span>
               <span class="wd-info-value"
                     [class.wd-info-value--failure]="sub.consecutiveFailureCount > 0">
@@ -726,7 +726,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <div class="wd-section wd-section--delivery">
           <div class="wd-section__header">
             <mat-icon class="wd-section__header-icon">history</mat-icon>
-            <h2 class="wd-section__header-title">{{ 'webhooks.detail.deliveryLogs' | transloco }}</h2>
+            <h2 class="wd-section__header-title">{{ 'settings.webhooks.detail.deliveryLogs' | transloco }}</h2>
           </div>
 
           @if (store.deliveryLogs(); as logs) {
@@ -735,18 +735,18 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                 <div class="wd-delivery-empty__icon-wrap">
                   <mat-icon>inbox</mat-icon>
                 </div>
-                <p class="wd-delivery-empty__text">{{ 'webhooks.detail.noDeliveryLogs' | transloco }}</p>
+                <p class="wd-delivery-empty__text">{{ 'settings.webhooks.detail.noDeliveryLogs' | transloco }}</p>
               </div>
             } @else {
               <table class="wd-delivery-table">
                 <thead>
                   <tr>
-                    <th>{{ 'webhooks.detail.timestamp' | transloco }}</th>
-                    <th>{{ 'webhooks.detail.event' | transloco }}</th>
-                    <th>{{ 'webhooks.detail.statusHeader' | transloco }}</th>
-                    <th>{{ 'webhooks.detail.httpCode' | transloco }}</th>
-                    <th>{{ 'webhooks.detail.duration' | transloco }}</th>
-                    <th>{{ 'webhooks.detail.actions' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.timestamp' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.event' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.statusHeader' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.httpCode' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.duration' | transloco }}</th>
+                    <th>{{ 'settings.webhooks.detail.actions' | transloco }}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -763,7 +763,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                               [class.wd-delivery-badge--success]="log.success"
                               [class.wd-delivery-badge--failed]="!log.success && log.attemptNumber >= 7"
                               [class.wd-delivery-badge--retrying]="!log.success && log.attemptNumber < 7">
-                          {{ log.success ? ('webhooks.detail.success' | transloco) : (log.attemptNumber < 7 ? ('webhooks.detail.retrying' | transloco) : ('webhooks.detail.failed' | transloco)) }}
+                          {{ log.success ? ('settings.webhooks.detail.success' | transloco) : (log.attemptNumber < 7 ? ('settings.webhooks.detail.retrying' | transloco) : ('settings.webhooks.detail.failed' | transloco)) }}
                         </span>
                       </td>
                       <td>{{ log.httpStatusCode ?? '-' }}</td>
@@ -771,7 +771,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                       <td>
                         @if (!log.success) {
                           <button mat-icon-button
-                                  [matTooltip]="'webhooks.detail.retryDelivery' | transloco"
+                                  [matTooltip]="'settings.webhooks.detail.retryDelivery' | transloco"
                                   (click)="onRetry(log, $event)">
                             <mat-icon>replay</mat-icon>
                           </button>
@@ -783,23 +783,23 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                         <td colspan="6">
                           <div class="wd-delivery-detail">
                             <div class="wd-delivery-detail__section">
-                              <span class="wd-delivery-detail__label">{{ 'webhooks.detail.requestPayload' | transloco }}</span>
+                              <span class="wd-delivery-detail__label">{{ 'settings.webhooks.detail.requestPayload' | transloco }}</span>
                               <pre class="wd-delivery-detail__value">{{ formatJson(log.requestPayload) }}</pre>
                             </div>
                             @if (log.responseBody) {
                               <div class="wd-delivery-detail__section">
-                                <span class="wd-delivery-detail__label">{{ 'webhooks.detail.responseBody' | transloco }}</span>
+                                <span class="wd-delivery-detail__label">{{ 'settings.webhooks.detail.responseBody' | transloco }}</span>
                                 <pre class="wd-delivery-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
                               </div>
                             }
                             @if (log.errorMessage) {
                               <div class="wd-delivery-detail__section">
-                                <span class="wd-delivery-detail__label">{{ 'webhooks.detail.errorMessage' | transloco }}</span>
+                                <span class="wd-delivery-detail__label">{{ 'settings.webhooks.detail.errorMessage' | transloco }}</span>
                                 <pre class="wd-delivery-detail__value">{{ log.errorMessage }}</pre>
                               </div>
                             }
                             <div class="wd-delivery-detail__section">
-                              <span class="wd-delivery-detail__label">{{ 'webhooks.detail.attemptNumber' | transloco }}</span>
+                              <span class="wd-delivery-detail__label">{{ 'settings.webhooks.detail.attemptNumber' | transloco }}</span>
                               <span class="wd-info-value">{{ log.attemptNumber }}</span>
                             </div>
                           </div>

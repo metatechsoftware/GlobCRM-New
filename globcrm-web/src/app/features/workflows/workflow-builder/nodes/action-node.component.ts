@@ -28,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>{{ actionIcon() }}</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || ('builder.action' | transloco) }}</span>
+            <span class="node-label">{{ node().label || ('workflows.builder.action' | transloco) }}</span>
             @if (actionTypeBadge()) {
               <span class="node-badge">{{ actionTypeBadge() }}</span>
             }
@@ -176,12 +176,12 @@ export class ActionNodeComponent {
   readonly actionTypeBadge = computed(() => {
     const actionType = this.node().config?.['actionType'];
     const keyMap: Record<string, string> = {
-      updateField: 'nodes.updateField',
-      sendNotification: 'nodes.sendNotification',
-      createActivity: 'nodes.createActivity',
-      sendEmail: 'nodes.sendEmail',
-      fireWebhook: 'nodes.fireWebhook',
-      enrollInSequence: 'nodes.enrollInSequence',
+      updateField: 'workflows.nodes.updateField',
+      sendNotification: 'workflows.nodes.sendNotification',
+      createActivity: 'workflows.nodes.createActivity',
+      sendEmail: 'workflows.nodes.sendEmail',
+      fireWebhook: 'workflows.nodes.fireWebhook',
+      enrollInSequence: 'workflows.nodes.enrollInSequence',
     };
     const key = actionType ? keyMap[actionType] : undefined;
     return key ? this.transloco.translate(key) : '';

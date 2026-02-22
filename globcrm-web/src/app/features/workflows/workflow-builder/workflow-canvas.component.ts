@@ -32,7 +32,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
       <div class="empty-canvas">
         <button mat-button class="add-trigger-btn" (click)="onAddTriggerClick()">
           <mat-icon>add</mat-icon>
-          <span>{{ 'builder.trigger' | transloco }}</span>
+          <span>{{ 'workflows.builder.trigger' | transloco }}</span>
         </button>
       </div>
     }
@@ -103,7 +103,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
                        fOutputConnectableSide="bottom"
                        class="connector connector-output-yes">
                   </div>
-                  <span class="branch-label yes-label">{{ 'builder.branchYes' | transloco }}</span>
+                  <span class="branch-label yes-label">{{ 'workflows.builder.branchYes' | transloco }}</span>
                 </div>
                 <div class="branch-output-wrapper">
                   <div fNodeOutput
@@ -111,7 +111,7 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
                        fOutputConnectableSide="bottom"
                        class="connector connector-output-no">
                   </div>
-                  <span class="branch-label no-label">{{ 'builder.branchNo' | transloco }}</span>
+                  <span class="branch-label no-label">{{ 'workflows.builder.branchNo' | transloco }}</span>
                 </div>
               </div>
             }
@@ -146,13 +146,13 @@ import { WorkflowNode, WorkflowConnection } from '../workflow.models';
     <!-- Zoom Controls -->
     @if (nodes().length > 0) {
       <div class="zoom-controls">
-        <button mat-icon-button (click)="zoomIn()" class="zoom-btn" [title]="'builder.zoomIn' | transloco">
+        <button mat-icon-button (click)="zoomIn()" class="zoom-btn" [title]="'workflows.builder.zoomIn' | transloco">
           <mat-icon>add</mat-icon>
         </button>
-        <button mat-icon-button (click)="zoomOut()" class="zoom-btn" [title]="'builder.zoomOut' | transloco">
+        <button mat-icon-button (click)="zoomOut()" class="zoom-btn" [title]="'workflows.builder.zoomOut' | transloco">
           <mat-icon>remove</mat-icon>
         </button>
-        <button mat-icon-button (click)="fitToView()" class="zoom-btn" [title]="'builder.fitToView' | transloco">
+        <button mat-icon-button (click)="fitToView()" class="zoom-btn" [title]="'workflows.builder.fitToView' | transloco">
           <mat-icon>fit_screen</mat-icon>
         </button>
       </div>
@@ -559,7 +559,7 @@ export class WorkflowCanvasComponent {
   }
 
   getDefaultLabel(type: string): string {
-    const key = `builder.${type}`;
+    const key = `workflows.builder.${type}`;
     const translated = this.transloco.translate(key);
     return translated !== key ? translated : type;
   }
@@ -580,7 +580,7 @@ export class WorkflowCanvasComponent {
     if (!config) return '';
     const triggerType = config['triggerType'];
     if (triggerType) {
-      const key = `nodes.${triggerType}`;
+      const key = `workflows.nodes.${triggerType}`;
       const translated = this.transloco.translate(key);
       return translated !== key ? translated : '';
     }
@@ -603,7 +603,7 @@ export class WorkflowCanvasComponent {
   private getActionBadge(node: WorkflowNode): string {
     const actionType = node.config?.['actionType'];
     if (actionType) {
-      const key = `nodes.${actionType}`;
+      const key = `workflows.nodes.${actionType}`;
       const translated = this.transloco.translate(key);
       return translated !== key ? translated : '';
     }
@@ -626,6 +626,6 @@ export class WorkflowCanvasComponent {
     if (!config?.['duration'] || !config?.['unit']) return '';
     const duration = config['duration'];
     const unit = config['unit'];
-    return `${this.transloco.translate('nodes.waitPrefix')} ${duration} ${unit}`;
+    return `${this.transloco.translate('workflows.nodes.waitPrefix')} ${duration} ${unit}`;
   }
 }

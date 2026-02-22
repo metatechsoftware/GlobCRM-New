@@ -44,20 +44,20 @@ import {
     TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ 'createDialog.title' | transloco }}</h2>
+    <h2 mat-dialog-title>{{ 'dashboard.createDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" style="display: flex; flex-direction: column; gap: 12px; min-width: 360px;">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'createDialog.name' | transloco }}</mat-label>
-          <input matInput formControlName="name" [placeholder]="'createDialog.namePlaceholder' | transloco" />
+          <mat-label>{{ 'dashboard.createDialog.name' | transloco }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'dashboard.createDialog.namePlaceholder' | transloco" />
         </mat-form-field>
-        <mat-checkbox formControlName="isTeamWide">{{ 'createDialog.teamWide' | transloco }}</mat-checkbox>
+        <mat-checkbox formControlName="isTeamWide">{{ 'dashboard.createDialog.teamWide' | transloco }}</mat-checkbox>
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'createDialog.cancel' | transloco }}</button>
+      <button mat-button mat-dialog-close>{{ 'dashboard.createDialog.cancel' | transloco }}</button>
       <button mat-flat-button color="primary" [disabled]="form.invalid" [mat-dialog-close]="form.value">
-        {{ 'createDialog.create' | transloco }}
+        {{ 'dashboard.createDialog.create' | transloco }}
       </button>
     </mat-dialog-actions>
   `,
@@ -96,9 +96,9 @@ export class DashboardComponent implements OnDestroy {
 
   readonly greeting = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return this.translocoService.translate('greeting.morning');
-    if (hour < 17) return this.translocoService.translate('greeting.afternoon');
-    return this.translocoService.translate('greeting.evening');
+    if (hour < 12) return this.translocoService.translate('dashboard.greeting.morning');
+    if (hour < 17) return this.translocoService.translate('dashboard.greeting.afternoon');
+    return this.translocoService.translate('dashboard.greeting.evening');
   });
 
   readonly timeIcon = computed(() => {
@@ -264,7 +264,7 @@ export class DashboardComponent implements OnDestroy {
   onDeleteDashboard(id: string): void {
     const dashboard = this.store.dashboards().find((d) => d.id === id);
     const name = dashboard?.name ?? 'this dashboard';
-    if (confirm(this.translocoService.translate('deleteConfirm', { name }))) {
+    if (confirm(this.translocoService.translate('dashboard.deleteConfirm', { name }))) {
       this.store.deleteDashboard(id);
     }
   }

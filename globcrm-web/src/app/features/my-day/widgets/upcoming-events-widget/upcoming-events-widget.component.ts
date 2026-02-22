@@ -21,7 +21,7 @@ interface EventGroup {
         <div class="widget-header-icon">
           <mat-icon>calendar_month</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.upcomingEvents.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.upcomingEvents.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -34,7 +34,7 @@ interface EventGroup {
         } @else if (eventGroups().length === 0) {
           <div class="events-widget__empty">
             <mat-icon class="events-widget__empty-icon">event_busy</mat-icon>
-            <span class="events-widget__empty-text">{{ 'widgets.upcomingEvents.empty' | transloco }}</span>
+            <span class="events-widget__empty-text">{{ 'myDay.widgets.upcomingEvents.empty' | transloco }}</span>
           </div>
         } @else {
           @for (group of eventGroups(); track group.label) {
@@ -289,9 +289,9 @@ export class UpcomingEventsWidgetComponent {
 
       let label: string;
       if (dateKey === todayStr) {
-        label = this.translocoService.translate('widgets.upcomingEvents.today');
+        label = this.translocoService.translate('myDay.widgets.upcomingEvents.today');
       } else if (dateKey === tomorrowStr) {
-        label = this.translocoService.translate('widgets.upcomingEvents.tomorrow');
+        label = this.translocoService.translate('myDay.widgets.upcomingEvents.tomorrow');
       } else {
         label = new Intl.DateTimeFormat('en-US', {
           weekday: 'short',

@@ -115,7 +115,7 @@ export class DealKanbanComponent implements OnInit {
         }
       },
       error: () => {
-        this.snackBar.open(this.transloco.translate('messages.pipelineLoadFailed'), 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('deals.messages.pipelineLoadFailed'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -135,7 +135,7 @@ export class DealKanbanComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open(this.transloco.translate('messages.kanbanLoadFailed'), 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('deals.messages.kanbanLoadFailed'), 'Dismiss', {
           duration: 3000,
         });
       },
@@ -184,7 +184,7 @@ export class DealKanbanComponent implements OnInit {
     // Forward-only enforcement
     if (targetStage.sortOrder <= sourceStage.sortOrder) {
       this.snackBar.open(
-        this.transloco.translate('kanban.forwardOnly'),
+        this.transloco.translate('deals.kanban.forwardOnly'),
         'Dismiss',
         { duration: 4000 },
       );
@@ -209,7 +209,7 @@ export class DealKanbanComponent implements OnInit {
           event.currentIndex,
           event.previousIndex,
         );
-        this.snackBar.open(this.transloco.translate('messages.stageUpdateFailed'), 'Dismiss', {
+        this.snackBar.open(this.transloco.translate('deals.messages.stageUpdateFailed'), 'Dismiss', {
           duration: 3000,
         });
       },

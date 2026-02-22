@@ -23,6 +23,8 @@ import {
     <div
       class="ic-card"
       [class.ic-card--connected]="connection()?.status === 'Connected'"
+      [style.animation-delay]="animationDelay()"
+      [style.--brand-color]="catalog().brandColor"
     >
       <div class="ic-card__header">
         <div class="ic-card__icon-wrap">
@@ -37,7 +39,10 @@ import {
             <span class="ic-badge ic-badge--popular">{{ 'settings.integrations.popular' | transloco }}</span>
           }
           @if (connection()?.status === 'Connected') {
-            <span class="ic-badge ic-badge--connected">{{ 'settings.integrations.status.connected' | transloco }}</span>
+            <span class="ic-badge ic-badge--connected">
+              <span class="ic-badge__dot"></span>
+              {{ 'settings.integrations.status.connected' | transloco }}
+            </span>
           } @else {
             <span class="ic-badge ic-badge--disconnected">{{ 'settings.integrations.status.notConnected' | transloco }}</span>
           }
@@ -92,6 +97,29 @@ import {
   `,
   styles: [
     `
+      @keyframes fadeSlideUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes pulse {
+        0% {
+          box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.45);
+        }
+        70% {
+          box-shadow: 0 0 0 6px rgba(52, 211, 153, 0);
+        }
+        100% {
+          box-shadow: 0 0 0 0 rgba(52, 211, 153, 0);
+        }
+      }
+
       .ic-card {
         display: flex;
         flex-direction: column;
@@ -101,20 +129,23 @@ import {
         background: var(--color-surface);
         min-height: 180px;
         cursor: pointer;
+        opacity: 0;
+        animation: fadeSlideUp 0.4s var(--ease-out, cubic-bezier(0.4, 0, 0.2, 1)) forwards;
         transition:
-          border-color 0.25s var(--ease-default),
-          box-shadow 0.25s var(--ease-default),
-          transform 0.25s var(--ease-default);
+          border-color 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+          box-shadow 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+          transform 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1));
       }
 
       .ic-card:hover {
         border-color: var(--color-border-strong);
-        box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+        box-shadow: var(--shadow-md, 0 4px 16px rgba(0, 0, 0, 0.08));
         transform: translateY(-2px);
       }
 
       .ic-card--connected {
         border-left: 3px solid var(--color-success);
+        box-shadow: inset 3px 0 8px -2px rgba(52, 211, 153, 0.15);
       }
 
       .ic-card--connected:hover {
@@ -129,14 +160,27 @@ import {
       }
 
       .ic-card__icon-wrap {
-        width: 40px;
-        height: 40px;
+        width: 44px;
+        height: 44px;
         flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md, 10px);
+        background: color-mix(in srgb, var(--brand-color, #F97316) 10%, transparent);
+        transition:
+          box-shadow 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1)),
+          transform 0.25s var(--ease-default, cubic-bezier(0.4, 0, 0.2, 1));
+      }
+
+      .ic-card:hover .ic-card__icon-wrap {
+        box-shadow: 0 0 16px color-mix(in srgb, var(--brand-color, #F97316) 20%, transparent);
+        transform: scale(1.05);
       }
 
       .ic-card__icon {
-        width: 40px;
-        height: 40px;
+        width: 28px;
+        height: 28px;
         object-fit: contain;
       }
 
@@ -148,6 +192,9 @@ import {
       }
 
       .ic-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
         font-size: 10px;
         font-weight: 700;
         text-transform: uppercase;
@@ -171,6 +218,15 @@ import {
       .ic-badge--disconnected {
         background: var(--color-surface-hover);
         color: var(--color-text-muted);
+      }
+
+      .ic-badge__dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--color-success);
+        flex-shrink: 0;
+        animation: pulse 2s infinite;
       }
 
       .ic-card__body {
@@ -245,9 +301,24 @@ import {
         color: var(--color-primary) !important;
       }
 
+      /* Dark mode: bump brand tint for better icon contrast */
+      :host-context([data-theme="dark"]) .ic-card__icon-wrap {
+        background: color-mix(in srgb, var(--brand-color, #F97316) 15%, transparent);
+      }
+
       @media (prefers-reduced-motion: reduce) {
         .ic-card {
+          animation: none;
+          opacity: 1;
           transition: none;
+        }
+
+        .ic-card__icon-wrap {
+          transition: none;
+        }
+
+        .ic-badge__dot {
+          animation: none;
         }
       }
     `,
@@ -257,6 +328,7 @@ export class IntegrationCardComponent {
   readonly catalog = input.required<IntegrationCatalogItem>();
   readonly connection = input<IntegrationConnection | null>(null);
   readonly isAdmin = input<boolean>(false);
+  readonly animationDelay = input<string>('0ms');
 
   readonly connect = output<void>();
   readonly disconnect = output<void>();

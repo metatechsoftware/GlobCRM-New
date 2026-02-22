@@ -124,17 +124,17 @@ const METRIC_GROUPS = [
     }
   `,
   template: `
-    <h2 mat-dialog-title>{{ isEdit ? ('targets.editTarget' | transloco) : ('targets.createTarget' | transloco) }}</h2>
+    <h2 mat-dialog-title>{{ isEdit ? ('dashboard.targets.editTarget' | transloco) : ('dashboard.targets.createTarget' | transloco) }}</h2>
     <mat-dialog-content>
       <form [formGroup]="form" class="target-form">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'targets.targetName' | transloco }}</mat-label>
-          <input matInput formControlName="name" [placeholder]="'targets.targetNamePlaceholder' | transloco" />
+          <mat-label>{{ 'dashboard.targets.targetName' | transloco }}</mat-label>
+          <input matInput formControlName="name" [placeholder]="'dashboard.targets.targetNamePlaceholder' | transloco" />
         </mat-form-field>
 
         @if (!isEdit) {
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'targets.metric' | transloco }}</mat-label>
+            <mat-label>{{ 'dashboard.targets.metric' | transloco }}</mat-label>
             <mat-select formControlName="metricType">
               @for (group of metricGroups; track group.label) {
                 <mat-optgroup [label]="group.label">
@@ -147,7 +147,7 @@ const METRIC_GROUPS = [
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'targets.period' | transloco }}</mat-label>
+            <mat-label>{{ 'dashboard.targets.period' | transloco }}</mat-label>
             <mat-select formControlName="period">
               @for (p of periodOptions; track p.value) {
                 <mat-option [value]="p.value">{{ p.label }}</mat-option>
@@ -157,20 +157,20 @@ const METRIC_GROUPS = [
         }
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'targets.targetValue' | transloco }}</mat-label>
+          <mat-label>{{ 'dashboard.targets.targetValue' | transloco }}</mat-label>
           <input matInput type="number" formControlName="targetValue" min="1" />
         </mat-form-field>
 
         <div class="target-form__row">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'targets.startDate' | transloco }}</mat-label>
+            <mat-label>{{ 'dashboard.targets.startDate' | transloco }}</mat-label>
             <input matInput [matDatepicker]="startPicker" formControlName="startDate" />
             <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
             <mat-datepicker #startPicker />
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'targets.endDate' | transloco }}</mat-label>
+            <mat-label>{{ 'dashboard.targets.endDate' | transloco }}</mat-label>
             <input matInput [matDatepicker]="endPicker" formControlName="endDate" />
             <mat-datepicker-toggle matIconSuffix [for]="endPicker" />
             <mat-datepicker #endPicker />
@@ -178,19 +178,19 @@ const METRIC_GROUPS = [
         </div>
 
         @if (!isEdit) {
-          <mat-checkbox formControlName="isTeamWide">{{ 'targets.teamWide' | transloco }}</mat-checkbox>
+          <mat-checkbox formControlName="isTeamWide">{{ 'dashboard.targets.teamWide' | transloco }}</mat-checkbox>
         }
       </form>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'targets.cancel' | transloco }}</button>
+      <button mat-button mat-dialog-close>{{ 'dashboard.targets.cancel' | transloco }}</button>
       <button
         mat-flat-button
         color="primary"
         [disabled]="form.invalid"
         (click)="onSave()"
       >
-        {{ isEdit ? ('targets.update' | transloco) : ('targets.create' | transloco) }}
+        {{ isEdit ? ('dashboard.targets.update' | transloco) : ('dashboard.targets.create' | transloco) }}
       </button>
     </mat-dialog-actions>
   `,

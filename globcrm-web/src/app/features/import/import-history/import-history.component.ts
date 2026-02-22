@@ -30,21 +30,21 @@ import { TranslocoPipe } from '@jsverse/transloco';
           <div class="import-history__header-left">
             <a routerLink="/settings" class="import-history__back">
               <mat-icon>arrow_back</mat-icon>
-              <span>{{ 'history.backToSettings' | transloco }}</span>
+              <span>{{ 'import.history.backToSettings' | transloco }}</span>
             </a>
             <div class="import-history__heading">
               <div class="import-history__icon-wrap">
                 <mat-icon>history</mat-icon>
               </div>
               <div>
-                <h1 class="import-history__title">{{ 'history.title' | transloco }}</h1>
-                <p class="import-history__subtitle">{{ 'history.subtitle' | transloco }}</p>
+                <h1 class="import-history__title">{{ 'import.history.title' | transloco }}</h1>
+                <p class="import-history__subtitle">{{ 'import.history.subtitle' | transloco }}</p>
               </div>
             </div>
           </div>
           <a mat-flat-button color="primary" routerLink="/import" class="import-history__new-btn">
             <mat-icon>upload_file</mat-icon>
-            {{ 'history.newImport' | transloco }}
+            {{ 'import.history.newImport' | transloco }}
           </a>
         </div>
       </div>
@@ -53,7 +53,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
       @if (loading()) {
         <div class="import-history__loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <span>{{ 'history.loading' | transloco }}</span>
+          <span>{{ 'import.history.loading' | transloco }}</span>
         </div>
       }
 
@@ -63,11 +63,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
           <div class="import-history__empty-icon-wrapper">
             <mat-icon class="import-history__empty-icon">cloud_upload</mat-icon>
           </div>
-          <h3>{{ 'history.noImports' | transloco }}</h3>
-          <p>{{ 'history.noImportsDesc' | transloco }}</p>
+          <h3>{{ 'import.history.noImports' | transloco }}</h3>
+          <p>{{ 'import.history.noImportsDesc' | transloco }}</p>
           <a mat-flat-button color="primary" routerLink="/import">
             <mat-icon>upload_file</mat-icon>
-            {{ 'wizard.title' | transloco }}
+            {{ 'import.wizard.title' | transloco }}
           </a>
         </div>
       }
@@ -78,14 +78,14 @@ import { TranslocoPipe } from '@jsverse/transloco';
           <table class="import-history__table">
             <thead>
               <tr>
-                <th>{{ 'history.fileName' | transloco }}</th>
-                <th>{{ 'history.entityType' | transloco }}</th>
-                <th>{{ 'history.status' | transloco }}</th>
-                <th class="text-right">{{ 'history.rows' | transloco }}</th>
-                <th class="text-right">{{ 'history.success' | transloco }}</th>
-                <th class="text-right">{{ 'history.errors' | transloco }}</th>
-                <th>{{ 'history.date' | transloco }}</th>
-                <th>{{ 'history.actions' | transloco }}</th>
+                <th>{{ 'import.history.fileName' | transloco }}</th>
+                <th>{{ 'import.history.entityType' | transloco }}</th>
+                <th>{{ 'import.history.status' | transloco }}</th>
+                <th class="text-right">{{ 'import.history.rows' | transloco }}</th>
+                <th class="text-right">{{ 'import.history.success' | transloco }}</th>
+                <th class="text-right">{{ 'import.history.errors' | transloco }}</th>
+                <th>{{ 'import.history.date' | transloco }}</th>
+                <th>{{ 'import.history.actions' | transloco }}</th>
               </tr>
             </thead>
             <tbody>
@@ -121,7 +121,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
                       <button mat-button color="warn" (click)="toggleErrors(job.id)"
                               class="import-history__details-btn">
                         <mat-icon>{{ expandedJobId() === job.id ? 'expand_less' : 'expand_more' }}</mat-icon>
-                        {{ expandedJobId() === job.id ? ('history.hideDetails' | transloco) : ('history.viewDetails' | transloco) }}
+                        {{ expandedJobId() === job.id ? ('import.history.hideDetails' | transloco) : ('import.history.viewDetails' | transloco) }}
                       </button>
                     }
                   </td>
@@ -134,15 +134,15 @@ import { TranslocoPipe } from '@jsverse/transloco';
                       <div class="import-history__errors">
                         <h4 class="import-history__errors-title">
                           <mat-icon>error_outline</mat-icon>
-                          {{ 'history.importErrors' | transloco }} ({{ job.errors.length }})
+                          {{ 'import.history.importErrors' | transloco }} ({{ job.errors.length }})
                         </h4>
                         <table class="import-history__errors-table">
                           <thead>
                             <tr>
-                              <th>{{ 'history.row' | transloco }}</th>
-                              <th>{{ 'history.field' | transloco }}</th>
-                              <th>{{ 'history.error' | transloco }}</th>
-                              <th>{{ 'history.value' | transloco }}</th>
+                              <th>{{ 'import.history.row' | transloco }}</th>
+                              <th>{{ 'import.history.field' | transloco }}</th>
+                              <th>{{ 'import.history.error' | transloco }}</th>
+                              <th>{{ 'import.history.value' | transloco }}</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -169,7 +169,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
         @if (hasMore()) {
           <div class="import-history__load-more">
             <button mat-stroked-button (click)="loadMore()">
-              {{ 'history.loadMore' | transloco }}
+              {{ 'import.history.loadMore' | transloco }}
             </button>
           </div>
         }

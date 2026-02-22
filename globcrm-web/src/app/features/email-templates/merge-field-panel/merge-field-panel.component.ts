@@ -99,7 +99,7 @@ export class MergeFieldPanelComponent {
     this.copiedField.set(field.key);
     setTimeout(() => this.copiedField.set(null), 1500);
     this.snackBar.open(
-      this.transloco.translate('email-templates.messages.copiedTag', { tag }),
+      this.transloco.translate('emailTemplates.messages.copiedTag', { tag }),
       this.transloco.translate('common.close'),
       { duration: 3000 },
     );

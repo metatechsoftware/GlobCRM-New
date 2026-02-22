@@ -3,6 +3,7 @@
   "list": {
     "title": "Ekip Akisi",
     "subtitle": "Ekibinizden aktivite ve guncellemeler",
+    "overline": "EKIP AKISI",
     "emptyTitle": "Henuz aktivite yok",
     "emptyDescription": "Bir guncelleme paylasin, bir basariyi kutlayin veya sohbeti baslatmak icin bir meslektasinizi etiketleyin.",
     "activity": "Aktivite",
@@ -13,7 +14,8 @@
     "comment": "{{ count }} yorum",
     "comments": "{{ count }} yorum",
     "loadMore": "Daha fazla yukle",
-    "loadingMore": "Yukleniyor..."
+    "loadingMore": "Yukleniyor...",
+    "systemAuthor": "Sistem"
   },
   "post": {
     "placeholder": "Ekibinizle bir seyler paylasin...",

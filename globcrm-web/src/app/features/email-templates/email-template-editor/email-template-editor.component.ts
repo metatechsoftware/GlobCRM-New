@@ -86,7 +86,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   readonly showMergePanel = signal(false);
 
   readonly isEditMode = computed(() => !!this.id());
-  readonly pageTitle = computed(() => (this.isEditMode() ? this.transloco.translate('email-templates.editor.editTitle') : this.transloco.translate('email-templates.editor.newTitle')));
+  readonly pageTitle = computed(() => (this.isEditMode() ? this.transloco.translate('emailTemplates.editor.editTitle') : this.transloco.translate('emailTemplates.editor.newTitle')));
 
   // ─── Unlayer Editor Options ────────────────────────────────────────────
 
@@ -186,7 +186,7 @@ export class EmailTemplateEditorComponent implements OnInit {
 
   save(): void {
     if (!this.templateName().trim()) {
-      this.snackBar.open(this.transloco.translate('email-templates.messages.nameRequired'), this.transloco.translate('common.close'), {
+      this.snackBar.open(this.transloco.translate('emailTemplates.messages.nameRequired'), this.transloco.translate('common.close'), {
         duration: 3000,
       });
       return;
@@ -209,7 +209,7 @@ export class EmailTemplateEditorComponent implements OnInit {
         // Update existing
         this.store.updateTemplate(templateId, request, () => {
           this.saving.set(false);
-          this.snackBar.open(this.transloco.translate('email-templates.messages.saved'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('emailTemplates.messages.saved'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
         });
@@ -217,7 +217,7 @@ export class EmailTemplateEditorComponent implements OnInit {
         // Create new
         this.store.createTemplate(request, () => {
           this.saving.set(false);
-          this.snackBar.open(this.transloco.translate('email-templates.messages.created'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('emailTemplates.messages.created'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
           this.router.navigate(['/email-templates']);
@@ -229,7 +229,7 @@ export class EmailTemplateEditorComponent implements OnInit {
   openPreview(): void {
     const templateId = this.id();
     if (!templateId) {
-      this.snackBar.open(this.transloco.translate('email-templates.messages.saveBeforePreview'), this.transloco.translate('common.close'), {
+      this.snackBar.open(this.transloco.translate('emailTemplates.messages.saveBeforePreview'), this.transloco.translate('common.close'), {
         duration: 3000,
       });
       return;

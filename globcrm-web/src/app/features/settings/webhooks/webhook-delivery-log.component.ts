@@ -420,7 +420,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       <div class="dl-header">
         <a class="dl-header__breadcrumb" routerLink="/settings/webhooks">
           <mat-icon>arrow_back</mat-icon>
-          {{ 'webhooks.deliveryLog.breadcrumb' | transloco }}
+          {{ 'settings.webhooks.deliveryLog.breadcrumb' | transloco }}
         </a>
 
         <div class="dl-header__top">
@@ -428,8 +428,8 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             <mat-icon>history</mat-icon>
           </div>
           <div class="dl-header__text">
-            <h1 class="dl-header__title">{{ 'webhooks.deliveryLog.pageTitle' | transloco }}</h1>
-            <p class="dl-header__subtitle">{{ 'webhooks.deliveryLog.pageSubtitle' | transloco }}</p>
+            <h1 class="dl-header__title">{{ 'settings.webhooks.deliveryLog.pageTitle' | transloco }}</h1>
+            <p class="dl-header__subtitle">{{ 'settings.webhooks.deliveryLog.pageSubtitle' | transloco }}</p>
           </div>
         </div>
       </div>
@@ -439,11 +439,11 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <!-- Filters -->
         <div class="dl-filters">
           <mat-icon class="dl-filters__icon">filter_list</mat-icon>
-          <span class="dl-filters__label">{{ 'webhooks.deliveryLog.filterLabel' | transloco }}</span>
+          <span class="dl-filters__label">{{ 'settings.webhooks.deliveryLog.filterLabel' | transloco }}</span>
           <mat-form-field appearance="outline" style="width: 300px">
-            <mat-label>{{ 'webhooks.deliveryLog.filterBySubscription' | transloco }}</mat-label>
+            <mat-label>{{ 'settings.webhooks.deliveryLog.filterBySubscription' | transloco }}</mat-label>
             <mat-select [value]="selectedSubscriptionId()" (selectionChange)="onFilterChange($event.value)">
-              <mat-option value="">{{ 'webhooks.deliveryLog.allSubscriptions' | transloco }}</mat-option>
+              <mat-option value="">{{ 'settings.webhooks.deliveryLog.allSubscriptions' | transloco }}</mat-option>
               @for (sub of subscriptions(); track sub.id) {
                 <mat-option [value]="sub.id">{{ sub.name }}</mat-option>
               }
@@ -462,20 +462,20 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
               <div class="dl-empty__icon-wrap">
                 <mat-icon>send</mat-icon>
               </div>
-              <h3 class="dl-empty__title">{{ 'webhooks.deliveryLog.noLogsTitle' | transloco }}</h3>
-              <p class="dl-empty__text">{{ 'webhooks.deliveryLog.noLogsDesc' | transloco }}</p>
+              <h3 class="dl-empty__title">{{ 'settings.webhooks.deliveryLog.noLogsTitle' | transloco }}</h3>
+              <p class="dl-empty__text">{{ 'settings.webhooks.deliveryLog.noLogsDesc' | transloco }}</p>
             </div>
           } @else {
             <table class="dl-table">
               <thead>
                 <tr>
-                  <th>{{ 'webhooks.deliveryLog.timestamp' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.subscription' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.event' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.status' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.httpCode' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.duration' | transloco }}</th>
-                  <th>{{ 'webhooks.deliveryLog.actions' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.timestamp' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.subscription' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.event' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.status' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.httpCode' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.duration' | transloco }}</th>
+                  <th>{{ 'settings.webhooks.deliveryLog.actions' | transloco }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -499,7 +499,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                             [class.dl-badge--success]="log.success"
                             [class.dl-badge--failed]="!log.success && log.attemptNumber >= 7"
                             [class.dl-badge--retrying]="!log.success && log.attemptNumber < 7">
-                        {{ log.success ? ('webhooks.deliveryLog.success' | transloco) : (log.attemptNumber < 7 ? ('webhooks.deliveryLog.retrying' | transloco) : ('webhooks.deliveryLog.failed' | transloco)) }}
+                        {{ log.success ? ('settings.webhooks.deliveryLog.success' | transloco) : (log.attemptNumber < 7 ? ('settings.webhooks.deliveryLog.retrying' | transloco) : ('settings.webhooks.deliveryLog.failed' | transloco)) }}
                       </span>
                     </td>
                     <td>{{ log.httpStatusCode ?? '-' }}</td>
@@ -507,7 +507,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                     <td>
                       @if (!log.success) {
                         <button mat-icon-button
-                                [matTooltip]="'webhooks.deliveryLog.retryDelivery' | transloco"
+                                [matTooltip]="'settings.webhooks.deliveryLog.retryDelivery' | transloco"
                                 (click)="onRetry(log, $event)">
                           <mat-icon>replay</mat-icon>
                         </button>
@@ -519,23 +519,23 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                       <td colspan="7">
                         <div class="dl-detail">
                           <div class="dl-detail__section">
-                            <span class="dl-detail__label">{{ 'webhooks.deliveryLog.requestPayload' | transloco }}</span>
+                            <span class="dl-detail__label">{{ 'settings.webhooks.deliveryLog.requestPayload' | transloco }}</span>
                             <pre class="dl-detail__value">{{ formatJson(log.requestPayload) }}</pre>
                           </div>
                           @if (log.responseBody) {
                             <div class="dl-detail__section">
-                              <span class="dl-detail__label">{{ 'webhooks.deliveryLog.responseBody' | transloco }}</span>
+                              <span class="dl-detail__label">{{ 'settings.webhooks.deliveryLog.responseBody' | transloco }}</span>
                               <pre class="dl-detail__value">{{ truncate(log.responseBody, 1024) }}</pre>
                             </div>
                           }
                           @if (log.errorMessage) {
                             <div class="dl-detail__section">
-                              <span class="dl-detail__label">{{ 'webhooks.deliveryLog.errorMessage' | transloco }}</span>
+                              <span class="dl-detail__label">{{ 'settings.webhooks.deliveryLog.errorMessage' | transloco }}</span>
                               <pre class="dl-detail__value">{{ log.errorMessage }}</pre>
                             </div>
                           }
                           <div class="dl-detail__section">
-                            <span class="dl-detail__label">{{ 'webhooks.deliveryLog.attemptNumber' | transloco }}</span>
+                            <span class="dl-detail__label">{{ 'settings.webhooks.deliveryLog.attemptNumber' | transloco }}</span>
                             <span class="dl-detail__attempt">{{ log.attemptNumber }}</span>
                           </div>
                         </div>

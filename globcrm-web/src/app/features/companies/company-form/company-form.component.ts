@@ -147,7 +147,7 @@ export class CompanyFormComponent implements OnInit {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open(this.transloco.translate('messages.companyLoadFailed'), 'Close', {
+        this.snackBar.open(this.transloco.translate('companies.messages.companyLoadFailed'), 'Close', {
           duration: 5000,
         });
       },
@@ -225,14 +225,14 @@ export class CompanyFormComponent implements OnInit {
       this.companyService.update(this.companyId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.companyUpdated'), 'Close', {
+          this.snackBar.open(this.transloco.translate('companies.messages.companyUpdated'), 'Close', {
             duration: 3000,
           });
           this.router.navigate(['/companies', this.companyId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.companyUpdateFailed'), 'Close', {
+          this.snackBar.open(this.transloco.translate('companies.messages.companyUpdateFailed'), 'Close', {
             duration: 5000,
           });
         },
@@ -260,7 +260,7 @@ export class CompanyFormComponent implements OnInit {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open(this.transloco.translate('messages.companyCreated'), 'Close', {
+            this.snackBar.open(this.transloco.translate('companies.messages.companyCreated'), 'Close', {
               duration: 3000,
             });
             this.router.navigate(['/companies', created.id]);
@@ -271,7 +271,7 @@ export class CompanyFormComponent implements OnInit {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open(this.transloco.translate('messages.companyCreateFailed'), 'Close', {
+            this.snackBar.open(this.transloco.translate('companies.messages.companyCreateFailed'), 'Close', {
               duration: 5000,
             });
           }

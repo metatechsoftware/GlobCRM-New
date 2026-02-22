@@ -58,22 +58,22 @@ export class ReportGalleryComponent implements OnInit {
   readonly searchFilter = signal<string>('');
 
   readonly entityTypes = computed(() => [
-    { value: '', label: this.transloco.translate('gallery.allEntityTypes') },
-    { value: 'Contact', label: this.transloco.translate('entities.Contact') },
-    { value: 'Company', label: this.transloco.translate('entities.Company') },
-    { value: 'Deal', label: this.transloco.translate('entities.Deal') },
-    { value: 'Lead', label: this.transloco.translate('entities.Lead') },
-    { value: 'Activity', label: this.transloco.translate('entities.Activity') },
-    { value: 'Quote', label: this.transloco.translate('entities.Quote') },
-    { value: 'Request', label: this.transloco.translate('entities.Request') },
-    { value: 'Product', label: this.transloco.translate('entities.Product') },
+    { value: '', label: this.transloco.translate('reports.gallery.allEntityTypes') },
+    { value: 'Contact', label: this.transloco.translate('reports.entities.Contact') },
+    { value: 'Company', label: this.transloco.translate('reports.entities.Company') },
+    { value: 'Deal', label: this.transloco.translate('reports.entities.Deal') },
+    { value: 'Lead', label: this.transloco.translate('reports.entities.Lead') },
+    { value: 'Activity', label: this.transloco.translate('reports.entities.Activity') },
+    { value: 'Quote', label: this.transloco.translate('reports.entities.Quote') },
+    { value: 'Request', label: this.transloco.translate('reports.entities.Request') },
+    { value: 'Product', label: this.transloco.translate('reports.entities.Product') },
   ]);
 
   /** Computed list of category options from loaded categories */
   readonly categoryOptions = computed(() => {
     const cats = this.store.categories();
     return [
-      { value: '', label: this.transloco.translate('gallery.allCategories') },
+      { value: '', label: this.transloco.translate('reports.gallery.allCategories') },
       ...cats.map((c) => ({ value: c.id, label: c.name })),
     ];
   });

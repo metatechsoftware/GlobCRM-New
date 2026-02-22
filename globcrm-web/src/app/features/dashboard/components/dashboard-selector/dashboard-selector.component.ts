@@ -79,13 +79,13 @@ import { AuthStore } from '../../../../core/auth/auth.store';
   `,
   template: `
     <mat-form-field appearance="outline" class="dashboard-selector__select">
-      <mat-label>{{ 'selector.dashboard' | transloco }}</mat-label>
+      <mat-label>{{ 'dashboard.selector.dashboard' | transloco }}</mat-label>
       <mat-select
         [value]="activeDashboardId()"
         (selectionChange)="dashboardSelected.emit($event.value)"
       >
         @if (personalDashboards().length > 0) {
-          <mat-optgroup [label]="'selector.myDashboards' | transloco">
+          <mat-optgroup [label]="'dashboard.selector.myDashboards' | transloco">
             @for (d of personalDashboards(); track d.id) {
               <mat-option [value]="d.id">
                 <div class="dashboard-selector__option">
@@ -94,7 +94,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
                     mat-icon-button
                     class="dashboard-selector__delete-btn"
                     (click)="onDelete($event, d.id)"
-                    [title]="'selector.deleteDashboard' | transloco"
+                    [title]="'dashboard.selector.deleteDashboard' | transloco"
                   >
                     <mat-icon>delete_outline</mat-icon>
                   </button>
@@ -104,7 +104,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
           </mat-optgroup>
         }
         @if (teamDashboards().length > 0) {
-          <mat-optgroup [label]="'selector.teamDashboards' | transloco">
+          <mat-optgroup [label]="'dashboard.selector.teamDashboards' | transloco">
             @for (d of teamDashboards(); track d.id) {
               <mat-option [value]="d.id">
                 <div class="dashboard-selector__option">
@@ -114,7 +114,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
                       mat-icon-button
                       class="dashboard-selector__delete-btn"
                       (click)="onDelete($event, d.id)"
-                      [title]="'selector.deleteDashboard' | transloco"
+                      [title]="'dashboard.selector.deleteDashboard' | transloco"
                     >
                       <mat-icon>delete_outline</mat-icon>
                     </button>
@@ -130,7 +130,7 @@ import { AuthStore } from '../../../../core/auth/auth.store';
       mat-icon-button
       class="dashboard-selector__add-btn"
       (click)="createDashboard.emit()"
-      [title]="'selector.createDashboard' | transloco"
+      [title]="'dashboard.selector.createDashboard' | transloco"
     >
       <mat-icon>add</mat-icon>
     </button>

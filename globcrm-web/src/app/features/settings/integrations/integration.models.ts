@@ -6,6 +6,16 @@ export type IntegrationCategory =
   | 'calendar'
   | 'developer-tools';
 
+export const CATEGORY_ICONS: Record<IntegrationCategory | 'all', string> = {
+  all: 'apps',
+  communication: 'chat_bubble',
+  accounting: 'calculate',
+  marketing: 'campaign',
+  storage: 'cloud',
+  calendar: 'calendar_month',
+  'developer-tools': 'code',
+};
+
 export interface CredentialFieldDef {
   key: string;
   label: string;

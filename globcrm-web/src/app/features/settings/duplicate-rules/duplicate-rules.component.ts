@@ -524,7 +524,7 @@ interface EntityRuleConfig {
       <!-- Breadcrumb -->
       <a routerLink="/settings" class="dr-breadcrumb">
         <mat-icon>arrow_back</mat-icon>
-        <span>{{ 'duplicateRules.breadcrumb' | transloco }}</span>
+        <span>{{ 'settings.duplicateRules.breadcrumb' | transloco }}</span>
       </a>
 
       <!-- Header -->
@@ -533,8 +533,8 @@ interface EntityRuleConfig {
           <mat-icon>compare_arrows</mat-icon>
         </div>
         <div class="dr-header__text">
-          <h1 class="dr-header__title">{{ 'duplicateRules.pageTitle' | transloco }}</h1>
-          <p class="dr-header__subtitle">{{ 'duplicateRules.pageSubtitle' | transloco }}</p>
+          <h1 class="dr-header__title">{{ 'settings.duplicateRules.pageTitle' | transloco }}</h1>
+          <p class="dr-header__subtitle">{{ 'settings.duplicateRules.pageSubtitle' | transloco }}</p>
         </div>
       </div>
 
@@ -554,7 +554,7 @@ interface EntityRuleConfig {
                 <mat-icon>{{ config.entityType === 'Contact' ? 'person' : 'business' }}</mat-icon>
               </div>
               <h2 class="dr-section__title">
-                {{ config.entityType === 'Contact' ? ('duplicateRules.contactMatchingRules' | transloco) : ('duplicateRules.companyMatchingRules' | transloco) }}
+                {{ config.entityType === 'Contact' ? ('settings.duplicateRules.contactMatchingRules' | transloco) : ('settings.duplicateRules.companyMatchingRules' | transloco) }}
               </h2>
             </div>
 
@@ -566,9 +566,9 @@ interface EntityRuleConfig {
                   (change)="config.autoDetectionEnabled = $event.checked">
                 </mat-slide-toggle>
                 <div class="dr-toggle__content">
-                  <div class="dr-rule__label">{{ 'duplicateRules.enableAutoDetection' | transloco }}</div>
+                  <div class="dr-rule__label">{{ 'settings.duplicateRules.enableAutoDetection' | transloco }}</div>
                   <p class="dr-rule__helper">
-                    {{ 'duplicateRules.autoDetectionHint' | transloco }}
+                    {{ 'settings.duplicateRules.autoDetectionHint' | transloco }}
                   </p>
                 </div>
               </div>
@@ -578,13 +578,13 @@ interface EntityRuleConfig {
             <div class="dr-rule">
               <div class="dr-threshold">
                 <div class="dr-threshold__header">
-                  <span class="dr-rule__label">{{ 'duplicateRules.similarityThreshold' | transloco }}</span>
+                  <span class="dr-rule__label">{{ 'settings.duplicateRules.similarityThreshold' | transloco }}</span>
                   <span class="dr-threshold__value">{{ config.similarityThreshold }}%</span>
                   <span class="dr-threshold__badge"
                         [class.dr-threshold__badge--strict]="config.similarityThreshold > 85"
                         [class.dr-threshold__badge--moderate]="config.similarityThreshold >= 70 && config.similarityThreshold <= 85"
                         [class.dr-threshold__badge--permissive]="config.similarityThreshold < 70">
-                    {{ config.similarityThreshold > 85 ? ('duplicateRules.strict' | transloco) : (config.similarityThreshold >= 70 ? ('duplicateRules.moderate' | transloco) : ('duplicateRules.permissive' | transloco)) }}
+                    {{ config.similarityThreshold > 85 ? ('settings.duplicateRules.strict' | transloco) : (config.similarityThreshold >= 70 ? ('settings.duplicateRules.moderate' | transloco) : ('settings.duplicateRules.permissive' | transloco)) }}
                   </span>
                 </div>
                 <div class="dr-threshold__slider-wrap">
@@ -602,16 +602,16 @@ interface EntityRuleConfig {
                   </mat-slider>
                 </div>
                 <p class="dr-rule__helper">
-                  {{ 'duplicateRules.thresholdHint' | transloco }}
+                  {{ 'settings.duplicateRules.thresholdHint' | transloco }}
                 </p>
               </div>
             </div>
 
             <!-- Matching fields -->
             <div class="dr-rule">
-              <div class="dr-rule__label">{{ 'duplicateRules.matchingFieldsLabel' | transloco }}</div>
+              <div class="dr-rule__label">{{ 'settings.duplicateRules.matchingFieldsLabel' | transloco }}</div>
               <p class="dr-rule__helper" style="margin-bottom: var(--space-3)">
-                {{ 'duplicateRules.matchingFieldsHint' | transloco }}
+                {{ 'settings.duplicateRules.matchingFieldsHint' | transloco }}
               </p>
               <div class="dr-fields">
                 @if (config.entityType === 'Contact') {
@@ -620,10 +620,10 @@ interface EntityRuleConfig {
                       <mat-icon>badge</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldName' | transloco }}</div>
-                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldNameDesc' | transloco }}</div>
+                      <div class="dr-field-card__name">{{ 'settings.duplicateRules.fieldName' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'settings.duplicateRules.fieldNameDesc' | transloco }}</div>
                     </div>
-                    <span class="dr-field-card__required">{{ 'duplicateRules.required' | transloco }}</span>
+                    <span class="dr-field-card__required">{{ 'settings.duplicateRules.required' | transloco }}</span>
                   </div>
                   <label class="dr-field-card"
                          [class.dr-field-card--active]="isFieldEnabled(config, 'email')">
@@ -631,8 +631,8 @@ interface EntityRuleConfig {
                       <mat-icon>email</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldEmail' | transloco }}</div>
-                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldEmailDesc' | transloco }}</div>
+                      <div class="dr-field-card__name">{{ 'settings.duplicateRules.fieldEmail' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'settings.duplicateRules.fieldEmailDesc' | transloco }}</div>
                     </div>
                     <mat-checkbox
                       [checked]="isFieldEnabled(config, 'email')"
@@ -645,10 +645,10 @@ interface EntityRuleConfig {
                       <mat-icon>business</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldCompanyName' | transloco }}</div>
-                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldCompanyNameDesc' | transloco }}</div>
+                      <div class="dr-field-card__name">{{ 'settings.duplicateRules.fieldCompanyName' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'settings.duplicateRules.fieldCompanyNameDesc' | transloco }}</div>
                     </div>
-                    <span class="dr-field-card__required">{{ 'duplicateRules.required' | transloco }}</span>
+                    <span class="dr-field-card__required">{{ 'settings.duplicateRules.required' | transloco }}</span>
                   </div>
                   <label class="dr-field-card"
                          [class.dr-field-card--active]="isFieldEnabled(config, 'website')">
@@ -656,8 +656,8 @@ interface EntityRuleConfig {
                       <mat-icon>language</mat-icon>
                     </div>
                     <div class="dr-field-card__body">
-                      <div class="dr-field-card__name">{{ 'duplicateRules.fieldWebsite' | transloco }}</div>
-                      <div class="dr-field-card__desc">{{ 'duplicateRules.fieldWebsiteDesc' | transloco }}</div>
+                      <div class="dr-field-card__name">{{ 'settings.duplicateRules.fieldWebsite' | transloco }}</div>
+                      <div class="dr-field-card__desc">{{ 'settings.duplicateRules.fieldWebsiteDesc' | transloco }}</div>
                     </div>
                     <mat-checkbox
                       [checked]="isFieldEnabled(config, 'website')"
@@ -676,7 +676,7 @@ interface EntityRuleConfig {
                 @if (config.saving) {
                   <mat-spinner diameter="20"></mat-spinner>
                 }
-                {{ 'duplicateRules.saveRules' | transloco: { entity: config.entityType } }}
+                {{ 'settings.duplicateRules.saveRules' | transloco: { entity: config.entityType } }}
               </button>
             </div>
           </div>

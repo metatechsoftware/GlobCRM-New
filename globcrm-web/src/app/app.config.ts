@@ -16,6 +16,7 @@ import { provideTranslocoLocale } from '@jsverse/transloco-locale';
 import { routes } from './app.routes';
 import { authInterceptor } from './core/auth/auth.interceptor';
 import { AuthService } from './core/auth/auth.service';
+import { LanguageService } from './core/i18n/language.service';
 import { TranslocoHttpLoader } from './core/i18n/transloco-loader';
 import { TranslatedPaginatorIntl } from './core/i18n/transloco-paginator-intl';
 
@@ -41,6 +42,9 @@ export const appConfig: ApplicationConfig = {
           useFallbackTranslation: true,
           logMissingKey: true,
         },
+        scopes: {
+          autoPrefixKeys: false,
+        },
       },
       loader: TranslocoHttpLoader,
     }),
@@ -50,6 +54,14 @@ export const appConfig: ApplicationConfig = {
         tr: 'tr-TR',
       },
     }),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: () => {
+        const languageService = inject(LanguageService);
+        return () => languageService.initLanguage();
+      },
+      multi: true,
+    },
     {
       provide: APP_INITIALIZER,
       useFactory: () => {

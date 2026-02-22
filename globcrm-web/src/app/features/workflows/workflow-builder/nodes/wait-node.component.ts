@@ -28,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>hourglass_empty</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || ('builder.wait' | transloco) }}</span>
+            <span class="node-label">{{ node().label || ('workflows.builder.wait' | transloco) }}</span>
             @if (waitSummary()) {
               <span class="node-badge">{{ waitSummary() }}</span>
             }
@@ -165,6 +165,6 @@ export class WaitNodeComponent {
     if (!config?.['duration'] || !config?.['unit']) return '';
     const duration = config['duration'];
     const unit = config['unit'];
-    return `${this.transloco.translate('nodes.waitPrefix')} ${duration} ${unit}`;
+    return `${this.transloco.translate('workflows.nodes.waitPrefix')} ${duration} ${unit}`;
   });
 }

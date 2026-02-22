@@ -116,7 +116,7 @@ interface TableColumn {
       </table>
     } @else {
       <div class="table-empty">
-        <span>{{ 'widgets.noData' | transloco }}</span>
+        <span>{{ 'dashboard.widgets.noData' | transloco }}</span>
       </div>
     }
   `,

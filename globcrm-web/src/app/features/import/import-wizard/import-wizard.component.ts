@@ -50,15 +50,15 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <div class="wizard-hero__content">
           <a class="wizard-back" routerLink="/settings">
             <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'wizard.backToSettings' | transloco }}</span>
+            <span>{{ 'import.wizard.backToSettings' | transloco }}</span>
           </a>
           <div class="wizard-hero__heading">
             <div class="wizard-hero__icon-wrap">
               <mat-icon>upload_file</mat-icon>
             </div>
             <div>
-              <h1>{{ 'wizard.title' | transloco }}</h1>
-              <p class="header-subtitle">{{ 'wizard.subtitle' | transloco }}</p>
+              <h1>{{ 'import.wizard.title' | transloco }}</h1>
+              <p class="header-subtitle">{{ 'import.wizard.subtitle' | transloco }}</p>
             </div>
           </div>
         </div>
@@ -116,10 +116,10 @@ export class ImportWizardComponent implements OnInit, OnDestroy {
   @ViewChild('stepper') stepper!: MatStepper;
 
   readonly steps = [
-    { index: 0, labelKey: 'wizard.steps.upload' },
-    { index: 1, labelKey: 'wizard.steps.mapFields' },
-    { index: 2, labelKey: 'wizard.steps.preview' },
-    { index: 3, labelKey: 'wizard.steps.import' },
+    { index: 0, labelKey: 'import.wizard.steps.upload' },
+    { index: 1, labelKey: 'import.wizard.steps.mapFields' },
+    { index: 2, labelKey: 'import.wizard.steps.preview' },
+    { index: 3, labelKey: 'import.wizard.steps.import' },
   ];
 
   private signalRSub?: Subscription;

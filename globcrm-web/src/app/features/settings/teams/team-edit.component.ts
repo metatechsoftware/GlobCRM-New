@@ -257,15 +257,15 @@ export class TeamEditComponent implements OnInit {
     TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ 'teamEdit.addMemberDialog.title' | transloco }}</h2>
+    <h2 mat-dialog-title>{{ 'settings.teamEdit.addMemberDialog.title' | transloco }}</h2>
     <mat-dialog-content>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'teamEdit.addMemberDialog.searchLabel' | transloco }}</mat-label>
+        <mat-label>{{ 'settings.teamEdit.addMemberDialog.searchLabel' | transloco }}</mat-label>
         <input
           matInput
           [formControl]="searchControl"
           [matAutocomplete]="auto"
-          [placeholder]="'teamEdit.addMemberDialog.searchPlaceholder' | transloco"
+          [placeholder]="'settings.teamEdit.addMemberDialog.searchPlaceholder' | transloco"
         />
         <mat-icon matSuffix>search</mat-icon>
         <mat-autocomplete
@@ -292,17 +292,17 @@ export class TeamEditComponent implements OnInit {
           @if (isSearching()) {
             <mat-option disabled>
               <mat-spinner diameter="20"></mat-spinner>
-              {{ 'teamEdit.addMemberDialog.searching' | transloco }}
+              {{ 'settings.teamEdit.addMemberDialog.searching' | transloco }}
             </mat-option>
           }
           @if (!isSearching() && searchControl.value && searchResults().length === 0 && hasSearched()) {
-            <mat-option disabled>{{ 'teamEdit.addMemberDialog.noUsersFound' | transloco }}</mat-option>
+            <mat-option disabled>{{ 'settings.teamEdit.addMemberDialog.noUsersFound' | transloco }}</mat-option>
           }
         </mat-autocomplete>
       </mat-form-field>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'teamEdit.addMemberDialog.close' | transloco }}</button>
+      <button mat-button mat-dialog-close>{{ 'settings.teamEdit.addMemberDialog.close' | transloco }}</button>
     </mat-dialog-actions>
   `,
   styles: [

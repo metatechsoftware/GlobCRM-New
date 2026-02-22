@@ -43,7 +43,7 @@ interface PreferenceRow {
       <!-- Breadcrumb back-link -->
       <a routerLink="/settings" class="np-breadcrumb">
         <mat-icon class="np-breadcrumb__icon">arrow_back</mat-icon>
-        <span class="np-breadcrumb__text">{{ 'notifications.breadcrumb' | transloco }}</span>
+        <span class="np-breadcrumb__text">{{ 'settings.notifications.breadcrumb' | transloco }}</span>
       </a>
 
       <!-- Page header -->
@@ -52,8 +52,8 @@ interface PreferenceRow {
           <mat-icon class="np-header__icon">notifications_active</mat-icon>
         </div>
         <div class="np-header__text">
-          <h1 class="np-header__title">{{ 'notifications.pageTitle' | transloco }}</h1>
-          <p class="np-header__subtitle">{{ 'notifications.pageSubtitle' | transloco }}</p>
+          <h1 class="np-header__title">{{ 'settings.notifications.pageTitle' | transloco }}</h1>
+          <p class="np-header__subtitle">{{ 'settings.notifications.pageSubtitle' | transloco }}</p>
         </div>
       </header>
 
@@ -69,8 +69,8 @@ interface PreferenceRow {
               <mat-icon class="np-section__header-icon">tune</mat-icon>
             </div>
             <div class="np-section__header-text">
-              <h2 class="np-section__title">{{ 'notifications.channelsTitle' | transloco }}</h2>
-              <p class="np-section__subtitle">{{ 'notifications.channelsSubtitle' | transloco }}</p>
+              <h2 class="np-section__title">{{ 'settings.notifications.channelsTitle' | transloco }}</h2>
+              <p class="np-section__subtitle">{{ 'settings.notifications.channelsSubtitle' | transloco }}</p>
             </div>
           </div>
 
@@ -78,8 +78,8 @@ interface PreferenceRow {
             <!-- Column headers -->
             <div class="np-col-headers">
               <span class="np-col-headers__spacer"></span>
-              <span class="np-col-headers__label">{{ 'notifications.inAppHeader' | transloco }}</span>
-              <span class="np-col-headers__label">{{ 'notifications.emailHeader' | transloco }}</span>
+              <span class="np-col-headers__label">{{ 'settings.notifications.inAppHeader' | transloco }}</span>
+              <span class="np-col-headers__label">{{ 'settings.notifications.emailHeader' | transloco }}</span>
             </div>
 
             <!-- Preference rows -->
@@ -130,7 +130,7 @@ interface PreferenceRow {
             @if (saving()) {
               <mat-spinner diameter="20" class="np-actions__spinner"></mat-spinner>
             }
-            {{ 'notifications.savePreferences' | transloco }}
+            {{ 'settings.notifications.savePreferences' | transloco }}
           </button>
         </div>
       }

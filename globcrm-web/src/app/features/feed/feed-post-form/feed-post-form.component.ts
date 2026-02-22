@@ -52,12 +52,12 @@ import { CreateFeedPostPayload } from '../feed.models';
 
     .post-form-card {
       display: flex;
-      gap: 12px;
-      padding: 16px;
+      gap: 14px;
+      padding: 20px;
       background: var(--color-surface, #fff);
       border: 1px solid var(--color-border-subtle, #F0F0EE);
       border-radius: var(--radius-lg, 12px);
-      margin-bottom: 16px;
+      margin-bottom: 20px;
       transition:
         border-color var(--duration-normal, 200ms) var(--ease-default),
         box-shadow var(--duration-normal, 200ms) var(--ease-default);
@@ -65,7 +65,17 @@ import { CreateFeedPostPayload } from '../feed.models';
 
     .post-form-card--focused {
       border-color: var(--color-border-focus, #F97316);
-      box-shadow: var(--shadow-focus);
+      box-shadow: var(--shadow-focus), var(--shadow-glow);
+    }
+
+    .post-form-avatar {
+      flex-shrink: 0;
+      display: inline-flex;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      box-shadow: 0 0 0 2px var(--color-primary, #F97316);
+      overflow: hidden;
     }
 
     .post-form-body {
@@ -83,11 +93,11 @@ import { CreateFeedPostPayload } from '../feed.models';
     .post-textarea {
       display: block;
       width: 100%;
-      min-height: 56px;
-      padding: 10px 12px;
+      min-height: 64px;
+      padding: 12px 14px;
       border: 1px solid var(--color-border, #E8E8E6);
       border-radius: var(--radius-md, 8px);
-      background: var(--color-surface, #fff);
+      background: var(--color-bg-input, var(--color-surface, #fff));
       font-family: inherit;
       font-size: var(--text-base, 0.875rem);
       color: var(--color-text, #1a1a1a);
@@ -95,15 +105,17 @@ import { CreateFeedPostPayload } from '../feed.models';
       outline: none;
       transition:
         border-color var(--duration-fast, 100ms),
-        box-shadow var(--duration-fast, 100ms);
+        box-shadow var(--duration-fast, 100ms),
+        background var(--duration-fast, 100ms);
 
       &::placeholder {
-        color: var(--color-text-muted, #9CA3AF);
+        color: var(--color-text-faint, #B0ACA7);
       }
 
       &:focus {
         border-color: var(--color-border-focus, #F97316);
-        box-shadow: var(--shadow-focus);
+        box-shadow: var(--shadow-focus), inset 0 0 20px var(--orange-glow, rgba(249,115,22,0.12));
+        background: var(--color-surface, #fff);
       }
     }
 
@@ -159,21 +171,23 @@ import { CreateFeedPostPayload } from '../feed.models';
       display: flex;
       align-items: center;
       justify-content: center;
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       border: none;
       background: none;
       border-radius: var(--radius-md, 8px);
-      color: var(--color-text-secondary, #6B7280);
+      color: var(--color-text-muted, #9CA3AF);
       cursor: pointer;
       transition:
         background var(--duration-fast, 100ms),
         color var(--duration-fast, 100ms),
+        box-shadow var(--duration-fast, 100ms),
         transform var(--duration-fast, 100ms) var(--ease-spring);
 
       &:hover {
-        background: var(--color-highlight, rgba(249, 115, 22, 0.06));
+        background: var(--color-primary-soft, #FFF7ED);
         color: var(--color-primary, #F97316);
+        box-shadow: var(--shadow-xs);
         transform: scale(1.08);
       }
 
@@ -196,10 +210,11 @@ import { CreateFeedPostPayload } from '../feed.models';
       padding: 8px 20px;
       border-radius: var(--radius-full, 9999px);
       border: none;
-      background: var(--color-primary, #F97316);
+      background: linear-gradient(135deg, var(--color-primary, #F97316), var(--color-primary-hover, #EA580C));
       color: var(--color-primary-fg, #fff);
       font-size: var(--text-sm, 0.8125rem);
       font-weight: var(--font-semibold, 600);
+      letter-spacing: var(--tracking-snug, -0.01em);
       cursor: pointer;
       transition:
         transform var(--duration-fast, 100ms) var(--ease-spring),
@@ -207,7 +222,7 @@ import { CreateFeedPostPayload } from '../feed.models';
 
       &:hover:not(:disabled) {
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+        box-shadow: 0 4px 16px rgba(249, 115, 22, 0.4), var(--shadow-glow, 0 0 24px rgba(249,115,22,0.12));
       }
 
       &:active:not(:disabled) {
@@ -215,7 +230,8 @@ import { CreateFeedPostPayload } from '../feed.models';
       }
 
       &:disabled {
-        opacity: 0.45;
+        background: var(--color-text-faint, #B0ACA7);
+        opacity: 1;
         cursor: default;
       }
 
@@ -242,17 +258,19 @@ import { CreateFeedPostPayload } from '../feed.models';
   `,
   template: `
     <div class="post-form-card" [class.post-form-card--focused]="isFocused()">
-      <app-avatar
-        [firstName]="userFirstName"
-        [lastName]="userLastName"
-        size="sm" />
+      <div class="post-form-avatar">
+        <app-avatar
+          [firstName]="userFirstName"
+          [lastName]="userLastName"
+          size="sm" />
+      </div>
       <div class="post-form-body">
         <div class="textarea-wrap">
           <textarea class="post-textarea"
                     #textareaRef
                     [(ngModel)]="postContent"
                     rows="2"
-                    [placeholder]="'post.placeholder' | transloco"
+                    [placeholder]="'feed.post.placeholder' | transloco"
                     (focus)="isFocused.set(true)"
                     (blur)="isFocused.set(false)"
                     (input)="onTextareaInput()"
@@ -273,15 +291,15 @@ import { CreateFeedPostPayload } from '../feed.models';
 
         <div class="post-form-actions">
           <div class="post-form-toolbar">
-            <button class="toolbar-btn" [matTooltip]="'post.attachFile' | transloco" type="button" (click)="fileInput.click()">
+            <button class="toolbar-btn" [matTooltip]="'feed.post.attachFile' | transloco" type="button" (click)="fileInput.click()">
               <mat-icon>attach_file</mat-icon>
             </button>
             <input #fileInput type="file" hidden multiple (change)="onFileSelected($event)" />
-            <button class="toolbar-btn" [matTooltip]="'post.mention' | transloco" type="button" (click)="insertAtSymbol()">
+            <button class="toolbar-btn" [matTooltip]="'feed.post.mention' | transloco" type="button" (click)="insertAtSymbol()">
               <mat-icon>alternate_email</mat-icon>
             </button>
             <div class="emoji-container">
-              <button class="toolbar-btn" [matTooltip]="'post.emoji' | transloco" type="button" (click)="toggleEmojiPicker($event)">
+              <button class="toolbar-btn" [matTooltip]="'feed.post.emoji' | transloco" type="button" (click)="toggleEmojiPicker($event)">
                 <mat-icon>sentiment_satisfied_alt</mat-icon>
               </button>
               @if (showEmojiPicker()) {
@@ -293,7 +311,7 @@ import { CreateFeedPostPayload } from '../feed.models';
                   [disabled]="!postContent.trim() && !pendingFiles().length"
                   (click)="onSubmit()">
             <mat-icon>send</mat-icon>
-            {{ 'post.submit' | transloco }}
+            {{ 'feed.post.submit' | transloco }}
           </button>
         </div>
 

@@ -216,7 +216,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open(this.transloco.translate('messages.contactLoadFailed'), this.transloco.translate('common.close'), {
+        this.snackBar.open(this.transloco.translate('contacts.messages.contactLoadFailed'), this.transloco.translate('common.close'), {
           duration: 5000,
         });
       },
@@ -315,14 +315,14 @@ export class ContactFormComponent implements OnInit, OnDestroy {
       this.contactService.update(this.contactId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.contactUpdated'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('contacts.messages.contactUpdated'), this.transloco.translate('common.close'), {
             duration: 3000,
           });
           this.router.navigate(['/contacts', this.contactId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.contactUpdateFailed'), this.transloco.translate('common.close'), {
+          this.snackBar.open(this.transloco.translate('contacts.messages.contactUpdateFailed'), this.transloco.translate('common.close'), {
             duration: 5000,
           });
         },
@@ -352,7 +352,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open(this.transloco.translate('messages.contactCreated'), this.transloco.translate('common.close'), {
+            this.snackBar.open(this.transloco.translate('contacts.messages.contactCreated'), this.transloco.translate('common.close'), {
               duration: 3000,
             });
             this.router.navigate(['/contacts', created.id]);
@@ -363,7 +363,7 @@ export class ContactFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open(this.transloco.translate('messages.contactCreateFailed'), this.transloco.translate('common.close'), {
+            this.snackBar.open(this.transloco.translate('contacts.messages.contactCreateFailed'), this.transloco.translate('common.close'), {
               duration: 5000,
             });
           }

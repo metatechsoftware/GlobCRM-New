@@ -16,9 +16,9 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>notifications</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.notifications.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.notifications.title' | transloco }}</mat-card-title>
         @if (!isLoading() && totalCount() > 0) {
-          <span class="notif-widget__badge">{{ 'widgets.notifications.today' | transloco: { count: totalCount() } }}</span>
+          <span class="notif-widget__badge">{{ 'myDay.widgets.notifications.today' | transloco: { count: totalCount() } }}</span>
         }
       </mat-card-header>
 
@@ -32,7 +32,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
         } @else if (notificationGroups().length === 0) {
           <div class="notif-widget__empty">
             <mat-icon class="notif-widget__empty-icon">notifications_none</mat-icon>
-            <span class="notif-widget__empty-text">{{ 'widgets.notifications.allCaughtUp' | transloco }}</span>
+            <span class="notif-widget__empty-text">{{ 'myDay.widgets.notifications.allCaughtUp' | transloco }}</span>
           </div>
         } @else {
           <div class="notif-widget__groups">
@@ -59,7 +59,7 @@ import { MyDayNotificationGroupDto } from '../../my-day.models';
                     </div>
                   }
                   @if (group.items.length > 3) {
-                    <span class="notif-widget__more">{{ 'widgets.notifications.more' | transloco: { count: group.items.length - 3 } }}</span>
+                    <span class="notif-widget__more">{{ 'myDay.widgets.notifications.more' | transloco: { count: group.items.length - 3 } }}</span>
                   }
                 </div>
               </div>
@@ -309,7 +309,7 @@ export class NotificationDigestWidgetComponent {
   }
 
   typeLabel(type: string): string {
-    const key = `widgets.notifications.types.${type}`;
+    const key = `myDay.widgets.notifications.types.${type}`;
     const translated = this.translocoService.translate(key);
     // If translation key doesn't exist, transloco returns the key itself
     if (translated === key) {
@@ -326,9 +326,9 @@ export class NotificationDigestWidgetComponent {
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMs / 3600000);
 
-    if (diffMins < 1) return this.translocoService.translate('widgets.notifications.time.justNow');
-    if (diffMins < 60) return this.translocoService.translate('widgets.notifications.time.minutes', { count: diffMins });
-    if (diffHours < 24) return this.translocoService.translate('widgets.notifications.time.hours', { count: diffHours });
+    if (diffMins < 1) return this.translocoService.translate('myDay.widgets.notifications.time.justNow');
+    if (diffMins < 60) return this.translocoService.translate('myDay.widgets.notifications.time.minutes', { count: diffMins });
+    if (diffHours < 24) return this.translocoService.translate('myDay.widgets.notifications.time.hours', { count: diffHours });
     const locale = this.translocoService.getActiveLang() === 'tr' ? 'tr-TR' : 'en-US';
     return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit' });
   }

@@ -170,10 +170,10 @@ import {
   template: `
     <div class="targets">
       <div class="targets__header">
-        <h2 class="targets__title">{{ 'targets.title' | transloco }}</h2>
+        <h2 class="targets__title">{{ 'dashboard.targets.title' | transloco }}</h2>
         <button mat-flat-button color="primary" (click)="onAddTarget()">
           <mat-icon>add</mat-icon>
-          {{ 'targets.addTarget' | transloco }}
+          {{ 'dashboard.targets.addTarget' | transloco }}
         </button>
       </div>
 
@@ -185,14 +185,14 @@ import {
                 <button
                   class="targets__card-action-btn"
                   (click)="onEditTarget(target)"
-                  [title]="'targets.editTarget' | transloco"
+                  [title]="'dashboard.targets.editTarget' | transloco"
                 >
                   <mat-icon>edit</mat-icon>
                 </button>
                 <button
                   class="targets__card-action-btn targets__card-action-btn--delete"
                   (click)="onDeleteTarget(target)"
-                  [title]="'targets.delete' | transloco"
+                  [title]="'dashboard.targets.delete' | transloco"
                 >
                   <mat-icon>delete</mat-icon>
                 </button>
@@ -204,11 +204,11 @@ import {
       } @else {
         <div class="targets__empty">
           <mat-icon>track_changes</mat-icon>
-          <h3>{{ 'targets.empty.title' | transloco }}</h3>
-          <p>{{ 'targets.empty.description' | transloco }}</p>
+          <h3>{{ 'dashboard.targets.empty.title' | transloco }}</h3>
+          <p>{{ 'dashboard.targets.empty.description' | transloco }}</p>
           <button mat-stroked-button (click)="onAddTarget()">
             <mat-icon>add</mat-icon>
-            {{ 'targets.empty.createButton' | transloco }}
+            {{ 'dashboard.targets.empty.createButton' | transloco }}
           </button>
         </div>
       }
@@ -230,7 +230,7 @@ export class TargetManagementComponent {
     dialogRef.afterClosed().subscribe((result: CreateTargetRequest | undefined) => {
       if (!result) return;
       this.store.createTarget(result);
-      this.snackBar.open(this.translocoService.translate('targets.created'), 'OK', { duration: 2000 });
+      this.snackBar.open(this.translocoService.translate('dashboard.targets.created'), 'OK', { duration: 2000 });
     });
   }
 
@@ -243,19 +243,19 @@ export class TargetManagementComponent {
     dialogRef.afterClosed().subscribe((result: UpdateTargetRequest | undefined) => {
       if (!result) return;
       this.store.updateTarget(target.id, result);
-      this.snackBar.open(this.translocoService.translate('targets.updated'), 'OK', { duration: 2000 });
+      this.snackBar.open(this.translocoService.translate('dashboard.targets.updated'), 'OK', { duration: 2000 });
     });
   }
 
   onDeleteTarget(target: TargetDto): void {
     const ref = this.snackBar.open(
-      this.translocoService.translate('targets.deleteConfirm', { name: target.name }),
-      this.translocoService.translate('targets.delete'),
+      this.translocoService.translate('dashboard.targets.deleteConfirm', { name: target.name }),
+      this.translocoService.translate('dashboard.targets.delete'),
       { duration: 5000 },
     );
     ref.onAction().subscribe(() => {
       this.store.deleteTarget(target.id);
-      this.snackBar.open(this.translocoService.translate('targets.deleted'), 'OK', { duration: 2000 });
+      this.snackBar.open(this.translocoService.translate('dashboard.targets.deleted'), 'OK', { duration: 2000 });
     });
   }
 }

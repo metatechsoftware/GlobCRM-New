@@ -224,17 +224,17 @@ export class CalendarComponent implements OnInit {
           customFields: activity.customFields,
         }).subscribe({
           next: () => {
-            this.snackBar.open(this.translocoService.translate('messages.rescheduled'), 'Close', { duration: 2000 });
+            this.snackBar.open(this.translocoService.translate('calendar.messages.rescheduled'), 'Close', { duration: 2000 });
           },
           error: () => {
             info.revert();
-            this.snackBar.open(this.translocoService.translate('messages.rescheduleFailed'), 'Close', { duration: 5000 });
+            this.snackBar.open(this.translocoService.translate('calendar.messages.rescheduleFailed'), 'Close', { duration: 5000 });
           },
         });
       },
       error: () => {
         info.revert();
-        this.snackBar.open(this.translocoService.translate('messages.rescheduleFailed'), 'Close', { duration: 5000 });
+        this.snackBar.open(this.translocoService.translate('calendar.messages.rescheduleFailed'), 'Close', { duration: 5000 });
       },
     });
   }
@@ -300,7 +300,7 @@ export class CalendarComponent implements OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.snackBar.open(this.translocoService.translate('messages.loadFailed'), 'Close', { duration: 5000 });
+        this.snackBar.open(this.translocoService.translate('calendar.messages.loadFailed'), 'Close', { duration: 5000 });
       },
     });
   }

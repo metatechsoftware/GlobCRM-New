@@ -168,7 +168,7 @@ interface LeaderboardEntry {
       </div>
     } @else {
       <div class="leaderboard__empty">
-        <span>{{ 'widgets.noData' | transloco }}</span>
+        <span>{{ 'dashboard.widgets.noData' | transloco }}</span>
       </div>
     }
   `,

@@ -17,7 +17,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>history</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.recentRecords.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.recentRecords.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -33,7 +33,7 @@ import { MyDayRecentRecordDto } from '../../my-day.models';
         } @else if (records().length === 0) {
           <div class="records-widget__empty">
             <mat-icon class="records-widget__empty-icon">history</mat-icon>
-            <span class="records-widget__empty-text">{{ 'widgets.recentRecords.empty' | transloco }}</span>
+            <span class="records-widget__empty-text">{{ 'myDay.widgets.recentRecords.empty' | transloco }}</span>
           </div>
         } @else {
           <div class="records-widget__list">

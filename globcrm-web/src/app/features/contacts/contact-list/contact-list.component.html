@@ -9,14 +9,14 @@
           <mat-icon>people</mat-icon>
         </div>
         <div class="list-header__text">
-          <h1>{{ 'list.title' | transloco }}</h1>
-          <p class="list-header__subtitle">{{ 'list.subtitle' | transloco }}</p>
+          <h1>{{ 'contacts.list.title' | transloco }}</h1>
+          <p class="list-header__subtitle">{{ 'contacts.list.subtitle' | transloco }}</p>
         </div>
       </div>
       <button mat-raised-button color="primary"
               *appHasPermission="'Contact:Create'"
               (click)="openCreateDialog()">
-        <mat-icon>add</mat-icon> {{ 'list.addContact' | transloco }}
+        <mat-icon>add</mat-icon> {{ 'contacts.list.addContact' | transloco }}
       </button>
     </div>
 
@@ -53,13 +53,13 @@
     <!-- Bulk Action Bar -->
     @if (selectedContacts().length > 0) {
       <div class="bulk-action-bar">
-        <span class="bulk-action-bar__count">{{ 'list.bulkCount' | transloco: { count: selectedContacts().length } }}</span>
+        <span class="bulk-action-bar__count">{{ 'contacts.list.bulkCount' | transloco: { count: selectedContacts().length } }}</span>
         <button mat-flat-button color="primary" (click)="bulkEnrollInSequence()">
           <mat-icon>schedule_send</mat-icon>
-          {{ 'list.enrollInSequence' | transloco }}
+          {{ 'contacts.list.enrollInSequence' | transloco }}
         </button>
         <button mat-stroked-button (click)="clearSelection()">
-          {{ 'list.clearSelection' | transloco }}
+          {{ 'contacts.list.clearSelection' | transloco }}
         </button>
       </div>
     }

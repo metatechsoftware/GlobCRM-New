@@ -1,7 +1,7 @@
 <div class="calendar-layout">
   <!-- Header toolbar -->
   <div class="calendar-header">
-    <h1>{{ 'calendar.title' | transloco }}</h1>
+    <h1>{{ 'deals.calendar.title' | transloco }}</h1>
 
     <div class="header-actions">
       <!-- Pipeline selector -->
@@ -9,8 +9,8 @@
         <mat-select
           [value]="selectedPipelineId()"
           (selectionChange)="onPipelineChanged($event.value)"
-          [placeholder]="'calendar.allPipelines' | transloco">
-          <mat-option [value]="null">{{ 'calendar.allPipelines' | transloco }}</mat-option>
+          [placeholder]="'deals.calendar.allPipelines' | transloco">
+          <mat-option [value]="null">{{ 'deals.calendar.allPipelines' | transloco }}</mat-option>
           @for (pipeline of pipelines(); track pipeline.id) {
             <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
           }

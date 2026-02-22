@@ -188,7 +188,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       next: (lead) => {
         // Redirect if lead is converted (cannot edit)
         if (lead.isConverted) {
-          this.snackBar.open(this.transloco.translate('form.validation.cannotEditConverted'), this.transloco.translate('common.close'), { duration: 5000 });
+          this.snackBar.open(this.transloco.translate('leads.form.validation.cannotEditConverted'), this.transloco.translate('common.close'), { duration: 5000 });
           this.router.navigate(['/leads', this.leadId]);
           return;
         }
@@ -213,7 +213,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.isLoadingDetail.set(false);
-        this.snackBar.open(this.transloco.translate('messages.leadDataLoadFailed'), this.transloco.translate('common.close'), { duration: 5000 });
+        this.snackBar.open(this.transloco.translate('leads.messages.leadDataLoadFailed'), this.transloco.translate('common.close'), { duration: 5000 });
       },
     });
   }
@@ -250,12 +250,12 @@ export class LeadFormComponent implements OnInit, OnDestroy {
       this.leadService.update(this.leadId, request).subscribe({
         next: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.leadUpdated'), this.transloco.translate('common.close'), { duration: 3000 });
+          this.snackBar.open(this.transloco.translate('leads.messages.leadUpdated'), this.transloco.translate('common.close'), { duration: 3000 });
           this.router.navigate(['/leads', this.leadId]);
         },
         error: () => {
           this.isSaving.set(false);
-          this.snackBar.open(this.transloco.translate('messages.leadUpdateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
+          this.snackBar.open(this.transloco.translate('leads.messages.leadUpdateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
         },
       });
     } else {
@@ -281,7 +281,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreated.emit(created);
           } else {
-            this.snackBar.open(this.transloco.translate('messages.leadCreated'), this.transloco.translate('common.close'), { duration: 3000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadCreated'), this.transloco.translate('common.close'), { duration: 3000 });
             this.router.navigate(['/leads', created.id]);
           }
         },
@@ -290,7 +290,7 @@ export class LeadFormComponent implements OnInit, OnDestroy {
           if (this.dialogMode()) {
             this.entityCreateError.emit();
           } else {
-            this.snackBar.open(this.transloco.translate('messages.leadCreateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
+            this.snackBar.open(this.transloco.translate('leads.messages.leadCreateFailed'), this.transloco.translate('common.close'), { duration: 5000 });
           }
         },
       });

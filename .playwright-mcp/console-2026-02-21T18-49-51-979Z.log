@@ -1,0 +1,23 @@
+[     282ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[     347ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     350ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     361ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     363ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     365ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     367ms] [ERROR] Error while trying to load "auth/en" HttpErrorResponse @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/chunk-7LB5PNTV.js?v=829cc14b:652
+[     370ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   14251ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[   14289ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   14291ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   14294ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   14298ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   14299ms] [ERROR] Error while trying to load "auth/en" HttpErrorResponse @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/chunk-7LB5PNTV.js?v=829cc14b:652
+[   14301ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[   48194ms] [ERROR] WebSocket connection to 'ws://localhost:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/@vite/client:1028
+[   51559ms] [ERROR] WebSocket connection to 'ws://localhost:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/@vite/client:1028
+[   54916ms] [ERROR] WebSocket connection to 'ws://localhost:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/@vite/client:1028
+[   58276ms] [ERROR] WebSocket connection to 'ws://localhost:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/@vite/client:1028
+[   61654ms] [ERROR] WebSocket connection to 'ws://localhost:4200/' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:4200/@vite/client:1028
+[   63999ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[  108845ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[  109868ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0

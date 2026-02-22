@@ -17,7 +17,7 @@ import { MyDayTaskDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>checklist</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.tasks.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.tasks.title' | transloco }}</mat-card-title>
       </mat-card-header>
 
       <mat-card-content>
@@ -30,7 +30,7 @@ import { MyDayTaskDto } from '../../my-day.models';
         } @else if (overdueTasks().length === 0 && todayTasks().length === 0) {
           <div class="tasks-widget__empty">
             <mat-icon class="tasks-widget__empty-icon">check_circle</mat-icon>
-            <span class="tasks-widget__empty-text">{{ 'widgets.tasks.empty' | transloco }}</span>
+            <span class="tasks-widget__empty-text">{{ 'myDay.widgets.tasks.empty' | transloco }}</span>
           </div>
         } @else {
           <!-- Overdue section -->
@@ -38,7 +38,7 @@ import { MyDayTaskDto } from '../../my-day.models';
             <div class="tasks-widget__section tasks-widget__section--overdue">
               <div class="tasks-widget__section-header tasks-widget__section-header--overdue">
                 <mat-icon>warning</mat-icon>
-                <span>{{ 'widgets.tasks.overdue' | transloco }}</span>
+                <span>{{ 'myDay.widgets.tasks.overdue' | transloco }}</span>
               </div>
               @for (task of overdueTasks(); track task.id) {
                 <div class="tasks-widget__row tasks-widget__row--overdue"
@@ -70,7 +70,7 @@ import { MyDayTaskDto } from '../../my-day.models';
               @if (overdueTasks().length > 0) {
                 <div class="tasks-widget__section-header">
                   <mat-icon>today</mat-icon>
-                  <span>{{ 'widgets.tasks.dueToday' | transloco }}</span>
+                  <span>{{ 'myDay.widgets.tasks.dueToday' | transloco }}</span>
                 </div>
               }
               @for (task of todayTasks(); track task.id) {

@@ -28,7 +28,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>filter_list</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || ('builder.condition' | transloco) }}</span>
+            <span class="node-label">{{ node().label || ('workflows.builder.condition' | transloco) }}</span>
             @if (conditionSummary) {
               <span class="node-badge">{{ conditionSummary }}</span>
             }

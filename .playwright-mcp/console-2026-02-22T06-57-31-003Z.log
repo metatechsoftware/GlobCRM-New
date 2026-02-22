@@ -1,0 +1,10 @@
+[     164ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[     199ms] [WARNING] Detected a matBadge on an "aria-hidden" "<mat-icon>". Consider setting aria-hidden="false" in order to surface the information assistive technology.
+<mat-icon _ngcontent-ng-c2213715249="" role="img" matbadgecolor="warn" matbadgesize="small" class="mat-icon notranslate mat-badge" aria-hidden="true"></mat-icon> @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/@angular_material_badge.js?v=829cc14b:150
+[  149188ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/feed?page=1&pageSize=2:0
+[  353004ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[  353054ms] [WARNING] Detected a matBadge on an "aria-hidden" "<mat-icon>". Consider setting aria-hidden="false" in order to surface the information assistive technology.
+<mat-icon _ngcontent-ng-c2213715249="" role="img" matbadgecolor="warn" matbadgesize="small" class="mat-icon notranslate mat-badge" aria-hidden="true"></mat-icon> @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/@angular_material_badge.js?v=829cc14b:150
+[  356412ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[  356427ms] [WARNING] Detected a matBadge on an "aria-hidden" "<mat-icon>". Consider setting aria-hidden="false" in order to surface the information assistive technology.
+<mat-icon _ngcontent-ng-c2213715249="" role="img" matbadgecolor="warn" matbadgesize="small" class="mat-icon notranslate mat-badge" aria-hidden="true"></mat-icon> @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/@angular_material_badge.js?v=829cc14b:150

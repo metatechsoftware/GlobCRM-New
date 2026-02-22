@@ -356,7 +356,7 @@ public class QuoteTemplatesController : ControllerBase
         }
         else
         {
-            mergeData = GetSampleMergeData();
+            mergeData = await GetSampleMergeDataAsync();
         }
 
         var renderedHtml = await _renderService.RenderAsync(template.HtmlBody, mergeData);
@@ -561,7 +561,7 @@ public class QuoteTemplatesController : ControllerBase
     {
         try
         {
-            var sampleData = GetSampleMergeData();
+            var sampleData = await GetSampleMergeDataAsync();
             var renderedHtml = await _renderService.RenderAsync(template.HtmlBody, sampleData);
             var thumbnailBytes = await _playwrightPdfService.GenerateThumbnailAsync(renderedHtml);
 
@@ -584,9 +584,9 @@ public class QuoteTemplatesController : ControllerBase
     /// Returns sample merge data for thumbnail generation and preview rendering.
     /// Uses realistic placeholder values for all merge field categories.
     /// </summary>
-    private Dictionary<string, object?> GetSampleMergeData()
+    private async Task<Dictionary<string, object?>> GetSampleMergeDataAsync()
     {
-        var org = _tenantProvider.GetCurrentOrganizationAsync().GetAwaiter().GetResult();
+        var org = await _tenantProvider.GetCurrentOrganizationAsync();
         var orgName = org?.Name ?? "Your Organization";
 
         return new Dictionary<string, object?>

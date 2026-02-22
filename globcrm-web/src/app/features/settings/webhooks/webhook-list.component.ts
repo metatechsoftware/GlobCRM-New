@@ -601,26 +601,26 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         <div class="wl-header__left">
           <a routerLink="/settings" class="wl-back">
             <mat-icon>arrow_back</mat-icon>
-            <span>{{ 'webhooks.list.breadcrumb' | transloco }}</span>
+            <span>{{ 'settings.webhooks.list.breadcrumb' | transloco }}</span>
           </a>
           <div class="wl-title-row">
             <div class="wl-icon-wrap">
               <mat-icon>webhook</mat-icon>
             </div>
             <div>
-              <h1 class="wl-title">{{ 'webhooks.list.title' | transloco }}</h1>
-              <p class="wl-subtitle">{{ 'webhooks.list.subtitle' | transloco }}</p>
+              <h1 class="wl-title">{{ 'settings.webhooks.list.title' | transloco }}</h1>
+              <p class="wl-subtitle">{{ 'settings.webhooks.list.subtitle' | transloco }}</p>
             </div>
           </div>
         </div>
         <div class="wl-header__actions">
           <a mat-stroked-button routerLink="/settings/webhooks/delivery-logs">
             <mat-icon>list_alt</mat-icon>
-            {{ 'webhooks.list.viewAllDeliveryLogs' | transloco }}
+            {{ 'settings.webhooks.list.viewAllDeliveryLogs' | transloco }}
           </a>
           <a mat-flat-button color="primary" routerLink="/settings/webhooks/new">
             <mat-icon>add</mat-icon>
-            {{ 'webhooks.list.addWebhook' | transloco }}
+            {{ 'settings.webhooks.list.addWebhook' | transloco }}
           </a>
         </div>
       </div>
@@ -629,7 +629,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       @if (store.loading()) {
         <div class="wl-loading">
           <mat-spinner diameter="40"></mat-spinner>
-          <p>{{ 'webhooks.list.loading' | transloco }}</p>
+          <p>{{ 'settings.webhooks.list.loading' | transloco }}</p>
         </div>
       } @else if (store.subscriptions().length === 0) {
         <!-- Empty State -->
@@ -642,11 +642,11 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
             </div>
             <mat-icon class="wl-empty__icon">webhook</mat-icon>
           </div>
-          <h3>{{ 'webhooks.list.noWebhooksTitle' | transloco }}</h3>
-          <p>{{ 'webhooks.list.noWebhooksDesc' | transloco }}</p>
+          <h3>{{ 'settings.webhooks.list.noWebhooksTitle' | transloco }}</h3>
+          <p>{{ 'settings.webhooks.list.noWebhooksDesc' | transloco }}</p>
           <a mat-flat-button color="primary" routerLink="/settings/webhooks/new" class="wl-empty__btn">
             <mat-icon>add</mat-icon>
-            {{ 'webhooks.list.addWebhook' | transloco }}
+            {{ 'settings.webhooks.list.addWebhook' | transloco }}
           </a>
         </div>
       } @else {
@@ -688,18 +688,18 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                     </span>
                     <span class="wl-card__events">
                       <mat-icon>notifications</mat-icon>
-                      {{ sub.eventSubscriptions.length }} {{ sub.eventSubscriptions.length !== 1 ? ('webhooks.events' | transloco) : ('webhooks.event' | transloco) }}
+                      {{ sub.eventSubscriptions.length }} {{ sub.eventSubscriptions.length !== 1 ? ('settings.webhooks.events' | transloco) : ('settings.webhooks.event' | transloco) }}
                     </span>
                     @if (sub.consecutiveFailureCount > 0) {
                       <span class="wl-card__failures">
                         <mat-icon>warning</mat-icon>
-                        {{ sub.consecutiveFailureCount }} {{ sub.consecutiveFailureCount !== 1 ? ('webhooks.list.consecutiveFailures' | transloco) : ('webhooks.list.consecutiveFailure' | transloco) }}
+                        {{ sub.consecutiveFailureCount }} {{ sub.consecutiveFailureCount !== 1 ? ('settings.webhooks.list.consecutiveFailures' | transloco) : ('settings.webhooks.list.consecutiveFailure' | transloco) }}
                       </span>
                     }
                     @if (sub.lastDeliveryAt) {
                       <span class="wl-card__last-delivery">
                         <mat-icon>schedule</mat-icon>
-                        {{ 'webhooks.list.lastDelivery' | transloco }} {{ sub.lastDeliveryAt | date:'short' }}
+                        {{ 'settings.webhooks.list.lastDelivery' | transloco }} {{ sub.lastDeliveryAt | date:'short' }}
                       </span>
                     }
                   </div>
@@ -708,13 +708,13 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                 <!-- Actions -->
                 <div class="wl-card__actions" (click)="$event.stopPropagation()">
                   <button mat-icon-button
-                          [matTooltip]="'webhooks.list.editTooltip' | transloco"
+                          [matTooltip]="'settings.webhooks.list.editTooltip' | transloco"
                           class="wl-action-btn"
                           (click)="onEdit(sub)">
                     <mat-icon>edit</mat-icon>
                   </button>
                   <button mat-icon-button
-                          [matTooltip]="'webhooks.list.deleteTooltip' | transloco"
+                          [matTooltip]="'settings.webhooks.list.deleteTooltip' | transloco"
                           color="warn"
                           class="wl-action-btn wl-action-btn--danger"
                           (click)="onDelete(sub)">

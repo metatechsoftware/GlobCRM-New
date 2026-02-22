@@ -1,0 +1,8 @@
+[     518ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:5233/api/profile/preferences:0
+[     591ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     595ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     602ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     603ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     607ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0
+[     607ms] [ERROR] Error while trying to load "auth/en" HttpErrorResponse @ http://localhost:4200/@fs/C:/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/globcrm-web/.angular/cache/19.2.20/globcrm-web/vite/deps/chunk-7LB5PNTV.js?v=829cc14b:652
+[     609ms] [ERROR] Failed to load resource: the server responded with a status of 404 (Not Found) @ http://localhost:4200/assets/i18n/auth/auth/en.json:0

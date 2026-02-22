@@ -41,11 +41,11 @@ import { TranslocoPipe } from '@jsverse/transloco';
             </svg>
             <div class="ring-center">
               <span class="ring-percent">{{ store.progressPercent() }}%</span>
-              <span class="ring-text">{{ 'wizard.progress.complete' | transloco }}</span>
+              <span class="ring-text">{{ 'import.wizard.progress.complete' | transloco }}</span>
             </div>
           </div>
 
-          <div class="progress-title">{{ 'wizard.progress.importing' | transloco }}</div>
+          <div class="progress-title">{{ 'import.wizard.progress.importing' | transloco }}</div>
 
           <div class="live-stats">
             <div class="stat-item">
@@ -54,7 +54,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.processedRows ?? 0 }} / {{ store.progress()?.totalRows ?? 0 }}</span>
-                <span class="stat-label">{{ 'wizard.progress.processed' | transloco }}</span>
+                <span class="stat-label">{{ 'import.wizard.progress.processed' | transloco }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -63,7 +63,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.successCount ?? 0 }}</span>
-                <span class="stat-label">{{ 'wizard.progress.succeeded' | transloco }}</span>
+                <span class="stat-label">{{ 'import.wizard.progress.succeeded' | transloco }}</span>
               </div>
             </div>
             <div class="stat-item">
@@ -72,7 +72,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
               </div>
               <div class="stat-info">
                 <span class="stat-value">{{ store.progress()?.errorCount ?? 0 }}</span>
-                <span class="stat-label">{{ 'wizard.progress.errors' | transloco }}</span>
+                <span class="stat-label">{{ 'import.wizard.progress.errors' | transloco }}</span>
               </div>
             </div>
           </div>
@@ -88,20 +88,20 @@ import { TranslocoPipe } from '@jsverse/transloco';
             </mat-icon>
           </div>
           <div class="completion-title">
-            {{ store.progress()?.status === 'Completed' ? ('wizard.progress.importComplete' | transloco) : ('wizard.progress.importFailed' | transloco) }}
+            {{ store.progress()?.status === 'Completed' ? ('import.wizard.progress.importComplete' | transloco) : ('import.wizard.progress.importFailed' | transloco) }}
           </div>
           <div class="completion-summary">
-            {{ 'wizard.progress.processedSuccess' | transloco }}
+            {{ 'import.wizard.progress.processedSuccess' | transloco }}
           </div>
           <div class="completion-detail-chips">
             <span class="detail-chip success">
               <mat-icon>check_circle</mat-icon>
-              {{ store.progress()?.successCount ?? 0 }} {{ 'wizard.progress.imported' | transloco }}
+              {{ store.progress()?.successCount ?? 0 }} {{ 'import.wizard.progress.imported' | transloco }}
             </span>
             @if ((store.progress()?.errorCount ?? 0) > 0) {
               <span class="detail-chip errors">
                 <mat-icon>error</mat-icon>
-                {{ store.progress()?.errorCount ?? 0 }} {{ 'wizard.progress.errors' | transloco }}
+                {{ store.progress()?.errorCount ?? 0 }} {{ 'import.wizard.progress.errors' | transloco }}
               </span>
             }
           </div>
@@ -109,13 +109,13 @@ import { TranslocoPipe } from '@jsverse/transloco';
 
         @if (store.currentJob()?.errors?.length) {
           <div class="error-list">
-            <h3>{{ 'wizard.progress.errorsShowingFirst' | transloco:{ count: Math.min(store.currentJob()!.errors.length, 10) } }}</h3>
+            <h3>{{ 'import.wizard.progress.errorsShowingFirst' | transloco:{ count: Math.min(store.currentJob()!.errors.length, 10) } }}</h3>
             <table class="error-table">
               <thead>
                 <tr>
-                  <th>{{ 'wizard.progress.row' | transloco }}</th>
-                  <th>{{ 'wizard.progress.field' | transloco }}</th>
-                  <th>{{ 'wizard.progress.error' | transloco }}</th>
+                  <th>{{ 'import.wizard.progress.row' | transloco }}</th>
+                  <th>{{ 'import.wizard.progress.field' | transloco }}</th>
+                  <th>{{ 'import.wizard.progress.error' | transloco }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,10 +134,10 @@ import { TranslocoPipe } from '@jsverse/transloco';
         <div class="completion-actions">
           <button mat-raised-button color="primary" (click)="importAnother.emit()">
             <mat-icon>add</mat-icon>
-            {{ 'wizard.progress.importAnother' | transloco }}
+            {{ 'import.wizard.progress.importAnother' | transloco }}
           </button>
           <a mat-button routerLink="/import/history">
-            {{ 'wizard.progress.viewHistory' | transloco }}
+            {{ 'import.wizard.progress.viewHistory' | transloco }}
           </a>
         </div>
       }

@@ -22,7 +22,7 @@ import { WorkflowNode } from '../../workflow.models';
             <mat-icon>bolt</mat-icon>
           </div>
           <div class="node-info">
-            <span class="node-label">{{ node().label || ('builder.trigger' | transloco) }}</span>
+            <span class="node-label">{{ node().label || ('workflows.builder.trigger' | transloco) }}</span>
             @if (triggerTypeBadge) {
               <span class="node-badge">{{ triggerTypeBadge }}</span>
             }
@@ -152,11 +152,11 @@ export class TriggerNodeComponent {
     const config = this.node().config;
     if (!config) return '';
     const keyMap: Record<string, string> = {
-      recordCreated: 'nodes.recordCreated',
-      recordUpdated: 'nodes.recordUpdated',
-      recordDeleted: 'nodes.recordDeleted',
-      fieldChanged: 'nodes.fieldChanged',
-      dateBased: 'nodes.dateBased',
+      recordCreated: 'workflows.nodes.recordCreated',
+      recordUpdated: 'workflows.nodes.recordUpdated',
+      recordDeleted: 'workflows.nodes.recordDeleted',
+      fieldChanged: 'workflows.nodes.fieldChanged',
+      dateBased: 'workflows.nodes.dateBased',
     };
     const key = keyMap[config['triggerType']];
     return key ? this.transloco.translate(key) : '';

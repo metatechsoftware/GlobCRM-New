@@ -56,6 +56,11 @@
                 "glob": "**/*",
                 "input": "src/assets/i18n",
                 "output": "/assets/i18n"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/assets/icons"
               }
             ],
             "styles": [
@@ -131,6 +136,11 @@
                 "glob": "**/*",
                 "input": "src/assets/i18n",
                 "output": "/assets/i18n"
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets/icons",
+                "output": "/assets/icons"
               }
             ],
             "styles": [
@@ -141,5 +151,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": "17639705-2ed4-4e09-91fc-a3326894b71f"
   }
 }

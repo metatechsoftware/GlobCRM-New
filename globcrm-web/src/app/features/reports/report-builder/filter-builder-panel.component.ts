@@ -31,38 +31,38 @@ interface OperatorOption {
 }
 
 const STRING_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
-  { value: 'equals', labelKey: 'operators.equals' },
-  { value: 'not_equals', labelKey: 'operators.not_equals' },
-  { value: 'contains', labelKey: 'operators.contains' },
-  { value: 'not_contains', labelKey: 'operators.not_contains' },
-  { value: 'is_empty', labelKey: 'operators.is_empty' },
-  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
+  { value: 'equals', labelKey: 'reports.operators.equals' },
+  { value: 'not_equals', labelKey: 'reports.operators.not_equals' },
+  { value: 'contains', labelKey: 'reports.operators.contains' },
+  { value: 'not_contains', labelKey: 'reports.operators.not_contains' },
+  { value: 'is_empty', labelKey: 'reports.operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'reports.operators.is_not_empty' },
 ];
 
 const NUMBER_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
-  { value: 'equals', labelKey: 'operators.equals' },
-  { value: 'not_equals', labelKey: 'operators.not_equals' },
-  { value: 'greater_than', labelKey: 'operators.greater_than' },
-  { value: 'less_than', labelKey: 'operators.less_than' },
-  { value: 'greater_than_or_equal', labelKey: 'operators.greater_than_or_equal' },
-  { value: 'less_than_or_equal', labelKey: 'operators.less_than_or_equal' },
-  { value: 'between', labelKey: 'operators.between' },
-  { value: 'is_empty', labelKey: 'operators.is_empty' },
-  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
+  { value: 'equals', labelKey: 'reports.operators.equals' },
+  { value: 'not_equals', labelKey: 'reports.operators.not_equals' },
+  { value: 'greater_than', labelKey: 'reports.operators.greater_than' },
+  { value: 'less_than', labelKey: 'reports.operators.less_than' },
+  { value: 'greater_than_or_equal', labelKey: 'reports.operators.greater_than_or_equal' },
+  { value: 'less_than_or_equal', labelKey: 'reports.operators.less_than_or_equal' },
+  { value: 'between', labelKey: 'reports.operators.between' },
+  { value: 'is_empty', labelKey: 'reports.operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'reports.operators.is_not_empty' },
 ];
 
 const DATE_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
-  { value: 'equals', labelKey: 'operators.on' },
-  { value: 'not_equals', labelKey: 'operators.not_on' },
-  { value: 'greater_than', labelKey: 'operators.after' },
-  { value: 'less_than', labelKey: 'operators.before' },
-  { value: 'between', labelKey: 'operators.between' },
-  { value: 'is_empty', labelKey: 'operators.is_empty' },
-  { value: 'is_not_empty', labelKey: 'operators.is_not_empty' },
+  { value: 'equals', labelKey: 'reports.operators.on' },
+  { value: 'not_equals', labelKey: 'reports.operators.not_on' },
+  { value: 'greater_than', labelKey: 'reports.operators.after' },
+  { value: 'less_than', labelKey: 'reports.operators.before' },
+  { value: 'between', labelKey: 'reports.operators.between' },
+  { value: 'is_empty', labelKey: 'reports.operators.is_empty' },
+  { value: 'is_not_empty', labelKey: 'reports.operators.is_not_empty' },
 ];
 
 const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
-  { value: 'equals', labelKey: 'operators.equals' },
+  { value: 'equals', labelKey: 'reports.operators.equals' },
 ];
 
 /**
@@ -93,7 +93,7 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
         <mat-expansion-panel-header>
           <mat-panel-title>
             <mat-icon>filter_list</mat-icon>
-            {{ 'panels.filters' | transloco }}
+            {{ 'reports.panels.filters' | transloco }}
             @if (conditionCount() > 0) {
               <span class="filter-builder-panel__count">{{ conditionCount() }}</span>
             }
@@ -127,7 +127,7 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
           <div class="filter-condition">
             <!-- Field Selector -->
             <mat-form-field appearance="outline" class="filter-condition__field">
-              <mat-label>{{ 'panels.field' | transloco }}</mat-label>
+              <mat-label>{{ 'reports.panels.field' | transloco }}</mat-label>
               <mat-select
                 [ngModel]="condition.fieldId"
                 (ngModelChange)="onConditionFieldChange(idx, $event)"
@@ -140,7 +140,7 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
 
             <!-- Operator Selector -->
             <mat-form-field appearance="outline" class="filter-condition__operator">
-              <mat-label>{{ 'panels.operator' | transloco }}</mat-label>
+              <mat-label>{{ 'reports.panels.operator' | transloco }}</mat-label>
               <mat-select
                 [ngModel]="condition.operator"
                 (ngModelChange)="onConditionOperatorChange(idx, $event)"
@@ -155,7 +155,7 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
             @if (!isEmptyOperator(condition.operator)) {
               @if (isBetweenOperator(condition.operator)) {
                 <mat-form-field appearance="outline" class="filter-condition__value filter-condition__value--half">
-                  <mat-label>{{ 'panels.from' | transloco }}</mat-label>
+                  <mat-label>{{ 'reports.panels.from' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -164,7 +164,7 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
                   />
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="filter-condition__value filter-condition__value--half">
-                  <mat-label>{{ 'panels.to' | transloco }}</mat-label>
+                  <mat-label>{{ 'reports.panels.to' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -174,18 +174,18 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
                 </mat-form-field>
               } @else if (isBooleanField(condition.fieldId)) {
                 <mat-form-field appearance="outline" class="filter-condition__value">
-                  <mat-label>{{ 'panels.value' | transloco }}</mat-label>
+                  <mat-label>{{ 'reports.panels.value' | transloco }}</mat-label>
                   <mat-select
                     [ngModel]="condition.value"
                     (ngModelChange)="onConditionValueChange(idx, $event)"
                   >
-                    <mat-option value="true">{{ 'panels.boolTrue' | transloco }}</mat-option>
-                    <mat-option value="false">{{ 'panels.boolFalse' | transloco }}</mat-option>
+                    <mat-option value="true">{{ 'reports.panels.boolTrue' | transloco }}</mat-option>
+                    <mat-option value="false">{{ 'reports.panels.boolFalse' | transloco }}</mat-option>
                   </mat-select>
                 </mat-form-field>
               } @else {
                 <mat-form-field appearance="outline" class="filter-condition__value">
-                  <mat-label>{{ 'panels.value' | transloco }}</mat-label>
+                  <mat-label>{{ 'reports.panels.value' | transloco }}</mat-label>
                   <input
                     matInput
                     [type]="getInputType(condition.fieldId)"
@@ -222,11 +222,11 @@ const BOOLEAN_OPERATOR_KEYS: { value: string; labelKey: string }[] = [
         <div class="filter-group__actions">
           <button mat-button (click)="addCondition()" class="filter-group__add-btn">
             <mat-icon>add</mat-icon>
-            {{ 'panels.addCondition' | transloco }}
+            {{ 'reports.panels.addCondition' | transloco }}
           </button>
           <button mat-button (click)="addGroup()" class="filter-group__add-btn">
             <mat-icon>playlist_add</mat-icon>
-            {{ 'panels.addGroup' | transloco }}
+            {{ 'reports.panels.addGroup' | transloco }}
           </button>
           @if (isNested()) {
             <button mat-icon-button (click)="removeGroup()" class="filter-group__remove-btn">

@@ -1,10 +1,10 @@
 <div class="entity-form-container">
   @if (!dialogMode()) {
     <div class="form-header">
-      <a mat-icon-button routerLink="/contacts" [attr.aria-label]="'form.backToContacts' | transloco">
+      <a mat-icon-button routerLink="/contacts" [attr.aria-label]="'contacts.form.backToContacts' | transloco">
         <mat-icon>arrow_back</mat-icon>
       </a>
-      <h1>{{ isEditMode ? ('form.editTitle' | transloco) : ('form.createTitle' | transloco) }}</h1>
+      <h1>{{ isEditMode ? ('contacts.form.editTitle' | transloco) : ('contacts.form.createTitle' | transloco) }}</h1>
     </div>
   }
 
@@ -18,20 +18,20 @@
       <div class="duplicate-warning">
         <mat-icon>warning</mat-icon>
         <div class="duplicate-warning__content">
-          <strong>{{ 'form.duplicates.title' | transloco }}</strong>
+          <strong>{{ 'contacts.form.duplicates.title' | transloco }}</strong>
           @for (match of potentialDuplicates(); track match.id) {
             <div class="duplicate-warning__match">
               <a [routerLink]="['/contacts', match.id]" target="_blank">
                 {{ match.fullName }}
               </a>
               <span class="duplicate-warning__details">
-                {{ match.email ? '(' + match.email + ')' : '' }} -- {{ match.score }}{{ 'form.duplicates.matchPercent' | transloco }}
+                {{ match.email ? '(' + match.email + ')' : '' }} -- {{ match.score }}{{ 'contacts.form.duplicates.matchPercent' | transloco }}
               </span>
             </div>
           }
         </div>
         <button mat-icon-button class="duplicate-warning__dismiss"
-                (click)="dismissDuplicateWarning()" [attr.aria-label]="'form.aria.dismissWarning' | transloco">
+                (click)="dismissDuplicateWarning()" [attr.aria-label]="'contacts.form.aria.dismissWarning' | transloco">
           <mat-icon>close</mat-icon>
         </button>
       </div>
@@ -40,62 +40,62 @@
     <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
       <div class="form-grid">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.firstName' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.firstName' | transloco }}</mat-label>
           <input matInput formControlName="firstName" required
                  (blur)="onNameOrEmailBlur()">
           @if (contactForm.controls['firstName'].hasError('required')) {
-            <mat-error>{{ 'form.validation.firstNameRequired' | transloco }}</mat-error>
+            <mat-error>{{ 'contacts.form.validation.firstNameRequired' | transloco }}</mat-error>
           }
           @if (contactForm.controls['firstName'].hasError('maxlength')) {
-            <mat-error>{{ 'form.validation.firstNameMaxLength' | transloco }}</mat-error>
+            <mat-error>{{ 'contacts.form.validation.firstNameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.lastName' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.lastName' | transloco }}</mat-label>
           <input matInput formControlName="lastName" required
                  (blur)="onNameOrEmailBlur()">
           @if (contactForm.controls['lastName'].hasError('required')) {
-            <mat-error>{{ 'form.validation.lastNameRequired' | transloco }}</mat-error>
+            <mat-error>{{ 'contacts.form.validation.lastNameRequired' | transloco }}</mat-error>
           }
           @if (contactForm.controls['lastName'].hasError('maxlength')) {
-            <mat-error>{{ 'form.validation.lastNameMaxLength' | transloco }}</mat-error>
+            <mat-error>{{ 'contacts.form.validation.lastNameMaxLength' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.email' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.email' | transloco }}</mat-label>
           <input matInput formControlName="email" type="email"
                  (blur)="onNameOrEmailBlur()">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.phone' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.phone' | transloco }}</mat-label>
           <input matInput formControlName="phone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.mobilePhone' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.mobilePhone' | transloco }}</mat-label>
           <input matInput formControlName="mobilePhone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.jobTitle' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.jobTitle' | transloco }}</mat-label>
           <input matInput formControlName="jobTitle">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.department' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.department' | transloco }}</mat-label>
           <input matInput formControlName="department">
         </mat-form-field>
 
         <!-- Company autocomplete selector -->
         <mat-form-field appearance="outline" class="company-field">
-          <mat-label>{{ 'form.fields.company' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.company' | transloco }}</mat-label>
           <input matInput
                  [formControl]="companySearchControl"
                  [matAutocomplete]="companyAuto"
-                 [placeholder]="'form.fields.companySearchPlaceholder' | transloco">
+                 [placeholder]="'contacts.form.fields.companySearchPlaceholder' | transloco">
           <mat-autocomplete #companyAuto="matAutocomplete"
                             [displayWith]="displayCompanyName"
                             (optionSelected)="onCompanySelected($event)">
@@ -113,46 +113,46 @@
           @if (selectedCompanyId()) {
             <button mat-icon-button matSuffix type="button"
                     (click)="clearCompany()"
-                    [attr.aria-label]="'form.aria.clearCompany' | transloco">
+                    [attr.aria-label]="'contacts.form.aria.clearCompany' | transloco">
               <mat-icon>close</mat-icon>
             </button>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'form.fields.address' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.address' | transloco }}</mat-label>
           <input matInput formControlName="address">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.city' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.city' | transloco }}</mat-label>
           <input matInput formControlName="city">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.state' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.state' | transloco }}</mat-label>
           <input matInput formControlName="state">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.country' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.country' | transloco }}</mat-label>
           <input matInput formControlName="country">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'form.fields.postalCode' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.postalCode' | transloco }}</mat-label>
           <input matInput formControlName="postalCode">
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'form.fields.description' | transloco }}</mat-label>
+          <mat-label>{{ 'contacts.form.fields.description' | transloco }}</mat-label>
           <textarea matInput formControlName="description" rows="3"></textarea>
         </mat-form-field>
       </div>
 
       <!-- Custom fields -->
       <div class="custom-fields-section">
-        <h3>{{ 'form.sections.customFields' | transloco }}</h3>
+        <h3>{{ 'contacts.form.sections.customFields' | transloco }}</h3>
         <app-custom-field-form
           [entityType]="'Contact'"
           [customFieldValues]="existingCustomFields"
@@ -168,7 +168,7 @@
             @if (isSaving()) {
               <mat-spinner diameter="20"></mat-spinner>
             }
-            {{ isEditMode ? ('form.saveChanges' | transloco) : ('form.createContact' | transloco) }}
+            {{ isEditMode ? ('contacts.form.saveChanges' | transloco) : ('contacts.form.createContact' | transloco) }}
           </button>
         </div>
       }

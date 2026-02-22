@@ -144,16 +144,16 @@ import { ReportListItem, ReportChartType } from '../report.models';
             @if (report().isShared) {
               <mat-icon
                 class="report-card__share-icon"
-                [matTooltip]="'card.sharedWithTeam' | transloco"
+                [matTooltip]="'reports.card.sharedWithTeam' | transloco"
               >people</mat-icon>
             } @else {
               <mat-icon
                 class="report-card__share-icon report-card__share-icon--personal"
-                [matTooltip]="'card.personalReport' | transloco"
+                [matTooltip]="'reports.card.personalReport' | transloco"
               >person</mat-icon>
             }
             @if (report().isSeedData) {
-              <span class="report-card__seed-chip">{{ 'card.starter' | transloco }}</span>
+              <span class="report-card__seed-chip">{{ 'reports.card.starter' | transloco }}</span>
             }
           </span>
         </div>
@@ -405,17 +405,17 @@ export class ReportCardComponent {
 
   /** Label for the chart type */
   readonly chartLabel = computed((): string => {
-    const key = `card.chartTypes.${this.report().chartType}`;
+    const key = `reports.card.chartTypes.${this.report().chartType}`;
     return this.transloco.translate(key);
   });
 
   /** Relative time for last run */
   readonly lastRunText = computed(() => {
     const lastRun = this.report().lastRunAt;
-    if (!lastRun) return this.transloco.translate('card.neverRun');
+    if (!lastRun) return this.transloco.translate('reports.card.neverRun');
     const diff = Date.now() - new Date(lastRun).getTime();
     const minutes = Math.floor(diff / 60000);
-    if (minutes < 1) return this.transloco.translate('card.justNow');
+    if (minutes < 1) return this.transloco.translate('reports.card.justNow');
     if (minutes < 60) return `${minutes}m ago`;
     const hours = Math.floor(minutes / 60);
     if (hours < 24) return `${hours}h ago`;

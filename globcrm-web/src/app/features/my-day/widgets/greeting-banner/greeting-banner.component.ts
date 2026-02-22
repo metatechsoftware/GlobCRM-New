@@ -1,7 +1,7 @@
-import { Component, ChangeDetectionStrategy, computed, input, output, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, computed, input, output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-greeting-banner',
@@ -22,7 +22,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
               <mat-icon>{{ timeIcon() }}</mat-icon>
             </div>
             <div class="greeting-banner__text">
-              <h2 class="greeting-banner__title">{{ greeting() }}, {{ firstName() }}</h2>
+              <h2 class="greeting-banner__title">{{ greetingKey() | transloco }}, {{ firstName() }}</h2>
               <span class="greeting-banner__date">{{ dateStr() }}</span>
             </div>
           </div>
@@ -36,34 +36,34 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
           } @else {
             <div class="greeting-banner__stat-chip">
               <mat-icon class="greeting-banner__stat-icon">task_alt</mat-icon>
-              <span>{{ 'stats.tasksToday' | transloco: { count: stats().tasksToday } }}</span>
+              <span>{{ 'myDay.stats.tasksToday' | transloco: { count: stats().tasksToday } }}</span>
             </div>
             <div class="greeting-banner__stat-chip" [class.greeting-banner__stat-chip--danger]="stats().overdue > 0">
               <mat-icon class="greeting-banner__stat-icon">warning</mat-icon>
-              <span>{{ 'stats.overdue' | transloco: { count: stats().overdue } }}</span>
+              <span>{{ 'myDay.stats.overdue' | transloco: { count: stats().overdue } }}</span>
             </div>
             <div class="greeting-banner__stat-chip">
               <mat-icon class="greeting-banner__stat-icon">videocam</mat-icon>
-              <span>{{ 'stats.meetings' | transloco: { count: stats().meetings } }}</span>
+              <span>{{ 'myDay.stats.meetings' | transloco: { count: stats().meetings } }}</span>
             </div>
           }
         </div>
 
         <div class="greeting-banner__actions">
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Contact')">
-            <mat-icon>person_add</mat-icon> <span>{{ 'quickActions.newContact' | transloco }}</span>
+            <mat-icon>person_add</mat-icon> <span>{{ 'myDay.quickActions.newContact' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Deal')">
-            <mat-icon>handshake</mat-icon> <span>{{ 'quickActions.newDeal' | transloco }}</span>
+            <mat-icon>handshake</mat-icon> <span>{{ 'myDay.quickActions.newDeal' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Activity')">
-            <mat-icon>task_alt</mat-icon> <span>{{ 'quickActions.logActivity' | transloco }}</span>
+            <mat-icon>task_alt</mat-icon> <span>{{ 'myDay.quickActions.logActivity' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Note')">
-            <mat-icon>note_add</mat-icon> <span>{{ 'quickActions.newNote' | transloco }}</span>
+            <mat-icon>note_add</mat-icon> <span>{{ 'myDay.quickActions.newNote' | transloco }}</span>
           </button>
           <button class="greeting-banner__action-btn" (click)="quickAction.emit('Email')">
-            <mat-icon>email</mat-icon> <span>{{ 'quickActions.sendEmail' | transloco }}</span>
+            <mat-icon>email</mat-icon> <span>{{ 'myDay.quickActions.sendEmail' | transloco }}</span>
           </button>
         </div>
       </div>
@@ -84,6 +84,31 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       0%   { background-position: 0% 50%; }
       50%  { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
+    }
+
+    @keyframes contentSlideUp {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes iconEntrance {
+      0%   { opacity: 0; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes chipSlideIn {
+      0%   { opacity: 0; transform: translateX(-8px); }
+      100% { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes iconFloat {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-2px); }
+    }
+
+    @keyframes dotDrift {
+      0%, 100% { background-position: 0 0; }
+      50%      { background-position: 10px 5px; }
     }
 
     .greeting-banner {
@@ -144,6 +169,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       pointer-events: none;
       background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
       background-size: 20px 20px;
+      animation: dotDrift 25s ease-in-out infinite;
     }
 
     /* ── Top Row ─────────────────────────────────── */
@@ -174,11 +200,18 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       box-shadow:
         0 4px 16px rgba(0, 0, 0, 0.1),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      animation: iconEntrance 400ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms backwards;
+      transition: transform 250ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+      &:hover {
+        transform: scale(1.08) rotate(-6deg);
+      }
 
       mat-icon {
         font-size: 26px;
         width: 26px;
         height: 26px;
+        animation: iconFloat 6s ease-in-out 1.2s infinite;
       }
     }
 
@@ -196,6 +229,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       font-weight: 400;
       letter-spacing: -0.02em;
       line-height: 1.15;
+      animation: contentSlideUp 400ms cubic-bezier(0.4, 0, 0.2, 1) 280ms backwards;
     }
 
     .greeting-banner__date {
@@ -203,6 +237,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       opacity: 0.8;
       font-weight: var(--font-medium, 500);
       letter-spacing: 0.02em;
+      animation: contentSlideUp 350ms cubic-bezier(0.4, 0, 0.2, 1) 360ms backwards;
     }
 
     /* ── Stat Chips (Frosted Glass) ──────────────── */
@@ -227,12 +262,29 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       font-weight: var(--font-medium, 500);
       color: #fff;
       border: 1px solid rgba(255, 255, 255, 0.15);
-      transition: background 200ms ease, transform 200ms ease;
+      transition: background 200ms ease, transform 200ms ease, box-shadow 200ms ease;
 
       &:hover {
         background: rgba(255, 255, 255, 0.22);
-        transform: translateY(-1px);
+        transform: translateY(-2px) scale(1.03);
+        box-shadow: 0 4px 16px rgba(255, 255, 255, 0.08);
       }
+    }
+
+    .greeting-banner__stat-chip:not(.greeting-banner__shimmer) {
+      animation: chipSlideIn 350ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
+    }
+
+    .greeting-banner__stat-chip:not(.greeting-banner__shimmer):nth-child(1) {
+      animation-delay: 420ms;
+    }
+
+    .greeting-banner__stat-chip:not(.greeting-banner__shimmer):nth-child(2) {
+      animation-delay: 480ms;
+    }
+
+    .greeting-banner__stat-chip:not(.greeting-banner__shimmer):nth-child(3) {
+      animation-delay: 540ms;
     }
 
     .greeting-banner__stat-chip--danger {
@@ -286,6 +338,9 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       font-size: var(--text-sm, 0.875rem);
       font-weight: var(--font-medium, 500);
       cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      animation: chipSlideIn 300ms cubic-bezier(0.4, 0, 0.2, 1) backwards;
       transition:
         background 200ms ease,
         transform 200ms ease,
@@ -297,10 +352,31 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         height: 17px;
       }
 
+      &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(255, 255, 255, 0.15) 50%,
+          transparent 100%
+        );
+        transition: left 400ms ease;
+        pointer-events: none;
+      }
+
       &:hover {
         background: rgba(255, 255, 255, 0.22);
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+        &::after {
+          left: 100%;
+        }
       }
 
       &:active {
@@ -308,6 +384,12 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         box-shadow: none;
       }
     }
+
+    .greeting-banner__action-btn:nth-child(1) { animation-delay: 560ms; }
+    .greeting-banner__action-btn:nth-child(2) { animation-delay: 600ms; }
+    .greeting-banner__action-btn:nth-child(3) { animation-delay: 640ms; }
+    .greeting-banner__action-btn:nth-child(4) { animation-delay: 680ms; }
+    .greeting-banner__action-btn:nth-child(5) { animation-delay: 720ms; }
 
     /* ── Responsive ──────────────────────────────── */
     @media (max-width: 768px) {
@@ -363,9 +445,37 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
         animation: none;
       }
 
-      .greeting-banner__stat-chip,
-      .greeting-banner__action-btn {
+      .greeting-banner__decor-dots {
+        animation: none;
+      }
+
+      .greeting-banner__icon-wrapper {
+        animation: none;
         transition: none;
+      }
+
+      .greeting-banner__icon-wrapper mat-icon {
+        animation: none;
+      }
+
+      .greeting-banner__title,
+      .greeting-banner__date {
+        animation: none;
+      }
+
+      .greeting-banner__stat-chip,
+      .greeting-banner__stat-chip:not(.greeting-banner__shimmer) {
+        animation: none;
+        transition: none;
+      }
+
+      .greeting-banner__action-btn {
+        animation: none;
+        transition: none;
+
+        &::after {
+          display: none;
+        }
       }
     }
   `],
@@ -375,13 +485,12 @@ export class GreetingBannerComponent {
   readonly stats = input.required<{ tasksToday: number; overdue: number; meetings: number }>();
   readonly isLoading = input<boolean>(false);
   readonly quickAction = output<string>();
-  private readonly translocoService = inject(TranslocoService);
 
-  readonly greeting = computed(() => {
+  readonly greetingKey = computed(() => {
     const hour = new Date().getHours();
-    if (hour < 12) return this.translocoService.translate('greeting.morning');
-    if (hour < 17) return this.translocoService.translate('greeting.afternoon');
-    return this.translocoService.translate('greeting.evening');
+    if (hour < 12) return 'myDay.greeting.morning';
+    if (hour < 17) return 'myDay.greeting.afternoon';
+    return 'myDay.greeting.evening';
   });
 
   readonly timeIcon = computed(() => {

@@ -16,11 +16,11 @@ import { MyDayEmailDto } from '../../my-day.models';
         <div class="widget-header-icon">
           <mat-icon>email</mat-icon>
         </div>
-        <mat-card-title>{{ 'widgets.email.title' | transloco }}</mat-card-title>
+        <mat-card-title>{{ 'myDay.widgets.email.title' | transloco }}</mat-card-title>
         @if (!isLoading()) {
           <span class="email-widget__badge"
                 [class.email-widget__badge--active]="unreadCount() > 0">
-            {{ 'widgets.email.unread' | transloco: { count: unreadCount() } }}
+            {{ 'myDay.widgets.email.unread' | transloco: { count: unreadCount() } }}
           </span>
         }
       </mat-card-header>
@@ -36,10 +36,10 @@ import { MyDayEmailDto } from '../../my-day.models';
           <div class="email-widget__empty">
             <mat-icon class="email-widget__empty-icon">mail_outline</mat-icon>
             @if (recentEmails().length === 0 && unreadCount() === 0) {
-              <span class="email-widget__empty-text">{{ 'widgets.email.connectEmail' | transloco }}</span>
-              <a class="email-widget__setup-link" routerLink="/settings">{{ 'widgets.email.setupEmail' | transloco }}</a>
+              <span class="email-widget__empty-text">{{ 'myDay.widgets.email.connectEmail' | transloco }}</span>
+              <a class="email-widget__setup-link" routerLink="/settings">{{ 'myDay.widgets.email.setupEmail' | transloco }}</a>
             } @else {
-              <span class="email-widget__empty-text">{{ 'widgets.email.noRecentEmails' | transloco }}</span>
+              <span class="email-widget__empty-text">{{ 'myDay.widgets.email.noRecentEmails' | transloco }}</span>
             }
           </div>
         } @else {

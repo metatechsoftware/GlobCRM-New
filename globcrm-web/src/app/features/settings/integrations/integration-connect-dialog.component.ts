@@ -46,11 +46,13 @@ export interface ConnectDialogResult {
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <h2 mat-dialog-title class="cd-title">
-      <img
-        [src]="data.catalogItem.iconPath"
-        [alt]="data.catalogItem.name"
-        class="cd-title__icon"
-      />
+      <div class="cd-title__icon-wrap" [style.--brand-color]="data.catalogItem.brandColor">
+        <img
+          [src]="data.catalogItem.iconPath"
+          [alt]="data.catalogItem.name"
+          class="cd-title__icon"
+        />
+      </div>
       {{ 'settings.integrations.connectDialog.title' | transloco:{ name: data.catalogItem.name } }}
     </h2>
 
@@ -103,9 +105,24 @@ export interface ConnectDialogResult {
         letter-spacing: -0.02em;
       }
 
+      .cd-title__icon-wrap {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-sm, 6px);
+        background: color-mix(in srgb, var(--brand-color, #F97316) 10%, transparent);
+        flex-shrink: 0;
+      }
+
+      :host-context([data-theme="dark"]) .cd-title__icon-wrap {
+        background: color-mix(in srgb, var(--brand-color, #F97316) 15%, transparent);
+      }
+
       .cd-title__icon {
-        width: 28px;
-        height: 28px;
+        width: 22px;
+        height: 22px;
         object-fit: contain;
       }
 

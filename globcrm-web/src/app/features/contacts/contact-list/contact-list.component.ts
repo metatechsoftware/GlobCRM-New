@@ -309,14 +309,14 @@ export class ContactListComponent implements OnInit {
             .subscribe({
               next: (result) => {
                 const msg = result.skipped > 0
-                    ? this.transloco.translate('messages.bulkEnrolledWithSkipped', { enrolled: result.enrolled, name: selectedSequence.name, skipped: result.skipped })
-                    : this.transloco.translate('messages.bulkEnrolled', { enrolled: result.enrolled, name: selectedSequence.name });
+                    ? this.transloco.translate('contacts.messages.bulkEnrolledWithSkipped', { enrolled: result.enrolled, name: selectedSequence.name, skipped: result.skipped })
+                    : this.transloco.translate('contacts.messages.bulkEnrolled', { enrolled: result.enrolled, name: selectedSequence.name });
                 this.snackBar.open(msg, this.transloco.translate('common.close'), { duration: 5000 });
                 this.selectedContacts.set([]);
               },
               error: (err) => {
                 this.snackBar.open(
-                  err?.message ?? this.transloco.translate('messages.enrollFailed'),
+                  err?.message ?? this.transloco.translate('contacts.messages.enrollFailed'),
                   this.transloco.translate('common.close'),
                   { duration: 5000 },
                 );

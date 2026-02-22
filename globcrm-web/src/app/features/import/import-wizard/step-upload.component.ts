@@ -31,25 +31,25 @@ import { TranslocoPipe } from '@jsverse/transloco';
   template: `
     <div class="upload-container">
       <!-- Entity Type Cards -->
-      <div class="section-label">{{ 'wizard.upload.whatImporting' | transloco }}</div>
+      <div class="section-label">{{ 'import.wizard.upload.whatImporting' | transloco }}</div>
       <div class="entity-type-cards">
         <button class="entity-card"
                 [class.selected]="entityType() === 'Contact'"
                 (click)="entityType.set('Contact')">
           <mat-icon class="entity-card__icon">person</mat-icon>
-          <span class="entity-card__label">{{ 'wizard.upload.contacts' | transloco }}</span>
+          <span class="entity-card__label">{{ 'import.wizard.upload.contacts' | transloco }}</span>
         </button>
         <button class="entity-card"
                 [class.selected]="entityType() === 'Company'"
                 (click)="entityType.set('Company')">
           <mat-icon class="entity-card__icon">business</mat-icon>
-          <span class="entity-card__label">{{ 'wizard.upload.companies' | transloco }}</span>
+          <span class="entity-card__label">{{ 'import.wizard.upload.companies' | transloco }}</span>
         </button>
         <button class="entity-card"
                 [class.selected]="entityType() === 'Deal'"
                 (click)="entityType.set('Deal')">
           <mat-icon class="entity-card__icon">handshake</mat-icon>
-          <span class="entity-card__label">{{ 'wizard.upload.deals' | transloco }}</span>
+          <span class="entity-card__label">{{ 'import.wizard.upload.deals' | transloco }}</span>
         </button>
       </div>
 
@@ -66,16 +66,16 @@ import { TranslocoPipe } from '@jsverse/transloco';
         @if (store.loading()) {
           <div class="upload-loading">
             <mat-spinner diameter="48"></mat-spinner>
-            <p>{{ 'wizard.upload.processing' | transloco }}</p>
+            <p>{{ 'import.wizard.upload.processing' | transloco }}</p>
           </div>
         } @else if (!selectedFile()) {
           <div class="drop-zone__content">
             <div class="drop-zone__icon-bg">
               <mat-icon>cloud_upload</mat-icon>
             </div>
-            <h3 class="drop-zone__title">{{ 'wizard.upload.dropTitle' | transloco }}</h3>
-            <p class="drop-zone__subtitle">{{ 'wizard.upload.orBrowse' | transloco }}</p>
-            <p class="drop-zone__hint">{{ 'wizard.upload.hint' | transloco }}</p>
+            <h3 class="drop-zone__title">{{ 'import.wizard.upload.dropTitle' | transloco }}</h3>
+            <p class="drop-zone__subtitle">{{ 'import.wizard.upload.orBrowse' | transloco }}</p>
+            <p class="drop-zone__hint">{{ 'import.wizard.upload.hint' | transloco }}</p>
           </div>
         } @else {
           <div class="file-card">
@@ -87,14 +87,14 @@ import { TranslocoPipe } from '@jsverse/transloco';
               <span class="file-card__meta">
                 {{ formatFileSize(selectedFile()!.size) }}
                 @if (store.uploadResponse()) {
-                  · {{ store.uploadResponse()!.totalRows }} {{ 'wizard.upload.rowsDetected' | transloco }}
+                  · {{ store.uploadResponse()!.totalRows }} {{ 'import.wizard.upload.rowsDetected' | transloco }}
                 }
               </span>
             </div>
             @if (store.hasUpload()) {
               <div class="file-card__status">
                 <mat-icon>check_circle</mat-icon>
-                {{ 'wizard.upload.ready' | transloco }}
+                {{ 'import.wizard.upload.ready' | transloco }}
               </div>
             }
           </div>
@@ -109,7 +109,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
         <button mat-raised-button color="primary"
                 [disabled]="!store.hasUpload()"
                 (click)="stepComplete.emit()">
-          {{ 'wizard.next' | transloco }}
+          {{ 'import.wizard.next' | transloco }}
         </button>
       </div>
     </div>

@@ -1,6 +1,6 @@
 <h2 mat-dialog-title>
   <mat-icon>swap_horiz</mat-icon>
-  {{ 'convert.dialogTitle' | transloco }} {{ data.lead.fullName }}
+  {{ 'leads.convert.dialogTitle' | transloco }} {{ data.lead.fullName }}
 </h2>
 
 <mat-dialog-content>
@@ -9,7 +9,7 @@
   @if (duplicateLoading()) {
     <div class="loading-section">
       <mat-spinner diameter="32"></mat-spinner>
-      <span>{{ 'convert.checkingDuplicates' | transloco }}</span>
+      <span>{{ 'leads.convert.checkingDuplicates' | transloco }}</span>
     </div>
   }
 
@@ -17,48 +17,48 @@
   <div class="convert-section">
     <div class="section-header">
       <mat-icon>person</mat-icon>
-      <h3>{{ 'convert.contactSection' | transloco }}</h3>
-      <span class="required-badge">{{ 'convert.required' | transloco }}</span>
+      <h3>{{ 'leads.convert.contactSection' | transloco }}</h3>
+      <span class="required-badge">{{ 'leads.convert.required' | transloco }}</span>
     </div>
 
     <form [formGroup]="contactForm">
       <div class="form-grid">
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.firstName' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.firstName' | transloco }}</mat-label>
           <input matInput formControlName="firstName" required>
           @if (contactForm.controls['firstName'].hasError('required')) {
-            <mat-error>{{ 'convert.validation.firstNameRequired' | transloco }}</mat-error>
+            <mat-error>{{ 'leads.convert.validation.firstNameRequired' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.lastName' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.lastName' | transloco }}</mat-label>
           <input matInput formControlName="lastName" required>
           @if (contactForm.controls['lastName'].hasError('required')) {
-            <mat-error>{{ 'convert.validation.lastNameRequired' | transloco }}</mat-error>
+            <mat-error>{{ 'leads.convert.validation.lastNameRequired' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.email' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.email' | transloco }}</mat-label>
           <input matInput formControlName="email" type="email">
           @if (contactForm.controls['email'].hasError('email')) {
-            <mat-error>{{ 'convert.validation.invalidEmail' | transloco }}</mat-error>
+            <mat-error>{{ 'leads.convert.validation.invalidEmail' | transloco }}</mat-error>
           }
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.phone' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.phone' | transloco }}</mat-label>
           <input matInput formControlName="phone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.mobilePhone' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.mobilePhone' | transloco }}</mat-label>
           <input matInput formControlName="mobilePhone">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.fields.jobTitle' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.fields.jobTitle' | transloco }}</mat-label>
           <input matInput formControlName="jobTitle">
         </mat-form-field>
       </div>
@@ -71,7 +71,7 @@
         <div>
           @for (match of duplicateResult()!.contactMatches; track match.id) {
             <p>
-              {{ 'convert.duplicateContact' | transloco: { name: match.fullName, email: match.email } }}
+              {{ 'leads.convert.duplicateContact' | transloco: { name: match.fullName, email: match.email } }}
             </p>
           }
         </div>
@@ -83,12 +83,12 @@
   <div class="convert-section">
     <div class="section-header">
       <mat-icon>business</mat-icon>
-      <h3>{{ 'convert.companySection' | transloco }}</h3>
+      <h3>{{ 'leads.convert.companySection' | transloco }}</h3>
       <mat-slide-toggle
         [checked]="createCompanyEnabled()"
         (change)="onCompanyToggle($event.checked)"
         labelPosition="before">
-        {{ 'convert.createOrLink' | transloco }}
+        {{ 'leads.convert.createOrLink' | transloco }}
       </mat-slide-toggle>
     </div>
 
@@ -100,7 +100,7 @@
           <div>
             @for (match of duplicateResult()!.companyMatches; track match.id) {
               <p>
-                {{ 'convert.duplicateCompany' | transloco: { name: match.name } }}
+                {{ 'leads.convert.duplicateCompany' | transloco: { name: match.name } }}
               </p>
             }
           </div>
@@ -111,18 +111,18 @@
         [value]="companyMode()"
         (change)="onCompanyModeChange($event.value)"
         class="company-mode-group">
-        <mat-radio-button value="link">{{ 'convert.linkToExisting' | transloco }}</mat-radio-button>
-        <mat-radio-button value="create">{{ 'convert.createNew' | transloco }}</mat-radio-button>
+        <mat-radio-button value="link">{{ 'leads.convert.linkToExisting' | transloco }}</mat-radio-button>
+        <mat-radio-button value="create">{{ 'leads.convert.createNew' | transloco }}</mat-radio-button>
       </mat-radio-group>
 
       @if (companyMode() === 'link') {
         <div class="company-search">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'convert.searchCompanies' | transloco }}</mat-label>
+            <mat-label>{{ 'leads.convert.searchCompanies' | transloco }}</mat-label>
             <input matInput
                    [formControl]="companySearchControl"
                    [matAutocomplete]="companyAuto"
-                   [placeholder]="'convert.searchPlaceholder' | transloco">
+                   [placeholder]="'leads.convert.searchPlaceholder' | transloco">
             <mat-autocomplete #companyAuto="matAutocomplete"
                               [displayWith]="displayCompanyName"
                               (optionSelected)="onCompanySelected($event)">
@@ -144,17 +144,17 @@
       @if (companyMode() === 'create') {
         <form [formGroup]="companyForm" class="form-grid">
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>{{ 'convert.newCompanyName' | transloco }}</mat-label>
+            <mat-label>{{ 'leads.convert.newCompanyName' | transloco }}</mat-label>
             <input matInput formControlName="newCompanyName">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'convert.newCompanyWebsite' | transloco }}</mat-label>
+            <mat-label>{{ 'leads.convert.newCompanyWebsite' | transloco }}</mat-label>
             <input matInput formControlName="newCompanyWebsite" placeholder="https://...">
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'convert.newCompanyPhone' | transloco }}</mat-label>
+            <mat-label>{{ 'leads.convert.newCompanyPhone' | transloco }}</mat-label>
             <input matInput formControlName="newCompanyPhone">
           </mat-form-field>
         </form>
@@ -166,30 +166,30 @@
   <div class="convert-section">
     <div class="section-header">
       <mat-icon>handshake</mat-icon>
-      <h3>{{ 'convert.dealSection' | transloco }}</h3>
+      <h3>{{ 'leads.convert.dealSection' | transloco }}</h3>
       <mat-slide-toggle
         [checked]="createDealEnabled()"
         (change)="onDealToggle($event.checked)"
         labelPosition="before">
-        {{ 'convert.createDeal' | transloco }}
+        {{ 'leads.convert.createDeal' | transloco }}
       </mat-slide-toggle>
     </div>
 
     @if (createDealEnabled()) {
       <form [formGroup]="dealForm" class="form-grid">
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'convert.dealTitle' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.dealTitle' | transloco }}</mat-label>
           <input matInput formControlName="dealTitle">
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.dealValue' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.dealValue' | transloco }}</mat-label>
           <input matInput formControlName="dealValue" type="number" min="0">
           <span matTextPrefix>$&nbsp;</span>
         </mat-form-field>
 
         <mat-form-field appearance="outline">
-          <mat-label>{{ 'convert.dealPipeline' | transloco }}</mat-label>
+          <mat-label>{{ 'leads.convert.dealPipeline' | transloco }}</mat-label>
           <mat-select formControlName="dealPipelineId">
             @for (pipeline of pipelines(); track pipeline.id) {
               <mat-option [value]="pipeline.id">{{ pipeline.name }}</mat-option>
@@ -212,6 +212,6 @@
       <mat-spinner diameter="20"></mat-spinner>
     }
     <mat-icon>swap_horiz</mat-icon>
-    {{ 'convert.convertButton' | transloco }}
+    {{ 'leads.convert.convertButton' | transloco }}
   </button>
 </mat-dialog-actions>

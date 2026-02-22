@@ -676,15 +676,15 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
       <div class="ea-header">
         <a routerLink="/settings" class="ea-header__back">
           <mat-icon>arrow_back</mat-icon>
-          <span>{{ 'emailAccounts.breadcrumb' | transloco }}</span>
+          <span>{{ 'settings.emailAccounts.breadcrumb' | transloco }}</span>
         </a>
         <div class="ea-header__row">
           <div class="ea-header__icon-wrap">
             <mat-icon>mail</mat-icon>
           </div>
           <div>
-            <h1 class="ea-header__title">{{ 'emailAccounts.pageTitle' | transloco }}</h1>
-            <p class="ea-header__subtitle">{{ 'emailAccounts.pageSubtitle' | transloco }}</p>
+            <h1 class="ea-header__title">{{ 'settings.emailAccounts.pageTitle' | transloco }}</h1>
+            <p class="ea-header__subtitle">{{ 'settings.emailAccounts.pageSubtitle' | transloco }}</p>
           </div>
         </div>
       </div>
@@ -696,7 +696,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
           <div class="ea-section__inner">
             <div class="ea-loading">
               <mat-spinner diameter="40"></mat-spinner>
-              <p class="ea-loading__text">{{ 'emailAccounts.loadingStatus' | transloco }}</p>
+              <p class="ea-loading__text">{{ 'settings.emailAccounts.loadingStatus' | transloco }}</p>
             </div>
           </div>
         } @else if (!accountStatus() || !accountStatus()!.connected) {
@@ -711,13 +711,13 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                 </div>
                 <mat-icon class="ea-disconnected__icon">mail_outline</mat-icon>
               </div>
-              <h2 class="ea-disconnected__title">{{ 'emailAccounts.noGmailConnected' | transloco }}</h2>
+              <h2 class="ea-disconnected__title">{{ 'settings.emailAccounts.noGmailConnected' | transloco }}</h2>
               <p class="ea-disconnected__desc">
-                {{ 'emailAccounts.noGmailDesc' | transloco }}
+                {{ 'settings.emailAccounts.noGmailDesc' | transloco }}
               </p>
               <button class="ea-connect-btn" (click)="connect()">
                 <mat-icon>link</mat-icon>
-                {{ 'emailAccounts.connectGmail' | transloco }}
+                {{ 'settings.emailAccounts.connectGmail' | transloco }}
               </button>
             </div>
           </div>
@@ -739,7 +739,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                   <mat-icon>check</mat-icon>
                 </div>
                 <div class="ea-banner__info">
-                  <h3 class="ea-banner__title">{{ 'emailAccounts.gmailConnected' | transloco }}</h3>
+                  <h3 class="ea-banner__title">{{ 'settings.emailAccounts.gmailConnected' | transloco }}</h3>
                   <p class="ea-banner__address">{{ accountStatus()!.gmailAddress }}</p>
                 </div>
               </div>
@@ -751,7 +751,7 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                     <mat-icon>wifi_tethering</mat-icon>
                   </div>
                   <div class="ea-info-card__content">
-                    <p class="ea-info-card__label">{{ 'emailAccounts.syncStatus' | transloco }}</p>
+                    <p class="ea-info-card__label">{{ 'settings.emailAccounts.syncStatus' | transloco }}</p>
                     <div class="ea-info-card__value">
                       <span class="ea-badge"
                             [class.ea-badge--active]="accountStatus()!.syncStatus === 'Active'"
@@ -769,9 +769,9 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                     <mat-icon>schedule</mat-icon>
                   </div>
                   <div class="ea-info-card__content">
-                    <p class="ea-info-card__label">{{ 'emailAccounts.lastSynced' | transloco }}</p>
+                    <p class="ea-info-card__label">{{ 'settings.emailAccounts.lastSynced' | transloco }}</p>
                     <p class="ea-info-card__value">
-                      {{ accountStatus()!.lastSyncAt ? formatRelativeTime(accountStatus()!.lastSyncAt!) : ('webhooks.detail.never' | transloco) }}
+                      {{ accountStatus()!.lastSyncAt ? formatRelativeTime(accountStatus()!.lastSyncAt!) : ('settings.webhooks.detail.never' | transloco) }}
                     </p>
                   </div>
                 </div>
@@ -796,16 +796,16 @@ import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
                     <span class="ea-sync-btn__spinner">
                       <mat-spinner diameter="16"></mat-spinner>
                     </span>
-                    {{ 'emailAccounts.syncing' | transloco }}
+                    {{ 'settings.emailAccounts.syncing' | transloco }}
                   } @else {
                     <mat-icon>sync</mat-icon>
-                    {{ 'emailAccounts.syncNow' | transloco }}
+                    {{ 'settings.emailAccounts.syncNow' | transloco }}
                   }
                 </button>
 
                 <button class="ea-disconnect-btn" (click)="disconnect()">
                   <mat-icon>link_off</mat-icon>
-                  {{ 'emailAccounts.disconnect' | transloco }}
+                  {{ 'settings.emailAccounts.disconnect' | transloco }}
                 </button>
               </div>
             </div>

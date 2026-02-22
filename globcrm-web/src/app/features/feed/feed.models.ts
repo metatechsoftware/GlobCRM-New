@@ -2,8 +2,8 @@
  * Feed item type enum.
  */
 export enum FeedItemType {
-  SystemEvent = 'SystemEvent',
-  SocialPost = 'SocialPost',
+  SystemEvent = 'systemEvent',
+  SocialPost = 'socialPost',
 }
 
 /**

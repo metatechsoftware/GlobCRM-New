@@ -1,7 +1,7 @@
 <div class="kanban-layout">
   <!-- Header toolbar -->
   <div class="kanban-header">
-    <h1>{{ 'kanban.title' | transloco }}</h1>
+    <h1>{{ 'leads.kanban.title' | transloco }}</h1>
 
     <div class="header-actions">
       <!-- Show Terminal Stages toggle -->
@@ -9,7 +9,7 @@
         [checked]="includeTerminal()"
         (change)="onTerminalToggled($event.checked)"
         class="terminal-toggle">
-        {{ 'kanban.showLostConverted' | transloco }}
+        {{ 'leads.kanban.showLostConverted' | transloco }}
       </mat-slide-toggle>
 
       <!-- View mode switcher -->
@@ -26,7 +26,7 @@
       <button mat-raised-button color="primary"
               *appHasPermission="'Lead:Create'"
               routerLink="/leads/new">
-        <mat-icon>add</mat-icon> {{ 'kanban.addLead' | transloco }}
+        <mat-icon>add</mat-icon> {{ 'leads.kanban.addLead' | transloco }}
       </button>
     </div>
   </div>
@@ -121,7 +121,7 @@
               </div>
             }
             @if (stage.leads.length === 0) {
-              <div class="column-empty">{{ 'kanban.noLeads' | transloco }}</div>
+              <div class="column-empty">{{ 'leads.kanban.noLeads' | transloco }}</div>
             }
           </div>
         </div>
@@ -130,8 +130,8 @@
   } @else if (!isLoading()) {
     <div class="kanban-empty">
       <mat-icon class="empty-icon">person_search</mat-icon>
-      <p>{{ 'kanban.emptyTitle' | transloco }}</p>
-      <p class="empty-subtext">{{ 'kanban.emptySubtext' | transloco }}</p>
+      <p>{{ 'leads.kanban.emptyTitle' | transloco }}</p>
+      <p class="empty-subtext">{{ 'leads.kanban.emptySubtext' | transloco }}</p>
     </div>
   }
 </div>

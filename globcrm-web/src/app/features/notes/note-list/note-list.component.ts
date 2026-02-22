@@ -62,13 +62,13 @@ import { NoteListDto } from '../note.models';
         (viewSelected)="onViewSelected($event)" />
       <div class="entity-list-content">
         <div class="list-header">
-          <h1>{{ 'list.title' | transloco }}</h1>
+          <h1>{{ 'notes.list.title' | transloco }}</h1>
 
           <div class="list-header-actions">
             <button mat-raised-button color="primary"
                     *appHasPermission="'Note:Create'"
                     routerLink="new">
-              <mat-icon>add</mat-icon> {{ 'list.newNote' | transloco }}
+              <mat-icon>add</mat-icon> {{ 'notes.list.newNote' | transloco }}
             </button>
           </div>
         </div>

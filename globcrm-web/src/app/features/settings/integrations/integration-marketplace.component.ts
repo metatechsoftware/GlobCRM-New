@@ -19,6 +19,7 @@ import {
   IntegrationCatalogItem,
   IntegrationViewModel,
   IntegrationActivityLogEntry,
+  CATEGORY_ICONS,
 } from './integration.models';
 import { IntegrationCardComponent } from './integration-card.component';
 import { IntegrationStore } from './integration.store';
@@ -52,10 +53,16 @@ interface CategoryOption {
   template: `
     <!-- Page Header -->
     <div class="mp-header">
-      <h1 class="mp-header__title">{{ 'settings.integrations.title' | transloco }}</h1>
-      <p class="mp-header__subtitle">
-        {{ 'settings.integrations.subtitle' | transloco }}
-      </p>
+      <div class="mp-header__mesh"></div>
+      <div class="mp-header__content">
+        <div class="mp-header__icon-wrap">
+          <mat-icon class="mp-header__icon">hub</mat-icon>
+        </div>
+        <div class="mp-header__text">
+          <h1 class="mp-header__title">{{ 'settings.integrations.title' | transloco }}</h1>
+          <p class="mp-header__subtitle">{{ 'settings.integrations.subtitle' | transloco }}</p>
+        </div>
+      </div>
     </div>
 
     <!-- Filter Bar -->
@@ -80,6 +87,7 @@ interface CategoryOption {
             [class.mp-chip--active]="selectedCategory() === cat.value"
             (click)="selectedCategory.set(cat.value)"
           >
+            <mat-icon class="mp-chip__icon">{{ getCategoryIcon(cat.value) }}</mat-icon>
             {{ cat.labelKey | transloco }}
           </button>
         }
@@ -89,11 +97,12 @@ interface CategoryOption {
     <!-- Integration Grid -->
     @if (integrations().length > 0) {
       <div class="mp-grid">
-        @for (integration of integrations(); track integration.catalog.key) {
+        @for (integration of integrations(); track integration.catalog.key; let i = $index) {
           <app-integration-card
             [catalog]="integration.catalog"
             [connection]="integration.connection"
             [isAdmin]="isAdmin()"
+            [animationDelay]="(i * 60) + 'ms'"
             (connect)="onConnect(integration)"
             (disconnect)="onDisconnect(integration)"
             (testConnection)="onTestConnection(integration)"
@@ -103,8 +112,11 @@ interface CategoryOption {
       </div>
     } @else {
       <div class="mp-empty">
-        <mat-icon class="mp-empty__icon">search_off</mat-icon>
-        <p class="mp-empty__text">{{ 'settings.integrations.empty' | transloco }}</p>
+        <div class="mp-empty__icon-wrap">
+          <mat-icon class="mp-empty__icon">extension_off</mat-icon>
+        </div>
+        <h3 class="mp-empty__heading">{{ 'settings.integrations.empty' | transloco }}</h3>
+        <p class="mp-empty__text">{{ 'settings.integrations.emptyHint' | transloco }}</p>
         <button class="mp-empty__reset" (click)="clearFilters()">
           {{ 'settings.clearSearch' | transloco }}
         </button>
@@ -180,6 +192,10 @@ export class IntegrationMarketplaceComponent implements OnInit {
 
   ngOnInit(): void {
     this.integrationStore.loadConnections();
+  }
+
+  getCategoryIcon(category: IntegrationCategory | 'all'): string {
+    return CATEGORY_ICONS[category] ?? 'apps';
   }
 
   clearFilters(): void {

@@ -194,11 +194,11 @@ import { TargetProgressComponent } from '../widgets/target-progress/target-progr
           <mat-menu #widgetMenu="matMenu">
             <button mat-menu-item (click)="edit.emit()">
               <mat-icon>settings</mat-icon>
-              <span>{{ 'widgets.configure' | transloco }}</span>
+              <span>{{ 'dashboard.widgets.configure' | transloco }}</span>
             </button>
             <button mat-menu-item (click)="remove.emit()">
               <mat-icon>delete</mat-icon>
-              <span>{{ 'widgets.remove' | transloco }}</span>
+              <span>{{ 'dashboard.widgets.remove' | transloco }}</span>
             </button>
           </mat-menu>
         }

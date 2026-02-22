@@ -1,43 +1,43 @@
-<h2 mat-dialog-title>{{ isCreateMode() ? ('customFields.editDialog.createTitle' | transloco) : ('customFields.editDialog.editTitle' | transloco) }}</h2>
+<h2 mat-dialog-title>{{ isCreateMode() ? ('settings.customFields.editDialog.createTitle' | transloco) : ('settings.customFields.editDialog.editTitle' | transloco) }}</h2>
 
 <mat-dialog-content>
   <form [formGroup]="form" class="field-form">
     <!-- Basic Info -->
     <div class="form-section">
-      <h3>{{ 'customFields.editDialog.basicInfo' | transloco }}</h3>
+      <h3>{{ 'settings.customFields.editDialog.basicInfo' | transloco }}</h3>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'customFields.editDialog.label' | transloco }}</mat-label>
-        <input matInput formControlName="label" [placeholder]="'customFields.editDialog.labelPlaceholder' | transloco" />
+        <mat-label>{{ 'settings.customFields.editDialog.label' | transloco }}</mat-label>
+        <input matInput formControlName="label" [placeholder]="'settings.customFields.editDialog.labelPlaceholder' | transloco" />
         @if (form.get('label')?.hasError('required') && form.get('label')?.touched) {
-          <mat-error>{{ 'customFields.editDialog.labelRequired' | transloco }}</mat-error>
+          <mat-error>{{ 'settings.customFields.editDialog.labelRequired' | transloco }}</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'customFields.editDialog.nameLabel' | transloco }}</mat-label>
-        <input matInput formControlName="name" [placeholder]="'customFields.editDialog.namePlaceholder' | transloco" />
+        <mat-label>{{ 'settings.customFields.editDialog.nameLabel' | transloco }}</mat-label>
+        <input matInput formControlName="name" [placeholder]="'settings.customFields.editDialog.namePlaceholder' | transloco" />
         @if (!isCreateMode()) {
-          <mat-hint>{{ 'customFields.editDialog.nameHint' | transloco }}</mat-hint>
+          <mat-hint>{{ 'settings.customFields.editDialog.nameHint' | transloco }}</mat-hint>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'customFields.editDialog.fieldType' | transloco }}</mat-label>
+        <mat-label>{{ 'settings.customFields.editDialog.fieldType' | transloco }}</mat-label>
         <mat-select formControlName="fieldType">
           @for (type of fieldTypes; track type) {
             <mat-option [value]="type">{{ fieldTypeLabels[type] }}</mat-option>
           }
         </mat-select>
         @if (!isCreateMode()) {
-          <mat-hint>{{ 'customFields.editDialog.fieldTypeHint' | transloco }}</mat-hint>
+          <mat-hint>{{ 'settings.customFields.editDialog.fieldTypeHint' | transloco }}</mat-hint>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>{{ 'customFields.editDialog.section' | transloco }}</mat-label>
+        <mat-label>{{ 'settings.customFields.editDialog.section' | transloco }}</mat-label>
         <mat-select formControlName="sectionId">
-          <mat-option [value]="null">{{ 'customFields.editDialog.generalSection' | transloco }}</mat-option>
+          <mat-option [value]="null">{{ 'settings.customFields.editDialog.generalSection' | transloco }}</mat-option>
           @for (section of data.sections; track section.id) {
             <mat-option [value]="section.id">{{ section.name }}</mat-option>
           }
@@ -45,7 +45,7 @@
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="half-width">
-        <mat-label>{{ 'customFields.editDialog.sortOrder' | transloco }}</mat-label>
+        <mat-label>{{ 'settings.customFields.editDialog.sortOrder' | transloco }}</mat-label>
         <input matInput formControlName="sortOrder" type="number" />
       </mat-form-field>
     </div>
@@ -55,34 +55,34 @@
     <!-- Type-specific fields -->
     @if (showTextValidation()) {
       <div class="form-section">
-        <h3>{{ 'customFields.editDialog.textValidation' | transloco }}</h3>
+        <h3>{{ 'settings.customFields.editDialog.textValidation' | transloco }}</h3>
         <div class="form-row">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'customFields.editDialog.minLength' | transloco }}</mat-label>
+            <mat-label>{{ 'settings.customFields.editDialog.minLength' | transloco }}</mat-label>
             <input matInput formControlName="minLength" type="number" />
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'customFields.editDialog.maxLength' | transloco }}</mat-label>
+            <mat-label>{{ 'settings.customFields.editDialog.maxLength' | transloco }}</mat-label>
             <input matInput formControlName="maxLength" type="number" />
           </mat-form-field>
         </div>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'customFields.editDialog.regexPattern' | transloco }}</mat-label>
-          <input matInput formControlName="regexPattern" [placeholder]="'customFields.editDialog.regexPlaceholder' | transloco" />
+          <mat-label>{{ 'settings.customFields.editDialog.regexPattern' | transloco }}</mat-label>
+          <input matInput formControlName="regexPattern" [placeholder]="'settings.customFields.editDialog.regexPlaceholder' | transloco" />
         </mat-form-field>
       </div>
     }
 
     @if (showNumberValidation()) {
       <div class="form-section">
-        <h3>{{ 'customFields.editDialog.numberValidation' | transloco }}</h3>
+        <h3>{{ 'settings.customFields.editDialog.numberValidation' | transloco }}</h3>
         <div class="form-row">
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'customFields.editDialog.minValue' | transloco }}</mat-label>
+            <mat-label>{{ 'settings.customFields.editDialog.minValue' | transloco }}</mat-label>
             <input matInput formControlName="minValue" type="number" />
           </mat-form-field>
           <mat-form-field appearance="outline">
-            <mat-label>{{ 'customFields.editDialog.maxValue' | transloco }}</mat-label>
+            <mat-label>{{ 'settings.customFields.editDialog.maxValue' | transloco }}</mat-label>
             <input matInput formControlName="maxValue" type="number" />
           </mat-form-field>
         </div>
@@ -91,30 +91,30 @@
 
     @if (showOptions()) {
       <div class="form-section">
-        <h3>{{ 'customFields.editDialog.options' | transloco }}</h3>
+        <h3>{{ 'settings.customFields.editDialog.options' | transloco }}</h3>
         <div formArrayName="options">
           @for (option of options.controls; track $index; let i = $index) {
             <div [formGroupName]="i" class="option-row">
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'customFields.editDialog.optionValue' | transloco }}</mat-label>
+                <mat-label>{{ 'settings.customFields.editDialog.optionValue' | transloco }}</mat-label>
                 <input matInput formControlName="value" />
               </mat-form-field>
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'customFields.editDialog.optionLabel' | transloco }}</mat-label>
+                <mat-label>{{ 'settings.customFields.editDialog.optionLabel' | transloco }}</mat-label>
                 <input matInput formControlName="label" />
               </mat-form-field>
               <mat-form-field appearance="outline" class="color-field">
-                <mat-label>{{ 'customFields.editDialog.optionColor' | transloco }}</mat-label>
+                <mat-label>{{ 'settings.customFields.editDialog.optionColor' | transloco }}</mat-label>
                 <input matInput formControlName="color" placeholder="#FF0000" />
               </mat-form-field>
               <div class="option-actions">
-                <button mat-icon-button [matTooltip]="'customFields.editDialog.moveUp' | transloco" (click)="moveOption(i, 'up')" [disabled]="i === 0">
+                <button mat-icon-button [matTooltip]="'settings.customFields.editDialog.moveUp' | transloco" (click)="moveOption(i, 'up')" [disabled]="i === 0">
                   <mat-icon>arrow_upward</mat-icon>
                 </button>
-                <button mat-icon-button [matTooltip]="'customFields.editDialog.moveDown' | transloco" (click)="moveOption(i, 'down')" [disabled]="i === options.length - 1">
+                <button mat-icon-button [matTooltip]="'settings.customFields.editDialog.moveDown' | transloco" (click)="moveOption(i, 'down')" [disabled]="i === options.length - 1">
                   <mat-icon>arrow_downward</mat-icon>
                 </button>
-                <button mat-icon-button [matTooltip]="'customFields.editDialog.remove' | transloco" color="warn" (click)="removeOption(i)">
+                <button mat-icon-button [matTooltip]="'settings.customFields.editDialog.remove' | transloco" color="warn" (click)="removeOption(i)">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>
@@ -123,16 +123,16 @@
         </div>
         <button mat-stroked-button type="button" (click)="addOption()">
           <mat-icon>add</mat-icon>
-          {{ 'customFields.editDialog.addOption' | transloco }}
+          {{ 'settings.customFields.editDialog.addOption' | transloco }}
         </button>
       </div>
     }
 
     @if (showRelation()) {
       <div class="form-section">
-        <h3>{{ 'customFields.editDialog.relationTarget' | transloco }}</h3>
+        <h3>{{ 'settings.customFields.editDialog.relationTarget' | transloco }}</h3>
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'customFields.editDialog.relatedEntityType' | transloco }}</mat-label>
+          <mat-label>{{ 'settings.customFields.editDialog.relatedEntityType' | transloco }}</mat-label>
           <mat-select formControlName="relationEntityType">
             @for (type of entityTypes; track type) {
               <mat-option [value]="type">{{ type }}</mat-option>
@@ -145,16 +145,16 @@
     @if (showFormula()) {
       <mat-divider></mat-divider>
       <div class="form-section">
-        <h3>{{ 'customFields.editDialog.formulaConfig' | transloco }}</h3>
+        <h3>{{ 'settings.customFields.editDialog.formulaConfig' | transloco }}</h3>
 
         <mat-form-field appearance="outline" class="full-width">
-          <mat-label>{{ 'customFields.editDialog.resultType' | transloco }}</mat-label>
+          <mat-label>{{ 'settings.customFields.editDialog.resultType' | transloco }}</mat-label>
           <mat-select formControlName="formulaResultType">
             @for (type of resultTypes; track type.value) {
               <mat-option [value]="type.value">{{ type.label }}</mat-option>
             }
           </mat-select>
-          <mat-hint>{{ 'customFields.editDialog.resultTypeHint' | transloco }}</mat-hint>
+          <mat-hint>{{ 'settings.customFields.editDialog.resultTypeHint' | transloco }}</mat-hint>
         </mat-form-field>
 
         <app-formula-editor
@@ -174,12 +174,12 @@
     @if (!showFormula()) {
     <mat-expansion-panel class="validation-panel">
       <mat-expansion-panel-header>
-        <mat-panel-title>{{ 'customFields.editDialog.validationRules' | transloco }}</mat-panel-title>
+        <mat-panel-title>{{ 'settings.customFields.editDialog.validationRules' | transloco }}</mat-panel-title>
       </mat-expansion-panel-header>
 
       <div class="validation-checks">
-        <mat-checkbox formControlName="required">{{ 'customFields.editDialog.requiredField' | transloco }}</mat-checkbox>
-        <mat-checkbox formControlName="unique">{{ 'customFields.editDialog.uniqueField' | transloco }}</mat-checkbox>
+        <mat-checkbox formControlName="required">{{ 'settings.customFields.editDialog.requiredField' | transloco }}</mat-checkbox>
+        <mat-checkbox formControlName="unique">{{ 'settings.customFields.editDialog.uniqueField' | transloco }}</mat-checkbox>
       </div>
     </mat-expansion-panel>
     }
@@ -187,12 +187,12 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()">{{ 'customFields.editDialog.cancel' | transloco }}</button>
+  <button mat-button (click)="cancel()">{{ 'settings.customFields.editDialog.cancel' | transloco }}</button>
   <button
     mat-flat-button
     color="primary"
     (click)="save()"
     [disabled]="saving() || (showFormula() && !formulaValid())">
-    {{ saving() ? ('customFields.editDialog.saving' | transloco) : (isCreateMode() ? ('customFields.editDialog.create' | transloco) : ('customFields.editDialog.save' | transloco)) }}
+    {{ saving() ? ('settings.customFields.editDialog.saving' | transloco) : (isCreateMode() ? ('settings.customFields.editDialog.create' | transloco) : ('settings.customFields.editDialog.save' | transloco)) }}
   </button>
 </mat-dialog-actions>

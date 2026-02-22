@@ -56,23 +56,23 @@ const ENTITY_OPTIONS: EntityOption[] = [
       <mat-expansion-panel-header>
         <mat-panel-title>
           <mat-icon>dataset</mat-icon>
-          {{ 'panels.dataSource' | transloco }}
+          {{ 'reports.panels.dataSource' | transloco }}
         </mat-panel-title>
       </mat-expansion-panel-header>
 
       <div class="entity-source-panel__content">
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>{{ 'panels.reportName' | transloco }}</mat-label>
+          <mat-label>{{ 'reports.panels.reportName' | transloco }}</mat-label>
           <input
             matInput
             [ngModel]="nameValue()"
             (ngModelChange)="onNameChange($event)"
-            [placeholder]="'panels.reportNamePlaceholder' | transloco"
+            [placeholder]="'reports.panels.reportNamePlaceholder' | transloco"
           />
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>{{ 'panels.entityType' | transloco }}</mat-label>
+          <mat-label>{{ 'reports.panels.entityType' | transloco }}</mat-label>
           <mat-select
             [ngModel]="entityTypeValue()"
             (ngModelChange)="onEntityTypeChange($event)"
@@ -92,12 +92,12 @@ const ENTITY_OPTIONS: EntityOption[] = [
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>{{ 'panels.category' | transloco }}</mat-label>
+          <mat-label>{{ 'reports.panels.category' | transloco }}</mat-label>
           <mat-select
             [ngModel]="categoryIdValue()"
             (ngModelChange)="onCategoryChange($event)"
           >
-            <mat-option [value]="null">{{ 'panels.categoryNone' | transloco }}</mat-option>
+            <mat-option [value]="null">{{ 'reports.panels.categoryNone' | transloco }}</mat-option>
             @for (cat of categories(); track cat.id) {
               <mat-option [value]="cat.id">{{ cat.name }}</mat-option>
             }
@@ -105,12 +105,12 @@ const ENTITY_OPTIONS: EntityOption[] = [
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="entity-source-panel__field">
-          <mat-label>{{ 'panels.description' | transloco }}</mat-label>
+          <mat-label>{{ 'reports.panels.description' | transloco }}</mat-label>
           <textarea
             matInput
             [ngModel]="descriptionValue()"
             (ngModelChange)="onDescriptionChange($event)"
-            [placeholder]="'panels.descriptionPlaceholder' | transloco"
+            [placeholder]="'reports.panels.descriptionPlaceholder' | transloco"
             rows="2"
           ></textarea>
         </mat-form-field>

@@ -40,47 +40,47 @@ interface DialogData {
     TranslocoPipe,
   ],
   template: `
-    <h2 mat-dialog-title>{{ 'saveTemplate.title' | transloco }}</h2>
+    <h2 mat-dialog-title>{{ 'workflows.saveTemplate.title' | transloco }}</h2>
     <mat-dialog-content>
       <p class="dialog-hint">
-        {{ 'saveTemplate.hint' | transloco:{ name: data.workflowName } }}
+        {{ 'workflows.saveTemplate.hint' | transloco:{ name: data.workflowName } }}
       </p>
 
       <mat-form-field appearance="outline" class="dialog-field">
-        <mat-label>{{ 'saveTemplate.templateName' | transloco }}</mat-label>
+        <mat-label>{{ 'workflows.saveTemplate.templateName' | transloco }}</mat-label>
         <input matInput
                [(ngModel)]="name"
-               [placeholder]="'saveTemplate.templateNamePlaceholder' | transloco"
+               [placeholder]="'workflows.saveTemplate.templateNamePlaceholder' | transloco"
                required />
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="dialog-field">
-        <mat-label>{{ 'saveTemplate.description' | transloco }}</mat-label>
+        <mat-label>{{ 'workflows.saveTemplate.description' | transloco }}</mat-label>
         <textarea matInput
                   [(ngModel)]="description"
-                  [placeholder]="'saveTemplate.descriptionPlaceholder' | transloco"
+                  [placeholder]="'workflows.saveTemplate.descriptionPlaceholder' | transloco"
                   rows="3">
         </textarea>
       </mat-form-field>
 
       <mat-form-field appearance="outline" class="dialog-field">
-        <mat-label>{{ 'saveTemplate.category' | transloco }}</mat-label>
+        <mat-label>{{ 'workflows.saveTemplate.category' | transloco }}</mat-label>
         <mat-select [(ngModel)]="category" required>
-          <mat-option value="sales">{{ 'saveTemplate.categories.sales' | transloco }}</mat-option>
-          <mat-option value="engagement">{{ 'saveTemplate.categories.engagement' | transloco }}</mat-option>
-          <mat-option value="operational">{{ 'saveTemplate.categories.operational' | transloco }}</mat-option>
-          <mat-option value="custom">{{ 'saveTemplate.categories.custom' | transloco }}</mat-option>
+          <mat-option value="sales">{{ 'workflows.saveTemplate.categories.sales' | transloco }}</mat-option>
+          <mat-option value="engagement">{{ 'workflows.saveTemplate.categories.engagement' | transloco }}</mat-option>
+          <mat-option value="operational">{{ 'workflows.saveTemplate.categories.operational' | transloco }}</mat-option>
+          <mat-option value="custom">{{ 'workflows.saveTemplate.categories.custom' | transloco }}</mat-option>
         </mat-select>
       </mat-form-field>
     </mat-dialog-content>
 
     <mat-dialog-actions align="end">
-      <button mat-button mat-dialog-close>{{ 'saveTemplate.cancel' | transloco }}</button>
+      <button mat-button mat-dialog-close>{{ 'workflows.saveTemplate.cancel' | transloco }}</button>
       <button mat-flat-button
               color="primary"
               [disabled]="!name() || !category()"
               (click)="save()">
-        {{ 'saveTemplate.save' | transloco }}
+        {{ 'workflows.saveTemplate.save' | transloco }}
       </button>
     </mat-dialog-actions>
   `,
