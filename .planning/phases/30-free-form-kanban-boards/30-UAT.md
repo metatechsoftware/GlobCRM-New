@@ -1,5 +1,5 @@
 ---
-status: complete
+status: diagnosed
 phase: 30-free-form-kanban-boards
 source: 30-01-SUMMARY.md, 30-02-SUMMARY.md, 30-03-SUMMARY.md, 30-04-SUMMARY.md, 30-05-SUMMARY.md, 30-06-SUMMARY.md
 started: 2026-02-22T12:00:00Z
@@ -97,27 +97,44 @@ skipped: 0
   reason: "User reported: the board list doesnt show the newly created custom board"
   severity: major
   test: 4
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "MatDialog.open() called without viewContainerRef, so dialog gets root injector instead of route-level injector where BoardStore is provided. Dialog's inject(BoardStore) gets a different instance than the boards-list component."
+  artifacts:
+    - path: "globcrm-web/src/app/features/boards/boards-list/boards-list.component.ts"
+      issue: "openCreateDialog() missing viewContainerRef in dialog config"
+    - path: "globcrm-web/src/app/features/boards/boards.routes.ts"
+      issue: "BoardStore provided at route level, not root"
+  missing:
+    - "Pass viewContainerRef to MatDialog.open() config so dialog shares the same BoardStore instance"
+  debug_session: ".planning/debug/boards-list-not-refreshing.md"
 
 - truth: "Card move across columns persists on refresh and cards can be reordered within the same column"
   status: failed
   reason: "User reported: on refresh the card is moved back to the list it was created on and the cards cant be reordered in the list itself"
   severity: major
   test: 8
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Double-mutation bug: CDK moveItemInArray/transferArrayItem mutates store arrays in-place, then store.moveCard() tries to splice/insert the same arrays again. For cross-column moves, the card is already gone from source so splice returns undefined, hitting early return before API call. For same-column reorder, indices reference pre-rearrangement positions causing corrupted state."
+  artifacts:
+    - path: "globcrm-web/src/app/features/boards/boards.store.ts"
+      issue: "moveCard() lines 138-167 double-applies CDK mutations; early return at line 152 skips API call; previousBoard captured after mutation"
+    - path: "globcrm-web/src/app/features/boards/board-detail/board-detail.component.ts"
+      issue: "onCardDrop() lines 389-438 calls CDK mutation functions before passing data to store"
+  missing:
+    - "Remove store's redundant array manipulation since CDK already mutated correctly"
+    - "Capture previousBoard via deep clone before CDK mutations for error rollback"
+    - "Store should only patchState with new array references and make API call"
+  debug_session: ".planning/debug/card-drag-drop-bugs.md"
 
 - truth: "Checklist items show in the card detail panel checklist section after being added"
   status: failed
   reason: "User reported: checklist item is added as indicator on card but doesnt show up under checklist in detail panel"
   severity: major
   test: 12
-  root_cause: ""
-  artifacts: []
-  missing: []
-  debug_session: ""
+  root_cause: "Backend BoardsController.cs is missing a GET endpoint for fetching checklist items. Frontend calls GET /api/boards/{boardId}/cards/{cardId}/checklist but endpoint doesn't exist (404). CardDto only maps ChecklistTotal/ChecklistChecked counts, not actual items."
+  artifacts:
+    - path: "src/GlobCRM.Api/Controllers/BoardsController.cs"
+      issue: "Missing GET checklist endpoint; has POST/PUT/DELETE/PATCH but no GET"
+    - path: "globcrm-web/src/app/features/boards/card-detail-panel/card-detail-panel.component.ts"
+      issue: "loadChecklistItems() line 530-537 calls correct URL but backend returns 404"
+  missing:
+    - "Add GET endpoint to BoardsController for fetching checklist items by cardId"
+  debug_session: ".planning/debug/checklist-items-not-loading.md"

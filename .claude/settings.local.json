@@ -33,7 +33,8 @@
       "Bash(true:*)",
       "mcp__plugin_playwright_playwright__browser_click",
       "Bash(cd /c/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/src/GlobCRM.Api && dotnet ef database update --context ApplicationDbContext --project ../GlobCRM.Infrastructure 2>&1)",
-      "Bash(cd /c/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/src/GlobCRM.Api && dotnet ef database update --context TenantDbContext --project ../GlobCRM.Infrastructure 2>&1)"
+      "Bash(cd /c/Users/maliy/Documents/MetaTech/Projects/GlobCRM-New/src/GlobCRM.Api && dotnet ef database update --context TenantDbContext --project ../GlobCRM.Infrastructure 2>&1)",
+      "Bash(ls:*)"
     ]
   }
 }

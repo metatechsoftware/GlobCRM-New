@@ -1175,7 +1175,7 @@ public record BoardListDto
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }
     public string? Color { get; init; }
-    public string Visibility { get; init; } = string.Empty;
+    public BoardVisibility Visibility { get; init; }
     public Guid? CreatorId { get; init; }
     public string? CreatorName { get; init; }
     public int ColumnCount { get; init; }
@@ -1189,7 +1189,7 @@ public record BoardListDto
         Name = entity.Name,
         Description = entity.Description,
         Color = entity.Color,
-        Visibility = entity.Visibility.ToString(),
+        Visibility = entity.Visibility,
         CreatorId = entity.CreatorId,
         CreatorName = entity.Creator != null
             ? $"{entity.Creator.FirstName} {entity.Creator.LastName}".Trim()
@@ -1210,7 +1210,7 @@ public record BoardDetailDto
     public string Name { get; init; } = string.Empty;
     public string? Description { get; init; }
     public string? Color { get; init; }
-    public string Visibility { get; init; } = string.Empty;
+    public BoardVisibility Visibility { get; init; }
     public Guid? CreatorId { get; init; }
     public string? CreatorName { get; init; }
     public Guid? TeamId { get; init; }
@@ -1225,7 +1225,7 @@ public record BoardDetailDto
         Name = entity.Name,
         Description = entity.Description,
         Color = entity.Color,
-        Visibility = entity.Visibility.ToString(),
+        Visibility = entity.Visibility,
         CreatorId = entity.CreatorId,
         CreatorName = entity.Creator != null
             ? $"{entity.Creator.FirstName} {entity.Creator.LastName}".Trim()
