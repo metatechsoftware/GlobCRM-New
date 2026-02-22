@@ -1,0 +1,85 @@
+<div class="editor-page">
+  <!-- Top Toolbar -->
+  <div class="editor-toolbar">
+    <div class="toolbar-left">
+      <button mat-icon-button (click)="goBack()" [matTooltip]="'quoteTemplates.editor.backTooltip' | transloco">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h2 class="page-title">{{ pageTitle() }}</h2>
+    </div>
+
+    <div class="toolbar-center">
+      <div class="fields-group">
+        <mat-form-field appearance="outline" class="name-field">
+          <mat-label>{{ 'quoteTemplates.editor.templateName' | transloco }}</mat-label>
+          <input
+            matInput
+            [value]="templateName()"
+            (input)="templateName.set($any($event.target).value)"
+            [placeholder]="'quoteTemplates.editor.templateNamePlaceholder' | transloco"
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="page-size-field">
+          <mat-label>{{ 'quoteTemplates.editor.pageSize' | transloco }}</mat-label>
+          <mat-select
+            [value]="pageSize()"
+            (selectionChange)="pageSize.set($event.value)"
+          >
+            <mat-option value="A4">A4</mat-option>
+            <mat-option value="Letter">Letter</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="orientation-field">
+          <mat-label>{{ 'quoteTemplates.editor.orientation' | transloco }}</mat-label>
+          <mat-select
+            [value]="pageOrientation()"
+            (selectionChange)="pageOrientation.set($event.value)"
+          >
+            <mat-option value="portrait">{{ 'quoteTemplates.editor.portrait' | transloco }}</mat-option>
+            <mat-option value="landscape">{{ 'quoteTemplates.editor.landscape' | transloco }}</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <div class="toolbar-right">
+      <mat-slide-toggle
+        [checked]="isDefault()"
+        (change)="isDefault.set($event.checked)"
+        [matTooltip]="'quoteTemplates.editor.defaultTooltip' | transloco"
+      >
+        {{ 'quoteTemplates.editor.default' | transloco }}
+      </mat-slide-toggle>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="save-btn"
+        [disabled]="saving() || !templateName()"
+        (click)="save()"
+      >
+        @if (saving()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          <mat-icon>save</mat-icon>
+        }
+        {{ 'quoteTemplates.editor.save' | transloco }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Main Content: Full-height Unlayer Editor -->
+  <div class="editor-content">
+    <div class="editor-container">
+      <email-editor
+        #emailEditor
+        [options]="editorOptions()"
+        (loaded)="onEditorLoaded()"
+        (ready)="onEditorReady()"
+        minHeight="calc(100vh - 64px)"
+      ></email-editor>
+    </div>
+  </div>
+</div>
