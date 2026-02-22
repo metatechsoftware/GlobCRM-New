@@ -1,10 +1,11 @@
 import { Routes } from '@angular/router';
+import { provideTranslocoScope } from '@jsverse/transloco';
 import { QuoteTemplateStore } from './quote-template.store';
 
 export const QUOTE_TEMPLATE_ROUTES: Routes = [
   {
     path: '',
-    providers: [QuoteTemplateStore],
+    providers: [QuoteTemplateStore, provideTranslocoScope('quoteTemplates')],
     children: [
       {
         path: '',

@@ -152,6 +152,9 @@ public class TenantSeeder : ITenantSeeder
                 .ExecuteDeleteAsync();
         }
 
+        // ── Delete existing Quote Template seed data ────────────────
+        await _db.QuoteTemplates.Where(qt => qt.TenantId == organizationId && qt.IsSeedData).ExecuteDeleteAsync();
+
         // ── Delete existing Report seed data ──────────────────────
         // Reports before categories (FK constraint)
         await _db.Reports.Where(r => r.TenantId == organizationId && r.IsSeedData).ExecuteDeleteAsync();
@@ -2032,6 +2035,11 @@ public class TenantSeeder : ITenantSeeder
         // STEP 14: Report Categories + Starter Reports
         // ══════════════════════════════════════════════════════════
         await SeedReportsAsync(organizationId);
+
+        // ══════════════════════════════════════════════════════════
+        // STEP 15: Quote PDF Template Starters
+        // ══════════════════════════════════════════════════════════
+        await SeedQuoteTemplatesAsync(organizationId);
     }
 
     /// <summary>
@@ -3262,6 +3270,338 @@ public class TenantSeeder : ITenantSeeder
         _logger.LogInformation(
             "Report seed data created for organization {OrgId}: 3 categories, 6 starter reports",
             organizationId);
+    }
+
+    /// <summary>
+    /// Seeds 2 starter quote PDF templates for a new organization.
+    /// Template 1: "Standard Quote" (default) — clean layout with org header, line items table, totals.
+    /// Template 2: "Detailed Proposal" — extended layout with description block, terms section.
+    /// </summary>
+    private async Task SeedQuoteTemplatesAsync(Guid organizationId)
+    {
+        // Idempotency: skip if seed quote templates already exist
+        var alreadySeeded = await _db.QuoteTemplates
+            .AnyAsync(qt => qt.TenantId == organizationId && qt.IsSeedData);
+        if (alreadySeeded) return;
+
+        var minimalDesignJson = @"{""body"":{""rows"":[],""values"":{""backgroundColor"":""#ffffff""}},""counters"":{""u_row"":0,""u_column"":0,""u_content_text"":0}}";
+
+        var standardQuote = new QuoteTemplate
+        {
+            TenantId = organizationId,
+            Name = "Standard Quote",
+            DesignJson = minimalDesignJson,
+            HtmlBody = BuildStandardQuoteHtml(),
+            IsDefault = true,
+            PageSize = "A4",
+            PageOrientation = "portrait",
+            PageMarginTop = "20mm",
+            PageMarginRight = "15mm",
+            PageMarginBottom = "20mm",
+            PageMarginLeft = "15mm",
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        var detailedProposal = new QuoteTemplate
+        {
+            TenantId = organizationId,
+            Name = "Detailed Proposal",
+            DesignJson = minimalDesignJson,
+            HtmlBody = BuildDetailedProposalHtml(),
+            IsDefault = false,
+            PageSize = "A4",
+            PageOrientation = "portrait",
+            PageMarginTop = "20mm",
+            PageMarginRight = "15mm",
+            PageMarginBottom = "20mm",
+            PageMarginLeft = "15mm",
+            IsSeedData = true,
+            CreatedAt = DateTimeOffset.UtcNow,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        _db.QuoteTemplates.AddRange(standardQuote, detailedProposal);
+        await _db.SaveChangesAsync();
+
+        _logger.LogInformation(
+            "Quote template seed data created for organization {OrgId}: 2 starter templates",
+            organizationId);
+    }
+
+    private static string BuildStandardQuoteHtml()
+    {
+        return @"<!DOCTYPE html>
+<html>
+<head>
+<meta charset=""utf-8"">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 32px; padding-bottom: 20px; border-bottom: 2px solid #EA580C; }
+  .org-info h1 { font-size: 22px; font-weight: 700; color: #EA580C; margin-bottom: 4px; }
+  .org-info p { font-size: 12px; color: #666; }
+  .quote-badge { text-align: right; }
+  .quote-badge h2 { font-size: 28px; font-weight: 800; color: #EA580C; text-transform: uppercase; letter-spacing: 1px; }
+  .quote-badge .quote-number { font-size: 14px; color: #666; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .details-grid { display: flex; gap: 40px; margin-bottom: 28px; }
+  .details-section { flex: 1; }
+  .details-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .details-section p { font-size: 13px; color: #333; margin-bottom: 2px; }
+  .details-section .label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th:last-child { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td:last-child { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+  .totals { margin-left: auto; width: 280px; margin-bottom: 28px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row.grand-total { border-top: 2px solid #1C1917; padding-top: 10px; margin-top: 6px; font-size: 16px; font-weight: 700; color: #EA580C; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .notes-section { background: #fafaf8; border: 1px solid #eee; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-section p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 1px solid #eee; font-size: 11px; color: #999; }
+</style>
+</head>
+<body>
+  <div class=""header"">
+    <div class=""org-info"">
+      <h1>{{organization.name}}</h1>
+      <p>{{organization.address}}</p>
+      <p>{{organization.phone}} &middot; {{organization.email}}</p>
+    </div>
+    <div class=""quote-badge"">
+      <h2>Quote</h2>
+      <div class=""quote-number"">{{quote.number}}</div>
+    </div>
+  </div>
+
+  <div class=""details-grid"">
+    <div class=""details-section"">
+      <h3>Bill To</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{company.name}}</p>
+      <p>{{contact.email}}</p>
+    </div>
+    <div class=""details-section"">
+      <h3>Quote Details</h3>
+      <p><span class=""label"">Title:</span> {{quote.title}}</p>
+      <p><span class=""label"">Date:</span> {{quote.issue_date}}</p>
+      <p><span class=""label"">Valid Until:</span> {{quote.expiry_date}}</p>
+      <p><span class=""label"">Status:</span> {{quote.status}}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Qty</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in line_items %}
+      <tr>
+        <td>{{item.description}}</td>
+        <td>{{item.quantity}}</td>
+        <td>{{item.unit_price}}</td>
+        <td>{{item.line_total}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <div class=""totals"">
+    <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+    <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+    <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+    <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+  </div>
+
+  <div class=""notes-section"">
+    <h3>Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+
+  <div class=""footer"">
+    <p>{{organization.name}} &middot; {{organization.website}}</p>
+  </div>
+</body>
+</html>";
+    }
+
+    private static string BuildDetailedProposalHtml()
+    {
+        return @"<!DOCTYPE html>
+<html>
+<head>
+<meta charset=""utf-8"">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; color: #1a1a1a; line-height: 1.6; font-size: 14px; }
+  .header-bar { background: linear-gradient(135deg, #1C1917 0%, #342D29 100%); color: white; padding: 32px; margin-bottom: 28px; }
+  .header-bar h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+  .header-bar .subtitle { font-size: 14px; opacity: 0.8; }
+  .header-bar .org-details { margin-top: 12px; font-size: 12px; opacity: 0.7; }
+  .meta-row { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
+  .meta-card { flex: 1; min-width: 140px; background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 14px; }
+  .meta-card .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 4px; }
+  .meta-card .value { font-size: 14px; font-weight: 500; color: #1a1a1a; }
+  .section { margin-bottom: 24px; }
+  .section-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #eee; }
+  .description-block { background: #fafaf8; border-left: 3px solid #EA580C; padding: 16px; margin-bottom: 24px; border-radius: 0 6px 6px 0; }
+  .description-block p { font-size: 13px; color: #444; }
+  .client-info { display: flex; gap: 40px; margin-bottom: 24px; }
+  .client-col { flex: 1; }
+  .client-col h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 8px; }
+  .client-col p { font-size: 13px; color: #333; margin-bottom: 2px; }
+  table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+  thead th { background: #1C1917; color: #fff; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; text-align: left; }
+  thead th.num { text-align: right; }
+  tbody td { padding: 10px 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+  tbody td.num { text-align: right; font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  tbody tr:nth-child(even) { background: #fafaf8; }
+  .totals-wrapper { display: flex; justify-content: flex-end; margin-bottom: 28px; }
+  .totals { width: 300px; }
+  .totals .row { display: flex; justify-content: space-between; padding: 6px 0; font-size: 13px; }
+  .totals .row .amount { font-family: 'JetBrains Mono', 'Courier New', monospace; }
+  .totals .row.grand-total { border-top: 2px solid #EA580C; padding-top: 10px; margin-top: 6px; font-size: 18px; font-weight: 700; color: #EA580C; }
+  .terms-section { background: #fafaf8; border: 1px solid #eee; border-radius: 8px; padding: 20px; margin-bottom: 24px; }
+  .terms-section h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 10px; }
+  .terms-section ul { padding-left: 18px; font-size: 13px; color: #555; }
+  .terms-section ul li { margin-bottom: 4px; }
+  .notes-box { border: 1px dashed #ddd; border-radius: 6px; padding: 16px; margin-bottom: 20px; }
+  .notes-box h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #EA580C; font-weight: 600; margin-bottom: 6px; }
+  .notes-box p { font-size: 13px; color: #555; }
+  .footer { text-align: center; padding-top: 20px; border-top: 2px solid #eee; }
+  .footer p { font-size: 11px; color: #999; }
+  .footer .brand { font-size: 13px; font-weight: 600; color: #EA580C; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+  <div class=""header-bar"">
+    <h1>{{organization.name}}</h1>
+    <div class=""subtitle"">Proposal &middot; {{quote.number}}</div>
+    <div class=""org-details"">{{organization.address}} &middot; {{organization.phone}} &middot; {{organization.email}}</div>
+  </div>
+
+  <div class=""meta-row"">
+    <div class=""meta-card"">
+      <div class=""label"">Quote Number</div>
+      <div class=""value"">{{quote.number}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Issue Date</div>
+      <div class=""value"">{{quote.issue_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Valid Until</div>
+      <div class=""value"">{{quote.expiry_date}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Status</div>
+      <div class=""value"">{{quote.status}}</div>
+    </div>
+    <div class=""meta-card"">
+      <div class=""label"">Version</div>
+      <div class=""value"">{{quote.version}}</div>
+    </div>
+  </div>
+
+  <div class=""description-block"">
+    <p>{{quote.description}}</p>
+  </div>
+
+  <div class=""client-info"">
+    <div class=""client-col"">
+      <h3>Client Contact</h3>
+      <p><strong>{{contact.first_name}} {{contact.last_name}}</strong></p>
+      <p>{{contact.job_title}}</p>
+      <p>{{contact.email}}</p>
+      <p>{{contact.phone}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Company</h3>
+      <p><strong>{{company.name}}</strong></p>
+      <p>{{company.industry}}</p>
+      <p>{{company.address}}</p>
+      <p>{{company.phone}}</p>
+      <p>{{company.website}}</p>
+    </div>
+    <div class=""client-col"">
+      <h3>Related Deal</h3>
+      <p><strong>{{deal.title}}</strong></p>
+      <p>Stage: {{deal.stage}}</p>
+      <p>Value: {{deal.value}}</p>
+      <p>Close Date: {{deal.close_date}}</p>
+    </div>
+  </div>
+
+  <div class=""section"">
+    <div class=""section-title"">Line Items</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class=""num"">Qty</th>
+          <th class=""num"">Unit Price</th>
+          <th class=""num"">Discount %</th>
+          <th class=""num"">Tax %</th>
+          <th class=""num"">Net Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in line_items %}
+        <tr>
+          <td>{{item.description}}</td>
+          <td class=""num"">{{item.quantity}}</td>
+          <td class=""num"">{{item.unit_price}}</td>
+          <td class=""num"">{{item.discount_percent}}</td>
+          <td class=""num"">{{item.tax_percent}}</td>
+          <td class=""num"">{{item.net_total}}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class=""totals-wrapper"">
+    <div class=""totals"">
+      <div class=""row""><span>Subtotal</span><span class=""amount"">{{quote.subtotal}}</span></div>
+      <div class=""row""><span>Discount</span><span class=""amount"">-{{quote.discount_total}}</span></div>
+      <div class=""row""><span>Tax</span><span class=""amount"">{{quote.tax_total}}</span></div>
+      <div class=""row grand-total""><span>Grand Total</span><span class=""amount"">{{quote.grand_total}}</span></div>
+    </div>
+  </div>
+
+  <div class=""terms-section"">
+    <h3>Terms &amp; Conditions</h3>
+    <ul>
+      <li>This quote is valid until the expiry date shown above.</li>
+      <li>Payment is due within 30 days of invoice date.</li>
+      <li>All prices are in the agreed currency unless otherwise stated.</li>
+      <li>Scope changes may result in price adjustments.</li>
+    </ul>
+  </div>
+
+  <div class=""notes-box"">
+    <h3>Additional Notes</h3>
+    <p>{{quote.notes}}</p>
+  </div>
+
+  <div class=""footer"">
+    <p class=""brand"">{{organization.name}}</p>
+    <p>{{organization.address}} &middot; {{organization.website}}</p>
+    <p>Thank you for your business.</p>
+  </div>
+</body>
+</html>";
     }
 }
 

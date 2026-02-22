@@ -1,0 +1,108 @@
+<div class="preview-dialog">
+  <!-- Header -->
+  <div class="preview-header">
+    <h2>{{ 'quoteTemplates.preview.title' | transloco }}</h2>
+    <button mat-icon-button (click)="close()" [attr.aria-label]="'common.close' | transloco">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Control Bar -->
+  <div class="control-bar">
+    <!-- Quote Selector -->
+    <div class="quote-selector">
+      <span class="selector-label">{{ 'quoteTemplates.preview.selectQuote' | transloco }}</span>
+
+      <mat-form-field appearance="outline" class="quote-select-field">
+        <mat-select
+          [value]="selectedQuoteId()"
+          (selectionChange)="onQuoteSelected($event.value)"
+          [placeholder]="'quoteTemplates.preview.selectQuotePlaceholder' | transloco"
+        >
+          @for (quote of quotes(); track quote.id) {
+            <mat-option [value]="quote.id">
+              {{ quote.quoteNumber }} - {{ quote.title }}
+            </mat-option>
+          }
+          @if (quotes().length === 0 && !loadingQuotes()) {
+            <mat-option disabled>{{ 'quoteTemplates.preview.noQuotes' | transloco }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      @if (loadingQuotes()) {
+        <mat-spinner diameter="18"></mat-spinner>
+      }
+    </div>
+
+    <!-- Actions -->
+    <div class="control-actions">
+      <button
+        mat-icon-button
+        [matTooltip]="'quoteTemplates.preview.refreshTooltip' | transloco"
+        (click)="loadPreview()"
+        [disabled]="loading() || !selectedQuoteId()"
+      >
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="downloadPdf()"
+        [disabled]="downloading() || !selectedQuoteId()"
+        class="download-btn"
+      >
+        @if (downloading()) {
+          <mat-spinner diameter="18"></mat-spinner>
+        } @else {
+          <mat-icon>picture_as_pdf</mat-icon>
+        }
+        {{ 'quoteTemplates.preview.downloadPdf' | transloco }}
+      </button>
+
+      <button mat-button (click)="close()">
+        {{ 'quoteTemplates.preview.close' | transloco }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Preview Area -->
+  <div class="preview-area">
+    <div class="preview-viewport">
+      <div class="preview-container">
+        @if (loading()) {
+          <div class="preview-loading">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>{{ 'quoteTemplates.preview.loading' | transloco }}</p>
+          </div>
+        }
+
+        @if (error()) {
+          <div class="preview-error">
+            <mat-icon>error_outline</mat-icon>
+            <p>{{ error() }}</p>
+            <button mat-button color="primary" (click)="loadPreview()">
+              {{ 'common.retry' | transloco }}
+            </button>
+          </div>
+        }
+
+        @if (!selectedQuoteId() && !loading()) {
+          <div class="preview-empty">
+            <mat-icon>description</mat-icon>
+            <p>{{ 'quoteTemplates.preview.selectQuotePrompt' | transloco }}</p>
+          </div>
+        }
+
+        @if (previewHtml() && !loading()) {
+          <iframe
+            class="preview-iframe"
+            [srcdoc]="previewHtml()! | safeHtml"
+            sandbox
+          ></iframe>
+        }
+      </div>
+    </div>
+  </div>
+</div>

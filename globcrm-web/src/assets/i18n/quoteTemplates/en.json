@@ -1,0 +1,66 @@
+{
+  "list": {
+    "title": "Quote Templates",
+    "tagline": "Design and manage custom PDF templates for your quotes",
+    "createButton": "New Template",
+    "loading": "Loading templates...",
+    "default": "DEFAULT",
+    "lastModified": "Modified:",
+    "actions": {
+      "more": "More actions",
+      "edit": "Edit",
+      "clone": "Clone",
+      "setDefault": "Set as Default",
+      "delete": "Delete"
+    },
+    "empty": {
+      "title": "No templates yet",
+      "description": "Create your first quote template to generate beautifully branded PDF quotes.",
+      "button": "Create Template"
+    }
+  },
+  "editor": {
+    "editTitle": "Edit Template",
+    "newTitle": "New Template",
+    "templateName": "Template Name",
+    "templateNamePlaceholder": "Enter template name",
+    "pageSize": "Page Size",
+    "orientation": "Orientation",
+    "portrait": "Portrait",
+    "landscape": "Landscape",
+    "default": "Default Template",
+    "defaultTooltip": "Set as the default template for new quotes",
+    "backTooltip": "Back to templates",
+    "save": "Save",
+    "saving": "Saving...",
+    "preview": "Preview"
+  },
+  "preview": {
+    "title": "Template Preview",
+    "selectQuote": "Preview with:",
+    "selectQuotePlaceholder": "Select a quote",
+    "selectQuotePrompt": "Select a quote from the dropdown above to preview this template with real data.",
+    "noQuotes": "No quotes available",
+    "loading": "Loading preview...",
+    "downloadPdf": "Download PDF",
+    "downloadError": "Failed to download PDF",
+    "close": "Close",
+    "error": "Failed to load preview",
+    "refreshTooltip": "Refresh preview"
+  },
+  "messages": {
+    "cloned": "Template cloned successfully",
+    "setAsDefault": "Template set as default",
+    "deleted": "Template deleted",
+    "saved": "Template saved",
+    "created": "Template created",
+    "nameRequired": "Template name is required",
+    "saveBeforePreview": "Save the template before previewing"
+  },
+  "deleteDialog": {
+    "title": "Delete Template",
+    "message": "Are you sure you want to delete this template? This action cannot be undone.",
+    "cancel": "Cancel",
+    "confirm": "Delete"
+  }
+}

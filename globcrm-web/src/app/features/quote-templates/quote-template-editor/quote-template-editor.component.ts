@@ -19,11 +19,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { EmailEditorModule, EmailEditorComponent } from 'angular-email-editor';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { QuoteTemplateStore } from '../quote-template.store';
+import { QuoteTemplatePreviewComponent, QuotePreviewDialogData } from '../quote-template-preview/quote-template-preview.component';
 
 /**
  * Full-page Unlayer template editor for quote PDF templates.
@@ -62,6 +63,7 @@ export class QuoteTemplateEditorComponent implements OnInit {
 
   readonly store = inject(QuoteTemplateStore);
   private readonly router = inject(Router);
+  private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly transloco = inject(TranslocoService);
 
@@ -232,6 +234,45 @@ export class QuoteTemplateEditorComponent implements OnInit {
           this.router.navigate(['/quote-templates']);
         });
       }
+    });
+  }
+
+  // ─── Preview ─────────────────────────────────────────────────────────
+
+  openPreview(): void {
+    const templateId = this.id();
+    if (!templateId) {
+      this.snackBar.open(
+        this.transloco.translate('quoteTemplates.messages.saveBeforePreview'),
+        this.transloco.translate('common.close'),
+        { duration: 3000 },
+      );
+      return;
+    }
+
+    // Save current state first, then open preview
+    this.emailEditor.exportHtml((data: { design: object; html: string }) => {
+      const request = {
+        name: this.templateName().trim(),
+        designJson: JSON.stringify(data.design),
+        htmlBody: data.html,
+        pageSize: this.pageSize(),
+        pageOrientation: this.pageOrientation(),
+        pageMarginTop: this.marginTop(),
+        pageMarginRight: this.marginRight(),
+        pageMarginBottom: this.marginBottom(),
+        pageMarginLeft: this.marginLeft(),
+        isDefault: this.isDefault(),
+      };
+
+      this.store.updateTemplate(templateId, request, () => {
+        this.dialog.open(QuoteTemplatePreviewComponent, {
+          width: '90vw',
+          maxWidth: '900px',
+          height: '85vh',
+          data: { templateId } as QuotePreviewDialogData,
+        });
+      });
     });
   }
 

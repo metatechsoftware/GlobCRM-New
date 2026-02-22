@@ -54,6 +54,17 @@
       </mat-slide-toggle>
 
       <button
+        mat-stroked-button
+        class="preview-btn"
+        [disabled]="!isEditMode()"
+        (click)="openPreview()"
+        [matTooltip]="!isEditMode() ? ('quoteTemplates.messages.saveBeforePreview' | transloco) : ''"
+      >
+        <mat-icon>visibility</mat-icon>
+        {{ 'quoteTemplates.editor.preview' | transloco }}
+      </button>
+
+      <button
         mat-raised-button
         color="primary"
         class="save-btn"

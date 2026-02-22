@@ -397,7 +397,32 @@
     },
     "editor": {
       "editTitle": "Şablonu Düzenle",
-      "newTitle": "Yeni Şablon"
+      "newTitle": "Yeni Şablon",
+      "templateName": "Şablon Adı",
+      "templateNamePlaceholder": "Şablon adını girin",
+      "pageSize": "Sayfa Boyutu",
+      "orientation": "Yön",
+      "portrait": "Dikey",
+      "landscape": "Yatay",
+      "default": "Varsayılan Şablon",
+      "defaultTooltip": "Yeni teklifler için varsayılan şablon olarak ayarla",
+      "backTooltip": "Şablonlara dön",
+      "save": "Kaydet",
+      "saving": "Kaydediliyor...",
+      "preview": "Önizleme"
+    },
+    "preview": {
+      "title": "Şablon Önizleme",
+      "selectQuote": "Şununla önizle:",
+      "selectQuotePlaceholder": "Bir teklif seçin",
+      "selectQuotePrompt": "Bu şablonu gerçek verilerle önizlemek için yukarıdaki açılır menüden bir teklif seçin.",
+      "noQuotes": "Mevcut teklif yok",
+      "loading": "Önizleme yükleniyor...",
+      "downloadPdf": "PDF İndir",
+      "downloadError": "PDF indirilemedi",
+      "close": "Kapat",
+      "error": "Önizleme yüklenemedi",
+      "refreshTooltip": "Önizlemeyi yenile"
     },
     "messages": {
       "cloned": "Şablon başarıyla kopyalandı",
@@ -405,7 +430,8 @@
       "deleted": "Şablon silindi",
       "saved": "Şablon kaydedildi",
       "created": "Şablon oluşturuldu",
-      "nameRequired": "Şablon adı gereklidir"
+      "nameRequired": "Şablon adı gereklidir",
+      "saveBeforePreview": "Önizlemeden önce şablonu kaydedin"
     }
   },
   "userMenu": {
