@@ -50,6 +50,31 @@ public class Organization
     /// </summary>
     public string DefaultLanguage { get; set; } = "en";
 
+    /// <summary>
+    /// URL to the organization's logo image. Used in quote PDF template branding headers.
+    /// </summary>
+    public string? LogoUrl { get; set; }
+
+    /// <summary>
+    /// Organization's physical address. Used in quote PDF template branding.
+    /// </summary>
+    public string? Address { get; set; }
+
+    /// <summary>
+    /// Organization's phone number. Used in quote PDF template branding.
+    /// </summary>
+    public string? Phone { get; set; }
+
+    /// <summary>
+    /// Organization's contact email. Used in quote PDF template branding.
+    /// </summary>
+    public string? Email { get; set; }
+
+    /// <summary>
+    /// Organization's website URL. Used in quote PDF template branding.
+    /// </summary>
+    public string? Website { get; set; }
+
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
     public DateTimeOffset UpdatedAt { get; set; } = DateTimeOffset.UtcNow;
 
